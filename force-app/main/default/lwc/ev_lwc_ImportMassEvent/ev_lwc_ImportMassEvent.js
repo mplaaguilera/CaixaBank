@@ -7,7 +7,8 @@
  *   1.3            Carolina Lopez     US680535         23/08/2023         Add logic for sending data from child and parent component to method saveFieldRecord
  *                                                                         and logic creation of campaign and centros_objetivo
  *   1.4            Carolina Lopez     US680535         25/08/2023         Add logic handleDismiss and Toast to check assignment selection
- *   1.5            Carolina Lopez     US704873         09710/2023         Modify method saveFieldRecord to add campaign parameter.
+ *   1.5            Carolina Lopez     US704873         09/10/2023         Modify method saveFieldRecord to add campaign parameter.
+ *   1.6            Carolina Lopez     FIX              23/04/2024         Create setCurrentPageReferenceLogic and included NavigationMixin in backCampaign, errorProcces, handleDismiss.
  **/
 
 import { LightningElement, wire, api, track } from 'lwc';
@@ -19,8 +20,10 @@ import createCampaign from '@salesforce/apex/EV_ImportMassEvent_Controller.creat
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import altaMasiva from '@salesforce/apex/EV_ImportMassEvent_Controller.mtBatchAltaMasiva';
 import centros from '@salesforce/apex/EV_ImportMassEvent_Controller.centros';
+import { CurrentPageReference } from 'lightning/navigation';
+import {NavigationMixin} from 'lightning/navigation';
 
-export default class Ev_lwc_ImportMassEvent extends LightningElement {
+export default class Ev_lwc_ImportMassEvent extends NavigationMixin(LightningElement) {
     @api recordId;
     isModalOpen = false;
     isModalInsertOpen = false;
@@ -53,6 +56,13 @@ export default class Ev_lwc_ImportMassEvent extends LightningElement {
 
     employeesFromChild = [];
     @track recordsList = [];
+
+    @wire(CurrentPageReference)
+    setCurrentPageReference(currentPageReference) {
+        if(currentPageReference){
+            this.recordId = currentPageReference.attributes.attributes.c__recordId;
+        }
+    }
 
     connectedCallback(){
         this.handleGetCampaign();
@@ -200,11 +210,14 @@ export default class Ev_lwc_ImportMassEvent extends LightningElement {
         this.isFinish = event.target.checked;
     }
     backCampaign() {
-        var redirect = eval('$A.get("e.force:navigateToURL");');
-                            redirect.setParams({
-                                "url": "/" + this.recordId
-                            });
-                            redirect.fire();
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                objectApiName: 'Campaign',
+                recordId: this.recordId,
+                actionName: 'view'
+            }
+        });
     }
     errorProcces(){
         this.dispatchEvent(
@@ -218,11 +231,14 @@ export default class Ev_lwc_ImportMassEvent extends LightningElement {
         
         setTimeout(() => {
             if(this.dispatchEvent){
-                var redirect = eval('$A.get("e.force:navigateToURL");');
-                redirect.setParams({
-                    "url": "/" + this.recordId
+                this[NavigationMixin.Navigate]({
+                    type: 'standard__recordPage',
+                    attributes: {
+                        objectApiName: 'Campaign',
+                        recordId: this.recordId,
+                        actionName: 'view'
+                    }
                 });
-                redirect.fire();
             }
         },1000);
     }
@@ -297,11 +313,14 @@ export default class Ev_lwc_ImportMassEvent extends LightningElement {
     
 
     handleDismiss(event){
-        var redirect = eval('$A.get("e.force:navigateToURL");');
-        redirect.setParams({
-            "url": "/" + this.recordId
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                objectApiName: 'Campaign',
+                recordId: this.recordId,
+                actionName: 'view'
+            }
         });
-        redirect.fire();
     }
 
     handlePrevious(){

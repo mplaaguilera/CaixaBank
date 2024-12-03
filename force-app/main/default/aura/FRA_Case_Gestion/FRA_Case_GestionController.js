@@ -42,9 +42,16 @@
 					component.find('desplegableSolucion').set('v.value', null);
 					component.set('v.nivelSeleccionado.solucion', false);
 				}
+
+				//Obtener el valor de Campana Fraude
+				if (retorno.FRA_CampanaFraude__c) {
+					component.set('v.opcionesCampanaFMW', [{'value': retorno.FRA_CampanaFraude__c, 'label': retorno.FRA_CampanaFraude__c}]);
+					component.find('desplegableCampanaCustom').set('v.value', retorno.FRA_CampanaFraude__c);
+				}
+
 				component.set(
 					'v.opcionesCargadas',
-					{'tematicas': false, 'productos': false, 'motivos': false, 'causas': false, 'soluciones': false}
+					{'tematicas': false, 'productos': false, 'motivos': false, 'causas': false, 'soluciones': false, 'campanasFMW': false}
 				);
 			}
 		});
@@ -96,6 +103,16 @@
 			helper.getSoluciones(component);
 		}
 	},
+
+	campanaCustomFocus: function(component, event, helper) {
+		if (!component.get('v.opcionesCargadas.campanasFMW')) {
+			helper.getCampanasPicklistFMW(component);
+		}
+	},
+
+	campanaCustomSeleccionada: function(component) {
+        component.set('v.nivelSeleccionado.campanaFMW', true);
+    },
 
 	tematicaSeleccionada: function(component, event, helper) {
 		component.set('v.nivelSeleccionado.tematica', true);
@@ -168,6 +185,7 @@
 				component.find('motivo').set('v.value', component.find('desplegableMotivo').get('v.value'));
 				component.find('causa').set('v.value', component.find('desplegableCausa').get('v.value'));
 				component.find('solucion').set('v.value', component.find('desplegableSolucion').get('v.value'));
+				component.find('campana').set('v.value', component.find('desplegableCampanaCustom').get('v.value'));
 
 				if (event.getSource().getLocalId() === 'botonGuardarCerrar') {
 					component.find('interaccion').set('v.value', 'Nuevo');

@@ -1,0 +1,349 @@
+<template>
+	<lightning-spinner if:true={showSpinnerFirst} alternative-text="Loading" size="medium"></lightning-spinner>
+	<div if:true={showAll}>
+		<div class="slds-page-header slds-page-header_record-home">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:report"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name-title">
+								<h1>
+									<span>Mis Oportunidades</span>
+								</h1>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<lightning-card>
+			<h3 slot="title" >
+				<lightning-button-icon if:true={showChart} title="ocultar" variant="border-filled" icon-name="utility:down" onclick={handleHideChart} class="header-card-chart-icon" ></lightning-button-icon>
+				<lightning-button-icon if:false={showChart} title="descubrir" variant="border-filled" icon-name="utility:right" onclick={handleHideChart} class="header-card-chart-icon"></lightning-button-icon>
+				<span if:true={showChart}>Ocultar gráficos</span>
+				<span if:false={showChart}>Mostrar gráficos</span>
+			</h3>
+			<div data-id="showChart" class="body-card-chart slds-border_top">
+				<lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+				<div class="slds-clearfix">
+					<lightning-button label="Quitar todos los filtros" title="Quitar todos los filtros" class="slds-m-left_x-small slds-m-top_x-small slds-float_right" onclick={handleQuitarFiltros}></lightning-button>
+				</div>
+				<div class="slds-grid slds-gutters">
+					<div class="slds-col slds-size_1-of-3">
+						<div data-id="borderExp" class="border-chart">
+							<lightning-card>
+								<div class="header-card-chart">
+									<b>Experiencia</b>
+								</div>
+								<div class="expChart margin-chart"></div>
+							</lightning-card>
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<div data-id="borderProduct" class="border-chart">
+							<lightning-card>
+								<div class="header-card-chart">
+									<div class="slds-clearfix">
+										<b class="slds-float_left">Producto</b>
+										<c-av_-multi-picklist data-id="searchProductMulti" values={optionsProducts} class="slds-float_right multipicklist" ongetvalues={handleSearchProduct}></c-av_-multi-picklist>
+									</div>
+								</div>
+								<ul class="slds-clearfix">
+									<template if:true={pillSelected} for:each={selectedlabels} for:item="eachvalue">
+										<li key={eachvalue} class="slds-float_right margin-pill">
+											<span class="slds-pill">
+												<span class="slds-pill__label" title={eachvalue}>{eachvalue}</span>
+												<span class="slds-icon_container slds-pill__remove" title="Remove">
+													<lightning-icon icon-name="utility:close" size="x-small" title="Remove" onclick={closePillProd} data-value={eachvalue}></lightning-icon>
+												</span>
+											</span>
+										</li>
+									</template>
+								</ul>
+								<div data-id="divScrollProductChart" class="productChart margin-chart"></div>
+							</lightning-card>
+						</div>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<div data-id="borderName" class="border-chart">
+							<lightning-card>
+								<div class="header-card-chart">
+									<div class="slds-clearfix">
+										<div class="slds-float_left" style="margin-bottom: 1.5rem;">
+											<b>Nombre de la oportunidad</b><br>
+											<div class="dot-dark-blue"></div>
+											<div class="inline legend-margin">Oportunidades prioritarias</div>
+										</div>
+										<c-av_-multi-picklist data-id="searchNameMulti" values={optionsNames} class="slds-float_right" ongetvalues={handleSearchName}></c-av_-multi-picklist>
+									</div>
+								</div>
+								<ul class="slds-clearfix">
+									<template if:true={pillSelected} for:each={selectedNames} for:item="eachvalue">
+										<li key={eachvalue} class="slds-float_right margin-pill">
+											<span class="slds-pill">
+												<span class="slds-pill__label" title={eachvalue}>{eachvalue}</span>
+												<span class="slds-icon_container slds-pill__remove" title="Remove">
+													<lightning-icon icon-name="utility:close" size="x-small" title="Remove" onclick={closePillName} data-value={eachvalue}></lightning-icon>
+												</span>
+											</span>
+										</li>
+									</template>
+								</ul>
+								<div data-id="divScrollNameChart" class="nameChart margin-chart"></div>
+							</lightning-card>
+						</div>
+					</div>
+				</div>
+			</div>
+		</lightning-card>
+		<div class="divPadding">
+			<lightning-card>
+				<div class="more-filter-padding">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="utility:filterList" size="xx-small" class="color-blue-icon pointer-filter" onclick={showFiltersClick}></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name-title">
+								<h1 style="margin-top: 0.1rem;">
+									<span if:true={showMoreFilters} class="color-blue pointer-filter" onclick={showFiltersClick}>Ocultar más filtros</span>
+									<span if:false={showMoreFilters} class="color-blue pointer-filter" onclick={showFiltersClick}>Mostrar más filtros</span>
+								</h1>
+							</div>
+						</div>
+					</div>
+					<div if:true={showMoreFilters}>
+						<div class="slds-grid slds-gutters padding-block1">
+							<div class="slds-col slds-size_1-of-4">
+								<c-av_-lookup class="width-input" data-id="clookup2" selection={initialSelectionOffice} errors={errors} onsearch={handleSearchOffice} onselectionchange={handleSelectionChange} onclick={handleSearchOfficeClick} fieldlabel="Oficina" placeholder={officePlaceholder} is-multi-entry={isMultiEntry} required></c-av_-lookup>
+							</div>
+							<div class="slds-col slds-size_1-of-4">
+								<lightning-combobox class="width-input" name="owner" label="Empleado asignado" options={optionsEmployee} value={employeeFilter} placeholder="--Seleccionar--" onchange={handleChangeEmployee} disabled={isDisabledEmployee} required></lightning-combobox>
+								<div class="slds-form_vertical slds-grid margin-toggle">
+									<lightning-input type="toggle" class="another-office" onchange={handleAnotherOffice} checked={isAnotherOffice} name="anotherOffice" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" disabled={isDisabledEmployee}></lightning-input>
+									<label class="slds-form-element__label">Ver empleados de otras oficinas</label>
+								</div>
+								<lightning-spinner if:true={loadingEmployee} alternative-text="Loading" size="medium"></lightning-spinner>
+							</div>
+							<div class="slds-col slds-size_1-of-4">
+								<lightning-combobox name="recordTypes" label="Origen" options={optionsOppoOrigen} placeholder="--Seleccionar--" onchange={handleChangeOrigen} value={origenFilter} required></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-4">
+								<lightning-combobox name="status" label="Etapa" options={optionsOppoStatus} placeholder="--Seleccionar--" onchange={handleChangeEstado} value={statusFilter} required></lightning-combobox>
+							</div>
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">Fecha de próxima gestión (desde)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">(hasta)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">Fecha de vencimiento (desde)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">(hasta)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">Fecha de última modificación (desde)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">(hasta)</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">Expectativa de venta</label>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<label class="slds-form-element__label">Segmento</label>
+							</div>
+						</div>
+						<div class="slds-grid slds-gutters margin-labels padding-block2">
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaGestionFrom" onchange={handleChangeFechaGestionFrom} value={fechaGestionFrom}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaGestionUntil" onchange={handleChangeFechaGestionUntil} value={fechaGestionUntil}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaVencimientoFrom" onchange={handleChangeFechaVencimientoFrom} value={fechaVencimientoFrom}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaVencimientoUntil" onchange={handleChangeFechaVencimientoUntil} value={fechaVencimientoUntil}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaModificacionFrom" onchange={handleChangeFechaModificacionFrom} value={fechaModificacionFrom}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-input type="date" name="fechaModificacionUntil" onchange={handleChangeFechaModificacionUntil} value={fechaModificacionUntil}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-combobox name="expeVenta" options={optionsExpectativaVenta} placeholder="--Seleccionar--" onchange={handleChangePotencial} value={potencial}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-8">
+								<lightning-combobox data-id="cliDropDown" name="indicadorCli" options={optionsIndicadorCli} value={valueNull} placeholder="--Seleccionar--" onchange={handleChangeIndicadorCli}></lightning-combobox>
+							</div>
+						</div>
+						<div if:true={employeesDiv} class="slds-form_vertical slds-grid">
+							<h5 class="lookup-cmp slds-size_1-of-1"><strong>Empleados seleccionados:</strong></h5>
+						</div>
+						<div if:true={employeesDiv} class="slds-form_vertical slds-grid divPadding margin-fix" >
+							<ul class="slds-clearfix">
+								<template for:each={selectedEmployees} for:item="employee">
+									<li key={employee.bucleId} class="slds-float_left margin-pill" data-id={employee.id}>
+										<lightning-pill style="margin:8px 0" label={employee.label} name ={employee.id} onremove={unSelectEmployee}>
+											<lightning-icon icon-name="standard:user" alternative-text="user"></lightning-icon>
+										</lightning-pill>
+									</li>
+								</template>
+							</ul>
+						</div>
+						<div if:true={estadoDiv} class="slds-form_vertical slds-grid">
+							<h5 class="lookup-cmp slds-size_1-of-1"><strong>Etapas seleccionadas:</strong></h5>
+						</div>
+						<div if:true={estadoDiv} class="slds-form_vertical slds-grid divPadding margin-fix" >
+							<ul class="slds-clearfix">
+								<template for:each={selectedEstado} for:item="status">
+									<li key={status.bucleId} class="slds-float_left margin-pill" data-id={status.id}>
+										<lightning-pill style="margin:8px 0" label={status.label} name ={status.id} onremove={unSelectEstado}>
+											<lightning-icon icon-name="standard:stage" alternative-text="stage"></lightning-icon>
+										</lightning-pill>
+									</li>
+								</template>
+							</ul>
+						</div>
+						<div if:true={selectedIndicadoresDiv} class="slds-form_vertical slds-grid">
+							<h5 class="lookup-cmp slds-size_1-of-1"><strong>Indicadores seleccionados:</strong></h5>
+						</div>
+						<div if:true={selectedIndicadoresDiv} class="slds-form_vertical slds-grid divPadding margin-fix" >
+							<ul class="slds-clearfix">
+								<template for:each={selectedIndicadores} for:item="ind">
+									<li key={ind.bucleId} class="slds-float_left margin-pill" data-id={ind.id}>
+										<lightning-pill style="margin:8px 0" label={ind.label} name ={ind.id} onremove={unSelectIndicador}>
+											<lightning-icon icon-name="standard:catalog" alternative-text="indicador"></lightning-icon>
+										</lightning-pill>
+									</li>
+								</template>
+							</ul>
+						</div>
+						<div class="slds-clearfix">
+							<lightning-button label="Aplicar" title="Aplicar" variant="brand" class="slds-m-left_x-small slds-float_rigth button-filters" onclick={handleAplicarMoreFilters} disabled={disabledAplicarMoreFilters}></lightning-button>
+						</div>
+					</div>
+					<lightning-spinner if:true={loadingTable} alternative-text="Loading" size="medium"></lightning-spinner>
+				</div>
+			</lightning-card>
+		</div>
+		<div class="divPadding">
+			<lightning-card>
+				<div class="table-info-div slds-grid toggle-div">
+					<label class="slds-form-element__label">Solo destacadas</label>
+					<lightning-input type="toggle" name="destacadas" onchange={handleDestacadas} variant="label-hidden" message-toggle-active="" message-toggle-inactive="" checked={destacadas}></lightning-input>
+				</div>
+				<div class="table-info-filter slds-clearfix">
+					<hr class="hr-table-top"/>
+					<lightning-input class="input-checkbox-bajo slds-float_left" type="checkbox" name="preconcedido" onchange={handlePreconcedido} checked={preconcedido}></lightning-input>
+					<label class="slds-form-element__label input-checkbox slds-float_left">Preconcedido</label>
+					<lightning-input class="input-checkbox-bajo slds-float_left" type="checkbox" name="myBox" onchange={handleMyBox} checked={myBox}></lightning-input>
+					<label class="slds-form-element__label input-checkbox slds-float_left">My Box</label>
+					<lightning-input class="input-checkbox-bajo slds-float_left" type="checkbox" name="targetAuto" onchange={handleTargetAuto} checked={targetAuto}></lightning-input>
+					<label class="slds-form-element__label input-checkbox slds-float_left">Target Auto</label>
+					<lightning-combobox class="input-combobox slds-float_left" name="orderBy" label="Ordenar por:" options={optionsOrderBy} placeholder="--Seleccionar--" onchange={handleOrderBy} value={orderBy}></lightning-combobox>
+					<lightning-combobox class="input-combobox slds-float_left" name="orderingCriterion" label="Criterio ordenación:" options={optionsOrderingCriterion} placeholder="--Seleccionar--" onchange={handleOrderingCriterion} value={orderingCriterion} disabled={disabledOrdering}></lightning-combobox>
+					<lightning-combobox class="input-combobox slds-float_left" name="limit" label="Límite:" options={optionsLimit} placeholder="--Seleccionar--" onchange={handleLimit} value={limit}></lightning-combobox>
+					<lightning-combobox class="input-combobox slds-float_left input-type" field-level-help="Selecciona un empleado y producto para filtrar por tipo" name="type" label="Tipo:" options={optionsType} placeholder="--Seleccionar--" onchange={handleType} value={type} disabled={disabledType}></lightning-combobox>
+					<lightning-button label="Aplicar" data-id="searchButton" title="Aplicar" variant="brand" class="slds-m-left_x-small slds-float_left table-info-button-ac" onclick={handleAplicar} disabled={disabledAplicar}></lightning-button>
+					<lightning-button-icon title="Actualizar datos" variant="border-filled" icon-name="action:reset_password" class="slds-m-left_x-small slds-float_right slds-button_neutral table-info-button" onclick={actuData}></lightning-button-icon>
+					<p class="slds-float_right table-info-text table-info-text-color">Datos Actualizados: {updatedData}</p>
+				</div>
+				<div class="table-info-filter">
+					<p>Resultados: Oportunidades: <span if:true={helpMessage}>2000/</span>{total} <span if:true={viewTotalClient}>Clientes: {totalClient}</span></p>
+					<div class="help-text">
+						<p if:true={helpMessage}><lightning-formatted-text value={labels.recordLimit}></lightning-formatted-text></p>
+					</div>
+					<hr class="hr-table"/>
+				</div>
+				<div class="slds-tabs_default">
+					<ul class="slds-tabs_default__nav">
+					  <li class="slds-tabs_default__item slds-is-active" title="Datos básicos" data-id="DataBasic" onclick={tabDataTableBasic}>
+						<a class="slds-tabs_default__link">Datos básicos</a>
+					  </li>
+					  <li class="slds-tabs_default__item" title="Datos Cliente" data-id="DataClient" onclick={tabDataTableClient}>
+						<a class="slds-tabs_default__link">Datos Cliente</a>
+					  </li>
+					</ul>
+				</div>
+				<div style="height: 500px;">
+					<lightning-spinner if:true={loadingTable} alternative-text="Loading" size="medium"></lightning-spinner>
+					<c-a-v_-opp-search-data-table if:true={dataFromTable} data-id="divblock" key-field="oppId" data={listOppTable} columns={columnsDataBasic} onrowselection={getSelectedName} selected-rows={selectedRowsStorage} wrap-table-header></c-a-v_-opp-search-data-table>
+					<c-a-v_-opp-search-data-table if:false={dataFromTable} data-id="divblock" key-field="oppId" data={listOppTable} columns={columnsDataClient} onrowselection={getSelectedName} selected-rows={selectedRowsStorage} wrap-table-header></c-a-v_-opp-search-data-table>
+				</div>
+				<br />
+				<div if:true={isMultipagina}>
+					<lightning-layout horizontal-align="space">
+						<lightning-layout-item flexibility="auto">
+							<lightning-button if:true={showPrevious} label="Anterior" icon-name="utility:chevronleft"
+								onclick={previousHandler}>
+							</lightning-button>
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							Página {page} de {totalPage}
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							<lightning-button if:true={showNext} label="Posterior" icon-name="utility:chevronright" icon-position="right"
+								onclick={nextHandler}></lightning-button>
+						</lightning-layout-item>
+					</lightning-layout>
+				</div>
+			</lightning-card>
+		</div>
+		<div class="divPadding">
+			<lightning-card variant="Narrow" title="Asignación" icon-name="standard:avatar">
+				<lightning-tabset>
+					<lightning-tab label="Mi Oficina">
+						<div data-id="lookup1" class="slds-form-element__label assign-lookup slds-size_1-of-4">
+							<c-av_-lookup class="lookup-cmp" style="width: 20rem;"
+								data-id="clookup1"
+								selection={initialSelection}
+								errors={errors}
+								onsearch={handleSearch}
+								onselectionchange={handleSelectionChange}
+								fieldlabel={employeeLabel}
+								placeholder={employeePlaceholder}
+								is-multi-entry={isMultiEntry}
+								my-office="true">
+							</c-av_-lookup>
+						</div>
+						<lightning-button label="Asignar" onclick={handleModal} class="my-office-true"></lightning-button>
+						<lightning-spinner if:true={loadingTable} alternative-text="Loading" size="medium"></lightning-spinner>
+					</lightning-tab>
+					<lightning-tab label="Otra Oficina">
+						<div data-id="lookup6" class="slds-form-element__label assign-lookup slds-size_1-of-4">
+							<c-av_-lookup class="lookup-cmp" style="width: 20rem;"
+								data-id="clookup6"
+								selection={initialSelection}
+								errors={errors}
+								onsearch={handleSearch}
+								onselectionchange={handleSelectionChange}
+								fieldlabel={employeeLabel}
+								placeholder={employeePlaceholder}
+								is-multi-entry={isMultiEntry}
+								my-office="false"
+							>
+							</c-av_-lookup>
+						</div>
+						<lightning-button label="Asignar" onclick={handleModal} class="my-office-false"></lightning-button>
+						<lightning-spinner if:true={loadingTable} alternative-text="Loading" size="medium"></lightning-spinner>
+					</lightning-tab>
+				</lightning-tabset>
+			</lightning-card>
+		</div>
+	</div>
+	<div if:true={isModalOpen}>
+		<c-av_-task-opp-modal is-modal-open={isModalOpen} action-type={actionType} selected-items={selectedItems} onclosemodal={handleCloseModal} onconfirm={doAction}></c-av_-task-opp-modal>
+	</div>
+</template>

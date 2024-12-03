@@ -80,34 +80,28 @@
     },
 
     muestraModalValidar : function(component, event, helper) {
-        let procedencia = component.get('v.procedencia');
-        if(procedencia == 'SAC_003' || procedencia == 'Inadmision') {
-            var action = component.get('c.getDocumentRedaccion');
-            action.setParams({'id':component.get('v.caso.Id')});
-            action.setCallback(this, function(response) {
-                    var state = response.getState();
-                    if(state === 'SUCCESS'){
-                        let nonValidatedItems = [];
-                        let returnValues = response.getReturnValue();
-                        if (Array.isArray(returnValues)) {
-                            returnValues.forEach(function(item) {
-                                if(item.SAC_ValidadoCV__c == false){
-                                    nonValidatedItems.push(item);
-                                }
-                            });
-                        }
-                        if(nonValidatedItems.length > 0 ){
-                            component.set('v.modalValidar', true);
-                        }else{
-                            component.set('v.muestraModal', true);
-                        }
+        var action = component.get('c.getDocumentRedaccion');
+        action.setParams({'id':component.get('v.caso.Id')});
+        action.setCallback(this, function(response) {
+                var state = response.getState();
+                if(state === 'SUCCESS'){
+                    let nonValidatedItems = [];
+                    let returnValues = response.getReturnValue();
+                    if (Array.isArray(returnValues)) {
+                        returnValues.forEach(function(item) {
+                            if(item.SAC_ValidadoCV__c == false){
+                                nonValidatedItems.push(item);
+                            }
+                        });
                     }
-                });
-            $A.enqueueAction(action);
-        } else {
-            component.set('v.muestraModal', true);
-        }
-       
+                    if(nonValidatedItems.length > 0 ){
+                        component.set('v.modalValidar', true);
+                    }else{
+                        component.set('v.muestraModal', true);
+                    }
+                }
+            });
+        $A.enqueueAction(action);
     
     },
     

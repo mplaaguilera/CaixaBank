@@ -1,13 +1,17 @@
 import { LightningElement, track, api, wire } from 'lwc';
 import { NavigationMixin }      from 'lightning/navigation';
 import { CurrentPageReference } from 'lightning/navigation';
+import { ShowToastEvent } 	    from 'lightning/platformShowToastEvent';
+import AV_CMP_ErrorMessage 		from '@salesforce/label/c.AV_CMP_ErrorMessage';
 import getName      from '@salesforce/apex/AV_Header_Controller.getAccountInfo';
 import getActions   from '@salesforce/apex/AV_Header_Controller.getActions';
 import getFields    from '@salesforce/apex/AV_Header_Controller.getFields';
-import getLoadDate    from '@salesforce/apex/AV_Header_Controller.getDateLoad';
 import clientLabel from '@salesforce/label/c.AV_Client'
 import BPRPS from '@salesforce/customPermission/AV_PrivateBanking';
-import REPPS from '@salesforce/customPermission/AV_ReportClienteCP';
+import oldReportPS 	   from '@salesforce/customPermission/AV_OldReports';
+import getIdFilterObject       	from '@salesforce/apex/AV_SObjectRelatedInfoCController.getIdFilterObject';
+import caixaBankNowIcon  from '@salesforce/resourceUrl/AV_CaixaBankNow';
+import getCaixaBankURL 	   from '@salesforce/apex/AV_LinkOperativoController.getCaixaBankURL';
 
 export default class Av_Header extends NavigationMixin(LightningElement) {
 
@@ -22,7 +26,8 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	@api showHeader;
 	@api showBody;
 	@api withPS; 
-	
+	trueRender = false;
+	imageUrl = caixaBankNowIcon;
 	//Header
 	@api title;
 	labelCliente = clientLabel;
@@ -30,7 +35,11 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	@api icon;
 	@api showHierarchy;
 	@api actionSetting;
-	//LIMITDROPDOWN = (BPRPS) ? 2 : 1;
+    @api setting = 'AV0001';
+    @api filterField = 'Id';
+    @track hasLinks = false;
+    @track listData;
+
 	LIMITDROPDOWN2 = 2;
 
 	//Body
@@ -50,6 +59,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	@track isShowFlowAction = false;
 	@track fields;
 	@track recordType;
+	@track numDocument;
 	@track isIntouch;
 	@track _wiredFields;
 	@track isRating = false;
@@ -59,6 +69,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	@track dropdownActions = [];
 	@api objectApiName; 
 	showDropdownActions = false;
+	showSpinner = true;
 	nameRecord;
 	@track activityData = [];
 	@track activityData2 =[];
@@ -67,24 +78,86 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	@track isChecked= false;
 	@track account;
 	@track navigatetoReportCustomButtonHeader = false;
+	clientNumper
+	clientplates
 	get isActivity(){
-		return (this.objectApiName == 'Task' || this.objectApiName == 'Event');
+		return (this.objectApiName === 'Task' || this.objectApiName === 'Event');
 	}
-	@wire(getName, {recordId: '$recordId'})
-	getNameData(wireResult) {
-		let data = wireResult.data;
-		let error = wireResult.error;
-		this._wiredName = wireResult;
-		if (data) {
-			this.name = data[0];
-			this.recordType = data[1];
-			this.isIntouch = data[2];
-			this.nameRecord = (this.objectApiName == 'Account') ? data[0] : data[3];
-			this.account = data[4];
-		} else if (error) {
+
+	
+	connectedCallback(){
+		this.isBpr = BPRPS;
+		this.getNameData();
+		this.getIdFilterObjectData();
+	}
+
+	getNameData(){
+		this.showSpinner = true;
+		getName({recordId:this.recordId}) 
+		.then(data => {
+			if (data) {
+				this.name = data.accountName;
+				this.recordType = data.rtDevName;
+				this.isIntouch = data.isIntouch;
+				this.nameRecord = (this.objectApiName === 'Account') ? data.accountName : data.nameRecord;
+				this.account = data.accountId;
+				this.clientNumper = data.clientNumper;
+				this.clientplates = data.contactPlate;
+				this.trueRender = true;
+				this.numDocument = data.numDocument ? data.numDocument : null;
+			} else {
+				console.log(data);
+			}
+			this.showSpinner = false;
+		}).catch(error => {
 			console.log(error);
-		}
+			this.showSpinner = false;
+		})
 	}
+
+	getIdFilterObjectData(){
+		this.showSpinner = true;
+		getIdFilterObject({recordId:this.recordId, objectApiName:this.objectApiName, objectFilter:this.filterObject, filterField:this.filterField})
+ 		.then(data => {
+			if (data) {
+				var result = JSON.parse(JSON.stringify(data));
+				
+				getCaixaBankURL({filterObject: this.filterObject, customerId: result, setting: this.setting}).then(result => {
+					this.hasLinks = true;
+					this.listData = result;
+					this.externalUrl = result.url;
+					
+				}).catch(error => {
+					const evt = new ShowToastEvent({
+						title: AV_CMP_ErrorMessage,
+						message: JSON.stringify(error),
+						variant: 'error'
+					});
+					this.dispatchEvent(evt);
+				});
+			} 
+			
+			this.showSpinner = false;
+		}).catch(error => {
+			console.log(error);
+			this.showSpinner = false;
+		})
+	}
+
+
+
+	navigateToCaixaBankNow() {
+        if(this.externalUrl) {
+			window.location.href = this.externalUrl;
+        } else {
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'URL not found',
+                variant: 'error'
+            });
+            this.dispatchEvent(evt);
+        }
+    }
 
 	//Para usar en versiones futuras
 	limitObjMap ={
@@ -94,41 +167,39 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	};
 
 	@wire(getActions, { actionSetting: '$actionSetting' })
-	getActions(wireResult) {
-		let error = wireResult.error;
-		let data = wireResult.data;
-		if (data) {
-			if(this.objectApiName == 'Account'){
-				if(REPPS){
-					this.showDropdownActions = true;
-					
-					let i = 0;
-					data.forEach(act => {
-						if(++i <= this.LIMITDROPDOWN2){
-							this.actions.push(act);
-						}else{
-							this.dropdownActions.push(act);
-						}
-						
-						this.showDropdownActions = this.dropdownActions.length > 0;
-					})
-				}else{
-					this.actions = data;
-					this.showDropdownActions = false;
-					
-				}
-			}else{
-				this.actions = data;
-				this.showDropdownActions = false;
-			}
-		} else if (error) {
-			console.log(error);
-		}
-	}
-	
-	connectedCallback(){
-		this.isBpr = BPRPS;
-	}
+    getActions(wireResult) {
+        let error = wireResult.error;
+        let data = wireResult.data;
+        if (data) {
+            if(this.objectApiName === 'Account'){
+                if(!oldReportPS){
+
+                    this.showDropdownActions = true;
+                    
+                    let i = 0;
+                    data.forEach(act => {
+                        if(++i <= this.LIMITDROPDOWN2){
+                            this.actions.push(act);
+                        }else{
+                            this.dropdownActions.push(act);
+                        }
+                        
+                        this.showDropdownActions = this.dropdownActions.length > 0;
+                    })
+                }else{
+                    this.actions = data;
+                    this.showDropdownActions = false;
+                    
+                }
+            }else{
+                this.actions = data;
+                this.showDropdownActions = false;
+            }
+        } else if (error) {
+            console.log(error);
+        }
+    }
+
 
 	@wire(getFields, {recordId: '$recordId', fieldSetName: '$fieldSetName'})
 	getFieldsData(wireResult) {
@@ -140,7 +211,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 			if( !this.isActivity){
 				this.fields = Object.values(fieldList).map(f => {
 					var isCustomField = false;
-					if(f.name == this.fieldSearch){
+					if(f.name === this.fieldSearch){
 						isCustomField = true;
 					}
 					return {
@@ -153,7 +224,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 				this.activityData;
 				for(let key in data[0]){
 					if(typeof data[0][key] === 'boolean'){
-						if(data[0][key] == false || data[0][key]== null){
+						if(data[0][key] === false || data[0][key]== null){
 							this.activityData.push({
 								label:key,
 								checkbox2:true
@@ -211,12 +282,17 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 				// namespace prefix followed by two underscores followed by the
 				// developer name. E.g. 'namespace__TabName'
 				apiName: tabName
-			},state: {
+			},state: ((tabName) != 'AV_PlanificarCita')?
+			{
 				c__recId:this.recordId,
 				c__id:this.name,
 				c__rt:this.recordType,
 				c__intouch:this.isIntouch,
 				c__account:this.account
+			}
+			:{
+				c__clientNumper: this.clientNumper,
+				c__matricula : this.clientplates
 			}
 		});
 	}
@@ -238,7 +314,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 		});
 	}
 
-	// navigateToReportClient() {
+
 	navigateToHierarchy(event) {
 		var evt = eval("$A.get('e.force:navigateToComponent')");
 		evt.setParams({
@@ -251,7 +327,7 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	}
 
 	get inputFlowVariables() {
-		if(this.flowName == 'EV_SendInvitaionCampaign'){
+		if(this.flowName === 'EV_SendInvitaionCampaign'){
 			return [
 				{              
 					name: 'EV_RecordId',
@@ -270,17 +346,6 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 		}
 	}
 
-	@wire(getLoadDate, {recordId: '$recordId', filterObject:'$filterObject', helpField:'$helpField'})
-	getLoadDate(wireResult) {
-		let error = wireResult.error;
-		let data = wireResult.data;
-		if (data) {
-			this.fechaCarga = fechaModT + data;
-		} else if (error) {
-			console.log(error);
-		}
-	}
-
 	fireFlowAction(event) {
 		if(event.target.dataset.type === 'Flow'){
 			this.flowlabel = event.target.dataset.label;
@@ -296,27 +361,25 @@ export default class Av_Header extends NavigationMixin(LightningElement) {
 	}
 
 	handleStatusChange(event) {
-		const status = event.detail.status;
-		const outputVariables = event.detail.outputVariables;
-		if(outputVariables && this.flowOutput != null) {
-			outputVariables.forEach(e => {
-				this.flowOutput.split(',').forEach(v => {
-					if(e.name == v && e.value) {
-						this.redirectId = e.value;
-					}
-				});
-			});       
-		}
-		if(status === 'FINISHED') {
+		if(event.detail.status === 'FINISHED') {
 			this.hideFlowAction(event);
-			eval('$A.get("e.force:refreshView").fire();');
-			if(this.redirectId) {
-				var redirect = eval('$A.get("e.force:navigateToURL");');
-				redirect.setParams({
-					"url": "/" + this.redirectId
-				});
-				redirect.fire();
+			const outputVariables = event.detail.outputVariables;
+			for (let i=0;i < outputVariables.length; i++) {
+				const outputVar = outputVariables[i];
+				if(outputVar === 'redirectId') {
+					this.navigateToRecordDirect(outputVar.value);
+				}
 			}
 		}
+	}
+ 
+	navigateToRecordDirect(recordId){
+		this[NavigationMixin.Navigate]({
+			type: 'standard__recordPage',
+			attributes: {
+				recordId: recordId,
+				actionName:'view'
+			}
+		});
 	}
 }

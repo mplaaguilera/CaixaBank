@@ -13,14 +13,11 @@ export default class Sac_Contratos extends LightningElement {
         obtenerContratos({
             idRegistro: this.recordId
         }).then(data => {
-            console.log(data);
             this.listContratos = data.lstContratos;
             this.customerId = data.customerId;
-            console.log(this.listContratos);
             //this.showTable = true;
             this.isShowModal = true;
         }).catch(error => {
-            console.error(error);
 			this.mostrarToast('error', 'Problema recuperando los contratos', JSON.stringify(error));
         });
     }

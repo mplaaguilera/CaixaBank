@@ -1,0 +1,57 @@
+<template>
+	<div class="main-container">
+		<lightning-spinner if:true={isLoading} alternative-text="Loading" size="large"></lightning-spinner>
+		<lightning-progress-indicator current-step={current} type="base" has-error={error}>
+			<lightning-progress-step label={label.docSelect} value="1"></lightning-progress-step>
+			<lightning-progress-step label={label.docuIdentOppVin} value="2"></lightning-progress-step>
+			<lightning-progress-step label={label.docuConfirmaAso} value="3"></lightning-progress-step>
+		</lightning-progress-indicator>
+		<div class="data-info-style" if:true={showInfoTable}>
+			<lightning-datatable hide-checkbox-column="true" key-field="id" data={dataDocumentSelected}
+				columns={columnsDocumentSelected}></lightning-datatable>
+		</div>
+		<h1 class="info-docs-title">{infoMessage}</h1>
+		<div class="action-button-container" if:true={showActionButtons}>
+			<lightning-button label={label.docAsoOpp} onclick={nextStep}
+				disabled={disabledAssociateAndDiscardButton}></lightning-button>
+			<lightning-button label={label.docDescar} onclick={discard}
+				disabled={disabledAssociateAndDiscardButton}></lightning-button>
+			<lightning-button if:true={showBackButton} label={label.docuVolver} onclick={lastStep}></lightning-button>
+		</div>
+		<div class="container-data-table" if:true={firstStep}>
+			<div class="data-table-style">
+				<lightning-datatable if:true={renderFirstTable} key-field="id" data={dataDocument} columns={columns}
+					onrowselection={getSelectedRow}>
+				</lightning-datatable>
+			</div>
+		</div>
+		<div class="container-data-table second-table" if:true={secondStep}>
+			<div class="input-container">
+				<lightning-input type="text" label={label.docuBusClient} value={accountName}
+					onchange={changeNameAccount}></lightning-input>
+				<lightning-input type="text" label={label.docuBusOpp} value={opportunityName}
+					onchange={changeNameOpportunity}></lightning-input>
+				<lightning-button class="slds-m-left_x-small button-margin" variant="brand" label={label.buscar}
+					title="Primary action" onclick={handleClickSearchOpp}
+					disabled={disableSearchButton}></lightning-button>
+			</div>
+			<div class="data-table-style">
+				<lightning-datatable key-field="id" data={dataOpp} columns={columnsOpp}
+					onrowselection={getSelectedRowDataOpp}>
+				</lightning-datatable>
+			</div>
+		</div>
+		<div class="container-third-data-table" if:true={thirdStep}>
+			<div>
+				<lightning-datatable key-field="id" data={dataConfirmTable} hide-checkbox-column="true"
+					columns={columnsConfirmTable}>
+				</lightning-datatable>
+			</div>
+			<div class="action-button-container">
+				<lightning-button class="slds-m-left_x-small" variant="brand" label={label.docuConfir} title="Primary action"
+					onclick={confirmAssociate}></lightning-button>
+				<lightning-button label={label.cancelar} onclick={cancel}></lightning-button>
+			</div>
+		</div>
+	</div>
+</template>

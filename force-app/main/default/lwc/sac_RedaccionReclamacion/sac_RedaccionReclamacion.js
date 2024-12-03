@@ -52,7 +52,6 @@ export default class Sac_RedaccionReclamacion extends LightningElement {
                 this.options = JSON.parse(JSON.stringify(this.options));
             })
             .catch(error => {
-                console.log(error);
                 this.dispatchEvent(
                 new ShowToastEvent({
                     title: 'Error.',

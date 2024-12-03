@@ -1,0 +1,35 @@
+<template>
+    <article class="slds-card">
+        <template if:true={fields}>
+            <lightning-accordion active-section-name="Accordion">
+                <lightning-accordion-section class="slds-form-element_compound slds-var-p-around_large " name="Accordion Section" label={accordionTitle} columns={columnNum} opacity="1">
+                        <lightning-record-view-form density="comfy" record-id={recordId} object-api-name={filterObject}>
+                            <div class="slds-grid slds-grid_vertical">
+                                <lightning-layout horizontal-align="stretch" vertical-align="stretch" multiple-rows flexibility="auto">
+                                        <template for:each={fields} for:item="field">
+                                            <lightning-layout-item key={field.name} size={sizeColumn} flexibility="auto" padding="slds-p-around_xx-small">
+                                                    <template if:true={field.isPhoneField}> 
+                                                        <c-cibefield-set-related-info-child object-api-name={filterObject} record-id={recordId} phone-value={phoneValue} phone-label={phoneLabel}></c-cibefield-set-related-info-child>
+                                                        <li key={field.name} data-id={field.name} >
+                                                        </li>
+                                                    </template>
+                                                    <template if:false={field.isPhoneField}>
+                                                        <li key={field.name} data-id={field.name} >
+                                                            <lightning-output-field class="slds-float_left slds-has-left-magnet" field-name={field.name} variant="image"></lightning-output-field>
+                                                        </li>
+                                                    </template>
+                                            </lightning-layout-item>
+                                        </template>
+                                </lightning-layout>
+                            </div>
+                            <template if:true={showSpinner}> 
+                                <div>
+                                    <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+                                </div>
+                            </template>
+                        </lightning-record-view-form>
+                </lightning-accordion-section>
+            </lightning-accordion>
+        </template>
+    </article>
+</template>

@@ -6,37 +6,69 @@
                     <lightning-icon icon-name="standard:opportunity" size="small"></lightning-icon>
                 </div>
                 <div class="slds-media__body">
-                    <h2 class="slds-card__header-title">
-                        <span>{labels.title} ({dataValues.length})</span>
-                    </h2>
+                    <div if:true={isEMP}>
+                        <h2 class="slds-card__header-title">
+                            <span>{labels.titleEMP} ({dataValues.length})</span>
+                        </h2>
+                    </div>
+                    <div if:false={isEMP}>
+                        <h2 class="slds-card__header-title">
+                            <span>{labels.title} ({dataValues.length})</span>
+                        </h2>
+                    </div>
                 </div>
+                <lightning-button-group if:true={isEMP}>
+                    <lightning-button-icon icon-name="utility:refresh" size="medium" onclick={refresh} class="slds-m-left_xx-small"></lightning-button-icon>
+                </lightning-button-group>
             </header>
         </div>
         <div class="slds-card__body slds-card__body_inner">
-            <div>
-                <lightning-datatable
-                        key-field="id"
-                        hide-checkbox-column=”true”
-                        data={pageData}
-                        columns={columns}
-                        sorted-by={sortBy}
-                        sorted-direction={sortDirection}
-                        onsort={handleSortData}
-                        default-sort-direction={defaultSort}
-                        resize-column-disabled>
-                </lightning-datatable>
+            <div if:true={isEMP}>
+                <div>
+                    <lightning-datatable
+                            key-field="id"
+                            hide-checkbox-column=”true”
+                            data={dataValues}
+                            columns={columnsEMP}
+                            sorted-by={sortBy}
+                            sorted-direction={sortDirection}
+                            onsort={handleSortData}
+                            default-sort-direction={defaultSort}
+                            resize-column-disabled>
+                    </lightning-datatable>
+                </div>
+                <footer class="slds-card__footer">
+                    <lightning-button variant="base" label="Ver más" title="Ver más" onclick={viewMore}></lightning-button>
+                </footer>
             </div>
-            <div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
-                <lightning-button-group>
-                    <lightning-button-icon icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
-                    <lightning-button-icon icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
-                    <lightning-button-icon icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
-                    <lightning-button-icon icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
-                </lightning-button-group>
-                <div class="slds-m-top_xxx-small">
-                    ({getPageNumber} / {getTotalPageNumber})
+
+            <div if:false={isEMP}>
+                <div>
+                    <lightning-datatable
+                            key-field="id"
+                            hide-checkbox-column=”true”
+                            data={pageData}
+                            columns={columns}
+                            sorted-by={sortBy}
+                            sorted-direction={sortDirection}
+                            onsort={handleSortData}
+                            default-sort-direction={defaultSort}
+                            resize-column-disabled>
+                    </lightning-datatable>
+                </div>
+                <div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
+                    <lightning-button-group>
+                        <lightning-button-icon icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
+                        <lightning-button-icon icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
+                    </lightning-button-group>
+                    <div class="slds-m-top_xxx-small">
+                        ({getPageNumber} / {getTotalPageNumber})
+                    </div>
                 </div>
             </div>
+            
             <template if:true={isShowSpinner}> 
                 <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
             </template>

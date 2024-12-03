@@ -26,10 +26,16 @@ import makeMain from '@salesforce/label/c.AV_CMP_ConvertMain';
 import unlinkLabel from '@salesforce/label/c.AV_UnlinkOpp_Error';
 import mainLabel from '@salesforce/label/c.AV_Main_Error';
 import getOppLink from '@salesforce/apex/AV_LinkOperativoController.getOppLinkPEA';
+import OLDHOMETSK from '@salesforce/customPermission/AV_OldHomeTask';
+
+import validateOppStage from '@salesforce/label/c.AV_ValidateOppStage';
+
 
 export default class Av_DetailOppTask extends NavigationMixin (LightningElement) {
 
-	@api opptask;
+	@api recinfo;
+	@api isMain;
+	@api opp;
 	@api justOne;
 	@api nameobject;
     @api idobject;
@@ -44,12 +50,18 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	@track formFactorMobile;
 	@track incluir;
 	peaOpp = 'AV_PEA__c';
-
+	@track showToggleByPermission = false;
+	@track isNewProductActions;
 	
 
     connectedCallback(){ 
-		this.incluir=this.opptask.AV_IncludeInPrioritizingCustomers__c;
+		this.incluir=this.opp.AV_IncludeInPrioritizingCustomers__c;
 		this.getOppLinks();
+		this.isNewProductActions = this.opp?.AV_PF__r?.AV_NewReportActions__c;	
+		if(OLDHOMETSK){
+			this.showToggleByPermission = true;
+		}	
+
 	}
 
 	get isBrowser() {
@@ -105,7 +117,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 		this.showFooter = false;
 		for(var item of this.template.querySelectorAll('c-av_-custom-path')) {
 			item.resetSelection();
-			item.updateCurrentStage(this.opptask.AV_Stage__c);
+			item.updateCurrentStage(this.opp.StageName);
 		}
 		
 	}
@@ -120,7 +132,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	handleError() {
 		this.disableSpinner();
 		if (this.stage=='Con venta' || this.stage=='Vencido' || this.stage=='Potencial') {
-			this.showToast(errorLabel, 'No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.', 'error');
+			this.showToast(errorLabel, validateOppStage, 'error');
 		} else {
 			this.showToast(errorLabel, errorMsgLabel, 'error');
 		}
@@ -145,21 +157,36 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	pathValues(listValues) {
 		var aux = [];
         for(var value of listValues) {
-            //aux.push(value.label);
-            aux.push({value: value.value, label: value.label});
+			if(this.isNewProductActions){
+				aux.push({ value: value.value, label: value.label });
+				
+			}else{
+				
+				if(value.value == 'Producto Contratado'){
+					aux.push({ value: 'Cerrado positivo', label: 'Cerrado positivo' });
+					continue;
+				}
+				
+				if(value.value == 'Producto Rechazado' ){
+					aux.push({ value: 'No interesado', label: 'Cerrada Negativa' });
+					continue;
+				}
+				aux.push({ value: value.value, label: value.label });
+
+			}
         }
-        this.allStages = this.allStages.concat(aux);
+		if(this.allStages.length === 0){
+			this.allStages = this.allStages.concat(aux);
+		}	
 	}
 
 	handleMain() {
 		this.actionType = 'main';
-		//this.isModalOpen = true;
-		this.updateMainOppTask(this.opptask);
+		this.updateMainOppTask(this.opp);
 	}
 
 	handleUnlink() {
 		this.actionType = 'unlink';
-		//this.isModalOpen = true;
 		this.enableSpinner();
 		this.unlinkOpp();
 	}
@@ -184,7 +211,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 		
 		switch (actionType) {
 			case 'main':
-				this.updateMainOppTask(this.opptask);
+				this.updateMainOppTask(this.opp);
 				break;
 			case 'unlink':
 				this.unlinkOpp();
@@ -193,7 +220,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	}
 
 	updateMainOppTask(oppTaskId) {
-		updateMain({oppTask: oppTaskId})
+		updateMain({opp: oppTaskId, recInfo: this.recinfo})
 			.then(() => {
 				this.refreshParentMain();
 				this.showToast(successLabel, successMsgLabel, 'success', 'pester');
@@ -207,7 +234,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	}
 
 	unlinkOpp() {
-		unlinkOpp({oppTask: this.opptask})
+		unlinkOpp({opp: this.opp, recInfo: this.recinfo})
 			.then(() => {
 				this.refreshParentUnlink();
 				this.showToast(successLabel, successUnlinkMsgLabel, 'success', 'pester');
@@ -240,10 +267,10 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 		var values = [];
 		for(var field of fields) {
 			switch (field.fieldName) {
-				case 'AV_Entity__c':
+				case 'AV_Entidad__c':
 					values.push(field.value);
 					break;
-				case 'AV_Commentary__c':
+				case 'AV_Comentarios__c':
 					values.push(field.value);
 					break;
 			}
@@ -280,7 +307,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
-                recordId: this.opptask.AV_Opportunity__c,
+                recordId: this.opp.Id,
                 objectApiName: 'Opportunity',
                 actionName: 'view'
             }
@@ -294,7 +321,7 @@ export default class Av_DetailOppTask extends NavigationMixin (LightningElement)
 	getOppLinks() {
 
 	//	getOppLink({id: this.idobject, objApiName: this.nameobject})
-		getOppLink({id: this.opptask.AV_Opportunity__c, objApiName: 'Opportunity', peaF: this.peaOpp})
+		getOppLink({id: this.opp.Id, objApiName: 'Opportunity', peaF: this.peaOpp})
 			.then(result => {
 				if (result != null) {
 					this.listLinks = result.url;

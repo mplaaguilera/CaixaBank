@@ -6,45 +6,45 @@
         
         <div if:true={showDetail} class="slds-form_horizontal slds-grid slds-wrap">	
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
 					<lightning-record-edit-form object-api-name="SIREC__SIREC_obj_proceso__c" id="clienteNew" >
 						<lightning-input-field field-name="SIREC__SIREC_fld_cliente__c" label="Cliente" value={clienteId} onchange={changeCliente}> </lightning-input-field>
 					</lightning-record-edit-form>	
 				</div>			
             </div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
 					<lightning-input type="date" name="FechaInicio" label="Fecha Inicio" value={fechaInicio} onchange={changeFechaInicio}></lightning-input>
 				</div>
 			</div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
 					<lightning-combobox name="Centro" label="Centro" placeholder="Seleccione una opción" value={valueOficina} options={optionOficina} onchange={changeFiltroOficina} required></lightning-combobox>
 				</div>
 			</div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
 					<lightning-combobox name="TipoRecordtype" label="Tipo proceso" placeholder="Seleccione una opción" value={valueTipoProceso} options={optionTipoProceso} onchange={changeTipoProceso}></lightning-combobox>
 				</div>
 			</div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
                 	<lightning-combobox name="estrategia" label="Estrategia" placeholder="Seleccione una opción" value={valueEstrategia} options={optionEstrategia} onchange={changeEstrategia}></lightning-combobox>
             	</div>
 			</div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
                 	<lightning-combobox  name="Situacion" label="Situación" placeholder="Seleccione una opción" value={valueSituacion} options={optionSituacion} onchange={changeSituacion}></lightning-combobox>
             	</div>
 			</div>
 			
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">
+				<div class=" slds-var-m-around_x-small">
                 	<lightning-combobox name="Empleado" label="Empleado" placeholder="Seleccione una opción" value={valueEmpleado} options={optionsEmpleado} onchange={changeEmpleado} required></lightning-combobox>
             	</div>
 			</div>
             <div class="slds-size_1-of-4">
-				<div class=" slds-m-around_x-small">					
+				<div class=" slds-var-m-around_x-small">					
 					<lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={buscar} disabled={disabledBuscar}></lightning-button>
 					<lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
 				</div>

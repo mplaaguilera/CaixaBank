@@ -8,8 +8,7 @@
     <aura:attribute name="alternateFieldValueList" type="String[]"/>
     <aura:attribute name="enteredValue" type="String" default=""/>
     <aura:attribute name="helpText" type="String[]"/>
-    <aura:attribute name="helpTextValue" type="String"/>
-
+ 
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
@@ -52,7 +51,7 @@
                 <!-- <aura:if isTrue="{!v.helpText != null}">
                     <lightning:helptext content="{!v.helpText}"/>
                 </aura:if> -->
-            </div>
+            </div> 
         </div>
     </span>
 </aura:component>

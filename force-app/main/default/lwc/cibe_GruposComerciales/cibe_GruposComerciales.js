@@ -8,13 +8,66 @@ import getShadow from '@salesforce/apex/CIBE_GruposComerciales_Controller.getSha
 import getEconomicInfo from '@salesforce/apex/CIBE_GruposComerciales_Controller.getEconomicInfo';
 import getApplicationN from '@salesforce/apex/CIBE_AppUtilities.getAppDefinition';
 
-const economicGroupTypeOptions = [
-    { label: 'Dominio',  value: '110' },
-    { label: 'Restringido',  value: '120' },
-    { label: 'Ampliado',  value: '130' }
-];
+//labels
+import nombreCliente from '@salesforce/label/c.CIBE_NombreClienteT';
+import rarGrupo from '@salesforce/label/c.CIBE_RARGrupo';
+import rentabilidad from '@salesforce/label/c.CIBE_Rentabilidad';
+import facturacion from '@salesforce/label/c.CIBE_Facturacion';
+import financiacion from '@salesforce/label/c.CIBE_Financiacion';
+import LEX from '@salesforce/label/c.CIBE_LEX';
+import vencimientoLEX from '@salesforce/label/c.CIBE_VencimientoLEX';
+import fuente from '@salesforce/label/c.CIBE_Fuente';
+import rar from '@salesforce/label/c.CIBE_RAR';
+import grupoEconomico from '@salesforce/label/c.CIBE_GrupoEconomico';
+import verGrupos from '@salesforce/label/c.CIBE_VerGrupos';
+import dominio from '@salesforce/label/c.CIBE_Dominio';
+import restringido from '@salesforce/label/c.CIBE_Restringido';
+import ampliado from '@salesforce/label/c.CIBE_Ampliado';
+import tipoGE from '@salesforce/label/c.CIBE_TipoGrupoEconomico';
+import seleccionaTipoGE from '@salesforce/label/c.CIBE_TipoGE';
+import seleccionaGE from '@salesforce/label/c.CIBE_SelectGE';
+import repreJerarquica from '@salesforce/label/c.CIBE_RepresentacionJerarquica';
+import otrosClientes from '@salesforce/label/c.CIBE_OtrosClientes';
+import gruposEconomicos from '@salesforce/label/c.CIBE_GruposEconomicos';
+import cerrar from '@salesforce/label/c.CIBE_Cerrar';
+import interlocutor from '@salesforce/label/c.CIBE_Interlocutor';
+
+
+
 
 export default class Cibe_GruposComerciales extends LightningElement {
+
+    labels = {
+        nombreCliente,
+        rarGrupo,
+        rentabilidad,
+        facturacion,
+        financiacion,
+        LEX,
+        vencimientoLEX,
+        fuente,
+        rar,
+        grupoEconomico,
+        verGrupos,
+        dominio,
+        restringido,
+        ampliado,
+        tipoGE,
+        seleccionaTipoGE,
+        seleccionaGE,
+        repreJerarquica,
+        otrosClientes,
+        gruposEconomicos,
+        cerrar,
+        interlocutor
+
+    }
+
+    economicGroupTypeOptions = [
+        { label: this.labels.dominio, value: '110' },
+        { label: this.labels.restringido, value: '120' },
+        { label: this.labels.ampliado, value: '130' }
+    ];
 
     @api recordId;
     @api isLoaded = false;
@@ -24,7 +77,7 @@ export default class Cibe_GruposComerciales extends LightningElement {
     @track clients;
 
     @track groupType = '120';
-    @track economicGroupTypeOptions = economicGroupTypeOptions;
+    //@track economicGroupTypeOptions = economicGroupTypeOptions;
 
     @track group;
     @track economicGroupOptions;
@@ -42,25 +95,24 @@ export default class Cibe_GruposComerciales extends LightningElement {
 
     @track columns = [];
     @track application;
-    
+
     @wire(getApplicationN, {})
-	getApp({ error, data }) {
+    getApp({ error, data }) {
         if (data) {
             this.application = data;
-            if(data == 'CIBE_MisClientesCIB'){
+            if (data == 'CIBE_MisClientesCIB') {
                 this.columns = this.gridColumnsCIB;
-            } else if(data == 'CIBE_MisClientesEMP' || data == 'SIR_misClientesSolutions' || data == 'SIRE_MisClientesSolucionesEMP') {
+            } else if (data == 'CIBE_MisClientesEMP' || data == 'SIR_misClientesSolutions' || data == 'SIRE_MisClientesSolucionesEMP') {
                 this.columns = this.gridColumnsEMP;
             }
-        } else if(error) {
+        } else if (error) {
             console.error('error', JSON.stringify(error));
         }
     }
 
-    @wire(getClients, { recordId : '$recordId', application : '$application'})
+    @wire(getClients, { recordId: '$recordId', application: '$application' })
     getClients({ error, data }) {
         if (data) {
-            console.log('### getClient ', data);
             this.matrix = data.matrix;
             this.clientIds = data.clientIds;
             this.clients = data.clients;
@@ -76,12 +128,11 @@ export default class Cibe_GruposComerciales extends LightningElement {
         }
     }
 
-    @wire(getEconomicGroupList, { recordId : '$matrix', groupType : '$groupType' })
+    @wire(getEconomicGroupList, { recordId: '$matrix', groupType: '$groupType' })
     getEconomicGroupList({ error, data }) {
         if (data) {
-            console.log('### getEconomicGroupList ', data);
             this.economicGroupOptions = data;
-            if(this.economicGroupOptions.length > 0) {
+            if (this.economicGroupOptions.length > 0) {
                 this.group = data[0].value;
             }
         } else if (error) {
@@ -96,26 +147,25 @@ export default class Cibe_GruposComerciales extends LightningElement {
         }
     }
 
-    @wire(getShadow, { recordId : '$group', groupType : '$groupType', clientIds : '$clientIds', application : '$application'})
+    @wire(getShadow, { recordId: '$group', groupType: '$groupType', clientIds: '$clientIds', application: '$application', clients: '$clients' })
     getShadow({ error, data }) {
         if (data) {
-            console.log('### getShadow ', data);
-            this.expanded = data.clientIds;   
+            this.expanded = data.clientIds;
             let tree = JSON.parse(JSON.stringify(data.clients));
             this.tree(tree);
             this.shadow = tree;
-
             const notShadowedClients = [...this.clients];
             this.unShadow(this.shadow, notShadowedClients);
             this.notShadowedClients = notShadowedClients;
-            if(this.gridLoadingState) {
+
+            if (this.gridLoadingState) {
                 this.throwRefreshEvent(this.clientIds);
                 this.gridLoadingState = false;
             }
         } else if (error) {
             console.log(error);
 
-            if(this.gridLoadingState) {
+            if (this.gridLoadingState) {
                 this.throwRefreshEvent(this.clientIds);
                 this.gridLoadingState = false;
             }
@@ -124,7 +174,7 @@ export default class Cibe_GruposComerciales extends LightningElement {
 
     tree(objs) {
         objs.map(e => {
-            if(e['children']) {
+            if (e['children']) {
                 e._children = e['children'];
                 this.tree(e._children);
             }
@@ -133,18 +183,18 @@ export default class Cibe_GruposComerciales extends LightningElement {
 
     unShadow(shadow, notShadowedClients) {
         shadow.forEach(e => {
-            if(!e.isGrupo) {
+            if (!e.isGrupo) {
                 var index = -1;
                 notShadowedClients.forEach((e2, i) => {
-                    if(e2.id === e.id) {
+                    if (e2.id === e.id) {
                         index = i;
                     }
                 });
-                
-                if(index != -1) {
+
+                if (index != -1) {
                     notShadowedClients.splice(index, 1);
                 }
-            } else if(e.isGrupo) {
+            } else if (e.isGrupo) {
                 this.unShadow(e._children, notShadowedClients);
             }
         });
@@ -164,24 +214,24 @@ export default class Cibe_GruposComerciales extends LightningElement {
 
     get hasShadows() {
         return this.notShadowedClients != null && this.notShadowedClients.length > 0;
-    }    
+    }
 
     refreshRelated1(event) {
         this.selected1 = [];
         event.detail.selectedRows.forEach(e => {
-            if(!e.isGrupo){
-                if(!this.selected1.includes(e.id) && !this.selected2.includes(e.id)) {
+            if (!e.isGrupo) {
+                if (!this.selected1.includes(e.id) && !this.selected2.includes(e.id)) {
                     this.selected1.push(e.id);
                 }
             }
         });
 
         const selected = this.selected1.concat(this.selected2);
-        if(!(selected.length > 0)) {
+        if (!(selected.length > 0)) {
             this.throwRefreshEvent(this.clientIds);
         }
 
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             this.throwRefreshEvent(selected);
         }
     }
@@ -189,19 +239,19 @@ export default class Cibe_GruposComerciales extends LightningElement {
     refreshRelated2(event) {
         this.selected2 = [];
         event.detail.selectedRows.forEach(e => {
-            if(!e.isGrupo){
-                if(!this.selected1.includes(e.id) && !this.selected2.includes(e.id)) {
+            if (!e.isGrupo) {
+                if (!this.selected1.includes(e.id) && !this.selected2.includes(e.id)) {
                     this.selected2.push(e.id);
                 }
             }
         });
 
         const selected = this.selected1.concat(this.selected2);
-        if(!(selected.length > 0)) {
+        if (!(selected.length > 0)) {
             this.throwRefreshEvent(this.clientIds);
         }
 
-        if(selected.length > 0) {
+        if (selected.length > 0) {
             this.throwRefreshEvent(selected);
         }
     }
@@ -213,16 +263,16 @@ export default class Cibe_GruposComerciales extends LightningElement {
             }));
     }
 
-    showViewGroups(event){
-        getEconomicInfo({recordId: event.detail.row.id})
+    showViewGroups(event) {
+        getEconomicInfo({ recordId: event.detail.row.id })
             .then(result => {
-                if(result != null) {
+                if (result != null) {
                     this.groups = result;
                 }
             }).finally(() => {
                 this.isShowViewGroups = true;
             });
-            
+
     }
 
     hideViewGroups(event) {
@@ -232,81 +282,90 @@ export default class Cibe_GruposComerciales extends LightningElement {
     gridColumnsEMP = [
         {
             type: 'url',
-            typeAttributes : {
-                label : {
-                    fieldName : "accountName"
+            typeAttributes: {
+                label: {
+                    fieldName: "accountName"
                 },
                 target: '_self'
             },
             fieldName: 'showRecord',
-            label: 'Nombre Cliente',
-            initialWidth : 300
+            actions: false,
+            label: this.labels.nombreCliente,
+            initialWidth: 300
         },
         {
-            type: 'url',
-            typeAttributes : {
-                label : {
-                    fieldName : "interlocutor"
+            type: 'text',
+            hideDefaultActions: true,
+            typeAttributes: {
+                label: {
+                    fieldName: "interlocutor"
                 },
                 target: '_self'
             },
-            fieldName: 'interlocutorLink',
-            label: 'Interlocutor'
+            fieldName: 'rol',
+            label: this.labels.interlocutor
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rar',
-            label: 'RAR',
+            label: this.labels.rar,
             cellAttributes: {
                 alignment: 'right'
             },
-            initialWidth : 80
+            initialWidth: 80
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rarGrupo',
-            label: 'RAR Grupo',
+            label: this.labels.rarGrupo,
             cellAttributes: {
                 alignment: 'right'
             },
-            initialWidth : 120
+            initialWidth: 120
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rentabilidad',
-            label: 'Rentabilidad (€)',
+            label: this.labels.rentabilidad,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'facturacion',
-            label: 'Facturación (€)',
+            label: this.labels.facturacion,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'activo',
-            label: 'Financiación (€)',
+            label: this.labels.financiacion,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'lexDisponible',
-            label: 'Lex Disponible (€)',
+            label: this.labels.LEX,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'date',
+            hideDefaultActions: true,
             fieldName: 'lexFechaVigencia',
-            label: 'Lex Fin de Vigencia',
+            label: this.labels.vencimientoLEX,
             cellAttributes: {
                 alignment: 'right'
             },
@@ -317,92 +376,111 @@ export default class Cibe_GruposComerciales extends LightningElement {
             }
         },
         {
-            label: 'Grupo Economico',
-            type: "button", 
+            type: 'text',
+            hideDefaultActions: true,
+            fieldName: 'source',
+            label: this.labels.fuente,
+            cellAttributes: {
+                alignment: 'center'
+            },
+            wrapText: true
+        },
+        {
+            label: this.labels.grupoEconomico,
+            type: "button",
+            hideDefaultActions: true,
             typeAttributes: {
-                label: 'Ver Grupos',
+                label: this.labels.verGrupos,
                 name: 'gruposEconomico',
                 title: 'Grupos Economico'
             },
             cellAttributes: {
                 alignment: 'left'
             },
-            initialWidth : 140
+            initialWidth: 140
         }
     ];
 
     gridColumnsCIB = [
         {
             type: 'url',
-            typeAttributes : {
-                label : {
-                    fieldName : "accountName"
+            hideDefaultActions: true,
+            typeAttributes: {
+                label: {
+                    fieldName: "accountName"
                 },
                 target: '_self'
             },
             fieldName: 'showRecord',
-            label: 'Nombre Cliente',
-            cellAttributes : {
-                iconName : {
-                    fieldName : 'bookIcon'
+            label: this.labels.nombreCliente,
+            cellAttributes: {
+                iconName: {
+                    fieldName: 'bookIcon'
                 }
             },
-            initialWidth : 300
+            initialWidth: 300
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rar',
-            label: 'RAR',
+            label: this.labels.rar,
             cellAttributes: {
                 alignment: 'right'
             },
-            initialWidth : 80
+            initialWidth: 80
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rarGrupo',
-            label: 'RAR Grupo',
+            label: this.labels.rarGrupo,
             cellAttributes: {
                 alignment: 'right'
             },
-            initialWidth : 120
+            initialWidth: 120
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'rentabilidad',
-            label: 'Rentabilidad (€)',
+            label: this.labels.rentabilidad,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'facturacion',
-            label: 'Facturación (€)',
+            label: this.labels.facturacion,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'activo',
-            label: 'Financiación (€)',
+            label: this.labels.financiacion,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'text',
+            hideDefaultActions: true,
             fieldName: 'lexDisponible',
-            label: 'Lex Disponible (€)',
+            label: this.labels.LEX,
             cellAttributes: {
                 alignment: 'right'
             }
         },
         {
             type: 'date',
+            hideDefaultActions: true,
             fieldName: 'lexFechaVigencia',
-            label: 'Lex Fin de Vigencia',
+            label: this.labels.vencimientoLEX,
             cellAttributes: {
                 alignment: 'right'
             },
@@ -413,39 +491,50 @@ export default class Cibe_GruposComerciales extends LightningElement {
             }
         },
         {
-            label: 'Grupo Economico',
-            type: "button", 
+            type: 'text',
+            hideDefaultActions: true,
+            fieldName: 'source',
+            label: this.labels.fuente,
+            cellAttributes: {
+                alignment: 'center'
+            },
+            wrapText: true
+        },
+        {
+            label: this.labels.grupoEconomico,
+            type: "button",
+            hideDefaultActions: true,
             typeAttributes: {
-                label: 'Ver Grupos',
+                label: this.labels.verGrupos,
                 name: 'gruposEconomico',
                 title: 'Grupos Economico'
             },
             cellAttributes: {
                 alignment: 'left'
             },
-            initialWidth : 140
+            initialWidth: 140
         }
     ];
 
     @track height1 = '';
     @track height2 = '';
 
-    renderedCallback () {
+    renderedCallback() {
         this.height1 = this.getHeight1();
         this.height2 = this.getHeight2();
     }
 
     getHeight1() {
         let count = 0;
-        if(this.shadow !== undefined && this.shadow !== null) {
+        if (this.shadow !== undefined && this.shadow !== null) {
             const grid = this.template.querySelector('[data-gc="GC1"');
-            if(grid !== undefined && grid !== null) {
+            if (grid !== undefined && grid !== null) {
                 const expandeds = grid.getCurrentExpandedRows();
                 this.shadow.forEach(client => {
                     count++;
                     expandeds.forEach(expanded => {
-                        if(client.id === expanded) {
-                            if(client._children !== undefined && client._children !== null) {
+                        if (client.id === expanded) {
+                            if (client._children !== undefined && client._children !== null) {
                                 client._children.forEach(activity => {
                                     count++;
                                 });
@@ -460,15 +549,15 @@ export default class Cibe_GruposComerciales extends LightningElement {
 
     getHeight2() {
         let count = 0;
-        if(this.notShadowedClients !== undefined && this.notShadowedClients !== null) {
+        if (this.notShadowedClients !== undefined && this.notShadowedClients !== null) {
             const grid = this.template.querySelector('[data-gc="GC2"');
-            if(grid !== undefined && grid !== null) {
+            if (grid !== undefined && grid !== null) {
                 const expandeds = grid.getCurrentExpandedRows();
                 this.notShadowedClients.forEach(client => {
                     count++;
                     expandeds.forEach(expanded => {
-                        if(client.id === expanded) {
-                            if(client._children !== undefined && client._children !== null) {
+                        if (client.id === expanded) {
+                            if (client._children !== undefined && client._children !== null) {
                                 client._children.forEach(activity => {
                                     count++;
                                 });

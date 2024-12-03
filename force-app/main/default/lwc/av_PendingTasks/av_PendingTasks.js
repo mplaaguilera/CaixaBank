@@ -18,6 +18,7 @@ export default class Av_PendingTasks extends LightningElement {
 	}
 
     getData() {
+        console.log('rid => ',this.recordId);
         getAvisosTasks({recordId: this.recordId})
             .then(result => {
                 if (result != null) {

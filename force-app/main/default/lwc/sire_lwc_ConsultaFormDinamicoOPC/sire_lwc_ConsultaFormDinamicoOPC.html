@@ -1,0 +1,42 @@
+<template>
+    <lightning-card>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="section-layout-container slds-section slds-is-open">
+                <h3 style="padding-left: 15px;" class="label slds-section__title slds-truncate slds-var-p-around_xx-small slds-theme_shade">Formulario {tituloFormulario}</h3>
+                <div class="slds-grid slds-wrap slds-modal__content slds-var-p-around_medium">            
+                    <!-- Aqui empieza la parte dinamica de crear campos mediante un for -->
+                    <template for:each={campos} for:item="campo">
+                        <div class={campo.claseColumnas} key={campo}>
+                            <template lwc:if={campo.campoInput}>
+                                <div style={campo.anchoCampo}>
+                                    <lightning-input type={campo.tipo} formatter={campo.formato} step={campo.step} name={campo.codigoHito} label={campo.label} value={campo.valor} required={campo.requerido} disabled={campo.disabled} onchange={getCambioValor}></lightning-input>
+                                </div> 
+                            </template>
+                            <template lwc:elseif={campo.campoSelect}>
+                                <div style={campo.anchoCampo}>
+                                    <lightning-combobox
+                                        name={campo.codigoHito}
+                                        label={campo.label}
+                                        value={campo.valor}
+                                        placeholder="Seleccione una opción"
+                                        options={campo.opciones}
+                                        required={campo.requerido}
+                                        disabled={campo.disabled}
+                                        onchange={getCambioValor} >
+                                    </lightning-combobox>
+                                </div> 
+                            </template> 
+                            <template lwc:elseif={campo.campoTextArea}>
+                                <div style={campo.anchoCampo}>
+                                    <lightning-textarea name={campo.codigoHito} label={campo.label} value={campo.valor} max-length="200" 
+                                        required={campo.requerido} disabled={campo.disabled} onchange={getCambioValor}
+                                        field-level-help="Máximo 200 caracteres"></lightning-textarea>
+                                </div> 
+                            </template>                           
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

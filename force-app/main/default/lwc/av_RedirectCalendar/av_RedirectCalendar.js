@@ -6,7 +6,7 @@ export default class Av_RedirectCalendar extends NavigationMixin(LightningElemen
 
     // Expose the labels to use in the template.
     label = {
-        ButtonCalendar,
+        ButtonCalendar
     };
 
     // Navigate to Calendar Page

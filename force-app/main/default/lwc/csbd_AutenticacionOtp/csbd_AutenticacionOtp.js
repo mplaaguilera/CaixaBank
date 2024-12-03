@@ -1,16 +1,10 @@
 import {LightningElement, api, wire, track} from 'lwc';
 import {getRecord, getFieldValue, getFieldDisplayValue} from 'lightning/uiRecordApi';
-import {getObjectInfo} from 'lightning/uiObjectInfoApi';
 import {NavigationMixin} from 'lightning/navigation';
 import LightningConfirm from 'lightning/confirm';
 import {errorApex} from 'c/csbd_lwcUtils';
 import {DATATABLE_COLUMNS, NAME_COLUMN, confirmarInicioAutenticacion, toast} from './utils.js';
-import {
-	n2ValidarRespuestasPreguntasMockOk,
-	n2ValidarRespuestasPreguntasMockKo,
-	n2ValidarOtpMockOk,
-	n2ValidarOtpMockKo
-} from './mocks.js';
+import {n2ValidarOtpMockOk, n2ValidarOtpMockKo} from './mocks.js';
 
 import OPP_IDENTIFICADOR from '@salesforce/schema/Opportunity.CSBD_Identificador__c';
 import OPP_RT_DEVELOPERNAME from '@salesforce/schema/Opportunity.RecordType.DeveloperName';
@@ -28,7 +22,6 @@ import OPP_ACCOUNT_NAME from '@salesforce/schema/Opportunity.Account.Name';
 import OPP_ACCOUNT_EDAD from '@salesforce/schema/Opportunity.Account.AV_Age__c';
 import OPP_ACCOUNT_MENOR_EMANCIPADO from '@salesforce/schema/Opportunity.Account.CC_MenorEmancipado__c';
 import OPP_CONTACT_ID from '@salesforce/schema/Opportunity.CSBD_Contact__c';
-import AUT from '@salesforce/schema/CC_Comunicaciones__c';
 
 import getDatosApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.getDatos';
 import getDatosAsyncApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.getDatosAsync';
@@ -41,7 +34,8 @@ import autenticacionClienteDigitalEnviarApex from '@salesforce/apex/CSBD_Autenti
 import autenticacionClienteDigitalValidarApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.autenticacionClienteDigitalValidar';
 import nivel2ValidacionInicialApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.nivel2ValidacionInicial';
 import nivel2EnviarSolicitudOtpApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.nivel2EnviarSolicitudOtp';
-import n2ValidarRespuestasPreguntasApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.n2ValidarRespuestasPreguntas';
+import validacionRespuestasNivel2Apex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.validacionRespuestasNivel2';
+import segundoNivelApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.segundoNivel';
 import n2ValidarOtpApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.n2ValidarOtp';
 import codigoAutenticacionNoRecibidoApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.codigoAutenticacionNoRecibido';
 import cancelarAutenticacionApex from '@salesforce/apex/CSBD_AutenticacionOtp_Apex.cancelarAutenticacion';
@@ -57,16 +51,13 @@ const OPPTY_FIELDS = [
 export default class csbdAutenticacionOtp extends NavigationMixin(LightningElement) {
 	@api recordId;
 
-	autenticacionRecordTypeInfos;
-
 	@track componente = {
-		idRtAutenticacion: null,
 		usuarioDesarrollador: false,
 		abierto: false,
 		autEmergenciaHabilitada: false,
 		spinner: false,
 		funcionesBind: {},
-		simularRespuestas: {validarRespuestas: null, enviarOtp: null, validarOtp: null, enviarPush: null}
+		simularRespuestas: {enviarOtp: null, validarOtp: null, enviarPush: null}
 	};
 
 	oportunidad;
@@ -81,7 +72,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 	autenticacionPendValidar;
 
-	n2Preguntas = {pregunta1: {}, pregunta2: {}};
+	preguntasNivel2 = {pregunta1: {}, pregunta2: {}};
 
 	omitirOtpNivel2 = false;
 
@@ -128,35 +119,31 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 		this.nivel = nivel;
 		if (await confirmarInicioAutenticacion(nivel)) {
-			this.cerrarModalNuevoIntento();
+			//this.cerrarModalNuevoIntento(); //PENDIENTE
 			this.componente.spinner = true;
 
 			if (nivel === 'Nivel 2') {
-				if (this.canalAutenticable) {
-					nivel2ValidacionInicialApex({recordId: this.recordId})
-					.then(async ({resultado, omitirOtp}) => {
-						this.componente.spinner = false;
-						if (resultado === 'PENDIENTE VALIDAR') {
-							toast('info', 'Autenticación de nivel 2 no disponible', 'Ya hay una autenticación previa pendiente de validar');
-						} else if (resultado === 'SIN DATOS') {
-							toast('info', 'Autenticación de nivel 2 no disponible', `No constan datos suficientes para poder validar la identidad del cliente ${getFieldValue(this.oportunidad, OPP_ACCOUNT_NAME)}`);
-						} else if (resultado === 'CLIENTE BLOQUEADO') {
-							toast('error', 'Autenticación de nivel 2 no disponible', 'No se permite autenticar al cliente ya que se encuentra bloqueado de manera preventiva');
-						} else if (resultado === 'SIN LLAMADAS') {
-							toast('info', 'Autenticación de nivel 2 no disponible', 'No hay ninguna llamada de teléfono en curso');
-						} else if (resultado === 'OK') {
-							this.componente.spinner = true;
-							this.omitirOtpNivel2 = omitirOtp;
-							await this.abrirModalPreguntasNivel2();
-						}
-					}).catch(error => {
-						errorApex(this, error, 'Problema iniciando la autenticación de nivel 2');
-						this.componente.spinner = false;
-					});
-				} else {
+				nivel2ValidacionInicialApex({recordId: this.recordId})
+				.then(async ({resultado, omitirOtp}) => {
 					this.componente.spinner = false;
-					toast('info', 'Autenticación de nivel 2 no disponible', 'La autenticación segura de nivel 2 no está disponible para el canal ' + getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA));
-				}
+					if (resultado === 'PENDIENTE VALIDAR') {
+						toast('info', 'Autenticación de nivel 2 no disponible', 'Ya hay una autenticación previa pendiente de validar');
+					} else if (resultado === 'SIN DATOS') {
+						toast('info', 'Autenticación de nivel 2 no disponible', `No constan datos suficientes para poder validar la identidad del cliente ${getFieldValue(this.oportunidad, OPP_ACCOUNT_NAME)}`);
+					} else if (resultado === 'CLIENTE BLOQUEADO') {
+						toast('error', 'Autenticación de nivel 2 no disponible', 'No se permite autenticar al cliente ya que se encuentra bloqueado de manera preventiva');
+					} else if (resultado === 'SIN LLAMADAS') {
+						toast('info', 'Autenticación de nivel 2 no disponible', 'No hay ninguna llamada de teléfono en curso');
+					} else if (resultado === 'OK') {
+						this.componente.spinner = true;
+						this.omitirOtpNivel2 = omitirOtp;
+						await this.abrirModalPreguntasNivel2();
+					}
+				}).catch(error => {
+					errorApex(this, error, 'Problema iniciando la autenticación de nivel 2');
+					this.componente.spinner = false;
+				});
+
 			} else if (nivel === 'Emergencia') {
 				if (this.canalAutenticable) {
 					this.abrirModalPreguntasEmergencia();
@@ -184,35 +171,52 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			if (!inputsPreguntas.every(i => i.validity.valid)) {
 				this.componente.spinner = false;
 			} else {
-				const formatRespuesta = r => (r ?? '').toString().replaceAll('+34 ', '').replaceAll('+3400', '').replaceAll('+34', '').replaceAll(' ', '');
-
-				this.n2ValidarRespuestasPreguntas({
+				validacionRespuestasNivel2Apex({
 					recordId: this.recordId,
-					pregunta1: this.n2Preguntas.pregunta1.inputLabel,
-					respuesta1: formatRespuesta(this.refs.n2InputPregunta1.value),
-					pregunta2: this.n2Preguntas.pregunta2.inputLabel,
-					respuesta2: formatRespuesta(this.refs.n2InputPregunta2.value.toString()),
-					enviarSMS: this.omitirOtpNivel2
-				}).then(async ({ok, idAutenticacion}) => {
-					if (!ok) { //Respuestas KO
+					pregunta1: this.preguntasNivel2.pregunta1.inputLabel,
+					respuesta1: this.refs.nivel2InputPregunta1.value.toString(),
+					pregunta2: this.preguntasNivel2.pregunta2.inputLabel,
+					respuesta2: this.refs.nivel2InputPregunta2.value.toString()
+				}).then(async retornoValidacionRespuestas => {
+					if (!retornoValidacionRespuestas.respuesta1 || !retornoValidacionRespuestas.respuesta2) {
+						//Respuestas nivel 2 KO
 						this.componente.spinner = false;
-						this.modalMensajeAbrir(
-							'Las respuestas son incorrectas.', 'utility:error', 'modalMensajeIconError', false, 1400,
-							async () => {
-								await this.actualizarTablasAutenticaciones();
-								this.abrirModalNuevoIntento();
+						/*
+						this.notificarKo('Las respuestas son incorrectas.', () => {
+							this.n2crearRegistroAutenticacion(retornoValidacionRespuestas)
+							.catch(error => errorApex(this, error, 'Error en validacionesBasicas'))
+							.finally(() => this.notificarKoCerrar());
+						}, false);
+						*/
+						this.modalMensajeAbrir('Las respuestas son incorrectas.', 'utility:error', 'modalMensajeIconError', false, 1400);
+
+						this.n2crearRegistroAutenticacion(retornoValidacionRespuestas)
+						.catch(error => errorApex(this, error, 'Problema registrando el intento fallido de autenticación'));
+					} else {
+						//Respuestas nivel 2 OK
+						if (!this.canalAutenticable) {
+							this.cerrarModalPreguntasNivel2();
+							this.componente.spinner = false;
+							toast('info', 'Autenticación de nivel 2 no disponible', 'La autenticación segura de nivel 2 con envío de OTP no está disponible para el canal ' + getFieldDisplayValue(this.oportunidad, OPP_CASO_ORIGEN_CANAL_ENTRADA));
+						} else {
+							try {
+								await this.n2crearRegistroAutenticacion(retornoValidacionRespuestas);
+								//if (!getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)) {
+								const callback = () => window.setTimeout(() => {
+									this.n2EnviarOtp();
+								}, 0);
+								this.modalMensajeAbrir(
+									'Las respuestas son correctas.', 'utility:success', 'modalMensajeIconSuccess',
+									false, 1400, callback
+								);
+								//}
+							} catch (error) {
+								errorApex(this, error, 'Problema registrando la autenticación');
 							}
-						);
-					} else { //Respuestas OK
-						await this.actualizarTablasAutenticaciones();
-						this.autenticacionPendValidar = this.datatableData.datatableEnCurso.find(a => a.Id === idAutenticacion);
-						this.modalMensajeAbrir(
-							'Las respuestas son correctas.', 'utility:success', 'modalMensajeIconSuccess',
-							false, 1400, () => window.setTimeout(() => this.n2EnviarOtp(), 0)
-						);
+						}
 					}
 				}).catch(error => {
-					errorApex(this, error, 'Problema validando las respuestas');
+					errorApex(this, error, 'Problema comprobando las respuestas');
 					this.componente.spinner = false;
 				});
 			}
@@ -226,6 +230,9 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 				} else if (response === 'Correo no informado') {
 					toast('info', 'Autenticación de emergencia no disponible', 'El campo "Email solicitud" de la oportunidad no está informado');
 				} else {
+					//PENDIENTE
+					//component.set('v.noValidado', true);
+					//component.set('v.mensajeNoValidado', response);
 					this.cerrarModalPreguntasEmergencia();
 				}
 			}).catch(error => {
@@ -233,6 +240,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 				this.componente.spinner = false;
 			}).finally(() => this.componente.spinner = false);
 		} else if (nivel === 'Cliente Digital') {
+			//PENDIENTE
 			autenticacionClienteDigitalApex({
 				idOportunidad: this.recordId,
 				idCliente: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID),
@@ -246,7 +254,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 					this.componente.spinner = false;
 				} else if (resultado === 'OK') {
 					this.componente.spinner = false;
-					this.modalMensajeAbrir('Solicitando envío de la notificación push al dispositivo del cliente...', 'utility:push', null, true);
+					this.modalMensajeAbrir('Solicitando envío del código de un solo uso al cliente...', 'utility:push', null, true);
 					autenticacionClienteDigitalEnviarApex({recordId: this.recordId, autenticacionId: idAutenticacion})
 					.then(async resultadoEnvio => {
 						if (resultadoEnvio === 'OK') {
@@ -289,6 +297,8 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 	}
 
 	@api async abrirModal(aperturaInicial = false) {
+		//this.componente.abierto = true;
+
 		const mostrarModal = () => {
 			this.refs.backdropModal.classList.add('slds-backdrop_open');
 			this.refs.modalAutenticacionOtp.classList.add('slds-fade-in-open');
@@ -396,14 +406,16 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		}
 	}
 
-	async cerrarModal() {
+	async cerrarModal(ocultarBackdrop = true) {
 		if (!this.componente.spinner) {
+			this.componente.abierto = false;
 			this.refs.modalAutenticacionOtp.classList.remove('slds-fade-in-open');
+			ocultarBackdrop && this.refs.backdropModal.classList.remove('slds-backdrop_open');
 		}
 	}
 
 	modalTeclaPulsada({keyCode}) {
-		!this.componente.spinner && keyCode === 27 && this.salir(); //Tecla ESC
+		!this.componente.spinner && keyCode === 27 && this.cerrarModal(); //Tecla ESC
 	}
 
 	async actualizarTablasAutenticaciones() {
@@ -500,26 +512,22 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			].find(pi => label.toLowerCase().includes(pi.tipoPregunta))
 			|| {inputType: 'text', inputMin: 3, inputMax: null, inputMaxLength: 255, inputPlaceholder: '93000000'};
 
-			this.n2Preguntas = {
+			this.preguntasNivel2 = {
 				pregunta1: {...getParamsInputPregunta(preguntas.pregunta1), inputLabel: preguntas.pregunta1, textoAyuda: preguntas.textoAyuda1},
 				pregunta2: {...getParamsInputPregunta(preguntas.pregunta2), inputLabel: preguntas.pregunta2, textoAyuda: preguntas.textoAyuda2}
 			};
 			this.componente.spinner = false;
-			this.cerrarModal();
+			this.cerrarModal(false);
 
 			if (this.componente.usuarioDesarrollador) {
-				const defaults = {cuenta: '9491', tarjeta: '1234', año: '1984', edad: '55', default: '650399855'};
-				this.refs.n2InputPregunta1.value = defaults[this.n2Preguntas.pregunta1.tipoPregunta] ?? defaults.default;
-				this.refs.n2InputPregunta2.value = defaults[this.n2Preguntas.pregunta2.tipoPregunta] ?? defaults.default;
+				this.refs.nivel2InputPregunta1.value = 650399855;
+				this.refs.nivel2InputPregunta2.value = 1984;
 			} else {
-				this.refs.n2InputPregunta1.value = null;
-				this.refs.n2InputPregunta2.value = null;
+				this.refs.nivel2InputPregunta1.value = null;
+				this.refs.nivel2InputPregunta2.value = null;
 			}
-			const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
-			modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
 			this.refs.modalPreguntasNivel2.classList.add('slds-fade-in-open');
-			window.setTimeout(() => this.refs.n2InputPregunta1.focus(), 90);
-
+			window.setTimeout(() => this.refs.nivel2InputPregunta1.focus(), 90);
 		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de preguntas de validación para nivel 2'))
 		.finally(() => this.componente.spinner = false);
 	}
@@ -537,6 +545,32 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		this.crearAutenticacion(this.nivel);
 	}
 
+	async n2crearRegistroAutenticacion({respuesta1, respuesta2}) {
+		try {
+			const retorno = await segundoNivelApex({
+				recordId: this.recordId,
+				valido: respuesta1 && respuesta2,
+				nivel: 'Nivel 2',
+				pregunta1: this.preguntasNivel2.pregunta1.inputLabel,
+				respuesta1: this.refs.nivel2InputPregunta1.value,
+				pregunta2: this.preguntasNivel2.pregunta2.inputLabel,
+				respuesta2: this.refs.nivel2InputPregunta2.value,
+				validacion1: respuesta1,
+				validacion2: respuesta2,
+				enviarSMS: this.omitirOtpNivel2
+				//enviarPreguntas: getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)
+			});
+
+			await this.actualizarTablasAutenticaciones();
+			this.autenticacionPendValidar = this.datatableData.datatableEnCurso.find(a => a.Id === retorno.id);
+			if (retorno.resultado !== 'OK') { //&& !getFieldValue(this.oportunidad, OPP_CASO_ORIGEN_OMITIR_PREGUNTAS)) {
+				this.abrirModalNuevoIntento();
+			}
+		} catch (error) {
+			errorApex(this, error, 'Problema creando el registro de autenticación');
+		}
+	}
+
 	async abrirModalPreguntasEmergencia() {
 		if (!this.preguntasEmergencia.length) {
 			const retorno = await getPreguntasEmergenciaApex({});
@@ -545,12 +579,9 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 				aleatorias: retorno.aleatorias.map(p => ({id: p.Id, nombre: p.Name, valor: p.CC_Valor__c}))
 			};
 		}
-
 		this.componente.spinner = false;
-		this.cerrarModal();
-
+		this.cerrarModal(false);
 		this.refs.modalPreguntasEmergencia.classList.add('slds-fade-in-open');
-		window.setTimeout(() => this.refs.modalPreguntasEmergenciaCancelar.focus(), 90);
 	}
 
 	cerrarModalPreguntasEmergencia() {
@@ -567,7 +598,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 	}
 
 	async abrirModalValidarOtp() {
-		await this.cerrarModal();
+		await this.cerrarModal(false);
 		const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
 		modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
 
@@ -594,7 +625,8 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 	async modalValidarOtpCancelar() {
 		const autenticacion = this.datatableData.datatableEnCurso.find(a => a.Id === this.autenticacionPendValidar.Id);
-		if (await this.cancelarAutenticacion(autenticacion)) { //Se ha aceotado el Lightging Confirm
+		if (await this.cancelarAutenticacion(autenticacion)) {
+			//Se ha aceotado el Lightging Confirm
 			this.cerrarModalValidarOtp(null, false);
 		}
 	}
@@ -615,6 +647,8 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		if (!inputsOtpInformados) {
 			this.refs.inputOtp1.focus();
 		} else {
+			//this.componente.spinner = true;
+			//await this.cerrarModalValidarOtp(null, false);
 			this.modalMensajeAbrir('Consultando validez del código indicado...', 'utility:sms', null, true);
 
 
@@ -700,7 +734,7 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 	}
 
 	async abrirModalValidarPush() {
-		await this.cerrarModal();
+		await this.cerrarModal(false);
 		const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
 		modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
 
@@ -762,22 +796,17 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		.finally(() => this.componente.spinner = false);
 	}
 
-	abrirModalNuevoIntento() {
-		const modalNuevoIntento = this.refs.modalNuevoIntento;
-		if (!modalNuevoIntento.classList.contains('slds-fade-in-open')) {
-			const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
-			modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
-			this.refs.modalNuevoIntento.classList.add('slds-fade-in-open');
-			window.setTimeout(() => this.refs.modalNuevoIntentoCancelar.focus(), 90);
-		}
+	async abrirModalNuevoIntento() {
+		await this.cerrarModal(false);
+		const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
+		modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
+		this.refs.modalNuevoIntento.classList.add('slds-fade-in-open');
+		//focus
 	}
 
 	cerrarModalNuevoIntento() {
-		const modalNuevoIntento = this.refs.modalNuevoIntento;
-		if (modalNuevoIntento.classList.contains('slds-fade-in-open')) {
-			modalNuevoIntento.classList.remove('slds-fade-in-open');
-			this.abrirModal();
-		}
+		this.refs.modalNuevoIntento.classList.remove('slds-fade-in-open');
+		this.abrirModal();
 	}
 
 	modalNuevoIntentoTeclaPulsada({keyCode}) {
@@ -809,7 +838,6 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		if (!this.autenticacionPendValidar) {
 			console.error('No es posible determinar el registro de la autenticación en curso');
 			toast('error', 'Problema solicitando el envío del código OTP', 'No es posible determinar el registro de la autenticación en curso');
-			this.modalMensajeCerrar(() => this.abrirModal());
 			return false;
 		}
 		this.modalMensajeAbrir('Solicitando envío del código de un solo uso al cliente...', 'utility:sms', null, true);
@@ -857,6 +885,32 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		typeof callback === 'function' && window.setTimeout(callback, 200);
 	}
 
+	/*
+	async notificarOk(mensaje, callback) {
+		this.modalMensaje = {mensaje, iconName: 'utility:sms', spinner: true};
+		const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
+		modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
+		const modalMensaje = this.refs.modalMensaje;
+		modalMensaje.classList.add('slds-fade-in-open');
+		window.setTimeout(() => {
+			modalMensaje.classList.remove('slds-fade-in-open');
+			typeof callback === 'function' && callback();
+		}, 1300);
+	}
+
+	async notificarKo(mensaje, callback, cerrarAuto = true) {
+		this.modalMensaje.mensaje = mensaje;
+		const modalesAbiertos = this.template.querySelectorAll('section.slds-modal.slds-fade-in-open:not(.modalAutenticacionOtp)');
+		modalesAbiertos.forEach(m => m.classList.remove('slds-fade-in-open'));
+		const modalMensaje = this.refs.modalMensaje;
+		modalMensaje.classList.add('slds-fade-in-open');
+		window.setTimeout(() => {
+			cerrarAuto && this.notificarKoCerrar();
+			typeof callback === 'function' && callback();
+		}, 1300);
+	}
+	*/
+
 	navegarDetalleCliente() {
 		this[NavigationMixin.Navigate]({type: 'standard__recordPage', attributes: {
 			recordId: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID),
@@ -866,17 +920,12 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 
 	async menuDevOnselect({detail: {value: accion}}) {
 		//Menú de desarrollo
-		this.componente = {...this.componente};
-
 		if (accion.startsWith('simular.')) {
-			this.componente.simularRespuestas = {...this.componente.simularRespuestas};
-			window.setTimeout(() => {
-				let [, tipo, valorNuevo] = accion.split('.');
-				valorNuevo = this.componente.simularRespuestas[tipo] === valorNuevo ? null : valorNuevo;
-				this.componente.simularRespuestas[tipo] = valorNuevo;
-				this.refs[`simular.${tipo}.ok`].iconName = valorNuevo === 'ok' ? 'utility:check' : '';
-				this.refs[`simular.${tipo}.ko`].iconName = valorNuevo === 'ko' ? 'utility:check' : '';
-			}, 0);
+			let [, tipo, valorNuevo] = accion.split('.');
+			valorNuevo = this.componente.simularRespuestas[tipo] === valorNuevo ? null : valorNuevo;
+			this.componente.simularRespuestas[tipo] = valorNuevo;
+			this.refs[`simular.${tipo}.ok`].iconName = valorNuevo === 'ok' ? 'utility:check' : '';
+			this.refs[`simular.${tipo}.ko`].iconName = valorNuevo === 'ko' ? 'utility:check' : '';
 
 		} else if (accion === 'debugger') {
 			debugger;
@@ -890,10 +939,6 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		} else if (accion === 'mostrarNombreAutenticaciones') {
 			this.mostrarOcultarColumnaNombreAutenticaciones();
 
-		} else if (accion === 'finModoDesarrollo') {
-			this.componente.usuarioDesarrollador = false;
-			this.mostrarOcultarColumnaNombreAutenticaciones(true);
-
 		} else if (accion === 'aux') {
 			//eslint-disable-next-line no-console
 			console.log('aux');
@@ -902,10 +947,10 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		}
 	}
 
-	mostrarOcultarColumnaNombreAutenticaciones(forzarOcultar = false) {
+	mostrarOcultarColumnaNombreAutenticaciones() {
 		const mostrarOcultarColumnaNombreAut = columnas => {
 			const indexColumnaNombreAut = columnas.findIndex(c => c.fieldName === '_autenticacionUrl');
-			if (indexColumnaNombreAut === -1 && !forzarOcultar) {
+			if (indexColumnaNombreAut === -1) {
 				//Añadir columna de nombre de la autenticación después de la fecha de creación
 				columnas.splice(2, 0, NAME_COLUMN);
 			} else {
@@ -931,16 +976,6 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 		}
 	}
 
-	async n2ValidarRespuestasPreguntas(inputs) {
-		if (this.componente.simularRespuestas.validarRespuestas === 'ok') {
-			return n2ValidarRespuestasPreguntasMockOk(this.componente.idRtAutenticacion, this.oportunidad);
-		} else if (this.componente.simularRespuestas.validarOtp === 'ko') {
-			return n2ValidarRespuestasPreguntasMockKo(this.componente.idRtAutenticacion, this.oportunidad);
-		} else {
-			return n2ValidarRespuestasPreguntasApex(inputs);
-		}
-	}
-
 	eliminarAutenticacionesCliente() {
 		this.componente.spinner = true;
 		eliminarAutenticacionesClienteApex({idAccount: getFieldValue(this.oportunidad, OPP_ACCOUNT_ID)})
@@ -948,24 +983,5 @@ export default class csbdAutenticacionOtp extends NavigationMixin(LightningEleme
 			toast('success', 'Autenticaciones del cliente eliminadas');
 			await this.actualizarTablasAutenticaciones();
 		}).finally(() => this.componente.spinner = false);
-	}
-
-	salir() {
-		if (!this.componente.spinner) {
-			this.componente.abierto = false;
-			this.refs.modalAutenticacionOtp.classList.remove('slds-fade-in-open');
-			this.refs.backdropModal.classList.remove('slds-backdrop_open');
-		}
-	}
-
-	@wire(getObjectInfo, {objectApiName: AUT})
-	wiredGetObjectInfo({error, data}) {
-		if (data) {
-			const recordTypeInfos = Object.values(data.recordTypeInfos);
-			const rtAutenticacionCsbd = recordTypeInfos.find(rt => rt.name === 'Autenticación segura (CSBD)');
-			this.componente.idRtAutenticacion = rtAutenticacionCsbd.recordTypeId;
-		} else if (error) {
-			console.error(error);
-		}
 	}
 }

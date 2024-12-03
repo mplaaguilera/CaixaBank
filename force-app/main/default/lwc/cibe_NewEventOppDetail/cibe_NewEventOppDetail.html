@@ -1,0 +1,531 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer slds-m-vertical_small">
+
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
+				<lightning-icon if:true={mainVinculed} size="x-small" title={label.mainOpp}
+					class="main-icon slds-button slds-button_neutral botonDorado" icon-name="utility:favorite"
+					variant="warning"></lightning-icon>
+				<div if:false={mainVinculed} class="vinculed">
+					<lightning-button-icon size="medium" title={label.markMainOpp} icon-name="utility:favorite"
+						variant="border-filled" onclick={handleMain}></lightning-button-icon>
+				</div>
+			</div>
+			<div class="slds-float_left">
+				<div class="name-col">
+					<div style="width:fit-content">
+						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
+						<span if:false={isInserted}>{name}</span>
+						<p>{label.statusOpp} <b>{statusNowLabel}</b></p>
+						<p>{label.fechaCierre} : <b>{oppoDateFront}</b></p>
+						<p if:true={showName}>Nombre del cliente : <b>{oppo.accountName}</b></p>
+					</div>
+				</div>
+			</div>
+			<div class="marginButtons itemSetting slds-float_left"
+				style="margin-right:15px; margin-left: 15px; width:fit-content">
+				<div if:false={isFuture}>
+					<div if:true={isOwner}>
+						<div if:true={noEvento}>
+							<lightning-button-icon icon-name="utility:edit" data-id="penfir" onclick={handlePFPath}
+								name="penfir" class={pfClass} variant="border" size="large"
+								title='Pendiente Firma'></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}
+								name="check" class={checkClass} variant="border" size="large"
+								title={label.cerradaPositiva}></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath}
+								name="close" class={closeClass} variant="border" size="large"
+								title={label.cerradaNegativa}></lightning-button-icon>
+						</div>
+						<div if:false={noEvento}>
+							<lightning-button-icon if:false={vinculed} icon-name="utility:arrow_right"
+								data-id="insistir" onclick={handleInsPath} name="insistir" class={insisClass}
+								variant="border" size="large" title='Insistir'></lightning-button-icon>
+							<lightning-button-icon if:true={vinculed} icon-name="utility:arrow_right" data-id="insistir"
+								onclick={handleInsPath} name="insistir" class={insisClass} variant="border" size="large"
+								title='Insistir'></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:edit" data-id="penfir" onclick={handlePFPath}
+								name="penfir" class={pfClass} variant="border" size="large"
+								title='Pendiente Firma'></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}
+								name="check" class={checkClass} variant="border" size="large"
+								title={label.cerradaPositiva}></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath}
+								name="close" class={closeClass} variant="border" size="large"
+								title={label.cerradaNegativa}></lightning-button-icon>
+						</div>
+					</div>
+					<div if:false={isOwner}>
+						<div if:true={isEditable}>
+							<div if:false={noEvento}>
+								<lightning-button-icon if:false={vinculed} icon-name="utility:arrow_right"
+									data-id="insistir" onclick={handleInsPath} name="insistir" class={insisClass}
+									variant="border" size="large" title='Insistir'></lightning-button-icon>
+								<lightning-button-icon if:true={vinculed} icon-name="utility:arrow_right"
+									data-id="insistir" onclick={handleInsPath} name="insistir" class={insisClass}
+									variant="border" size="large" title='Insistir'></lightning-button-icon>
+								<lightning-button-icon icon-name="utility:edit" data-id="penfir" onclick={handlePFPath}
+									name="penfir" class={pfClass} variant="border" size="large"
+									title='Pendiente Firma'></lightning-button-icon>
+								<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}
+									name="check" class={checkClass} variant="border" size="large"
+									title={label.cerradaPositiva}></lightning-button-icon>
+								<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath}
+									name="close" class={closeClass} variant="border" size="large"
+									title={label.cerradaNegativa}></lightning-button-icon>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div if:true={isFuture}>
+					<div if:true={isOwner}>
+						<div if:false={noEvento}>
+							<lightning-button-icon icon-name="utility:event" data-id="agendado" data-future="future"
+								onclick={handlePath} name="agendado" class={agendadoClass} variant="border" size="large"
+								title={label.agendar}>
+							</lightning-button-icon>
+							<span class="margin-agendar"></span>
+
+							<lightning-button-icon icon-name="utility:arrow_right" data-id="insistir"
+								data-future="future" onclick={handleInsPath} name="insistir" class={insisClass}
+								variant="border" size="large" title='Insistir'>
+							</lightning-button-icon>
+							<lightning-button-icon icon-name="utility:edit" data-id="penfir" data-future="future"
+								onclick={handlePFPath} name="penfir" class={pfClass} variant="border" size="large"
+								title='Pendiente Firma'></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:check" data-id="check" data-future="future"
+								onclick={handlePath} name="check" class={checkClass} variant="border" size="large"
+								title={label.cerradaPositiva}></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:close" data-id="close" data-future="future"
+								onclick={handlePath} name="close" class={closeClass} variant="border" size="large"
+								title={label.cerradaNegativa}></lightning-button-icon>
+						</div>
+					</div>
+					<div if:false={isOwner}>
+						<div if:true={isEditable}>
+							<div if:false={noEvento}>
+								<lightning-button-icon if:true={vinculed} icon-name="utility:event" data-id="noAgendado"
+									onclick={handlePath} name="noAgendado" class={agendadoClass} variant="border"
+									size="large" title='Desagendar'></lightning-button-icon>
+								<lightning-button-icon if:false={vinculed} icon-name="utility:event" data-id="agendado"
+									onclick={handlePath} name="agendado" class={agendadoClass} variant="border"
+									size="large" title={label.agendar}></lightning-button-icon>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Agendar Fieldset-->
+			<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address"
+				if:true={unfoldCmp}>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
+				<div class="slds-form-element__control">
+					<div class="slds-form-element__row">
+						<div class="slds-size_1-of-3">
+							<lightning-input data-id="importe" type="text" label={label.importe}
+								placeholder={label.amount} value={amount}
+								onchange={handleChangeImportePropio}></lightning-input>
+						</div>
+						<div class="slds-size_1-of-3">
+							<div class="slds-form-element">
+								<div class="slds-form-element__control">
+									<lightning-combobox label={label.probabilidad} required id="form-element-id-03"
+										placeholder="Probabilidad de exito" options={optionsProbabilidad}
+										onchange={handleChangeProbabilidad} value={probabilidad}></lightning-combobox>
+								</div>
+							</div>
+						</div>
+						<div class="slds-size_1-of-3" style="display: flex;">
+							<lightning-button label={label.detail} onclick={openDetailWindow}
+								style="margin-top:1.1rem"></lightning-button>
+							<lightning-button-icon if:true={showDeleteButtonOpp} icon-name="utility:delete"
+								data-id="delete" variant="border" size="large" title="Eliminar"
+								onclick={openDeleteWindow}
+								style="margin-top:1.1rem;margin-left: 0.5rem;"></lightning-button-icon>
+							<!-- POPUP -->
+							<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+								if:true={isModalDeleteOpen}>
+								<div class="slds-modal__container">
+									<header class="slds-modal__header">
+										<h2 class="slds-text-heading_medium"><strong>Confirmar eliminar</strong>
+										</h2>
+									</header>
+									<div class="slds-modal__content slds-p-around_medium" style="text-align: center;">
+										<h2>¿Deseas eliminar la Oportunidad "{name}"?</h2>
+									</div>
+									<footer class="slds-modal__footer">
+										<lightning-button label="Cancelar"
+											onclick={closeDeleteWindow}></lightning-button>
+										<lightning-button label="Eliminar" variant="brand" onclick={handleDelete}
+											style="margin-left: 10px;"></lightning-button>
+
+									</footer>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form-element__row">
+						<div class="slds-size_1-of-3">
+							<lightning-input data-id="fecPrG" type="date" required label="Fecha próxima gestión"
+								value={fechaProxGest} onchange={handleChangeFechaProxGestion}></lightning-input>
+						</div>
+						<div class="slds-size_1-of-3">
+							<lightning-input data-id="fecCierr" type="date" required label="Fecha cierre"
+								value={fechaCierre} onchange={handleChangeFechaCierre}></lightning-input>
+						</div>
+					</div>
+					<div class="slds-form-element__row">
+						<div class="slds-size_2-of-3">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label"
+									for="form-element-id-01">{label.comentario}</label>
+								<div class="slds-form-element__control">
+									<textarea id="form-element-id-01" class="slds-textarea" value={comentario}
+										onchange={handleChangeComentario}>{comentarioToSend}</textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<!--Cerrada Positiva Fieldset-->
+			<div if:true={isCPositiva}>
+				<fieldset
+					class="slds-form-element slds-form-element_compound slds-form-element_address slds-grid_vertical-align-start">
+					<div class="slds-form-element__control slds-grid_vertical-align-start">
+						<div class="slds-form-element__row slds-grid_vertical-align-start">
+							<div class="slds-size_2-of-3 slds-grid_vertical-align-start">
+								<div class="slds-form-element slds-grid_vertical-align-start">
+									<label class="slds-form-element__label"
+										for="form-element-id-01">{label.comentario}</label>
+									<textarea id="comentarioPF" class="slds-textarea" value={comentario}
+										onchange={handleChangeComentario}>{comentario}</textarea>
+								</div>
+							</div>
+							<div class="slds-size_1-of-3">
+								<div class="slds-m-bottom_large" style="display: flex;">
+									<lightning-button label={label.detail} onclick={openDetailWindow}
+										style="margin-top:1.1rem;"></lightning-button>
+									<lightning-button-icon if:true={showDeleteButtonOpp} icon-name="utility:delete"
+										data-id="delete" variant="border" size="large" title="Eliminar"
+										style="margin-top:1.1rem;margin-left: 0.5rem;"
+										onclick={openDeleteWindow}></lightning-button-icon>
+									<!-- POPUP -->
+									<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+										if:true={isModalDeleteOpen}>
+										<div class="slds-modal__container">
+											<header class="slds-modal__header">
+												<h2 class="slds-text-heading_medium"><strong>Confirmar eliminar</strong>
+												</h2>
+											</header>
+											<div class="slds-modal__content slds-p-around_medium"
+												style="text-align: center;">
+												<h2>¿Deseas eliminar la Oportunidad "{name}"?</h2>
+											</div>
+											<footer class="slds-modal__footer">
+												<lightning-button label="Cancelar"
+													onclick={closeDeleteWindow}></lightning-button>
+												<lightning-button label="Eliminar" variant="brand"
+													onclick={handleDelete}
+													style="margin-left: 10px;"></lightning-button>
+
+											</footer>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<!--Insistir Fieldset-->
+			<div if:true={isInsistir}>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecPrG" type="date" required label="Fecha próxima gestión"
+									value={fechaProxGest} onchange={handleChangeFechaProxGestion}></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecCierr" type="date" required label="Fecha cierre"
+									value={fechaCierre} onchange={handleChangeFechaCierre}></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3" style="display: flex;">
+								<lightning-button label={label.detail} onclick={openDetailWindow}
+									style="margin-top:1.1rem"></lightning-button>
+								<lightning-button-icon if:true={showDeleteButtonOpp} icon-name="utility:delete"
+									style="margin-top:1.1rem;margin-left: 0.5rem;" data-id="delete" variant="border"
+									size="large" title="Eliminar" onclick={openDeleteWindow}></lightning-button-icon>
+								<!-- POPUP -->
+								<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+									if:true={isModalDeleteOpen}>
+									<div class="slds-modal__container">
+										<header class="slds-modal__header">
+											<h2 class="slds-text-heading_medium"><strong>Confirmar eliminar</strong>
+											</h2>
+										</header>
+										<div class="slds-modal__content slds-p-around_medium"
+											style="text-align: center;">
+											<h2>¿Deseas eliminar la Oportunidad "{name}"?</h2>
+										</div>
+										<footer class="slds-modal__footer">
+											<lightning-button label="Cancelar"
+												onclick={closeDeleteWindow}></lightning-button>
+											<lightning-button label="Eliminar" variant="brand" onclick={handleDelete}
+												style="margin-left: 10px;"></lightning-button>
+
+										</footer>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-form-element__row">
+							<div class="slds-size_2-of-3">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label"
+										for="form-element-id-01">{label.comentario}</label>
+									<textarea class="slds-textarea" value={comentario}
+										onchange={handleChangeComentario}>{comentarioToSend}</textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<!--Insistir WO Fieldset-->
+			<div if:true={isInsistirNo}>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecPrG" type="date" required label="Fecha próxima gestión"
+									value={fechaProxGest} onchange={handleChangeFechaProxGestion}></lightning-input>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<!--Pendiente Firma Fieldset-->
+			<div if:true={isPenfir}>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecPrG" type="date" required label="Fecha próxima gestión"
+									value={fechaProxGest} onchange={handleChangeFechaProxGestion}></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecCierr" type="date" required label="Fecha cierre"
+									value={fechaCierre} onchange={handleChangeFechaCierre}></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3" style="display: flex;">
+								<lightning-button label={label.detail} onclick={openDetailWindow}
+									style="margin-top:1.1rem"></lightning-button>
+								<lightning-button-icon if:true={showDeleteButtonOpp} icon-name="utility:delete"
+									data-id="delete" variant="border" size="large" title="Eliminar"
+									style="margin-top:1.1rem;margin-left: 0.5rem;"
+									onclick={openDeleteWindow}></lightning-button-icon>
+								<!-- POPUP -->
+								<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+									if:true={isModalDeleteOpen}>
+									<div class="slds-modal__container">
+										<header class="slds-modal__header">
+											<h2 class="slds-text-heading_medium"><strong>Confirmar eliminar</strong>
+											</h2>
+										</header>
+										<div class="slds-modal__content slds-p-around_medium"
+											style="text-align: center;">
+											<h2>¿Deseas eliminar la Oportunidad "{name}"?</h2>
+										</div>
+										<footer class="slds-modal__footer">
+											<lightning-button label="Cancelar"
+												onclick={closeDeleteWindow}></lightning-button>
+											<lightning-button label="Eliminar" variant="brand" onclick={handleDelete}
+												style="margin-left: 10px;"></lightning-button>
+
+										</footer>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-form-element__row">
+							<div class="slds-size_2-of-3">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label"
+										for="form-element-id-01">{label.comentario}</label>
+									<textarea id="form-element-id-6" class="slds-textarea" value={comentario}
+										onchange={handleChangeComentario}>{comentarioToSend}</textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<!-- <div if:true={showComents} style="margin:.7rem 15px 0 17.5rem">
+					<p style="color:gray">{historyCommentDateLabel}</p>
+					<p style="margin-top:.3rem">{comentario}</p>
+				</div> -->
+			<!-- Campos CerradoNegativo -->
+			<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address"
+				if:true={showState}>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
+				<div class="slds-form-element__control">
+					<div class="slds-form-element__row">
+						<div class="slds-size_2-of-3">
+							<lightning-combobox required label={label.estado} id="form-element-id-04"
+								placeholder={label.estado} options={optionsEstado} onchange={handleChangeEstado}
+								value={state}></lightning-combobox>
+						</div>
+						<div class="slds-size_1-of-3" style="display: flex;">
+							<lightning-button label={label.detail} onclick={openDetailWindow}
+								style="margin-top:1.1rem"></lightning-button>
+							<lightning-button-icon if:true={showDeleteButtonOpp} icon-name="utility:delete"
+								data-id="delete" variant="border" size="large" title="Eliminar"
+								style="margin-top:1.1rem;margin-left: 0.5rem;"
+								onclick={openDeleteWindow}></lightning-button-icon>
+							<!-- POPUP -->
+							<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+								if:true={isModalDeleteOpen}>
+								<div class="slds-modal__container">
+									<header class="slds-modal__header">
+										<h2 class="slds-text-heading_medium"><strong>Confirmar eliminar</strong>
+										</h2>
+									</header>
+									<div class="slds-modal__content slds-p-around_medium" style="text-align: center;">
+										<h2>¿Deseas eliminar la Oportunidad "{name}"?</h2>
+									</div>
+									<footer class="slds-modal__footer">
+										<lightning-button label="Cancelar"
+											onclick={closeDeleteWindow}></lightning-button>
+										<lightning-button label="Eliminar" variant="brand" onclick={handleDelete}
+											style="margin-left: 10px;"></lightning-button>
+
+									</footer>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form-element__row">
+						<div class="slds-size_2-of-3">
+							<div class="slds-form-element">
+								<label class="slds-form-element__label"
+									for="form-element-id-01">{label.comentario}</label>
+								<textarea class="slds-textarea" value={comentario}
+									onchange={handleChangeComentario}> {comentarioToSend}</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<!-- POPUP -->
+			<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"
+				if:true={isModalOpen}>
+				<!-- <div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open"> -->
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+							title="Close" onclick={closeModal}>
+							<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+								size="small"></lightning-icon>
+							<span class="slds-assistive-text">Cerrar</span>
+						</button>
+						<h2 class="slds-text-heading_medium"><strong>{label.detail}</strong></h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium">
+
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input data-id="importe" type="text" label={label.importe}
+									placeholder={label.amount} value={amount}
+									onchange={handleChangeImportePropio}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-combobox label={label.divisa} id="divisa" options={optionsDivisa}
+									onchange={handleChangeDivisa} value={divisa}></lightning-combobox>
+							</div>
+
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="€" label={label.impactoBal}
+									onchange={handleChangeImpactoBalance} value={impactoBalance}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="€" label={label.impactoCom}
+									onchange={handleChangeImpactoComisiones}
+									value={impactoComisiones}></lightning-input>
+							</div>
+						</div>
+
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-form slds-form_stacked">
+									<div class="slds-form-element">
+										<label
+											class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+											for="toggle">{label.esg}</label>
+										<lightning-input type="toggle" variant="label-hidden" name="toggle"
+											message-toggle-active="" message-toggle-inactive="" checked={esg}
+											onchange={handleESG}></lightning-input>
+									</div>
+								</div>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-form slds-form_stacked">
+									<div class="slds-form-element">
+										<label
+											class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+											for="toggle">{label.confidencial}</label>
+										<lightning-input type="toggle" variant="label-hidden" name="toggle"
+											message-toggle-active="" message-toggle-inactive="" checked={confidencial}
+											onchange={handleConfidencial}></lightning-input>
+									</div>
+								</div>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+
+						<div class="slds-m-vertical_x-small">
+							{label.prodOtraEntidad}
+						</div>
+
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" label={label.entidad} onchange={handleChangeEntidad}
+									value={entidad}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="date" label={label.vencimiento}
+									onchange={handleChangeVencimiento} value={vencimiento}></lightning-input>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="€" label={label.precio}
+									onchange={handleChangePrecio} value={precio}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="%" label={label.margen}
+									onchange={handleChangeMargen} value={margen}></lightning-input>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button label={label.guardar} onclick={handleSave2}
+							disabled={isGuardarDisabled}></lightning-button>
+					</footer>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

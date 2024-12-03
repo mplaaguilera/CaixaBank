@@ -1,0 +1,9 @@
+<aura:component
+    implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    controller="CIBE_Header_Controller" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <!-- <aura:attribute name="param1" type="String"></aura:attribute>
+    {!v.param1} -->
+    <lightning:workspaceAPI aura:id="workspace" />
+    <c:cibe_EditEvent></c:cibe_EditEvent>
+</aura:component>

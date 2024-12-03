@@ -185,7 +185,7 @@ export default class Av_MassReassignOwnerOppsBPR extends LightningElement {
 	get optionsOppoStatus() {
 		return [
 			{ label: 'Potencial', value: 'Potencial' },
-			{ label: 'En gestión/insistir', value: 'En gestión/insistir' },
+			{ label: 'En Gestión', value: 'En gestión/insistir' },
 			{ label: 'No apto', value: 'No apto'},
 			{ label: 'Cerrada negativa', value: 'No interesado'},
 			{ label: 'Cerrada positiva', value: 'Cerrado positivo'},

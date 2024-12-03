@@ -4,14 +4,6 @@
 
 import {LightningElement, api} from 'lwc';
 
-const TEMA_CLASS = {
-	'Claro': 'slds-scoped-notification_light',
-	'Oscuro': 'slds-scoped-notification_dark',
-	'Éxito': 'slds-theme_success',
-	'Advertencia': 'slds-theme_warning',
-	'Error': 'slds-theme_error'
-};
-
 export default class CcScopedNotification extends LightningElement {
 	@api tema = 'Claro';
 
@@ -23,7 +15,6 @@ export default class CcScopedNotification extends LightningElement {
 
 	@api articleStyle;
 
-	/*
 	get articleClass() {
 		let articleClass = 'slds-card' + (this.texture ? ' slds-theme_alert-texture' : '');
 		if (this.tema === 'Claro') {
@@ -38,15 +29,6 @@ export default class CcScopedNotification extends LightningElement {
 			articleClass += ' slds-theme_error';
 		}
 		return articleClass;
-	}
-	*/
-
-	get articleClass() {
-		let articleClass = 'slds-card';
-		if (this.texture) {
-			articleClass += ' slds-theme_alert-texture';
-		}
-		return articleClass + ' ' + (TEMA_CLASS[this.tema] || '');
 	}
 
 	get iconoNombre() {

@@ -4,7 +4,6 @@
     <aura:attribute name="caso" type="Case" />
     <aura:attribute name="user" type="String" />
     <aura:attribute name="esPropietario" type="Boolean" default="false" />
-    <aura:attribute name="esPropietarioLetrado" type="Boolean" default="false" />
     <aura:attribute name="estaEnLaCola" type="Boolean" default="false" />
     <aura:attribute name="isGestor" type="Boolean" default="false" />    
     <aura:attribute name="modalAdvertencia" type="Boolean" default="false" /> 
@@ -67,10 +66,6 @@
         <aura:if isTrue="{!v.showAllButtons}">       
             <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner" onclick="{!c.tomarPropiedadConsulta}" disabled="{!v.esPropietario}"/>
 
-            <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_ConsultaSAC'}">
-                <lightning:button aura:id="botonTomarPropiedadLet" label="Tomar propiedad letrado" iconName="utility:change_owner" onclick="{!c.tomarPropiedadLetrado}" disabled="{!v.esPropietarioLetrado}"/>
-            </aura:if>
-
             <aura:if isTrue="{!and(v.caso.Status == 'SAC_011',v.showAllButtons)}">
                 <lightning:button label="Devolver Consulta" iconName="utility:skip" onclick="{!c.abrirModalAdvertenciaDevolverConsulta}"  disabled="{!v.estaEnLaCola}"/>
                 <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_Consulta'}">
@@ -82,7 +77,7 @@
                         </aura:set>
                     </aura:if>
                 </aura:if>                
-                <aura:if isTrue="{!or(v.esPropietario, v.esPropietarioLetrado)}">
+                <aura:if isTrue="{!v.esPropietario}">
                         <lightning:button label="Resolver " onclick="{! c.mostrarModalResolver }"  iconName="action:update_status"  disabled="false"/>
                         <lightning:button label="Derivar " onclick="{! c.derivacionModal }"  iconName="action:flow"  disabled="false"/>
                         <lightning:button label="Descartar " onclick="{! c.descartar }" iconName="action:reject"  disabled="false"/> 
@@ -116,32 +111,20 @@
                             </aura:set>
                         </aura:if>
                     </aura:if>
-                    <aura:if isTrue="{!v.caso.Status == 'SAC_011'}">
-                        <aura:if isTrue="{!or(v.esPropietario, v.esPropietarioLetrado)}">
-                            <lightning:button label="Resolver " onclick="{! c.mostrarModalResolver }"  iconName="action:update_status"  disabled="false"/>
-                            <lightning:button label="Derivar " onclick="{! c.derivacionModal }"  iconName="action:flow"  disabled="false"/>
-                            <lightning:button label="Descartar " onclick="{! c.descartar }" iconName="action:reject"  disabled="false"/> 
-                            <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_ConsultaSAC'}">
-                                <lightning:button label="Convertir " onclick="{! c.convertirModalReclamacion }" iconName="utility:rotate"  disabled="false"/>
-                            </aura:if>
-
-                            <aura:set attribute="else">
-                                <lightning:button label="Resolver " onclick="{! c.mostrarModalResolver }"  iconName="action:update_status"  disabled="true"/>
-                                <lightning:button label="Derivar " onclick="{! c.derivacionModal }"  iconName="action:flow"  disabled="true"/>
-                                <lightning:button label="Descartar " onclick="{! c.descartar }" iconName="action:reject"  disabled="true"/> 
-                                <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_ConsultaSAC'}">
-                                    <lightning:button label="Convertir " onclick="{! c.convertirModalReclamacion }" iconName="utility:rotate"  disabled="true"/>
-                                </aura:if>
-                            </aura:set> 
+                    <aura:if isTrue="{!and(v.esPropietario, v.caso.Status == 'SAC_011')}">
+                        <lightning:button label="Resolver " onclick="{! c.mostrarModalResolver }"  iconName="action:update_status"  disabled="false"/>
+                        <lightning:button label="Derivar " onclick="{! c.derivacionModal }"  iconName="action:flow"  disabled="false"/>
+                        <lightning:button label="Descartar " onclick="{! c.descartar }" iconName="action:reject"  disabled="false"/> 
+                        <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_ConsultaSAC'}">
+                            <lightning:button label="Convertir " onclick="{! c.convertirModalReclamacion }" iconName="utility:rotate"  disabled="false"/>
                         </aura:if>
-                        
                         <aura:set attribute="else">
                             <lightning:button label="Resolver " onclick="{! c.mostrarModalResolver }"  iconName="action:update_status"  disabled="true"/>
                             <lightning:button label="Derivar " onclick="{! c.derivacionModal }"  iconName="action:flow"  disabled="true"/>
                             <lightning:button label="Descartar " onclick="{! c.descartar }" iconName="action:reject"  disabled="true"/> 
                             <aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'SAC_ConsultaSAC'}">
-                                <lightning:button label="Convertir " onclick="{! c.convertirModalReclamacion }" iconName="utility:rotate"  disabled="true"/>
-                            </aura:if>
+                            <lightning:button label="Convertir " onclick="{! c.convertirModalReclamacion }" iconName="utility:rotate"  disabled="true"/>
+                        </aura:if>
                         </aura:set> 
                     </aura:if>                  
 
@@ -149,9 +132,7 @@
                         <lightning:button label="Reabrir Consulta" onclick="{! c.reabrir }" iconName="utility:arrow_left"  disabled="true"/>
 
                         <aura:set attribute="else">
-                            <aura:if isTrue="{!or(v.esPropietario, v.esPropietarioLetrado)}">
-                                <lightning:button label="Reabrir Consulta" onclick="{! c.modalReabrir }" iconName="utility:arrow_left"/>
-                            </aura:if>
+                            <lightning:button label="Reabrir Consulta" onclick="{! c.modalReabrir }" iconName="utility:arrow_left"  disabled="{!v.noEsPropietario}"/>
                         </aura:set>
 
                     </aura:if>

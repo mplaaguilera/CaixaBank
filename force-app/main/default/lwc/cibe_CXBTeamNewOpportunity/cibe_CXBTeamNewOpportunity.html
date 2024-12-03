@@ -30,6 +30,7 @@
                             </c-av_-lookup>
                           </div>
                     </div>
+
                     <div class="slds-form-element slds-form-element_stacked slds-m-around_small">
                             <lightning-dual-listbox
                                 data-id={selected}
@@ -42,6 +43,22 @@
                                 size="5">
                             </lightning-dual-listbox>
                     </div>
+
+
+
+                    <div if:true={isEMP} class="slds-form-element slds-form-element_stacked slds-m-around_small">
+                        <lightning-dual-listbox
+                            data-id={selected}
+                            label={labels.equipoInternacional}
+                            source-label={labels.availableOptions}
+                            selected-label={labels.selecedOptions}
+                            options={teamInternational}
+                            value={selected2}
+                            onchange={handleChange2}
+                            size="5">
+                        </lightning-dual-listbox>
+                    </div>
+
 
                     <div class="slds-card__body slds-card__body_inner ">
                         <template for:each={data} for:item="member" >

@@ -133,7 +133,6 @@
 			/*Recuperamos el mcc seleccionado como principal*/
 			checkboxes.forEach(function(checkbox){
 				if(checkbox.checked){
-					console.log('Inserto la principal');
 					let index = checkbox.getAttribute("data-index");
 					let mccPrin = listaMCCs[index];
 		
@@ -188,14 +187,12 @@
 
 				/*Recogemos el resto de MCCs*/
 				} else {
-					console.log('????????');
 					let index = checkbox.getAttribute("data-index");
 					restoMCCs.push(listaMCCs[index]);
 				}
 			});
 			/*Insertamos las pretensiones no seleccionadas*/
 			let insertarPretensiones = component.get('c.insertarPretensiones');
-			console.log('Inserto las no principal');
 			insertarPretensiones.setParams({'idCase': component.get('v.recordId'), 'mccsPretension': restoMCCs/*component.get('v.listMCC')*/});
 			insertarPretensiones.setCallback(this, function(response) {
 				var state = response.getState();

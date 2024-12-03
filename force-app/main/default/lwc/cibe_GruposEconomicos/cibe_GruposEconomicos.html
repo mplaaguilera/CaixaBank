@@ -23,9 +23,9 @@
         <div class="slds-form-element slds-form-element_stacked slds-var-m-around_small slds-size_1-of-6">
             <lightning-combobox
                 name="tipoGrupo"
-                label="Tipo de grupo económico"
+                label={labels.tipoGrEconomico}
                 value={tipoGrupo}
-                placeholder="Seleccione un tipo"
+                placeholder={labels.selectType}
                 options={options}
                 onchange={handleTipoGrupoChange}
                 dropdown-alignment="auto"
@@ -33,13 +33,21 @@
             </lightning-combobox>
         </div>
         <div class="slds-var-p-around_medium lgc-bg">
-            <div style={height} class="slds-scrollable">
+            <div if:false={cib} style={height} class="slds-scrollable">
                 <lightning-tree-grid
                     columns={gridColumns}
                     data={record}
                     key-field="id"
                     ontoggle={handleRowToggle}
                     resize-column-disabled
+                ></lightning-tree-grid>
+            </div>
+            <div if:true={cib} style={height} class="slds-scrollable">
+                <lightning-tree-grid
+                    columns={gridColumnsCIB}
+                    data={recordCIB}
+                    key-field="id"
+                    ontoggle={handleRowToggle}
                 ></lightning-tree-grid>
             </div>
             <template if:true={showLoadingBody}>

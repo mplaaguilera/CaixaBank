@@ -6,14 +6,15 @@ import recursoCSS from '@salesforce/resourceUrl/SIR_lightningTreeGrid';
 const COLUMNS = [
     { type: 'url', fieldName: 'idProceso', label: 'Proceso',
         typeAttributes: {
-            label: { fieldName: 'name' },
+            label: { fieldName: 'name' }
         },initialWidth: 210 },    
     { type: 'date', fieldName: 'fechaInicio', label: 'Fecha Inicio' }, //Inicio en Estrategia o Inicio Proceso Refi 
-    { type: 'date', fieldName: 'fechaFin', label: 'Fecha Fin', }, // Estrategia
+    { type: 'date', fieldName: 'fechaFin', label: 'Fecha Fin' }, // Estrategia
     { type: 'text', fieldName: 'estrategia', label: 'Estrategia' },
     { type: 'text', fieldName: 'situacion', label: 'Situación' },
     { type: 'date', fieldName: 'fechaSituacion', label: 'Fecha Situación' },
-    { type: 'text', fieldName: 'gestor', label: 'Gestor' },    
+    { type: 'text', fieldName: 'alertaSirec', label: 'Alerta SIREC' },
+    { type: 'text', fieldName: 'gestor', label: 'Gestor' }
 ];
 
 export default class Sir_lwc_arbolProceso extends LightningElement {    
@@ -21,7 +22,6 @@ export default class Sir_lwc_arbolProceso extends LightningElement {
     gridColumns = COLUMNS;  
     @track procesos; 
     @track titulo;   
-    
     
     @wire(getProcesos, {idProceso: '$recordId'})
     getProcesos({error, data}) { 
@@ -33,6 +33,4 @@ export default class Sir_lwc_arbolProceso extends LightningElement {
             loadStyle(this, recursoCSS);
         }     
     }
-    
-
 }

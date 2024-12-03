@@ -21,11 +21,10 @@ export default class AV_LookUpFlow extends LightningElement {
 	
 	@api recordId; 
 
-    @wire(CurrentPageReference) pageRef;
-    recordId;
-
-	connectedCallback() {
-        this.recordId = this.pageRef.attributes.recordId;
+	@wire(CurrentPageReference)
+    currPage(pageRef) {
+        this.recordId = pageRef.attributes.recordId;
+        this.currentPageReference = pageRef;
     }
 
 	@api

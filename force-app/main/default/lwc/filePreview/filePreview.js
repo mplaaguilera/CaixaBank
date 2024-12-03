@@ -7,7 +7,7 @@ export default class FilePreview extends LightningElement {
   getDocBaseUrl = () => {
     return `https://${
       window.location.hostname.split(".")[0]
-    }.file.force.com`;
+    }--c.documentforce.com`;
   };
   getContentDocUrl = (fileId) => {
     return `/lightning/r/ContentDocument/${fileId}/view`;

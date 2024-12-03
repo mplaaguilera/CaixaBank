@@ -147,7 +147,7 @@
     </aura:if>
 
      <!-- Modal para informar de que hay elementos por validar-->
-     <aura:if isTrue="{!and(or(v.procedencia=='SAC_003',v.procedencia=='Inadmision'),v.modalValidar)}">
+     <aura:if isTrue="{!and(v.procedencia=='SAC_003',v.modalValidar)}">
         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
             aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">

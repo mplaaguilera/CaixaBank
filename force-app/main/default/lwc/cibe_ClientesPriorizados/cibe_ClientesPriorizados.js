@@ -1,4 +1,7 @@
 import { LightningElement, wire, track, api } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
+import { RefreshEvent } from 'lightning/refresh';
+
 
 //labels
 import titulo from '@salesforce/label/c.CIBE_ClientesPriorizados';
@@ -82,6 +85,7 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
     @track sortByLabel;
     @track sortDirection;
     @track defaultSort = 'asc';
+    @api subjectPick;
 
     filterResults = {
         subjectFilterValue: null
@@ -137,17 +141,12 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
         this.showPill = false;
         this.showSpinner = false;
         this.data = this.auxData;
-
     }
-
-    @api subjectPick;
 
     handleSelectionChange(event){
         this.multiSelectionDouble++;
         this.initialSelection = [];
         this.buttonDisabled = false;
-        
-
         this.selectedIds = event.detail;
 
         this.errors = [];
@@ -163,24 +162,25 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
                             'sObjectType':'Account',
                             'subtitle':'Matricula •',
                             'title':this.originalLookUpOptions[i].title,
-                            'bucleId':this.multiSelectionDouble};
-                        break;
-                }
-            }
-            let insert = true;
-            if (this.selection.length > 0) {
-                for (let i = 0; i < this.selection.length; i++) {
-                    if (this.selection[i].id == this.subjectPick.id) {
-                        insert = false;
+                            'bucleId':this.multiSelectionDouble
+                        };
                         break;
                     }
                 }
+                let insert = true;
+                if (this.selection.length > 0) {
+                    for (let i = 0; i < this.selection.length; i++) {
+                        if (this.selection[i].id == this.subjectPick.id) {
+                            insert = false;
+                            break;
+                        }
+                    }
+                }
+                if (insert) {
+                    this.selection.push(this.subjectPick);
+                }       
             }
-            if (insert) {
-                this.selection.push(this.subjectPick);
-            }       
-		}
-	    }
+        }
         this.showPill = true;
     }
     
@@ -195,6 +195,7 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
         getData({ filterResults: this.filterResults, selectedIds : this.selectedIds, clickFilter : this.auxClickFilter })
             .then((result) => {
                 this.data = result;
+                refreshApex(this.data);
             })
             .catch((error) => {
                 console.log("error ", error);
@@ -212,15 +213,12 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
                 sortField = col.typeAttributes.label.fieldName;
             }
         }
-
         this.sortDirection = event.detail.sortDirection;
-
         this.sortData(sortField, this.sortDirection);
     }
 
     sortData(fieldname, direction) {
         let parseData = JSON.parse(JSON.stringify(this.data));
-
         let keyValue = (a) => {
             return a[fieldname];
         };
@@ -231,25 +229,22 @@ export default class Cibe_ClientesPriorizados extends LightningElement {
             y = keyValue(y) ? keyValue(y) : '';
             return isReverse * ((x > y) - (y > x));
         });
-
         this.data.forEach(e => {
             console.log(e);
         })
-
     }  
 
     sortBy(field, reverse, primer) {
-        const key = primer
-        ? function(x) {
-        return primer(x[field]);
-        }
-        : function(x) {
-        return x[field];
-        };return function(a, b) {
-        a = key(a);
-        b = key(b);
+        const key = primer ? function(x) {
+            return primer(x[field]);
+        } : function(x) {
+                return x[field];
+            };
+        
+        return function(a, b) {
+            a = key(a);
+            b = key(b);
          return reverse * ((a > b) - (b > a));
         };
-        }
-
+    }
 }

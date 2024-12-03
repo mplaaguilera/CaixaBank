@@ -232,6 +232,8 @@
     <aura:attribute name="mostrarOnboarding" type="Boolean" default="false" description="Cierto si se muestra boton Onboarding"/>
     <aura:attribute name="botonValidarOnboarding" type="Boolean" default="true"/>
     <aura:attribute name="valueInputDNI" type="String" default="" />
+    <aura:attribute name="bloqueadoBotonDerivar" type="Boolean" default="false" />
+    <aura:attribute name="derivadaCSBD" type="Boolean" default="false" />
 
 
     <!--Handlers-->
@@ -387,9 +389,10 @@
                 </aura:if>
 
                 <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
-                    <lightning:button aura:id="operativaOficina" label="Derivar" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
+                    <lightning:button aura:id="operativaOficina" label="Derivar" iconName="utility:company" onclick="{!c.validacionesOperativa}" disabled="{!v.bloqueadoBotonDerivar}"/>
                     <aura:if isTrue="{!v.mostrarModalOficina}">
-                        <c:cc_Operativa_Oficina aura:id="lwcOperativa" recordId="{!v.recordId}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>
+                        <!--101-->
+                        <c:cc_Operativa_Oficina aura:id="lwcOperativa" recordId="{!v.recordId}" oportunidadCreadaAPI="{!v.derivadaCSBD}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>
                     </aura:if>
                 </aura:if>
 

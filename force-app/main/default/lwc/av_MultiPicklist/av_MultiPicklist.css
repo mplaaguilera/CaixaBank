@@ -1,0 +1,11 @@
+.slds-has-focus {
+	--slds-g-color-brand-base-60:black;
+	--lwc-shadowButtonFocus:black;
+}
+.hr-division {
+	margin: 0rem;
+}
+.pading-all-show {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}

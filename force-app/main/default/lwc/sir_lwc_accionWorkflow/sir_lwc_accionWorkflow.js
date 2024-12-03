@@ -10,14 +10,14 @@ import getPicklistContactos from '@salesforce/apex/SIR_LCMP_accionWorkflow.getPi
 import insertAccion from '@salesforce/apex/SIR_LCMP_accionWorkflow.insertAccion';
 import updateAccion from '@salesforce/apex/SIR_LCMP_accionWorkflow.updateAccion';
 import enviarAccion from '@salesforce/apex/SIR_LCMP_accionWorkflow.enviarAccion';
+import buscarIdsAccion from '@salesforce/apex/SIR_LCMP_accionWorkflow.buscarIdsAccion';
+
 
 import {loadStyle } from 'lightning/platformResourceLoader';
 import recurso from '@salesforce/resourceUrl/SIR_proceso';
 
 import { getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import ACCIONES_OBJECT from '@salesforce/schema/SIREC__SIREC_obj_acciones__c';
-import PROCESO_OBJECT from '@salesforce/schema/SIREC__SIREC_obj_proceso__c';
 
 export default class Sir_lwc_accionWorkflow extends LightningElement {
     @api recordId;
@@ -30,6 +30,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     @track rtIdProcesoPRESOL;
     @track rtIdProcesoIMPA;
     @track rtIdProcesoEmpFlujo;
+    @track recordTypeDeveloperNameProceso;
 
     @track nuevaAccion = false;
     @track titulo = null;
@@ -48,6 +49,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     @track proceso = null;
     @track nombreProceso = null;
     @track estrategia = null;
+    @track descEstrategia = null;
     @track idTarea = null;
     @track fechaContacto = null;
     @track fechaCarga = null;
@@ -95,16 +97,18 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     @track isLoaded = false;
     @track mostrarInterviniente = false;
     @track mostrarContacto = false;
+    @track recordtypeAccion;
+
 
     // cargamos con el recurso estatico los estilos
     connectedCallback(){
         loadStyle(this, recurso);
     }
     
-    @wire(getObjectInfo, { objectApiName: ACCIONES_OBJECT })
+    /*@wire(getObjectInfo, { objectApiName: ACCIONES_OBJECT })
     objectInfoAcciones;
     @wire(getObjectInfo, { objectApiName: PROCESO_OBJECT })
-    objectInfoProceso;
+    objectInfoProceso;*/
 
     
     /*Se obtienen los valores de las Picklist en funcion del RT de Accion*/
@@ -116,78 +120,88 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     resultPicklistValuesEmpFlujo;
 
     /* Se hace consulta sobre el proceso para obtener la información de la tarea */
-    @wire(getProceso, { idProceso: '$recordId', objectInfoAcciones: '$objectInfoAcciones', objectInfoProceso: '$objectInfoProceso'})
+    @wire(getProceso, { idProceso: '$recordId' }) // objectInfoAcciones: '$objectInfoAcciones', objectInfoProceso: '$objectInfoProceso'
     getProceso(value) { 
         this.wiredAccion = value;
         const { data, error } = value;        
         if(data){
-            //Se obtienen los rts de Acciones
-            const rtisAcc = this.objectInfoAcciones.data.recordTypeInfos;
-            this.rtIdAccPRESOL = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Preventivo');
-            this.rtIdAccIMPA = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Amistoso');
-            this.rtIdAccEmpFlujo = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Amistoso Empresa');
-            //Se obtienen los rts de Procesos
-            const rtisProceso = this.objectInfoProceso.data.recordTypeInfos;
-            this.rtIdProcesoPRESOL = Object.keys(rtisProceso).find(rti => rtisProceso[rti].name === 'PRESOL');
-            this.rtIdProcesoIMPA = Object.keys(rtisProceso).find(rti => rtisProceso[rti].name === 'Proceso Amistoso');
-            this.rtIdProcesoEmpFlujo = Object.keys(rtisProceso).find(rti => rtisProceso[rti].name === 'Flujo');
-            //Si se ha pulsado sobre el boton "Gestion Tarea Pendiente" en la ficha de PROCESO
-            if(data.length > 0){
-                this.fichaProceso = true;
-                this.proceso = data; 
-                this.idAccount = this.proceso[0].SIREC__SIREC_fld_cliente__c;
-                this.idTarea = this.proceso[0].SIREC__SIREC_fld_tarea__c;
-                this.tipoTarea = this.proceso[0].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_tipo_tarea__c;
-                this.codTarea = this.proceso[0].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_codigo_tarea__c;
-                this.recordTypeIdProceso = this.proceso[0].RecordTypeId;
-                if(this.recordTypeIdProceso == this.rtIdProcesoPRESOL){
-                    this.fechaMinima = this.proceso[0].SIR_fechaCarga__c;        
-                } else {
-                    this.fechaMinima = this.proceso[0].SIREC__SIREC_fld_fechaInicio__c;        
-                }
-                //Se setea el id del rt de acción en función del rt del proceso 
-                if(this.recordTypeIdProceso == this.rtIdProcesoIMPA){
-                    this.recordTypeIdAcc = this.rtIdAccIMPA;
-                    this.mostrarInterviniente = true;
-                    this.mostrarContacto = false;
-                } else if(this.recordTypeIdProceso == this.rtIdProcesoPRESOL){
-                    this.recordTypeIdAcc = this.rtIdAccPRESOL;
-                    this.mostrarInterviniente = true;
-                    this.mostrarContacto = false;
-                } else if(this.recordTypeIdProceso == this.rtIdProcesoEmpFlujo){
-                    this.recordTypeIdAcc = this.rtIdAccEmpFlujo;
-                    this.mostrarInterviniente = false;
-                    this.mostrarContacto = true;
-                } else {
-                    this.recordTypeIdAcc = this.rtIdAccIMPA;
-                    this.mostrarInterviniente = true;
-                    this.mostrarContacto = false;
+            this.recordTypeDeveloperNameProceso = data[0].RecordType.DeveloperName;
+            buscarIdsAccion({rtDevelop : this.recordTypeDeveloperNameProceso}).then(result => { 
+                //Se obtiene el rt de Accion del proceso actual
+                this.recordtypeAccion = result;
+
+                if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_procesoAmistoso'){ //PROCESO_RECORDTYPE_DEVELOPER_NAME_IMPA
+                    this.rtIdAccIMPA = result;
+                }else if (this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso') { //PROCESO_RECORDTYPE_DEVELOPER_NAME_EMP_FLUJO
+                    this.rtIdAccEmpFlujo = result;
+                } else if (this.recordTypeDeveloperNameProceso === 'SIREC_rt_Anticipacion') { //PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL
+                    this.rtIdAccPRESOL = result;
+                }else{
+                    return null;
                 }
 
-                //Comprobamos si ya existe una accion en curso, o si por el contrario es una nueva accion
-                //Se considerean acciones en curso aquellas cuyo estado es: En curso, Enviado, Pendiente de Sincronizar
-                getAccionProceso({idTarea : this.idTarea}).then(result => { 
-                    // Es una modificacion de accion desde ficha PROCESO
-                    if(result.length > 0){
-                        this.accion = result;
-                        this.idAccion = this.accion[0].Id;
+                //Si se ha pulsado sobre el boton "Gestion Tarea Pendiente" en la ficha de PROCESO
+                if(data.length > 0){
+                    this.fichaProceso = true;
+                    this.proceso = data; 
+                    this.idAccount = this.proceso[0].SIREC__SIREC_fld_cliente__c;
+                    this.idTarea = this.proceso[0].SIREC__SIREC_fld_tarea__c;
+                    this.tipoTarea = this.proceso[0].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_tipo_tarea__c;
+                    this.codTarea = this.proceso[0].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_codigo_tarea__c;
+                    this.recordTypeIdProceso = this.proceso[0].RecordTypeId;
 
-                        this.nuevaAccion = false;
-                        this.titulo = 'Modificación';                        
-                        //Mostramos el formulario de modificacion de accion                 
-                        this.informarFormAccionProceso(this.idAccion); 
-                    } else { //Es una nueva accion
-                        this.nombreProceso = this.proceso[0].Name;
-                        this.estrategia = this.proceso[0].SIREC__SIREC_fld_estrategia__c;
-                        this.titulo = 'Nueva';                                        
-                        //Mostramos el formulario de creacion de accion                                         
-                        this.crearFormAccion();                            
+                    //Se setea el id del rt de acción en función del rt del proceso 
+                    if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_procesoAmistoso'){
+                        this.recordTypeIdAcc = this.rtIdAccIMPA;
+                        this.mostrarInterviniente = true;
+                        this.mostrarContacto = false;
+                        this.fechaMinima = this.proceso[0].SIREC__SIREC_fld_fechaInicio__c;        
+                    } else if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_Anticipacion'){
+                        this.recordTypeIdAcc = this.rtIdAccPRESOL;
+                        this.mostrarInterviniente = true;
+                        this.mostrarContacto = false;
+                        this.fechaMinima = this.proceso[0].SIR_fechaCarga__c;                               
+                    } else if(this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso'){
+                        this.recordTypeIdAcc = this.rtIdAccEmpFlujo;
+                        this.mostrarInterviniente = false;
+                        this.mostrarContacto = true;
+                        this.fechaMinima = this.proceso[0].SIREC__SIREC_fld_fechaInicio__c;        
+                    } else {
+                        this.recordTypeIdAcc = this.rtIdAccIMPA;
+                        this.mostrarInterviniente = true;
+                        this.mostrarContacto = false;
+                        this.fechaMinima = this.proceso[0].SIREC__SIREC_fld_fechaInicio__c;                              
                     }
-                })
-                .catch(error => {
-                    this.mensajeError = error;
-                });
-            }                           
+
+                    //Comprobamos si ya existe una accion en curso, o si por el contrario es una nueva accion
+                    //Se considerean acciones en curso aquellas cuyo estado es: En curso, Enviado, Pendiente de Sincronizar
+                    getAccionProceso({idTarea : this.idTarea}).then(result => { 
+                        // Es una modificacion de accion desde ficha PROCESO
+                        if(result.length > 0){
+                            this.accion = result;
+                            this.idAccion = this.accion[0].Id;
+
+                            this.nuevaAccion = false;
+                            this.titulo = 'Modificación';                        
+                            //Mostramos el formulario de modificacion de accion                 
+                            this.informarFormAccionProceso(this.idAccion); 
+                        } else { //Es una nueva accion
+                            this.nombreProceso = this.proceso[0].Name;
+                            this.estrategia = this.proceso[0].SIREC__SIREC_fld_estrategia__c;
+                            this.descEstrategia = this.proceso[0].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
+                            this.titulo = 'Nueva';                                        
+                            //Mostramos el formulario de creacion de accion                                         
+                            this.crearFormAccion();                            
+                        }
+                    })
+                    .catch(error => {
+                        this.mensajeError = error;
+                    });
+                }                    
+            })
+            .catch(error => {
+                this.mensajeError = error;  
+            });                                     
         }                 
     }
 
@@ -197,13 +211,13 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
         this.botonGuardar = true;
         this.nombreBoton = 'Guardar';               
         var today = new Date();
-        if(this.fechaContacto == '' ||  this.fechaContacto == null){
+        if(this.fechaContacto === '' ||  this.fechaContacto == null){
             this.fechaContacto = today.toISOString();            
         }
         this.responsable = this.userId;
-        if(this.recordTypeIdProceso == this.rtIdProcesoEmpFlujo){
+        if(this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso'){
             getPicklistContactos({idAccount: this.idAccount}).then(result => {
-                if(result.length == 0){
+                if(result.length === 0){
                     this.nombreBoton = 'Guardar'; 
                     this.disabledGuardar = true;
                     this.mensajeKO = true;
@@ -215,10 +229,10 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                 }                                  
             });
         } else {
-            getPicklistIntervinientes({idProceso: this.recordId}).then(result => { 
+            getPicklistIntervinientes({idProceso : this.recordId}).then(result => { 
                 this.optionsInterviniente = result; 
                 for (var i = 0; i < result.length; i++) {
-                    if(result[i].value == this.proceso[0].SIREC__SIREC_fld_cliente__c){
+                    if(result[i].value === this.proceso[0].SIREC__SIREC_fld_cliente__c){
                         this.interviniente = result[i].value;
                     }
                 }                      
@@ -231,7 +245,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     informarFormAccionProceso(idAccion){  
         this.idAccion = idAccion; 
         var today = new Date();
-        if(this.fechaContacto == '' || this.fechaContacto == null){
+        if(this.fechaContacto === '' || this.fechaContacto == null){
             this.fechaContacto = today.toISOString();            
         }
 
@@ -241,9 +255,9 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
             this.disableAcciones = false;
             this.disableResultado = false; 
 
-            if(this.recordTypeIdProceso == this.rtIdProcesoEmpFlujo){                
+            if(this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso'){                
                 getPicklistContactos({idAccount: this.idAccount}).then(result => {
-                    if(result.length == 0){
+                    if(result.length === 0){
                         this.nombreBoton = 'Guardar'; 
                         this.disabledGuardar = true;
                         this.mensajeKO = true;
@@ -251,7 +265,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                     } else {
                         this.optionsContacto = result; 
                         for (var i = 0; i < result.length; i++) {
-                            if(result[i].value == this.accion[0].SIR_contactoAccionEmp__c){
+                            if(result[i].value === this.accion[0].SIR_contactoAccionEmp__c){
                                 this.contacto = result[i].value;
                             }
                         } 
@@ -263,7 +277,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                 getPicklistIntervinientes({idProceso: this.accion[0].SIREC__SIREC_fld_proceso__c}).then(result => { 
                     this.optionsInterviniente = result; 
                     for (var i = 0; i < result.length; i++) {
-                        if(result[i].value == this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
+                        if(result[i].value === this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
                             this.interviniente = result[i].value;
                         }
                     } 
@@ -285,13 +299,13 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
         this.valueAccion = this.accion[0].SIREC__SIREC_fld_accion__c;
         this.valueResultado = this.accion[0].SIREC__SIREC_fld_resultado__c;
         //Se filtran valores que no deben aparecer en el campo Resultado
-        if(this.recordTypeIdProceso == this.rtIdProcesoPRESOL){
+        if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_Anticipacion'){
             let key = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26));                 
-        } else if(this.recordTypeIdProceso == this.rtIdProcesoIMPA){
+        } else if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_procesoAmistoso'){
             let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
-        } else if(this.recordTypeIdProceso == this.rtIdProcesoEmpFlujo){
+        } else if(this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso'){
             let key = this.resultPicklistValuesEmpFlujo.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesEmpFlujo.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
         }
@@ -333,13 +347,13 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
         this.valueResultado = null;
         this.validaciones();
         //Se filtran valores que no deben aparecer en el campo Resultado
-        if(this.recordTypeIdProceso == this.rtIdProcesoPRESOL){
+        if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_Anticipacion'){
             let key = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26));                 
-        } else if(this.recordTypeIdProceso == this.rtIdProcesoIMPA){
+        } else if(this.recordTypeDeveloperNameProceso === 'SIREC_rt_procesoAmistoso'){
             let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
-        } else if(this.recordTypeIdProceso == this.rtIdProcesoEmpFlujo){            
+        } else if(this.recordTypeDeveloperNameProceso === 'SIRE_RT_Amistoso'){            
             let key = this.resultPicklistValuesEmpFlujo.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
             this.optionsResultado = this.resultPicklistValuesEmpFlujo.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
         }
@@ -368,7 +382,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
     changeContacto(event){
         this.contacto = event.target.value;
         for(let i = 0; i < this.optionsContacto.length; i++){ 
-            if(this.optionsContacto[i].value == this.contacto){
+            if(this.optionsContacto[i].value === this.contacto){
                 this.contactoCargo = this.optionsContacto[i].label;
             }
         }
@@ -395,7 +409,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
         
         let today = new Date();
         today = today.toISOString(); 
-        if(this.valueResultado !='' && this.valueResultado != null && this.valueResultado != undefined && this.fechaContacto>today){ 
+        if(this.valueResultado !== '' && this.valueResultado != null && this.valueResultado !== undefined && this.fechaContacto>today){ 
             this.errorGeneral = true;
             this.mensajeError = this.mensajeError + '- La fecha no puede ser superior a la de hoy cuando se tiene un resultado informado. \n'; 
         }
@@ -407,17 +421,17 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
 
         // Si la accion es de recordType EmpFlujo entonces se mira si esta informado el campo Contacto, en caso de cualquier otro RT se da como OK porque no es obligatorio
         var contactoOk = false;
-        if(this.recordTypeIdAcc == this.rtIdAccEmpFlujo && this.contacto != undefined || this.recordTypeIdAcc != this.rtIdAccEmpFlujo){
+        if(this.recordTypeIdAcc === this.rtIdAccEmpFlujo && this.contacto !== undefined || this.recordTypeIdAcc !== this.rtIdAccEmpFlujo){
             contactoOk = true;
         } else {
             contactoOk = false;
         }
         
-        if(this.interviniente != undefined && this.responsable != undefined && this.responsable != '' && this.valueAccion != undefined 
-            && this.valueAccion != '' && this.valueAccion != null && this.valueTipo != undefined && this.fechaContacto != undefined 
-            && contactoOk == true && !this.errorGeneral){
+        if(this.interviniente !== undefined && this.responsable !== undefined && this.responsable !== '' && this.valueAccion !== undefined 
+            && this.valueAccion !== '' && this.valueAccion != null && this.valueTipo !== undefined && this.fechaContacto !== undefined 
+            && contactoOk === true && !this.errorGeneral){
             this.disabledGuardar = false;
-            if (this.valueResultado !='' && this.valueResultado != null && this.valueResultado != undefined) {
+            if (this.valueResultado !=='' && this.valueResultado != null && this.valueResultado !== undefined) {
                 this.nombreBoton = 'Guardar y enviar';
             }else{
                 this.nombreBoton = 'Guardar'; 
@@ -446,6 +460,8 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
         this.form.push(this.comprobarValor(this.contactoCargo));                 
         this.form.push(this.comprobarValor(this.estrategia));
         this.form.push(this.comprobarValor(this.recordTypeIdAcc));
+        this.form.push(this.comprobarValor(this.descEstrategia));
+        this.form.push(this.comprobarValor(this.idTarea));
 
         //Si es una nueva Accion
         if(this.nuevaAccion){
@@ -454,11 +470,11 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                 var resultadoInsert = result;
                 resultadoInsert = resultadoInsert.split('-');     
                 //Si la accion se crea correctamente
-                if(resultadoInsert[0] == 'OK'){
+                if(resultadoInsert[0] === 'OK'){
                     var resultadoInsertSplit2 = resultadoInsert[1].split('@');       
                     this.idAccion = resultadoInsertSplit2[1]; 
                     //Si el resultado esta informado se llama al WS altaAccion                   
-                    if(resultadoInsertSplit2[0] == 'true'){
+                    if(resultadoInsertSplit2[0] === 'true'){
                         this.idAccion = resultadoInsertSplit2[1];
                         this.enviarAccionWS();
                     } 
@@ -502,9 +518,9 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                     var resultadoUpdate = result;
                     resultadoUpdate = resultadoUpdate.split('-');
                     //Si la modificacion se realiza correctamente                 
-                    if(resultadoUpdate[0] == 'OK'){   
+                    if(resultadoUpdate[0] === 'OK'){   
                         // Se llama al WS porque el resultado esta informado                          
-                        if(resultadoUpdate[1] == 'true'){                            
+                        if(resultadoUpdate[1] === 'true'){                            
                             this.enviarAccionWS();    
                         } else {                     
                             this.dispatchEvent(
@@ -551,7 +567,7 @@ export default class Sir_lwc_accionWorkflow extends LightningElement {
                     /* Modificacion HSC 20/10 -- Las acciones no se anidan */
                     this.isLoaded = false;
                     //Si el envio ha ido bien y el WS devuelve un OK
-                    if(result[0] == 'OK'){  
+                    if(result[0] === 'OK'){  
                         /// cga - si se envia a sirec y ha dado ok se anida
                         this.dispatchEvent(new CustomEvent('siguiente'));
                     }

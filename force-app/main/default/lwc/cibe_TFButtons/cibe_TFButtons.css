@@ -1,0 +1,34 @@
+.pestanyes-globals {
+    font-family: Arial;
+}
+
+
+:host {
+    display: block;
+}
+
+.contenidor-general .pestanyes-globals .pestanyes li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid white; 
+    display: inline-block;
+}
+
+.contenidor-general .pestanyes-globals .pestanyes li a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #009ee0; 
+    color: white; 
+    text-decoration: none;
+}
+
+.contenidor-general .pestanyes-globals .pestanyes li.select a {
+    background-color: #e7e7e7;
+    color: black;
+    font-weight: bold;
+}
+
+.contenidor-general .pestanyes-globals .pestanyes li a:hover {
+    background-color: #006a98;
+}

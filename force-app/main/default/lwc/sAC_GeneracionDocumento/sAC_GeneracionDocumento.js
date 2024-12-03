@@ -11,9 +11,10 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 //Campos reclamación
 import IDIOMA_FIELD from '@salesforce/schema/Case.CC_Idioma__c';
+import RECORDTYPE_FIELD from '@salesforce/schema/Case.RecordType.DeveloperName';
 
 
-const fields = [IDIOMA_FIELD];
+const fields = [IDIOMA_FIELD, RECORDTYPE_FIELD];
 export default class SAC_GeneracionDocumento extends LightningElement {
 
     @track idRedaccion;
@@ -40,6 +41,8 @@ export default class SAC_GeneracionDocumento extends LightningElement {
 
     @track caso;
     @track idiomaReclamacion = '';
+    @track recordType;
+    @track carpetaRaiz;
    
     @api recordId;  
     @api cuerpo;
@@ -58,7 +61,12 @@ export default class SAC_GeneracionDocumento extends LightningElement {
         if(data){
             this.caso = data;
             this.idiomaReclamacion = data.fields.CC_Idioma__c.value;
-            console.log('el idioma ' + JSON.stringify(this.idiomaReclamacion));
+            this.recordType = getFieldValue(this.caso, RECORDTYPE_FIELD);
+            if(this.recordType === 'SPV_Reclamacion') {
+                this.carpetaRaiz = 'SPV_PlantillasRedaccion';
+            } else {
+                this.carpetaRaiz = 'SAC_PlantillasRedaccion';
+            }
         }
     }
 
@@ -67,37 +75,20 @@ export default class SAC_GeneracionDocumento extends LightningElement {
         event.preventDefault();   
         const fields = event.detail.fields;
         fields.SAC_DocPDF__c = this.cuerpo;
-        console.log('this.cuerpo ' +this.cuerpo);
-        // Utiliza una expresión regular para encontrar todas las ocurrencias de <br><br>
-        //const regex = /<br\s*\/?><br\s*\/?>/gi;
-        
-        // Reemplaza todas las ocurrencias de <br><br> por </span></p><p>
-        // const updatedHtml = this.cuerpo.replace(regex, '<p></p>');
-        // fields.SAC_DocPDF__c = updatedHtml;
-        // console.log('this.cuerpo DESPUESS ' +fields.SAC_DocPDF__c);
 
-        // const sinBr = this.cuerpo.replace(/<br\s*>/gi, '');
-        // fields.SAC_DocPDF__c = sinBr;
-        // console.log('this.cuerpo DESPUESS ' +fields.SAC_DocPDF__c);
-
-        const conDisplayBlock = this.cuerpo.replace(/(<br\s*\/?>\s*){2}/gi, '</p><p>');
+        const conDisplayBlock = this.cuerpo.replace(/(<br\s*\/?>\s*){2}|<br\s*\/?>&nbsp;/gi, '</p><p>');
 
         fields.SAC_DocPDF__c = conDisplayBlock;
-        console.log('this.cuerpo DESPUES ' +fields.SAC_DocPDF__c);
 
+            
         if(this.idiomaReclamacion == 'en'){     //Si el idioma es inglés
-            fields["SAC_NombrePlantillaLateral__c"] = '';
-            console.log('INGLÉS');
+            fields["SAC_NombrePlantillaLateral__c"] = 'SAC_Lateral_ENG';
         }else if(this.idiomaReclamacion == 'ca'){       //Si el idioma es catalán
-            fields["SAC_NombrePlantillaLateral__c"] = '';
-            console.log('CATALÁN');
+            fields["SAC_NombrePlantillaLateral__c"] = 'SAC_Lateral_CAT';
         }else{          //Si el idioma es Castellano o cualquier otro, se usa la plantilla en castellano
             fields["SAC_NombrePlantillaLateral__c"] = 'SAC_CartaPlantilla';
-            console.log('CASTELLANO');
         }
-
-        //fields["SAC_NombrePlantillaLateral__c"] = 'HOLAAAAAAAAAAAAA';
-        
+   
         this.template.querySelector('lightning-record-edit-form').submit(fields);
     }
 
@@ -125,15 +116,15 @@ export default class SAC_GeneracionDocumento extends LightningElement {
        compruebaDocumentoRedaccion({'id': this.recordId }).then(result => {
        if(result){
             // Asigna el resultado del @wire a una variable separada en lugar de la misma función
-            this.documentoGuardado = result;       
+       
+            this.documentoGuardado = result; 
+                  
             // Comprueba si result.data existe antes de acceder a sus propiedades
             if (result.SAC_DocPDF__c != null && result.SAC_DocPDF__c !== " ") {
-                this.cuerpo = result.SAC_DocPDF__c.replace(/(<br\s*\/?>\s*){2}/gi, '</p><p>');
-                console.log('HTML PASADO A TINY 1 ' + this.cuerpo);
+                this.cuerpo = result.SAC_DocPDF__c.replace(/(<br\s*\/?>\s*){2}|<br\s*\/?>&nbsp;/gi, '</p><p>');
                 this.footer = result.SAC_Footer__c;
                 this.header = result.SAC_Header__c;
                 this.idDocumento = result.Id;
-                
                 getRuta({}).then(result => {
                     if(result){
                         this.rutaVS = 'https://' + result + '/apex/SAC_EditorHTMLPlantillas?id=' + this.recordId;
@@ -217,8 +208,7 @@ export default class SAC_GeneracionDocumento extends LightningElement {
     handleEventoAplicar(event){
         this.botonGenerar = true;
         this.header = event.detail.header;
-        this.cuerpo = event.detail.cuerpo.replace(/(<br\s*\/?>\s*){2}/gi, '</p><p>');
-        console.log('HTML PASADO A TINY 2 ' + this.cuerpo);
+        this.cuerpo = event.detail.cuerpo.replace(/(<br\s*\/?>\s*){2}|<br\s*\/?>&nbsp;/gi, '</p><p>');
         this.footer = event.detail.footer;
 
         this.callVFPageMethod();
@@ -233,6 +223,7 @@ export default class SAC_GeneracionDocumento extends LightningElement {
     connectedCallback() {
         if(this.llamadaPlantillas && !this.realizadaPrimeraLlamada) {
             this.realizadaPrimeraLlamada = true;
+
             getRuta({}).then(result => {
                 if(result){
                     this.rutaVS = 'https://' + result + '/apex/SAC_EditorHTMLPlantillas?id=' + this.recordId;

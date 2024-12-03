@@ -651,7 +651,7 @@
             <aura:if isTrue="{!v.demMorExist}">
                 <div style="margin-bottom: 20px;margin-top: 20px;">
                     <lightning:card title="Demandas Judiciales Morosidad - Reclamantes y Cotitulares" iconName="utility:custom_apps">
-                        <aura:if isTrue="{!v.demMorExist}">
+                        <aura:if isTrue="{!v.demMorReclamanteExist}">
                             <lightning:card title="Reclamantes">
                                 <div class="table-container" style="max-height: 200px; overflow-y: auto;">
                                     <table class="slds-table slds-table_cell-buffer slds-table_bordered">
@@ -664,16 +664,19 @@
                                                     <div class="slds-truncate" title="title55">Fecha cierre</div>
                                                 </th>
                                                 <th scope="col">
-                                                    <div class="slds-truncate" title="title56">Oficina Gestora</div>
+                                                    <div class="slds-truncate" title="title56">NIF</div>
                                                 </th>
                                                 <th scope="col">
-                                                    <div class="slds-truncate" title="title57">NIF</div>
+                                                    <div class="slds-truncate" title="title57">Oficina Gestora</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title58">Resolución</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title59">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title62">Contrato</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title60">Producto</div>
@@ -693,16 +696,19 @@
                                                         <div class="slds-truncate" title="title63">{!dem.fechaCierre}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title64">{!dem.oficinaGestora}</div>
+                                                        <div class="slds-truncate" title="title64">{!dem.nif}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title65">{!dem.nif}</div>
+                                                        <div class="slds-truncate" title="title65">{!dem.oficinaGestora}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title66">{!dem.resolucion}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title67">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title70">{!dem.contrato}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title68">{!dem.producto}</div>
@@ -730,16 +736,19 @@
                                                     <div class="slds-truncate" title="title55">Fecha cierre</div>
                                                 </th>
                                                 <th scope="col">
-                                                    <div class="slds-truncate" title="title56">Oficina Gestora</div>
+                                                    <div class="slds-truncate" title="title56">NIF</div>
                                                 </th>
                                                 <th scope="col">
-                                                    <div class="slds-truncate" title="title57">NIF</div>
+                                                    <div class="slds-truncate" title="title57">Oficina Gestora</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title58">Resolución</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title59">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title62">Contrato</div>
                                                 </th>
                                                 <th scope="col">
                                                     <div class="slds-truncate" title="title60">Producto</div>
@@ -759,16 +768,19 @@
                                                         <div class="slds-truncate" title="title63">{!dem.fechaCierre}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title64">{!dem.oficinaGestora}</div>
+                                                        <div class="slds-truncate" title="title64">{!dem.nif}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title65">{!dem.nif}</div>
+                                                        <div class="slds-truncate" title="title65">{!dem.oficinaGestora}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title66">{!dem.resolucion}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title67">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title70">{!dem.contrato}</div>
                                                     </td>
                                                     <td>
                                                         <div class="slds-truncate" title="title68">{!dem.producto}</div>
@@ -826,34 +838,34 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <aura:iteration items="{!v.concursosReclamanteList}" var="dem">
+                                            <aura:iteration items="{!v.concursosReclamanteList}" var="con">
                                                 <tr>
                                                     <td>
-                                                        <div class="slds-truncate" title="title62">{!dem.idReclamacion}</div>
+                                                        <div class="slds-truncate" title="title62">{!con.idReclamacion}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title63">{!dem.tematica}</div>
+                                                        <div class="slds-truncate" title="title63">{!con.tematica}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title64">{!dem.productoServicio}</div>
+                                                        <div class="slds-truncate" title="title64">{!con.productoServicio}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title65">{!dem.estado}</div>
+                                                        <div class="slds-truncate" title="title65">{!con.estado}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title66">{!dem.docRec}</div>
+                                                        <div class="slds-truncate" title="title66">{!con.docRec}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title67">{!dem.docRes}</div>
+                                                        <div class="slds-truncate" title="title67">{!con.docRes}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title68">{!dem.importeAbonado}€</div>
+                                                        <div class="slds-truncate" title="title68">{!con.importeAbonado}€</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title69">{!dem.fechaAlta}</div>
+                                                        <div class="slds-truncate" title="title69">{!con.fechaAlta}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title69">{!dem.fechaCierre}</div>
+                                                        <div class="slds-truncate" title="title69">{!con.fechaCierre}</div>
                                                     </td>
                                                 </tr>
                                             </aura:iteration>
@@ -863,7 +875,7 @@
                             </lightning:card>
                         </aura:if>
                         <aura:if isTrue="{!v.concursosCotitularExist}">
-                            <lightning:card title="Reclamantes">
+                            <lightning:card title="Cotitulares">
                                 <div class="table-container" style="max-height: 200px; overflow-y: auto;">
                                     <table class="slds-table slds-table_cell-buffer slds-table_bordered">
                                         <thead>
@@ -898,34 +910,34 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <aura:iteration items="{!v.concursosReclamanteList}" var="dem">
+                                            <aura:iteration items="{!v.concursosCotitularList}" var="con">
                                                 <tr>
                                                     <td>
-                                                        <div class="slds-truncate" title="title62">{!dem.idReclamacion}</div>
+                                                        <div class="slds-truncate" title="title62">{!con.idReclamacion}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title63">{!dem.tematica}</div>
+                                                        <div class="slds-truncate" title="title63">{!con.tematica}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title64">{!dem.productoServicio}</div>
+                                                        <div class="slds-truncate" title="title64">{!con.productoServicio}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title65">{!dem.estado}</div>
+                                                        <div class="slds-truncate" title="title65">{!con.estado}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title66">{!dem.docRec}</div>
+                                                        <div class="slds-truncate" title="title66">{!con.docRec}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title67">{!dem.docRes}</div>
+                                                        <div class="slds-truncate" title="title67">{!con.docRes}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title68">{!dem.importeAbonado}€</div>
+                                                        <div class="slds-truncate" title="title68">{!con.importeAbonado}€</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title69">{!dem.fechaAlta}</div>
+                                                        <div class="slds-truncate" title="title69">{!con.fechaAlta}</div>
                                                     </td>
                                                     <td>
-                                                        <div class="slds-truncate" title="title69">{!dem.fechaCierre}</div>
+                                                        <div class="slds-truncate" title="title69">{!con.fechaCierre}</div>
                                                     </td>
                                                 </tr>
                                             </aura:iteration>

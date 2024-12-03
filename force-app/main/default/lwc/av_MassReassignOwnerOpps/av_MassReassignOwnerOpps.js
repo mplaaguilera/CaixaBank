@@ -19,11 +19,11 @@ import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
 
 
 const columnsOpp = [
-	{ label: 'Cliente', fieldName: 'AccountNameURL', type: 'url', typeAttributes: {label: { fieldName: 'AccountName' } }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'AccountName'},
+	{ label: 'Cliente', fieldName: 'AccountNameURL', type: 'url', typeAttributes: {label: { fieldName: 'AccountName' }, tooltip:{fieldName: 'AccountName'} }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'AccountName'},
 	{ label: 'Origen', fieldName: 'AV_Origen__c', type: 'text',hideDefaultActions: true, sortable: true, sortBy:'AV_Origen__c'},
 	{ label: 'Producto', fieldName: 'PFName', type: 'text', hideDefaultActions: true, sortable: true, sortBy:'PFName' },
 	{ label: 'Etapa', fieldName: 'StageName',type: 'text', hideDefaultActions: true , sortable: true, sortBy:'StageName' },
-	{ label: 'Nombre de la oportunidad', fieldName: 'OppNameURL', type: "url",	typeAttributes:{ label: { fieldName: 'Name' } }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'Name'},
+	{ label: 'Nombre de la oportunidad', fieldName: 'OppNameURL', type: "url",	typeAttributes:{ label: { fieldName: 'Name' }, tooltip:{fieldName: 'Name'}}, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'Name'},
 	{ label: 'Expectativa de venta', fieldName: 'AV_Potencial__c',type: 'text', hideDefaultActions: true, sortable: true, sortBy:'AV_Potencial__c' },
 	{ label: 'Edad', fieldName: 'AV_Age__c',type: 'number', hideDefaultActions: true, sortable: true, sortBy:'AV_Age__c' },
 	{ label: 'Ahorro e Inversión', fieldName: 'AV_AhorroEInversion__c',type: 'currency', hideDefaultActions: true, sortable: true, sortBy:'AV_AhorroEInversion__c', typeAttributes: {minimumFractionDigits: 0, maximumFractionDigits: 2} },
@@ -34,7 +34,7 @@ const columnsOpp = [
 	{ label: 'Target Auto', fieldName: 'AV_TargetAuto__c', type:'picklist', hideDefaultActions: true, sortable: true, sortBy:'AV_TargetAuto__c' },
 	{ label: 'Fecha de vencimiento', fieldName: 'CloseDate', type: "date-local",typeAttributes:{ month: "2-digit", day: "2-digit" }, sortable: true, sortBy:'CloseDate'},
 	{ label: 'Fecha de próxima gestión', fieldName: 'AV_FechaProximoRecordatorio__c',  type: "date-local",typeAttributes:{ month: "2-digit", day: "2-digit" }, sortable: true, sortBy:'AV_FechaProximoRecordatorio__c'},
-	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url',	typeAttributes:{ label: { fieldName: 'OwnerName' } }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'OwnerName'},
+	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url',	typeAttributes:{ label: { fieldName: 'OwnerName' }}, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'OwnerName'},
 	{ label: 'Oficina', fieldName: 'officeRow', type: 'text', hideDefaultActions: true, sortable: true, sortBy:'officeRow' },
 	{ label: 'Indicador Priorizador', fieldName: 'AV_IncludeInPrioritizingCustomers__c',type: 'boolean', sortable: true, sortBy:'AV_IncludeInPrioritizingCustomers__c'}
 	
@@ -182,10 +182,11 @@ export default class Av_MassReassignOwnerOpps extends LightningElement {
 	get optionsOppoStatus() {
 		return [
 			{ label: 'Potencial', value: 'Potencial' },
-			{ label: 'En gestión/insistir', value: 'En gestión/insistir' },
-			{ label: 'No apto', value: 'No apto'},
+			{ label: 'En Gestión', value: 'En gestión/insistir' },
 			{ label: 'Cerrada negativa', value: 'No interesado'},
+			{ label: 'Producto Rechazado', value: 'Producto Rechazado'},
 			{ label: 'Cerrada positiva', value: 'Cerrado positivo'},
+			{ label: 'Producto Contratado', value: 'Producto Contratado'},
 			{ label: 'Vencida', value: 'Vencido'},
 			{ label: 'Con venta', value: 'Con venta'}
 		];
@@ -740,31 +741,23 @@ export default class Av_MassReassignOwnerOpps extends LightningElement {
     }
 
 	resetFilters(){
-		try {
 			const lookup5 = this.template.querySelector('[data-id="clookup5"]');
 			if (lookup5 != null || typeof lookup5 != 'undefined') {
 				lookup5.handleClearSelection();
 			}
-		} catch (e) {
 			console.log('Lookup Error ==> ',e);
-		}
-		try {
+		
 			const lookup3 = this.template.querySelector('[data-id="clookup3"]');
 			if (lookup3 != null || typeof lookup3 != 'undefined') {
 				lookup3.handleClearSelection();
 			}
-		} catch (e) {
 			console.log('Lookup Error ==> ',e);
-		}
-		try {
 			const lookup4 = this.template.querySelector('[data-id="clookup4"]');
 			if (lookup4 != null || typeof lookup4 != 'undefined') {
 				lookup4.handleClearSelection();
 			}
-		} catch (e) {
 			console.log('Lookup Error ==> ',e);
-		}
-		this.template.querySelectorAll('lightning-input').forEach(each => {
+			this.template.querySelectorAll('lightning-input').forEach(each => {
 			each.value = '';
 		});
 		this.dueDateFilter = null;
@@ -1001,11 +994,9 @@ export default class Av_MassReassignOwnerOpps extends LightningElement {
 				return primer(x[field]);
 			}
 			: function(x) {
-				console.log('p:'+x[field]);
 				return x[field];
 			};
 			
-			console.log('key'+key);
 			return function(a, b) {
 				a = key(a);
 				b = key(b);
@@ -1018,14 +1009,13 @@ export default class Av_MassReassignOwnerOpps extends LightningElement {
 				}else{
 					result=( reverse * ((a.toLowerCase()  > b.toLowerCase() ) - (b.toLowerCase()  > a.toLowerCase() )));
 				};
-				console.log('entra-'+result);
 				return result;
 			}
 		}
 	}
 
     onHandleSort(event) {
-        const { fieldName: sortedBy, sortDirection } = event.detail;
+        //const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.items];
 		const sortFieldName = this.columns.find(field=>sortedBy===field.fieldName).sortBy;
         cloneData.sort(this.sortBy(sortFieldName, sortDirection === 'asc' ? 1 : -1));

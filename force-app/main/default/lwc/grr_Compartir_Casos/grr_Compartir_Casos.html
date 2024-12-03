@@ -1,0 +1,83 @@
+<template>
+    <div class="slds-card">
+        <!-- Cabecera de la card -->
+        <div class="slds-card__header slds-grid">
+            <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning-icon icon-name="utility:adduser" size="small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Compartir caso</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                    <lightning-button label="Compartir" onclick={compartirAbrir} disabled={propietarioDisabled}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template if:true={modalCompartirCargado}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open modalCompartir slds-backdrop_open" onkeydown={modalTeclaPulsada}>
+            <div class="slds-modal__container slds-modal_large">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={closeModal} icon-class="slds-button slds-button_icon slds-modal__close" alternative-text="Cerrar"><label>Cerrar</label></lightning-button-icon>
+                <!--Cabecera del modal-->
+                <div class="slds-modal__header slds-var-p-around_medium">
+                    <h1 class="slds-modal__title slds-text-heading_small slds-hyphenate">Compartir caso</h1>
+                </div>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_small" style="padding-top: 12px; padding-bottom: 16px;">
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-var-p-top_small slds-var-p-right_small slds-var-p-left_small">
+                        <h2 class="slds-text-heading_small slds-text-align_center" style="font-size: 14px;">Selecciona uno o varios usuarios con los que desea compartir el caso:</h2>
+                        <br>
+                        <lightning-datatable
+                            class="slds-max-medium-table_stacked"
+                            key-field="id"
+                            data={usuariosGrupo}
+                            columns={usuariosGrupoColumns}
+                            data-id="usuariosGrupoTable"
+                            onrowselection={handleRowSelection}>
+                        </lightning-datatable>
+                        <br>
+                        <div class="slds-align_absolute-center">
+                            <lightning-combobox
+                                class="slds-text-align_left"
+                                label="Selecciona el tipo de permiso:"
+                                value={selectedRoleId}
+                                options={caseTeamRoles}
+                                onchange={handleRoleChange}>
+                            </lightning-combobox>
+                        </div>                        
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-var-p-around_small slds-var-p-top_large">
+                        <div class="slds-var-p-around_small slds-align_absolute-center">
+                            <lightning-button label="Compartir" onclick={compartirCaso} disabled={botonCompartirDisabled}></lightning-button>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-1 slds-var-p-around_small">
+                        <br>
+                        <br>
+                        <h2 class="slds-text-heading_small slds-text-align_center" style="font-size: 14px;">Los siguientes usuarios tienen actualmente acceso al caso:</h2>
+                        <br>
+                        <lightning-datatable
+                            class="slds-max-medium-table_stacked"
+                            key-field="id"
+                            data={caseTeamMembers}
+                            columns={caseTeamColumns}
+                            data-id="caseTeamTable"
+                            onrowselection={handleRowSelection}>
+                        </lightning-datatable>
+                        <div class="slds-var-p-around_small slds-align_absolute-center">
+                            <lightning-button label="Eliminar" onclick={eliminarCompartirCaso} disabled={botonEliminarDisabled}></lightning-button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

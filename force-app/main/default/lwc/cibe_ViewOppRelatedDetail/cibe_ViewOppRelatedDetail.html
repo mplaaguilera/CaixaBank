@@ -1,0 +1,205 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer slds-m-vertical_small">
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
+				<lightning-icon if:true={mainVinculed} size ="x-small" title ={label.mainOpp}   class="main-icon slds-button slds-button_neutral botonDorado" icon-name="utility:favorite" variant="warning" ></lightning-icon>
+				<div if:false={mainVinculed} class="vinculed">
+					<lightning-button-icon size ="medium" title={label.markMainOpp}   icon-name="utility:favorite" variant="border-filled" onclick={handleMain} ></lightning-button-icon>
+				</div>
+			</div>
+			<div class="slds-float_left">
+				<div class="name-col">
+					<div style="width:fit-content">
+						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
+						<span if:false={isInserted}>{name}</span>
+						<p>{label.statusOpp} <b>{statusNowLabel}</b></p>
+						<p>{label.fechaCierre} : <b>{oppoDateFront}</b></p>
+					</div>
+				</div>
+			</div>
+			<div  class="marginButtons itemSetting slds-float_left" style="margin-right:15px; margin-left: 15px; width:fit-content">
+				<lightning-button-icon if:true={vinculed} icon-name="utility:event" data-id="noAgendado" onclick={handlePath}  name="noAgendado" class={agendadoClass} variant="border" size="large" title='Desagendar'></lightning-button-icon>		
+				<lightning-button-icon if:false={vinculed} icon-name="utility:event" data-id="agendado" onclick={handlePath}  name="agendado" class={agendadoClass} variant="border" size="large" title={label.agendar}></lightning-button-icon>			
+			</div>
+
+			<!-- <div if:true={isEditable}>  -->
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address" if:true={unfoldCmp}>
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-4 input-text-align_right">
+								<!-- <div class="slds-form-element">
+									<div class="slds-form-element__control">  -->
+										<lightning-input data-id="importe"  type="text" label={label.importe} placeholder={cero} value={amount} read-only disabled></lightning-input>
+									<!-- </div>
+								</div> -->
+							</div>	
+							<div class="slds-size_1-of-4 input-text-align_right">
+								<lightning-combobox  label={label.probabilidad}  id="form-element-id-03"  placeholder="Probabilidad de exito" options={optionsProbabilidad}  onchange={handleChangeProbabilidad} value={probabilidad} read-only></lightning-combobox>
+							</div>
+							<div class="slds-size_1-of-4 input-text-align_right">
+								<lightning-input data-id="fecPrG" class ="input-text-align_right" type="date" label="Fecha próxima gestión" value={fechaProxGest} read-only disabled></lightning-input>
+							</div>
+							<div class="slds-size_1-of-4">
+								<lightning-input data-id="fecCierr"  type="date" label="Fecha cierre"  value={fechaCierre} read-only disabled></lightning-input>
+							</div>
+						</div>
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-1">
+								<div class="slds-form-element">
+									<label class="slds-form-element__label" for="form-element-id-01">{label.comentario}</label>
+									<div class="slds-form-element__control">
+										<textarea id="form-element-id-01" class="slds-textarea" value={comentarioToSend} disabled  readonly>{comentario}</textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			<!-- </div> -->
+			<div if:true={isCPositiva}>
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_2-of-3">
+								<label class="slds-form-element__label" for="form-element-id-01">{label.comentario}</label>
+								<textarea id="comentarioPF" class="slds-textarea" value={comentarioToSend} onchange={handleChangeComentario}></textarea>
+							</div>
+							<div class="slds-size_1-of-3">
+								<lightning-button label ={label.detail} onclick={openDetailWindow} style="margin:1.1rem 0 3.5rem 0.5rem"></lightning-button>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+
+			<div if:true={isInsistir}>
+				<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+					<div class="slds-form-element__control">
+						<div class="slds-form-element__row">
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecPrG"  type="date" required  label="Fecha Próx Gestión"  value={fechaProxGest} ></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3">
+								<lightning-input data-id="fecCierr"  type="date" label="Fecha Cierre"  value={fechaCierre} ></lightning-input>
+							</div>
+							<div class="slds-size_1-of-3">
+								<lightning-button label ={label.detail} onclick={openDetailWindow} style="margin-top:1.1rem"></lightning-button>
+							</div>
+						</div>
+						<div class="slds-form-element__row">
+							<div class="slds-size_2-of-3">
+								<label class="slds-form-element__label" for="form-element-id-01">{label.comentario}</label>
+								<textarea id="form-element-id-0" class="slds-textarea" value={comentarioToSend} onchange={handleChangeComentario}></textarea>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<!-- <div if:false={comesfromevent}>
+			
+				<div if:true={showComents} style="margin:.7rem 15px 0 17.5rem">
+					<p style="color:gray">{historyCommentDateLabel}</p>
+					<p style="margin-top:.3rem">{comentario}</p>
+				</div>
+			
+			</div> -->
+			<!-- Campos CerradoNegativo -->
+			<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address" if:true={showState}>
+				<div class="slds-form-element__control">
+					<div class="slds-form-element__row">
+						<div class="slds-size_1-of-3">
+							<lightning-input data-id="fecPrG"  type="date" required  label="Fecha Próx Gestión"  value={fechaProxGest} onchange={handleChangeFechaProxGestion}></lightning-input>
+						</div>
+						<div class="slds-size_1-of-3">
+							<lightning-input data-id="fecCierr"  type="date" label="Fecha Cierre"  value={fechaCierre} onchange={handleChangeFechaCierre}></lightning-input>
+						</div>
+						<div class="slds-size_1-of-3">
+							<lightning-button label ={label.detail} onclick={openDetailWindow} style="margin-top:1.1rem"></lightning-button>
+						</div>
+					</div>
+					<div class="slds-form-element__row">
+						<div style="width: 350px;" class="slds-size_1-of-3">
+							<lightning-combobox required label={label.estado}  id="form-element-id-04"  placeholder={label.estado} options={optionsEstado}   onchange={handleChangeEstado} value={state}></lightning-combobox>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<!-- POPUP -->
+			<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open" if:true={isModalOpen}>
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Cerrar</span>
+                    </button>
+						<h2 class="slds-text-heading_medium"><strong>{label.detail}</strong></h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium">
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-3">
+								<lightning-combobox  label={label.divisa}  id="divisa"  options={optionsDivisa}   onchange={handleChangeDivisa} value={divisa}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-3">
+								<lightning-input type="text" placeholder="€" label={label.impactoBal} onchange={handleChangeImpactoBalance} value={impactoBalance}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-3">
+								<lightning-input type="text"  label={label.impactoCom} onchange={handleChangeImpactoComisiones} value={impactoComisiones}></lightning-input>
+							</div>
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-form slds-form_stacked">
+									<div class="slds-form-element">
+										<label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{label.esg}</label>
+										<lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" checked={esg} onchange={handleESG}></lightning-input>
+									</div>
+								</div>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-form slds-form_stacked">
+									<div class="slds-form-element">
+										<label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{label.confidencial}</label>
+										<lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" checked={confidencial} onchange={handleConfidencial}></lightning-input>
+									</div>
+								</div>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+						<div class="slds-m-vertical_x-small">
+							{label.prodOtraEntidad}
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text"  label={label.entidad} onchange={handleChangeEntidad} value={entidad}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="date"  label={label.vencimiento} onchange={handleChangeVencimiento} value={vencimiento}></lightning-input>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+						<div class="slds-grid slds-gutters">
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="€"  label={label.precio} onchange={handleChangePrecio} value={precio}></lightning-input>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<lightning-input type="text" placeholder="%"  label={label.margen} onchange={handleChangeMargen} value={margen}></lightning-input>
+							</div>
+							<div class="slds-col">
+							</div>
+						</div>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button label={label.guardar} onclick={handleSave2}></lightning-button>
+					</footer>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</template>

@@ -15,7 +15,7 @@
                 tabId: enclosingTab,
                 icon: "standard:event",
                 iconAlt: "Cliente"
-            });                
+            });              
         }).catch(error => {
         console.log('error => ',error)
         })
@@ -36,26 +36,39 @@
         
     },
     closeFocusedTab : function(component, event, helper) {
+        let goRecordOrHome = event.getParam("goRecordOrHome");
 		var origenTab = component.get("v.origenTab");
 		var workspaceAPI = component.find("workspaceCmp");
+        if(goRecordOrHome){
+            component.find("newevent").navigateHome();
+
+        }
 		workspaceAPI.closeTab({tabId: origenTab});
 
 	
 	},
-    onPageReferenceChange: function(component, event, helper) {
+    onPageReferenceChange: function(component) {
 		var myPageRef = component.get("v.pageReference");
-		component.set("v.id", myPageRef.state.c__recId);
+        let recordIdToRedirect;
+        if(window.location.pathname != null){
+
+            if((window.location.pathname).split('/').includes('r')){
+                let arrayUrl = (window.location.pathname).split('/');
+                recordIdToRedirect = arrayUrl[4];
+                component.set('v.itsRecordAccount',arrayUrl[3] === 'Account');
+            }else if(myPageRef.state.ws != null){
+                component.set('v.itsRecordAccount',true);
+                recordIdToRedirect = myPageRef.state.ws.split('/')[4];
+            }
+        }else if(myPageRef.state.ws != null){
+            component.set('v.itsRecordAccount',true);
+            recordIdToRedirect = myPageRef.state.ws.split('/')[4];
+
+        }
+            component.set("v.id", recordIdToRedirect);
 	},
 
 	focusedTab : function(component, event, helper) {
-		// var workspaceAPI = component.find("workspaceCmp");
-        // workspaceAPI.getEnclosingTabId().then(enclosingTab =>{
-        //     workspaceAPI.openSubtab({parentTabId: enclosingTab,url:component.get("v.origenTabUrl"),focus:true}).then(() =>{
-        //     })
-        //     .catch(function(error) {
-        //         console.log(error);
-        //     });
-        // })
         component.find("workspaceCmp").openTab({url: component.get('v.origenTabUrl'),focus:true});
 	},
     closeFocusedTabAndClose : function(component, event, helper) {
@@ -68,14 +81,13 @@
 	},	focusRecordTab : function(component, event, helper) {
 		var id = component.get("v.id");
 		var workspaceAPI = component.find("workspaceCmp");
-		workspaceAPI.openTab({url: '#/sObject/'+id+'/view',focus:true});
+        var origenTab = component.get("v.origenTab");
+        if(component.get('v.itsRecordAccount')){
+            workspaceAPI.openTab({url: '#/sObject/'+id+'/view',focus:true});
+        }else{
+            workspaceAPI.openSubtab({parentTabId: origenTab,recordId:id,focus:true})
+        }
 			
 	
 	}
-    // closeFocusedTab: function(cmp){
-    //     var workspaceAPI = cmp.find("workspaceCmp");
-    //     workspaceAPI.getEnclosingTabId().then(tab => {
-    //         workspaceAPI.closeTab({tabId:tab});
-    //     })
-    // }
 })

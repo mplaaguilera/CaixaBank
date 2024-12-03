@@ -24,7 +24,15 @@
             <property name="impactoBalFinA" type="Integer" label="impactoBalFinA" description="impacto Balance Fin Año" />
             <property name="fechaProxGestion" type="Date" label="Fecha Proxima Gestión" description="Fecha Proxima Gestión" />
             <property name="incluirCliente" type="Boolean" label="Incluir la oportunidad en Clientes priorizados" description="Incluir la oportunidad en Clientes priorizados" />
-            
+            <property name="deadlineOpp" type="Integer" label="Plazo/Duracion de la operacion" description="deadlineOpp"/>
+            <property name="deadlineOpp2" type="Integer" label="Plazo/Duracion de la operacion valor" description="deadlineOpp2"/>
+            <property name="pais" type="String" label="Pais" description="Pais"/>
+            <property name="importeTotalMercado" type="Integer" label="Importe total mercado" description="Importe total mercado"/>
+            <property name="importeRenovacion" type="Integer" label="Importe renovacion o modificacion" description="Importe renovacion o modificacion"/>
+            <property name="bancoTicket" type="String" label="Bancos participantes vs ticket" description="Bancos participantes vs ticket"/>
+            <property name="importeVariacion" type="Integer" label="Variacion sobre el importe anterior" description="Variacion sobre el importe anterior"/>
+            <property name="sindicaciones" type="Boolean" label="Sindicado/Club Deal" description="Sindicado/Club Deal." />
+            <property name="valueOperacion" type="String" label="Tipo Operación" description="Tipo de Operación." />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

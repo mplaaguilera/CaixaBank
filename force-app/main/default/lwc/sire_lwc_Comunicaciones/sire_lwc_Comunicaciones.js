@@ -39,7 +39,7 @@ export default class Sire_lwc_Comunicaciones extends LightningElement {
       // Ponemos un setTimeout (hace esperar los milisegundos que ponga antes de ejecutar lo de dentro) porque iba demasiado rapido y no daba tiempo a cargar URL     
       setTimeout(() => { 
         refreshApex(this.wiredResultAccion);
-        this.getQueries(); 
+        //this.getQueries(); 
       }, 100);      
     }
 
@@ -87,7 +87,7 @@ export default class Sire_lwc_Comunicaciones extends LightningElement {
                 if(result.data[i].SIREC__SIREC_fld_proceso__c != null){
                 rowData.situacion = result.data[i].SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c;
                 rowData.idProceso = '/lightning/r/SIREC__SIREC_obj_proceso__c/' + result.data[i].SIREC__SIREC_fld_proceso__r.Id + '/view';
-                rowData.estrategia = result.data[i].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_estrategia__c;
+                rowData.estrategia = result.data[i].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                 }              
                 currentData.push(rowData);            
             }

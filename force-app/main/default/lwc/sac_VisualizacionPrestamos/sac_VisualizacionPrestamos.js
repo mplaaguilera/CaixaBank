@@ -5,6 +5,7 @@ export default class prestamoList extends LightningElement {
     @api recordId;
     prestamosRT;
     @track selectedPrestamoId;
+    showMessage = false;
 
     // Get related Préstamos
     @wire(getPrestamosByAccountId, { recId: '$recordId' })
@@ -41,6 +42,7 @@ export default class prestamoList extends LightningElement {
                 };
             });
             spinnerLoading = false;
+            this.showMessage = true;
             // Event for validation
             const event = new CustomEvent('validationcheck', {
                 detail: { hasValidation, spinnerLoading}
@@ -48,6 +50,7 @@ export default class prestamoList extends LightningElement {
             this.dispatchEvent(event);
         } else if (error) {
             this.prestamosRT = undefined;
+            this.showMessage = true;
         }
     }
 

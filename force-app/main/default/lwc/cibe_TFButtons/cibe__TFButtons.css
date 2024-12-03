@@ -1,0 +1,96 @@
+#pestanyes-globals ul.pestanyes li.tab-form {
+  float: right;
+  background: url();
+  display: inline-block;
+  white-space: nowrap
+}
+#pestanyes-globals {
+  font-family: Arial;
+  background-color: #f6f6f6;
+  clear: both;
+  margin: 0 -15px 3px -15px
+}
+#pestanyes-globals ul.pestanyes {
+  background-color: #fff
+}
+
+#pestanyes-globals ul.pestanyes li {
+  background-color: #009ee0
+}
+
+#pestanyes-globals ul.pestanyes li.seleccionat {
+  font-weight: bold
+}
+
+#pestanyes-globals ul.pestanyes li:hover,#pestanyes-globals ul.pestanyes li.seleccionat:hover {
+  background-color: #006a98
+}
+
+#pestanyes-globals ul.pestanyes li.seleccionat {
+  background-color: #f2f2f2
+}
+ul.pestanyes {
+  margin: 0;
+  padding: 0;
+  list-style-type: none
+}
+ul.pestanyes a:link,ul.pestanyes a:visited {
+  color: #666;
+  text-decoration: none;
+  white-space: nowrap
+}
+ul.pestanyes li.seleccionat {
+  background-color: #f2f2f2
+}
+ul.pestanyes-submenu li.seleccionat:hover {
+  text-decoration: none
+}
+ul.pestanyes li.seleccionat a:link,ul.pestanyes li.seleccionat a:visited {
+  color: #333;
+  font-size: 1.071em
+}
+
+ul.pestanyes {
+  background-color: #009ee0;
+  height: 35px;
+  font-size: 1.071em
+}
+
+ul.pestanyes li {
+  height: 35px;
+  float: left;
+  border-left: 1px solid #fff
+}
+
+ul.pestanyes li .seleccionat {
+  color: #333
+}
+
+ul.pestanyes li:hover {
+  background-color: #006a98
+}
+
+ul.pestanyes li a {
+  display: block;
+  padding: 0.5em 20px 0.3em 20px;
+  margin-left: 4px
+}
+
+ul.pestanyes li.seleccionat a {
+  padding-bottom: 0.35em
+}
+
+ul.pestanyes li.deshabilitat {
+  float: left;
+  opacity: 0.5
+}
+
+ul.pestanyes li.deshabilitat a {
+  padding: 0.5em 14px 0.3em 14px;
+  color: #d5d5d5
+}
+
+ul.pestanyes a:link,ul.pestanyes a:visited {
+  color: #fff;
+  font-size: 1.071em
+}

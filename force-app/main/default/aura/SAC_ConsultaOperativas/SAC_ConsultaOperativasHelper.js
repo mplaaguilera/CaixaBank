@@ -37,7 +37,6 @@
                     component.set('v.disableDescartar', true); 
                     component.set('v.disableDerivar', true); 
 					component.set('v.esPropietario', true);
-                    component.set('v.esPropietarioLetrado', true);
 					component.set('v.estaEnLaCola', true);
                 }
                 else{
@@ -51,12 +50,6 @@
                         }else{
                             component.set('v.esPropietario', false);  
                             component.set('v.estaEnLaCola', true);
-                        }
-
-                        if(response.getReturnValue().UserName === component.get('v.caso.SAC_Letrado__c')){
-                            component.set('v.esPropietarioLetrado', true);
-                        }else{
-                            component.set('v.esPropietarioLetrado', false);
                         }
                     });
                     $A.get('e.force:refreshView').fire();

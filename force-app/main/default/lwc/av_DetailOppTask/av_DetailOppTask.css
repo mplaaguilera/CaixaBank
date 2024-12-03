@@ -1,7 +1,7 @@
 .chev-icon{
     vertical-align: top;
 }
-.opptask-title{
+.opp-title{
     color: #006dcc;
     vertical-align: sub;
     font-size: 14px;
@@ -12,17 +12,17 @@
     padding-right: 0.5rem;
     vertical-align: baseline;
 }
-.linked-opptask-button{
+.linked-opp-button{
     float: right;
 }
-.last-opptask-button{
+.last-opp-button{
     padding-right: 0.3rem;
     /*background-image: linear-gradient(#2d5674 33%, rgba(255,255,255,0) 0%);
     background-position: right;
     background-size: 0.1rem 0.25rem;
     background-repeat: repeat-y;*/
 }
-.modify-opptask-button{
+.modify-opp-button{
     margin-right: 0.5rem;
     float: right;
 }
@@ -33,7 +33,7 @@
     padding-bottom: 0.3rem;
     padding-top: 0.3rem;
 }
-.opptask-form{
+.opp-form{
     margin-left: 1rem;
     margin-right: 1rem;
 }
@@ -51,7 +51,7 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
 }
-.opptask-link{
+.opp-link{
     text-decoration: none;
 }
 .value-concept{
@@ -87,11 +87,11 @@
 	margin-right: 1rem;
 }
 
-.opptask-titleMobile{
+.opp-titleMobile{
 	display: block;
     line-height: normal;
 }
-.opptask-stage{
+.opp-stage{
 	color: rgb(45 86 116);
 	font-size: 12px;
 	font-style: italic;
@@ -99,7 +99,7 @@
 	position: relative;
 	display: inline;
 }
-.opptask-name{
+.opp-name{
     padding-top: 0.4rem;
     color: var(--lwc-brandTextLink,rgb(0, 109, 204))
 }
@@ -117,6 +117,7 @@
 }
 
 .label-priorizador{
+    padding-top: 10px;
     padding-left: 2rem;
 	width: 17rem;
 }

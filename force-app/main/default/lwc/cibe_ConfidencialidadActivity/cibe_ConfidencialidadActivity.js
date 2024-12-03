@@ -3,7 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from "lightning/navigation";
 
 //Controller
-import getRecord from '@salesforce/apex/CIBE_ConfidencialidadActivityController.getRecord';saveRecord
+import getRecord from '@salesforce/apex/CIBE_ConfidencialidadActivityController.getRecord';
 import saveRecord from '@salesforce/apex/CIBE_ConfidencialidadActivityController.saveRecord';
 import createNotification from '@salesforce/apex/CIBE_ConfidencialidadActivityController.createNotification';
 import isOwner from '@salesforce/apex/CIBE_ConfidencialidadActivityController.isOwner';
@@ -54,6 +54,9 @@ export default class Cibe_Confidencialidad extends NavigationMixin(LightningElem
         if(data) {
             var result = JSON.parse(JSON.stringify(data));
             this.confidential = result.confidential;
+            if(result.rtDeveloperName && (result.rtDeveloperName == 'CIBE_EventoCliente' || result.rtDeveloperName == 'CIBE_EventoGestor')){
+                this.hasNotPermission = true;
+            }
         }else if(error) {
             console.log(error);
         }

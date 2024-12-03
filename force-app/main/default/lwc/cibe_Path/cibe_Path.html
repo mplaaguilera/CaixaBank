@@ -47,12 +47,10 @@
             </div>
         </div>
         <footer class="slds-m-around_medium">          
-            <lightning-record-edit-form record-id={recordId} record-type-id={recordTypeId} 
-                                        object-api-name={objectApiName} onsubmit={handleSubmit} 
+            <lightning-record-edit-form record-id={recordId} record-type-id={recordTypeId}
+                                        object-api-name={objectApiName} onsubmit={handleSubmit}
                                         onsuccess={handleSuccess} onerror={handleError} mode="view" density="compact">
-                
-                
-
+            
                 <template if:true={isCerradoPositivo}>
                     <template if:true={isImpComisiones}>
                         <lightning-input-field field-name="CIBE_ImpactoDivisaComisionesCierreAnio__c" required></lightning-input-field>
@@ -61,29 +59,91 @@
                         <lightning-input-field field-name="CIBE_ImpactoDIvisaBalanceCierreAnio__c" required></lightning-input-field>
                     </template>
                 </template>
-                <template if:true={isCerradoNegativo}>
-                    <lightning-input-field field-name="CIBE_CerradoNegativo__c" required></lightning-input-field>
-                </template>
-
-                <template if:true={noIsVencida}>
-                    <div class="slds-grid slds-wrap">
-                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
-                            <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
-                            <div class="slds-grid slds-wrap">
-                                <label class="slds-col slds-size_2-of-3 slds-p-around_x-small slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">{labels.incluirClienteLabel}</label>
-                                <lightning-input-field class="slds-col slds-size_1-of-3 slds-p-around_x-small" type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input-field>                        
-                            </div>
-                        </div>
+                <!-- <template if:true={isCerradoNegativo}>
+                    <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                        <lightning-input-field field-name="CIBE_CerradoNegativo__c" required></lightning-input-field>
                     </div>
-                        <!--<lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY"  required="true" field-name="AV_FechaProximoRecordatorio__c"
-                    class="user-input-fecha" ></lightning-input>
-                    
-                    <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.incluirClienteLabel}</label>
-                    <lightning-input type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" 
-                    field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input> -->
-                </template>
+                </template> -->
+
+                    <template if:true={roleEmp}>
+                        <template if:true={noIsVencida}>
+                            <div class="slds-grid slds-wrap">
+                                <template if:true={isCerradoNegativo}>
+                                    <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                        <lightning-input-field field-name="CIBE_CerradoNegativo__c" required></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                        <lightning-input-field class="user-input-fecha" field-name="CloseDate"></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                        <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
+                                    </div>
+                                    <template if:false={isCibe}>
+                                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                            <lightning-input-field class="user-input-fecha" field-name="AV_Comentarios__c"></lightning-input-field>
+                                        </div>
+                                    </template>
+                                </template>
+                                <template if:false={isCerradoNegativo}>
+                                    <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                                        <lightning-input-field class="user-input-fecha" field-name="CloseDate"></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                                        <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
+                                    </div>
+                                    <template if:false={isCibe}>
+                                        <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                                            <lightning-input-field class="user-input-fecha" field-name="AV_Comentarios__c"></lightning-input-field>
+                                        </div>
+                                    </template>
+                                </template>
+                            </div>
+                        </template>
+                    </template>
+
+                    <template if:false={roleEmp}>
+                        <template if:true={noIsVencida}>
+                            <div class="slds-grid slds-wrap">
+                                    <template if:true={isCerradoNegativo}>
+                                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                            <lightning-input-field field-name="CIBE_CerradoNegativo__c" required></lightning-input-field>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                            <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
+                                        </div>
+                                        <!-- <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                            <lightning-layout multiple-rows>
+                                                    <label class="slds-form-element__label slds-size_1-of-3">{labels.incluirClienteLabel}</label>
+                                                    <lightning-input-field class="user-input-fecha" variant="label-hidden" type="toggle" name="toggle" message-toggle-active="" message-toggle-inactive="" field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input-field>                        
+                                            </lightning-layout>
+                                        </div> -->
+                                        <template if:false={isCibe}>
+                                            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                                                <lightning-input-field class="user-input-fecha" field-name="AV_Comentarios__c"></lightning-input-field>
+                                            </div>
+                                        </template>
+                                    </template>
+    
+                                    <template if:false={isCerradoNegativo}>
+                                        <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                                            <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
+                                        </div>
+                                        <!-- <div class="slds-col slds-size_1-of-3 slds-p-around_x-small slds-m-top_xx-small">
+                                            <lightning-layout multiple-rows>
+                                                    <label class="slds-form-element__label slds-size_1-of-2">{labels.incluirClienteLabel}</label>
+                                                    <lightning-input-field class="slds-m-left_xx-large slds-m-around_x-small" variant="label-hidden" type="toggle" name="toggle" message-toggle-active="" message-toggle-inactive="" field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input-field>                        
+                                            </lightning-layout>
+                                        </div> -->
+                                        <template if:false={isCibe}>
+                                            <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                                                <lightning-input-field class="user-input-fecha" field-name="AV_Comentarios__c"></lightning-input-field>
+                                            </div>
+                                        </template>
+                                    </template>
+                            </div>
+                        </template>
+                    </template>
+
                 <lightning-input-field class="slds-hide" field-name="StageName" value={stage} required></lightning-input-field>
                 <div class="slds-m-top_x-small slds-align_absolute-center">
                     <lightning-button id="submit1" type="submit" label={labels.guardar} variant="brand"></lightning-button>

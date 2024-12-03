@@ -1,0 +1,21 @@
+<template>
+    <template if:true={hasLinks}>
+        <div style="margin:0 0 -0.9em 0">
+            <lightning-accordion>
+                <div class="contenidor-general">
+                    <div class="pestanyes-globals">  
+                        <ul class="pestanyes">
+                            <template for:each={listData} for:item="section">
+                                <template for:each={section.links} for:item="link">
+                                    <li key={link.id} class={link.class}>
+                                        <a href={link.url} title={link.label} onclick={handleLinkClick}>{link.label}</a>
+                                    </li>
+                                </template>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </lightning-accordion>
+        </div>
+    </template>
+</template>

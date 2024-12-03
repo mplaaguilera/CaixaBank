@@ -3,6 +3,7 @@ import { CurrentPageReference  } from 'lightning/navigation';
 import { NavigationMixin }      from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
+
 import sendDataToController from '@salesforce/apex/AV_ReportAppointment_Controller.processReportData';
 import updateBackReport from '@salesforce/apex/AV_ReportAppointment_Controller.updateBackReport';
 import unWrappOpportunities from '@salesforce/apex/AV_ReportAppointment_Controller.unWrappOpportunities';
@@ -11,20 +12,25 @@ import updateBackReportTaskEvent from '@salesforce/apex/AV_ReportAppointment_Con
 import createTaskOpp from '@salesforce/apex/AV_ReportAppointment_Controller.createTaskOpp';
 import updateTaskBlock from '@salesforce/apex/AV_ReportAppointment_Controller.updateTaskBlock';
 import updateDeleteTaskCheckOnOff from '@salesforce/apex/AV_ReportAppointment_Controller.updateDeleteTaskCheckOnOff';
+import validatePFNewOppAndForbiddenWords from '@salesforce/apex/AV_NewOpportunity_Controller.validatePFNewOppAndForbiddenWords';
+import getUserInfo from '@salesforce/apex/AV_ReportAppointment_Controller.getUserInfo';  
+
+
 
 //Label
 import errorMsgLabel        from '@salesforce/label/c.AV_CMP_SaveMsgError';
+const IDPROVISIONAL = 'idProvisional';
 
 export default class Av_ReportAppointment extends NavigationMixin(LightningElement) {
 
 	@api recordId;
 	@api accountName;
-@api objectApiName;
-
+	@api objectApiName;
 	clientid;
 	oppoName;
 	oppoStage;
 	oppoFecha;
+	objectInfo;
 	@track iconClient = "standard:report"
 	@track iconOpportunity = "standard:opportunity"
 	@track isLegalEntity;
@@ -39,6 +45,12 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	@track tasksObject;
 	@track taskOrEventInfo;
 	@track radioButtonSelected = false;
+	@track isShowNewEvent;
+	@track nolocalizado; 
+	@track optionevent; 
+	@track clientetab ='tabEvent';  
+	noLocalizadoAfterSave= false;  
+	goPlanAppointment;
 	buttonEventToNoComercial;
 	opporeporting;
 	isChecked;
@@ -46,17 +58,26 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	newEventId;
 	isShowFlowAction = false;
 	istheretasks = true;
-	showSpinner = false;
+	showSpinner = true;
 	showEventPopup = false;
 	showTaskPopup =  false;
 	showNoOpportunityMessage = false;
 	disableButtonCancel = false;
 	disableButtonSave = false;
-	disableButtonSaveAndEvent = false;
+	disableButtonSaveAndEvent = true;
 	opposIdsSet = [];
 	oppIdMainCAO = '';
 	customActivitys = [];
+	opposScheduled = [];
+	opposList = [];
+	opposVinculed = [];
 	isReportOpportunity;
+	userLogged; 
+    @track showModal = false; 
+	switchModal = false; 
+	currentMultigest;
+	
+
 	get inputFlowVariables() {
 		return [
 			{
@@ -76,16 +97,12 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 			}
 		];
 	}
-
-	connectedCallback(){
-		this.recordId = this.currentPageReference.state.c__recId;
-		this.accountName = this.currentPageReference.state.c__id;
-		this.isLegalEntity = this.currentPageReference.state.c__rt == 'CC_Cliente';
-		this.isIntouch = this.currentPageReference.state.c__intouch == 'true';
-		this.isReportOpportunity = this.currentPageReference.state.c__objectname == 'Opportunity';
-		this.clientid = (this.isReportOpportunity) ? this.currentPageReference.state.c__account : this.recordId;
+	typeLabel = {
+		'030':'Muro',
+		'ESE':'Email,sms,etc',
+		'OFT':'Tarea de oficina'
 	}
-
+	
 	setOppoName(e){
 		this.opporeporting = e.detail.reportingopp;
 		this.oppoName  = e.detail.reportingopp.Name;
@@ -111,7 +128,45 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	@wire(CurrentPageReference)
 	setCurrentPageReference(currentPageReference) {
 		this.currentPageReference = currentPageReference;
+		if(this.userLogged == null){
+			getUserInfo()
+				.then(data => {
+					if (data) {
+						this.userLogged = data.gestor;
+						if(data.multigestor){
+							this.currentMultigest = data.multigestor.Id;
+						}
+					} else {
+						console.error(data);
+					
+					}
+				}).catch(error => {
+					console.log(error);
+				})
+		}
+		this.recordId = this.currentPageReference.state.c__recId;
+		this.accountName = this.currentPageReference.state.c__id;
+		this.isLegalEntity = this.currentPageReference.state.c__rt == 'CC_Cliente';
+		this.isIntouch = this.currentPageReference.state.c__intouch == 'true';
+		this.isReportOpportunity = this.currentPageReference.state.c__objectname == 'Opportunity';
+		this.clientid = (this.isReportOpportunity) ? this.currentPageReference.state.c__account : this.recordId;
+		this.showSpinner = false;
 	}
+
+	
+	@wire(getUserInfo)
+    wiredUser({ error, data }) {
+        if (data) {
+            this.userLogged = data.gestor;
+			if(data.multigestor){
+				this.currentMultigest = data.multigestor.Id;
+			}
+        } else if (error) {
+            console.error(error);
+        
+        }
+    }
+    
 
 	handleStatusChange(event){
 		const status = event.detail.status;
@@ -145,7 +200,12 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 			this.listOppUpdate = {};
 		}
 	}
-
+	restoreeventreport(){
+		this.isShowNewEvent = false;
+		this.citaComercial = false;
+		this.opposObject = {};
+		this.eventInfo = {};
+	}
 	focusRecord(){
 		this.dispatchEvent(new CustomEvent('focusrecordtab'));
 	}
@@ -167,39 +227,40 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	handleLinkOpportunity(){
-		this.showNoOpportunityMessage = false;
-	}
-
-	handleNoCommercial(){
-		let error = null;
-		if (error == null) {
-			let validateResponse = this.validateDates();
-			if(validateResponse == true){
-				this.showSpinner = true;
-				if (this.buttonEventToNoComercial == 'false') {
-					this.focusRecord();
-				}
-				if (this.listOppInsert != null && Object.keys(this.listOppInsert).length > 0) {
-					this.createOpportunityInsert(this.buttonEventToNoComercial);
-				} else if (this.listOppUpdate != null && Object.keys(this.listOppUpdate).length > 0) {
-					this.createOpportunityUpdate(this.buttonEventToNoComercial, null);
-				} else {
-					this.createTaskEvent(null, null, null, this.buttonEventToNoComercial);
-				}
-			}else{
-				this.template.querySelector('[data-id="oppoCmp"]').highlightOppo(validateResponse);
-				this.showSpinner = false;
-			}
+		let cntcBlck = this.template.querySelector("[data-id='contactBlock']");
+		if(cntcBlck.checkboxStatus){
+			cntcBlck.switchCitaCheckBox(false);
 		}
 		this.showNoOpportunityMessage = false;
 	}
 
-	handleSaveAndEvent(){
+	handleNoCommercial(){
+		let cntcBlck = this.template.querySelector('[data-id="contactBlock"]');
+		if(!cntcBlck.checkboxStatus){
+			cntcBlck.switchCitaCheckBox(true);
+		}
+		this.citaComercial = true;
+		this.showNoOpportunityMessage = false;
+		(this.goPlanAppointment) ? this.handleSaveAndEvent() : this.handleSave();
+	}
+	
+	sumMinutes(initialHour,duration){
+		let initialDateTomSeconds = new Date(initialHour).getTime();
+		let durationInms = parseInt(duration,10)*60*1000;
+		let finalDateInMs = initialDateTomSeconds + durationInms;
+		return new Date(finalDateInMs).toISOString();
+	}
+	async handleSaveAndEvent(){  
+		this.goPlanAppointment = true;
 		this.buttonEventToNoComercial='true';
 		var nowReference = new Date().toJSON();
 		let error = null;
-		if (this.taskOrEventInfo.type == 'task'){
-			if (!this.radioButtonSelected) {
+		let comentarios = [];
+
+	
+
+		if (this.taskOrEventInfo.type == 'task' ){
+			if (!this.radioButtonSelected && this.clientetab=='tabTask') {
 				this.handleError();
 				this.showToast('Error', 'Por favor, seleccione un tipo de tarea.', 'error', 'pester');
 				error='KO';
@@ -215,100 +276,384 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 				error='KO';
 			}
 		}
-		if((this.opposObject != null && Object.keys(this.opposObject).length > 0) || this.citaComercial) {
-			if (error == null) {
-				let validateResponse = this.validateDates();
-				if(validateResponse == true){
-					this.showSpinner = true;
-					if (this.listOppInsert != null && Object.keys(this.listOppInsert).length > 0) {
-						this.createOpportunityInsert('true');
-					} else if (this.listOppUpdate != null && Object.keys(this.listOppUpdate).length > 0) {
-						this.createOpportunityUpdate('true', null);
-					} else {
-						this.createTaskEvent(null, null, null, 'true');
-					}
-				}else{
-					this.handleError();
-					this.template.querySelector('[data-id="oppoCmp"]').highlightOppo(validateResponse);
-					this.showSpinner = false;
-				}
-			}
-		} else {
-			if(error == null){
-				if(this.taskOrEventInfo.type == 'event'){
-					this.handleError();
-					this.showEventPopup = true;
-					this.showNoOpportunityMessage = true;
-				}else  if(this.taskOrEventInfo.type == 'task'){
-					this.handleError();
-					this.showTaskPopup = true;
-					this.showNoOpportunityMessage = true;
+
+		let auxOppo = [];
+		let countAgend = 0;
+		let vinculatedOppos = [];
+		let vinculatedTasks = [];
+		if(this.opposObject != null ){
+			for(let oppoId in this.opposObject){
+				vinculatedOppos.push(this.opposObject[oppoId]);
+				auxOppo.push(this.opposObject[oppoId]);
+				if(this.opposObject[oppoId]['agendado']){
+					countAgend++;
 				}
 			}
 		}
+
+		if(this.tasksObject != null){
+			for(let tskId in this.tasksObject){
+				vinculatedTasks.push(this.tasksObject[tskId]);
+			}
+		}
+
+	
+
+		let count = 1;
+		let recordName;
+		this.opposScheduled = [];
+		let dateTask;
+		auxOppo.forEach(opp => {
+			
+			this.opposScheduled.push(
+				{
+					Id: opp['id'],
+					Name :  opp['Name'],
+					Stage :  opp['newPath'],
+					Fecha :  opp['proximaGestion'],
+					Comentarios :  opp['comentario'],
+					Potencial :  opp['expectativa'],
+					ImportePropio :  opp['importe'],
+					Margen :  opp['margin'],
+					ProductoMain :  opp['ProdId'],
+					ImporteCuota :  opp['cuota'],
+					ImporteOtraEntidad :  opp['importeOtraEntidad'],
+					OtraEntidadNombre :  opp['otraEntidad'],
+					NotInserted : (opp['id'].includes(IDPROVISIONAL)) ? true : undefined,
+					isVinculed : false,
+					mainVinculed: opp['mainVinculed'],
+					isTheLastItem : count == countAgend,
+					HistoryComment : opp['commentHistory'],
+					PrioritzingCustomer : opp['prioritzingCustomer'],
+					Agendado: opp['agendado'],
+					Subestado : opp['subestado'],
+					IsNewProduct: opp['isnewprod'],
+					Resolucion: opp['resolucion']
+					,owneridopp : opp['owneridopp']   
+
+				}
+			);
+			if(opp['agendado']){
+				count++;
+			}
+			if(opp['mainVinculed']){
+				recordName = opp['productName'];
+				dateTask = opp['proximaGestion'];
+			}
+			
+		})
+
+		let orignAppValue;
+		let subjectValue;
+		if(this.nolocalizado==true){
+			orignAppValue = 'AV_SFReportNoLocalizado';
+			subjectValue = 'No localizado'
+		}else{
+			orignAppValue = 'AV_SalesforceClientReport';
+			subjectValue = this.typeLabel[this.taskOrEventInfo.typeTask];
+		}
+		if(this.taskOrEventInfo.type == 'event'){
+			this.objectInfo = {
+				originReport : 'Opportunity',
+				objectToReport : {
+					sobjectType: 'Event',
+					AV_Tipo__c: this.taskOrEventInfo['typeEvent'],
+					StartDateTime : this.taskOrEventInfo['activityDateTime'],
+					EndDateTime : this.sumMinutes(this.taskOrEventInfo['activityDateTime'],this.taskOrEventInfo['duracion']),
+					AV_MemorableInterview__c: this.taskOrEventInfo['memorableInterview'],
+					Description: this.taskOrEventInfo['comment'],
+					AV_BranchPhysicalMeet__c: this.taskOrEventInfo['office'],
+					WhoId: this.taskOrEventInfo['contactPerson'],
+					Location: this.taskOrEventInfo['location'],
+					WhatId : this.clientid,
+					Subject : (!this.citaComercial && recordName != undefined) ? recordName : 'Gestión operativa',
+					AV_OrigenApp__c: 'AV_SalesforceClientReport',
+					RecordTypeId : 'AV_EventosConCliente',
+					CSBD_Evento_Estado__c : 'Gestionada Positiva'
+					,AV_Purpose__c : this.taskOrEventInfo['purpose']  
+				},
+				citaComercial: this.taskOrEventInfo['comercial'],
+				vinculatedOpportunities:this.opposObject,
+				vinculatedTasks : vinculatedTasks,
+				oldOppos : this.template.querySelector('[data-id="oppoCmp"]').sendInitialStates(),
+				HeaderId:this.headerId
+			}
+			if(this.objectInfo.objectToReport.citaComercial){
+				this.objectInfo.objectToReport.AV_Purpose__c = '002';
+			}else{
+				this.objectInfo.objectToReport.AV_Purpose__c = '001';
+			}
+			
+		}else if(this.taskOrEventInfo.type == 'task'){
+			this.objectInfo = {
+				originReport : 'Opportunity',
+				objectToReport : {
+					sobjectType: 'Task',
+					AV_Tipo__c: this.taskOrEventInfo.typeTask,
+					Status: 'Gestionada positiva',
+					WhatId : this.clientid,
+					ActivityDate: new Date().toISOString().substring(0,10),
+					Subject : subjectValue,  
+					RecordTypeId : 'AV_Otros',
+					Description : this.taskOrEventInfo.comentaryTask,
+					AV_OrigenApp__c : orignAppValue  
+					
+
+				}
+				,vinculatedOpportunities:this.opposObject,
+				vinculatedTasks : vinculatedTasks,
+				oldOppos : this.template.querySelector('[data-id="oppoCmp"]').sendInitialStates(),
+				HeaderId:this.headerId
+			}
+			
+		} 
+		for(let key in this.objectInfo.objectToReport){
+			if(this.objectInfo.objectToReport[key] == null || this.objectInfo.objectToReport[key] == undefined){
+				delete this.objectInfo.objectToReport[key];
+			}
+		}
+
+		for(let oppoId in this.opposObject){
+			let comentario = this.opposObject[oppoId]['comentario'];
+			comentarios.push(comentario);
+		}
+
+	
+		let coment = null;
+		if(this.taskOrEventInfo.comment != null && this.taskOrEventInfo.comment.trim() !== ''){
+			coment = this.taskOrEventInfo.comment
+		}else if(this.taskOrEventInfo.comentaryTask != null && this.taskOrEventInfo.comentaryTask.trim() !== ''){
+			coment = this.taskOrEventInfo.comentaryTask;
+		}
+		if(coment != null){
+			comentarios.push(coment);
+		}
+
+		let validateResponse = this.validateDates();
+		if(validateResponse == true){
+
+			try{
+
+				const result = await validatePFNewOppAndForbiddenWords({
+					prodId : null,
+					tskId : this.recordId,
+					comments : comentarios,
+					names : null
+				});
+
+				if((error == null && result == 'OK') || (error == null && result.includes('Warning'))){
+					if((this.opposObject != null && Object.keys(this.opposObject).length > 0) || this.citaComercial) {
+						if (result.includes('Warning')) {
+							this.showToast('Warning', result, 'warning', 'sticky');
+						}
+							try{
+								await this.evaluateReassignation();
+								this.objectInfo.vinculatedOpportunities = this.opposObject;
+								this.opposScheduled.forEach(oppo => {
+									oppo.owneridopp = this.opposObject[oppo.Id]['owneridopp'];
+								})
+								this.isShowNewEvent = true;
+								this.showSpinner = false;
+							}catch(error){
+								console.log('modal cerrado:'+error);
+							}
+					}	
+				} else if(result != 'OK'){
+					if(result == 'KO'){
+						this.showToast('Error', errorMsgLabel, 'error', 'pester');
+					}else if (!result.includes('Warning')) {
+						this.showToast('Error', result, 'error', 'pester');
+					}
+				}
+
+			}catch(error){
+				console.error(error);
+			}
+
+
+			}else{
+			this.handleError();
+			this.template.querySelector('[data-id="oppoCmp"]').highlightOppo(validateResponse);
+			this.showSpinner = false;
+		}
 	}
 	
-	handleSave(){
-
+	async handleSave(){    
+		this.goPlanAppointment = false;
 		this.buttonEventToNoComercial='false';
 		let error = null;
+		let comentarios = [];
 		var nowReference = new Date().toJSON();
+			
 		if(this.taskOrEventInfo.type == 'task'){
-			if (!this.radioButtonSelected) {
+			if(this.nolocalizado != null || this.nolocalizado != undefined){
+				this.noLocalizadoAfterSave= this.nolocalizado;
+			}
+
+			if (!this.radioButtonSelected && this.clientetab=='tabTask') {
 				this.handleError();
 				this.showToast('Error', 'Por favor, seleccione un tipo de tarea.', 'error', 'pester');
 				error='KO';
-			}
+			}	
 		} else if (this.taskOrEventInfo.type == 'event') {
 
-			if (this.taskOrEventInfo.typeEvent == 'CTOOC' && this.taskOrEventInfo.office == null) {
+			if (this.taskOrEventInfo.typeEvent == 'CTOOC' && this.taskOrEventInfo.office == null  && this.clientetab=='tabEvent') {
 				this.handleError();
 				this.showToast('Error', 'Cuando se selecciona "Cita en otra oficina" debes rellena el campo "Oficina".', 'error', 'pester');
 				error='KO';
-			}else if(this.taskOrEventInfo.activityDateTime == null || this.taskOrEventInfo.activityDateTime > nowReference){
+			}else if((this.taskOrEventInfo.activityDateTime == null || this.taskOrEventInfo.activityDateTime > nowReference) && this.clientetab=='tabEvent'){
 				this.handleError();
 				this.showToast('Error', 'La fecha no puede ser superior a hoy.', 'error', 'pester');
 				error='KO';
 			}
 		}
 
-		if((this.opposObject != null && Object.keys(this.opposObject).length > 0) || this.citaComercial) {
-			if(error == null) {
-				let validateResponse = this.validateDates();//If all the dates are correct return true.Either return the Id of the first oppo to fail
-				if(validateResponse == true){
-					this.focusRecord();
-					this.showSpinner = true;
-					if (this.listOppInsert != null && Object.keys(this.listOppInsert).length > 0) {
-						this.createOpportunityInsert('false');
-					} else if (this.listOppUpdate != null && Object.keys(this.listOppUpdate).length > 0) {
-						this.createOpportunityUpdate('false', null);
-					} else {
-						this.createTaskEvent(null, null, null, 'false');
+		for(let oppoId in this.opposObject){
+			let comentario = this.opposObject[oppoId]['comentario'];
+			comentarios.push(comentario);
+		}
+
+		let coment = null;
+		if(this.taskOrEventInfo.comment != null && this.taskOrEventInfo.comment.trim() !== ''){
+			coment = this.taskOrEventInfo.comment
+		}else if(this.taskOrEventInfo.comentaryTask != null && this.taskOrEventInfo.comentaryTask.trim() !== ''){
+			coment = this.taskOrEventInfo.comentaryTask;
+		}
+		if(coment != null){
+			comentarios.push(coment);
+		}
+		let validateResponse = this.validateDates();
+		if(validateResponse == true){
+
+			try{
+
+				const result = await validatePFNewOppAndForbiddenWords({
+					prodId : null,
+					tskId : this.recordId,
+					comments : comentarios,
+					names : null
+				});
+
+				if((error == null && result == 'OK') || (error == null && result.includes('Warning'))){
+					if((this.opposObject != null && Object.keys(this.opposObject).length > 0) || this.citaComercial) {
+						if (result.includes('Warning')) {
+							this.showToast('Warning', result, 'warning', 'sticky');
+						}
+						try{
+							await this.evaluateReassignation();
+						}catch(error){
+							console.log('modal cerrado:'+error);
+						}
+						this.focusRecord();
+						this.showSpinner = true;
+						if (this.listOppInsert != null && Object.keys(this.listOppInsert).length > 0) {
+							this.createOpportunityInsert('false');
+						} else if (this.listOppUpdate != null && Object.keys(this.listOppUpdate).length > 0) {
+							this.createOpportunityUpdate('false', null);
+						} else {
+							this.createTaskEvent(null, null, null, 'false');
+						}
+						
+					}  else {
+						if(error == null){
+							if(this.taskOrEventInfo.type == 'event'){ 
+								this.switchModal = true;  
+								this.handleError();
+								this.showEventPopup = true;
+								this.showNoOpportunityMessage = true;
+							}else  if(this.taskOrEventInfo.type == 'task'){
+								this.switchModal = true;  
+								this.handleError();
+								this.showTaskPopup = true;
+								this.showNoOpportunityMessage = true;
+							}
+						}
+					}	
+				} else if(result != 'OK'){
+					if(result == 'KO'){
+						this.showToast('Error', errorMsgLabel, 'error', 'pester');
+					}else if (!result.includes('Warning')) {
+						this.showToast('Error', result, 'error', 'pester');
 					}
-				}else{
-					this.handleError();
-					this.template.querySelector('[data-id="oppoCmp"]').highlightOppo(validateResponse);
-					this.showSpinner = false;
 				}
+
+			}catch(error){
+				console.error(error);
 			}
-		} else {
-			if(error == null){
-				if(this.taskOrEventInfo.type == 'event'){
-					this.handleError();
-					this.showEventPopup = true;
-					this.showNoOpportunityMessage = true;
-				}else  if(this.taskOrEventInfo.type == 'task'){
-					this.handleError();
-					this.showTaskPopup = true;
-					this.showNoOpportunityMessage = true;
+
+
+			}else{
+			this.handleError();
+			this.template.querySelector('[data-id="oppoCmp"]').highlightOppo(validateResponse);
+			this.showSpinner = false;
+		}
+
+	}
+
+	async evaluateReassignation(){
+		this.showModal = false;
+
+		
+		if((this.opposObject != undefined && Object.keys(this.opposObject)[0] != undefined ) || this.switchModal){  
+			
+			let ownerMismatch = false;
+			for(let key in this.opposObject){
+				if( this.opposObject[key]['owneridopp'] == this.currentMultigest){
+					this.opposObject[key]['owneridopp'] = this.userLogged.Id;
+					continue;
 				}
+				if((this.opposObject[key]['owneridopp'] != this.userLogged.Id)){
+					ownerMismatch = true;
+					continue;
+				}
+				this.showModal=false;
+			}
+	
+			
+			let ownerMismatch2 = false;
+			for(let key in this.tasksObject){
+				if( this.tasksObject[key]['owner'] == this.currentMultigest){
+					this.tasksObject[key]['owner'] = this.userLogged.Id;
+					continue;
+				}
+				if((this.tasksObject[key]['owner'] != this.userLogged.Id)){
+					ownerMismatch2 = true;
+					continue;
+					
+				}
+				this.showModal=false;
+			}
+			
+	
+			if (ownerMismatch || ownerMismatch2) {  
+				this.showModal = true;  
+				const result = await this.waitForUserDecision();
+				if (result) {
+					if(ownerMismatch){     
+						for (let key in this.opposObject) {
+							if (this.opposObject[key]['owneridopp'] != this.userLogged.Id && this.opposObject[key]['owneridopp'] != this.currentMultigest) {
+								this.opposObject[key]['owneridopp'] = this.userLogged.Id;
+							}
+						}
+					}
+	
+					if(ownerMismatch2){  
+						for (let key in this.tasksObject) {
+							if (this.tasksObject[key]['owner'] != this.userLogged.Id) {
+								this.tasksObject[key]['owner'] = this.userLogged.Id;
+							}
+						}
+					}
+				} 
+				this.showModal = false;
 			}
 		}
 	}
-
 	createOpportunityInsert(buttonEvent) {
-		console.log('Inicia createOpportunityInsert');
-		unWrappOpportunities({ opportunities:this.listOppInsert, accountId:this.clientid, isInsert: true})
+		if(this.noLocalizadoAfterSave == undefined || this.noLocalizadoAfterSave == null){
+			this.noLocalizadoAfterSave = false;
+		}
+		unWrappOpportunities({ opportunities:this.listOppInsert, accountId:this.clientid, isInsert: true,isNoLocalizado: this.noLocalizadoAfterSave})  
 			.then(result=> {
 				if (result != null) {
 					if (result.results == 'OK') {
@@ -316,7 +661,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
  						this.createOpportunityUpdate(buttonEvent,this.listOppIdsNews);
 					} else {
 						this.handleError();
-						console.log('createOpportunityInsert '+result.results);
 						this.showToast('Error',result.results,'error','pester');
 						this.showSpinner = false;
 						if (buttonEvent == 'true') {
@@ -343,17 +687,19 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	createOpportunityUpdate(buttonEvent,listOppNews) {
-		console.log('Inicia createOpportunityUpdate');
-		unWrappOpportunities({ opportunities:this.listOppUpdate, accountId:this.clientid,isInsert: false})
+		if(this.noLocalizadoAfterSave == undefined || this.noLocalizadoAfterSave == null){
+			this.noLocalizadoAfterSave = false;
+		}
+		unWrappOpportunities({ opportunities:this.listOppUpdate, accountId:this.clientid,isInsert: false,isNoLocalizado:this.noLocalizadoAfterSave})   
 			.then(result=> {
 				if (result != null) {
-					if (result.results == 'OK') {
+					if (result.results == 'OK') {	
 						this.listOppOld = result.mapOldOpp;
 						this.listOppIdsAll = result.opposId;
 						if (listOppNews != null) {
 							Array.prototype.push.apply(this.listOppIdsAll,listOppNews);
 						}
- 						this.createTaskEvent(listOppNews,this.listOppOld,this.listOppIdsAll,buttonEvent);
+						this.createTaskEvent(listOppNews,this.listOppOld,this.listOppIdsAll,buttonEvent);
 					} else {
 						if (listOppNews != null) {
 							this.backOpportunity(result.results,null,listOppNews,buttonEvent);
@@ -393,9 +739,11 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 			})
 	}
 
-	createTaskEvent(listOppNews, listOppOlds, listOppIdsAll, buttonEvent) {
-		console.log('Inicia createTaskEvent');	
-		sendDataToController({ eventOrTsk: this.taskOrEventInfo, opportunities: this.opposObject, mapOldOpp: listOppOlds, opposId: listOppNews})
+	createTaskEvent(listOppNews, listOppOlds, listOppIdsAll, buttonEvent) {	
+		if(this.nolocalizado == undefined || this.nolocalizado == null){
+			this.nolocalizado = false;
+		}
+		sendDataToController({ eventOrTsk: this.taskOrEventInfo, opportunities: this.opposObject, mapOldOpp: listOppOlds, opposId: listOppNews,isNoLocalizadoActive: this.nolocalizado})
 		.then(result =>{
 			if (result != null) {
 				if(result.results == 'OK'){ 
@@ -408,7 +756,7 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 						this.createTaskOpp(listOppNews, listOppOlds, listOppIdsAll, buttonEvent, result);
 					} else {
 						if (buttonEvent == 'true') {
-							this.isShowFlowAction = true;
+							this.redirectToPlanificarCita();
 						}
 						else{
 							this.handleCancel();
@@ -420,7 +768,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 						this.backOpportunity(result.results,listOppOlds,listOppNews,buttonEvent);
 					} else {
 						this.handleError();
-						console.log('createTaskEvent '+result.results);
 						if (buttonEvent == 'true') {
 							this.isShowFlowAction = false;
 						}
@@ -456,7 +803,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	updateDeleteTask(listOppNews, listOppOlds, listOppIdsAll, buttonEvent, resultTaskEvent) {
-		console.log('Inicia updateDeleteTask');
 		updateDeleteTaskCheckOnOff({listTaskChangeDate: resultTaskEvent.listTaskChangeDate,  listTaskToDelete: resultTaskEvent.listTaskToDelete,  listTaskOpportunityDelete: resultTaskEvent.listTaskOpportunityDelete})
 		.then(result => {
 			if (result != null) {
@@ -488,7 +834,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	blockTask(listOppNews, listOppOlds, listOppIdsAll, buttonEvent, resultTaskEvent) {
-		console.log('Inicia blockTask');
 		updateTaskBlock({eventOrTsk: this.taskOrEventInfo, tasks: this.tasksObject})
 		.then(result =>{
 			if (result != null) {
@@ -502,10 +847,7 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 						resultTaskEvent.dataBack.deleteManageHistInsert = result.deleteManageHistInsert;
 						this.createTaskOpp(listOppNews, listOppOlds, listOppIdsAll, buttonEvent,resultTaskEvent);
 					} else {
-						if (buttonEvent == 'true') {
-							this.isShowFlowAction = true;
-						}
-						else{
+						if (buttonEvent != 'true') {
 							this.handleCancel();
 						}
 						this.showSpinner = false;
@@ -523,7 +865,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	createTaskOpp(listOppNews, listOppOlds, listOppIdsAll, buttonEvent, resultTaskEvent) {
-		console.log('Inicia createTaskOpp');
 		createTaskOpp({jsonResultTaskEvent: JSON.stringify(resultTaskEvent)})
 		.then(result =>{
 			if (result != null) {
@@ -531,10 +872,7 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 					if(listOppIdsAll != null) { 
 						this.sendToGcfOpportunity(listOppIdsAll,buttonEvent);
 					}else{
-						if (buttonEvent == 'true') {
-							this.isShowFlowAction = true;
-						}
-						else{
+						if (buttonEvent != 'true') {
 							this.handleCancel();
 						}
 						this.showSpinner = false;
@@ -552,7 +890,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	backOpportunity(errorOpp,listOppUpdate,listIdOppInsert,buttonEvent) {
-		console.log('Inicia backOpportunity');
 		updateBackReport({jsonListOpp: JSON.stringify(listOppUpdate), listIdsOpp: listIdOppInsert})
 		.then(result => {
 			if(result != null) {
@@ -576,7 +913,6 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	backTaskEvent(errorView,listOppUpdate,listIdOppInsert,backResult,buttonEvent) {
-		console.log('Inicia backTaskEvent');
 		updateBackReportTaskEvent({jsonBackAll: backResult})
 		.then(result => {
 			if(result != null) {
@@ -608,29 +944,43 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 	}
 
 	sendToGcfOpportunity(listIdsOpps,buttonEvent) {
-		console.log('Inicia sendToGcfOpportunity');
-		sendOppToGCF({listIdsOppUpdateCreated:listIdsOpps})
-		.then(result =>{
-			if(buttonEvent == 'true'){
-				this.isShowFlowAction = true;
-			}
-			else{
-				this.handleCancel();
-			}
-			this.showSpinner = false;
-			if(result != 'OK') {
-				console.log('sendOppToGCF '+result);
-			}	
-		}).catch(error => {
-			if(buttonEvent == 'true'){
-				this.isShowFlowAction = true;
-			}
-			else{
-				this.handleCancel();
-			}
-			this.showSpinner = false;
-			console.log('sendOppToGCF '+error);
-		})
+		if(this.taskOrEventInfo.type == 'task'){
+			sendOppToGCF({listIdsOppUpdateCreated:listIdsOpps,newEvTsk:this.taskOrEventInfo.typeTask})  
+			.then(result =>{
+				if(buttonEvent != 'true'){
+					this.handleCancel();
+				}
+				this.showSpinner = false;
+				if(result != 'OK') {
+					console.log('Error sendOppToGCF '+result);
+				}
+			}).catch(error => {
+				if(buttonEvent != 'true'){
+					this.handleCancel();
+				}
+				this.showSpinner = false;
+				console.log(error);
+			})
+
+		}else if(this.taskOrEventInfo.type == 'event'){
+			sendOppToGCF({listIdsOppUpdateCreated:listIdsOpps,newEvTsk:this.taskOrEventInfo.typeEvent})  
+			.then(result =>{
+				if(buttonEvent != 'true'){
+					this.handleCancel();
+				}
+				this.showSpinner = false;
+				if(result != 'OK') {
+					console.log('Error sendOppToGCF '+result);
+				}
+			}).catch(error => {
+				if(buttonEvent != 'true'){
+					this.handleCancel();
+				}
+				this.showSpinner = false;
+				console.log(error);
+			})
+
+		}
 	}
 
 	setCustomActivityInfoForFlow(info){
@@ -661,23 +1011,26 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 			let comentario = this.opposObject[oppoId]['comentario'];
 			let agendado = this.opposObject[oppoId]['agendado'];
 			let validable = this.opposObject[oppoId]['validable'];
+			let noofrecerhasta = this.opposObject[oppoId]['noofrecerhasta'];
 
 			if(!validable){
 				continue;
 			}
-			if((stage == 'En gestión/insistir' || stage == 'No apto') &&
+			if((stage == 'En gestión/insistir') &&
 			((date != null && date != undefined && date < nowReference) || (date == null && date == undefined)) && !agendado){
 				return  this.opposObject[oppoId]['id'];
 			}
-			if((stage == 'No interesado') && (resolucion == 'O') && (comentario == null | comentario == '')){
+			if((stage == 'No interesado' || stage == 'Producto Rechazado') && ((resolucion == 'O') && (comentario == null | comentario == '') || resolucion == 'No Apto' && (noofrecerhasta == null || noofrecerhasta == undefined))){
 				return  this.opposObject[oppoId]['id'];
 			}
+
 		}
 		return response;
 	}
 
 	evaluateAgendeds(e){
 		this.disableButtonSave = e.detail;
+		this.disableButtonSaveAndEvent = e.detail;
 	}
 
 	setOppoForController(e){
@@ -685,8 +1038,9 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 		var oppInsert = {};
 		var oppUpdate = {};
 		for(let oppoId in this.opposObject){
-			if (oppoId.includes('idProvisional')) {
+			if (oppoId.includes(IDPROVISIONAL)) {
 				oppInsert[oppoId]= this.opposObject[oppoId];
+				oppInsert[oppoId]['owneridopp']= this.userLogged.Id; 
 			} else {
 				oppUpdate[oppoId]= this.opposObject[oppoId];
 			}
@@ -760,6 +1114,7 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 
 	evaluateAgendeds(e){
 		this.template.querySelector('[data-id="saveButton"]').disabled = e.detail;
+		this.template.querySelector('[data-id="saveAndEventButton"]').disabled = !e.detail;
 	}
 
 	switchButtons(){
@@ -767,4 +1122,49 @@ export default class Av_ReportAppointment extends NavigationMixin(LightningEleme
 		this.disableButtonSave = true;
 		this.disableButtonSaveAndEvent = true;
 	}
+
+	
+	handleNoLocalizado(e){
+		this.nolocalizado = e.detail.value;
+		if(this.nolocalizado){
+			this.disableButtonSaveAndEvent = true;				
+		}
+
+	}
+	
+	handleChangeOptionEvent(e){
+		this.optionevent = e.detail.value;
+		if(this.optionevent != 'LMD'){
+			this.nolocalizado = false;
+		}
+	}
+	
+	handleTabConCliente(e){
+		this.clientetab = e.detail.value;
+		
+	}
+
+	valueOppoList(e){
+		this.opposList = e.detail.opportunitiesList;
+		this.opposVinculed = e.detail.opportunitiesVinculed;
+	}
+
+	
+	waitForUserDecision() {
+        return new Promise((resolve) => {
+            this.decisionResolver = resolve;
+        });
+    }
+    handleYes() {
+        this.decisionResolver(true);
+    }
+    handleNo() {
+        this.decisionResolver(false);
+    }
+    handleCloseModal() {
+        this.showModal = false;
+    }
+    
+
+	
 }

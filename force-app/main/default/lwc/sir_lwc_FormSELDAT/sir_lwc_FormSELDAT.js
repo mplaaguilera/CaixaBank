@@ -1,5 +1,4 @@
 import { LightningElement, api, track, wire } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import {refreshApex} from '@salesforce/apex';
 
@@ -43,7 +42,7 @@ export default class Sir_lwc_FormSELDAT extends LightningElement {
     @track isDATA = false;
     @track labelDATF = 'Introduzca una fecha';
     @track labelDATN = 'Introduzca un importe';
-    @track labelDATA = 'Introduzca un texto (Máximo 255 caracteres)';
+    @track labelDATA = 'Introduzca un texto (Máximo 2.000 caracteres)';
 
     @track formularioVisible = false;
     @track mensajeError = null;
@@ -64,6 +63,9 @@ export default class Sir_lwc_FormSELDAT extends LightningElement {
 
     @track wiredTarea;
     @track wiredResultTarea = [];
+
+    @track errorGeneral;
+    @track mensajeErrorComentario;
     
     get options() {
         var options= [];
@@ -132,8 +134,8 @@ export default class Sir_lwc_FormSELDAT extends LightningElement {
             }else if(this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_importe__c != null && this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_importe__c != ''){
                 this.valueDATN = this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_importe__c;
                 this.seleccion = this.valueDATN;
-            }else if(this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_texto__c != null && this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_texto__c != ''){
-                this.valueDATA = this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_texto__c;
+            }else if(this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_textoLargo__c != null && this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_textoLargo__c != ''){
+                this.valueDATA = this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_textoLargo__c;
                 this.seleccion = this.valueDATA;
             }else if(this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_comentarios__c != null && this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_comentarios__c != ''){
                 this.comentario = this.tareaRecord.SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_comentarios__c;
@@ -209,11 +211,7 @@ export default class Sir_lwc_FormSELDAT extends LightningElement {
         if(this.isDATN){
             this.valueDATN = event.detail.value;
             this.seleccion = this.valueDATN;
-        }
-        if(this.isDATA){
-            this.valueDATA = event.detail.value;
-            this.seleccion = this.valueDATA;
-        }
+        }        
         if(this.isSELS){
             this.valueSELS = event.detail.value;
             this.seleccion = this.valueSELS.toString();
@@ -223,19 +221,42 @@ export default class Sir_lwc_FormSELDAT extends LightningElement {
             this.seleccion = this.valueSELM.toString();
         }
         //Se comprueba que alguno de los campos tenga valor para habilitar el botón de "Guardar"
-        if( (this.valueSELM != null && this.valueSELM != '') || (this.valueSELS != null && this.valueSELS != '') ||
-            (this.valueDATF != null && this.valueDATF != '') || (this.valueDATN != null && this.valueDATN != '') || (this.valueDATA != null && this.valueDATA != '') ){
+        if( (this.valueSELM != null && this.valueSELM !== '') || (this.valueSELS != null && this.valueSELS !== '') ||
+            (this.valueDATF != null && this.valueDATF !== '') || (this.valueDATN != null && this.valueDATN !== '')){
             this.disabledGuardar = false;
         }
+        if(this.isDATA){           
+            // Detectamos los caracteres que ocupan mas de 1 posicion de esta forma
+            var utf8Bytes = new TextEncoder().encode(event.detail.value);
+            var numCaracteres = utf8Bytes.length; 
+            // Como el maxlength calcula el salto de linea como 1 caracter, realizamos logica para detectar los saltos de linea y sumar 1 en el contador    
+            var ocurrencias = event.detail.value.matchAll(/\n/g);
+            for(let ocu of ocurrencias) {
+                numCaracteres = numCaracteres + 1;
+            } 
+            if(numCaracteres > 2000){
+                this.disabledGuardar = true;
+                this.errorGeneral = true;
+                this.mensajeErrorComentario = 'El comentario no puede contener más de 2.000 caracteres.';
+            } else if(event.detail.value === ''){
+                this.disabledGuardar = true;
+                this.errorGeneral = false;
+            } else {     
+                this.valueDATA = event.detail.value;
+                this.seleccion = this.valueDATA;           
+                this.disabledGuardar = false;
+                this.errorGeneral = false;
+            }            
+        }
     }
-
+    
     handleSaveAndSendClick(){
         this.disabledCerrar = true;
         this.disabledGuardar = true;
         updateTarea({tareaId: this.tareaId, seleccion : this.seleccion, comentario : this.comentario, send: true}).then(result => {
             if(result.length >= 0){
                 //Si el resultado del WS es OK 
-                if(result[0] =='OK'){
+                if(result[0] === 'OK'){
                   /*  this.dispatchEvent(
                         new ShowToastEvent({
                             title: 'Enviado',

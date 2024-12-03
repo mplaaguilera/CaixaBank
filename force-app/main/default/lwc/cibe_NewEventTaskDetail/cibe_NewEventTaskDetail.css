@@ -1,0 +1,237 @@
+.basicContainer {
+	border: .5px solid rgb(220, 220, 220);
+	box-shadow: .125rem 0.25rem 1px 1px rgb(220, 220, 220, 0.5);
+	border-radius: 5px;
+	padding: .75em;
+	display: flex;
+}
+
+.noticeOppo {
+	border: 2px solid red;
+}
+
+.itemSetting {
+	margin-top: 1.1rem;
+	justify-content: flex-start;
+}
+
+.longWidth {
+	width: 50rem;
+}
+
+.vinculed {
+	margin-top: .7rem;
+}
+
+.main-icon {
+	padding: 0.4rem 0.44rem 0.4rem 0.44rem;
+	vertical-align: baseline;
+	margin-top: .7rem;
+}
+
+.name-col {
+	width: 13.4rem;
+	margin-left: .1rem;
+	margin-right: .1rem;
+	margin-top: .7rem;
+}
+
+.shortWidth {
+	width: 10rem;
+}
+
+.inputsDiv {
+	width: 100%;
+}
+
+.inputsDiv * {
+	margin: 0px .5rem
+}
+
+.inputsDivfirst {
+	margin: 0 1rem 0 0 !important;
+}
+
+.marginButtons * {
+	margin: 0 .1rem;
+}
+
+.marginInput {
+	width: max-content;
+}
+
+.marginInput * {
+	margin: 0 .2rem;
+}
+
+.customArrowRight {
+	--slds-c-button-color-background: rgb(0, 126, 174);
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customArrowRight:hover {
+	--sds-c-button-color-background: rgb(0, 126, 174);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customArrowRightDefault:hover {
+	--sds-c-button-color-background: rgb(0, 126, 174);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customEvent {
+	--slds-c-button-color-background: rgb(235, 112, 146);
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customEventDefault:hover {
+	--sds-c-button-color-background: rgb(235, 112, 146);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customEvent:hover {
+	--sds-c-button-color-background: rgb(235, 112, 146);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customCheck {
+	--slds-c-button-color-background: rgb(0, 133, 53);
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customCheckDefault:hover {
+	--sds-c-button-color-background: rgb(0, 133, 53);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customCheck:hover {
+	--sds-c-button-color-background: rgb(0, 133, 53);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customClose {
+	--slds-c-button-color-background: rgb(51, 51, 51);
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customCloseDefault:hover {
+	--sds-c-button-color-background: rgb(51, 51, 51);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customClose:hover {
+	--sds-c-button-color-background: rgb(51, 51, 51);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customBan {
+	--slds-c-button-color-background: rgb(229, 16, 41);
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customBanDefault:hover {
+	--sds-c-button-color-background: rgb(229, 16, 41);
+	--sds-c-button-text-color-hover: white;
+}
+
+.customBan:hover {
+	--sds-c-button-color-background: rgb(229, 16, 41);
+	--sds-c-button-text-color-hover: white;
+}
+
+/* Estilos del pop-up modal */
+.modalContainer {
+	border: .5px solid rgb(238, 238, 238);
+	box-shadow: .125rem 0.25rem 2px 1px rgb(220, 220, 220);
+	border-radius: 5px;
+	padding: .75em;
+}
+
+.modalInputs {
+	display: flex;
+	margin-bottom: 10px;
+
+}
+
+.modalInputs lightning-input {
+	margin-right: 15px;
+}
+
+.modalToggle {
+	margin-bottom: 20px;
+}
+
+.slds-button:active {
+	background-color: violet;
+	border-color: red;
+	color: green;
+}
+
+.asterisk {
+	color: red;
+	left: 6.7rem;
+	top: 1.4rem;
+	position: relative;
+	z-index: 10;
+	display: block;
+	height: 0;
+}
+
+.asteriskResolution {
+	color: red;
+	left: 4.7rem;
+	top: 1.4rem;
+	position: relative;
+	z-index: 10;
+	display: block;
+	height: 0;
+}
+
+.asteriskComentary {
+	color: red;
+	left: 4.9rem;
+	top: 1.4rem;
+	position: relative;
+	z-index: 10;
+	display: block;
+	height: 0;
+}
+
+.custom-textarea {
+	height: 33px;
+}
+
+.marginSubProduct {
+	padding-bottom: 0.1rem;
+
+}
+
+.customInsis {
+	--slds-c-button-color-background: #3d2fff;
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customInsisDefault:hover {
+	--sds-c-button-color-background: #3d2fff;
+	--sds-c-button-text-color-hover: white;
+}
+
+.customInsis:hover {
+	--sds-c-button-color-background: #3d2fff;
+	--sds-c-button-text-color-hover: white;
+}
+
+.customPF {
+	--slds-c-button-color-background: #F4C95D;
+	--slds-g-color-neutral-base-50: white;
+}
+
+.customPFDefault:hover {
+	--sds-c-button-color-background: #F4C95D;
+	--sds-c-button-text-color-hover: white;
+}
+
+.customPF:hover {
+	--sds-c-button-color-background: #F4C95D;
+	--sds-c-button-text-color-hover: white;
+}

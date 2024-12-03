@@ -88,6 +88,28 @@ import industriaInter from '@salesforce/label/c.CIBE_IndustriaInter';
 import buscar from '@salesforce/label/c.CIBE_buscar';
 import reset from '@salesforce/label/c.CIBE_Reiniciar';
 import etapaOpo from '@salesforce/label/c.CIBE_EtapaOportunidad';
+import misClientes from '@salesforce/label/c.CIBE_MisClientes';
+import esg from '@salesforce/label/c.CIBE_FinanciacionSostenible';
+
+import potencial from '@salesforce/label/c.CIBE_Potencial';
+import enCurso from '@salesforce/label/c.CIBE_EnCurso';
+import pendFirma from '@salesforce/label/c.CIBE_PendienteFirma';
+import cerradaPosi from '@salesforce/label/c.CIBE_CerradaPositiva';
+import cerradaNeg from '@salesforce/label/c.CIBE_CerradaNegativa';
+import vencida from '@salesforce/label/c.CIBE_Vencida';
+
+import redsegSele from '@salesforce/label/c.CIBE_RedesSegSelec';
+import sectPaisesSele from '@salesforce/label/c.CIBE_Sectpaisselec';
+import centrosCartSele from '@salesforce/label/c.CIBE_Centrcarteraselec';
+import equipoOprSele from '@salesforce/label/c.CIBE_Equipoportselec';
+import etapasSele from '@salesforce/label/c.CIBE_Etapselec';
+import paisesSele from '@salesforce/label/c.CIBE_Paisesselec';
+import fechaCirreSele from '@salesforce/label/c.CIBE_FechaCierreselec';
+import indInterSele from '@salesforce/label/c.CIBE_IndustriaInternselec';
+
+
+
+
 
 
 export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningElement {
@@ -133,8 +155,26 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 		industriaInter,
 		reset,
 		buscar,
-		etapaOpo
+		etapaOpo,
+		misClientes,
+		esg,
+		potencial,
+		enCurso,
+		pendFirma,
+		cerradaPosi,
+		cerradaNeg,
+		vencida,
+		redsegSele,
+		sectPaisesSele,
+		centrosCartSele,
+		equipoOprSele,
+		etapasSele,
+		paisesSele,
+		fechaCirreSele,
+		indInterSele
+		
 	}
+
 
 	@track data;
 	//@track columns;
@@ -215,11 +255,11 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 	@track picklistValues2;
 	@track picklistValues3;
     @track picklistValues4;
-	@track centroCartera;
-	@track redesSegmentos;
-	@track negocios;
-	@track sectoresSegmentos
-	@track centrosCarteras
+	@track centroCartera = null;
+	@track redesSegmentos = null;
+	@track negocios = null;
+	@track sectoresSegmentos= null;
+	@track centrosCarteras;
 	@track initialSelectionRedes = [];
 	@track initialSelectionNegocios = [];
 	@track initialSelectionSectores = [];
@@ -318,14 +358,15 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 
     get optionsOppoStatus() {
 		return [
-			{ label: 'Potencial', value: 'Potencial' },
-            { label: 'En curso', value: 'En curso' },
-			{ label: 'Pendiente de firma', value: 'CIBE_Pendiente_Firma' },
-			{ label: 'Cerrada negativa', value: 'Cerrado negativo'},
-			{ label: 'Cerrada positiva', value: 'CIBE_Cerrado positivo'},
-			{ label: 'Vencida', value: 'CIBE_Vencido'}
+			{ label: this.labels.potencial, value: 'Potencial' },
+            { label: this.labels.enCurso, value: 'En curso' },
+			{ label: this.labels.pendFirma, value: 'CIBE_Pendiente_Firma' },
+			{ label: this.labels.cerradaPosi, value: 'Cerrado negativo'},
+			{ label: this.labels.cerradaNeg, value: 'CIBE_Cerrado positivo'},
+			{ label: this.labels.vencida, value: 'CIBE_Vencido'}
 		];
 	}
+
 
 	getDataList(redesFilter, sectoresFilter, centrosFilter, participeFilter, statusFilter, paisFilter, fechaCierreFilter, industriaFilter, isMisClientes, isESG, offset) {
 		fetchData({redesFilter : redesFilter, sectoresFilter : sectoresFilter ,centrosFilter : centrosFilter ,participeFilter : participeFilter , statusFilter : statusFilter, 
@@ -333,8 +374,6 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 			.then(result => {
 				this.helpMessage = false;
 				this.iconName = 'standard:Opportunity';
-				console.log('result');
-				console.log(result);
 				if(result != null && result.length > 0) {
 					this.data = result.map(
 						record  => Object.assign(
@@ -350,8 +389,6 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 						)
 					)
 
-					console.log('this.data');
-					console.log(this.data);
 					this.size = result.length;
 					if (this.size > 20) {
 						this.totalRecountCount = 'Total 2000/' + this.size;
@@ -470,7 +507,6 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 		for(let i=0;i<this.optionsOppoStatus.length;i++){
 			if(this.optionsOppoStatus[i]['value']===event.target.value){
 				this.statusPick = this.optionsOppoStatus[i];
-				console.log('statusPick ' + JSON.stringify(this.statusPick));
 				this.statusPick['bucleId']=this.multiSelectionS;
 				break;
 			}
@@ -537,15 +573,8 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 
 	unSelectPais(cmp){
 		this.divToDel = cmp.target.parentNode;
-		console.log('unSelectPais');
-		console.log(this.divToDel);
-		console.log(this.selectedPais);
 		for(let i=0;i<this.selectedPais.length;i++){
 			if(this.selectedPais[i].value === cmp.target.name){
-				console.log('this.selectedPais');
-				console.log(i);
-
-				console.log(this.selectedPais[i].value);
 				this.selectedPais.splice(i,1);
 				break;
 			}
@@ -586,14 +615,10 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 
 	unSelectRedes(cmp){
 		this.divToDel = cmp.target.parentNode;
-		console.log('divToDel ' + this.divToDel);
-		console.log('inputValue2 ' + this.inputValue2);
 		
 		for(let i=0;i<this.selectedRedes.length;i++){
 			if(this.selectedRedes[i].value === cmp.target.name){
-				console.log('selectedRedes ' + JSON.stringify(this.selectedRedes));
 				this.selectedRedes.splice(i,1);
-				console.log('selectedRedes ' + JSON.stringify(this.selectedRedes));
 				break;
 			}
 		}
@@ -635,7 +660,6 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 
 	unSelectCentro(cmp){
 		this.divToDel = cmp.target.parentNode;
-		console.log('divToDel ' + this.divToDel);
 		for(let i=0;i<this.selectedCent.length;i++){
 			if(this.selectedCent[i].value === cmp.target.name){
 				this.selectedCent.splice(i,1);
@@ -725,10 +749,6 @@ export default class Cibe_ListadoOportunidadesMisClientesCIB extends LightningEl
 	}
 	
 	handleValueChangeEquipoOpo(event) {
-		console.log('handleValueChangeEquipoOpo');
-		console.log('event');
-		console.log(event);
-
 		this.multiSelectionParticipe++;
 		this.participeFilter = event.detail.value;
 		for(let i=0;i<this.optionsParticipe.length;i++){
@@ -1098,15 +1118,11 @@ nextHandler() {
 
 	@wire(getIndustriaValues,{redesSegmentos: '$selectedRedes2' })
 	wiredIndustria({error,data}){
-		console.log('wiredIndustria');
 		if(data){
-			console.log('data');
-			console.log(data);
 			if(data != null && data.length > 0 ) {
 				this.optionsIndustria= JSON.parse(JSON.stringify(data));
 			}
 		}else if(error){
-			console.log('error');
 			console.log(error);
 		}
 	}
@@ -1116,7 +1132,6 @@ nextHandler() {
         if(data){
 			this.optionsPais = data;
 		}else if(error){ 
-			console.log('Error' );
             this.optionsPais = undefined;
 			console.log(error);
         }
@@ -1175,7 +1190,6 @@ nextHandler() {
 					downloadElement.click();
 				})
 				.catch(error => {
-					console.log('error Export');
 					console.log(error);
 				})
 				.finally(() => {
@@ -1185,12 +1199,8 @@ nextHandler() {
     }
 	//flow
 	handleClickOppo() {
-        console.log('handleClickOppo: ' +this.actionSetting );
-
         getActions({ actionSetting: this.actionSetting })
         .then(data=>{
-            console.log('data: ');
-            console.log(data);
             this.isLoaded = false;
             this.flowlabel = data[0].label;
             this.flowName = data[0].name;
@@ -1204,9 +1214,7 @@ nextHandler() {
     }
 
     handleStatusChange(event) {
-        console.log('handleStatusChange: ');
         const status = event.detail.status;
-        console.log(status);
         const outputVariables = event.detail.outputVariables;
         if(outputVariables) {
             outputVariables.forEach(e => {
@@ -1217,13 +1225,9 @@ nextHandler() {
                 });
             });       
         }
-        console.log(status);
         if(status === 'FINISHED') {
-            console.log('FINISHED: ');
             this.isShowFlowAction = false;
             const selectedEvent = new CustomEvent('closetab', {detail: {recordId: this.redirectId}});
-            console.log('closetab');
-            console.log(selectedEvent);
             this.dispatchEvent(selectedEvent);
             eval('$A.get("e.force:refreshView").fire();');
             if(this.redirectId) {

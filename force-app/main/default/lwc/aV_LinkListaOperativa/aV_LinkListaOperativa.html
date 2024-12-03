@@ -1,0 +1,20 @@
+<template>
+    <div class="container">
+        <template if:true={isLoading}>
+            <!-- Muestra el spinner de carga mientras se carga el contenido -->
+            <lightning-spinner alternative-text="Cargando" size="small"></lightning-spinner>
+        </template>
+        <template if:false={isLoading}>
+            <template if:true={hasLinks}>
+                <template for:each={listData} for:item="link">
+                    <div key={link.id} class="divbutton">
+                        <a href={link.url} title={link.label} class="slds-button slds-button_stretch slds-button_brand" style="background-color: #55ade8; border: 1px solid white;">{link.label}</a>
+                    </div>
+                </template>
+            </template>
+            <template if:false={hasLinks}>
+                <p>No hay enlaces disponibles.</p>
+            </template>
+        </template>
+    </div>
+</template>

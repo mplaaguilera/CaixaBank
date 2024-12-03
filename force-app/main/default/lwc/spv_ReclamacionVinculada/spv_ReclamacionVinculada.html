@@ -6,19 +6,21 @@
               <div key={reclamacion.reclamacionActual.Id} style="padding:8px">
                 <!--INFORMACION RECLAMACION-->
                 <lightning-card title={reclamacion.reclamacionActual.CaseNumber} icon-name="standard:case" class="slds-card_boundary" variant="narrow" style="width: 100%">
-                  <div class="slds-m-left_xx-small slds-grid slds-gutters"  style="padding: 12 px">
-                    <div class="slds-col">
-                        <p>
-                        Asunto:
-                        <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.Subject}
+                  <div class="slds-m-left_small slds-text-heading_small">
+                    <p>Asunto:
+                      <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.Subject}
                         onclick={navigateToCase} ></lightning-button>
-                        <br/>
+                    </p>
+                  </div>
+                  <div class="slds-m-left_small  slds-grid slds-wrap slds-text-heading_small">
+                    <div class="slds-size_6-of-12">
+                      <p>
                         Fecha alta:
                         <lightning-formatted-date-time style="padding-left:8px"
                           value={reclamacion.reclamacionActual.CreatedDate}></lightning-formatted-date-time>
                       </p>
                     </div>
-                    <div class="slds-col">
+                    <div class="slds-size_6-of-12">
                       Estado:
                       {reclamacion.reclamacionActual.Status}</br>
                       Sentido Resolución:

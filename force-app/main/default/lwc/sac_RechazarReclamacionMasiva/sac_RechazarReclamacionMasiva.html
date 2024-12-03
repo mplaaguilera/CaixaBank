@@ -6,29 +6,57 @@
     </template>
     
     <header class="slds-modal__header">
-    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Rechazar reclamaciones de mis grupos</h1>
+    <template if:true={esReclamacion}>
+        <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Rechazar reclamaciones de mis grupos</h1>
+    </template>
+    <template if:true={esConsulta}>
+        <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Descartar consultas de mis grupos</h1>
+    </template>
     </header>
-    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"  style="height: 300px" >
-        <template if:true={getMotivoValues.data}>
-            <h2>Seleccione el motivo de rechazo:</h2>
-            <div class="slds-combobox_container">
-                <lightning-combobox
-                    name="motivo"
-                    label="Motivo de Rechazo"
-                    value={valueMotivoRechazo}
-                    placeholder="Seleccione un motivo"
-                    options={getMotivoValues.data.values}
-                    onchange={handleChange} 
-                    required="true">
-                </lightning-combobox>
-            </div> 
-        </template>                          
-        <template if:true={otros}>
-            <lightning-textarea data-my-id="textoParaChatterRechazar" label="Comentario" minlength="5" required="true" value=""></lightning-textarea>
-        </template>
-    </div>   
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"  style="height: 300px" >
+            <template if:true={esReclamacion}>
+                <template if:true={getMotivoValues.data}>
+                    <h2>Seleccione el motivo de rechazo:</h2>
+                    <div class="slds-combobox_container">
+                        <lightning-combobox
+                            name="motivo"
+                            label="Motivo de Rechazo"
+                            value={valueMotivo}
+                            placeholder="Seleccione un motivo"
+                            options={getMotivoValues.data.values}
+                            onchange={handleChange} 
+                            required="true">
+                        </lightning-combobox>
+                    </div> 
+                </template>   
+            </template> 
+            <template if:true={esConsulta}>
+                <template if:true={getDescarteValues.data}>
+                    <h2>Seleccione el motivo de descarte:</h2>
+                    <div class="slds-combobox_container">
+                        <lightning-combobox
+                            name="motivo"
+                            label="Motivo de Descarte"
+                            value={valueMotivo}
+                            placeholder="Seleccione un motivo"
+                            options={getDescarteValues.data.values}
+                            onchange={handleChange} 
+                            required="true">
+                        </lightning-combobox>
+                    </div> 
+                </template>    
+            </template>
+            <template if:true={otros}>
+                <lightning-textarea data-my-id="textoParaChatterRechazar" label="Comentario" minlength="5" required="true" value=""></lightning-textarea>
+            </template>
+        </div> 
     <div class="slds-modal__footer">
         <lightning-button label="Cancelar"  onclick={closeModal} class="slds-m-left_x-small"></lightning-button>
-        <lightning-button variant="brand" onclick={rechazarClick} label="Rechazar" class="slds-m-left_x-small"></lightning-button>  
+        <template if:true={esReclamacion}>
+            <lightning-button variant="brand" onclick={rechazarClick} label="Rechazar" class="slds-m-left_x-small"></lightning-button>  
+        </template>
+        <template if:true={esConsulta}>
+            <lightning-button variant="brand" onclick={descartarClick} label="Descartar" class="slds-m-left_x-small"></lightning-button>  
+        </template>
     </div>
 </template>

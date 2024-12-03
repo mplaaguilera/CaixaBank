@@ -1,8 +1,8 @@
 <aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" >
     <aura:attribute name="gestorOportunidad" type="Object"/>
     <!--Lightning Data Service-->
-    <force:recordData aura:id="gestorOportunidadData" recordId="{!v.recordId}"
+    <force:recordData aura:id="gestorOportunidadData" recordId="{!v.recordId}" layoutType="COMPACT"
         fields="CSBD_Oportunidad__c" targetFields="{!v.gestorOportunidad}" recordUpdated="{!c.navegarOportunidad}"/>
-
+                        
     <lightning:workspaceAPI aura:id="workspace" />
 </aura:component>

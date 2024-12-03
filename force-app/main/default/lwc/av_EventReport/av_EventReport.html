@@ -1,83 +1,84 @@
 <template>
     <div class="masterDiv1">
         <div class="masterDiv" if:true={isDataLoaded}>
-            <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"></lightning-spinner>
-            <div class="slds-page-header slds-page-header_record-home">
-                <div class="slds-page-header__row">
-                    <div class="slds-page-header__col-title">
-                        <div class="slds-media">
-                            <div class="slds-media__figure">
-                                <lightning-icon icon-name="standard:event"></lightning-icon>
-                            </div>
-                            <div class="slds-media__body">
-                                <div class="slds-page-header__name-title">
-                                    <h1>
-                                        <span>Reporte cita</span>
-                                        <ul class="slds-list_horizontal">
-                                            <li class="slds-m-right_x-small">
-                                                <span class="slds-page-header__title slds-truncate">{subjectEvent}</span>
-                                            </li>
-                                        </ul>
-                                    </h1>
+            <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large" style="z-index: 3;position:fixed"></lightning-spinner>
+            <template if:false={isShowNewEvent}>
+                <div class="slds-page-header slds-page-header_record-home">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="standard:event"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span>Reporte cita</span>
+                                            <ul class="slds-list_horizontal">
+                                                <li class="slds-m-right_x-small">
+                                                    <span class="slds-page-header__title slds-truncate">{subjectEvent}</span>
+                                                </li>
+                                            </ul>
+                                        </h1>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="slds-page-header__row slds-page-header__row_gutters">
-                    <div class="slds-page-header__col-details">
-                        <ul class="slds-page-header__detail-row">
-                            <li class="slds-page-header__detail-block">
-                                <div class="slds-text-title slds-truncate" title="FechaInicio">Fecha de inicio</div>
-                                <div class="slds-truncate" title="Prioridad">{startDateTime}</div>
-                            </li>
-                            <li class="slds-page-header__detail-block">
-                                <div class="slds-text-title slds-truncate" title="FechaFin">Fecha de finalización</div>
-                                <div class="slds-truncate" title="Estado">{endDateTime}</div>
-                            </li>
-                            <li class="slds-page-header__detail-block">
-                                <div class="slds-text-title slds-truncate" title="Relacionado con">Relacionado con</div>
-                                <div class="slds-truncate" title="Relacionado con">
-                                    <a onclick={navegateToAccount}>{accountName}</a>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="slds-page-header__row slds-page-header__row_gutters">
+                        <div class="slds-page-header__col-details">
+                            <ul class="slds-page-header__detail-row">
+                                <li class="slds-page-header__detail-block">
+                                    <div class="slds-text-title slds-truncate" title="FechaInicio">Fecha de inicio</div>
+                                    <div class="slds-truncate" title="Prioridad">{startDateTime}</div>
+                                </li>
+                                <li class="slds-page-header__detail-block">
+                                    <div class="slds-text-title slds-truncate" title="FechaFin">Fecha de finalización</div>
+                                    <div class="slds-truncate" title="Estado">{endDateTime}</div>
+                                </li>
+                                <li class="slds-page-header__detail-block">
+                                    <div class="slds-text-title slds-truncate" title="Relacionado con">Relacionado con</div>
+                                    <div class="slds-truncate" title="Relacionado con">
+                                        <a onclick={navegateToAccount}>{accountName}</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </template>
             
-            <c-av_-contact-block-event-report idevent={idEvent} typeevent={type} startdatetime={startDateTime} accountid={idAccount} class="marginLayer" islegalentity={isLegalEntity} isintouch={isIntouch}  onchangecita={handleChangeCita} onsetinfo={setInfo} onradiobuttonselected={handleRadioButtonSelection}></c-av_-contact-block-event-report><br>
-            <c-av_-opportunity-block-event-task-report if:false={citaComercial} recordid={recordId} headerid={headerId} accountid={idAccount} data-id="oppoCmp" onsetoppoforcontroller={setOppoForController} onevaluateagendeds={evaluateAgendeds} class="marginLayer"></c-av_-opportunity-block-event-task-report>
-            <c-av_-task-block-appointment if:true={istheretasks} oncounttasks={setTaskVisibility} accountid={idAccount} onsettaskfromcontroller={settaskfromcontroller} class="marginLayer"></c-av_-task-block-appointment>
-
+            <template if:false={isShowNewEvent}>
+                <c-av_-contact-block-event-report data-id='contactBlock' idevent={idEvent} typeevent={type} startdatetime={startDateTime} accountid={idAccount} class="marginLayer" islegalentity={isLegalEntity} isintouch={isIntouch}  onchangecita={handleChangeCita} onsetinfo={setInfo} onradiobuttonselected={handleRadioButtonSelection}></c-av_-contact-block-event-report><br>
+                <c-av_-opportunity-block-event-task-report if:false={citaComercial} recordid={recordId} headerid={headerId} accountid={idAccount} data-id="oppoCmp" onsetoppoforcontroller={setOppoForController} onevaluateagendeds={evaluateAgendeds} onsendoppolistrecord={hanldeOppoListRecord} onsendvalueoppolist={valueOppoList} class="marginLayer"></c-av_-opportunity-block-event-task-report>
+                <c-av_-task-block-appointment if:true={istheretasks} oncounttasks={setTaskVisibility} accountid={idAccount} onsettaskfromcontroller={settaskfromcontroller} class="marginLayer"></c-av_-task-block-appointment>
+            </template>
+        
+            <c-av_new-event if:true={isShowNewEvent} 
+            reportedevent={eventInfo} 
+            opposlist={opposList} 
+            opposvinculed={opposVinculed}
+            oncancelback={restoreeventreport} 
+            opposscheduled={opposScheduled} 
+            comesfromevent=true
+            onfocustab ={handleError}
+            onclosetab ={handleCancel}
+            onfocusrecordtab ={focusRecord}
+            onfocusrecordtabandclose ={handleCloseAndFocus}
+            ></c-av_new-event>
+          
+            
         </div>
     </div>
     <!-- FOOTER -->
-    <div class="customFooter">
-		<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
-		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Guardar Reporte</button>
-		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndEvent}  name="saveEvent" onclick={handleSaveAndEvent}>Guardar Reporte + Alta de Evento</button>
-	</div>
+    <template if:false={isShowNewEvent}>
+        <div class="customFooter">
+            <button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+            <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Guardar Reporte</button>
+            <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndEvent} data-id="saveAndEventButton"  name="saveEvent" onclick={handleSaveAndEvent}>Guardar Reporte + Alta de Cita</button>
+        </div>
+    </template>
 
-    <!--FLOW EVENT-->
-	<template if:true={isShowFlowAction}>
-		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
-			<div class="slds-modal__container">
-				<lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={closeModal}></lightning-button-icon>
-				<div class="slds-modal__header">
-					<h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
-				</div>
-				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
-					<div class="slds-is-relative">
-						<lightning-flow flow-api-name="AV_NuevoEvento" flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
-					</div>
-				</div>
-			</div>
-		</section>
-		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
-	</template>
-
-    <!-- POPUP GUARDAR SIN OPP VINCULADA  PARA EVENTO -->
 
     <template if:true={showNoOpportunityMessage}>
         <div class="slds-modal_container">
@@ -95,6 +96,30 @@
             <div class="slds-backdrop slds-backdrop_open"></div> 
         </div>
     </template>
-	
+
     
+    <template if:true={showModal}>
+        <div class="slds-modal slds-fade-in-open" role="dialog" tabindex="-1">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse iconClose" title="Close" onclick={handleCloseModal} >
+                        <lightning-icon class="iconX" icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium">Reasignación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <h1 style="font-size: 13px;">
+                        Estás a punto de reportar algún registro  del que no eres propietario. ¿Deseas convertirte en el propietario de esos registros?
+                    </h1>
+                </div>
+                <footer class="slds-modal__footer slds-text-align_center">
+                    <lightning-button class="slds-button" label="Sí" onclick={handleYes}></lightning-button>
+                    <lightning-button class="slds-button" label="No" onclick={handleNo}></lightning-button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+ 
 </template>

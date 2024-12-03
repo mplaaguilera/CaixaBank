@@ -176,7 +176,7 @@ export default class Av_PostponeCall extends LightningElement {
 				"AV_Date__c": this.today.toISOString().substring(0,10),
                 "AV_Status__c": "Posponer-Llamar más tarde",
                 "AV_Reminder__c": this.reminderDateTime,
-				"AV_Comment__c":this.comment,
+				"AV_Comment__c":this.comment
 			}
 		};
 		createRecord(record)

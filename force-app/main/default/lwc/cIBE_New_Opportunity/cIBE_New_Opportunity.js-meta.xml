@@ -10,7 +10,7 @@
         <targetConfig targets="lightning__FlowScreen">
             <property name="pfId" type="String" label="Id PF Experiencia" description="Id del PF Experiencia." role="inputOnly"/>
             <property name="producto" type="String" label="Producto" description="Producto." />
-            <property name="valueSubProducto" type="String" label="Sub Producto" description="Sub Producto." />
+            <property name="valueSubProducto" type="String" label="Sub Producto" description="Sub Producto." /> 
             <property name="propietario" type="String" label="Propietario" description="Propietario." />
             <property name="oportunidad" type="String" label="Nombre de la oportunidad" description="Nombre de la oportunidad." />
             <property name="valueOperacion" type="String" label="Tipo Operación" description="Tipo de Operación." />
@@ -19,6 +19,8 @@
             <property name="esg" type="Boolean" label="ESG" description="ESG." />
             <property name="cliente" type="String" label="Cliente" description="AccountId" />
             <property name="anadirParticipante" type="Boolean" label="Añadir participantes a la oportunidad" description="Añadir participantes a la oportunidad" />
+            <property name="comentario" type="String" label="Comentario" description="Comentario." />
+            <property name="valuePais" type="String" label="Pais" description="Pais." />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

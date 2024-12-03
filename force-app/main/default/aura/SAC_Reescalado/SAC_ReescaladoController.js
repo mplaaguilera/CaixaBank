@@ -119,6 +119,7 @@
     },
 
     handleUploadFinished: function (component, event) {
+
         var recordId = component.get("v.recordId");
         var copiarArchivo = component.get("c.insertarAdjuntoCaso");
         copiarArchivo.setParams({'interaccionId' : recordId});

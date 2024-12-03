@@ -5,15 +5,16 @@ import recursoCSS from '@salesforce/resourceUrl/SIR_lightningTreeGrid';
 
 const COLUMNS = [
     {label: 'Empresa',  fieldName: 'idEmpresa',  type: 'url',  typeAttributes: {label: { fieldName: 'nombreEmpresa' }} },
-    {label: 'Tipo Proceso', fieldName: 'tipoProceso', type: 'text'}, 
+    {label: 'Tipo Proceso', fieldName: 'tipoProceso', type: 'text', initialWidth: 130}, 
     {label: 'Estrategia',  fieldName: 'idProceso',  type: 'url',  typeAttributes: {label: { fieldName: 'estrategia' }} }, 
-    {label: 'Fecha Inicio', fieldName: 'fechaInicio', type: 'date'},   
-    {label: 'Fecha Situación', fieldName: 'fechaSituacion', type: 'date'},
+    {label: 'Fecha Inicio', fieldName: 'fechaInicio', type: 'date', initialWidth: 112},   
+    {label: 'Fecha Situación', fieldName: 'fechaSituacion', type: 'date', initialWidth: 136},
     {label: 'Situación', fieldName: 'situacion', type: 'text'},   
-    {label: 'Deuda Total', fieldName: 'deudaTotal', type: 'currency'},     
-    {label: 'Máx. nº días impago', fieldName: 'diasImpago', type: 'number'},   
+    {label: 'Deuda Total', fieldName: 'deudaTotal', type: 'currency', initialWidth: 120},     
+    {label: 'Máx. nº días impago', fieldName: 'diasImpago', type: 'number', initialWidth: 166},   
     {label: 'Gestor', fieldName: 'gestor', type: 'text'},   
-    {label: 'Propuesta', fieldName: 'propuesta', type: 'text'}  
+    {label: 'Propuesta', fieldName: 'propuesta', type: 'text'},
+    {label: 'Aplica Grupo', fieldName: 'propuestaNivelGrupo', type: 'text', initialWidth: 120}  
 ];
 
 export default class Sire_lwc_procesosActivosGrupoEconomico extends LightningElement {  

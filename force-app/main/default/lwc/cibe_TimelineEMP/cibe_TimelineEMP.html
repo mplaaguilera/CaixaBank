@@ -1,0 +1,71 @@
+<template>
+	<div if:false={refreshIco}>
+		<div style="text-align: right;">
+			<lightning-button-icon icon-name="utility:loop" variant="border-filled" alternative-text="Refresh" class="slds-m-left_xx-small" onclick={refresh}></lightning-button-icon>
+		</div>
+
+		<template if:true={showResults}>
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="8" padding="around-small">
+
+				<div lwc-2nj244ovceg="" class="slds-form-element__control " style="display: -webkit-box; display: flex;" part="options">
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="cita" required="" checked={cita} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="cita">
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;">{label.cita}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox" style="margin-left: 10%;  float: left;">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="oportunidad" required="" checked={oportunidad} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="oportunidad">
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;">{label.oportunidad}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox" style="margin-left: 10%;  float: left;">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="tarea" required="" checked={tarea} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="tarea" >
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;" >{label.tarea}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox" style="margin-left: 10%;  float: left;">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="caso" required="" checked={caso} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="caso">
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;">{label.caso}</span>
+						</label>
+					</span>
+				</div>
+					
+			</lightning-layout-item>
+		</lightning-layout>
+		
+
+
+			<div >
+				<lightning-input type="text"  placeholder={label.buscar}  value={filterValue} onchange={handleFilterValue} class="slds-m-bottom_x-small"></lightning-input>
+			</div>
+			
+			<div >
+					<template for:each={nestedMap} for:item="mapKey">
+						<p class="slds-button test-id__section-header-button slds-section__title-action slds-m-bottom_x-small"  key={mapKey.key} >
+							{mapKey.key}
+						</p>
+						<template for:each={mapKey.value} for:item="comment">
+							<c-cibe_-Timeline-E-M-P-Item item={comment} key={comment}></c-cibe_-Timeline-E-M-P-Item>
+						</template>
+					</template>
+			</div>
+		</template>
+
+		<span if:false={showResults}>{label.noDataFoundLabel}</span>
+	
+	</div>
+	<lightning-spinner if:true={loading} size="small" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+</template>

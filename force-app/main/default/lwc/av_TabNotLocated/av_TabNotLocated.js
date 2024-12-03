@@ -153,7 +153,7 @@ export default class Av_TabNotLocated extends LightningElement {
 				"AV_Date__c": this.fecha,
 				"AV_Type__c": this.value,
 				"AV_Status__c":this.value2 ,
-				"AV_Comment__c":this.comment,
+				"AV_Comment__c":this.comment
 			}
 		};
 		createRecord(record)

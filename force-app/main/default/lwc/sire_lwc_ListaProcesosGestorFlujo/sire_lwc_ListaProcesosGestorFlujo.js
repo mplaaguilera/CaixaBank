@@ -16,7 +16,7 @@ export default class Sire_lwc_ListaProcesosGestorFlujo extends LightningElement 
     columns = [
         {label: this.labels.cliente, fieldName: 'ClienteURL', type: 'url', typeAttributes: {label: { fieldName: 'Cliente' }} }, 
         {label: this.labels.proceso, fieldName: 'Name', type: 'text'},
-        {label: this.labels.estrategia, fieldName: 'SIREC__SIREC_fld_estrategia__c', type: 'text'},
+        {label: this.labels.estrategia, fieldName: 'SIREC__SIREC_fld_descEstrategiaCatalogo__c', type: 'text'},
         {label: this.labels.situacion, fieldName: 'SIREC__SIREC_fld_situacion__c', type: 'text'},
         {label: this.labels.fechaSituacion, fieldName: 'SIREC__SIREC_fld_fechaSituacion__c', type: 'date'},   
         {label: this.labels.fechaInicio, fieldName: 'SIREC__SIREC_fld_fechaInicio__c', type: 'date'}    
@@ -41,7 +41,7 @@ export default class Sire_lwc_ListaProcesosGestorFlujo extends LightningElement 
                 }
 
                 rowData.Name = data[i].Name;
-                rowData.SIREC__SIREC_fld_estrategia__c = data[i].SIREC__SIREC_fld_estrategia__c;
+                rowData.SIREC__SIREC_fld_descEstrategiaCatalogo__c = data[i].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                 rowData.SIREC__SIREC_fld_fechaInicio__c = data[i].SIREC__SIREC_fld_fechaInicio__c;
                 rowData.SIREC__SIREC_fld_situacion__c = data[i].SIREC__SIREC_fld_situacion__c;
                 rowData.SIREC__SIREC_fld_fechaSituacion__c = data[i].SIREC__SIREC_fld_fechaSituacion__c;

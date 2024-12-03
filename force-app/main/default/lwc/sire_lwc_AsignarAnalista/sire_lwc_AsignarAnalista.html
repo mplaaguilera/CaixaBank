@@ -1,60 +1,99 @@
+<!-- sldsValidatorIgnore -->
 <template>	
     <lightning-card  variant="Narrow" title="Filtros de búsqueda" icon-name="standard:search">        
         <div class="slds-form_horizontal slds-grid slds-wrap">
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="DT" label="Búsqueda de Procesos por DT" placeholder="Seleccione una opción" value={valueCarGestorActual} options={carGestorActual} disabled="true"></lightning-combobox>
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">					
+					<lightning-button class="buttonStyle" variant="brand" label="Buscar TODOS los procesos Sin Analista" onclick={buscarSinAnalista} disabled={disabledBotonTodos}></lightning-button>
+					<lightning-helptext content="Los filtros no aplican a este botón"></lightning-helptext>
 				</div>
 			</div>
 
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="DT" label="DT Comercial" placeholder="Seleccione una opción" value={valueDtComercial} options={dtComercial} disabled="true"></lightning-combobox>
-				</div>
-			</div>
-		</div>
-
-		<div class="slds-form_horizontal slds-grid slds-wrap">	
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="estrategia" label="Estrategia" placeholder="Seleccione una opción" value={valueEstrategia} options={optionEstrategia} onchange={changeEstrategia}></lightning-combobox>
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
+					<lightning-combobox name="DT" label="DT Comercial" placeholder="Seleccione una opción" value={valueDtComercial} options={dtComercial} required={requiredDt} disabled={disabledDT} onchange={changeDT}></lightning-combobox>
 				</div>
 			</div>
 
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="Centro" label="Centro" placeholder="Seleccione una opción" value={valueOficina} options={optionOficina} onchange={changeFiltroOficina} required></lightning-combobox>
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
+					<fieldset class="slds-form-element">
+						<legend class="slds-form-element__label">Analista de Riesgo</legend>
+						<div class="slds-form-element__control" style="margin-left: 8%;">
+						  	<span class="slds-radio">
+								<input type="radio" id="radioTodos" value="todos" name="default" onchange={changeAnalista} />
+								<label class="slds-radio__label" for="radioTodos">
+									<span class="slds-radio_faux"></span>
+									<span class="slds-form-element__label">Todos</span>
+								</label>
+							</span>
+							<span class="slds-radio">
+								<input type="radio" id="radioSinAnalista" value="sinAnalista" name="default" class="radSinAnalista" onchange={changeAnalista}/>
+								<label class="slds-radio__label" for="radioSinAnalista">
+									<span class="slds-radio_faux"></span>
+									<span class="slds-form-element__label">Sin Analista asignado</span>
+								</label>
+							</span>
+						</div>
+					</fieldset>				
 				</div>
-			</div> 			
-
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="tipoGestion" label="Tipo de Gestion" placeholder="Seleccione una opción" value={valueTipoGestion} options={optionTipoGestion} onchange={changeTipoGestion}></lightning-combobox>
-				</div>
-
 			</div>
-		</div>
 
-		<div class="slds-form_horizontal slds-grid slds-wrap">	
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
 					<lightning-combobox name="Situacion" label="Situación" placeholder="Seleccione una opción" value={valueSituacion} options={optionSituacion} onchange={changeSituacion}></lightning-combobox>
 				</div>
 			</div>
+		</div>
 
-			<div class="slds-size_1-of-3">
-				<div class=" slds-m-around_x-small">
-					<lightning-combobox name="Empleado" label="Empleado" placeholder="Seleccione una opción" value={valueEmpleado} options={optionsEmpleado} onchange={changeEmpleado} required disabled={disabledEmpleado}></lightning-combobox>
+		<div class="slds-form_horizontal slds-grid slds-wrap">	
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
+					<div class=" slds-var-m-around_x-small">
+						<fieldset class="slds-form-element">
+							<legend class="slds-form-element__label">Stage 3</legend>
+							<div class="slds-form-element__control" style="margin-left: 8%;">
+							  	<span class="slds-radio">
+									<input type="radio" id="radioSi" value="si" name="default2" class="radStageSi" onchange={changeStage} />
+									<label class="slds-radio__label" for="radioSi">
+										<span class="slds-radio_faux"></span>
+										<span class="slds-form-element__label">Si</span>
+									</label>
+								</span>
+								<span class="slds-radio">
+									<input type="radio" id="radioNo" value="no" name="default2" class="radStageNo" onchange={changeStage}/>
+									<label class="slds-radio__label" for="radioNo">
+										<span class="slds-radio_faux"></span>
+										<span class="slds-form-element__label">No</span>
+									</label>
+								</span>
+							</div>
+						</fieldset>				
+					</div>
 				</div>
-			</div> 
-			
-			<div class="slds-size_1-of-3">
-				<div class="slds-m-around_x-small">					
+			</div>
+
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
+					<lightning-combobox name="Centro" label="Centro" placeholder="Seleccione una opción" value={valueOficina} options={optionOficina} onchange={changeFiltroOficina} required={requiredCentro} disabled={disabledCentro}></lightning-combobox>
+				</div>
+			</div> 			
+
+			<div class="slds-size_1-of-4">
+				<div class=" slds-var-m-around_x-small">
+					<lightning-combobox name="tipoGestion" label="Tipo de Gestion" placeholder="Seleccione una opción" value={valueTipoGestion} options={optionTipoGestion} onchange={changeTipoGestion}></lightning-combobox>
+				</div>
+			</div>
+
+			<div class="slds-size_1-of-4">
+				<div class="slds-var-m-around_x-small">					
 					<lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={buscar} disabled={disabledBuscar}></lightning-button>
 					<lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
+					
 				</div>
 			</div>
 		</div>
+		
     </lightning-card>
 
 	<div if:true={firstSearch} class="divPadding">			
@@ -70,7 +109,7 @@
 					default-sort-direction={defaultSortDirection}
 					sorted-direction={sortDirection}
 					sorted-by={sortedBy}
-					onsort={onHandleSort}>
+					onsort={onHandleSort}><label></label>
 				</lightning-datatable>
 				<br/>
 				<div if:true={isMultipagina}>
@@ -91,10 +130,66 @@
 			</div>
 			<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>			
 		</lightning-card>
+
 		<div class="divPadding marginBoton">				
 			<div class="slds-form_horizontal slds-grid slds-wrap">	
-				<div class="slds-size_3-of-4"></div>
-				<div class="slds-size_1-of-4">
+				<div class="slds-size_1-of-4"></div>
+				<div class="slds-size_1-of-4">				
+					<div class="slds-form-element">  
+						<label class="slds-form-element__label" for="combobox-id-2">{lookupLabel}</label>  
+						<div class="slds-form-element__control">  
+							<div class="slds-combobox_container">  
+								<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">  
+									<template if:true={selectedValue}>  
+										<div data-key="pilldiv" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">  
+											<span class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon" title="object">  
+												<div class="slds-icon slds-icon_small" aria-hidden="true"> <lightning-icon icon-name="standard:user" size="small"></lightning-icon> </div>  
+												<span class="slds-assistive-text">Record</span>  
+											</span>  
+											<input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" id="combobox-id-5" aria-controls="listbox-id-5" role="textbox" placeholder="Select an Option" readonly value={selectedValue} />  
+											<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick={removeRecordOnLookup} title="Remove selected option">  
+												<span class="slds-button__icon" aria-hidden="true" >  
+													<lightning-icon icon-name="utility:close" size="xx-Small" class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true"></lightning-icon>  
+												</span>  
+												<span class="slds-assistive-text">Remove selected record</span>  
+											</button>  
+										</div>  
+									</template>
+									<template if:false={selectedValue}>  
+										<div data-key="searchdiv" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">  
+											<input type="text" onfocusout={onLeave} value={searchKey} onkeyup={handleKeyChange} onchange={handleKeyChange} class="slds-input slds-combobox__input slds-has-focus" id="combobox-id-2" aria-autocomplete="list" aria-controls="listbox-id-2" role="textbox" placeholder="Search..." />  
+											<span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">  
+												<lightning-icon icon-name="utility:search" size="xx-Small" class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true"></lightning-icon>  
+											</span>  
+										</div>  
+										<template if:true={recordsList}>  
+											<div id="listbox-id-2-venu" data-key="dropdownresult" class="slds-show slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">  
+												<ul class="slds-listbox slds-listbox_vertical" role="presentation" >  
+													<template if:true={message}> <p style="margin-left:5px;"> {message}</p></template>  
+													<template for:each={recordsList} for:item="record">  
+													<li id={record.Id} key={record.Id} onclick={onRecordSelection} role="presentation" class="slds-listbox__item">  
+													<div data-key={record.Id} data-name={record.Name} class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">  
+														<span class="slds-media__figure slds-listbox__option-icon">  
+															<span class="slds-icon_container">  
+																<lightning-icon icon-name="standard:user" size="small"></lightning-icon>  
+															</span>  
+														</span>  
+														<span class="slds-media__body">  
+															<span data-key={record.Id} data-name={record.Name} class="slds-listbox__option-text slds-listbox__option-text_entity">{record.Name} </span> 
+														</span>  
+													</div>  
+													</li>  
+													</template>  
+												</ul>  
+											</div>  
+										</template>  
+									</template>  
+								</div>  
+							</div>  
+						</div>  
+					</div>
+				</div>
+				<div class="slds-size_1-of-4" style="margin-top: 2px;">
 					<lightning-button variant="brand" label="Asignar Analista de Riesgo" onclick={handleConfirmClick} disabled={disabledButtonAsignar}></lightning-button>
 				</div>
 			</div>		

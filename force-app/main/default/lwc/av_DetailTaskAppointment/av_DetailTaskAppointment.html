@@ -6,6 +6,7 @@
         <div class="buttons-col marginButtons">
             <lightning-button-icon icon-name="utility:check" class={buttonClassCheck} data-id="check" onclick={clickIcon} variant="border"  name="check"  size='large' title="Positiva"></lightning-button-icon>
             <lightning-button-icon icon-name="utility:close" class={buttonClassClose} data-id="close" onclick={clickIcon} variant="border"  name="close" size='large' title="Negativa"></lightning-button-icon>
+            <lightning-button-icon icon-name="utility:end_call" class={buttonClassNoLocalizado} name="nolocalizado"  title="No Localizado" data-id="nolocalizado" onclick={clickIcon}  ></lightning-button-icon>
         </div>
         <div class="slds-col comment-col" >
             <textarea if:true={showComentary} class="slds-textarea textarea" data-id="commentary"  placeholder="Comentario"  onchange={handleChangeComment}>{commentToSend}</textarea>

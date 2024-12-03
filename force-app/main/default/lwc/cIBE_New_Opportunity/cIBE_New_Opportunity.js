@@ -6,28 +6,29 @@ import NAME_FIELD from '@salesforce/schema/Product2.Name';
 import PRODID_FIELD from '@salesforce/schema/AV_ProductExperience__c.AV_ProductoFicha__c';
 
 //Methods
-import getSubProductoValues 	from '@salesforce/apex/CIBE_NewOpportunity_Controller.getSubProductoPicklist';
 import getOperacionPicklist     from '@salesforce/apex/CIBE_NewOpportunity_Controller.getTipoOperacionPicklist';
 import getStatusValues          from '@salesforce/apex/CIBE_NewOpportunity_Controller.getStatusValues';
 import getCliente               from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getCliente';
 import search                   from '@salesforce/apex/CIBE_NewOpportunity_Controller.search';
+import getPaisPicklist          from '@salesforce/apex/CIBE_NewOpportunity_Controller.getPaisPicklist';
+
 
 
 //Labels
 import estadoOportunidad from '@salesforce/label/c.CIBE_EstadoOportunidad';
 import productoLabel from '@salesforce/label/c.CIBE_Producto';
 import productoDebeSerMMPP from '@salesforce/label/c.CIBE_ProductoDebeSerMMPP';
-import subProducto from '@salesforce/label/c.CIBE_SubProducto';
 import productoNoMMPP from '@salesforce/label/c.CIBE_ProductoNoMMPP';
 import confidencial from '@salesforce/label/c.CIBE_Confidencial';
 import propietarioOportunidad from '@salesforce/label/c.CIBE_PropietarioOportunidad';
 import tipoOperacion from '@salesforce/label/c.CIBE_TipoOperacion';
 import nombreOportunidad from '@salesforce/label/c.CIBE_NombreOportunidad';
-import esg from '@salesforce/label/c.CIBE_ESG';
+import esg from '@salesforce/label/c.CIBE_FinanciacionSostenible';
 import clienteLabel from '@salesforce/label/c.CIBE_Cliente';
 import anadirParticipanteLabel from '@salesforce/label/c.CIBE_AddOppTM';
 import buscarProductos from '@salesforce/label/c.CIBE_BuscarProductos';
-
+import comentario_label from '@salesforce/label/c.CIBE_Comentario';
+import pais from '@salesforce/label/c.CIBE_Pais';
 
 
 
@@ -41,28 +42,32 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
     @api oportunidad;
     @api valueOperacion;
     @api valueSubProducto;
+    @api comentario;
     @api stageName;
     @api confidencial;
     @api esg;
     @api cliente;
     @api anadirParticipante;
+    @api valuePais = 'España'
+
 
     @track allStages = [];
     @track optionsSubProducto;
     @track optionsTipoOpera;
+    @track optionsPais;
     @track optionsExito;
     @track OportunidadValue;
     @track showErrorMMPP=false;
     @track isSinCliente = false;
-
     @track initialSelection = [];
     @track errors = [];
+    @track _pais = [];
+
 
     labels = {
         estadoOportunidad,
         productoLabel,
         productoDebeSerMMPP,
-        subProducto,
         productoNoMMPP,
         confidencial,
         propietarioOportunidad,
@@ -71,12 +76,33 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
         esg,
         clienteLabel,
         anadirParticipanteLabel,
-        buscarProductos
+        comentario_label,
+        buscarProductos,
+        pais
     }
 
     @track placeholder = this.labels.buscarProductos;
     
     connectedCallback(){
+        if(this.valuePais == 'España'){
+            this._pais.push('España');
+        }
+        let aux = this.valuePais.toString();
+        aux = aux.replaceAll(',', ';');
+       
+        if(aux.includes(';')){
+            let arr = aux.split(';'); 
+            arr.forEach(element => {
+                this._pais.push(element);
+            });
+            let valorNoRepetido = [...new Set(this._pais)];
+            this._pais = valorNoRepetido;
+
+        }else{
+            this._pais.push(aux);
+            let valorNoRepetido = [...new Set(this._pais)];
+            this._pais = valorNoRepetido;
+        }
         if(this.valueOperacion!=undefined){
             this.valueOperacion=this.valueOperacion;
         }else{
@@ -94,21 +120,48 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
 
         this.sendData();
     }
-    handleSubProducto(event){
-        if(this.productoName!='MMPP'){
-            this.showErrorMMPP=true;
-            this.valueSubProducto=null;
-            event.target.value=null;
-        }else{
-            this.showErrorMMPP=false;
-            this.valueSubProducto=event.target.value;  
-        }
+    handleComentario(event){
+        this.comentario = event.target.value;
         this.sendData();
     }
+
     handleTipoOpera(event){
         this.valueOperacion=event.target.value;  
         this.sendData();
     }
+
+    handlePais(event){
+        this.anadirParticipante = true;
+        if(!this._pais.includes(event.target.value)){
+            this._pais.push(event.target.value);
+        }
+        let aux = this._pais.toString();
+        aux = aux.replaceAll(',', ';');
+        this.valuePais = aux;
+        if(aux === 'España'){
+            this.anadirParticipante = false;
+        }else{
+            this.anadirParticipante = true;
+        }
+        this.sendData();
+    }
+
+    handleRemove(event){
+        const valueRemoved = event.target.name;
+        this._pais.splice(this._pais.indexOf(valueRemoved), 1);
+        let aux = this._pais.toString();
+        aux = aux.replaceAll(',', ';');
+        this.valuePais = aux;
+        if(aux === 'España'){
+            this.anadirParticipante = false;
+        }else if (aux == ''){
+            this.anadirParticipante = false;
+        }else{
+            this.anadirParticipante = true;
+        }
+        this.sendData();
+    }
+    
     handleOportunidad(event){
         this.oportunidad=event.target.value;  
         this.sendData();
@@ -139,30 +192,18 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
         if(data){
             if(JSON.parse(JSON.stringify(data)) === this.cliente){this.isSinCliente = true}
         }else if(error) {
-            console.log(error);
+            Console.log(error);
         }
     }
 
     handleCliente(event){
         this.cliente = event.target.value;
-
         if(this.cliente == undefined) {
             this.oportunidad = '';
         }
-
         this.sendData();
     }
 
-    @wire(getSubProductoValues, {})
-    getOptionsSubProducto({error,data}) {
-        
-        if(data){
-            this.optionsSubProducto=JSON.parse(JSON.stringify(data));
-            
-        }else if(error) {
-            console.log(error);
-        }
-    }
 
     @wire(getOperacionPicklist, {})
     getOptionsOperacion({error,data}) {
@@ -170,7 +211,17 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
             this.optionsTipoOpera=JSON.parse(JSON.stringify(data));
             
         }else if(error) {
-            console.log(error);
+            Console.log(error);
+        }
+    }
+
+    @wire(getPaisPicklist, {})
+    getPais({error,data}) {
+        if(data){
+            this.optionsPais=JSON.parse(JSON.stringify(data));
+            
+        }else if(error) {
+            Console.log(error);
         }
     }
 
@@ -181,7 +232,7 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
             this.stageName=data.fields.Name.value;
             this.productoName=data.fields.Name.value;
         } else if (error) {
-            console.log(error);
+            Console.log(error);
         }
 
     }
@@ -190,22 +241,23 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
     wiredProdId({ error, data }) {
         if (data) {
             this.producto = data.fields.AV_ProductoFicha__c.value;
+
         } else if(error) {
-            console.log(error);
+            Console.log(error);
         }
     }
 
     getStatus(){
         getStatusValues({objectName: 'Opportunity', fieldName: 'StageName'})
             .then(result => {
-                this.valuesOpp= result; //El resultado lo instanciamos en valuesOpp. la lista de los estados del path.
-                this.pathValues(this.valuesOpp); //llamamos pathvalue 
+                this.valuesOpp= result;
+                this.pathValues(this.valuesOpp);
             })
             .catch(error => {
-                console.log(error);
+                Console.log(error);
         });
     }
-    pathValues(listValues) { //pasándole lista estados y se guarda en allStage
+    pathValues(listValues) {
         var aux = [];
         for(var value of listValues) {
             aux.push({value: value.value, label: value.label});
@@ -219,7 +271,7 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
                 this.template.querySelector('[data-id="clookupProductEMP"]').setSearchResults(results);
             })
             .catch((error) => {
-                console.error('Lookup error', JSON.stringify(error));
+                Console.error('Lookup error', JSON.stringify(error));
                 this.errors = [error];
             });
         
@@ -232,12 +284,12 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
                     this.template.querySelector('[data-id="clookupProductEMP"]').setSearchResults(results);
                 })
                 .catch((error) => {
-                    console.error('Lookup error', JSON.stringify(error));
+                    Console.error('Lookup error', JSON.stringify(error));
                     this.errors = [error];
                 });
         }
-		      
     }
+
 
     handleSelect(event){
         this.errors = [];
@@ -249,7 +301,6 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
 				}
 		} else {
 			this.producto = null;
-            this.valueSubProducto =  null;
             this.template.querySelector('[data-id="clookupProductEMP"]').selection = [];
             this.template.querySelector('[data-id="clookupProductEMP"]').handleBlur();
 		}
@@ -258,10 +309,10 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
 
     
     sendData() {
+
         this.dispatchEvent(new CustomEvent('datareport', {
             detail: {
                 producto: this.producto,
-                valueSubProducto: this.valueSubProducto,
                 valueOperacion: this.valueOperacion,
                 oportunidad: this.oportunidad,
                 propietario: this.propietario,
@@ -269,9 +320,11 @@ export default class cIBE_New_Opportunity extends NavigationMixin(LightningEleme
                 confidencial: this.confidencial,
                 esg: this.esg,
                 cliente: this.cliente,
-                anadirParticipante: this.anadirParticipante
+                anadirParticipante: this.anadirParticipante,
+                comentario: this.comentario,
+                valuePais: this.valuePais
             }
         }));
     }
-    
+
 }

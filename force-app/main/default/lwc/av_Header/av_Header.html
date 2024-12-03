@@ -1,108 +1,114 @@
 <template>
-    <article class="slds-card">
-        <template if:true={showHeader}>
-            <div class="slds-page-header slds-page-header_record-home">
-                <div class="slds-page-header__row">
-                    <div class="slds-page-header__col-title">
-                        <div class="slds-media">
-                            <div class="slds-media__figure">
-                                <lightning-icon icon-name={icon}></lightning-icon>
-                            </div>
-                            <div class="slds-media__body">
-                                <div class="slds-page-header__name">
-                                    <div class="slds-page-header__name-title">
-                                        <h1>
-                                            <span>{title}</span>
-                                            <ul class="slds-list_horizontal">
-                                                <li class="slds-m-right_x-small">
-                                                    <span class="slds-page-header__title slds-truncate">{nameRecord}</span>
-                                                </li>
-                                                <template if:true={showHierarchy}>
-                                                    <li>
-                                                        <lightning-button-icon icon-name="utility:hierarchy" class="slds-theme_default" size="x-small" onclick={navigateToHierarchy}></lightning-button-icon>
-                                                    </li>
-                                                </template>
-                                            </ul>
-                                        </h1>
-                                    </div>
-                                </div>
-                            </div>                      
+	<article class="slds-card">
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium"></lightning-spinner>
+		<template if:true={showHeader}>
+			<div class="slds-page-header slds-page-header_record-home">
+				<div class="slds-page-header__row">
+					<div class="slds-page-header__col-title">
+						<div class="slds-media">
+							<div class="slds-media__figure">
+								<lightning-icon icon-name={icon}></lightning-icon>
+							</div>
+							<div class="slds-media__body">
+								<div class="slds-page-header__name">
+									<div class="slds-page-header__name-title">
+										<h1>
+											<span>{title}</span>
+											<ul class="slds-list_horizontal">
+												<li class="slds-m-right_x-small slds-grid slds-align_absolute-center">
+													<span class="slds-page-header__title slds-truncate">
+														{nameRecord}
+														<span if:true={numDocument}> - {numDocument}</span>
+													</span>
+													<button class="slds-button slds-button_icon slds-m-left_x-small" onclick={navigateToCaixaBankNow}>
+														<img src={imageUrl} alt="CaixaBankNow Icon" class="custom-button-image" />
+													</button>
+												</li>
+												
+												<template if:true={showHierarchy}>
+													<li>
+														<lightning-button-icon icon-name="utility:hierarchy" class="slds-theme_default" size="x-small" onclick={navigateToHierarchy}></lightning-button-icon>
+													</li>
+												</template>
+											</ul>
 
-                            <div class="slds-no-flex" >
-                                    <lightning-button-group>
-                                        <template for:each={actions} for:item="action">
-                                          <lightning-button key={action.name} class="slds-button_neutral" label={action.label} data-label={action.label} data-flow={action.name} data-type={action.type} data-output={action.output} data-isflow={action.isFlow} onclick={fireFlowAction}></lightning-button>
-                                        </template>
-                                        <template if:true={showDropdownActions}>
-                                        <lightning-button-menu alternative-text="Show menu" menu-alignment="right" class="btnMenu" >
-                                                <template for:each={dropdownActions} for:item="option" >
-                                                    <lightning-menu-item  label={option.label} key={option.value} data-label={option.label} data-flow={option.name} data-type={option.type} data-output={option.output} data-isflow={option.isFlow} onclick={fireFlowAction}></lightning-menu-item>
-                                                </template>
-                                            </lightning-button-menu>
-                                        </template>
-                                    </lightning-button-group>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
-        <template if:true={showBody}>
-            <template if:true={fields}>
-                <div class="slds-media__body">
-                    <lightning-record-view-form density="comfy" record-id={recordId} object-api-name={filterObject}>
-                        <ul class="slds-list_horizontal slds-m-left_small">
-                            <template for:each={fields} for:item="field">
-                                <li class="slds-m-left_x-small slds-m-right_x-large slds-m-vertical_x-small" key={field.name} data-id={field.name} onclick={getRating}>
-                                    <template if:true={field.isCustomField}>
-                                        <lightning-helptext key={field.name} data-id={field.name} content={fechaCarga}></lightning-helptext>
-                                    </template>
-                                    <lightning-output-field field-name={field.name} ></lightning-output-field>
-                                </li>
-                            </template>
-                        </ul>
-                    </lightning-record-view-form>
-                </div>
-            </template>
-            <template if:true={activityData}>
-                <div style="display:flex">
-                    <template for:each={activityData} for:item="act">
-                        <div key={act.label} style='margin: 1.5rem'>
-                            <div if:false={act.relId}>
-                                <div>{act.label}</div>
-                                <div>{act.value}</div>  
-                            </div>
-                            <div if:true={act.relId}>
-                                <div>{act.label}</div>
-                                <a style="text-decoration:dotted" name={act.relId} onclick={navigateToRecord}>{act.value}</a>
-                            </div>
-                            <div if:true={act.checkbox}>
-                                <input type="checkbox" checked={isChecked} disabled/>
-                            </div>
-                            <div if:true={act.checkbox2}>
-                                <input type="checkbox" checked={isChecked} disabled/>
-                            </div> 
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </template>
-    </article>
-
-    <template if:true={isShowFlowAction}>
-        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
-            <div class="slds-modal__container">
-                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideFlowAction}></lightning-button-icon>
-                <div class="slds-modal__header">
-                    <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
-                </div>
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
-                    <div class="slds-is-relative">
-                        <lightning-flow flow-api-name={flowName} flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
-    </template>
+										</h1>
+									</div>
+								</div>
+							</div>                      
+							<div class="slds-no-flex" >
+								<lightning-button-group>
+									<template for:each={actions} for:item="action">
+										<lightning-button key={action.name} class="slds-button_neutral" label={action.label} data-label={action.label} data-flow={action.name} data-type={action.type} data-output={action.output} data-isflow={action.isFlow} onclick={fireFlowAction}></lightning-button>
+									</template>
+									<template if:true={showDropdownActions}>
+									<lightning-button-menu alternative-text="Show menu" menu-alignment="right" class="btnMenu" >
+											<template for:each={dropdownActions} for:item="option" >
+												<lightning-menu-item  label={option.label} key={option.value} data-label={option.label} data-flow={option.name} data-type={option.type} data-output={option.output} data-isflow={option.isFlow} onclick={fireFlowAction}></lightning-menu-item>
+											</template>
+										</lightning-button-menu>
+									</template>
+								</lightning-button-group>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+		<template if:true={showBody}>
+			<template if:true={fields}>
+				<div class="slds-media__body">
+					<lightning-record-view-form density="comfy" record-id={recordId} object-api-name={filterObject}>
+						<ul class="slds-list_horizontal slds-m-left_small">
+							<template for:each={fields} for:item="field">
+								<li class="slds-m-left_x-small slds-m-right_x-large slds-m-vertical_x-small" key={field.name} data-id={field.name} onclick={getRating}>
+									<lightning-output-field field-name={field.name} ></lightning-output-field>
+								</li>
+							</template>
+						</ul>
+					</lightning-record-view-form>
+				</div>
+			</template>
+			<template if:true={activityData}>
+				<div style="display:flex">
+					<template for:each={activityData} for:item="act">
+						<div key={act.label} style='margin: 1.5rem'>
+							<div if:false={act.relId}>
+								<div>{act.label}</div>
+								<div>{act.value}</div>  
+							</div>
+							<div if:true={act.relId}>
+								<div>{act.label}</div>
+								<a style="text-decoration:dotted" name={act.relId} onclick={navigateToRecord}>{act.value}</a>
+							</div>
+							<div if:true={act.checkbox}>
+								<input type="checkbox" checked={isChecked} disabled/>
+							</div>
+							<div if:true={act.checkbox2}>
+								<input type="checkbox" checked={isChecked} disabled/>
+							</div> 
+						</div>
+					</template>
+				</div>
+			</template>
+		</template>
+	</article>
+	<template if:true={isShowFlowAction}>
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
+			<div class="slds-modal__container">
+				<div class="container">
+					<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"  onclick={hideFlowAction}></lightning-icon>
+				</div>
+				<div class="slds-modal__header">
+					<h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
+				</div>
+				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+					<div class="slds-is-relative">
+						<lightning-flow flow-api-name={flowName} flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
 </template>

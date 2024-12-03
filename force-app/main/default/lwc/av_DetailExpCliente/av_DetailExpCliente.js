@@ -46,11 +46,7 @@ export default class Av_DetailExpCliente extends LightningElement {
             console.log('error ====> ' + JSON.stringify(error))
         } 
     }
-
-    connectedCallback() {
-        
-    }
-
+    
     getData(num) {
         retrieveData({numPerso: num})
             .then(result => {

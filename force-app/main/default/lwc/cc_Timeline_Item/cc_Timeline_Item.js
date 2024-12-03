@@ -1,93 +1,72 @@
-import {LightningElement, api} from 'lwc';
-import {NavigationMixin} from 'lightning/navigation';
+import { LightningElement,api,track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 
-const CLASES_TIMELINE_ITEM = {
-	'Task': 'slds-timeline__item_expandable slds-timeline__item_task',
-	'Email': 'slds-timeline__item_expandable slds-timeline__item_email',
-	'Case': 'slds-timeline__item_expandable timeline__item_case',
-	'Chat-Agente': 'slds-timeline__item_expandable timeline__item_chat',
-	'Chat-Chatbot': 'slds-timeline__item_expandable timeline__item_chat',
-	'Other': 'slds-timeline__item_expandable timeline__item_social',
-	'Twitter': 'slds-timeline__item_expandable timeline__item_twitter'
-	//event: 'slds-timeline__item_expandable slds-timeline__item_event',
-	//'call': 'slds-timeline__item_expandable slds-timeline__item_call',
-};
 
-//eslint-disable-next-line new-cap, camelcase
-export default class Cc_Timeline_Item extends NavigationMixin(LightningElement) {
-	@api
-	get item() {
-		return this._item;
-	}
+export default class Cc_Timeline_Item extends LightningElement {
+    @api msg;
+    @api isexpanded;
+    @track isTask=false;
+    @track isCase=false;
+    @track isChat=false;
+    @track isMail=false;
+    @track isSocial=false;
+    @track isTwitter=false;
 
-	set item(value) {
-		this._item = {...value, timelineItemClass: CLASES_TIMELINE_ITEM[value.ActivityTimelineType]};
-	}
+    @track inIn=false;
+    @track inOut=false;
 
-	_item;
+    
+    urlcase;
 
-	isTask = false;
+    connectedCallback() {
+        this.isIn =this.msg.Entrante;  
+        this.isOut=!this.msg.Entrante;
 
-	isCase = false;
+        switch(this.msg.ActivityTimelineType) {
+            case 'Case' : 
+              this.isCase = true;
+              this.isIn=false;
+              this.isOut=false;
+              break;
+            case 'Chat-Agente' : 
+              this.isChat = true;
+              break;
+            case 'Chat-Chatbot' : 
+              this.isChat = true;
+              break;
+            case 'Email' : 
+              this.isMail = true;
+              break;
+            case 'Twitter' : 
+              this.isTwitter = true;
+              break;
+            case 'Other' : 
+              this.isSocial = true;
+              break;              
+            default:
+                this.isTask = true;
+          }
 
-	isChat = false;
 
-	isMailInbound = false;
+    }
 
-	isMailOutbound = false;
+    changeState(){ 
+        this.isexpanded=!this.isexpanded;
+    }
 
-	isSocial = false;
+    navigateToCase() {
+        console.log('Ini');
+        // View a custom object record.
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: '5006E00000A9EyZQAV',
+                objectApiName: 'Case',
+                actionName: 'view'
+            }
+        });    
+        console.log('Fin');   
+    }
+    
 
-	isTwitter = false;
-
-	incoming;
-
-	connectedCallback() {
-		this.incoming = this.item?.Entrante;
-
-		switch (this.item.ActivityTimelineType) {
-			case 'Case':
-				this.isCase = true;
-				break;
-			case 'Chat-Agente':
-				this.isChat = true;
-				break;
-			case 'Chat-Chatbot':
-				this.isChat = true;
-				break;
-			case 'Email':
-				if (this.item.Entrante) {
-					this.isMailInbound = true;
-				} else {
-					this.isMailOutbound = true;
-				}
-				break;
-			case 'Twitter':
-				this.isTwitter = true;
-				break;
-			case 'Other':
-				this.isSocial = true;
-				break;
-			default:
-				this.isTask = true;
-		}
-	}
-
-	navigate(event) {
-		event.stopPropagation();
-		event.preventDefault();
-		this[NavigationMixin.Navigate]({
-			type: 'standard__recordPage',
-			attributes: {
-				recordId: event.currentTarget.dataset.recordId,
-				//objectApiName: 'Case',
-				actionName: 'view'
-			}
-		});
-	}
-
-	expandirContraerItem(event) {
-		this.template.querySelector('[data-item-id="' + event.currentTarget.dataset.id + '"]').classList.toggle('slds-is-open');
-		event.stopPropagation();
-	}
 }

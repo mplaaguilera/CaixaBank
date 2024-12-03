@@ -1,4 +1,6 @@
 import { LightningElement, api, wire, track  } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
+
 
 //labels
 import titulo from '@salesforce/label/c.CIBE_ClientesPriorizados';
@@ -196,6 +198,7 @@ export default class cibe_ClientesPriorizadosCIB extends LightningElement {
         getData({ filterResults: this.filterResults, selectedIds : this.selectedIds, clickFilter : this.auxClickFilter })
             .then((result) => {
                 this.data = result;
+                refreshApex(this.data);
             })
             .catch((error) => {
                 console.log("error ", error);

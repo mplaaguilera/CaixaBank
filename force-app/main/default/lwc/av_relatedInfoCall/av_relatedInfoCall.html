@@ -1,0 +1,24 @@
+<template>
+        <lightning-accordion class="slds-box slds-theme_default" allow-multiple-sections-open active-section-name="prueba" onsectiontoggle={handleSectionToggle}>
+            <lightning-accordion-section style= "border-radius: 5px 5px 5px 5px; overflow: hidden; margin: -8px -5px;" name="prueba" label= "Información relacionada">
+                <div>
+                    <template if:true={activities.length}>
+                        <div class="slds-grid slds-wrap">
+                            <template for:each={activities} for:item="activity">
+                                <div key={activity.id}>
+                                    <div class="slds-m-top_medium">
+                                        <div class="slds-text-body_small">Nombre</div> 
+                                        <div class="slds-m-bottom_medium">{activity.name}</div>
+                                        <div class="slds-text-body_small">Asunto</div>
+                                        <div class="slds-m-bottom_medium"><a href={href} target="_blank">{activity.subject}</a></div>
+                                        <div class="slds-text-body_small">Descripción</div>
+                                        <div class="slds-m-bottom_medium">{activity.comentario}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </lightning-accordion-section> 
+        </lightning-accordion>
+</template>

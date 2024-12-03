@@ -1,22 +1,20 @@
-import { LightningElement, track, api } from 'lwc';
+import { LightningElement, track, api,wire } from 'lwc';
 import { ShowToastEvent } 		from 'lightning/platformShowToastEvent';
 
 //Labels
 import AV_CMP_NoDataFound 		from '@salesforce/label/c.AV_CMP_NoDataFound';
 import AV_CMP_ErrorMessage 		from '@salesforce/label/c.AV_CMP_ErrorMessage';
 
-import AV_CMP_No_Admit 			from '@salesforce/label/c.AV_GDPR_NoAdmit';
-import AV_CMP_No_Admit_PME		from '@salesforce/label/c.AV_GDPR_NoAdmit_PME';
-import AV_CMP_Yes_Admit 		from '@salesforce/label/c.AV_GDPR_YesAdmit';
-import AV_CMP_Yes_Admit_PME 	from '@salesforce/label/c.AV_GDPR_YesAdmit_PME';
 
 import AV_GDPR_Help 			from '@salesforce/label/c.AV_GDPR_Help';
+import AV_SupportContact        from '@salesforce/label/c.AV_SupportCallContact';  
+import AV_OnlySupportOp        from '@salesforce/label/c.AV_OnlySupportOp';  
+
 //Methods
-import getTreatments 			from '@salesforce/apex/AV_GDPR_Controller.getTreatments';
+import getJsonAlertas        from '@salesforce/apex/AV_ClientAlerts_Controller.getJsonAlertas';  
 import getIdFilterObject       	from '@salesforce/apex/AV_SObjectRelatedInfoCController.getIdFilterObject';
 
 export default class Av_GDPR extends LightningElement {
-
 
 	@api recordId;
 	@api objectApiName;
@@ -36,16 +34,15 @@ export default class Av_GDPR extends LightningElement {
     @track ObjectId;
 	helpText = AV_GDPR_Help;
 
+	alertas =[];  
+	@track alertKy21 = false 
+	@track admitCall = true;
 
 	label = {
-        AV_CMP_No_Admit,
-        AV_CMP_No_Admit_PME,
-        AV_CMP_Yes_Admit,
-        AV_CMP_Yes_Admit_PME
+		AV_OnlySupportOp ,  
+		AV_SupportContact  
+
     };
-
-	
-
 
 	connectedCallback() {
 		this.currenObjectName = this.objectApiName;
@@ -61,70 +58,44 @@ export default class Av_GDPR extends LightningElement {
 		this.getRecId(this.recordId,this.currenObjectName,this.filterObject,this.filterField);
 	}
 
-	getTreatments() {
-		getTreatments({recordId: this.ObjectId})
-			.then(result => {
-				if(result.severity === 'ok'){
-					this.listConsents = result.listTreatments;
-					this.hasConsents = true;
-					this.viewSpinner = false;
-					for(let cns of this.listConsents){
-						switch(cns.consentContent){
-							case 'NO_ADMIT':
-								this.noAdmit = true;
-							break;
-
-							case 'NO_ADMIT_PME':
-								this.noAdmitPME = true;
-							break;
-
-							case 'YES_ADMIT':
-								this.yesAdmit = true;
-							break;
-
-							case 'YES_ADMIT_PME':
-								this.yesAdmitPME = true;
-							break;
-						}
-					}
-
-				}else if(result.severity === 'error'){
-					console.log('Display ShowToastEvent error: ' + result.descError);
-					const evt = new ShowToastEvent({
-						title: AV_CMP_ErrorMessage,
-						message: result.descError,
-						variant: result.severity
-					});
-					this.noDataFound = result.descError;
-					this.dispatchEvent(evt);
-					this.viewSpinner = false;
-				} 
-				else {
-					console.log('Option invalid: ' + JSON.stringify(result));
-					this.viewSpinner = false;
-				}
-			})
-			.catch(error => {
-				console.log('Display ShowToastEvent error (catch): ' + JSON.stringify(error));
-				const evt = new ShowToastEvent({
-					title: AV_CMP_ErrorMessage,
-					message: JSON.stringify(error),
-					variant: 'error'
-				});
-				this.noDataFound = JSON.stringify(error);
-				this.dispatchEvent(evt);
+	
+	@wire(getJsonAlertas, { recordId: '$recordId', obj: '$objectApiName' })
+    wiredAlertas({ error, data }) {
+        if (data) {
+            this.alertas = data;
+			const keys = this.alertas.map(alt => alt.key); 
+			if (keys.includes("21")) {
+				this.hasConsents = true;
+				this.alertKy21 = true;
+				this.admitCall = false;
 				this.viewSpinner = false;
-			});
-	}
+			} else {
+				this.hasConsents = true;
+				this.viewSpinner = false;
+				this.admitCall = true;
+			}
+			
+			
+        } 
+		else if(data == null){
+			this.hasConsents =true;
+			this.admitCall = true;
+			this.viewSpinner = false;
+		}
+		else if (error) {
+            console.error('Error al obtener alertas:', error);
+        }
+		
+    }
+
 	getRecId(recordId,objectApiName,filterObject,filterField){
         if(objectApiName == filterObject){
             this.ObjectId = recordId;
-            this.getTreatments();
+            
         }else{
             getIdFilterObject({ recordId: this.recordId, objectApiName: this.objectApiName, objectFilter: this.filterObject, filterField: this.filterField  })
                 .then(resultIdObject => {
                     this.ObjectId = resultIdObject;
-                    if(this.ObjectId != null && this.ObjectId != undefined)  this.getTreatments();
                 })
                 .catch(error => {
                     console.log(error);
@@ -137,5 +108,4 @@ export default class Av_GDPR extends LightningElement {
                 });
         }
     }
-
 }

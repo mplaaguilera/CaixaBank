@@ -2,6 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getData from '@salesforce/apex/AV_MetricChart_Controller.getData';
+import getDataSinGestor from '@salesforce/apex/AV_MetricChart_Controller.getDataSinGestor';
 
 import USER_ID from '@salesforce/user/Id';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
@@ -9,10 +10,13 @@ import { getRecord } from 'lightning/uiRecordApi';
 
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import chartjs from '@salesforce/resourceUrl/AV_ChartJsV391';
+import AV_NotAssigned from '@salesforce/label/c.AV_NotAssigned';
+
 
 import BPRPS from '@salesforce/customPermission/AV_PrivateBanking';
 
-
+const OUTSTANDING_OPP = 'AV_OutstandingOpportunities'  
+const TASK ='AV_Task';  
 const PRIOR_MANAGE_CLIENTS = 'AV_PriorManageClients';
 const WARNINGS_TO_MANAGE = 'AV_WarningsToManage';
 const PENDING_CONVERSATION = 'AV_PendingConversation';
@@ -40,6 +44,7 @@ const INICIATIVA_GESTOR_A = 'Iniciativa Gestor/a';
 const ENTRADA = "Entrada','002";
 const SALIDA = "Salida','001";
 const AVISOS = 'Avisos';
+const OPORTUNIDADES_DESTACADAS = 'Oportunidades destacadas';
 
 export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 
@@ -49,8 +54,23 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 	@track reportId;
 	@track numRecords;
 	@track loading = false;
+	@track pag = true;
+	@track numRecordsSinGestor;
+	@track reportIdSinGestor;
+	@track numDiffClients;
+	
+
+	showClientExperienceLegend;
+	showIniciativaGestorLegend;
+	showOnBoardingLegend;
+	showLegendTareas;
+	showLegendOutstandingOpp;
+	showbuttonDiffClients;
 
 	showDonutCharts;
+	showbuttonSinAsignarTask = false;
+	showbuttonSinAsignarOpps = false;
+	showbuttonSinAsignarWarnings = false;
 	chart;
 	config;
 	dataset;
@@ -58,6 +78,8 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 	office;
 	offficeShort;
 	filterValue;
+	infoSinGestor = [];
+	
 	showLegendClients;
 	showLegendConversations;
 	showLegendAppointments;
@@ -67,6 +89,10 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 	error;
 	wiredData;
 	showTableGroupedByCliente;
+	centroSinGestor;
+	isPool = false;
+	multiGestAlias;
+
 
 	@track filtersValuesMap = new Map([
 		[PRIORIZADOR, PRIORIZADOR],
@@ -85,7 +111,6 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 
 	@wire(getRecord, { recordId: USER_ID, fields: [OFICINA] })
 	wiredUser(wireResult) {
-		// const { data, error } = wireResult;
 		let data = wireResult.data;
 		let error = wireResult.error;
 		if (data) {
@@ -101,12 +126,11 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 
 	@wire(getData, { metadataChart: '$metadataChartName' })
 	retrieveCharts(wireResult) {
-		// const { data, error } = wireResult;
 		let data = wireResult.data;
 		let error = wireResult.error;
 		this.wiredData = wireResult;
 		if (data) {
-			this.showButton = data.hasLinkPermission;
+			
 			if (this.metadataChartName == PRIOR_MANAGE_CLIENTS
 				|| this.metadataChartName == PENDING_CONVERSATION
 				|| this.metadataChartName == WARNINGS_TO_MANAGE
@@ -118,23 +142,84 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				|| this.metadataChartName == WARNINGS_TO_MANAGE_SD_BP
 				|| this.metadataChartName == PENDING_CONVERSATION_SD
 				|| this.metadataChartName == TODAYS_APPOINTMENT_SD
-				) {
+				|| this.metadataChartName == TASK
+				|| this.metadataChartName == OUTSTANDING_OPP) 
+			{
 				this.showDonutCharts = true;
 				this.loading = true;
 				if (this.metadataChartName == PRIOR_MANAGE_CLIENTS) {
-					this.showLegendClients = true;
+					this.showLegendClients = true;	
 				} else if (this.metadataChartName == PENDING_CONVERSATION || this.metadataChartName == PENDING_CONVERSATION_SD) {
 					this.showLegendConversations = true;
 				} else if (this.metadataChartName == TODAYS_APPOINTMENT ||this.metadataChartName == TODAYS_APPOINTMENT_SD) {
 					this.showLegendAppointments = true;
 				} else if (this.metadataChartName == TASK_FOR_TODAY ) {
 					this.showLegendTasks = true;
-				} else if (this.metadataChartName == WARNINGS_TO_MANAGE || this.metadataChartName == WARNINGS_TO_MANAGE_SD || this.metadataChartName == WARNINGS_TO_MANAGE_SD_BP) {
+				} else if ( this.metadataChartName == WARNINGS_TO_MANAGE_SD || this.metadataChartName == WARNINGS_TO_MANAGE_SD_BP) {
 					this.showLegendWarnings = true;
+				}else if (this.metadataChartName == WARNINGS_TO_MANAGE ){
+					this.isPool = data.isPool;
+					if(this.isPool){
+						this.multiGestAlias = data.multiGestAlias;
+					}
 
+					getDataSinGestor({ devName: WARNINGS_TO_MANAGE})
+                    .then(result => {
+						this.numRecordsSinGestor = result.numRecords;
+						this.reportIdSinGestor = result.reportId;
+						this.showLegendWarnings = true;
+						this.showbuttonSinAsignarWarnings = true;
+						this.centroSinGestor = result.centerAssociated;  
+                    })
+                    .catch(error => {
+                        console.error('Error retrieving data from getDataSinGestor: ', error);
+                    });
 				} else if (this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP) {
 					this.showLegendClients = true;
-				}
+				} else if (this.metadataChartName == OUTSTANDING_OPP) {
+					getDataSinGestor({ devName: OUTSTANDING_OPP})
+                    .then(result => {
+						this.numRecordsSinGestor = result.numRecords;
+						this.reportIdSinGestor = result.reportId;
+						this.numDiffClients = result.numClients;
+						let id = result.idSinGestor;
+						let label = AV_NotAssigned;
+						this.infoSinGestor = [label, id];
+						this.showbuttonDiffClients = true;
+                    	this.showLegendOutstandingOpp = true;
+                    	this.showbuttonSinAsignarOpps = true;
+                    })
+                    .catch(error => {
+                        console.error('Error retrieving data from getDataSinGestor: ', error);
+                    });
+				}else if(this.metadataChartName==TASK){
+					getDataSinGestor({ devName: TASK})
+                    .then(result => {
+						this.showbuttonSinAsignarTask = true;
+						this.showLegendTareas = true;
+						this.numRecordsSinGestor = result.numRecords;
+						this.reportIdSinGestor = result.reportId;
+                    })
+                    .catch(error => {
+                        console.error('Error retrieving data from getDataSinGestor: ', error);
+                    });
+					
+					if(data.numRecordsList[0]>0){
+						this.showClientExperienceLegend = true;
+					}
+					if(data.numRecordsList[1]>0){
+						this.showIniciativaGestorLegend = true;
+					}
+					if(data.numRecordsList[2]>0){
+						this.showOnBoardingLegend = true;
+					}
+					
+					if(data.numRecordsList[3]>0){
+						this.showAlertaComercial = true;
+					}
+					
+				} 
+
 				this.numRecords = data.numRecords;
 				if (this.numRecords > 0) {
 					this.showNumbers = false;
@@ -148,7 +233,7 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				if (data.numRecordsList !== undefined && (this.metadataChartName == PRIOR_MANAGE_CLIENTS || 
 					this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP ||
 					this.metadataChartName == TODAYS_APPOINTMENT || this.metadataChartName == PENDING_CONVERSATION ||
-					this.metadataChartName == TODAYS_APPOINTMENT_SD || this.metadataChartName == PENDING_CONVERSATION_SD ))		
+					this.metadataChartName == TODAYS_APPOINTMENT_SD || this.metadataChartName == PENDING_CONVERSATION_SD || this.metadataChartName == TASK ))		
 				 {
 					this.dataset = data.numRecordsList;
 				} else {
@@ -161,8 +246,8 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 					id: 'counter',
 					afterDraw(chart, arg, options) {
 						var { ctx, chartArea: { top, right, bottom, left, width, height } } = chart;
-						var fontSize = (height / 50).toFixed(2);
-						ctx.font = fontSize + "em sans-serif";
+						var fontSize = (height / 40).toFixed(2);
+						ctx.font = "700 " + fontSize + "em sans-serif";						
 						ctx.textBaseline = "middle";
 						ctx.textAlign = "center";
 						ctx.fillStyle = 'rgb(0,151,212)';
@@ -204,7 +289,7 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 								enabled: true
 							}
 						},
-						responsive: false //Si no no funciona la version
+						responsive: false
 					},
 					plugins: [counter]
 				};
@@ -224,6 +309,7 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 					console.log(error);
 					this.loading = false;
 				});
+				
 			} else {
 				this.showDonutCharts = false;
 				this.numRecords = data.numRecords;
@@ -237,6 +323,7 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 		} else if (error) {
 			console.log('Error loading: ', JSON.parse(JSON.stringify(error)));
 		}
+		
 	}
 
 	@api
@@ -258,14 +345,18 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 		} else if (chartName == TASK_FOR_TODAY ) {
 			labelList = [TAREAS];
 		} else if (chartName == WARNINGS_TO_MANAGE || chartName == WARNINGS_TO_MANAGE_SD || chartName == WARNINGS_TO_MANAGE_SD_BP) {
-
 			labelList = [AVISOS];
+		}else if(chartName == TASK){
+			labelList = [ CLIENT_EXPERIENCE,INICIATIVA_GESTOR,ONBOARDING_INTOUCH,ALERTAS_COMERCIALES]; 
+		} else if (chartName == OUTSTANDING_OPP){
+			labelList = [OPORTUNIDADES_DESTACADAS];
 		}
+		
 		return labelList;
 	}
 
 	getColours() {
-		if (this.metadataChartName == PRIOR_MANAGE_CLIENTS || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP ) {
+		if (this.metadataChartName == PRIOR_MANAGE_CLIENTS || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP || this.metadataChartName == OUTSTANDING_OPP ) {
 			this.coloursList = ['rgb(6,79,112)', 'rgb(0,126,174)', 'rgb(43,192,237)', 'rgb(165,234,253)', 'rgb(165, 234, 233)'];
 		} else if (this.metadataChartName == PENDING_CONVERSATION ||this.metadataChartName == PENDING_CONVERSATION_SD) {
 			this.coloursList = ['rgb(0,126,174)', 'rgb(43,192,237)', 'rgb(6,79,112)'];
@@ -275,23 +366,31 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 			this.coloursList = ['rgb(6,79,112)'];
 		} else if (this.metadataChartName == WARNINGS_TO_MANAGE || this.metadataChartName == WARNINGS_TO_MANAGE_SD || this.metadataChartName == WARNINGS_TO_MANAGE_SD_BP) {
 			this.coloursList = ['rgb(6,79,112)'];
+		} 
+		else if(this.metadataChartName == TASK){
+			this.coloursList = ['rgb(0,126,174)', 'rgb(43,192,237)','rgb(165, 234, 233)','rgb(165,234,253)'];
 		}
 	}
 
 	navigateToReportWithoutFilter(event) {
 		if (this.reportId !== undefined) {
 			if ((this.metadataChartName !== PRIOR_MANAGE_CLIENTS && this.metadataChartName !== PRIOR_MANAGE_CLIENTS_SD && this.metadataChartName !== PRIOR_MANAGE_CLIENTS_SD_BP)) {
-				this[NavigationMixin.Navigate]({
+				let center = (this.offficeShort.split('-').lenght == 2) ? this.offficeShort.split('-')[1] : this.offficeShort;
+				let pageReference = {
 					type: 'standard__recordPage',
 					attributes: {
 						recordId: this.reportId,
 						objectApiName: 'Report',
 						actionName: 'view'
 					}
-					/*state: {
-						fv9: valueToFilter  TEST
-					}*/
-				});
+			
+				};
+				if(this.isPool){
+					pageReference.state = {'fv8':center,'fv7':this.multiGestAlias}
+				}
+				this[NavigationMixin.Navigate](pageReference);
+
+			
 			} else {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__component',
@@ -304,8 +403,34 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				});
 			}
 		}
+		if(this.metadataChartName == OUTSTANDING_OPP){
+			this.pag = !this.pag;
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: "AV_OppSearchTab"
+				},
+				state: {
+					c__refresh: this.pag,
+					c__comesFromHome:true
+				}
+			});
+		}
+		
+		if(this.metadataChartName == TASK){
+				this[NavigationMixin.Navigate]({
+					type: 'standard__component',
+					attributes: {
+						componentName: "c__AV_NavigateTableGroupedByClient"
+					},
+					state: {
+						c__fv9: ''
+					}
+				});
+		}
+		
+		
 	}
-
 
 	navigateToReport(event) {
 		if (this.reportId !== undefined) {
@@ -320,12 +445,56 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				}
 			});
 		}
+		if(this.metadataChartName == OUTSTANDING_OPP){    
+			this.pag = !this.pag;
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: "AV_OppSearchTab"
+				},
+				state: {
+					c__refresh: this.pag,
+					c__comesFromHome: true
+				}
+			});
+		}
+
+		if(this.metadataChartName == TASK){
+			this[NavigationMixin.Navigate]({
+				type: 'standard__component',
+				attributes: {
+					componentName: "c__AV_NavigateTableGroupedByClient"
+				},
+				state: {
+					c__fv9: ''
+				}
+			});
+		}
+	}
+
+	navigateToReportSinGestor(event){
+		if(this.metadataChartName == OUTSTANDING_OPP){
+			this.pag = !this.pag;
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: "AV_OppSearchTab"
+				},
+				state: {
+					c__refresh: this.pag,
+					c__singestor : this.infoSinGestor,
+					c__comesFromHome:true
+ 
+				}
+			});
+		}
+	
 	}
 
 	navigateToReportWithFilter(metaChart) {
 		if (this.reportId !== undefined) {
 			var valueToFilter = "'" + this.filtersValuesMap.get(this.filterValue) + "'";
-			if (metaChart == PRIOR_MANAGE_CLIENTS || metaChart == PRIOR_MANAGE_CLIENTS_SD || metaChart == PRIOR_MANAGE_CLIENTS_SD_BP) {
+			if (metaChart == PRIOR_MANAGE_CLIENTS || metaChart == PRIOR_MANAGE_CLIENTS_SD || metaChart == PRIOR_MANAGE_CLIENTS_SD_BP ) {
 					this[NavigationMixin.Navigate]({
 						type: 'standard__component',
 						attributes: {
@@ -348,7 +517,21 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 						fv2: valueToFilter
 					}
 				});
-			} else {
+			} else if(metaChart == OUTSTANDING_OPP){
+				this.pag = !this.pag;
+				this[NavigationMixin.Navigate]({
+					type: 'standard__navItemPage',
+					attributes: {
+						apiName: "AV_OppSearchTab"
+					},
+					state: {
+						c__refresh: this.pag,
+						c__comesFromHome:true
+
+					}
+				});
+			} 
+			else {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -359,13 +542,27 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				});
 			}
 		}
+		
+		if(metaChart == TASK){
+			var valueToFilter = "'" + this.filtersValuesMap.get(this.filterValue) + "'";
+			this[NavigationMixin.Navigate]({
+				type: 'standard__component',
+				attributes: {
+					componentName: "c__AV_NavigateTableGroupedByClient"
+				},
+				state: {
+					c__fv9: valueToFilter
+				}
+			});
+		}
+		
 	}
 
 
 	navigateToReportWithFilterLegend(event) {
 		if (this.reportId !== undefined) {
 			var valueToFilter = "'" + event.currentTarget.dataset.id + "'";
-			if (this.metadataChartName == PRIOR_MANAGE_CLIENTS || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP) {
+			if (this.metadataChartName == PRIOR_MANAGE_CLIENTS || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD || this.metadataChartName == PRIOR_MANAGE_CLIENTS_SD_BP ) {
 					this[NavigationMixin.Navigate]({
 						type: 'standard__component',
 						attributes: {
@@ -399,6 +596,20 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				});
 			}
 		}
+		
+		if(this.metadataChartName == TASK){
+			var valueToFilter = "'" + event.currentTarget.dataset.id + "'";
+			this[NavigationMixin.Navigate]({
+				type: 'standard__component',
+				attributes: {
+					componentName: "c__AV_NavigateTableGroupedByClient"
+				},
+				state: {
+					c__fv9: valueToFilter
+				}
+			});
+		}
+		
 	}
 
 	goMassReassign(event) {
@@ -411,5 +622,36 @@ export default class Av_MetricChart extends NavigationMixin(LightningElement) {
 				c__fromHome: this.metadataChartName
 			}
 		})
+		
+	}
+
+	goMassReassignOpp(event) {
+		this[NavigationMixin.Navigate]({
+			type: 'standard__component',
+			attributes: {
+				componentName: "c__av_MassReassignOwnerOppsContainer"
+			},
+			state: {
+				c__fromHome: this.metadataChartName
+			}
+		});	
+	}
+
+
+	navigateToReportWithFilterLegend2(event) {
+		if (this.reportIdSinGestor !== undefined) {
+			this[NavigationMixin.Navigate]({
+				type: 'standard__recordPage',
+				attributes: {
+					recordId: this.reportIdSinGestor,
+					objectApiName: 'Report',
+					actionName: 'view'
+				},
+				state:{
+					fv7:this.centroSinGestor
+			   }
+			});
+			
+		}	
 	}
 }

@@ -6,13 +6,13 @@ import NAME_FIELD from '@salesforce/schema/Product2.Name';
 import PRODID_FIELD from '@salesforce/schema/AV_ProductExperience__c.AV_ProductoFicha__c';
 
 //Methods
-import getOperacionPicklist     from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getTipoOperacionPicklist';
-import getStatusValues          from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getStatusValues';
-import lookupSearch 	        from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.search';
-import lookupSearchFamily 	    from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.searchFamily';
-import getOpportunityFields     from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getOpportunityFields';
-import getCliente               from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getCliente';
-import searchCliente            from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.searchCliente';
+import getOperacionPicklist from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getTipoOperacionPicklist';
+import getStatusValues from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getStatusValues';
+import lookupSearch from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.search';
+import lookupSearchFamily from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.searchFamily';
+import getOpportunityFields from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getOpportunityFields';
+import getCliente from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getCliente';
+import searchCliente from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.searchCliente';
 
 
 //Labels translations
@@ -28,16 +28,17 @@ import nombreOportunidad from '@salesforce/label/c.CIBE_NombreOportunidad';
 import familia from '@salesforce/label/c.CIBE_Familia';
 import buscarProductos from '@salesforce/label/c.CIBE_BuscarProductos';
 import anadirParticipante from '@salesforce/label/c.CIBE_AnadirParticipante';
-import esg from '@salesforce/label/c.CIBE_ESG';
+import esg from '@salesforce/label/c.CIBE_FinanciacionSostenible';
 import buscarFamilia from '@salesforce/label/c.CIBE_BuscarFamilia';
 import ecas from '@salesforce/label/c.CIBE_ECAs';
 import sindicaciones from '@salesforce/label/c.CIBE_Sindicaciones';
 import clienteLabel from '@salesforce/label/c.CIBE_Cliente';
 import linea from '@salesforce/label/c.CIBE_Linea';
+import comentario_label from '@salesforce/label/c.CIBE_Comentario';
 
 
-export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningElement) {
-    
+export default class CIBE_New_Opportunity_CIB extends LightningElement {
+
     labels = {
         estadoOportunidad,
         productoLabel,
@@ -55,11 +56,12 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
         buscarFamilia,
         ecas,
         sindicaciones,
-        clienteLabel, 
-        linea
+        clienteLabel,
+        linea,
+        comentario_label
     }
 
-    @api pfId; 
+    @api pfId;
     @api developerName;
     @api producto;
     @api productoName;
@@ -70,17 +72,19 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
     @api stageName;
     @api confidencial;
     @api esg;
-    @api sindicaciones;
+    @api sindicaciones = false;
     @api ecas;
     @api cliente;
     @api linea;
     @api anadirParticipantes;
+    @api comentario;
+    @api showSinCliente;
 
     @track allStages = [];
     @track optionsTipoOpera;
     @track optionsExito;
     @track OportunidadValue;
-    @track showErrorMMPP=false;
+    @track showErrorMMPP = false;
     @track family;
 
     @track placeholder = this.labels.buscarProductos;
@@ -98,18 +102,18 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
     @track isSinCliente = false;
     @track isLinea = true;
 
+    isdisabled = false;
 
-    
     @api
-	get idResult(){
-		return this._idResult;
-	}
+    get idResult() {
+        return this._idResult;
+    }
 
     @wire(getOperacionPicklist, {})
-    getOptionsOperacion({error,data}) {
-        if(data){
-            this.optionsTipoOpera=JSON.parse(JSON.stringify(data));
-        }else if(error) {
+    getOptionsOperacion({ error, data }) {
+        if (data) {
+            this.optionsTipoOpera = JSON.parse(JSON.stringify(data));
+        } else if (error) {
             console.log(error);
         }
     }
@@ -118,8 +122,8 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
     wiredProdName({ error, data }) {
         if (data) {
             this.oportunidad = data.fields.Name.value;
-            this.stageName=data.fields.Name.value;
-            this.productoName=data.fields.Name.value;
+            this.stageName = data.fields.Name.value;
+            this.productoName = data.fields.Name.value;
         } else if (error) {
             console.log(error);
         }
@@ -129,87 +133,92 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
     wiredProdId({ error, data }) {
         if (data) {
             this.producto = data.fields.AV_ProductoFicha__c.value;
-        } else if(error) {
+        } else if (error) {
             console.log(error);
         }
     }
 
-    connectedCallback(){
-        if(this.valueOperacion!=undefined){
-            this.valueOperacion=this.valueOperacion;
-        }else{
-            this.valueOperacion='Nueva';
+    connectedCallback() {
+        if (this.valueOperacion != undefined) {
+            this.valueOperacion = this.valueOperacion;
+        } else {
+            this.valueOperacion = 'Nueva';
         }
         this.getStatus();
     }
 
-    getStatus(){
-        getStatusValues({objectName: 'Opportunity', fieldName: 'StageName'})
+
+
+
+    getStatus() {
+        getStatusValues({ objectName: 'Opportunity', fieldName: 'StageName' })
             .then(result => {
-                this.valuesOpp= result; //El resultado lo instanciamos en valuesOpp. la lista de los estados del path.
+                this.valuesOpp = result; //El resultado lo instanciamos en valuesOpp. la lista de los estados del path.
+                console.log('result: ',result);
+                
                 this.pathValues(this.valuesOpp); //llamamos pathvalue 
             })
             .catch(error => {
                 console.log(error);
-        });
+            });
     }
-    
+
     pathValues(listValues) { //pasandole lista estados y se guarda en allStage
         var aux = [];
-        for(var value of listValues) {
-            aux.push({value: value.value, label: value.label});
+        for (var value of listValues) {
+            aux.push({ value: value.value, label: value.label });
         }
         this.allStages = this.allStages.concat(aux);
     }
 
-    handleFamilia(event){
+    handleFamilia(event) {
         this.searchFamily = event.detail.searchTerm;
-        lookupSearchFamily ({searchTerm: event.detail.searchTerm, producto: this.valueSubProducto })
-        .then((results) => {
-            this.template.querySelector('[data-id="clookupFamilyCIB"]').setSearchResults(results);
-        })
-        .catch((error) => {
-            console.error('Lookup error', JSON.stringify(error));
-            this.errorsFamily = [error];
-        });
-    }
-
-    handleSelectFamily(event){
-        this.errors = [];
-		let targetId = event.target.dataset.id;
-		const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
-		if(selection.length !== 0){
-				for(let sel of selection) {
-					this.producto  = String(sel.id);
-				}
-		} else {
-			this.producto = null;
-            this.valueSubProducto =  null;
-            this.template.querySelector('[data-id="clookupOpCIB"]').selection = [];
-            this.template.querySelector('[data-id="clookupFamilyCIB"]').handleBlur();
-		}
-        this.sendData();
-    }
-
-    handleSearchFamilyClick(event) {
-        if (this.producto == null) {
-        lookupSearchFamily ({searchTerm: event.detail.searchTerm, producto: this.valueSubProducto })
+        lookupSearchFamily({ searchTerm: event.detail.searchTerm, producto: this.valueSubProducto })
             .then((results) => {
                 this.template.querySelector('[data-id="clookupFamilyCIB"]').setSearchResults(results);
             })
             .catch((error) => {
                 console.error('Lookup error', JSON.stringify(error));
                 this.errorsFamily = [error];
-            });            
-        }
-	}
+            });
+    }
 
-    autoSelectFamily(valueProducto){
-        lookupSearchFamily ({searchTerm: '', producto: valueProducto})
+    handleSelectFamily(event) {
+        this.errors = [];
+        let targetId = event.target.dataset.id;
+        const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
+        if (selection.length !== 0) {
+            for (let sel of selection) {
+                this.producto = String(sel.id);
+            }
+        } else {
+            this.producto = null;
+            this.valueSubProducto = null;
+            this.template.querySelector('[data-id="clookupOpCIB"]').selection = [];
+            this.template.querySelector('[data-id="clookupFamilyCIB"]').handleBlur();
+        }
+        this.sendData();
+    }
+
+    handleSearchFamilyClick(event) {
+        if (this.producto == null) {
+            lookupSearchFamily({ searchTerm: event.detail.searchTerm, producto: this.valueSubProducto })
+                .then((results) => {
+                    this.template.querySelector('[data-id="clookupFamilyCIB"]').setSearchResults(results);
+                })
+                .catch((error) => {
+                    console.error('Lookup error', JSON.stringify(error));
+                    this.errorsFamily = [error];
+                });
+        }
+    }
+
+    autoSelectFamily(valueProducto) {
+        lookupSearchFamily({ searchTerm: '', producto: valueProducto })
             .then((results) => {
-                    let targetId = results[0].id;           
-                    this.producto  = targetId;       
-                    this.template.querySelector('[data-id="clookupFamilyCIB"]').selection = results[0];
+                let targetId = results[0].id;
+                this.producto = targetId;
+                this.template.querySelector('[data-id="clookupFamilyCIB"]').selection = results[0];
             })
             .catch((error) => {
                 console.error('Lookup error', JSON.stringify(error));
@@ -218,8 +227,8 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
     }
 
     handleSearch(event) {
-        if(this.producto !== null){
-            lookupSearch ({searchTerm: event.detail.searchTerm, familia: this.producto })
+        if (this.producto !== null) {
+            lookupSearch({ searchTerm: event.detail.searchTerm, familia: this.producto })
                 .then((results) => {
                     this.template.querySelector('[data-id="clookupOpCIB"]').setSearchResults(results);
                 })
@@ -228,72 +237,64 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
                     this.errors = [error];
                 });
         }
-	}
+    }
 
-    handleSubProducto(event){
+    handleSubProducto(event) {
         this.errors = [];
-		let targetId = event.target.dataset.id;
-		const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
-		if(selection.length !== 0){
-				for(let sel of selection) {
-					this.valueSubProducto  = String(sel.id);
-				}
-                this.autoSelectFamily(this.valueSubProducto);
-		} else {
-			this.valueSubProducto = null;
+        let targetId = event.target.dataset.id;
+        const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
+        if (selection.length !== 0) {
+            for (let sel of selection) {
+                this.valueSubProducto = String(sel.id);
+            }
+            this.autoSelectFamily(this.valueSubProducto);
+        } else {
+            this.valueSubProducto = null;
             this.template.querySelector('[data-id="clookupOpCIB"]').handleBlur();
-		}
+        }
         this.sendData();
     }
 
-	handleSearchClick(event) {
-		if (this.valueSubProducto == null) {
-			lookupSearch ({searchTerm: event.detail.searchTerm, familia: this.producto })
-				.then((results) => {
-					this.template.querySelector('[data-id="clookupOpCIB"]').setSearchResults(results);
-				})
-				.catch((error) => {
-					console.error('Lookup error', JSON.stringify(error));
-					this.errors = [error];
-				});
-		}        
+    handleSearchClick(event) {
+        if (this.valueSubProducto == null) {
+            lookupSearch({ searchTerm: event.detail.searchTerm, familia: this.producto })
+                .then((results) => {
+                    this.template.querySelector('[data-id="clookupOpCIB"]').setSearchResults(results);
+                })
+                .catch((error) => {
+                    console.error('Lookup error', JSON.stringify(error));
+                    this.errors = [error];
+                });
+        }
     }
 
     @wire(getCliente, {})
-    getCliente({error,data}) {
-        if(data){
-            this.initialCliente=[{id: data, icon:'standard:account', title: 'Sin Cliente'}];  
-                if(JSON.parse(JSON.stringify(data)) === this.cliente){
+    getCliente({ error, data }) {
+        if (data) {
+            if (this.showSinCliente !== undefined) {
+                if (this.showSinCliente === true) {
+                    this.isSinCliente = false;
+                    this.initialCliente = [{ id: data, icon: 'standard:account', title: 'Sin Cliente' }];
+                    this.isdisabled = true;
+                } else if (this.showSinCliente === false) {
+                    this.initialCliente = [];
+                    // if (JSON.parse(JSON.stringify(data)) === this.cliente) {
                     this.isSinCliente = true;
+                    this.isdisabled = false;
+                    this.cliente = null;
                 }
-        }else if(error) {
-            console.log(error);
+            } else {
+                console.log(error);
+            }
         }
     }
 
     handleSearchCliente(event) {
-        searchCliente ({searchTerm: event.detail.searchTerm })
+        searchCliente({ searchTerm: event.detail.searchTerm })
             .then((results) => {
                 this.template.querySelector('[data-id="lookupCliente"]').setSearchResults(results);
-                this.initialCliente=[{id: result[0].id, icon:result[0].icon, title: result[0].title}];
+                this.initialCliente = [{ id: result[0].id, icon: result[0].icon, title: result[0].title }];
                 this.sendData();
-
-            })
-            .catch((error) => {
-                console.error('Lookup error', JSON.stringify(error));
-                this.errors = [error];
-            });
-	}
-
-	handleSearchClienteClick(event) {
-        searchCliente ({searchTerm: event.detail.searchTerm })
-            .then((results) => {
-                console.log('handleSearchCliente');
-                console.log('searchTerm: '+ searchTerm);
-                console.log(results);
-                this.template.querySelector('[data-id="lookupCliente"]').setSearchResults(results);
-                this.sendData();
-                this.template.querySelector('c-av_-lookup').scrollIntoView();
 
             })
             .catch((error) => {
@@ -301,100 +302,123 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
                 this.errors = [error];
             });
     }
-    handleSelectCliente(event){
+
+    handleSearchClienteClick(event) {
+        // searchCliente({ searchTerm: event.detail.searchTerm })
+        //     .then((results) => {
+        //         console.log('results ', Object.assign({}, results));
+        //         this.template.querySelector('[data-id="lookupCliente"]').setSearchResults(results);
+        //         this.sendData();
+        //         this.template.querySelector('c-av_-lookup').scrollIntoView();
+
+
+        //     })
+        //     .catch((error) => {
+        //         console.error('Lookup error', JSON.stringify(error));
+        //         this.errors = [error];
+        //     });
+    }
+    handleSelectCliente(event) {
         this.errors = [];
-		let targetId = event.target.dataset.id;
-		const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
-		if(selection.length !== 0){
-				for(let sel of selection) {
-					this.cliente  = String(sel.id);
-				}
-		} else {
-			this.cliente = null;
+        let targetId = event.target.dataset.id;
+        const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
+        if (selection.length !== 0) {
+            for (let sel of selection) {
+                this.cliente = String(sel.id);
+            }
+        } else {
+            this.cliente = null;
             this.template.querySelector('[data-id="lookupCliente"]').selection = [];
             this.template.querySelector('[data-id="lookupCliente"]').handleBlur();
-		}
+        }
         this.sendData();
         this.template.querySelector('[data-id="lookupCliente"]').handleBlur();
     }
-    handleClienteLoseFocus(){
+
+    handleClienteLoseFocus() {
         this.template.querySelector('c-av_-lookup').scrollIntoView();
     }
-    handleFamilyLoseFocus(){
+    handleFamilyLoseFocus() {
         this.template.querySelector('c-av_-lookup').scrollIntoView();
     }
-    handProductLoseFocus(){
+    handProductLoseFocus() {
         this.template.querySelector('c-av_-lookup').scrollIntoView();
     }
 
-    handleESG(event){
-        this.esg=event.target.checked;  
+    handleESG(event) {
+        this.esg = event.target.checked;
         this.sendData();
     }
-    
-    handleTipoOpera(event){
-        this.valueOperacion=event.target.value;  
+    @track tipoOperacion;
+    handleTipoOpera(event) {
+        this.valueOperacion = event.target.value;
         this.sendData();
+
     }
-    handleOportunidad(event){
-        this.oportunidad=event.target.value;  
+    handleOportunidad(event) {
+        this.oportunidad = event.target.value;
         this.sendData();
     }
 
-    handlePropietario(event){
-        this.propietario=event.target.value;  
+    handlePropietario(event) {
+        this.propietario = event.target.value;
         this.sendData();
     }
 
-    handleConfidencial(event){
-        this.confidencial=event.target.checked;  
+    handleConfidencial(event) {
+        this.confidencial = event.target.checked;
         this.sendData();
     }
 
-    handleECAs(event){
-        this.ecas = event.target.checked;  
+    handleECAs(event) {
+        this.ecas = event.target.checked;
         this.sendData();
     }
 
-    handleSindicaciones(event){
-        this.sindicaciones = event.target.checked;  
+    handleSindicaciones(event) {
+        this.sindicaciones = event.target.checked;
         this.sendData();
     }
 
-    handleLinea(event){
-        this.linea = event.target.checked;  
+    handleLinea(event) {
+        this.linea = event.target.checked;
         this.sendData();
     }
 
-    @wire(getOpportunityFields, {productoName: '$valueSubProducto'})
-    getOpportunityFields({error,data}) {
+    handleComentario(event) {
+        this.comentario = event.target.value;
+        this.sendData();
+    }
+
+    @wire(getOpportunityFields, { productoName: '$valueSubProducto' })
+    getOpportunityFields({ error, data }) {
         this.isTipoOpe = true;
         this.isEca = true;
         this.isSindi = true;
-        this.isLinea = true;   
-        if(data){
+        this.isLinea = true;
+        if (data) {
             data.forEach(d => {
-                    if(d == 'CIBE_TipoOperacion__c') {
-                        this.isTipoOpe = false;
-                    }
-                    if(d == 'CIBE_ECAs__c') {
-                        this.isEca = false;            
-                    }
-                    if(d == 'CIBE_Sindicaciones__c') {
-                        this.isSindi = false;            
-                    }
-                    if(d == 'CIBE_Linea__c') {
-                        this.isLinea = false;            
-                    }
-                });
-        }else if(error) {
+                if (d == 'CIBE_TipoOperacion__c') {
+                    this.isTipoOpe = false;
+                }
+                if (d == 'CIBE_ECAs__c') {
+                    this.isEca = false;
+                }
+                if (d == 'CIBE_Sindicaciones__c') {
+                    this.isSindi = false;
+                }
+                if (d == 'CIBE_Linea__c') {
+                    this.isLinea = false;
+                }
+            });
+        } else if (error) {
             console.log(error);
         }
     }
-    
 
 
-    handleCliente(event){
+
+    handleCliente(event) {
         this.cliente = event.target.value;
         this.sendData();
     }
@@ -412,11 +436,12 @@ export default class CIBE_New_Opportunity_CIB extends NavigationMixin(LightningE
                     confidencial: this.confidencial,
                     ecas: this.ecas,
                     sindicaciones: this.sindicaciones,
-                    cliente : this.cliente, 
-                    linea: this.linea
+                    cliente: this.cliente,
+                    linea: this.linea,
+                    comentario: this.comentario
                 }
             })
         );
     }
-    
+
 }

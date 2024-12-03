@@ -32,6 +32,19 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 	firstRender = true;
     isbpr=isbpr;
 	selectedTab = 'tabEvent';
+	tabselected;
+	comentaryTask;
+	
+	@api get checkboxStatus(){
+		return this.showComentary;
+	}
+
+	@api
+	switchCitaCheckBox(value){
+		this.template.querySelector("[data-id='citanocomercialcb']").checked = value;
+
+	}
+	
 
     get optionsDuration(){
 		return [
@@ -52,7 +65,10 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 		this.durationValue = (this.isintouch) ? 30 : 5;
 		this.selectedOption = (this.isintouch) ? 'CTF' : 'LMD';
 	}
-	
+	handleChangeComentary(e){
+		this.comentaryTask = e.detail.value;
+		this.sendDataToReport();
+	}
 	renderedCallback(){
 		if(this.firstRender){
 			let idToCheck = (this.isintouch) ? 'cita-telefonicacheked' : 'llamada';
@@ -114,7 +130,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 			this.showLocation = false;
 			this.location = null;
 			this.officeNumberCompany= null;
-			this.statusValue = 'Gestionada positiva';
+			this.statusValue = 'Gestionada positiva';	
 		}else if(this.selectedOption === 'CTF'){
 			this.durationValueInitial = '30' ;
 			this.durationValue = 30 ;
@@ -123,6 +139,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 			this.location = null;
 			this.officeNumberCompany= null;
 			this.statusValue = 'Gestionada positiva';
+			
 		}else if(this.selectedOption === 'VLD'){
 			this.durationValueInitial = '30' ;
 			this.durationValue = 30 ;
@@ -131,6 +148,8 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 			this.location = null;
 			this.officeNumberCompany= null;
 			this.statusValue = 'Gestionada positiva';
+			
+
 		}else if(this.selectedOption === 'CTOOC'){
 			this.durationValueInitial = '60';
 			this.durationValue = 60;
@@ -139,6 +158,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 			this.location = null;
 			this.officeNumberCompany= null;
 			this.statusValue = 'Gestionada positiva';
+			
 		}else if(this.selectedOption === '001'){
 			this.durationValueInitial = '60';
 			this.durationValue = 60;
@@ -147,6 +167,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 			this.location = null;
 			this.officeNumberCompany= null;
 			this.statusValue = 'Gestionada positiva';
+
 		}
 		this.sendDataToReport();
 	}
@@ -248,6 +269,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 	handleTabActive(event){
 		this.selectedTab = event.target.value;
 		this.sendDataToReport();
+		
 	}
 	
 	notifyUser(title, message, variant) {
@@ -267,6 +289,7 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 					detail:{ 
 						eventClosed: {
 							type: 'event',
+							tab: this.selectedTab,
 							typeEvent: this.selectedOption,
 							duracion: this.durationValue,
 							activityDateTime: this.activityDateTime,
@@ -280,11 +303,13 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 						},
 						taskClosed: {
 							type: 'task',
+							tab: this.selectedTab,
 							idTask: this.recordid,
 							typeTask: null,
 							accountId: this.accountid,
 							statusTask: this.statusValue,
-							recordType: this.recordtype
+							recordType: this.recordtype,
+							comentaryTask: this.comentaryTask
 						}
 					}
 				})
@@ -297,15 +322,19 @@ export default class Av_ContactBlockTaskReport extends LightningElement {
 						eventClosed: {},
 						taskClosed: {
 							type: 'task',
+							tab: this.selectedTab,
 							idTask: this.recordid,
 							typeTask: this.selectedOptionTask,
 							accountId: this.accountid,
 							statusTask: this.statusValue,
-							recordType: this.recordtype
+							recordType: this.recordtype,
+							comentaryTask: this.comentaryTask
 						}
 					}
 				})
 			);
 		}
 	}
+
+	
 }

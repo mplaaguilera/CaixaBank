@@ -1,9 +1,7 @@
 <aura:component controller="SEG_Email_Launcher_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome">
 
     <!-- Attributes -->
-
-    <aura:attribute name="caso" type="Case"/>
-    <aura:attribute name="errorLds" type="String"/>
+   
     <aura:attribute name="iniciando" type="Integer" default="0"/>
     <aura:attribute name="caseSubject" type="String" />
     <aura:attribute name="caseStatus" type="String" />
@@ -45,7 +43,7 @@
     <aura:attribute name="nombreContactoSOEOSN" type="String" default=""/>
     <aura:attribute name="emailContactoSOEOSN" type="String" default=""/>
 
-
+   
 
     <!-- Control cuenta pendiente Asociar -->
     <aura:attribute name="noContacto" type="boolean" default="false"/>
@@ -62,7 +60,7 @@
 
     <lightning:workspaceAPI aura:id="workspace"/>
 
-    <!--Init
+    <!--Init	
     <aura:handler name="init" value="{!this}" action="{!c.getCaso}" />
     <aura:handler name="init" value="{!this}" action="{!c.cargarEmails}" />
     <aura:handler name="init" value="{!this}" action="{!c.cargarFechaEmails}" />
@@ -71,10 +69,10 @@
     <aura:handler name="init" value="{!this}" action="{!c.cargarEmailReciente}" />
 	-->
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    <aura:handler name="init" value="{!this}" action="{!c.cargarAnexos}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.cargarAnexos}" />
 
     <!--On render-->
-    <!-- <aura:handler name="render" value="{!this}" action="{!c.checkContact}"/> -->
+    <aura:handler name="render" value="{!this}" action="{!c.checkContact}"/>
 
     <!--refreshView
     <aura:handler event="force:refreshView" action="{!c.getCaso}" />
@@ -85,10 +83,7 @@
 	-->
     <aura:handler event="force:refreshView" action="{!c.init}" />
     <aura:handler event="force:refreshView" action="{!c.cargarAnexos}" />
-
-    <force:recordData aura:id="caseData" recordId="{!v.recordId}" fields="ContactId, SEG_Organizacion__c, SEG_Zona__c"
-        targetFields="{!v.caso}" targetError="{!v.errorLds}" recordUpdated="{!c.casoUpdatedDataService}"/>
-
+    
     <!--
     <aura:if isTrue="{!v.noContacto &amp;&amp; !v.avisoNoContacto}">
         <div style="text-align: center;">
@@ -183,7 +178,7 @@
                                                             </li>
                                                         </aura:set>
                                                     </aura:if>
-
+                                                    
                                                     <!--Salientes-->
                                                     <aura:set attribute="else">
                                                         <!--Automático (menos acuses)-->
@@ -206,7 +201,7 @@
                                                                 </a>
                                                             </li>
                                                         </aura:if>
-
+        
                                                         <!--Acuses-->
                                                         <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Acuse'}">
                                                             <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
@@ -227,7 +222,7 @@
                                                                 </a>
                                                             </li>
                                                         </aura:if>
-
+        
                                                         <!--Responder-->
                                                         <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Responder'}">
                                                             <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
@@ -248,7 +243,7 @@
                                                                 </a>
                                                             </li>
                                                         </aura:if>
-
+        
                                                         <!--Nuevo-->
                                                         <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Nuevo'}">
                                                             <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
@@ -269,7 +264,7 @@
                                                                 </a>
                                                             </li>
                                                         </aura:if>
-
+        
                                                         <!--Reenviar-->
                                                         <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Reenviar'}">
                                                             <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
@@ -337,7 +332,7 @@
                             nombreGrupoColaboradorPrincipal="{!v.nombreGrupoColaboradorPrincipal}"
                             nombreContactoSOEOSN="{!v.nombreContactoSOEOSN}"
                             emailContactoSOEOSN="{!v.emailContactoSOEOSN}"/>
-
+                            
                         <aura:if isTrue="{!v.origenBuscador == 'principal'}">
                             <div>
                                 <lightning:button label="Cancelar" iconName="utility:close" onclick="{!c.cerrarPlantillas}"/>

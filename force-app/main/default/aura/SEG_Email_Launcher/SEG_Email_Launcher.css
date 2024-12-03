@@ -30,20 +30,3 @@
     background-color: #cfddff;
     min-height: 48px;
 }
-
-.THIS button.slds-button.slds-button_neutral,
-.THIS button.slds-button.slds-button_destructive,
-.THIS button.slds-button.slds-button_text-destructive,
-.THIS button.slds-button.slds-button_icon-border,
-.THIS button.slds-combobox__input,
-.THIS textarea.slds-textarea,
-.THIS select.slds-select,
-.THIS input.slds-input,
-.THIS div.slds-dropdown,
-.THIS ul.slds-dropdown,
-.THIS button.slds-button_icon-border-filled,
-.THIS span.slds-pill,
-.THIS div.slds-rich-text-editor,
-.THIS span.slds-file-selector__button {
-    border-color: rgb(201, 201, 201);
-}

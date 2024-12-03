@@ -1,0 +1,6 @@
+:host { 
+    --slds-c-accordion-summary-color-background: var(--lwc-colorBackground,rgb(243, 242, 242));
+    --slds-c-accordion-summary-padding: var(--lwc-accordionSummaryPadding, 2rem);
+    --slds-c-accordion-summary-border-radius: var(--lwc-accordionSummaryBorder, 1px);
+    --slds-c-accordion-summary-height: var(--lwc-accordionSummaryHeight, 10px);
+}

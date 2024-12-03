@@ -1,9 +1,9 @@
 import { LightningElement, api,wire }   from 'lwc';
 import { NavigationMixin }              from 'lightning/navigation';
 import getName                          from '@salesforce/apex/AV_Header_Controller.getAccountInfo';
-import NEWOPPREPORT 	                from '@salesforce/customPermission/AV_ReportClienteCP';
+import oldReportPS 	                from '@salesforce/customPermission/AV_OldReports';
 
-import { CurrentPageReference } from "lightning/navigation";
+import { CurrentPageReference }         from "lightning/navigation";
 
 
 export default class av_ReportOpp extends NavigationMixin(LightningElement){
@@ -16,32 +16,28 @@ export default class av_ReportOpp extends NavigationMixin(LightningElement){
     isExecuting = false;  
     nameRecord;
     account;
-    @wire(CurrentPageReference)
-    wirePageRef(data){
-        if(data){
-            this.recordId = data.attributes.recordId;
-            getName({recordId:this.recordId})
-                .then(data =>{
-                    if (data) {
-                        this.name = data[0];
-                        this.recordType = data[1];
-                        this.isIntouch = data[2];
-                        this.nameRecord = (this.objectApiName == 'Account') ? data[0] : data[3];
-                        this.account = data[4];
-                    } else if (error) {
-                        console.log(error);
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
-    }
 
     @api async invoke() {
         if (this.isExecuting) {
             return;
         }  
-        let tabToGo = (NEWOPPREPORT) ? 'AV_ReportClientFromOppo' : 'AV_ReportOpportunityParentTab';
+        try{
+        const data = await getName({recordId:this.recordId});
+        if (data) {
+            this.name = data.accountName;
+            this.recordType = data.rtDevName;
+            this.isIntouch = data.isIntouch;
+            this.nameRecord = (this.objectApiName == 'Account') ? data.accountName : data.nameRecord;
+            this.account = data.accountId;
+            }else{
+                throw new Error('No data available');
+            }    
+        } catch(error) {
+            console.log(error);
+            return;
+        }
+        
+        let tabToGo = (oldReportPS) ? 'AV_ReportOpportunityParentTab' : 'AV_ReportClientFromOppo';
         this[NavigationMixin.Navigate]({ 
             type: 'standard__navItemPage',
             attributes: {

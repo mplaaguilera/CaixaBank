@@ -87,6 +87,11 @@
                             let ficherosAdjuntos = response.getReturnValue();
                             var selected = [];
                             component.set('v.ficherosAdjuntos', ficherosAdjuntos);
+
+                            if(ficherosAdjuntos.length !== 0){
+                                component.set('v.deleteLastCV', '1');
+                            }
+
                             helper.actualizaSeleccionados(component, event);
                         }
                         else{
@@ -200,7 +205,35 @@
 
     },
 
-    eliminarRegistro: function(component, event, helper) {
+    eliminarRegistro: function(component, event, helper) {        
+        
+        let ficherosAdjuntos = component.get('v.ficherosAdjuntos');
+        var numAdjuntos = ficherosAdjuntos.length;
+        var idAdjuntoBorrado = '';
+        
+        for(let j = 0; j < ficherosAdjuntos.length; j++){            
+            if(ficherosAdjuntos[j].ContentDocumentId == component.get('v.idAdjuntoEliminar')){
+
+                //Es el ultimo fichero de la lista                
+                if(numAdjuntos - 1 === j){
+                    idAdjuntoBorrado = ficherosAdjuntos[j].ContentDocumentId;
+                }
+                
+                ficherosAdjuntos.splice(j, 1);
+            }
+        }
+        component.set('v.ficherosAdjuntos', ficherosAdjuntos);
+        
+        //DE107472 error al eliminar ficheros
+        if(ficherosAdjuntos.length === 0){
+            component.set('v.deleteLastCV', '2');
+        }else{
+            if(idAdjuntoBorrado != ''){
+                component.set('v.deleteLastCV', idAdjuntoBorrado);
+            }else{
+                component.set('v.deleteLastCV', '1');
+            }
+        }
         
         let pills = component.get('v.pills');
         for(let j = 0; j < pills.length; j++){

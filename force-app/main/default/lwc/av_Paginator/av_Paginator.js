@@ -10,7 +10,7 @@ export default class Paginator extends LightningElement {
 
     // Expose the labels to use in the template.
     label = {
-        SearchWords,
+        SearchWords
     };
 
     @api showSearchBox = false; //Show/hide search box; valid values are true/false
@@ -62,12 +62,12 @@ export default class Paginator extends LightningElement {
     }
     setRecordsToDisplay(){
         this.recordsToDisplay = [];
-        if(!this.pageSize)
+        if(!this.pageSize){
             this.pageSize = this.totalRecords;
-
+        }
         this.totalPages = Math.ceil(this.totalRecords/this.pageSize);
 
-        if(this.numeropaginas.length == 0){
+        if(this.numeropaginas.length === 0){
             for(let i=1; i <= this.totalPages; i++){
                 this.numeropaginas.push(i);
             }
@@ -76,7 +76,9 @@ export default class Paginator extends LightningElement {
         this.setPaginationControls();
 
         for(let i=(this.pageNumber-1)*this.pageSize; i < this.pageNumber*this.pageSize; i++){
-            if(i === this.totalRecords) break;
+            if(i === this.totalRecords) {
+                break;
+            }
             this.recordsToDisplay.push(this.records[i]);
         }
         this.dispatchEvent(new CustomEvent('paginatorchange', {detail: this.recordsToDisplay})); //Send records to display on table to the parent component
@@ -117,8 +119,10 @@ export default class Paginator extends LightningElement {
                 //this.recordsToDisplay = this.records.filter(rec => rec.includes(searchKey));
                 //Search with any column value (Updated as per the feedback)
                 this.recordsToDisplay = this.records.filter(rec => JSON.stringify(rec).includes(searchKey));
-                if(Array.isArray(this.recordsToDisplay) && this.recordsToDisplay.length > 0)
+                if(Array.isArray(this.recordsToDisplay) && this.recordsToDisplay.length > 0){
                     this.dispatchEvent(new CustomEvent('paginatorchange', {detail: this.recordsToDisplay})); //Send records to display on table to the parent component
+                }
+                   
             }, DELAY);
         }else{
             this.controlPagination = showIt;

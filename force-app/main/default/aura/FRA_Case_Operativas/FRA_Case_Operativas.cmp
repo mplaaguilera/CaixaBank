@@ -33,7 +33,7 @@
                 <!--Cabecera del modal-->
                 <header class="slds-modal__header">
                     <!--Icono de cierre-->
-                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalAsociarCaso}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalAsociarCaso}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
                     <!--Título-->
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Fusionar con caso</h2>
                     <p class="slds-var-m-top_x-small">El caso origen se eliminará y su correo se incorporará al caso destino.</p>

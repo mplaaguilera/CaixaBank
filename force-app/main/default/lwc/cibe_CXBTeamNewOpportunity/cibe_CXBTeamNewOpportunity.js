@@ -3,10 +3,13 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 import { NavigationMixin } from "lightning/navigation";
 import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
+import USER_ID from '@salesforce/user/Id';
 
 import lookupSearch from '@salesforce/apex/CIBE_CXBTeamNewOpportunityController.search';
 import getMembers from '@salesforce/apex/CIBE_CXBTeamNewOpportunityController.getMembers';
 import getAccountTeamMember from '@salesforce/apex/CIBE_CXBTeamNewOpportunityController.getAccountTeamMember';
+import getContact from '@salesforce/apex/CIBE_CXBTeamNewOpportunityController.getContact';
+import getUserRole 	    from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.getUserRole';
 
 
 //import labels
@@ -27,6 +30,7 @@ import clientTeam from '@salesforce/label/c.CIBE_ClientTeam';
 import otrosGestores from '@salesforce/label/c.CIBE_OtrosGestores';
 import 	selecedOptions from '@salesforce/label/c.CIBE_SelectedOptions';
 import 	availableOptions from '@salesforce/label/c.CIBE_AvailableOptions';
+import 	equipoInternacional from '@salesforce/label/c.CIBE_EquipoInternacional';
 
 
 export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(LightningElement) {
@@ -48,12 +52,16 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
         clientTeam,
         otrosGestores,
         availableOptions,
-        selecedOptions
+        selecedOptions,
+        equipoInternacional
 
     }
 
     @api EAPGestor;
     @api recordId;
+    @api valuePais;
+    @api valueCountries;
+    @api paisesArr;
 
 
     @api
@@ -80,6 +88,21 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
     @track contactIds = [];
     @track teamAccount = [];
     @track selected = [];
+    @track selected2 = [];
+    @track teamInternational = [];
+    @track paises;
+    @track isEMP = false;
+
+    connectedCallback(){
+
+        if(this.valuePais != null || this.valuePais != undefined){
+            this.paises = this.valuePais.toString();
+        }
+
+        if(this.paises != null) {
+            this.getContact();
+        }
+    }
 
     handleSearch(event) {
 		this.buscar = event.detail.searchTerm;
@@ -89,7 +112,7 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
 				this.template.querySelector('[data-id="clookup1"]').scrollIntoView();
 			})
 			.catch((error) => {
-				console.error('Lookup error', JSON.stringify(error));
+				Console.log(error);
 				this.errors = [error];
 			});
 	}
@@ -102,7 +125,7 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
 					this.template.querySelector('[data-id="clookup1"]').scrollIntoView();
 				})
 				.catch((error) => {
-					console.error('Lookup error', JSON.stringify(error));
+					Console.log(error);
 					this.errors = [error];
 				});
 		}
@@ -125,6 +148,9 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
         }
     }
 
+
+    @track prueba;
+
     handleChange(event){
         
         const teamIds = [];
@@ -135,6 +161,24 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
         this.selected = event.detail.value;
 
         let aux = [...this.selected];
+        const selectedIds = this.selectedIds.filter((item) => !teamIds.includes(item));
+        aux = aux.concat(selectedIds);
+        this.selectedIds = aux;
+
+        this.data = this.data.filter(item => aux.includes(item.id));
+        refreshApex(this._wiredDataValues);
+        
+    }
+
+    handleChange2(event){
+        
+        const teamIds = [];
+        this.teamInternational.forEach(e => {
+            teamIds.push(e.value);
+        });
+        this.selected2 = event.detail.value;
+
+        let aux = [...this.selected2];
         const selectedIds = this.selectedIds.filter((item) => !teamIds.includes(item));
         aux = aux.concat(selectedIds);
         this.selectedIds = aux;
@@ -171,7 +215,7 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
             });
             this.sendData();
         } else if(error) {
-            console.log(error);
+            Console.log(error);
         }
     }
 
@@ -184,11 +228,24 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
             }
             this.teamAccount = options;
         }else if(error){
-            console.log(error);
+            Console.log(error);
         }
         
     }
 
+    getContact(){
+        getContact({pais: this.paises})
+            .then(result => {
+                let options = [];
+                for (var key in result) {
+                    options.push({ label: result[key].Name, value: result[key].Id  });
+                }
+                this.teamInternational = options;
+            })
+            .catch(error => {
+                Console.log(error);
+        });
+    }
 
     handlePermiso(event) {
         const value = event.detail.value;
@@ -209,6 +266,7 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
         this.data = JSON.parse(JSON.stringify(this.data.filter(item => item.id !== targetId)));
         this.selectedIds = this.selectedIds.filter((item) => item !== targetId);
         this.selected = this.selectedIds;
+        this.selected2 = this.selectedIds;
 
     }
 
@@ -230,5 +288,22 @@ export default class cibe_CXBTeamNewOpportunity extends NavigationMixin(Lightnin
         );
         this.dispatchEvent(attributeChangeEvent);
     }
+
+
+    @wire(getUserRole,{userId:USER_ID})
+	wiredUser({error,data}){
+        if (data) {
+            this.userRoleName = data;
+            if(this.userRoleName == 'EMP'){
+                this.isEMP = true;
+            }else if (this.userRoleName == 'CIBE_CIBEmpresas'){
+                this.isEMP = true;
+            }
+        } else if (error) {
+            Console.log(error);
+        }
+	}
+
+   
 
 }

@@ -37,21 +37,3 @@ margin-top: 0 !important;
     margin-bottom: 2px;
     vertical-align:text-top;
 }
-
-.typeRelatedInputs{
-    width: 25rem;
-    /* gap:1.5rem; */
-    display: flex;
-    /* gap:.5rem; */
-}
-.typeRelatedInputs div{
-    width: calc(100%/3);
-}
-.typeRelatedInputs:first-child *{
-    margin:0;
-    width: 90%;
-}
-.typeRelatedInputs div lightning-combobox{
-    margin:0 auto;
-    width: 90%;
-}

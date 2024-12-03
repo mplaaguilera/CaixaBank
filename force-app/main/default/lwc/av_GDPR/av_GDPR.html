@@ -1,34 +1,22 @@
 <template>
     
 	<lightning-card>
-        <!--<lightning-button-icon icon-name="utility:help" slot="actions" alternative-text="Help" title={helpText}></lightning-button-icon>
-        <lightning-button-icon icon-name="utility:refresh" slot="actions" alternative-text="Refresh" onclick={refreshCmp}></lightning-button-icon>-->
-
+        
         <template if:true={hasConsents}>
-            <p if:true={noAdmit} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 30em;margin-left: 2em;">
+           
+            <p if:true={alertKy21} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 36em;margin-left: 2em;">
                 <lightning-icon icon-name="standard:first_non_empty" size="x-small" alternative-text="empty"></lightning-icon>
-                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_CMP_No_Admit}</span>
+                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_OnlySupportOp}</span>
                 <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info" title={helpText}></lightning-icon>
             </p>
-            <p if:true={noAdmitPME} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 30em;margin-left: 2em;">
-                <lightning-icon icon-name="standard:first_non_empty" size="x-small" alternative-text="empty"></lightning-icon>
-                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_CMP_No_Admit_PME}</span>
-                <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info" title={helpText}></lightning-icon>
-            </p>
-            <p if:true={yesAdmit} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 30em;margin-left: 2em;">
+            <p if:true={admitCall} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 36em;margin-left: 2em;">
                 <lightning-icon icon-name="standard:task2" size="x-small" alternative-text="empty" title="Empty"></lightning-icon>
-                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_CMP_Yes_Admit}</span>
+                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_SupportContact}</span>
                 <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info" title={helpText}></lightning-icon>
             </p>
-            <p if:true={yesAdmitPME} class="slds-dl_horizontal slds-var-p-around_x-small" style="width: 30em;margin-left: 2em;">
-                <lightning-icon icon-name="standard:task2" size="x-small" alternative-text="empty" title="Empty"></lightning-icon>
-                <span class="slds-dl_horizontal__detail" style="margin-left: 1em;">{label.AV_CMP_Yes_Admit_PME}</span>
-                <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info" title={helpText}></lightning-icon>
-            </p>
+            
         </template>
-        <p if:false={hasConsents} class="slds-dl_horizontal slds-var-p-around_x-small">
-            <span class="slds-dl_horizontal__label" style="width: 20em;margin-left: 3em;">{noDataFound}</span>
-        </p>
+       
         <div if:true={viewSpinner}>
             <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
         </div>

@@ -46,27 +46,28 @@
 						</div>
 						<!-- Origen-->
 						<div class="slds-col slds-size_1-of-5 ">
-							<lightning-combobox  name="recordTypes" label="Origen" 
-								options={optionsOppoOrigen} placeholder="--Seleccionar--" onchange={handleChangeOrigen} value={origenFilter} required>
+							<lightning-combobox  name="recordTypes" label={labels.origen} 
+								options={optionsOppoOrigen} placeholder={labels.seleccionar} onchange={handleChangeOrigen} value={origenFilter} required>
 							</lightning-combobox>
 						</div>
 						<!-- Stage -->
 						<div class="slds-col slds-size_1-of-5 ">
-							<lightning-combobox  name="status" label={labels.etapa} options={optionsOppoStatus} placeholder="--Seleccionar--"
+							<lightning-combobox  name="status" label={labels.etapa} options={optionsOppoStatus} placeholder={labels.seleccionar}
 								onchange={handleChangeEstado} value={statusFilter} required>
 							</lightning-combobox>
 						</div>
 						<!-- Product  ya no es required-->
 						<div class="slds-col slds-size_1-of-5 ">
 							<c-av_-lookup  data-id="clookup3" selection={initialSelection} errors={errors}
-								onsearch={handleSearchProduct} onselectionchange={handleSelectionChange} fieldlabel={labels.producto} placeholder="Buscar producto..."
-								is-multi-entry={isMultiEntry2} >
+								onsearch={handleSearchProduct} onselectionchange={handleSelectionChange} fieldlabel={labels.producto} placeholder={labels.buscarProductos}
+								is-multi-entry={isMultiEntry2}>
 							</c-av_-lookup>
 						</div>
+
 						<!-- Employee  ya no es required-->
 						<div class="slds-col slds-size_1-of-5">
 							<lightning-combobox  name="owner" label={labels.empleadoAsignado} 
-								options={optionsEmployee} value={employeeFilter} placeholder="--Seleccionar--" onchange={handleChangeEmployee} >
+								options={optionsEmployee} value={employeeFilter} placeholder={labels.seleccionar} onchange={handleChangeEmployee} >
 							</lightning-combobox>
 						</div>
 					</div>
@@ -74,10 +75,14 @@
 
 					<!-- Segunda fila -->
 					<div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
-						<div class="slds-col slds-size_1-of-4"></div>
-						<div class="slds-col slds-size_1-of-4"></div>
-						<div class="slds-col slds-size_1-of-4"></div>
-						<div class="slds-col slds-size_1-of-4 slds-list_horizontal">
+						<div if:true={isOriginAll} class="slds-col slds-size_4-of-5">
+							<h3 class = "slds-text-color_error">{labels.errorProdRellenoConFiltroTodos}</h3>
+						</div>
+						<div if:false={isOriginAll} class="slds-col slds-size_4-of-5"></div>
+						<!--<div class="slds-col slds-size_1-of-4"></div>
+						<div class="slds-col slds-size_1-of-4"></div> -->
+						
+						<div class="slds-col slds-size_1-of-5 slds-list_horizontal">
 							<lightning-input type="toggle" onchange={handleAnotherOffice} checked={isAnotherOffice} name="anotherOffice" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
 							<label class="slds-form-element__label slds-m-left_x-small"> Ver empleados otra oficina</label>
 						</div>
@@ -90,7 +95,7 @@
 						<div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
 							<div class="slds-col slds-size_1-of-4">
 								<!-- Employee's multiselection -->
-									<h5><strong>Empleados seleccionados</strong></h5>
+									<h5><strong>{labels.empleadosSeleccionados}</strong></h5>
 									<div class="slds-list_horizontal">
 										<template for:each={selectedEmployees} for:item="employee" >
 											<div class="slds-m-around_xxx-small" key={employee.bucleId}  data-id={employee.id}>						
@@ -107,7 +112,7 @@
 						<div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
 							<div class="slds-col slds-size_1-of-4 slds-wrap">
 							<!-- Product's multiselection -->
-								<h5><strong>Productos seleccionados</strong></h5>
+								<h5><strong>{labels.productosSeleccionados}</strong></h5>
 								<div class="slds-list_horizontal">
 									<template for:each={selectedProducts} for:item="product" >
 										<div class="slds-m-around_xxx-small" key={product.bucleId}> 
@@ -127,7 +132,7 @@
 						<div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
 							<div class="slds-col slds-size_1-of-4">
 								<!-- Participe's multiselection -->
-								<h5><strong>Participe seleccionados</strong></h5>
+								<h5><strong>{labels.participesSeleccionados}</strong></h5>
 						
 								<!-- <div class="" > -->
 								<div class="slds-list_horizontal">
@@ -152,19 +157,19 @@
 						<div data-id="lookup2" class="slds-grid slds-gutters slds-m-around_x-small slds-border_top ">
 							<!-- Opportunity name form2alinear-->
 							<div class="slds-col slds-size_1-of-4 ">
-								<lightning-input type="text" label="Nombre de la oportunidad" value={subjectFilter} onchange={handleChangeSubject}></lightning-input>
+								<lightning-input type="text" label={labels.nombreOpp} value={subjectFilter} onchange={handleChangeSubject}></lightning-input>
 							</div>
 							<!-- Importe(desde) -->
 							<div class="slds-col slds-size_1-of-4 ">
-								<lightning-input  type="text"  name="Importe" min={cero} label="Importe (desde)" onchange={handleChangeImporte} ></lightning-input>
+								<lightning-input  type="text"  name="Importe" min={cero} label={labels.importeDesde} onchange={handleChangeImporte} ></lightning-input>
 							</div>
 							<!-- Fecha de cierre (desde) -->
 							<div class="slds-col slds-size_1-of-4 ">
-								<lightning-input type="date"  name="fechaCierreD" max={todaysDate} label="Fecha Cierre (desde)" onchange={handleChangeFechaCierreD} ></lightning-input>
+								<lightning-input type="date"  name="fechaCierreD" max={todaysDate} label={labels.fechaCierreDesde} onchange={handleChangeFechaCierreD} ></lightning-input>
 							</div>
 							<!-- Fecha de cierre (hasta) -->
 							<div class="slds-col slds-size_1-of-4 ">
-								<lightning-input type="date" name="fechaCierreH"  label="Fecha Cierre (hasta)" onchange={handleChangeFechaCierreH} ></lightning-input>
+								<lightning-input type="date" name="fechaCierreH"  label={labels.fechaCierreHasta} onchange={handleChangeFechaCierreH} ></lightning-input>
 							</div>
 						</div>
 					
@@ -172,15 +177,15 @@
 						<div data-id="lookup3" class="slds-grid slds-gutters slds-m-around_x-small">
 							<!-- Probabilidad de exito picklist -->
 							<div class="slds-col slds-size_1-of-4 ">
-								<lightning-combobox  name="Probabilidad" label="Probabilidad Exito" 
-									options={optionsProbabilidad} placeholder="--Seleccionar--" onchange={handleChangeProbabilidad} value={targetProbabilidad}>
+								<lightning-combobox  name="Probabilidad" label={labels.probabilidadExito}
+									options={optionsProbabilidad} placeholder={labels.seleccionar} onchange={handleChangeProbabilidad} value={targetProbabilidad}>
 								</lightning-combobox>	
 							</div>
 							
 							<!-- Participe. Permite la multiselección opportunity team -->
 							<div class="slds-col slds-size_1-of-4 ">
 								<c-av_-lookup  data-id="clookupPar" selection={initialSelection} errors={errors} 
-								onsearch={handleSearchParticipe} onselectionchange={handleSelectionChange} fieldlabel="Participe" placeholder="Buscar Participe..."
+								onsearch={handleSearchParticipe} onselectionchange={handleSelectionChange} fieldlabel={labels.participe} placeholder={labels.buscarParticipe}
 								is-multi-entry={isMultiEntry3}>
 								</c-av_-lookup>
 							</div>
@@ -188,7 +193,7 @@
 							<div class="slds-col slds-size_1-of-4 ">
 								<c-av_-lookup data-id="clookup4" selection={initialSelection} 
 									errors={errors} onsearch={handleSearchAccount} onselectionchange={handleSelectionChange}
-									fieldlabel="Cliente" placeholder={clientPlaceholder} is-multi-entry={isMultiEntry2}>
+									fieldlabel={labels.cliente} placeholder={clientPlaceholder} is-multi-entry={isMultiEntry2}>
 								</c-av_-lookup>
 							</div>
 						</div>
@@ -208,7 +213,7 @@
 		</lightning-card>
 	</div>
 	<div class="recuperarbotones">
-		<lightning-card if:true={firstSearch} variant="Narrow"  title="Resultados de la búsqueda" icon-name={iconName}>
+		<lightning-card if:true={firstSearch} variant="Narrow"  title={labels.resultados} icon-name={iconName}>
 			<div class="total-data-text" >
 				<lightning-formatted-text class="slds-text-title--caps totalText" value={totalRecountCount}></lightning-formatted-text>
 				<!--<div class="help-text">
@@ -228,24 +233,24 @@
 					columns={columns}
 					row-number-offset={rowNumberOffset}
 					onrowselection={getSelectedName}
-					default-sort-direction={defaultSortDirection}
+					default-sort-direction={defaultSort}
                     sorted-direction={sortDirection}
-                    sorted-by={sortedBy}
-                    onsort={onHandleSort}
+                    sorted-by={sortByFieldName}
+                    onsort={handleSortData}
 					load-more-offset>
 				</lightning-datatable>
 				<br/>
 				<div if:true={isMultipagina}>
 					<lightning-layout horizontal-align="space">
 						<lightning-layout-item flexibility="auto">
-							<lightning-button label="Anterior" icon-name="utility:chevronleft" onclick={previousHandler}>
+							<lightning-button label={labels.anterior} icon-name="utility:chevronleft" onclick={previousHandler}>
 							</lightning-button>
 						</lightning-layout-item>
 						<lightning-layout-item flexibility="auto">
-							Página {page} de {totalPage}
+							{labels.pagina} {page} {labels.de} {totalPage}
 						</lightning-layout-item>
 						<lightning-layout-item flexibility="auto">
-							<lightning-button label="Posterior" icon-name="utility:chevronright" icon-position="right"
+							<lightning-button label={labels.posterior} icon-name="utility:chevronright" icon-position="right"
 								onclick={nextHandler}></lightning-button>
 						</lightning-layout-item>
 					</lightning-layout>
@@ -259,17 +264,17 @@
 	<div if:true={showAssignment} class="divPadding">
 		<lightning-card if:true={firstSearch} variant="Narrow" title="Asignación" icon-name="standard:avatar">
 			<lightning-tabset>
-				<lightning-tab label="Mi Oficina">
+				<lightning-tab label={labels.oficina}>
 					<div data-id="lookup1" class="slds-form-element__label assign-lookup slds-size_1-of-4">
 						<c-av_-lookup class="lookup-cmp" style="width: 20rem;" data-id="clookup1" selection={initialSelection} 
 							errors={errors} onsearch={handleSearch} onselectionchange={handleSelectionChange} 
 							fieldlabel={employeeLabel} placeholder={employeePlaceholder} is-multi-entry={isMultiEntry} my-office="true">
 						</c-av_-lookup>
 					</div>
-					<lightning-button label="Asignar" onclick={handleModal} class="my-office-true"></lightning-button>
+					<lightning-button label={labels.asignar} onclick={handleModal} class="my-office-true"></lightning-button>
 					<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>
 				</lightning-tab>
-				<lightning-tab label="Otra Oficina">
+				<lightning-tab label={labels.otraOficina}>
 					<div data-id="lookup6" class="slds-form-element__label assign-lookup slds-size_1-of-4">
 						<c-av_-lookup class="lookup-cmp" style="width: 20rem;"
 							data-id="clookup6"
@@ -284,7 +289,7 @@
 						>
 						</c-av_-lookup>
 					</div>
-					<lightning-button label="Asignar" onclick={handleModal} class="my-office-false"></lightning-button>
+					<lightning-button label={labels.asignar} onclick={handleModal} class="my-office-false"></lightning-button>
 					<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>
 				</lightning-tab>
 			</lightning-tabset>

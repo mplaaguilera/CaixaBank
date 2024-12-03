@@ -1,0 +1,50 @@
+<template>
+    <div class="slds-card">
+        <!-- Cabecera de la card -->
+        <div class="slds-card__header slds-grid">
+            <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Fusionar URs</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                    <lightning-button label="Fusionar" icon-name="utility:merge" onclick={handleBotonFusionar}></lightning-button>
+                </div>
+                <!--Modal Fusionar-->
+                <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalFusionar" onkeydown={modalTeclaPulsada}>
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__header">
+                            <lightning-button-icon icon-name="utility:close" size="large" onclick={closeModals} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                            <h1 class="slds-modal__title slds-hyphenate">Fusionar con UR</h1>
+                            <p class="slds-var-m-top_x-small">La UR actual se eliminará y sus lanzamientos, casos, registros de carga y archivos adjuntos se incorporarán a la UR seleccionada.</p>
+                        </div>
+                        <!--Contenido del modal-->
+                        <div class="slds-modal__content slds-var-p-around_large">
+                            <lightning-layout-item size="12">
+                                <div class="slds-grid slds-gutters slds-gutters_x-small">
+                                    <div class="slds-col slds-grow-none">
+                                        <lightning-icon icon-name="standard:merge" style="margin-left: 40px; margin-top: 21px;"></lightning-icon>
+                                    </div>
+                                    <div class="slds-col" style="padding-right: 40px; padding-bottom: 9px;">
+                                        <lightning-record-edit-form record-id={recId} object-api-name="GRR_UR__c" density="comfy">
+                                            <lightning-messages></lightning-messages>
+                                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>UR destino</label>
+                                            <lightning-input-field data-id="urRelacionada" field-name="GRR_URRelacionada__c" required variant="label-hidden"></lightning-input-field>
+                                        </lightning-record-edit-form>
+                                    </div>
+                                </div>
+                            </lightning-layout-item>
+                        </div>
+                        <div class="slds-modal__footer">
+                            <lightning-button label="Fusionar" variant="brand" onclick={handleFusionarUR} disabled={botonFusionarDisabled} icon-name="utility:merge"></lightning-button>
+                            <lightning-button label="Cancelar" onclick={closeModals} disabled={fusionandoUR} class="modalFusionarCancelar slds-var-m-left_medium"></lightning-button>
+                        </div>
+                    </div>
+                </section>
+                <!--Backdrop para los modales-->
+			    <div class="slds-backdrop backdropModales"></div>
+            </div>
+        </div>
+    </div>
+</template>

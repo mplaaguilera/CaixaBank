@@ -75,7 +75,7 @@
                                             <!-- Botón "Copiar" -->
                                             <aura:if isTrue="{!!empty(atributo.valor)}">
                                                 <div class="slds-col csbd-invisible" onmouseover="{!c.mostrarBotonCopiar}" onmouseout="{!c.mostrarBotonCopiar}">
-                                                    <lightning:buttonIcon iconName="utility:copy" variant="border-filled" onclick="{!c.copiarValor}" name="{!atributo.valor}" title="Copiar valor"/>
+                                                    <lightning:buttonIcon iconName="utility:copy" variant="bare" onclick="{!c.copiarValor}" name="{!atributo.valor}" title="Copiar valor"/>
                                                 </div>
                                             </aura:if>
                                         </div>

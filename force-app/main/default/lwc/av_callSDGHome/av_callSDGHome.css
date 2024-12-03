@@ -1,0 +1,20 @@
+.marginPagination {
+    margin-top:1em;
+}
+.marginPagination2 {
+    margin-top:-1em;
+}
+.boldRow {
+    font-weight: bold;
+}
+.color-yelow {
+    background-color: yellow;
+}
+.comboSize{
+    width: 80px; /* Ajusta el ancho según sea necesario */
+    height: auto; /* Permite que la altura se ajuste automáticamente */
+    padding: 0; /* Remueve el relleno para hacer el combobox más compacto */
+    font-size: 12px; /* Ajusta el tamaño del texto para hacerlo más pequeño */
+    line-height: 1; /* Ajusta la altura de línea para compactar el texto */
+    margin-top: 25px;
+}

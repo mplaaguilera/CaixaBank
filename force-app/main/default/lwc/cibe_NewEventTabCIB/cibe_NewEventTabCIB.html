@@ -1,0 +1,109 @@
+<template>
+	<div class="basicContainer">
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"
+			style="z-index: 93;position:fixed"></lightning-spinner>
+		<div data-id="headerEvent" class="slds-page-header slds-page-header_record-home">
+			<div class="slds-page-header__row">
+				<div class="slds-page-header__col-title">
+					<div class="slds-media">
+						<div class="slds-media__figure">
+							<lightning-icon icon-name="standard:event" class="meet-icon"></lightning-icon>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-page-header__name-title">
+								<h1>
+									<span>{label.cita}</span>
+									<ul class="slds-list_horizontal">
+										<li class="slds-m-right_x-small">
+											<span class="slds-page-header__title slds-truncate">{clientinfo.name}</span>
+										</li>
+									</ul>
+								</h1>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<lightning-card>
+			<div class="cardStyle">
+				<c-cibe_-new-event-report-detail-c-i-b data-id="detailCmp" issummary={nextScreen} timeinfo={timeInfo}
+					clientinfo={clientinfo} accountname={clientinfo.name} showsincliente={showSinCliente}
+					debug={debugvar} oneventinfo={setEventObject}></c-cibe_-new-event-report-detail-c-i-b>
+			</div>
+		</lightning-card>
+		<br />
+		<lightning-card if:false={nextScreen}>
+			<div class="cardStyle">
+				<div style="display:flex;margin-bottom:1rem">
+					<lightning-icon icon-name='utility:event' size="medium"></lightning-icon>
+					<h1><strong style="font-size:1.5rem">&nbsp;{label.fechahora}</strong></h1>
+				</div>
+				<div class="slds-grid typeRelatedInputs">
+					<div class="inputCalendar">
+						<lightning-combobox label={label.modocal} class="slds-m-left_large" options={optionsCalendario}
+							onchange={handleCalendarMode} value={calendarValue}></lightning-combobox>
+					</div>
+					<div class="inputDate">
+						<lightning-input type="date" data-id="activityDateInput" date-style="short" label={label.fecha}
+							value={activityDateToSend} message-when-value-missing={label.indicaFecha}
+							message-when-bad-input={label.forFechaCorrecto} required
+							onchange={handleChangeActivityDate}></lightning-input>
+					</div>
+					<div class="inputTime">
+						<lightning-input type="time" data-id="timeInicioInput" label={label.horainicio}
+							value={timeInicio} required message-when-value-missing={label.indicaHoraInicio}
+							onchange={handleChangeTimeInicio}></lightning-input>
+					</div>
+					<div class="inputTime">
+						<lightning-input type="time" data-id="timeFinInput" label={label.horafin} value={timeFin}
+							required message-when-value-missing={label.indicaHoraFin}
+							onchange={handleChangeTimeFin}></lightning-input>
+					</div>
+					<div class="inputDuration">
+						<lightning-combobox label={label.duracion} required options={optionsTime}
+							onchange={handleChangeDuration} value={initialDuration}></lightning-combobox>
+					</div>
+					<div class="inputUbicacion" if:true={showUbication}>
+						<lightning-input label="Ubicación" type="text" onchange={handleUbicacion} value={ubication}
+							placeholder={label.introduzcaUbicacion}></lightning-input>
+					</div>
+					<div>
+						<button type="submit" class="slds-button slds-button_stretch buttonStyleAdd"
+							disabled={disableButtonSave} data-id="addButton" name="add"
+							onclick={handleTime}>{label.anyadir}</button>
+					</div>
+
+				</div>
+				<div if:true={calendarBoolean}>
+					<div if:true={showCalendar} class="calendarStyle">
+						<c-cibe_-custom-calendar-new-event-c-i-b data-id='customcalendar' timerange={durationToCalendar}
+							currentdate={activityDateToCalendar} userid={employeeToCalendar}
+							evsubject={subjectToCalendar} gestoroverwrite={overlapToCalendar}
+							oneventcreatecalendar={eventCreateCalendar}
+							clientname={accountName}></c-cibe_-custom-calendar-new-event-c-i-b>
+					</div>
+				</div>
+				<div if:false={calendarBoolean}>
+					<div if:true={showCalendar} class="calendarStyle">
+						<c-cibe_-custom-calendar-new-event-completo-c-i-b data-id='customcalendar'
+							timerange={durationToCalendar} currentdate={activityDateToCalendar}
+							userid={employeeToCalendar} evsubject={subjectToCalendar}
+							gestoroverwrite={overlapToCalendar} oneventcreatecalendar={eventCreateCalendar}
+							clientname={accountName}></c-cibe_-custom-calendar-new-event-completo-c-i-b>
+					</div>
+				</div>
+			</div>
+		</lightning-card>
+		<div style="height: 50px;"></div>
+		<br />
+	</div>
+	<div class="slds-docked-form-footer">
+		<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel}
+			data-id="cancelButton" onclick={handleCancel}>{label.cancelar}</button>
+		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave}
+			data-id="saveButton" name="save" onclick={handleCreateEvent}>{label.finalizar}</button>
+	</div>
+
+</template>

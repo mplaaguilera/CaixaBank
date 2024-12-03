@@ -1,0 +1,13 @@
+<template>
+    <div class="container">
+        <label for="urlPicklist" class="label">PEA</label>
+        <lightning-combobox
+            name="urlPicklist"
+            class="combobox"
+            value={selectedUrl}
+            placeholder="Selecciona una opción"
+            options={urlOptions}
+            onchange={handleChange}>
+        </lightning-combobox>
+    </div>
+</template>

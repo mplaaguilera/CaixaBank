@@ -8,7 +8,10 @@ import OPPORTUNITY_RECORDTYPE_FIELD from '@salesforce/schema/Opportunity.RecordT
 import OPPORTUNITY_PRODUCT_FIELD  from '@salesforce/schema/Opportunity.AV_PF__c';
 import getOpportunityFields     from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getOpportunityFields';
 
+
 import getRecInfo from '@salesforce/apex/CIBE_Path_Opportunity_Controller.getRecordTypeVerification';
+import oppEmp             from '@salesforce/apex/CIBE_Path_Opportunity_Controller.oppEmp';
+
 
 //Labels
 
@@ -24,6 +27,8 @@ import oportunidadActualizada from '@salesforce/label/c.CIBE_OportunidadActualiz
 import oportunidadActualizadaCorrectamente from '@salesforce/label/c.CIBE_OportunidadActualizadaCorrectamente';
 import fechaProxGestionLabel from '@salesforce/label/c.CIBE_FechaProxGestion';
 import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados';
+import cambioNoPermitido from '@salesforce/label/c.CIBE_CambioEstadoNoPermitido';
+import errorOportunidad from '@salesforce/label/c.CIBE_ProblemUpdatingOportunity';
 
 
 export default class cibe_Path extends NavigationMixin(LightningElement) {
@@ -42,11 +47,15 @@ export default class cibe_Path extends NavigationMixin(LightningElement) {
     @track isImpBalance = false; 
 
     @track correctRecordType;
+    @track roleEmp = false;
 
     @track stage;
     @track loading = false;
     hasRendered = false;
     barNoChanges = false;
+
+
+    @track validacionPath = false;
 
     labels = {
         potencial,
@@ -60,7 +69,9 @@ export default class cibe_Path extends NavigationMixin(LightningElement) {
         oportunidadActualizada,
         oportunidadActualizadaCorrectamente,
         fechaProxGestionLabel,
-        incluirClienteLabel
+        incluirClienteLabel,
+        cambioNoPermitido,
+        errorOportunidad
     }
     
     @wire(getRecord, { 
@@ -119,6 +130,10 @@ export default class cibe_Path extends NavigationMixin(LightningElement) {
             step.setAttribute('data-active', 'true');
             this.stage = stageName;
         }  
+        console.log(stageName);
+        console.log( this.stage);
+        console.log(step);
+        console.log(JSON.stringify(oldStep));
     }
 
     get isEnCurso () {
@@ -141,19 +156,40 @@ export default class cibe_Path extends NavigationMixin(LightningElement) {
         return this.stage != 'CIBE_Vencido';
     }
 
-    handleSubmit() {
+    handleSubmit(event) {
         this.loading = true;
+        if(this.roleEmp == true && this.stageName == 'CIBE_Vencido' && (this.stage == 'En curso' || this.stage == 'Potencial' || this.stage == 'CIBE_Pendiente_Firma')){
+            event.preventDefault();
+            this.validacionPath = true;
+        }
+
+        if(this.validacionPath){
+
+            this.loading = false;
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: this.labels.errorOportunidad,
+                    message: this.labels.cambioNoPermitido,
+                    variant: 'error'
+                })
+            );
+            this.validacionPath = false;
+        }
     }
 
     handleSuccess() {
         this.loading = false;
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: this.labels.oportunidadActualizada,
-                message: this.labels.oportunidadActualizadaCorrectamente,
-                variant: 'success'
-            })
-        );
+
+      
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: this.labels.oportunidadActualizada,
+                    message: this.labels.oportunidadActualizadaCorrectamente,
+                    variant: 'success'
+                })
+            );
+        
+       
     }
 
     handleError(event) {
@@ -186,6 +222,16 @@ export default class cibe_Path extends NavigationMixin(LightningElement) {
                     }
                 });
         }else if(error) {
+            console.log(error);
+        }
+    }
+
+    @wire(oppEmp, { recordId : '$recordId' })
+    oppEmp({ data, error }) {
+        if(data){
+            console.log(data);
+            this.roleEmp = data;
+        }else if(error){
             console.log(error);
         }
     }

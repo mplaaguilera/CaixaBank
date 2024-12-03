@@ -29,7 +29,12 @@ export default class cibe_EventTabs extends NavigationMixin(LightningElement) {
         this._wiredData = wiredData;
         const {data, error} = wiredData;
         if(data){
+        console.log('DATA EVENTO');
+        console.log(data);
+        if(data.ev != null &&data.ev.CSBD_Evento_Estado__c !=null){
             this.status = data.ev.CSBD_Evento_Estado__c;
+        }
+            
         }else if(error) {
             console.log(error);
         }

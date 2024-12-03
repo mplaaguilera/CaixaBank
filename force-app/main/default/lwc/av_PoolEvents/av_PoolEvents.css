@@ -1,0 +1,18 @@
+/* Clase para las columnas regulares */
+.columnClass {
+    width: 22.5%;
+}
+
+/* Clase para la última columna (acciones), ajustamos el ancho */
+.columnClass:last-child {
+    width: 10%;
+}
+
+/* Forzar el botón de acción hacia la derecha */
+.slds-table .slds-cell-edit.action-right {
+    display: flex !important; /* Forzar flexbox */
+    justify-content: flex-end !important; /* Forzar alineación a la derecha */
+    align-items: center !important; /* Alineación vertical centrada */
+    padding-right: 10px !important; /* Opcional: Ajustar el padding si es necesario */
+    text-align: right !important; /* Asegurarse de que el texto también esté alineado a la derecha */
+}

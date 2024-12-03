@@ -37,17 +37,51 @@ export default class Av_ContactBlockEventReport extends LightningElement {
 	hora;
 	activityTime;
 
-	
-	connectedCallback(){
-		this.isbpr = ISBPR;
-		var newDate = new Date();
-		newDate.setHours(this.startdatetime.split(' ')[1].split(':')[0], this.startdatetime.split(' ')[1].split(':')[1], '00');
-		this.now = newDate.toISOString();
-		this.sendDataToReport();
+	@api get checkboxStatus(){
+		return this.showComentary;
 	}
 
+	@api
+	switchCitaCheckBox(value){
+		this.template.querySelector("[data-id='citanocomercialcb']").checked = value;
+	}
 	
 
+	connectedCallback() {
+		this.isbpr = ISBPR;
+		const currentUTCDate = new Date();
+
+		const formatDateToLocalString = (date) => {
+			let day = String(date.getDate()).padStart(2, '0');
+			let month = String(date.getMonth() + 1).padStart(2, '0');
+			let year = date.getFullYear();
+			let hours = String(date.getHours()).padStart(2, '0');
+			let minutes = String(date.getMinutes()).padStart(2, '0');
+			
+			return `${day}/${month}/${year}, ${hours}:${minutes}`;
+		};
+
+		let currentLocalDate = formatDateToLocalString(currentUTCDate);
+
+		const parseLocalStringToDate = (dateString) => {
+			let [datePart, timePart] = dateString.split(', ');
+			let [day, month, year] = datePart.split('/');
+			let [hours, minutes] = timePart.split(':');
+			return new Date(year, month - 1, day, hours, minutes);
+		};
+	
+		let startDateTimeObj = parseLocalStringToDate(this.startdatetime);
+		let currentDateTimeObj = parseLocalStringToDate(currentLocalDate);
+	
+		if (startDateTimeObj > currentDateTimeObj) {
+			this.now = currentDateTimeObj.toISOString(); 
+		} else {
+			this.now = startDateTimeObj.toISOString();
+		}
+	
+		this.sendDataToReport();
+	}
+	
 	renderedCallback(){
 		if(this.firstRender){
 			this.checkedradio();
@@ -120,6 +154,7 @@ export default class Av_ContactBlockEventReport extends LightningElement {
 				this.durationValueInitial = '60';
 				this.durationValue = 60;
 				this.showOffice = false;
+				this.showLocation = true;
 			}
 		}
 		this.sendDataToReport();
@@ -211,7 +246,6 @@ export default class Av_ContactBlockEventReport extends LightningElement {
 
 	handleTimeChange(event){
 		this.activityTime = event.target.value;
-		console.log('this.activityTime --> ', this.activityTime);
 		this.sendDataToReport();
 	}
 

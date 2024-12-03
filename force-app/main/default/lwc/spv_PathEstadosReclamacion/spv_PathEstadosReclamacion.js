@@ -60,7 +60,7 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
         if (data) {
 			this.status = data.fields.Status.value;
 			this.subestado = data.fields.SEG_Subestado__c.value;
-		 	this.seleccionadoSubestado = false;
+			
 			if(data.fields.RecordType.value.fields.DeveloperName.value == 'SPV_Pretension' && data.fields.Status.value == 'SAC_007') {
 				const botonActualizar = this.template.querySelector('.botonActualizar');
 				botonActualizar.disabled = true;
@@ -390,9 +390,6 @@ export default class Spv_PathEstadosReclamacion extends LightningElement {
 					}
 		
 					//Mostrar el mensaje de error en el toast
-					console.log('errorMessage ' + errorMessage);
-					console.log('errorMessage ' + JSON.stringify(errorMessage));
-
 					this.mostrarToast('error', 'Error actualizando el caso', errorMessage);
 				}).finally(() => botonActualizar.disabled = false);
 			}	

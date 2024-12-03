@@ -1,0 +1,151 @@
+<template>
+	<!-- LOADING -->
+	<template if:true={loadingVisible}>
+		<div class="slds-modal__content slds-var-p-around_medium" style="height: 150px;">                      
+			<lightning-spinner alternative-text="Loading..." variant="brand" style="display: contents; "></lightning-spinner>                 
+		</div>
+	</template>
+	<!-- LWC DETALLES AP-PP -->
+	<template if:true={abrirComponente}>		
+		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">			
+				<c-sir_lwc_-View-Online-Acu-Pago-Plan-Pago id-propuesta={idPropuesta} onsiguiente={cerrarComponente}></c-sir_lwc_-View-Online-Acu-Pago-Plan-Pago>			 
+			</div>
+		</section>
+		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	</template>
+	<!-- RESPUESTA WS OK -->
+	<template if:true={mostrarInfo}>
+		<lightning-layout multiple-rows>
+			<template lwc:if={cabeceraProcesoActivo}>	
+				<template for:each={cabecera} for:item="cab">		
+					<lightning-layout-item size="4" key={cab}>					
+							<h1 class="colorAzul">Situación actual gestión agencias externas</h1>
+							<span class="slds-form-element__label negrita">{cab.unoTipoGestion} {cab.unoSituacion} </span><br>
+							<span class="slds-form-element__label">Fecha: </span><span class="slds-form-element__label"> {cab.unoFecha}</span><br>											
+							<span class="slds-form-element__label">Agencia: </span><span class="slds-form-element__label">{cab.unoAgencia}</span><br>
+							<span class="slds-form-element__label">Fecha inicio gestión: </span><span class="slds-form-element__label">{cab.unoFechaInicioGestion}</span><br>		
+					</lightning-layout-item>	
+					<lightning-layout-item size="4" key={cab}>
+						<h1 class="colorAzul">Última acción realizada</h1>
+						<span class="slds-form-element__label">Acción: </span><span class="slds-form-element__label">{cab.dosAccion}</span><br>
+						<span class="slds-form-element__label">Fecha/Hora: </span><span class="slds-form-element__label">{cab.dosFechaHora}</span><br>
+						<span class="slds-form-element__label">Contacto: </span><span class="slds-form-element__label">{cab.dosTelefono}</span><br>
+						<span class="slds-form-element__label">Interviniente: </span><span class="slds-form-element__label">{cab.dosInterviniente}</span><br>
+						<span class="slds-form-element__label">Resultado: </span><span class="slds-form-element__label">{cab.dosResultado}</span><br>	
+						<span class="slds-form-element__label">Comentario: </span><span class="slds-form-element__label">{cab.dosComentarioGestor}</span>		
+					</lightning-layout-item>
+					<lightning-layout-item size="4" key={cab}>
+						<h1 class="colorAzul">Última acción con contacto</h1>
+						<span class="slds-form-element__label">Acción: </span><span class="slds-form-element__label">{cab.tresAccion}</span><br>
+						<span class="slds-form-element__label">Fecha/Hora: </span><span class="slds-form-element__label">{cab.tresFechaHora}</span><br>
+						<span class="slds-form-element__label">Contacto: </span><span class="slds-form-element__label">{cab.tresContacto}</span><br>
+						<span class="slds-form-element__label">Interviniente: </span><span class="slds-form-element__label">{cab.tresInterviniente}</span><br>
+						<span class="slds-form-element__label">Resultado: </span><span class="slds-form-element__label">{cab.tresResultado}</span><br>	
+						<span class="slds-form-element__label">Comentario: </span><span class="slds-form-element__label">{cab.tresComentario}</span>					
+					</lightning-layout-item>
+				</template>								
+			</template>	
+		</lightning-layout>
+		<br>
+		<ul class="slds-timeline">
+			<li>
+				<table class="slds-table slds-no-row-hover" style="border-bottom: 1px solid #c9c9c9;">
+					<thead>
+						<tr>
+							<th class="slds-col " style="width:4%;">							
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:23%;">
+								<div class=" sizeTexto" title="Nombre Proceso">Nombre Proceso</div>
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:15%;">
+								<div class=" sizeTexto" title="Situación">Situación Proceso</div>
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:15%;">
+								<div class=" sizeTexto" title="Fecha Situación">Fecha Situación Proceso</div>
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:15%;">
+								<div class=" sizeTexto" title="Gestor">Gestor Proceso</div>
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:15%;">
+								<div class=" sizeTexto" title="Fecha Inicio">Fecha Inicio Proceso</div>
+							</th>
+							<th class="slds-col slds-cell-wrap" style="width:13%;">
+								<div class=" sizeTexto" title="Detalle solución">Detalle solución
+									<lightning-helptext content="Consultar si hay más información en Procesos Otras Unidades Gestión" style="position: relative; top: -3px;padding-left: 3px;"></lightning-helptext>							
+								</div>													
+							</th>
+						</tr>
+					</thead>			
+				</table>
+			</li>
+			<template for:each={datosProcesos} for:item="padre">
+			<li key={padre}>
+				<div class="slds-timeline__item_expandable slds-timeline__item_email slds-is-open">
+					<div class="slds-media">
+						<div class="slds-media__figure">						
+							<lightning-button-icon icon-name={padre.icono} variant="bare" alternative-text="Settings" title="Settings" name={padre.numRegistro} onclick={extenderContraer} ></lightning-button-icon>
+							<div class="slds-icon_container slds-icon-standard-email slds-timeline__icon">
+								<lightning-icon icon-name={padre.iconoCabecera} size="medium" ></lightning-icon>							
+							</div>
+						</div>
+						<div class="slds-media__body">
+							<div class="slds-grid slds-grid_align-spread">
+								<table class="slds-table slds-no-row-hover">
+										<tr>													
+											<td class="sizeTexto slds-col slds-col slds-cell-wrap" style="width:22%;">
+												<template lwc:if={cabeceraProcesoActivo}>
+													<lightning-button variant="base" label={padre.nombreProceso} title={padre.titleIconoCabecera} name={padre.numRegistro} onclick={infoCabecera} class="slds-var-m-left_x-small"></lightning-button>
+												</template>
+												<template lwc:else> 
+													{padre.nombreProceso}
+												</template>											
+											</td>
+											<td class="sizeTexto slds-col slds-cell-wrap" style="width:15%;">{padre.situacion}</td>
+											<td class="sizeTexto slds-col slds-cell-wrap" style="width:15%;">{padre.fechaSituacion}</td>
+											<td class="sizeTexto slds-col slds-cell-wrap" style="width:15%;">{padre.gestor}</td>
+											<td class="sizeTexto slds-col slds-cell-wrap" style="width:15%;">{padre.fechaInicio}</td>
+											<td class="sizeTexto slds-col slds-cell-wrap" style="width:13%;">	
+												<template lwc:if={padre.verDetalles}>
+													<lightning-button variant="base" label="" title="Pulsa para ver detalles especificos" icon-name="utility:search" onclick={verDetalles} value={padre.idPropuesta} class="slds-var-m-left_x-small"></lightning-button>
+												</template>
+											</td>
+										</tr>								
+								</table>
+							</div>
+							<article class="slds-box slds-timeline__item_details slds-theme_shade ocultos claseIdentificados" data-recid={padre.numRegistro}>					
+								<lightning-datatable
+									key-field="id"
+									hide-checkbox-column
+									data={padre.acciones}
+									columns={columns}>
+								</lightning-datatable>
+							</article>						
+						</div>
+					</div>		
+				</div>
+			</li>
+			</template>
+		</ul>
+	</template>	
+	<!-- No tiene procesos en Agencias Externas  -->
+	<template if:true={vacio}>
+		<div class="alignCentro"><lightning-formatted-text value={mensaje}></lightning-formatted-text></div>
+	</template> 
+	<!-- Errores  -->
+    <template if:true={mensajeKO}>
+        <div style="align-content: center;margin: 10px;">
+            <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-utility-error" title="error">
+                        <lightning-icon icon-name="utility:error" alternative-text="error" size="small" title="error" variant="inverse"></lightning-icon>                                
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>{mensajeError}</p>
+                    <p>{codigoError}</p>
+                </div>
+            </div>  
+        </div>              
+    </template> 
+</template>

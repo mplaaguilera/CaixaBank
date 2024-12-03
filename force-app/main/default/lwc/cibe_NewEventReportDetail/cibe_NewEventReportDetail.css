@@ -1,0 +1,53 @@
+.radioButtonStyle {
+    display: flex;
+    width: fit-content;
+    margin-bottom: .75rem;
+
+}
+
+.radioButtonStyle div {
+    width: max-content;
+    padding: 0 2vw;
+}
+
+.radioButtonStyle div:first-child {
+    padding: 0 1vw 0 0;
+}
+
+.radioButtonStyle div label {
+    margin-left: 5px;
+    vertical-align: text-top;
+}
+
+.radioButtonStyle div input {
+    margin-bottom: 2px;
+    vertical-align: text-top;
+}
+
+/* fusion gestion agil y alta de cita */
+
+.contact-type {
+    margin: 2em;
+}
+
+.margin-title {
+    margin-bottom: 1em;
+}
+
+.custom-margin-toggle {
+    margin-bottom: 0.7em;
+}
+
+.toggle-group-position {
+    display: flex;
+    justify-content: flex-end;
+    /* margin-bottom: -3em; */
+}
+
+.invisible-button {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    border: none;
+    background: transparent;
+}

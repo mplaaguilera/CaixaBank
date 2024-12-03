@@ -1,0 +1,193 @@
+<template>
+	<article class="slds-card">
+		<header class="slds-media slds-media_center slds-has-flexi-truncate">
+			<div class="slds-media__body">
+				<h2 class="slds-card__header-title">
+					<span>{labels.tipoCita}</span>
+				</h2>
+			</div>
+			<div class="slds-form-element">
+				<label class="slds-checkbox_toggle slds-grid">
+					<span class="slds-form-element__label slds-m-bottom_none">{labels.confidencialidad}</span>
+					<input type="checkbox" name="checkbox-toggle-16" value="checkbox-toggle-16"
+						aria-describedby="checkbox-toggle-16" checked={confidencial} onchange={handleConfidencial} />
+					<span id="checkbox-toggle-16" class="slds-checkbox_faux_container">
+						<span class="slds-checkbox_faux"></span>
+					</span>
+				</label>
+			</div>
+		</header>
+
+		<hr style="margin-top: 5px;">
+
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="8" padding="around-small" style="margin-top: -42px;">
+				<div style="margin:1.25rem 0 .75rem 0">
+					<span style="color:red;">*</span>{labels.tipoCita}
+				</div>
+				<div lwc-2nj244ovceg="" class="slds-form-element__control " style="display: -webkit-box; display: flex;"
+					part="options">
+					<span lwc-2nj244ovceg="" class="slds-radio">
+						<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="VLD" required=""
+							value="VLD" onchange={handleRadioChange} checked>
+						<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="VLD">
+							<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label"
+								part="label">{labels.videollamada}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-radio">
+						<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="OCX" required=""
+							value="OCX" onchange={handleRadioChange}>
+						<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="OCX">
+							<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label"
+								part="label">{labels.ofiCaixabank}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-radio">
+						<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="OCL" required=""
+							value="OCL" onchange={handleRadioChange}>
+						<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="OCL">
+							<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label"
+								part="label">{labels.ofiCliente}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-radio">
+						<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="LT" required=""
+							value="LT" onchange={handleRadioChange}>
+						<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="LT">
+							<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label"
+								part="label">{labels.llamadaTelefono}</span>
+						</label>
+					</span>
+				</div>
+
+			</lightning-layout-item>
+		</lightning-layout>
+
+		<lightning-layout multiple-rows if:true={readyToRender}>
+			<lightning-layout-item size="4" padding="around-small" if:true={showAccountInput}>
+				<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="accountlookup" selection={initialclient}
+					onsearch={handleSearchAccount} onselectionchange={handleSelectionAccount} fieldlabel={labels.client}
+					placeholder="Buscar cliente" required>
+				</c-av_-lookup>
+			</lightning-layout-item>
+			<lightning-layout-item size="4" padding="around-small">
+				<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="employeelookup" selection={initialemployee}
+					onsearch={handleSearchEmployee} onselectionchange={handleSelectionEmployee}
+					fieldlabel={labels.owner} placeholder={labels.buscaEmpleado} required>
+				</c-av_-lookup>
+			</lightning-layout-item>
+			<lightning-layout-item size="4" padding="around-small">
+				<lightning-combobox name="progress" label={labels.descripcion} value={subjectToSend}
+					placeholder={labels.descripcion} options={picklistValues} onchange={handleChangeSubject} required>
+				</lightning-combobox>
+			</lightning-layout-item>
+			<lightning-layout-item size="4" padding="around-small" if:true={asuntoCita}>
+				<lightning-input type="text" value={asunto} required label={labels.Otradescripcion}
+					onchange={handleAsunto}></lightning-input>
+			</lightning-layout-item>
+		</lightning-layout>
+
+		<lightning-layout size="4" padding="around-small">
+			<lightning-layout-item size="12" padding="around-small">
+				<lightning-textarea name="input3" value={comentarios} label={labels.comentario}
+					placeholder={labels.escribeAqui} onchange={handleComentarios}></lightning-textarea>
+			</lightning-layout-item>
+		</lightning-layout>
+
+		<div class="slds-card__header slds-grid slds-m-top_x-large">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">
+						<span>{labels.asistentes}</span>
+					</h2>
+				</div>
+			</header>
+		</div>
+
+		<hr style="margin-top: 5px; margin-bottom:5px;">
+
+		<div class="slds-card__body slds-card__body_inner">
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col">
+					<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="attendeeslookupClientes"
+						onsearch={handleSearchAttendes3} onselectionchange={handleSelectionAttendee3}
+						fieldlabel={labels.asistentesClientes} placeholder={labels.buscaContacto}>
+					</c-av_-lookup>
+				</div>
+				<div class="slds-col">
+					<lightning-input data-id="email" type="email" label={labels.asistentesNoRegistrados}
+						placeholder={labels.escribirEmail} onchange={handleEmail} onkeypress={handleEnter}
+						value={email}>
+
+					</lightning-input>
+					<!-- <lightning-input data-id="email" type="email" label="Asistentes no regsitrados" value={email} onchange={handleEmail}></lightning-input> -->
+				</div>
+				<div class="slds-col">
+					<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="attendeeslookupCXB"
+						onsearch={handleSearchAttendes} onselectionchange={handleSelectionAttendee}
+						fieldlabel={labels.asistentesCaixa} placeholder={labels.buscaContacto}>
+					</c-av_-lookup>
+				</div>
+				<div class="slds-col slds-m-top_medium" style="margin-top: 21px;">
+					<lightning-button label={labels.anyadir} disabled={buttonDisabledAttendees}
+						title="Non-primary action" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</div>
+
+		<lightning-datatable if:true={añadirAttende} key-field="id" data={attendeData} columns={columns}
+			onrowaction={handleRowAction} onrowselection={handleRowSelection} selected-rows={preSelectedRows}>
+		</lightning-datatable>
+
+		<div class="slds-card__header slds-grid slds-m-top_x-large">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">
+						<span>{labels.producto}</span>
+					</h2>
+				</div>
+			</header>
+		</div>
+		<hr style="margin-top: 5px; margin-bottom:5px;">
+
+		<div class="slds-card__body slds-card__body_inner">
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col">
+					<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="familySearch"
+						selection={initialSelection} onsearch={handleSearchFamily} onclick={handleSearchFamilyClick}
+						onselectionchange={handleFamily} fieldlabel={labels.familia} placeholder={labels.buscarFamilia}
+						onblur={handleFamilyLoseFocus}>
+					</c-av_-lookup>
+				</div>
+
+				<div class="slds-col">
+					<c-av_-lookup class="lookup-cmp slds-size_1-of-4" data-id="productSearch"
+						onsearch={handleSearchProduct} onselectionchange={handleProduct} fieldlabel={labels.producto}
+						placeholder={labels.buscarProducto} onclick={handleSearchProductClick}>
+					</c-av_-lookup>
+				</div>
+				<div class="slds-col">
+					<lightning-input data-id="comentarioProduct" type="text" label={labels.comentario}
+						value={productComment} onchange={handleProdComment}
+						placeholder={labels.comentarioProducto}></lightning-input>
+				</div>
+				<div class="slds-col slds-m-top_medium" style="margin-top: 21px;">
+					<lightning-button label={labels.anyadir} disabled={buttonDisabled} title="Non-primary action"
+						onclick={handleClickProduct} class="slds-m-left_x-small"></lightning-button>
+				</div>
+			</div>
+		</div>
+
+		<lightning-datatable if:true={añadirProduct} key-field="id" data={attendeProducts} columns={columnsProduct}
+			onrowaction={handleRowActionProduct} hide-checkbox-column="true">
+		</lightning-datatable>
+	</article>
+</template>

@@ -1,34 +1,14 @@
-<!-- sldsValidatorIgnore -->
 <template>
-	<article class="slds-card">
-		<div class="slds-card__header" style="padding-bottom: 2px;">
-			<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-				<div class="slds-col">
-					<div class="slds-truncate">
-						<header class="slds-media slds-media_center">
-							<div class="slds-media__figure">
-								<lightning-icon icon-name="standard:call_history" size="small" class="iconoCard"></lightning-icon>
-							</div>
-							<div class="slds-media__body">
-								<h2 class="slds-card__header-title slds-var-p-top_medium slds-var-p-bottom_medium">
-									Historial de interacciones
-								</h2>
-							</div>
-						</header>
-					</div>
-				</div>
-				<div class="slds-col">
-					<lightning-button-icon icon-name="utility:refresh" variant="bare" tooltip="Actualizar datos" onclick={refresh} class="slds-var-m-right_small"></lightning-button-icon>
-				</div>
-			</div>
+    <lightning-card title="Histórico de Interacciones">     
+        <article class="slds-card">
+            <div class="body_component">
+                <ul class="slds-timeline">
 
-		</div>
-		<div class="slds-card__body slds-card__body_inner" style="padding-left: 8px; padding-right: 4px;">
-			<ul class="slds-timeline">
-				<template lwc:if={interacciones.length} for:each={interacciones} for:item="interaccion">
-					<c-cc_-timeline_-item key={interaccion.RecordId} item={interaccion}></c-cc_-timeline_-item>
-				</template>
-			</ul>
-		</div>
-	</article>
+                    <template for:each={Interacciones.data} for:item="msg">   
+                        <c-cc_-timeline_-item key={msg.Id} msg={msg} isexpanded=false></c-cc_-timeline_-item>
+                    </template>
+                </ul>
+            </div>
+        </article>
+    </lightning-card>
 </template>

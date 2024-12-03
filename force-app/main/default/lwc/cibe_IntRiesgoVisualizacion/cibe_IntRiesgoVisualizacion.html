@@ -5,6 +5,11 @@
         </div>
     </template>
     <template if:false={bError}>
+        <template if:true={loadchildcontract}>
+            <div class="backgroundInverse">
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            </div>
+        </template>
         <article class="slds-card slds-card_boundary">
             <div class="slds-card__header slds-grid">
                 <header class="slds-media slds-media_center slds-has-flexi-truncate">
@@ -15,17 +20,23 @@
                 </div>
                 </header>
             </div>
-            <div class="slds-card__body slds-card__body_inner" style="text-align:right;">
+            <div class="slds-card__body slds-card__body_inner">
                 <lightning-tree-grid
+                    class="activo-tree-grid"
                     style="text-align:right;"
                     key-field="producto"
                     data={dataActivo}
                     columns={columnsActivo}
-                    expanded-rows={initialExpandedRows}
-                    hide-checkbox-column>
+                    onrowselection={handleRowSelection}
+                    data-name="activo"
+                    >
                 </lightning-tree-grid>
             </div>
-            <footer class="slds-card__footer"></footer>
+            <footer class="slds-card__footer">
+                <template if:true={showLoadMoreButtonActivo}>
+                    <lightning-button label="Cargar más" onclick={loadMoreContractsActivo}></lightning-button>
+                </template>
+            </footer>
         </article>
         <article class="slds-card slds-card_boundary">
             <div class="slds-card__header slds-grid">
@@ -39,34 +50,74 @@
             </div>
             <div class="slds-card__body slds-card__body_inner">
                 <lightning-tree-grid
+                    class="pasivo-tree-grid"
+                    style="text-align:right;"
                     key-field="producto"
                     data={dataPasivo}
                     columns={columnsPasivo}
-                    hide-checkbox-column>
+                    onrowselection={handleRowSelection}
+                    data-section="pasivo"
+                    >
                 </lightning-tree-grid>
             </div>
+            <footer class="slds-card__footer">
+                <template if:true={showLoadMoreButtonPasivo}>
+                    <lightning-button label="Cargar más" onclick={loadMoreContractsPasivo}></lightning-button>
+                </template>
+            </footer>
         </article>
         <article class="slds-card slds-card_boundary">
             <div class="slds-card__header slds-grid">
                 <header class="slds-media slds-media_center slds-has-flexi-truncate">
                 <div class="slds-media__body">
                     <h2 class="slds-card__header-title">
-                        <span>Servicios</span>
+                        <span>Servicios con Contrato</span>
                     </h2>
                 </div>
                 </header>
             </div>
             <div class="slds-card__body slds-card__body_inner">
                 <lightning-tree-grid
+                    class="serviciocontract-tree-grid"
                     key-field="producto"
                     data={dataServicio}
                     columns={columnsServicio}
-                    expanded-rows={initialExpandedRowsProductos}
+                    onrowselection={handleRowSelection}
+                    data-section="servicio"
+                    >
+                </lightning-tree-grid>
+            </div>
+            <footer class="slds-card__footer">
+                <template if:true={showLoadMoreButtonServicio}>
+                    <lightning-button label="Cargar más" onclick={loadMoreContractsServicio}></lightning-button>
+                </template>
+            </footer>
+        </article>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Servicios derivados de operativa </span>
+                    </h2>
+                </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <lightning-tree-grid
+                    class="servicioperativa-tree-grid"
+                    key-field="producto"
+                    data={dataServicioOperativa}
+                    columns={columnsServicioOperativa}
                     hide-checkbox-column>
                 </lightning-tree-grid>
             </div>
-           
         </article>
+        <template if:true={loadingMoreCont}>
+            <div class="backgroundInverse">
+                <lightning-spinner alternative-text="Cargando mas Contratos" size="large"></lightning-spinner>
+            </div>
+        </template>
     </template>
     <template if:true={bError}>
         <div class="slds-illustration slds-illustration_large" aria-hidden="true">

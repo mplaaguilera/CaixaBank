@@ -236,7 +236,7 @@
         <div class="slds-modal__container">
             <header class="slds-modal__header">
                 <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReformular}"
-                    alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close" />
+                    alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reformular</h2>
                 <p class="slds-m-top_x-small">Seleccione un mensaje para reformular</p>
             </header>
@@ -268,7 +268,7 @@
         <div class="slds-modal__container">
             <header class="slds-modal__header">
                 <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalEscalar}"
-                    alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close" />
+                    alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Escalar</h2>
                 <p class="slds-m-top_x-small">Seleccione una categoría para escalar</p>
             </header>
@@ -328,7 +328,7 @@
             <aura:if isTrue="{!v.transferAPP}">
                 <header class="slds-modal__header">
                     <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReclasificar}"
-                                          alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close" />
+                                          alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Se va a proceder a realizar un transfer a la APP de Now In Contact</h2>
                 </header>
                 <footer class="slds-modal__footer">
@@ -338,7 +338,7 @@
                 <aura:set attribute="else">
             <header class="slds-modal__header">
                 <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReclasificar}"
-                    alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close" />
+                    alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
                 <aura:if isTrue="{!v.tipoChat == 'Hidden'}">
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reclasificar espacio</h2>
                     <p class="slds-m-top_x-small">Seleccione un espacio</p>

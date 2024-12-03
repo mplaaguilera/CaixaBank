@@ -1,0 +1,43 @@
+.flex-width {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.border {
+    border-bottom: solid;
+    margin-left: 12px;
+}
+
+.margen {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.force-button-style {
+    margin-top: -4%;
+    margin-bottom: 4%;
+}
+
+.card{
+    border: 0.5px solid gray;
+    border-radius: 6px;
+    height: 100%;
+}
+
+.prueba{
+    display:inline-block;
+    height: 100px;
+    width: 100px;
+    border: 2px black solid;
+}
+
+
+.prueba2{
+    display:inline-block;
+    border: 2px black solid;
+}
+
+.linea{
+    margin-top: 10px;
+    margin-bottom: 15px;
+}

@@ -2,7 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getData from '@salesforce/apex/CIBE_MetricChart_Controller.getData';
-import userHasPermissionSet from '@salesforce/apex/CIBE_MetricChart_Controller.userHasPermissionSet';
+// import userHasPermissionSet from '@salesforce/apex/CIBE_MetricChart_Controller.userHasPermissionSet';
 
 import USER_ID from '@salesforce/user/Id';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
@@ -29,19 +29,39 @@ import buscador from '@salesforce/label/c.CIBE_Buscador';
 import tareas from '@salesforce/label/c.CIBE_Tareas';
 import opPendFirmaLargo from '@salesforce/label/c.CIBE_OpPendFirmaLargo';
 
+import iniEmpleado from '@salesforce/label/c.CIBE_IniciativaEmpleado';
+import alertaCom from '@salesforce/label/c.CIBE_Alerta_Comercial';
+import accCom from '@salesforce/label/c.CIBE_AccionComercial';
+import sugerencia from '@salesforce/label/c.CIBE_Sugerencia';
+
+import opp from '@salesforce/label/c.CIBE_Oportunidades';
+
+
+
+
+
 
 const AVISOS = avisos;
 const TAREAS = tareas;
+//const OPPNEXT7DAYS= 'Oportunidades próximos 7 días';
 
 //CUSTOM METADATA
 const GESTIONAR_PRIORIZADOS_CIB = 'CIBE_PriorManageClients';
 const GESTIONAR_PRIORIZADOS_EMP = 'CIBE_PriorManageClientsEMP';
+const INICIATIVA_GESTOR_EMP = 'CIBE_IniciativaGestor_EMP';
+const EXPERIENCIA_CLIENTE_EMP = 'CIBE_ExperienciaCliente_EMP';
+const ALERTA_COMERCIAL_EMP ='CIBE_AlertaComercial_EMP';
+const ONBOARDING_EMP ='CIBE_Onboarding_EMP';
+
 const TASK_NEXT_7_DAYS_CIB = 'CIBE_TareasProximos7Dias_CIB';
 const TASK_NEXT_7_DAYS_EMP = 'CIBE_TareasProximos7Dias_EMP';
 const EVENTS_TODAY = 'CIBE_TodaysAppointments';
 const NOTIFICACIONES = 'CIBE_PendingConversation';
 const AVISOS_CIB = 'CIBE_WarningsToManage';
 const AVISOS_EMP = 'CIBE_WarningsToManageEMP';
+const OPPN7DAYS_EMP = 'CIBE_OpportunitiesNext7Days_EMP';
+const CITAS_7DAYS = 'CIBE_CitasProximos7Dias';
+
 
 //TAREAS RECORDTYPE CIB
 const RT_GESTIONAR_PRI_CIB 		= gestionarPri + ' CIB';
@@ -75,6 +95,7 @@ const RT_ONBOARDING_DN_EMP = 'CIBE_OnboardingEMP';
 const RT_INICIATIVA_GESTOR_DN_EMP = 'CIBE_OtrosEMP';
 const RT_AVISOS_DN_EMP = 'CIBE_AvisosEMP';
 
+
 //EVENTOS
 //Evento -> Activity -> Campo 'Iniciador' --> AV_InOutbound__c
 const ORIGEN_CLIENTE = origenCli;
@@ -89,7 +110,20 @@ const LLAMADAS = llamadas;
 const PENDIENTE_FIRMA_LABEL = opPendFir;
 const PENDIENTE_FIRMA = opPendFirmaLargo;
 
+//OPPORTUNITIES RECORDTYPE
 
+const RT_INICIATIVAEMPLEADO_EMP = iniEmpleado + ' EMP';
+const RT_ALERTACOMERCIAL_EMP = alertaCom + ' EMP';
+const RT_ACCIONCOMERCIAL_EMP = accCom + ' EMP';
+const RT_SUGERENCIA_EMP = sugerencia + ' EMP';
+
+
+//OPPORTUNITIES RECORDTYPE DEVELOPERNAME EMP
+
+const RT_INICIATIVAEMPLEADO_DN_EMP = 'CIBE_IniciativaEmpleadoEMP';
+const RT_ALERTACOMERCIAL_DN_EMP = 'CIBE_AlertaComercialEMP';
+const RT_ACCIONCOMERCIAL_DN_EMP = 'CIBE_AccionComercialEMP';
+const RT_SUGERENCIA_DN_EMP = 'CIBE_SugerenciaEMP';
 
 export default class cibe_MetricChart extends NavigationMixin(LightningElement) {
 
@@ -108,7 +142,12 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 		origenGes,
 		buscador,
 		tareas,
-		opPendFirmaLargo
+		opPendFirmaLargo,
+		iniEmpleado,
+		alertaCom,
+		accCom,
+		sugerencia,
+		opp
     };
 
 	@api metadataChartName;
@@ -131,13 +170,22 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 	@track showLegendNotify;
 	@track showLegendAppointments;
 	@track showLegendTasks7daysCIB;
-	@track showLegendTasks7daysEMP
+	@track showLegendTasks7daysEMP;
 	@track showLegendWarningsCIB;
 	@track showLegendWarningsEMP;
+	@track showLegendOpp7DaysEMP;
 	@track showNumbers;
 	@track error;
 	@track wiredData;
-	@track showTableGroupedByCliente;
+	// @track showTableGroupedByCliente;
+	@track showOrigenGesLegend;
+	@track showOrigenCliLegend;
+	@track showIniciativaGesLegend;
+    @track showExpCliLegend;
+	@track showLlamadasLegend;
+	@track showMuroLegend;
+	@track showStopandgoLegend;
+	@track showopPendFirLegend;
 
 	@track filtersValuesMap = new Map([
 		[RT_GESTIONAR_PRI_CIB, RT_GESTIONAR_PRI_DN_CIB],
@@ -153,25 +201,34 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 		[RT_ALERTA_COMERCIAL_EMP, RT_ALERTA_COMERCIAL_DN_EMP],
 		[RT_ONBOARDING_EMP, RT_ONBOARDING_DN_EMP],
 		[RT_AVISOS_EMP, RT_AVISOS_DN_EMP],
-
+		
 		[LLAMADAS, LLAMADAS],
 		[MURO, MURO],
 		[STOPGO, STOPGO],
 		[PENDIENTE_FIRMA_LABEL, PENDIENTE_FIRMA],
 		//[PENDIENTE_FIRMA_LABEL, PENDIENTE_FIRMA_LABEL],
 
-
 		[ORIGEN_CLIENTE, SALIDA],
-		[ORIGEN_GESTOR, ENTRADA],
+		[ORIGEN_GESTOR, ENTRADA],	
+
+		[RT_INICIATIVAEMPLEADO_EMP, RT_INICIATIVAEMPLEADO_DN_EMP],
+		[RT_ALERTACOMERCIAL_EMP, RT_ALERTACOMERCIAL_DN_EMP],
+		[RT_ACCIONCOMERCIAL_EMP, RT_ACCIONCOMERCIAL_DN_EMP],
+		[RT_SUGERENCIA_EMP, RT_SUGERENCIA_DN_EMP]
+		
 	]);
+
+	@track recordtypeLabel;
+	@track numRecord;
+
 	connectedCallback(){
 	}
-	@wire(userHasPermissionSet)
-	checkVisibilityHomeV4(data) {
-		if (data) {
-			this.showTableGroupedByCliente = data.data;
-		}
-	}
+	// @wire(userHasPermissionSet)
+	// checkVisibilityHomeV4(data) {
+	// 	if (data) {
+	// 		this.showTableGroupedByCliente = data.data;
+	// 	}
+	// }
 
 	@wire(getRecord, { recordId: USER_ID, fields: [OFICINA] })
 
@@ -190,17 +247,17 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 			console.log('Error loading: ', JSON.parse(JSON.stringify(error)));
 		}
 	}
-
+	
 	@wire(getData, { metadataChart: '$metadataChartName' })
 	retrieveCharts(wireResult) {
 		// const { data, error } = wireResult;
 		let data = wireResult.data;
 		let error = wireResult.error;
 		this.wiredData = wireResult;
+		
 		if (data) {
-
+			
 			this.showButton = data.hasLinkPermission;
-
 			if (this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB
 				|| this.metadataChartName == GESTIONAR_PRIORIZADOS_EMP
 				|| this.metadataChartName == TASK_NEXT_7_DAYS_CIB
@@ -209,28 +266,66 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 				|| this.metadataChartName == AVISOS_EMP
 				|| this.metadataChartName == NOTIFICACIONES
 				|| this.metadataChartName == EVENTS_TODAY
+				|| this.metadataChartName == OPPN7DAYS_EMP
+				|| this.metadataChartName == CITAS_7DAYS
 				) {
+
 				this.showDonutCharts = true;
 				this.loading = true;
+
 				if (this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB) {
 					this.showLegendClientsCIB = true;
 				} else if (this.metadataChartName == GESTIONAR_PRIORIZADOS_EMP) {
 					this.showLegendClientsEMP = true;
 				}else if (this.metadataChartName == NOTIFICACIONES) {
 					this.showLegendNotify = true;
+
+					if(data.numRecordsList[0]>0){
+						this.showLlamadasLegend = true;
+					}
+					if(data.numRecordsList[1]>0){
+						this.showMuroLegend = true;
+					}
+					if(data.numRecordsList[2]>0){
+						this.showStopandgoLegend = true;
+					}
+					
+					if(data.numRecordsList[3]>0){
+						this.showopPendFirLegend = true;
+					}
+					
 				} else if (this.metadataChartName == EVENTS_TODAY) {
 					this.showLegendAppointments = true;
 				} else if (this.metadataChartName == TASK_NEXT_7_DAYS_CIB) {
-					this.showLegendTasks7daysCIB = true;
-				} else if (this.metadataChartName == TASK_NEXT_7_DAYS_EMP) {
-					this.showLegendTasks7daysEMP = false;
+					this.showLegendTasks7daysCIB = false;
+				}else if (this.metadataChartName == TASK_NEXT_7_DAYS_EMP){
+					this.showLegendTasks7daysEMP=true;
+
+					if(data.numRecordsList[0]>0){
+						this.showIniciativaGesLegend = true;
+					}
+					if(data.numRecordsList[1]>0){
+						this.showExpCliLegend = true;
+					}
+
 				} else if (this.metadataChartName == AVISOS_CIB) {
 					this.showLegendWarningsCIB = true;
 				} else if (this.metadataChartName == AVISOS_EMP) {
 					this.showLegendWarningsEMP = false;
-				} 
+				} else if (this.metadataChartName == OPPN7DAYS_EMP) {
+					// this.showLegendTasks7daysEMP = true;
+				}else if (this.metadataChartName == CITAS_7DAYS) {
+					this.showLegendAppointments = true;
 
+					if(data.numRecordsList[0]>0){
+						this.showOrigenCliLegend = true;
+					}
+					if(data.numRecordsList[1]>0){
+						this.showOrigenGesLegend = true;
+					}
+				}
 				this.numRecords = data.numRecords;
+
 				if (this.numRecords > 0) {
 					this.showNumbers = false;
 				} else {
@@ -240,7 +335,6 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 				if (data.reportId !== undefined) {
 					this.reportId = data.reportId;
 				}
-
 				if (data.numRecordsList !== undefined 
 				&& (this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB
 					|| this.metadataChartName == GESTIONAR_PRIORIZADOS_EMP
@@ -249,7 +343,9 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					|| this.metadataChartName == EVENTS_TODAY 
 					|| this.metadataChartName == NOTIFICACIONES 
 					|| this.metadataChartName == AVISOS_CIB 
-					|| this.metadataChartName == AVISOS_EMP 
+					|| this.metadataChartName == AVISOS_EMP
+					|| this.metadataChartName == OPPN7DAYS_EMP
+					|| this.metadataChartName == CITAS_7DAYS
 				))		
 				{
 					this.dataset = data.numRecordsList;
@@ -285,7 +381,6 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					},
 					options: {
 						onClick: (event, elements, chart) => {
-							
 							if (elements[0] != null) {
 								this.filterValue = this.getLabels(this.metadataChartName)[elements[0].index];
 								this.navigateToReportWithFilter(this.metadataChartName);
@@ -344,6 +439,7 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 		}
 	}
 
+
 	@api
 	refreshChart() {
 		this.loading = true;
@@ -353,6 +449,7 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 	}
 
 	getLabels(chartName) {
+		
 		var labelList;
 		if (chartName == GESTIONAR_PRIORIZADOS_CIB ) {
 			labelList = [RT_GESTIONAR_PRI_CIB, RT_CLIENTE_EXP_CIB, RT_INICIATIVA_GESTOR_CIB, RT_ALERTA_COMERCIAL_CIB, RT_ONBOARDING_CIB];
@@ -362,13 +459,24 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 			labelList = [LLAMADAS, MURO, STOPGO, PENDIENTE_FIRMA_LABEL];
 		} else if (chartName == EVENTS_TODAY) {
 			labelList = [ORIGEN_CLIENTE, ORIGEN_GESTOR];
-		} else if (chartName == TASK_NEXT_7_DAYS_CIB || chartName == TASK_NEXT_7_DAYS_EMP) {
-			labelList = [TAREAS];
-		} else if (chartName == AVISOS_CIB || chartName == AVISOS_EMP) {
+		} //else if (chartName == TASK_NEXT_7_DAYS_CIB || chartName == TASK_NEXT_7_DAYS_EMP) {
+			//labelList = [TAREAS];}
+		else if (chartName == AVISOS_CIB || chartName == AVISOS_EMP) {
 			labelList = [AVISOS];
+		// } else if (chartName == OPPN7DAYS_EMP) {
+		// 	labelList = [RT_INICIATIVAEMPLEADO_EMP, RT_ALERTACOMERCIAL_EMP, RT_ACCIONCOMERCIAL_EMP, RT_SUGERENCIA_EMP];
+		} else if (chartName == OPPN7DAYS_EMP) {
+			labelList = [this.labels.opp];
+		} else if (chartName == CITAS_7DAYS) {
+			
+			labelList = [ORIGEN_CLIENTE, ORIGEN_GESTOR];
+		}else if(chartName == TASK_NEXT_7_DAYS_EMP){
+			labelList = [RT_INICIATIVA_GESTOR_EMP,RT_CLIENTE_EXP_EMP];
 		}
 		return labelList;
 	}
+
+	
 
 	getColours(chartName) {
 		if (chartName == GESTIONAR_PRIORIZADOS_CIB) {
@@ -379,19 +487,21 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 			this.coloursList = ['rgb(6,79,112)', 'rgb(0,126,174)', 'rgb(43,192,237)', 'rgb(165,234,253)'];
 		} else if (chartName == EVENTS_TODAY) {
 			this.coloursList = ['rgb(6,79,112)', 'rgb(0,126,174)'];
-		} else if (chartName == TASK_NEXT_7_DAYS_CIB || chartName == TASK_NEXT_7_DAYS_EMP) {
-			this.coloursList = ['rgb(6,79,112)'];
+		} else if (chartName == TASK_NEXT_7_DAYS_EMP) {
+			this.coloursList = ['rgb(6,79,112)', 'rgb(0,126,174)'];
 		} else if (chartName == AVISOS_CIB || chartName == AVISOS_EMP) {
 			this.coloursList = ['rgb(6,79,112)'];
-		}
+		} else if (chartName == OPPN7DAYS_EMP) {
+			this.coloursList = ['rgb(6,79,112)'];
+		} else if (chartName == CITAS_7DAYS) {
+			this.coloursList = ['rgb(6,79,112)', 'rgb(0,126,174)'];
+		} 
 	}
 	// Sin rosco
 	navigateToReportWithoutFilter(event) {
 		if (this.reportId !== undefined) {
-
 			if (this.metadataChartName !== GESTIONAR_PRIORIZADOS_CIB 
 				&& this.metadataChartName !== GESTIONAR_PRIORIZADOS_EMP) {
-
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -403,6 +513,7 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 						fv9: valueToFilter  TEST
 					}*/
 				});
+				
 			}else {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__component',
@@ -415,6 +526,13 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					}
 				});
 			}
+		}else if (this.metadataChartName == OPPN7DAYS_EMP) {
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: 'CIBE_BuscadorOportunidadesEMP'
+				}
+			})
 		}
 	}
 
@@ -431,43 +549,52 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					actionName: 'view'
 				}
 			});
+		}else if (this.metadataChartName == OPPN7DAYS_EMP) {
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: 'CIBE_BuscadorOportunidadesEMP'
+				}
+			})
 		}
 	}
 
 	// Rosco
 	navigateToReportWithFilter(metaChart) {
+
 		if (this.reportId !== undefined) {
 			var valueToFilterReport = "'" + this.filtersValuesMap.get(this.filterValue) + "'";
 			var valueToFilter =  this.filtersValuesMap.get(this.filterValue) ;
-			if (metaChart == GESTIONAR_PRIORIZADOS_CIB 
-				|| metaChart == GESTIONAR_PRIORIZADOS_EMP) {
-				if (!this.showTableGroupedByCliente) {
-					this[NavigationMixin.Navigate]({
-						type: 'standard__recordPage',
-						attributes: {
-							recordId: this.reportId,
-							objectApiName: 'Report',
-							actionName: 'view'
-						},
-						state: {
-							fv8: valueToFilterReport
-						}
-					});
-				} 
-				else {
-					this[NavigationMixin.Navigate]({
-						type: 'standard__component',
-						attributes: {
-							componentName: "c__CIBE_NavigateTableGroupedByClient"
-						},
-						state: {
-							c__rtName: valueToFilter,
-							c__isCIB: this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ? true : false
-						}
-					});
+			// if (metaChart == GESTIONAR_PRIORIZADOS_CIB 
+			// 	|| metaChart == GESTIONAR_PRIORIZADOS_EMP) {
+			// 	if (!this.showTableGroupedByCliente) {
+			// 		this[NavigationMixin.Navigate]({
+			// 			type: 'standard__recordPage',
+			// 			attributes: {
+			// 				recordId: this.reportId,
+			// 				objectApiName: 'Report',
+			// 				actionName: 'view'
+			// 			},
+			// 			state: {
+			// 				fv8: valueToFilterReport
+			// 			}
+			// 		});
+			// 	} 
+			// 	else {
+			// 		this[NavigationMixin.Navigate]({
+			// 			type: 'standard__component',
+			// 			attributes: {
+			// 				componentName: "c__CIBE_NavigateTableGroupedByClient"
+			// 			},
+			// 			state: {
+			// 				c__rtName: valueToFilter,
+			// 				c__isCIB: this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ? true : false
+			// 			}
+			// 		});
 					
-				}
-			} else if (metaChart == EVENTS_TODAY ) {
+			// 	}
+			// } else 
+			if (metaChart == EVENTS_TODAY) {
 					this[NavigationMixin.Navigate]({
 						type: 'standard__recordPage',
 						attributes: {
@@ -480,7 +607,36 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 						}
 				});
 			
-			} else if (metaChart == NOTIFICACIONES) {
+			} else if (metaChart == CITAS_7DAYS) {
+				this[NavigationMixin.Navigate]({
+					type: 'standard__recordPage',
+					attributes: {
+						recordId: this.reportId,
+						objectApiName: 'Report',
+						actionName: 'view'
+					},
+					state: {
+						fv2: valueToFilterReport,
+						fv3: valueToFilterReport
+					}
+				});
+		
+			}else if (this.metadataChartName == TASK_NEXT_7_DAYS_EMP) {    
+				valueToFilterReport = this.filterValue;
+				
+
+				this[NavigationMixin.Navigate]({
+					type: 'standard__recordPage',
+					attributes: {
+						recordId: this.reportId,
+						objectApiName: 'Report',
+						actionName: 'view'
+					},
+					state: {
+						fv0: valueToFilterReport
+					}
+				});
+			}else if (metaChart == NOTIFICACIONES) {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -493,7 +649,7 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					}
 			});
 		
-			} else {
+			}else {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -503,48 +659,58 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 					}
 				});
 			}
+		} else if (metaChart == OPPN7DAYS_EMP) {
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: 'CIBE_BuscadorOportunidadesEMP'
+				}
+			})
 		}
 	}
 
 	// Leyenda
 	navigateToReportWithFilterLegend(event) {
 
-		var filterValueLegend = event.target.dataset.id ;
+		var filterValueLegend = event.target.dataset.id;
+
 		if (this.reportId !== undefined) {
+
 			var valueToFilterReport = "'" + this.filtersValuesMap.get(filterValueLegend) + "'";
 			var valueToFilter =  this.filtersValuesMap.get(filterValueLegend) ;
-			if (this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB 
-				|| this.metadataChartName == GESTIONAR_PRIORIZADOS_EMP) {					
-					var word =  this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ?  ' CIB' : ' EMP';
-					valueToFilterReport = "'" + this.filtersValuesMap.get(filterValueLegend + word) + "'";
-					valueToFilter =  this.filtersValuesMap.has(filterValueLegend + word) ? this.filtersValuesMap.get(filterValueLegend + word) : 'no tiene' ;
-					if (!this.showTableGroupedByCliente) {
-					this[NavigationMixin.Navigate]({
-						type: 'standard__recordPage',
-						attributes: {
-							recordId: this.reportId,
-							objectApiName: 'Report',
-							actionName: 'view'
-						},
-						state: {
-							fv9: valueToFilterReport
-						}
+			// if (this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB 
+			// 	|| this.metadataChartName == GESTIONAR_PRIORIZADOS_EMP) {					
+			// 		var word =  this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ?  ' CIB' : ' EMP';
+			// 		valueToFilterReport = "'" + this.filtersValuesMap.get(filterValueLegend + word) + "'";
+			// 		valueToFilter =  this.filtersValuesMap.has(filterValueLegend + word) ? this.filtersValuesMap.get(filterValueLegend + word) : 'no tiene' ;
+			// 		if (!this.showTableGroupedByCliente) {
+			// 		this[NavigationMixin.Navigate]({
+			// 			type: 'standard__recordPage',
+			// 			attributes: {
+			// 				recordId: this.reportId,
+			// 				objectApiName: 'Report',
+			// 				actionName: 'view'
+			// 			},
+			// 			state: {
+			// 				fv9: valueToFilterReport
+			// 			}
 						
-					});
+			// 		});
 
-				} else {
-					this[NavigationMixin.Navigate]({
-						type: 'standard__component',
-						attributes: {
-							componentName: "c__cibe_NavigateTableGroupedByClient"
-						},
-						state: {
-							c__rtName: valueToFilter,
-							c__isCIB: this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ? true : false
-						}
-					});
-				}
-			} else if (this.metadataChartName == NOTIFICACIONES ) {
+			// 	} else {
+			// 		this[NavigationMixin.Navigate]({
+			// 			type: 'standard__component',
+			// 			attributes: {
+			// 				componentName: "c__cibe_NavigateTableGroupedByClient"
+			// 			},
+			// 			state: {
+			// 				c__rtName: valueToFilter,
+			// 				c__isCIB: this.metadataChartName == GESTIONAR_PRIORIZADOS_CIB ? true : false
+			// 			}
+			// 		});
+			// 	}
+			// } else 
+			if (this.metadataChartName == NOTIFICACIONES ) {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -556,9 +722,10 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 						fv1: valueToFilterReport
 					}
 				});
-			} else if ( this.metadataChartName == EVENTS_TODAY 
+			}else if (this.metadataChartName == EVENTS_TODAY 
 					|| this.metadataChartName == AVISOS_CIB 
 					|| this.metadataChartName == AVISOS_EMP) {
+
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
@@ -570,16 +737,53 @@ export default class cibe_MetricChart extends NavigationMixin(LightningElement) 
 						fv2: valueToFilterReport
 					}
 				});
-			} else {
+			}else if (this.metadataChartName == CITAS_7DAYS) {
 				this[NavigationMixin.Navigate]({
 					type: 'standard__recordPage',
 					attributes: {
 						recordId: this.reportId,
 						objectApiName: 'Report',
 						actionName: 'view'
+					},
+					state: {
+						fv2: valueToFilterReport,
+						fv3: valueToFilterReport
+					}
+				});
+		
+			}else if (this.metadataChartName == TASK_NEXT_7_DAYS_EMP) {    
+
+				valueToFilterReport = filterValueLegend + ' EMP';
+
+				this[NavigationMixin.Navigate]({
+					type: 'standard__recordPage',
+					attributes: {
+						recordId: this.reportId,
+						objectApiName: 'Report',
+						actionName: 'view'
+					},
+					state: {
+						fv0: valueToFilterReport
 					}
 				});
 			}
+		}else{
+			this[NavigationMixin.Navigate]({
+				type: 'standard__recordPage',
+				attributes: {
+					recordId: this.reportId,
+					objectApiName: 'Report',
+					actionName: 'view'
+				}
+			});
+
+		}if (this.metadataChartName == OPPN7DAYS_EMP) {
+			this[NavigationMixin.Navigate]({
+				type: 'standard__navItemPage',
+				attributes: {
+					apiName: 'CIBE_BuscadorOportunidadesEMP'
+				}
+			});
 		}
 	}
 

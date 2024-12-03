@@ -8,6 +8,7 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
     @api accountid;
 	@api recordid;
 	@api headerid;
+	showOtherOppsLabel;
 	opposCount = 0;
 	@track oppoList;
 	@track oppoListRecord;
@@ -18,7 +19,7 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 	showSpinner = true;
 	showOppoListRecord = false;
 	showOppoList = false;
-	oppoObj = {};//Guarda el conjunto de oportunidades que han sido editadas
+	oppoObj = {};
 	subProductInitial = [];
 	errors = [];
 	titleOppRecord = 'Oportunidades vinculadas';
@@ -29,13 +30,24 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 	@track requiredClass;
 	numAgendeds = 0;
 	selectedIds = [];
+	@track showButtonDelete = false;
+	
+
 
 	connectedCallback(){
 		this.retriveOpps();
 		if(this.recordid.includes('00U3')){
 			this.titleOppRecord = 'Oportunidades vinculadas';
 		}
-		
+	}
+
+	notifyUser(title, message, variant) {
+		if (this.notifyViaAlerts) {
+			alert(`${title}\n${message}`);
+		} else {
+			const toastEvent = new ShowToastEvent({ title, message, variant });
+			this.dispatchEvent(toastEvent);
+		}
 	}
 	
 	retriveOpps() {
@@ -44,6 +56,7 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 			if (result != null) {
 				if(result.listOppRecord != null && result.listOppRecord.length > 0) {
 					this.oppoListRecord = result.listOppRecord;
+					
 					this.oppoListRecord.forEach(opp => {
 						this.selectedIds.push(opp.ProductoMain);	
 					});
@@ -51,15 +64,22 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 				}
 				if(result.listOppAccounts != null && result.listOppAccounts.length > 0) {
 					this.oppoList = result.listOppAccounts;
+					
 					this.oppoList.forEach(opp => {
 						this.selectedIds.push(opp.ProductoMain);
 					});
 					this.showOppoList = true;
 				}
+				if(this.oppoListRecord == undefined){
+					this.showOtherOppsLabel = false;
+				}else{
+					this.showOtherOppsLabel = this.oppoList != undefined;
+				}
 				this.showSpinner = false;
 			}else {
 				this.showSpinner = false;
 			}
+			this.valueOppoList();
 		}).catch(error => {
 			console.log(error);
 			this.showSpinner = false;
@@ -76,7 +96,12 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 		})
 	}
 
+	
+
+	
+
 	handleAddOppo(){
+		this.showButtonDelete = true;
 		let cmp = this.template.querySelector("[data-id='clookup1']");
 		let selection = cmp.getSelection()[0];
 		if(selection != null){
@@ -89,12 +114,17 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 					ProductoMain:selection.id,
 					Fecha: new Date().toJSON().slice(0, 10),
 					NotInserted:true,
-					unFoldCmp:true
+					unFoldCmp:true,
+					IsNewProduct: selection.prodNewAction
+
 				}
 			);
+			this.valueOppoList();
 			cmp.handleClearSelection();
-		}		
+		}
 	}
+
+
 
 	handleSearchProduct(event) {
 		lookupSearchProduct({searchTerm:event.detail.searchTerm,selectedIds:this.selectedIds, accountId:this.accountid})
@@ -190,9 +220,23 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 			})
 		)
 	}
+	@api
+	sendInitialStates(){
+		let mapInitialSates = {};
+
+		for(let id in this.oppoObj){
+			mapInitialSates[id] = this.template.querySelector('[data-id="'+id+'"]').initialState;
+		}
+
+		return mapInitialSates;
+	}
 
 	evaluateAgendeds(e){
-		e.detail.sum ? this.numAgendeds++ : this.numAgendeds--;
+		if(e.detail.sum){
+			this.numAgendeds++;
+		}else if((this.numAgendeds - 1) != -1 ){
+			this.numAgendeds --;
+		}
 		this.dispatchEvent(
 			new CustomEvent(
 				'evaluateagendeds',{
@@ -205,15 +249,17 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 	@api
 	highlightOppo(id){
 		let b =  this.template.querySelector('[data-id="'+id+'"]');
-		if(this.oppoObj[id].newPath == 'No apto'){
-			this.showToast('Faltan datos','Indica una fecha de no ofrecer hasta que sea mayor o igual a hoy.','error','pester');
-		}else if(this.oppoObj[id].newPath == 'En gestión/insistir'){
-			this.showToast('Faltan datos','Indica una fecha de próxima gestión que sea mayor o igual a hoy.','error','pester');
-		}else if(this.oppoObj[id].newPath == 'No interesado' && this.oppoObj[id].resolucion == null){
-			this.showToast('Faltan datos','Debes de rellenar el campo de resolución.','error','pester');
-		}else if(this.oppoObj[id].newPath == 'No interesado' &&  this.oppoObj[id].resolucion == 'O' &&  (this.oppoObj[id].comentario == null | this.oppoObj[id].comentario == '')){
-			this.showToast('Faltan datos', 'Debes de rellenar el campo de comentario.', 'error', 'pester');
-		}
+		let closedStatus = ['No interesado','Producto Rechazado'];
+			if(this.oppoObj[id].newPath == 'En gestión/insistir'){
+				this.showToast('Faltan datos','Indica una fecha de próxima gestión que sea mayor o igual a hoy.','error','pester');
+			}else if(this.oppoObj[id].newPath == 'No interesado' && this.oppoObj[id].resolucion == null){
+				this.showToast('Faltan datos','Debes de rellenar el campo de resolución.','error','pester');
+			}else if(closedStatus.includes(this.oppoObj[id].newPath) &&  this.oppoObj[id].resolucion == 'O' &&  (this.oppoObj[id].comentario == null || this.oppoObj[id].comentario == '')){
+				this.showToast('Faltan datos', 'Debes de rellenar el campo de comentario.', 'error', 'pester');
+			}else if(closedStatus.includes(this.oppoObj[id].newPath) &&  this.oppoObj[id].resolucion == 'No Apto' && this.oppoObj[id].noofrecerhasta == null){
+				this.showToast('Faltan datos', 'Por favor, rellena los campos obligatorios.', 'error', 'pester');
+			}
+		
 		b.scrollIntoView({
 			behavior: 'auto',
 			block: 'center',
@@ -237,10 +283,47 @@ export default class Av_OpportunityBlockEventTaskReport extends LightningElement
 		let error = wireResult.error;
 		let data = wireResult.data;
 		if(data){
-			this.resolutionList = data[0].filter(item => item.value !== 'VD');
+			this.resolutionList = data[0].filter(item => item.value !== 'VD' && item.value !== 'Vencida');	
+			const noAptoItem = this.resolutionList.find(item => item.value === 'No Apto');
+			if (noAptoItem) {
+				this.resolutionList = this.resolutionList.filter(item => item.value !== 'No Apto');
+				this.resolutionList.unshift(noAptoItem);
+            }
 			this.potentialList = data[1];
 		}else if(error){
 			console.log('Error => ',error);
 		}
+	}
+
+	handleOppoDelete(event) {   
+		const oppoIdToDelete = event.detail;
+		const deletedOppo = this.oppoNewList.find(oppo => oppo.Id === oppoIdToDelete);
+		if (deletedOppo) {
+			this.selectedIds = this.selectedIds.filter(id => id !== deletedOppo.ProductoMain);
+		}
+		this.oppoNewList = this.oppoNewList.filter(oppo => oppo.Id !== oppoIdToDelete);
+		this.handleVinculation({ detail: { sum: false, oppoId: oppoIdToDelete } });
+	
+		if (this.oppoObj[oppoIdToDelete]) {
+			delete this.oppoObj[oppoIdToDelete];
+		}
+
+		this.dispatchEvent(
+			new CustomEvent('setoppoforcontroller',{
+				detail:this.oppoObj	
+			})
+		)
+	}
+
+	valueOppoList(){
+		this.dispatchEvent(
+			new CustomEvent('sendvalueoppolist',
+			{
+				detail:{
+					opportunitiesList: this.oppoList,
+					opportunitiesVinculed: this.oppoListRecord
+				}
+			})
+		)
 	}
 }

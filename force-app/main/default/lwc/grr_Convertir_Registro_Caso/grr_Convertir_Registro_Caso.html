@@ -1,0 +1,58 @@
+<template>
+    <template if:false={cargasCompletadas}>
+		<div style="min-height: 46px;">
+            <lightning-spinner size="small"></lightning-spinner>
+        </div>
+	</template>
+    <template if:true={cargasCompletadas}>
+         <div class="slds-card">
+            <!-- Cabecera de la card -->
+            <div class="slds-card__header slds-grid">
+                <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 16px;"> Generación múltiple de casos</span>
+                        </h2>
+                    </div>
+                    <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                        <template lwc:if={tipoFicheroRecobro}>
+                            <lightning-button label="Generar" onclick={modalRecobrosAbrir} disabled={guardando} class="slds-var-m-left_small"></lightning-button>
+                        </template>
+                        <template lwc:else>
+                        <lightning-button label="Generar" onclick={handleGenerarCasosGlobal} disabled={guardando} class="slds-var-m-left_small"></lightning-button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <template if:true={showModal}>
+                <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalProcedencia" onkeydown={modalTeclaPulsada}>
+                    <div class="slds-modal__container">
+                        <lightning-button-icon icon-name="utility:close" size="large" onclick={closeModals} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                        <!--Cabecera del modal-->
+                        <div class="slds-modal__header">
+                            <h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">Selección del canal de procedencia </h1>
+                            <p class="slds-var-m-top_x-small">Seleccione un canal de procedencia a utilizar en la generación de casos de tipo Recobros.</p>
+                        </div>
+                        <!--Contenido del modal-->
+                        <div class="slds-modal__content slds-var-p-around_xx-large" style="padding-top: 12px; padding-bottom: 16px;">
+                            <lightning-combobox data-id="comboboxProcedenciaSeleccionar" label="Canal de Procedencia" placeholder="-Selecciona un canal de procedencia-" required message-when-value-missing="Debe seleccionar un canal de procedencia" onchange={handleGrupoSeleccionado} options={opcionesProcedencias} data-operativa="SeleccionarProcedencia"></lightning-combobox>
+                        </div>
+                        <!--Pie-->
+                        <footer class="slds-modal__footer">
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <lightning-button class="modalProcedenciaConfirmar" label="Confirmar" variant="brand" onclick={generarCasosRecobros} disabled={botonConfirmarGrupoDisabled}></lightning-button>
+                                    <lightning-button class="modalProcedenciaCancelar slds-var-m-left_medium" label="Cancelar" onclick={closeModals}></lightning-button>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </section>
+
+                <!--Backdrop para los modales-->
+                <div class="slds-backdrop backdropModales"></div>
+            </template>
+        </div>
+    </template>
+</template>

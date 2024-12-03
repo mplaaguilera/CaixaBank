@@ -1,4 +1,4 @@
-import { LightningElement, track, wire } from 'lwc';
+import { LightningElement, track, wire, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRecord } from 'lightning/uiRecordApi';
 //Apex
@@ -23,6 +23,8 @@ import clienteLab from '@salesforce/label/c.CIBE_Cliente';
 import miOficinaLab from '@salesforce/label/c.CIBE_MiOficina';
 import productoLab from '@salesforce/label/c.CIBE_Producto';
 import participeLab from '@salesforce/label/c.CIBE_Participe';
+import errorProdRellenoConFiltroTodos from '@salesforce/label/c.CIBE_ErrorProdRellenoConFiltroTodos';
+
 
 
 
@@ -44,22 +46,130 @@ import reset from '@salesforce/label/c.CIBE_Reiniciar';
 import etapaOpo from '@salesforce/label/c.CIBE_EtapaOportunidad';
 //flow
 import getActions   from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.getActions';
-const columnsOpp = [
-	{ label: 'Cliente', fieldName: 'AccountNameURL', type: 'url', typeAttributes: {label: { fieldName: 'AccountName' } }, hideDefaultActions: true, wrapText:true},
-	{ label: 'Nombre de la oportunidad', fieldName: 'OppNameURL', type: "url",	typeAttributes:{ label: { fieldName: 'Name' } }, hideDefaultActions: true, wrapText:true},
-	{ label: 'Importe de la oportunidad', fieldName: 'Amount',type: 'currency', hideDefaultActions: true,sortable:true },
-	{ label: 'Impacto en balance', fieldName: 'CIBE_Balance__c',type: 'currency', hideDefaultActions: true,sortable:true },
-	{ label: 'Comisiones', fieldName: 'CIBE_Comisiones__c',type: 'currency', hideDefaultActions: true,sortable:true },
-	{ label: 'Etapa', fieldName: 'StageName',type: 'text', hideDefaultActions: true ,sortable:true },
-	{ label: 'Origen', fieldName: 'AV_Origen__c', type: 'text',hideDefaultActions: true},
-	{ label: 'Producto', fieldName: 'PFName', type: 'text', hideDefaultActions: true },
-	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url',	typeAttributes:{ label: { fieldName: 'OwnerName' } }, hideDefaultActions: true, wrapText:true},
-	{ label: 'Participe', fieldName: 'ParticipeRow', type: 'text', hideDefaultActions: true },
-	{ label: 'Fecha de Cierre', fieldName: 'CloseDate', type: "date-local",typeAttributes:{ month: "2-digit", day: "2-digit" }, sortable: true}
-];
+
+//labels
+import cliente from '@salesforce/label/c.CIBE_Cliente';
+import oportunidad from '@salesforce/label/c.CIBE_Oportunidad';
+import importe from '@salesforce/label/c.CIBE_Importe';
+import origen from '@salesforce/label/c.CIBE_Origen';
+import participe from '@salesforce/label/c.CIBE_Participe';
+import fCierre from '@salesforce/label/c.CIBE_FechaCierre';
+import oficina from '@salesforce/label/c.CIBE_MiOficinaT';
+import otraOficina from '@salesforce/label/c.CIBE_OtraOficina';
+import iniciativaEmpleado from '@salesforce/label/c.CIBE_IniciativaEmpleado';
+import todos from '@salesforce/label/c.CIBE_Todos';
+import accionComercial from '@salesforce/label/c.CIBE_AccionComercial';
+import sugerencia from '@salesforce/label/c.CIBE_Sugerencia';
+import alertaComercial from '@salesforce/label/c.CIBE_Alerta_Comercial';
+import potencial from '@salesforce/label/c.CIBE_Potencial';
+import enCurso from '@salesforce/label/c.CIBE_EnCurso';
+import pendienteFirma from '@salesforce/label/c.CIBE_PendienteFirma';
+import cerradaNegativa from '@salesforce/label/c.CIBE_CerradaNegativa';
+import cerradaPositiva from '@salesforce/label/c.CIBE_CerradaPositiva';
+import vencida from '@salesforce/label/c.CIBE_Vencida';
+import alta from '@salesforce/label/c.CIBE_Alta';
+import media from '@salesforce/label/c.CIBE_Media';
+import baja from '@salesforce/label/c.CIBE_Baja';
+import nombreOpp from '@salesforce/label/c.CIBE_NombreOportunidad';
+import importeDesde from '@salesforce/label/c.CIBE_ImporteDesde';
+import fechaCierreDesde from '@salesforce/label/c.CIBE_FechaCierreDesde';
+import fechaCierreHasta from '@salesforce/label/c.CIBE_FechaCierreHasta';
+import probabilidadExito from '@salesforce/label/c.CIBE_ProbabilidadExito';
+import buscarParticipe from '@salesforce/label/c.CIBE_BuscarParticipante';
+import resultados from '@salesforce/label/c.Cibe_resultadosBusqueda';
+import pagina from '@salesforce/label/c.CIBE_Pagina';
+import de from '@salesforce/label/c.CIBE_of';
+import asignar from '@salesforce/label/c.CIBE_AsignarS';
+import anterior from '@salesforce/label/c.CIBE_Anterior';
+import posterior from '@salesforce/label/c.CIBE_Posterior';
+import empleadosSeleccionados from '@salesforce/label/c.CIBE_EmpleadosSeleccionados';
+import productosSeleccionados from '@salesforce/label/c.CIBE_ProductoSseleccionados';
+import participesSeleccionados from '@salesforce/label/c.CIBE_ParticipeSeleccionados';
+import seleccionar from '@salesforce/label/c.CIBE_Seleccionar';
+import buscarProductos from '@salesforce/label/c.CIBE_BuscarProductos';
+
 
 export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 
+	labels = {
+		newOppor,
+		filtroB,
+		pais,
+		equipoOppo,
+		industriaInter,
+		reset,
+		buscar,
+		etapaOpo,
+		etapa,
+		centro,
+		producto,
+		empleadoAsignado,
+		errorOcc,
+		clienteLab,
+		miOficinaLab,
+		productoLab,
+		participeLab,
+		errorProdRellenoConFiltroTodos, 
+		cliente,
+		oportunidad,
+		origen,
+		importe,
+		fCierre,
+		participe,
+		oficina,
+		otraOficina,
+		iniciativaEmpleado,
+		todos,
+		accionComercial,
+		sugerencia,
+		alertaComercial,
+		potencial,
+		enCurso,
+		pendienteFirma,
+		cerradaNegativa,
+		cerradaPositiva,
+		vencida,
+		alta,
+		media,
+		baja,
+		nombreOpp,
+		importeDesde,
+		fechaCierreDesde,
+		fechaCierreHasta,
+		probabilidadExito,
+		buscarParticipe,
+		resultados,
+		pagina,
+		de,
+		asignar,
+		anterior,
+		posterior,
+		empleadosSeleccionados,
+		productosSeleccionados,
+		participesSeleccionados,
+		seleccionar,
+		buscarProductos
+		
+	}
+
+	@track columnsOpp = [
+		{ label: this.labels.cliente, 			fieldName: 'AccountNameURL', 		type: 'url', 		initialWidth : 200,				typeAttributes: {label: { fieldName: 'AccountName' } }, 	hideDefaultActions: true, 	wrapText:true, 		sortable:true},
+		{ label: this.labels.oportunidad, 		fieldName: 'OppNameURL', 			type: "url",										typeAttributes:{ label: { fieldName: 'Name' } }, 			hideDefaultActions: true,	wrapText:true,		sortable:true},
+		{ label: this.labels.importe,			fieldName: 'Amount',				type: 'text', 		initialWidth : 85,			 																hideDefaultActions: true,						sortable:true, 		cellAttributes: { alignment: 'right'}},
+		{ label: this.labels.etapa, 			fieldName: 'StageName',				type: 'text', 		initialWidth : 130,																			hideDefaultActions: true,						sortable:true},
+		{ label: this.labels.origen, 			fieldName: 'AV_Origen__c', 			type: 'text',																									hideDefaultActions: true,						sortable:true},
+		{ label: this.labels.producto, 			fieldName: 'PFName', 				type: 'text', 																									hideDefaultActions: true,						sortable:true},						
+		{ label: this.labels.empleadoAsignado, 	fieldName: 'OwnerNameURL', 			type: 'url',										typeAttributes:{ label: { fieldName: 'OwnerName' } }, 		hideDefaultActions: true, 	 wrapText:true},
+		{ label: this.labels.participe, 		fieldName: 'ParticipeRow', 			type: 'text', 																									hideDefaultActions: true },
+		{ label: this.labels.fCierre, 			fieldName: 'CloseDate', 			type: "date-local",	initialWidth : 90,				typeAttributes:{ month: "2-digit", day: "2-digit" }, 														sortable: true}
+	];
+	
+    @track sortByFieldName;
+    @track sortByLabel;
+    @track sortDirection;
+    @track defaultSort = 'asc';
+	
+	@api isOriginAll = false;
 	@track data;
 	@track targetObjName = 'Opportunity';
 	@track columns;
@@ -67,6 +177,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	@track totalRecountCount;
 	@track showSpinner = false;
 	@track firstSearch = false;
+	@track isProductFilterRequired  = false;
 
 	initialSelection = [];
 	initialSelectionOffice = [];
@@ -122,7 +233,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	@track fechaCierreH = null;
 	@track employeeFilter = this.employeeDefault;
 	@track statusFilter = 'Potencial';
-	@track origenFilter = 'CIBE_AccionComercialEMP';
+	@track origenFilter = 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP';
 	@track targetProbabilidad;
 	@track clientFilter;
 	@track importeFilter = 0;
@@ -157,29 +268,8 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	@track redirectId;
 	@track objectAPIName;
 	@track isShowFlowAction = false;
-
-	labels = {
-		newOppor,
-		filtroB,
-		pais,
-		equipoOppo,
-		industriaInter,
-		reset,
-		buscar,
-		etapaOpo,
-		etapa,
-		centro,
-		producto,
-		reset,
-		buscar,
-		empleadoAsignado,
-		errorOcc,
-		clienteLab,
-		miOficinaLab,
-		productoLab,
-		participeLab
-	}
 	
+
 	
 	@wire(getRecord,{recordId:USER_ID,fields:[NAME_FIELD,FUNCTION,OFICINA]})
 	wiredUser({error,data}){
@@ -203,30 +293,31 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 
 	get optionsOppoStatus() {
 		return [
-			{ label: 'Potencial', value: 'Potencial' },
-            { label: 'En curso', value: 'En curso' },
-			{ label: 'Pendiente de firma', value: 'CIBE_Pendiente_Firma' },
-			{ label: 'Cerrada negativa', value: 'Cerrado negativo'},
-			{ label: 'Cerrada positiva', value: 'CIBE_Cerrado positivo'},
-			{ label: 'Vencida', value: 'CIBE_Vencido'}
+			{ label: this.labels.potencial, value: 'Potencial' },
+            { label: this.labels.enCurso, value: 'En curso' },
+			{ label: this.labels.pendienteFirma, value: 'CIBE_Pendiente_Firma' },
+			{ label: this.labels.cerradaNegativa, value: 'Cerrado negativo'},
+			{ label: this.labels.cerradaPositiva, value: 'CIBE_Cerrado positivo'},
+			{ label: this.labels.vencida, value: 'CIBE_Vencido'}
 		];
 	}
 
 
 	get optionsOppoOrigen() {
 		return [
-			{ label: 'Iniciativa Empleado', value: 'CIBE_IniciativaEmpleadoEMP' },
-			{ label: 'Acción Comercial', value: 'CIBE_AccionComercialEMP' },
-			{ label: 'Sugerencia', value: 'CIBE_SugerenciaEMP' },
-			{ label: 'Alerta Comercial', value: 'CIBE_AlertaComercialEMP' }
+			{ label: this.labels.todos, value: 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP' },
+			{ label: this.labels.iniciativaEmpleado, value: 'CIBE_IniciativaEmpleadoEMP' },
+			{ label: this.labels.accionComercial, value: 'CIBE_AccionComercialEMP' },
+			{ label: this.labels.sugerencia, value: 'CIBE_SugerenciaEMP' },
+			{ label: this.labels.accionComercial, value: 'CIBE_AlertaComercialEMP' }
 		];
 	}
 
 	get optionsProbabilidad() {
 		return [
-			{ label: 'Alta', value: 'Alta' },
-			{ label: 'Media', value: 'Media' },
-			{ label: 'Baja', value: 'Baja' }
+			{ label: this.labels.alta, value: 'Alta' },
+			{ label: this.labels.media, value: 'Media' },
+			{ label: this.labels.baja, value: 'Baja' }
 		];
 	}
 
@@ -263,12 +354,11 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 				this.targetObjName == 'Opportunity';
 				this.helpMessage = false;
 				if(result.recordList != null && result.recordList.length > 0) {
-					this.columns = columnsOpp;
+					this.columns = this.columnsOpp;
 					this.iconName = 'standard:opportunity';
 					var rows = result.recordList;
 						for (var i = 0; i < rows.length; i++) {
 							var row = rows[i];
-							//console.log('OpportunityTeamMemberName: '+row.OpportunityTeamMembers[i]);
 							if(row.Owner){
 								row.OwnerName = row.Owner.Name;
 								row.OwnerNameURL = '/'+row.OwnerId;
@@ -295,6 +385,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 							}
 							if(row.Amount){
 								row.Amount = row.Amount ? row.Amount : null;
+								row.Amount = this.formatNumber(row.Amount);
 							}
 							if(row.CIBE_Balance__c){
 								row.CIBE_Balance__c = row.CIBE_Balance__c ? row.CIBE_Balance__c : null;
@@ -305,7 +396,6 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 							if(row.OpportunityTeamMembers!= undefined && row.OpportunityTeamMembers.length > 0 ){
 								row.ParticipeRow = row.OpportunityTeamMembers[0].Name ? row.OpportunityTeamMembers[0].Name : '';
 								for (var f = 1; f < row.OpportunityTeamMembers.length; f++) {
-									console.log('OpportunityTeamMemberName: '+row.OpportunityTeamMembers[f].Name);
 									row.ParticipeRow += row.OpportunityTeamMembers[f].Name ? ' / '+row.OpportunityTeamMembers[f].Name : '';
 								}
 							}
@@ -383,6 +473,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 				console.error('Lookup error', JSON.stringify(error));
 				this.errors = [error];
 			});
+			
 	}
 
 	//Participe
@@ -499,7 +590,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 					this.selectedOffice = String(sel.subtitle).slice(-5); // Get the office number
 					if (this.empleOfi.slice(-5) != this.selectedOffice) {
 						this.selectedEmployees = [];
-		}
+					}
 					this.getOptionsEmployee(sel.title.substring(0,5));
 					if (this.isAnotherOffice) {
 						this.handleAnotherOffice(new Object({'detail': {'checked': true}}));
@@ -525,7 +616,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 				if(this.selectedParticipe.length > 0){
 					this.showSelectedParticipe = true;
 				}else{
-					this.showSelectedParticipe = true;
+					this.showSelectedParticipe = false;
 				}
 			} else {
 				this.filterParticipe = null;
@@ -624,7 +715,6 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	}
 	
 	handleSearchData() {
-		console.log('handleSearchData');
 		this.page = 1;
 		this.size = 0;
 		this.firstSearch = true;
@@ -642,11 +732,9 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	}
 	handleChangeImporte(event) {
 		this.importeFilter = event.target.value;
-		console.log('importeFilter: '+this.importeFilter);
 		if(this.importeFilter =='' ||this.importeFilter ==null || this.importeFilter == undefined ){
 			this.importeFilter =0;
 		}
-		console.log('importeFilter: '+this.importeFilter);
 
 	}
 
@@ -661,7 +749,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 		this.setVisibilityOptions();
 		this.setButtonVisibility();
 	}
-	
+
 	handleChangeProbabilidad(event) {
 		this.targetProbabilidad = event.target.value;
 		if (this.isAnotherOffice) {
@@ -755,7 +843,6 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	 * @description		Fill the multiselectors for the query
 	 */
 	setMultiSelectors() {
-		console.log('Entra setMultiSelectors');
 		this.employeMultiFilter = [];
 		this.productsMultiFilter = [];
 		this.participesMultiFilter = [];
@@ -832,7 +919,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 
 		this.fechaCierreD = null;
 		this.fechaCierreH = null;
-		this.origenFilter ='CIBE_AccionComercialEMP';
+		this.origenFilter ='CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP';
 		this.targetProbabilidad = null;
 		this.statusFilter = null;
 		this.subjectFilter = null;
@@ -1013,7 +1100,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
             this.page = this.page + 1; //increase page by 1
 			if (this.page*100 > this.data.length) {
 				this.setMultiSelectors();
-				this.getDataList(this.clientFilter, this.subjectFilter, this.origenFilter, this.statusFilter, this.dueDate2Filter,this.dueDateFilter, this.employeMultiFilter, this.productsMultiFilter, this.fechaCierreD, this.fechaCierreH, this.page, this.numOficinaEmpresa, this.targetProbabilidad, this.importeFilter,this.participesMultiFilter);
+				this.getDataList(this.clientFilter, this.subjectFilter, this.origenFilter, this.statusFilter, this.employeMultiFilter, this.productsMultiFilter, this.fechaCierreD, this.fechaCierreH, this.page, this.numOficinaEmpresa, this.targetProbabilidad, this.importeFilter,this.participesMultiFilter);
 				this.toggleSpinner();
 			}
 			this.toggleSpinner();
@@ -1032,32 +1119,18 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
         this.startingRecord = this.startingRecord + 1;
     }
 
-    sortBy(field, reverse, primer) {
-        const key = primer
-            ? function(x) {
-                return primer(x[field]);
-            }
-            : function(x) {
-                return x[field];
-            };
+   
 
-        return function(a, b) {
-            a = key(a);
-            b = key(b);
-            return reverse * ((a > b) - (b > a));
-        };
-    }
-
-    onHandleSort(event) {
-        const cloneData = [...this.items];
-		const { fieldName: sortedBy, sortDirection } = event.detail;
+    // onHandleSort(event) {
+    //     const cloneData = [...this.items];
+	// 	const { fieldName: sortedBy, sortDirection } = event.detail;
 
 
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
-        this.items = cloneData;
-        this.sortDirection = sortDirection;
-        this.sortedBy = sortedBy;
-    }
+    //     cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+    //     this.items = cloneData;
+    //     this.sortDirection = sortDirection;
+    //     this.sortedBy = sortedBy;
+    // }
 
 	/**
 	 * Hides assignment depending on showAssignment value
@@ -1083,6 +1156,7 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	}
 
 	setButtonVisibility() {
+
 		if (((this.employeeFilter === null || typeof this.employeeFilter === 'undefined') ||
 			(this.statusFilter === null || typeof this.statusFilter === 'undefined')) 
 		){
@@ -1092,8 +1166,13 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 				
 				//this.filterProduct === null || typeof this.filterProduct === 'undefined' 
 			this.buttonDisabled = true;
+			this.isOriginAll = false;
+		} else if(this.origenFilter == 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP' && this.selectedProducts.length === 0){
+			this.buttonDisabled = true;
+			this.isOriginAll = true;
 		} else {
 			this.buttonDisabled = false;
+			this.isOriginAll = false;
 		}
 	}
 
@@ -1142,7 +1221,6 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 					});
 				});       
 			}
-			console.log(status);
 			if(status === 'FINISHED') {
 				this.isShowFlowAction = false;
 				const selectedEvent = new CustomEvent('closetab', {detail: {recordId: this.redirectId}});
@@ -1160,5 +1238,63 @@ export default class CIBE_MassReassignOwnerOpps extends LightningElement {
 	
 		hideFlowAction() {
 			this.isShowFlowAction = false;
+		}
+
+		handleSortData(event) {
+			this.sortByFieldName = event.detail.fieldName;
+			let sortField = event.detail.fieldName;
+			for (let col of this.columnsOpp) {
+				if (col.fieldName == this.sortByFieldName && col.type == 'url'){			
+					sortField = col.typeAttributes.label.fieldName;
+				}
+			}
+			this.sortDirection = event.detail.sortDirection;
+			this.sortData(sortField, this.sortDirection);
+		}
+	
+		sortData(fieldname, direction) {
+			let parseData = JSON.parse(JSON.stringify(this.items));
+			let keyValue = (a) => {
+				return a[fieldname];
+			};
+	
+			let isReverse = direction === 'asc' ? 1: -1;
+			this.items = parseData.sort((x, y) => {
+				x = keyValue(x) ? typeof  keyValue(x) === 'string' ? keyValue(x).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : keyValue(x) : '';
+				y = keyValue(y) ? typeof  keyValue(y) === 'string' ? keyValue(y).toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : keyValue(y) : '';
+				return isReverse * ((x > y) - (y > x));
+			});
+	
+			this.items.forEach(e => {
+				console.log(e.PFName);
+			})
+	
+			
+		}    		
+		sortBy(field, reverse, primer) {
+			const key = primer
+				? function(x) {
+					return primer(x[field]);
+				}
+				: function(x) {
+					return x[field];
+				};
+			return function(a, b) {
+				a = key(a);
+				b = key(b);
+				return reverse * ((a > b) - (b > a));
+			};
+		}
+		
+		formatNumber(number) {
+			//Asegura que el número es un entero y lo pasa a String
+			//var formattedNumber = Number(number.toFixed(0)).toString();
+			var formattedNumber = Math.trunc(number).toString();
+			/* Separa los miles con un punto. La expresión regular /B(?=(\d{3})+(?!\d))/g encuentra posiciones en una cadena
+			donde se puede insertar un separador, como un punto, para representar miles en un número*/
+			if(formattedNumber.length >= 4){
+				formattedNumber = formattedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+			}
+			return formattedNumber;
 		}
 }

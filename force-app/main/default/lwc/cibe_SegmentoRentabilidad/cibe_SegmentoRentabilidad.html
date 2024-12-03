@@ -1,0 +1,136 @@
+<template>
+
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner">
+            <h2 class="slds-card__header-title">
+                <span>{labels.segmento}</span>
+            </h2>
+
+            <div class="slds-grid slds-gutters">
+                <div class="caja2">
+
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-5">
+                            <h3>{labels.absoluta}</h3>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 icono" >
+                            <lightning-helptext content={labels.helpAbsoluta}></lightning-helptext>
+                        </div>
+
+                    </div>  
+
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item class="sizeCol ">
+                            <label class="slds-form-element__label" for="input-01">{labels.empresa}</label>
+
+
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                   <div if:true={empresaAbsoluta}>
+                                        <lightning-icon icon-name="utility:record" size="xx-small" class={empresaAbsolutaClass}></lightning-icon>
+                                   </div>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 style="margin-top: 0.1rem;">
+                                            <span  class="color-blue pointer-filter">{absolutaEmpresa}</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </lightning-layout-item>
+
+
+                        <lightning-layout-item class=" sizeCol  ">
+                            <label class="slds-form-element__label" for="input-01">{labels.grupoCEconomico}</label>
+
+
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <div if:true={grupoAbsoluta}>
+                                        <lightning-icon icon-name="utility:record" size="xx-small" class={grupoAbsolutaClass}></lightning-icon>
+                                   </div>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 style="margin-top: 0.1rem;">
+                                            <span  class="color-blue pointer-filter">{absolutaGrupo}</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </lightning-layout-item>
+
+                    </lightning-layout>
+
+                </div>
+                <div class="caja2">
+
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-5">
+                            <h3>{labels.relativa}</h3>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 icono" >
+                            <lightning-helptext content={labels.helpRelativa}></lightning-helptext>
+                        </div>
+
+                    </div> 
+                    
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item class="sizeCol ">
+                            <label class="slds-form-element__label" for="input-01">{labels.empresa}</label>
+
+
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                   <div if:true={empresaRelativa}>
+                                        <lightning-icon icon-name="utility:record" size="xx-small" class={empresaRelativaClass}></lightning-icon>
+                                   </div>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 style="margin-top: 0.1rem;">
+                                            <span  class="color-blue pointer-filter">{relativaEmpresa}</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </lightning-layout-item>
+
+
+                        <lightning-layout-item class="sizeCol ">
+                            <label class="slds-form-element__label" for="input-01">{labels.grupoCEconomico}</label>
+
+
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <div if:true={grupoRelativa}>
+                                        <lightning-icon icon-name="utility:record" size="xx-small" class={grupoRelativaClass}></lightning-icon>
+                                   </div>
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 style="margin-top: 0.1rem;">
+                                            <span  class="color-blue pointer-filter">{relativaGrupo}</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </lightning-layout-item>
+
+                    </lightning-layout>
+                    
+                </div>
+              </div>
+
+        </div>
+
+       
+
+    </article>
+    
+</template>

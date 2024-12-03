@@ -387,7 +387,11 @@
 			}
 		}
 		let selectedMccMotivo = component.get('v.opcionesMotivos').find(motivo => motivo.value === component.find("selectItemMotivo").get("v.value"));
-		component.set("v.seleccionado", selectedMccMotivo.label);
+		if(selectedMccMotivo != undefined){
+
+			component.set("v.seleccionado", selectedMccMotivo.label);
+		}
+		  
 		  
 		helper.inicioGuardar(component);
         

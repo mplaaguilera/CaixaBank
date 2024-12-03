@@ -1,0 +1,9 @@
+<template>
+    <lightning-spinner if:false={readyCalendar} alternative-text="Cargando..." variant="brand" size="medium"
+        class="spin-cls"></lightning-spinner>
+
+    <div style="background:#ffffff;" class="slds-grid">
+        <div id="calendar" class="fullcalendarjs"></div>
+        <!-- <div  id="calendar" class="fullcalendarjs" style="z-index:0"></div> -->
+    </div>
+</template>

@@ -4,7 +4,7 @@
     <aura:attribute name="recordId" type="String" />
 
     <aura:attribute name="rtGrupo" type="String" />
-    <aura:attribute name="Message" type="String" access="public" />
+
     <aura:attribute name="clasificacionesMaximo" type="List" />
     <aura:attribute name="clasificacionMaximoSelectValue" type="String" />
     <aura:attribute name="clasificacionMaximoSelectName" type="String" />

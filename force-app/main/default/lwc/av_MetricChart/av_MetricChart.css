@@ -7,10 +7,14 @@
 }
 .card-title{
     font-family: "SalesforceSans-Regular",Arial,sans-serif;
-    font-size: 1rem;
-    color: #16325c;
+    font-size: 0.8rem;
+    color: black;
+    font-weight: bold;
     line-height: 1.25rem;
     top: inherit;
+    padding-top: .40rem;
+    padding-left: .40rem;
+    padding-right: .40rem;
 }
 .cursor-link{
     cursor: pointer;
@@ -42,10 +46,13 @@
 }
 
 .num-records-donut-chart{
-    font-size: 1.3rem;
-    position: absolute;
-    margin-top: -33%;
-    margin-left: 47%;
+    /* font-size: 1.3rem; */
+    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    /* position: absolute; */
+    /* margin-top: -33%; */
+    /* margin-left: 47%; */
     text-align: center!important;
     color: #0097d4;
 }
@@ -57,6 +64,7 @@
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
+    margin-left: 1.5em;
 
 }
 .dot-blue {
@@ -66,6 +74,7 @@
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
+    margin-left: 1.5em;
 
 }
 .dot-intermediate-blue {
@@ -75,6 +84,7 @@
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
+    margin-left: 1.5em;
 
 }
 .dot-light-blue {
@@ -84,6 +94,7 @@
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
+    margin-left: 1.5em;
 
 }
 
@@ -94,21 +105,33 @@
     border-radius: 50%;
     display: inline-block;
     cursor: pointer;
+    margin-left: 1.5em;
 }
 .inline{
     display: inline-block;
     margin-left: 5%;
     cursor: pointer;
+    padding-left: .40em;
 }
+.card-SingestorTask {
+    border: 1px solid rgb(221, 219, 218);
+    color: #007EAE;
+    text-align: center;
+    font-size: medium;
+    cursor: pointer;
+    padding: 5px;
+}
+
 .card-temp-donut-chart{
     height: 19rem;
     width: 14rem;
     position: relative;
-    padding: 1.5rem;
+    /* padding: 1.5rem; */
     border: 1px solid rgb(221, 219, 218);
     border-radius: 0.25rem;
     background-clip: padding-box;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+    margin: 10px;
 }
 .custom-box{
     margin: 10px 0 0px -20px;
@@ -122,7 +145,7 @@
 }
 
 .custom_button{
-  width: 93%;
+  width: 100%;
   text-align:center;
   position: absolute;
   bottom:.5rem;
@@ -130,10 +153,26 @@
 }
 
 .inner_button{
-  padding:.25rem;
-  width: 90%;
-  border: 1px solid rgb(221,219,218);
-  border-radius: .25rem;
-  box-shadow: 0 2opx 2px 0 rgba(0,0,0,0.10);
-  background: none;
+    padding: .25rem;
+    font-size: 0.8rem;
+    width: 100%;
+    border-top: 1px solid rgb(221, 219, 218);
+    /* border-radius: .25rem; */
+    /* box-shadow: 0 20px 2px 0 rgba(0, 0, 0, 0.10); */
+    background: none;
+    text-align: center;
+    position: absolute;
+    /*left: 0;*/
+    bottom: 0;
+}
+
+.inner_button_first{
+    padding: .25rem;
+    font-size: 0.8rem;
+    width: 100%;
+    border-top: 1px solid rgb(221, 219, 218);
+    text-align: center;
+    background: none;
+    margin-top: 4rem;
+
 }

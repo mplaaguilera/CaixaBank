@@ -7,7 +7,7 @@
             var state = response.getState();
             if (state === "SUCCESS") {
                 let respuesta =  response.getReturnValue();
-                
+
                 component.set('v.ultimaActualizacion', respuesta.caso.SAC_FechaUltimaSolicitud__c);
                 component.set('v.antecedentesRevisados',  respuesta.caso.SAC_Antecedentes_Revisados__c);
 

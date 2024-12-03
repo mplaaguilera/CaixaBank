@@ -37,7 +37,6 @@
 							component.set('v.disableDescartar', true); 
 							component.set('v.disableDerivar', true); 
 							component.set('v.esPropietario', true);
-							component.set('v.esPropietarioLetrado', true);
 							component.set('v.noEsPropietario', false);
 							component.set('v.estaEnLaCola', true);
 						}
@@ -55,12 +54,6 @@
 									component.set('v.esPropietario', false); 
 									component.set('v.noEsPropietario', true);
 									component.set('v.estaEnLaCola', true);
-								}
-
-								if(response.getReturnValue().UserName === component.get('v.caso.SAC_Letrado__c')){
-									component.set('v.esPropietarioLetrado', true);
-								}else{
-									component.set('v.esPropietarioLetrado', false);
 								}
 							});
 							$A.enqueueAction(getUser); 
@@ -238,43 +231,31 @@
 	},
 
 	descartar : function(component, event, helper) {
-		let origenConsulta = component.get('v.caso').SAC_OrigenConsulta__c;
-		
-		if(origenConsulta == '' || origenConsulta == null){
-			let toastEvent = $A.get('e.force:showToast');
-			toastEvent.setParams({'title': 'Fallo al actualizar.', 'message': 'Para gestionar la consulta primero debe de indicar el origen de la misma.', 'type': 'error', 'mode': 'dismissable', 'duration': 4000});
-			toastEvent.fire();
-		}
-		else{
-			component.set("v.clickDescartar", true);
-		}
-		
-		/*
-		var idCase = component.get("v.recordId");		
-		var descartarConsulta = component.get('c.modificarEstadoCaso');        
-		descartarConsulta.setParams({
-            'caseId': idCase,  
-            'estado' : 'SAC_013' //Descartada
+        let origenConsulta = component.get('v.caso').SAC_OrigenConsulta__c;
+        var comprobarUsuario = component.get('c.checkUserPermission');  
+        var permisoUsuario = false;
+        comprobarUsuario.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state == "SUCCESS") {
+                permisoUsuario = response.getReturnValue();
+                if((origenConsulta == '' || origenConsulta == null) && !permisoUsuario){
+                    let toastEvent = $A.get('e.force:showToast');
+                    toastEvent.setParams({'title': 'Fallo al actualizar.', 'message': 'Para gestionar la consulta primero debe de indicar el origen de la misma.', 'type': 'error', 'mode': 'dismissable', 'duration': 4000});
+                    toastEvent.fire();
+                }
+                else{
+                    component.set("v.clickDescartar", true);
+                }
+            }else{
+                var errors = response.getError();
+                if (errors && errors[0] && errors[0].message) {
+                    helper.mostrarToast('error', 'No se ha podido descartar', 'Error inesperado contacta con el administrador: ' + errors[0].message);
+                }else{
+                    helper.mostrarToast('error', 'No se ha podido descartar', 'Error inesperado contacta con el administrador');
+                }
+            }
         });
-
-		descartarConsulta.setCallback(this, function (response) {
-			var state = response.getState();
-			if (state == "SUCCESS") {
-				$A.get('e.force:refreshView').fire();
-				helper.reinit(component);
-				helper.mostrarToast('success', 'Consulta descartada', 'La Consulta se ha descartado correctamente', component);
-			}else{
-				var errors = response.getError();
-				if (errors && errors[0] && errors[0].message) {
-					helper.mostrarToast('error', 'No se ha podido descartar', 'Error inesperado contacta con el administrador: ' + errors[0].message);
-				}else{
-					helper.mostrarToast('error', 'No se ha podido descartar', 'Error inesperado contacta con el administrador');
-				}
-			}
-		});
-
-		
-		$A.enqueueAction(descartarConsulta);*/
+        $A.enqueueAction(comprobarUsuario);
 	},
 
 	volver : function(component, event, helper) {
@@ -762,47 +743,5 @@
 			});
 			$A.enqueueAction(resolucion);
 		}
-	},
-
-	tomarPropiedadLetrado : function(component, event, helper) {
-        
-		var idCase = component.get("v.recordId");
-        var OwnerId = $A.get('$SObjectType.CurrentUser.Id');
-	
-		var action = component.get("c.tomarPropiedadLetradoConsulta");
-		action.setParams({
-			'caseId': idCase,  
-			'ownerId' : OwnerId
-		});
-			
-		var toastEvent = $A.get("e.force:showToast");
-		toastEvent.setParams({
-			"title": "Éxito!",
-			"message": "Se ha cambiado el propietario letrado correctamente.",
-			"type": "success"
-		});
-		
-		action.setCallback(this, function(response) {
-			var state = response.getState();
-			if(state == "SUCCESS") {
-				toastEvent.fire();
-				$A.get('e.force:refreshView').fire();
-				helper.reinit(component);
-			}
-			else
-			{
-				var errors = response.getError();
-				let toastParams = {
-					title: "Error",
-					message: errors[0].message, 
-					type: "error"
-				};
-				let toastEvent = $A.get("e.force:showToast");
-				toastEvent.setParams(toastParams);
-				toastEvent.fire();
-			}
-		});
-		
-		$A.enqueueAction(action);
-	},
+	}
 })

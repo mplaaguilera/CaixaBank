@@ -1,0 +1,58 @@
+.icon-style {
+    /* width:2rem; */
+    margin: .25rem 0;
+}
+
+.cmpStyle {
+    padding: .5rem 1rem;
+}
+
+.title-container {
+    display: flex;
+    align-items: center;
+    padding: 2%;
+    font-size: medium;
+
+}
+
+.title-BG {
+    display: flex;
+    margin-left: 1%;
+}
+
+.main-container {
+    display: flex;
+    padding: 2%;
+}
+
+.left-sub-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+}
+
+.right-sub-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 45%;
+    margin-left: 5%;
+}
+
+.info-container {
+    margin-top: 2%;
+    margin-left: 2%;
+}
+
+.members {
+    margin-top: 0.75rem;
+}
+
+.icon-style {
+    margin-right: 2% !important;
+}
+
+p {
+    margin-bottom: .2rem !important;
+}

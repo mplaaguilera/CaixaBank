@@ -17,69 +17,14 @@
                     </div>
                 </template>   
             </div>
-            <lightning-card title="Documentos a enviar" icon-name="standard:file">
-            <div slot="actions">
-              <div class="slds-float_right">              
-                  <lightning-button-icon
-                      icon-name="utility:refresh"
-                      title="Refrescar"
-                      onclick={handleRefreshClick}>
-                  </lightning-button-icon>
-              </div>
-            </div>
-            <div class="slds-form-element__control tabla-documentos" style="margin-top: 15px;">
-                <div if:true={hayDocs}>
-                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-                  <thead>
-                    <tr class="slds-line-height_reset">
-                      <th class="" scope="col">
-                        <div class="slds-truncate"  title="Enviar">Enviar</div>
-                      </th>
-                      <th class="" scope="col">
-                        <div class="slds-truncate" title="Fecha">Fecha</div>
-                      </th>
-                      <th class="" scope="col">
-                        <div class="slds-truncate" title="Titulo">Título</div>
-                      </th>
-                      <th class="" scope="col">
-                        <div class="slds-truncate" title="Tipo Documento">Tipo Documento</div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <template for:each={documentosPorColumnas} for:item="doc">
-                      <tr key={doc.Id}>
-                        <th scope="col">
-                          <div>
-                              <lightning-input type="checkbox" data-id={doc.idDoc} onchange={handleCheckboxChange}></lightning-input>
-                          </div>
-                        </th>
-                        <th scope="col">
-                            <div>{doc.formattedCreateDate}</div>
-                        </th>
-                        <th scope="col">
-                            <div>{doc.titulo}</div>
-                        </th>
-                        <th scope="col">
-                            <div>{doc.tipoDoc}</div>
-                        </th>         
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-1">
+                    <lightning-button data-name="botonEnviar" style="margin-right: 30px;margin-top: 15px;" class="slds-float_right" variant="brand" onclick={enviarOrganismo} label="Enviar" disabled={desactivarBotonEnviar}></lightning-button>
                 </div>
-               <div if:false={hayDocs}>
-                <p>No hay documentos validados </p>
-               </div> 
             </div>
-          </lightning-card>
         </lightning-card>
-        <div class="slds-grid">
-          <div class="slds-col slds-size_1-of-1">
-              <lightning-button data-name="botonEnviar" style="margin-right: 30px;margin-top: 15px; margin-bottom: 5px;" class="slds-float_right" variant="brand" onclick={enviarOrganismo} label="Enviar" disabled={desactivarBotonEnviar}></lightning-button>
-          </div>
-        </div>
     </div>
+
     <template if:true={isLoading}>
         <div class="slds-p-around_x-large">
             <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>

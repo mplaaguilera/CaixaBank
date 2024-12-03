@@ -252,7 +252,6 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
 
         // LEIDO SI O NO
         if(selectedComparisonLeido === "opcionSI"){
-            console.log('leido');
             filteredAlertas = filteredAlertas.filter(alerta =>
                 alerta.SAC_Leido__c === true
             );
@@ -265,13 +264,10 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
 
         //FECHA CREACION 
          if (selectedComparison === "opcion1") { // Igual a
-             console.log('hola');
              filteredAlertas = filteredAlertas.filter(alerta =>
                  new Date(alerta.CreatedDate).toISOString().split('T')[0] === selectedDateValue
              );
-             console.log('adios');
          } else if (selectedComparison === "opcion2") { // Después de
-            console.log('entra');
              filteredAlertas= filteredAlertas.filter(alerta =>
                  new Date(alerta.CreatedDate).toISOString().split('T')[0] > selectedDateValue
              );
@@ -294,7 +290,6 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
               const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
               filteredAlertas = filteredAlertas.filter(alerta => {
-                console.log('Alerta entra '+alerta);
                   const alertaDate = new Date(alerta.CreatedDate);
                   return alertaDate >= todayStart && alertaDate < todayEnd;
               });
@@ -414,18 +409,15 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
                 return alertaDate >= firstDayOfCurrentYear && alertaDate <= lastDayOfCurrentYear;
             });
         } else if (selectedComparison === 'opcion18') { // Año pasado
-            console.log('entra opcion');
             const today = new Date();
             const currentYear = today.getFullYear();
             const firstDayOfLastYear = new Date(currentYear - 1, 0, 1);
             const lastDayOfLastYear = new Date(currentYear - 1, 11, 31);
         
             filteredAlertas = filteredAlertas.filter(alerta => {
-                console.log('entra '+ alerta);
                 const alertaDate = new Date(alerta.CreatedDate);
                 return alertaDate >= firstDayOfLastYear && alertaDate <= lastDayOfLastYear;
             });
-            console.log('alertas salen '+ filteredAlertas);
         }
         
         
@@ -439,7 +431,6 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
                 return false
         });         
          } else if (selectedComparisonLectura === "opcion2") { // Después de
-            console.log('entra');
                 filteredAlertas = filteredAlertas.filter(alerta =>{
                 if(alerta.SAC_FechaLectura__c != null){
                     return new Date(alerta.SAC_FechaLectura__c).toISOString().split('T')[0] > selectedDateValueLectura;
@@ -447,7 +438,6 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
                     return false
             });
           } else if (selectedComparisonLectura === "opcion3") { // Antes de
-            console.log('entra');
             filteredAlertas = filteredAlertas.filter(alerta =>{
             if(alerta.SAC_FechaLectura__c != null){
                 return new Date(alerta.SAC_FechaLectura__c).toISOString().split('T')[0] < selectedDateValueLectura;
@@ -469,7 +459,6 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
               const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
               filteredAlertas = filteredAlertas.filter(alerta => {
-                console.log('Alerta entra '+alerta);
                   const alertaDate = new Date(alerta.SAC_FechaLectura__c);
                   return alertaDate >= todayStart && alertaDate < todayEnd;
               });
@@ -601,10 +590,8 @@ export default class Sac_Alertas extends NavigationMixin(LightningElement) {
         }
 
 
-        console.log('FINAL');
         this.tituloTabla = 'Alertas (' + filteredAlertas.length + ')';
         this.alertas = filteredAlertas;
-        console.log('alertas--->' + this.alertas);
         
     }
     

@@ -4,6 +4,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import NAME_FIELDUSER from '@salesforce/schema/User.Name';
 import NAME_FIELDPROD from '@salesforce/schema/Product2.Name';
+import PRODUCT_NEW_REPORT_ACTION from '@salesforce/schema/Product2.AV_NewReportActions__c';
 import PRODID_FIELD from '@salesforce/schema/AV_ProductExperience__c.AV_ProductoFicha__c';
 import lookupSearchProduct from '@salesforce/apex/AV_NewOpportunity_Controller.searchProduct';
 import lookupSearchByProduct from '@salesforce/apex/AV_NewOpportunity_Controller.searchByProduct';
@@ -25,13 +26,19 @@ import successUnlinkMsgLabel from '@salesforce/label/c.AV_CMP_SuccessUnlinkOpp';
 
 import AV_CMP_ErrorMessage from '@salesforce/label/c.AV_CMP_ErrorMessage';
 import SystemModstamp from '@salesforce/schema/Account.SystemModstamp';
+import OLDHOMETSK from '@salesforce/customPermission/AV_OldHomeTask';  
+
+
+
 
 export default class Av_NewOpportunityEditable extends LightningElement {
 
+	@api isMain;
+	@api recinfo;
 	@api layoutHorizontal = 'space'; //layout item horizontal...
 	@api isone = false;
 	@api defaultStage;
-	@api opptask;
+	@api opp;
 	@api isreport = false;
 	@api pfexp;
 	@api taskid;
@@ -73,6 +80,7 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	@track amount = null;
 	@track byProduct = null;
 	@track validationError = null;
+	@track noofrecerhasta;
 	@track find = '';
 	@track initialPotencial = "S";
 	@track errors = [];
@@ -89,6 +97,16 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	@track nombreSubProducto;
 	@track hasProduct = false;
 	@track checkNotAllowed = false;
+	@track showToggleByPermission = false;
+	@track isNewProductActions;
+	@track showNoOfrecerHasta = false;
+	noofrecerhastaprevio;
+	positiveClosedState;
+	negativeClosedState;
+	@track stageLabel;
+	@track prodInformed;
+
+	
 
 	toggle(event) {
 		this.show = event.target.checked;
@@ -116,7 +134,8 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			{ label: 'No le interesa por precio', value: 'No le interesa por precio' },
 			{ label: 'No le interesa por las características del producto', value: 'No le interesa por las características del producto' },
 			{ label: 'Perfil cliente inadecuado', value: 'PCI' },
-			{ label: 'Otros', value: 'O' }
+			{ label: 'Otros', value: 'O' },
+			{ label: 'No Apto', value: 'No Apto' }
 
 		]
 	}
@@ -132,8 +151,12 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	}
 
 	evaluateResolution() {
-		this.otros = this.resolucion == 'O' && (this.comentario === null || this.comentario?.trim().length === 0) && this.path == 'No interesado';
+		this.otros = this.resolucion == 'O' && (this.comentario === null || this.comentario?.trim().length === 0) && this.path == this.negativeClosedState;
 		this.requiredComment = this.resolucion == 'O';
+		this.showNoOfrecerHasta = this.resolucion == 'No Apto';
+		if(!this.showNoOfrecerHasta){
+			this.noofrecerhasta = null;
+		}
 	}
 
 	@wire(getRecord, { recordId: USER_ID, fields: [NAME_FIELDUSER] })
@@ -149,8 +172,9 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 		if (this.isreport) {
 			var sendData = new CustomEvent('datareport', {
 				detail: {
-					oppRecordType: this.opptask.AV_Opportunity__r?.RecordTypeId,
-					id: this.opptask.Id,
+					oppRecordType: this.opp.RecordTypeId,
+					oppRecordTypeDevName : this.opp.RecordType.DeveloperName,
+					id: this.opp.Id,
 					taskid: this.taskid,
 					path: this.path,
 					fechagestion: this.fechagestion,
@@ -161,7 +185,7 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 					interes: this.interes,
 					incluir: this.incluir,
 					producto: this.producto,
-					oportunidad: this.opptask.Name,
+					oportunidad: this.opp.Name,
 					cuota: this.cuota,
 					matricula: this.matricula,
 					otraentidadpick: this.otraentidadpick,
@@ -171,13 +195,14 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 					resolucion: this.resolucion,
 					margin: this.margin,
 					amount: this.amount,
-					byProduct: this.byProduct
+					byProduct: this.byProduct,
+					noofrecerhasta: this.noofrecerhasta
 				}
 			});
 			this.dispatchEvent(sendData);
 
 		} else {
-			var validateDecimal = /^[0-9]*(\,?)[0-9]+$/;
+			var validateDecimal = /^(\d+,\d{1,2}(?!,)|\d+)$/;
 			if (this.importe != null && this.importe != '') {
 				if (!this.importe.match(validateDecimal)) {
 					this.showToast('Error', 'El campo de Importe es de tipo decimal. El formato correcto es: 123,12', 'error', 'pester');
@@ -191,7 +216,7 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 				}
 			}
 			if (this.interes != null && this.interes != '') {
-				if (!this.interes.match(validateDecimal)) {
+				if (!this.interes.match(/^\d+.\d{1,2}$/) && !this.interes.match(/^\d+$/)) {
 					this.showToast('Error', 'El campo de Interes Cuota es de tipo decimal. El formato correcto es: 123,12', 'error', 'pester');
 					this.validationError = 'El campo es de tipo decimal. El formato correcto es: 123,12';
 				}
@@ -233,40 +258,46 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 					margin: this.margin,
 					amount: this.amount,
 					byProduct: this.byProduct,
+					noofrecerhasta:this.noofrecerhasta,
 					validationError: this.validationError
 				}
 			});
 			this.dispatchEvent(sendDataOpp);
 		}
 	}
-
+	handleChangeNoOfrecerHasta(e){
+		this.noofrecerhasta = e.target.value;
+		this.sendData();
+	}
 	handlePath(event) {
-		var oldPath = this.path
+		var oldPath = this.path;
 		this.path = event.detail.newValue;
-		this.evaluateResolution();
 		var today = new Date();
 		var year = today.getFullYear() + 2;
-		if (this.path == 'No interesado') {
+		if (this.path == this.negativeClosedState) {
 			this.isclosed = true;
+			this.showNoOfrecerHasta = true;
 		} else {
 			this.isclosed = false;
 			this.resolucion = '';
+			this.showNoOfrecerHasta = false;
 		}
-		this.showDateAndCli = !(this.path === 'Cerrado positivo' || this.isclosed === true);
-		this.checkNotAllowed = (this.path === 'Cerrado positivo' || this.isclosed === true || this.path == 'No apto');
+		this.evaluateResolution();
+		this.showDateAndCli = !(this.path === this.positiveClosedState || this.isclosed === true);
+		this.checkNotAllowed = (this.path === this.positiveClosedState || this.isclosed === true);
 		if (oldPath == 'Potencial') {
 			this.fechaActivacion = today.toISOString().substring(0, 10);
 		}
 		if (this.path == 'Potencial') {
 			this.fechaActivacion = null;
 		}
-		if (this.path == "No apto") {
-			today.setFullYear(year);
-			this.fechagestion = today.toISOString().substring(0, 10);
-		} else {
+		 else {
 			var today = new Date();
 			var year = today.getFullYear() + 1;
 			today.setFullYear(year);
+		}
+		if(this.path == this.negativeClosedState ||this.path === this.positiveClosedState){
+			this.fechagestion = (new Date()).toISOString().substring(0,10);
 		}
 		this.isFechaRequired();
 		this.showExpectativaVenta();
@@ -277,7 +308,7 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	}
 
 	isFechaRequired() {
-		if (this.path == "Potencial" || this.path == "No apto" || this.path == "En gestión/insistir") {
+		if (this.path == "Potencial" || this.path == "En gestión/insistir") {
 			this.asterisk = true;
 			if (typeof this.fechagestion == 'undefined' || this.fechagestion == null) {
 				this.reqFechaGestion = true;
@@ -398,10 +429,11 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 				this.sendData();
 				break;
 			case 'Tipo de Interés':
-				if (event.target.value == '') {
+				if (event.target.value == '' || event.target.value == null) {
 					this.interes = null;
 				} else {
-					this.interes = event.target.value;
+					let interescom= event.target.value.toString().replace('.', ',');
+					this.interes = interescom;
 				}
 				this.sendData();
 				break;
@@ -412,11 +444,12 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 		}
 	}
 
-	@wire(getRecord, { recordId: '$producto', fields: [NAME_FIELDPROD] })
+	@wire(getRecord, { recordId: '$producto', fields: [NAME_FIELDPROD,PRODUCT_NEW_REPORT_ACTION] })
 	wiredProdName({ error, data }) {
 		if (data) {
 			this.oportunidad = data.fields.Name.value;
 			this.nombreProducto = data.fields.Name.value;
+			this.isNewProductActions = data.fields.AV_NewReportActions__c.value;
 			this.getFields(this.producto);
 			this.sendData();
 			this.initialSelection = [{ id: this.producto, icon: 'standard:product', title: this.nombreProducto }];
@@ -453,22 +486,24 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 		var year = today.getFullYear();
 		today.setFullYear(year);
 		this.potencial = this.initialPotencial;
-		if (this.isreport && this.opptask != undefined) {
+		if (this.isreport && this.opp != undefined) {
 			this.getStatus();
-			this.path = this.opptask.AV_Stage__c;
-			this.asterisk = this.path == "No apto" || this.path == "En gestión/insistir";
-			this.fechagestion = this.opptask.AV_ReviewDate__c;
-			this.comentario = this.opptask.AV_Commentary__c;
-			this.entidad = this.opptask.AV_Entity__c;
-			this.fechavencimiento = this.opptask.AV_DueDate__c;
+			this.path = this.opp.StageName;
+			this.stageLabel = (this.opp.StageName == 'En gestión/insistir') ? 'En Gestión' : this.opp.StageName;
+			this.asterisk = this.path == "En gestión/insistir";
+			this.fechagestion = this.opp.AV_FechaProximoRecordatorio__c;
+			this.comentario = this.opp.AV_Comentarios__c;
+			this.entidad = this.opp.AV_Entidad__c;
+			this.fechavencimiento = this.opp.AV_FechaVencimiento__c;
 			this.origenapp = 'AV_SalesforceReport';
-			this.importe = this.opptask.AV_Amount__c;
-			this.fechaActivacion = this.opptask.AV_Opportunity__r.AV_FechaActivacion__c;
-			this.potencial = this.opptask.AV_Priority__c;
-			this.resolucion = this.opptask.AV_Resolucion__c;
-			this.amount = this.opptask.AV_AmountEuro__c;
-			this.margin = this.opptask.AV_MarginEuro__c;
-
+			this.importe = this.opp.Amount;
+			this.fechaActivacion = this.opp.AV_FechaActivacion__c;
+			this.potencial = this.opp.AV_Potencial__c;
+			this.resolucion = this.opp.AV_Resolucion__c;
+			this.amount = this.opp.AV_AmountEuro__c;
+			this.margin = this.opp.AV_MarginEuro__c;
+			this.noofrecerhastaprevio = this.opp.AV_NoOfrecerHasta__c;
+			
 			if (this.margin != null) {
 				let marginEuro = this.margin.toString().replace('.', ',');
 				this.margin = marginEuro;
@@ -481,25 +516,31 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 				let impor = this.importe.toString().replace('.', ',');
 				this.importe = impor;
 			}
-			this.cuota = this.opptask.AV_FeeAmount__c;
+			this.cuota = this.opp.AV_Cuota__c;
 			if (this.cuota != null) {
 				let cuo = this.cuota.toString().replace('.', ',');
 				this.cuota = cuo;
 			}
-			this.matricula = this.opptask.AV_LicensePlate__c;
-			this.interes = this.opptask.AV_TypeOfInterest__c;
+			this.matricula = this.opp.AV_LicensePlate__c;
+			this.interes = this.opp.AV_TipoInteres__c;
 			if (this.interes != null) {
 				let inter = this.interes.toString().replace('.', ',');
 				this.interes = inter;
 			}
-			this.incluir = this.opptask.AV_IncludeInPrioritizingCustomers__c;
-
-			this.producto = this.opptask.AV_Product__c;
+			this.incluir = this.opp.AV_IncludeInPrioritizingCustomers__c;
+			
+			this.producto = this.opp.AV_PF__c;
 			if (this.producto != null) {
-				this.byProduct = this.opptask.AV_ByProduct__c;
+				this.isNewProductActions = this.opp.AV_PF__r.AV_NewReportActions__c;
+				this.byProduct = this.opp.AV_ByProduct__c;
 				this.hasProduct = true;
+				this.positiveClosedState = (this.isNewProductActions) ? 'Producto Contratado' : 'Cerrado positivo';
+				this.negativeClosedState = (this.isNewProductActions) ? 'Producto Rechazado'  :  'No interesado';
+			}else{	
+				this.positiveClosedState = 'Producto Contratado';
+				this.negativeClosedState = 'Producto Rechazado';
 			}
-			this.otraentidad = this.opptask.AV_HoldingAnotherEntity__c;
+			this.otraentidad = this.opp.AV_Tenencia__c;
 			if (this.otraentidad == 'S') {
 				this.otraentidadpick = 'S';
 				this.hasOtherEntity = true;
@@ -507,13 +548,14 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			} else {
 				this.hasOtherEntity = false;
 			}
-			if (this.opptask && this.opptask.AV_IsMain__c) {
+			
+			if(this.opp && this.isMain){
 				this.showDetailMain = true;
 			}
 			this.evaluateResolution();
-			this.isclosed = (this.path == 'No interesado');
-			this.showDateAndCli = !(this.path == 'Cerrado positivo' || this.isclosed);
-			this.checkNotAllowed = (this.path === 'Cerrado positivo' || this.isclosed === true || this.path == 'No apto');
+			this.isclosed = (this.path == this.negativeClosedState);
+			this.showDateAndCli = !(this.path == this.positiveClosedState || this.isclosed);
+			this.checkNotAllowed = (this.path === this.positiveClosedState || this.isclosed === true );
 
 		} else {
 			if (this.path != 'Potencial') {
@@ -521,7 +563,16 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			}
 			this.getStatusNewOpp();
 			this.showDetail = true;
+			this.isNewProductActions = undefined;
+			this.positiveClosedState = 'Cerrado positivo';
+			this.negativeClosedState = 'No interesado';
+
 		}
+
+
+		if(OLDHOMETSK){
+			this.showToggleByPermission = true;
+		}	
 
 		this.showExpectativaVenta();
 	}
@@ -536,9 +587,24 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	pathValues(listValues) { //pasándole lista estados y se guarda en allStage
 		var aux = [];
 		for (var value of listValues) {
-			aux.push({ value: value.value, label: value.label });
-		}
+			if(this.isNewProductActions || !this.hasProduct){
+				aux.push({ value: value.value, label: value.label });
+			}else{
+				
+				if(value.value == 'Producto Contratado'){
+					aux.push({ value: 'Cerrado positivo', label: 'Cerrado positivo' });
+					continue;
+				}
+				
+				if(value.value == 'Producto Rechazado' ){
+					aux.push({ value: 'No interesado', label: 'Cerrada Negativa' });
+					continue;
+				}
+				aux.push({ value: value.value, label: value.label });
 
+			}
+		}
+		this.allStages = [];
 		this.allStages = this.allStages.concat(aux);
 	}
 
@@ -569,6 +635,8 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			.then(result => {
 				if (result.length > 0) {
 					this.listEntFields = result;
+					let i = 0;
+					
 					for (let item of this.listEntFields) {
 						if (this.listEntFields.length > 3) {
 							item.divClass = 'slds-col slds-size_1-of-' + this.listEntFields.length;
@@ -578,23 +646,18 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 						switch (item.label) {
 							case 'Fecha vencimiento':
 								item.value = this.fechavencimiento;
-								this.sendData();
 								break;
 							case 'Importe':
 								item.value = this.importe;
-								this.sendData();
 								break;
 							case 'Importe Cuota':
 								item.value = this.cuota;
-								this.sendData();
 								break;
 							case 'Tipo de Interés':
 								item.value = this.interes;
-								this.sendData();
 								break;
 							case 'Matrícula':
 								item.value = this.matricula;
-								this.sendData();
 								break;
 						}
 					}
@@ -630,8 +693,8 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	}
 
 	unlinkOpp() {
-		this.template.querySelector('lightning-layout[data-id="' + this.opptask.Id + '"]').focus();
-		unlinkOpp({ oppTask: this.opptask })
+		this.template.querySelector('lightning-layout[data-id="' + this.opp.Id + '"]').focus();
+		unlinkOpp({ opp: this.opp, recInfo: this.recinfo})
 			.then(() => {
 				this.refreshParentUnlink();
 				this.showToast(successLabel, successUnlinkMsgLabel, 'success', 'pester');
@@ -656,11 +719,11 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 	}
 
 	handleMain() {
-		this.updateMainOppTask(this.opptask);
+		this.updateMainOppTask(this.opp);
 	}
 
 	updateMainOppTask(oppTaskId) {
-		updateMain({ oppTask: oppTaskId })
+		updateMain({ opp: oppTaskId, recInfo: this.recinfo})
 			.then(() => {
 				this.refreshParentMain();
 				this.showToast(successLabel, successMsgLabel, 'success', 'pester');
@@ -682,14 +745,12 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			})
 			.catch((error) => {
 				this.notifyUser('Lookup Error', 'An error occured while searching with the lookup field.', 'error');
-				// eslint-disable-next-line no-console
 				console.error('Lookup error', JSON.stringify(error));
 				this.errors = [error];
 			});
 	}
 
 	handleSearchByProduct(event) {
-		console.log('searchterm1-------->' + event.detail.searchTerm);
 		this.find = event.detail.searchTerm;
 		lookupSearchByProduct({ searchTerm: event.detail.searchTerm, selectedIds: event.detail.selectedIds, product: this.producto })
 			.then((results) => {
@@ -732,17 +793,34 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 			targetId = 'lookup1';
 		}
 		if (targetId == 'lookup1') {
-			// const selection = this.template.querySelector(`[data-id="${targetId}"]`).getSelection();
 			const selection = this.template.querySelector(`[data-id="${targetId}"] > c-av_-lookup`).getSelection();
 			if (selection.length !== 0) {
+				this.prodInformed = true;
 				this.hasProduct = true;
 				for (let sel of selection) {
 					this.producto = String(sel.id);
+					// if(this.isNewProductActions != sel.prodNewAction || (!this.isreport && this.isNewProductActions == undefined)){
+						this.isNewProductActions = sel.prodNewAction;
+						this.isreport ? this.getStatus() : this.getStatusNewOpp();
+						this.positiveClosedState = (this.isNewProductActions) ? 'Producto Contratado' : 'Cerrado positivo';
+						this.negativeClosedState = (this.isNewProductActions) ? 'Producto Rechazado'  :  'No interesado';
+						
+					// }
 				}
 			} else {
 				this.producto = null;
 				this.find = '';
 				this.byProduct = null;
+				this.prodInformed = false;
+				this.hasProduct = false;
+				this.isreport ? this.getStatus() : this.getStatusNewOpp();
+				this.positiveClosedState  = 'Producto Contratado';
+				this.negativeClosedState  = 'Producto Rechazado' ;
+				if(!this.isreport){
+					this.path = 'En gestión/insistir';
+					this.template.querySelector('[data-id="customPath"]').resetSelection();
+					this.template.querySelector('[data-id="customPath"]').updateCurrentStage(this.path);
+				}
 				try {
 					const lookup5 = this.template.querySelector('[data-id="lookup2"] > c-av_-lookup');
 					if (lookup5 != null || typeof lookup5 != 'undefined') {
@@ -751,7 +829,6 @@ export default class Av_NewOpportunityEditable extends LightningElement {
 				} catch (e) {
 					console.log('Lookup Error ==> ', e);
 				}
-				this.hasProduct = false;
 			}
 		}
 	}

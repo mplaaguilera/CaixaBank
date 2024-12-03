@@ -123,6 +123,7 @@ export default class Cibe_OpportunityUpdateTeam extends LightningElement {
     @track data = [];
     @track _wiredDataValues;
     @track _wiredOppTeam;
+    @track _wiredData;
 
     @track funcionEdit;
     @track centronEdit;
@@ -174,9 +175,9 @@ export default class Cibe_OpportunityUpdateTeam extends LightningElement {
     @wire(getOpportunityTeamMembers, {recordId: '$recordId'})
     getOpportunityTeamMembers(wiredResult){
         this._wiredOppTeam = wiredResult;
+        this._wiredData = wiredResult;
         const {data, error} = wiredResult;
         if(data){
-            console.log(data);
             this.teamOpp = data;
         }else if (error){
             console.log(error);
@@ -582,6 +583,14 @@ export default class Cibe_OpportunityUpdateTeam extends LightningElement {
         setTimeout(() => {
             doneCallback(actions);
         }), 200;
-               
+    }
+
+    
+    refresh(event) {
+        this.isShowSpinner = true;
+        refreshApex(this._wiredData)
+            .finally(() => {
+                this.isShowSpinner = false;
+            });
     }
 }

@@ -34,7 +34,7 @@ export default class cibe_TaskTabs extends NavigationMixin(LightningElement) {
 	@api active;
 	@api recordId;
 	@track progressValue;
-	@track showDetail=true;
+	@track showDetail = true;
 	@track fecha;
 	@track recordType;
 	@track buttonDisabled;
@@ -45,6 +45,7 @@ export default class cibe_TaskTabs extends NavigationMixin(LightningElement) {
 	// controls the visibility of closeTaskAndOppTab tab if current page is experiencia cliente
 	@track isExperiencia;
 	@track isEMP = false;
+	@track isCIB = false;
 	@track preventClick = false;
 
 	@api isNoGestionable;
@@ -52,19 +53,16 @@ export default class cibe_TaskTabs extends NavigationMixin(LightningElement) {
 	@wire(getNoGestionable, {recordId: '$recordId'})
 	
     getNoGestionableData({error, data}) {
-	
-		console.log('data nogestionable: ');
-		console.log(data);
         if(data) {
             this.isNoGestionable = data;
         } 
         else if(error) {
-
             console.log('error ====> ' + JSON.stringify(error))
         } 
     }
 
 	hanldeProgressValueChange(event) {
+
 		this.progressValue = event.detail.progress;
 		this.template.querySelector('lightning-tabset').activeTabValue = this.progressValue;
 		this.template.querySelector('c-cibe_-management-history').refresh();
@@ -97,7 +95,7 @@ export default class cibe_TaskTabs extends NavigationMixin(LightningElement) {
 			this.getRecordType();
 
 		}		
-		eval("$A.get('e.force:refreshView').fire();");
+		//eval("$A.get('e.force:refreshView').fire();");
 	}
 
 	connectedCallback() {
@@ -115,13 +113,13 @@ export default class cibe_TaskTabs extends NavigationMixin(LightningElement) {
 				this.btnDisabled();
 				if (this.recordType == 'CIBE_ExperienciaClienteCIB' || this.recordType == 'CIBE_ExperienciaClienteEMP') {
 					this.isExperiencia = true;
-					this.isEMP = false;
-				}else if(this.recordType != 'CIBE_ExperienciaClienteEMP' && this.recordType && this.recordType.includes('EMP')){
+				}else{
 					this.isExperiencia = false;
+				}
+				if(this.recordType && this.recordType.includes('EMP')){
 					this.isEMP = true;
 				} else {				
-					this.isExperiencia = false;
-					this.isEMP = false;
+					this.isCIB = true;
 				}
             })
             .catch(error => {

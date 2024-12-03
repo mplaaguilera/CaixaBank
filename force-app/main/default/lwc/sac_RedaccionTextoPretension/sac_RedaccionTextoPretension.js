@@ -96,7 +96,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             this.myVal = this.plantilla(this.recordId);
 
             compruebaPropietario({id: this.recordId}).then(result => {
-                if(result == true){
+                if(result === true){
                     this.readOnly = true;
                 }
                 else{
@@ -109,7 +109,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al comprobar privilegios',
                     message: error.body.message,
                     variant: 'warning'
-                }),);
+                }));
     
                 })
 
@@ -118,18 +118,18 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al obtener plantillas',
                     message: result.error.body.message,
                     variant: 'warning'
-                }),
+                })
             );
             
             
         } else if (result.data) {
             let titulos = result.data;
-            if (titulos.length == 0) {
+            if (titulos.length === 0) {
                 this.mostrarToastSinPlantillas();
             }
             if(this.myVal == null){
                              
-                if(titulos.length == 1){
+                if(titulos.length === 1){
                     
                     getBody({idTitulo: titulos[0].idPlantilla, idCase: this.recordId}).then(result => {
                         let body = result;
@@ -142,7 +142,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                                 title: 'Fallo al obtener el contenido de la plantilla',
                                 message: error.body.message,
                                 variant: 'warning'
-                            }),);
+                            }));
             
                         })
                 }
@@ -156,7 +156,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             this.options = JSON.parse(JSON.stringify(this.options));
 
             compruebaPropietario({id: this.recordId}).then(result => {
-                if(result == true){
+                if(result === true){
                     this.readOnly = true;
                 }
                 else{
@@ -169,7 +169,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al comprobar privilegios',
                     message: error.body.message,
                     variant: 'warning'
-                }),);
+                }));
     
                 })
 
@@ -193,7 +193,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
 
     get read(){
         compruebaPropietario({id: this.recordId}).then(result => {
-            if(result == true){
+            if(result === true){
                 this.readOnly = true;
             }
             else{
@@ -206,7 +206,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                 title: 'Error',
                 message: error.body.message,
                 variant: 'error'
-            }),);
+            }));
 
             })
     }
@@ -222,7 +222,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             let titulos = result;
             if(this.myVal == null){
                              
-                if(titulos.length == 1){
+                if(titulos.length === 1){
                     
                     getBody({idTitulo: titulos[0].idPlantilla, idCase: this.recordId}).then(result => {
                         let body = result;
@@ -235,7 +235,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                                 title: 'Fallo al obtener plantillas',
                                 message: error.body.message,
                                 variant: 'error'
-                            }),);
+                            }));
             
                         })
                 }
@@ -255,7 +255,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             this.options = JSON.parse(JSON.stringify(this.options));
 
             compruebaPropietario({id: this.recordId}).then(result => {
-                if(result == true){
+                if(result === true){
                     this.readOnly = true;
                 }
                 else{
@@ -268,7 +268,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al comprobar privilegios',
                     message: error.body.message,
                     variant: 'error'
-                }),);
+                }));
     
                 })
 
@@ -280,7 +280,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                 title: 'Fallo al obtener el cuerpo de la plantilla',
                 message: error.body.message,
                 variant: 'warning',
-            }),);
+            }));
 */
             });
     }
@@ -318,7 +318,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             let titulos = result;
             if(this.myVal == null){
                              
-                if(titulos.length == 1){
+                if(titulos.length === 1){
                     
                     getBody({idTitulo: titulos[0].idPlantilla, idCase: this.recordId}).then(result => {
                         let body = result;
@@ -331,7 +331,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                                 title: 'Fallo al obtener plantillas',
                                 message: error.body.message,
                                 variant: 'error'
-                            }),);
+                            }));
             
                         })
                 }
@@ -351,7 +351,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
             this.options = JSON.parse(JSON.stringify(this.options));
 
             compruebaPropietario({id: this.recordId}).then(result => {
-                if(result == true){
+                if(result === true){
                     this.readOnly = true;
                 }
                 else{
@@ -364,7 +364,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al comprobar privilegios',
                     message: error.body.message,
                     variant: 'error'
-                }),);
+                }));
     
                 })
 
@@ -376,7 +376,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                 title: 'Fallo al obtener el cuerpo de la plantilla',
                 message: error.body.message,
                 variant: 'warning',
-            }),);
+            }));
 */
             });
     }
@@ -403,7 +403,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Fallo al obtener el cuerpo de la plantilla',
                     message: error.body.message,
                     variant: 'error'
-                }),);
+                }));
 
             })
     }
@@ -426,7 +426,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Motivo Inadmisión',
                     message: 'El campo motivo inadmisión está vacío.',
                     variant: 'warning',
-                }),);
+                }));
         }
         else if(this.valueSentidoCaso == null || this.valueSentidoCaso  == undefined){
             this.dispatchEvent(
@@ -434,7 +434,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                     title: 'Sentido resolución',
                     message: 'El campo sentido de resolución está vacío.',
                     variant: 'warning'
-                }),);
+                }));
             
 
         // if(this.valueSentidoCaso == null && this.valueSentidoNuevo != null){
@@ -454,7 +454,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
         //             title: 'Sentido resolución',
         //             message: 'El campo sentido de resolución está vacío.',
         //             variant: 'warning',
-        //         }),);
+        //         }));
 
         }else{
             this.isLoading = true;
@@ -493,7 +493,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                         title: 'Fallo al guardar la redacción',
                         message: mensageError,
                         variant: 'error'
-                    }),);
+                    }));
 
                     this.listoRedaccionFinal = false;
     
@@ -516,7 +516,7 @@ export default class Sac_RedaccionTextoPretension extends LightningElement {
                 title: 'Fallo al obtener plantillas',
                 message: 'No hay plantillas definidas para la pretensión',
                 variant: 'warning'
-            }),);
+            }));
     }
     /*
     async handleSave(event){

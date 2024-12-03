@@ -4,7 +4,10 @@ import { updateRecord, getRecord } from 'lightning/uiRecordApi';
 import NUMPERS_FIELD from '@salesforce/schema/Account.AV_NumPerso__c';
 import DATEALERT_FIELD from '@salesforce/schema/Account.AV_FechaRefrescoAlertas__c';
 import JSONALERT_FIELD from '@salesforce/schema/Account.AV_JSONAlertas__c';
-import alertsSectionLabel from '@salesforce/label/c.AV_CMP_AlertsSection'
+import alertsSectionLabel from '@salesforce/label/c.AV_CMP_AlertsSection';
+
+import getJsonGDPR           from '@salesforce/apex/AV_GDPR_Controller.getJsonGDPR';  
+
  
 export default class Av_Client_Alerts extends LightningElement {
 
@@ -42,7 +45,7 @@ export default class Av_Client_Alerts extends LightningElement {
     @wire(getAlerts, { numPerson: '$numPers', fechaRefresco: '$dateAlert', jsonBody: '$jsonAlert' })
     wiredAlerts({ error, data }) {
       
-        if (data) {      
+        if (data) {   
             if(data !== 'ERROR' && data !== 'UPDATED'){
                 if(data!== 'EMPTY'){
                     this.alerts = JSON.parse(data);                    
@@ -64,10 +67,15 @@ export default class Av_Client_Alerts extends LightningElement {
                 });
             }else if(data === 'UPDATED'){
                 this.alerts = JSON.parse(this.jsonAlert);
+                if(this.alerts != undefined){
+                    this.alerts = this.alerts.filter(alert => alert.key !== "21"); 
+                    getJsonGDPR({recordId:this.recordId});
+                }
                 this.listSize = (this.alerts != undefined) ?this.alerts.length:0;
             }else if(data === 'ERROR'){
                 this.alerts = undefined;
             }
+            
 
             if(this.alerts != undefined ){
                 if(this.alerts.length > 0){

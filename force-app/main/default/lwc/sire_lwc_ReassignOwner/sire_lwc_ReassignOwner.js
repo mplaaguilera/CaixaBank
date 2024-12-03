@@ -9,12 +9,15 @@ import buscarProcesos from '@salesforce/apex/SIRE_LCMP_ReassignOwner.buscarProce
 import changeGestor from '@salesforce/apex/SIRE_LCMP_ReassignOwner.changeGestor';
 import getOficinas from '@salesforce/apex/SIRE_LCMP_ReassignOwner.getOficinas';
 import findRecords  from '@salesforce/apex/SIRE_LCMP_ReassignOwner.findRecords';
+import getEstrategiasNegocio  from '@salesforce/apex/SIR_cls_Utils.getEstrategiasNegocio';
 import USER_ID from '@salesforce/user/Id';
 import LightningConfirm from 'lightning/confirm';
 
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
-import ESTRATEGIA_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c';
+//import ESTRATEGIA_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c';
 import SITUACION_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIR_fld_Situacion_SF__c';
+
+import { RefreshEvent } from "lightning/refresh";
 
 const columnsProceso = [
 	{label: 'Proceso', fieldName: 'enlaceProceso', type: 'url',  typeAttributes: {label: { fieldName: 'nombreProceso' }}, sortable: true },
@@ -35,6 +38,10 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 	@track clienteId; 
 	@track fechaInicio;
 	@track optionSituacion = [];
+	@track optionSituacionPreventivo = [];
+	@track optionSituacionFlujo = [];
+	@track optionEstrategiaPreventivo = [];
+	@track optionEstrategiaFlujo = [];
 	@track valueSituacion;
 	@track optionEstrategia = [];
 	@track valueEstrategia;
@@ -109,68 +116,83 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 
 	@track idRecordTypeFlujo = '';
 	@track idRecordTypePreventivo = '';
-	@track todosRecordTypes = '';
-
+	//@track todosRecordTypes = '';
+	@track idProcesoImpagado = '';
+	@track todasSituaciones = '';
+	@track todasSituacionesPreventivo = '';
+	@track todasSituacionesFlujo = '';
+	@track negocioPreventivo = 'Preventivo';
+	@track negocioFlujo = 'Flujo';
+	
 	connectedCallback() { 
         getQueryRecordTypeProceso({}).then(result => {
 			this.idRecordTypePreventivo = result[0];            
             this.idRecordTypeFlujo = result[1]; 
 			this.optionTipoProceso.push({'label': 'PREVEMP - Preventivo', 'value': result[0]});
 			this.optionTipoProceso.push({'label': 'Flujo', 'value': result[1]});
-			this.todosRecordTypes =  result[0] + ',' +  result[1];
+			this.valueTipoProceso = result[1];
+			this.idProcesoImpagado = result[1];
         })
         .catch(error => {
             this.mensajeError = error;
         }); 
     }
 
-	@wire(getPicklistValues, { recordTypeId: '$idRecordTypePreventivo', fieldApiName: ESTRATEGIA_FIELD })
+	
+/*	@wire(getPicklistValues, { recordTypeId: '$idRecordTypePreventivo', fieldApiName: ESTRATEGIA_FIELD })
     estrategiasPreventivo;
 	@wire(getPicklistValues, { recordTypeId: '$idRecordTypeFlujo', fieldApiName: ESTRATEGIA_FIELD })
     estrategiasFlujo;
+*/	
+
+	@wire(getEstrategiasNegocio, { negocio: '$negocioPreventivo' }) 
+	estrategiasPreventivo;
+	
+	@wire(getEstrategiasNegocio, { negocio: '$negocioFlujo' })
+	estrategiasFlujo;
 
 	@wire(getPicklistValues, { recordTypeId: '$idRecordTypePreventivo', fieldApiName: SITUACION_FIELD })
     situacionesPreventivo;
 	@wire(getPicklistValues, { recordTypeId: '$idRecordTypeFlujo', fieldApiName: SITUACION_FIELD })
     situacionesFlujo;
 
-	@wire(getOficinaGestorActual, {estrategiasPreventivo: '$estrategiasPreventivo', estrategiasFlujo: '$estrategiasFlujo', situacionesPreventivo: '$situacionesPreventivo', situacionesFlujo: '$situacionesFlujo'})
+	@wire(getOficinaGestorActual, { estrategiasPreventivo: '$estrategiasPreventivo', estrategiasFlujo: '$estrategiasFlujo', situacionesPreventivo: '$situacionesPreventivo', situacionesFlujo: '$situacionesFlujo'})
     wiredData(result) {		
 		if(result != null) { 
-			// Se comprueba si ya se ha lanzado el wire de la picklist de estrategia y de situaciones, ya que si no se ha lanzado dara error
-			if(this.estrategiasPreventivo.data != undefined && this.estrategiasFlujo.data != undefined && this.situacionesPreventivo.data != undefined && this.situacionesFlujo.data != undefined){
-				for(let i = 0; i < this.estrategiasPreventivo.data.values.length; i++){ 
-					this.optionEstrategia.push({'label': this.estrategiasPreventivo.data.values[i].label, 'value':this.estrategiasPreventivo.data.values[i].value});
+		
+			if(this.estrategiasPreventivo.data !== undefined && this.estrategiasFlujo.data !== undefined && this.situacionesPreventivo.data !== undefined && this.situacionesFlujo.data !== undefined){
+				for(let i = 0; i < this.estrategiasPreventivo.data.length; i++){ 
+					this.optionEstrategiaPreventivo.push({'label': this.estrategiasPreventivo.data[i].SIREC__SIREC_fld_Descripcion__c, 'value':this.estrategiasPreventivo.data[i].SIREC__SIREC_fld_Codigo__c});
 				}
-				for(let i = 0; i < this.estrategiasFlujo.data.values.length; i++){ 	
-					var existe = false;
-					for(var j = 0; j < this.optionEstrategia.length; j++) {
-						if (this.optionEstrategia[j].value == this.estrategiasFlujo.data.values[i].value) {
-							existe = true;
-							break;
-						} 					
-					}     
-					if(!existe){
-						this.optionEstrategia.push({'label': this.estrategiasFlujo.data.values[i].label, 'value':this.estrategiasFlujo.data.values[i].value});
-					}			
+				for(let i = 0; i < this.estrategiasFlujo.data.length; i++){ 	
+					this.optionEstrategiaFlujo.push({'label': this.estrategiasFlujo.data[i].SIREC__SIREC_fld_Descripcion__c, 'value':this.estrategiasFlujo.data[i].SIREC__SIREC_fld_Codigo__c});					
 				}
+				this.optionEstrategia = this.optionEstrategiaFlujo;
+				
 				for(let i = 0; i < this.situacionesPreventivo.data.values.length; i++){ 
-					if(this.situacionesPreventivo.data.values[i].value != 'SF_FINALIZ'){
-						this.optionSituacion.push({'label': this.situacionesPreventivo.data.values[i].label, 'value':this.situacionesPreventivo.data.values[i].value});
+					if(this.situacionesPreventivo.data.values[i].value !== 'SF_FINALIZ'){
+						this.optionSituacionPreventivo.push({'label': this.situacionesPreventivo.data.values[i].label, 'value':this.situacionesPreventivo.data.values[i].value});
+						// Informamos la variable todasSituaciones con todas las situaciones de Preventivo
+						if(this.todasSituacionesPreventivo === ''){
+							this.todasSituacionesPreventivo = this.situacionesPreventivo.data.values[i].value;
+						} else {
+							this.todasSituacionesPreventivo = this.todasSituacionesPreventivo + ',' + this.situacionesPreventivo.data.values[i].value;
+						}
 					}                
 				}
-				for(let i = 0; i < this.situacionesFlujo.data.values.length; i++){ 
-					var existe = false;
-					for(var j = 0; j < this.optionSituacion.length; j++) {
-						if (this.optionSituacion[j].value == this.situacionesFlujo.data.values[i].value) {
-							existe = true;
-							break;
-						} 					
-					}     
-					if(!existe && this.situacionesFlujo.data.values[i].value != 'SF_FINALIZ') {
-						this.optionSituacion.push({'label': this.situacionesFlujo.data.values[i].label, 'value':this.situacionesFlujo.data.values[i].value});
+				for(let i = 0; i < this.situacionesFlujo.data.values.length; i++){ 					     
+					if(this.situacionesFlujo.data.values[i].value !== 'SF_FINALIZ') {
+						this.optionSituacionFlujo.push({'label': this.situacionesFlujo.data.values[i].label, 'value':this.situacionesFlujo.data.values[i].value});
+						// Informamos la variable todasSituaciones con todas las situaciones de Flujo
+						if(this.todasSituacionesFlujo === ''){
+							this.todasSituacionesFlujo = this.situacionesFlujo.data.values[i].value;
+						} else {
+							this.todasSituacionesFlujo = this.todasSituacionesFlujo + ',' + this.situacionesFlujo.data.values[i].value;
+						}
 					}          
 				}
+				this.todasSituaciones = this.todasSituacionesFlujo;
+				this.optionSituacion = this.optionSituacionFlujo;
 				var infoOficina = result.data.split('*');
 				this.oficinaGestorActual = infoOficina[0];
 				this.oficina = infoOficina[0];
@@ -210,7 +232,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 		this.selectedRecordId = '';
 		this.selectedValue = '';
 		this.totalRecountCount  = 0;
-		if(this.clienteId == ''){
+		if(this.clienteId === ''){
 			this.clienteId = null;
 		}
 		this.data = null;	
@@ -220,25 +242,19 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 			oficinaParaQuery = this.valueOficina;
 		} else {
 			oficinaParaQuery = this.oficinaIdOriginal;
-		}
-		var opcionTodasOficinas = '';
-		if(this.valueOficina.includes(',')){ // Si contiene una coma significa que ha seleccionado la opcion de todas las oficinas y vienen en un string separado con asterisco
-			opcionTodasOficinas = true;
+		}		
+		var situacion = '';
+		if(this.valueSituacion !== undefined && this.valueSituacion !== '' && this.valueSituacion != null){
+			situacion = this.valueSituacion;
 		} else {
-			opcionTodasOficinas = false;
-		}
-		var recordTypeQuery = '';
-		if(this.valueTipoProceso != undefined && this.valueTipoProceso != ''){
-			recordTypeQuery = this.valueTipoProceso;
-		} else {
-			recordTypeQuery = this.todosRecordTypes;
+			situacion = this.todasSituaciones;
 		}
         buscarProcesos({
 			clienteId: this.clienteId, 
 			fechaInicio: this.fechaInicio, 
-			valueSituacion: this.valueSituacion, 
+			valueSituacion: situacion, 
 			valueEstrategia: this.valueEstrategia, 
-			valueTipoProceso: recordTypeQuery, 
+			valueTipoProceso: this.valueTipoProceso, 
 			valueEmpleado: this.valueEmpleado, 
 			oficina: oficinaParaQuery
 		}).then(result => {
@@ -252,27 +268,27 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 						rowData.enlaceProceso = '/' + row.Id ;
 						rowData.nombreProceso = row.Name;
 					} 
-					if(row.SIREC__SIREC_fld_cliente__c != null && row.SIREC__SIREC_fld_cliente__c != ''){
+					if(row.SIREC__SIREC_fld_cliente__c != null && row.SIREC__SIREC_fld_cliente__c !== ''){
 						rowData.enlaceCliente = '/lightning/r/Account/' + row.SIREC__SIREC_fld_cliente__r.Id+'/view';
 						rowData.nombreCliente = row.SIREC__SIREC_fld_cliente__r.Name;
 						rowData.numDocumento = row.SIREC__SIREC_fld_cliente__r.CC_Numero_Documento__c;
-						if(row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != null && row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != ''){
+						if(row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != null && row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c !== ''){
 							rowData.oficina = row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__r.Name;
 						}   
-						if(row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != null && row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != ''){  
+						if(row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != null && row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c !== ''){  
 							rowData.eap = row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__r.Name;
 						}						
 					}
-					if(row.SIREC__SIREC_fld_estrategia__c != null && row.SIREC__SIREC_fld_estrategia__c != '') {
-						rowData.estrategia = row.SIREC__SIREC_fld_estrategia__c;
+					if(row.SIREC__SIREC_fld_descEstrategiaCatalogo__c != null && row.SIREC__SIREC_fld_descEstrategiaCatalogo__c !== '') {
+						rowData.estrategia = row.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
 					} 
-					if(row.SIREC__SIREC_fld_fechaInicio__c != null && row.SIREC__SIREC_fld_fechaInicio__c != '') {
+					if(row.SIREC__SIREC_fld_fechaInicio__c != null && row.SIREC__SIREC_fld_fechaInicio__c !== '') {
 						rowData.fechaInicio = row.SIREC__SIREC_fld_fechaInicio__c;
 					} 
-					if(row.SIR_fld_Situacion_SF__c != null && row.SIR_fld_Situacion_SF__c != '') {
+					if(row.SIR_fld_Situacion_SF__c != null && row.SIR_fld_Situacion_SF__c !== '') {
 						rowData.situacion = row.SIR_fld_Situacion_SF__c;
 					}
-					if(row.SIR_DeudaTotal__c != null && row.SIR_DeudaTotal__c != '') {
+					if(row.SIR_DeudaTotal__c != null && row.SIR_DeudaTotal__c !== '') {
 						rowData.deudaTotal = row.SIR_DeudaTotal__c;
 					}  
 					if(row.OwnerId) {
@@ -319,8 +335,11 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
         this.clienteId = null;
 		this.fechaInicio = null;
         this.valueSituacion = null;
-        this.valueTipoProceso = null;
+        this.valueTipoProceso = this.idProcesoImpagado;
         this.valueEstrategia = null;
+		this.optionEstrategia = this.optionEstrategiaFlujo;
+		this.optionSituacion = this.optionSituacionFlujo;
+		this.todasSituaciones = this.todasSituacionesFlujo;
 		this.optionsEmpleado = this.valorInicialCampoEmpleados;	
         this.valueEmpleado = USER_ID;
 		this.firstSearch = false;
@@ -333,7 +352,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 		this.isMultipagina = true;	
 		this.totalRecountCount = 0;	
 		this.valueOficina = this.oficinaIdOriginal;
-		this.disabledBuscar = false;  	
+		this.disabledBuscar = false; 
 	}
 
 	toggleShow() {
@@ -357,7 +376,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 			this.numRegistrosSeleccionados = 'Registros seleccionados: 0';
 			this.procesosSeleccionados = [];
 		}
-		if(this.procesosSeleccionados != null && this.procesosSeleccionados.length > 0 && this.nuevoGestor != null && this.nuevoGestor != '' && this.nuevoGestor != undefined){
+		if(this.procesosSeleccionados != null && this.procesosSeleccionados.length > 0 && this.nuevoGestor != null && this.nuevoGestor !== '' && this.nuevoGestor !== undefined){
 			this.disabledButtonAsignar = false; 
 		} else {
 			this.disabledButtonAsignar = true; 
@@ -407,6 +426,11 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
         return function(a, b) {
             a = key(a);
             b = key(b);
+			if(a == null || a === undefined) {
+				a = '';	
+			} else if(b == null || b === undefined) {	
+				b = '';			
+			}
             return reverse * ((a > b) - (b > a));
         };
     }
@@ -414,7 +438,13 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
     onHandleSort(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.items];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'enlaceProceso'){
+			cloneData.sort(this.sortBy('nombreProceso', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'enlaceCliente'){
+			cloneData.sort(this.sortBy('nombreCliente', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.items = cloneData;
         this.sortDirection = sortDirection;
         this.sortedBy = sortedBy;
@@ -433,7 +463,17 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
     }
 
     changeTipoProceso(event){
-        this.valueTipoProceso = event.target.value;  
+        this.valueTipoProceso = event.target.value;		
+		let labelTipoProceso = event.target.options.find(opt => opt.value === event.detail.value).label;
+		if(labelTipoProceso === 'Flujo'){
+			this.optionEstrategia = this.optionEstrategiaFlujo;
+			this.optionSituacion = this.optionSituacionFlujo;
+			this.todasSituaciones = this.todasSituacionesFlujo;
+		} else {
+			this.optionEstrategia = this.optionEstrategiaPreventivo;
+			this.optionSituacion = this.optionSituacionPreventivo;
+			this.todasSituaciones = this.todasSituacionesPreventivo;
+		}
     }
 
     changeEmpleado(event){
@@ -464,7 +504,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 		this.selectedRecordId = '';
 		this.selectedValue = '';
 		this.oficina = '';        
-		if(event.target.value != ''){			
+		if(event.target.value !== ''){			
 			this.oficinaId = event.target.value;
 			if(this.oficinaId != null){
 				getOficinaString({oficina: this.oficinaId}).then(result => {
@@ -477,12 +517,12 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
     }
     
 	onLeave(event) {  
-		setTimeout(() => {  
-		 this.searchKey = "";  
-		 this.recordsList = null;  
+		setTimeout(() => {
+			this.searchKey = "";  
+			this.recordsList = null;  
 		}, 300);  
-	}  
-		 
+	}
+
 	onRecordSelection(event) {  
 		this.selectedRecordId = event.target.dataset.key;  
 		this.selectedValue = event.target.dataset.name;  
@@ -525,8 +565,8 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 	}  
 	
 	onSeletedRecordUpdate(){  
-	    const passEventr = new CustomEvent('recordselection', {  
-		    detail: { selectedRecordId: this.selectedRecordId, selectedValue: this.selectedValue }  
+		const passEventr = new CustomEvent('recordselection', {  
+			detail: { selectedRecordId: this.selectedRecordId, selectedValue: this.selectedValue }  
 		});  
 		this.dispatchEvent(passEventr); 
 		this.nuevoGestor = this.selectedRecordId;		
@@ -558,7 +598,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 		if(procesosId != null && procesosId.length > 0){
 			changeGestor({nuevoGestor: this.nuevoGestor, procesos: procesosId})  
 			.then((result) => {  
-				if(result == 'OK') {					
+				if(result === 'OK') {					
 					const evt = new ShowToastEvent({
 						title: 'Operación correcta',
 						message: 'Se han asignado correctamente',
@@ -566,6 +606,7 @@ export default class Sire_lwc_ReassignOwner extends LightningElement {
 						mode: 'dismissable'
 					});
 					this.dispatchEvent(evt);
+					this.dispatchEvent(new RefreshEvent());
 					this.buscar();
 					this.toggleSpinner();					
 				}				

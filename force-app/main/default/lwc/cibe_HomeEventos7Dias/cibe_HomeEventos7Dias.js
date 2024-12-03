@@ -27,11 +27,11 @@ export default class cibe_HomeTareasHoyCIB extends NavigationMixin(LightningElem
    
     @track columns = [
 
-        { label: this.labels.nombreCliente,           fieldName: 'idAccount',               sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},     initialWidth : 200,       typeAttributes: {label: {fieldName: 'AccountName'}}}, 
-        { label: this.labels.asunto,                  fieldName: 'idEvent',                 sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },    initialWidth : 200,       typeAttributes: {label: {fieldName: 'asunto'}}},
-        { label: this.labels.tipo,                    fieldName: 'tipo',                    sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'},     initialWidth : 150}, 
-        { label: this.labels.fechaInicio,             fieldName: 'fechaInicio',             sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },   initialWidth : 250,       typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute:"2-digit", second: '2-digit' }},
-        { label: this.labels.estado,                  fieldName: 'estado',                  sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' },    initialWidth : 150}  
+        { label: this.labels.nombreCliente,           fieldName: 'idAccount',               sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},       typeAttributes: {label: {fieldName: 'AccountName'}}}, 
+        { label: this.labels.asunto,                  fieldName: 'idEvent',                 sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },      typeAttributes: {label: {fieldName: 'asunto'}}},
+        { label: this.labels.tipo,                    fieldName: 'tipo',                    sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'}}, 
+        { label: this.labels.fechaInicio,             fieldName: 'fechaInicio',             sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },     typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute:"2-digit"}},
+        { label: this.labels.estado,                  fieldName: 'estado',                  sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' }}  
         
     ];
     

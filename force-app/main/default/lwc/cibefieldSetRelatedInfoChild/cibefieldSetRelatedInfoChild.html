@@ -1,0 +1,15 @@
+<template>
+    <lightning-record-view-form density="comfy" record-id={recordId} object-api-name={objectApiName}>
+            <p>
+                <label class="slds-form-element__label" >{phoneLabel}</label>
+            </p>
+            <div class="slds-grid" style="color: #0070c0;">
+                <div class="slds-float_left">
+                    <lightning-button-icon style="color: #0070c0;"  icon-name="utility:call"  variant="bare" icon-class="slds-float_left" onclick={handleCallAction} value={phoneValue} name={phoneLabel} title="Click to Call" alternative-text="Click to Call"></lightning-button-icon>
+                </div>
+                <div>
+                    <lightning-formatted-phone value={phoneValue} disabled></lightning-formatted-phone>
+                </div>
+            </div>
+    </lightning-record-view-form>
+</template>

@@ -9,6 +9,7 @@
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen">
             <property name="defaultStage" type="String" label="defaultStage" description="defaultStage." role="inputOnly"/>
+            <property name="accountId" type="String" label="Account Id" description="Id del Account." role="inputOnly"/>
             <property name="pfId" type="String" label="Id PF Experiencia" description="Id del PF Experiencia." role="inputOnly"/>
             <property name="producto" type="String" label="Producto" description="Productos." role="outputOnly"/>
             <property name="oportunidad" type="String" label="*Nombre de la oportunidad" description="Nombre de la oportunidad." role="outputOnly"/>

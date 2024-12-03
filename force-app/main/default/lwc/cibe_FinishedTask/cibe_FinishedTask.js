@@ -1,12 +1,15 @@
-import { LightningElement, api,track} from 'lwc';
+import { LightningElement, api,track, wire} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import getRecordType            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getRecordType';
-import lookupSearchContact      from '@salesforce/apex/CIBE_TabManagementTask_Controller.getContact';
+import lookupSearchContact      from '@salesforce/apex/CIBE_UtilitiesWOS.getContact';
 import getAccountRTCliente      from '@salesforce/apex/CIBE_TabManagementTask_Controller.acccountCliente';
 import getContactTask           from '@salesforce/apex/CIBE_TabManagementTask_Controller.getContactTask';
 import CIBE_CMP_ErrorMessage 	from '@salesforce/label/c.CIBE_CMP_ErrorMessage';
-import getPickList              from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId';
+import getPickList              from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId2';
+import roleEmp             from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.roleEMP';
+import roleCib             from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.roleCIB';
+
 
 //Labels
 import tareaFinalizada from '@salesforce/label/c.CIBE_TareaFinalizada';
@@ -47,8 +50,42 @@ export default class cibe_FinishedTask extends LightningElement {
 	@track accountId;
 	@track rtClienteAccount = false;
 	//picklist tipo
-	@track valueTipo = 'LT';
 	formattedFechaGestion;
+	@track valueTipo ;
+	//role user
+	@track roleEmpValue = null;
+	@track roleCibValue = null;
+
+
+
+
+
+	@wire(roleEmp)
+	getRoleEmp({data, error}) {
+        if(data) {
+            this.roleEmpValue = data;
+			this.valueTipo = this.roleEmpValue === true ? 'LMD' : '';
+
+			console.log(this.valueTipo);
+		} else if(error) {
+			console.log(error);
+		}
+    }
+
+	
+	@wire(roleCib)
+	getRoleCib({data, error}) {
+        if(data) {
+            this.roleEmpValue = data;
+			this.valueTipo = this.roleEmpValue === true ? 'LT' : '';
+
+			console.log(this.valueTipo);
+		} else if(error) {
+			console.log(error);
+		}
+    }
+
+	
 
 	handleChangeTipo(event) {
 		this.valueTipo = event.detail.value;
@@ -74,10 +111,16 @@ export default class cibe_FinishedTask extends LightningElement {
 	getContactoTarea() {
 		getContactTask({idRecords: this.recordId})
 			.then((results) => {
+				console.log('result');
+				console.log('results.WhoId'+results.WhoId);
+				console.log('results.WhatId'+results.WhatId);
+
 				if (results!= null) {
 					if (results.WhoId != null) {
 						this.initialSelection=[{id: results.WhoId, icon:'standard:contact', title: results.Who.Name}];
 						this.valueContact = results.WhoId;
+					}
+					if (results.WhatId != null) {
 						this.valueCliente = results.WhatId;
 					}
 					this.accountId = results.AccountId;
@@ -114,8 +157,15 @@ export default class cibe_FinishedTask extends LightningElement {
 	}
 
 	handleSearchContact(event) {
+		console.log('event.detail.searchTerm');
+		console.log(event.detail.searchTerm);
+		console.log('event.detail.selectedIds');
+		console.log(event.detail.selectedIds);
+
 		lookupSearchContact({searchTerm: event.detail.searchTerm, selectedIds: event.detail.selectedIds, accountId: this.valueCliente})
 			.then((results) => {
+				console.log('results');
+				console.log(results);
 				this.template.querySelector('[data-id="clookup3"]').setSearchResults(results);
 			})
 			.catch((error) => {
@@ -159,13 +209,14 @@ export default class cibe_FinishedTask extends LightningElement {
 		this.fecha=(new Date()).toISOString().substring(0,10);
 		this.recordId;
 		this.getRecordType();
+		console.log(this.valueTipo);
 		this.getPickListType();
 		this.getContactoTarea();
 		this.formattedFechaGestion = this.formatFechaGestion(this.fecha);
 	}
 
 	sendData() {
-		
+
 		const sendData  = new CustomEvent('datareport', {
 			detail: {
 				estado: this.valueEstado,
@@ -177,10 +228,13 @@ export default class cibe_FinishedTask extends LightningElement {
 			}
 		});
 		this.dispatchEvent(sendData);
+		
+
 	}
 
 	@api
 	fetchData() {
+		console.log('@@@@' + this.valueTipo);
 		return ({
 			estado: this.valueEstado,
 			tipo: this.valueTipo,
@@ -191,23 +245,27 @@ export default class cibe_FinishedTask extends LightningElement {
 		})
 
 	}
+	
 
 	getPickListType() {
-		getPickList({objectName: 'Task', recordId: this.recordId, fieldApiName: 'AV_Tipo__c', picklistDevName: 'CIBE_TaskTipo'})
-			.then(result => {
-				console.log(result);
-				this.optionsTipo = result;
-			})
-			.catch(error => {
-				console.log('Display ShowToastEvent error (catch): ', error);
-				this.dispatchEvent(
-					new ShowToastEvent({
-						title: CIBE_CMP_ErrorMessage,
-						message: JSON.stringify(error),
-						variant: 'error'
-					})
-				);
-			});
+		getPickList({objectName: 'Task', recordId: this.recordId, fieldApiName: 'AV_Tipo__c'})
+		.then(result => {
+			console.log(result);
+			this.optionsTipo = result;
+		})
+		.catch(error => {
+			console.log('Display ShowToastEvent error (catch): ', error);
+			this.dispatchEvent(
+				new ShowToastEvent({
+					title: CIBE_CMP_ErrorMessage,
+					message: JSON.stringify(error),
+					variant: 'error'
+				})
+			);
+		});
+
+		
+		
 	}
 
 	getRecordType() {

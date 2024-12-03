@@ -1,0 +1,172 @@
+<template>
+    <div if:true={renderComponent}>
+        <div class="basicContainer">
+            <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"
+                style="z-index: 93;position:fixed"></lightning-spinner>
+            <div data-id="headerEvent" class="slds-page-header slds-page-header_record-home">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="standard:event"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>{label.cita}</span>
+                                        <ul class="slds-list_horizontal">
+                                            <li class="slds-m-right_x-small">
+                                                <span class="slds-page-header__title slds-truncate">{nameAccount}</span>
+                                            </li>
+                                        </ul>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <lightning-card>
+                <div class="cardStyle">
+                    <c-cibe_-gestion-agil-report-detail data-id="detailCmp" issummary={nextScreen} timeinfo={timeInfo}
+                        clientinfo={clientinfo} accountname={clientinfo.name} debug={debugvar}
+                        oneventinfo={setEventObject}></c-cibe_-gestion-agil-report-detail>
+                </div>
+            </lightning-card>
+            <div style="height: 50px;"></div>
+            <!-- PARTE DE LAS OPORTUNIDADES  -->
+            <div>
+                <div>
+                    <span>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-icon size="small"
+                                    icon-name="standard:opportunity"></lightning-icon><strong>&nbsp;&nbsp;
+                                    {label.oportunidades} ({label.vinculadas} {opposCount})</strong>
+                            </div>
+                        </div>
+                    </span>
+                    <div class="newOppoContainer">
+                        <div class="slds-grid">
+                            <c-av_-lookup data-id="newproductlookup" onsearch={handleSearchProduct}
+                                onselectionchange={handleSelectionProduct} fieldlabel={label.addOpp}
+                                placeholder={label.searhProduct}>
+                            </c-av_-lookup>
+                            <lightning-button class="buttonAnadir" label={label.add} disabled={productToAdd}
+                                onclick={handleAddOppo}></lightning-button>
+                        </div>
+                    </div>
+                    <div>
+                        <template for:each={linkedOppList} for:item="opp">
+                            <div key={opp.id} class="cardMargin">
+                                <c-cibe_-new-event-opp-detail oppo={opp} onvinculateaction={handleVinculationOpp}
+                                    onmainclick={handleMainOpp} onsenddatafromoppo={buildOppoObj} data-id={opp.id}
+                                    onvinculateactionall={handleVinculationAll} ondesvincular={desvincularTodas}
+                                    potentiallist={potentialList} new-event-header-id={recordId}
+                                    is-future={disableButtonCloseMeeting} is-owner=true main-vinculed={opp.isPrincipal}
+                                    oportunidad-vin={opp.oppLinked}
+                                    ondeleteoppo={handleOppoDelete}></c-cibe_-new-event-opp-detail>
+                            </div>
+                        </template>
+                    </div>
+                    <template for:each={listAccountOpportunities} for:item="opp">
+                        <div key={opp.id} class="cardMargin">
+                            <c-cibe_-new-event-opp-detail oppo={opp} new-event-header-id={newEventHeaderId}
+                                onsenddatafromoppo={buildOppoObj} onvinculateaction={handleVinculationOpp}
+                                onvinculateactionall={handleVinculationAll} ondesvincular={desvincularTodas}
+                                onmainclick={handleMainOpp} is-future={disableButtonCloseMeeting}
+                                data-id={opp.id}></c-cibe_-new-event-opp-detail>
+                        </div>
+                    </template>
+                    <div style="height: 50px;"></div>
+                </div>
+            </div>
+
+            <!-- PARTE DE LAS TAREAS  -->
+            <div>
+                <div>
+                    <span>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-icon size="small"
+                                    icon-name="standard:task"></lightning-icon><strong>&nbsp;&nbsp;
+                                    {label.tareas} ({label.vinculadas} {taskCount})</strong>
+                            </div>
+                        </div>
+                    </span>
+
+                    <div class="newOppoContainer">
+                        <div class="slds-grid">
+                            <lightning-input data-id="newTask" onchange={handleNewTask} value={nameTask} type="text"
+                                label="Nueva Tarea" placeholder="Introduce el nombre"></lightning-input>
+                            <lightning-button class="buttonAnadir" label={label.add}
+                                onclick={handleAddTask}></lightning-button>
+                        </div>
+                    </div>
+
+                    <template for:each={taskNewList} for:item="task">
+                        <div key={task.id} class="cardMargin">
+                            <c-cibe_-new-event-task-detail tarea={task} new-event-header-id={newEventHeaderId}
+                                onsenddatafromtarea={buildTaskObj} onvinculateaction={handleVinculationTask}
+                                onvinculateactionalltask={handleVinculationAllTask}
+                                ondesvinculartask={desvincularTodasTask} onmainclick={handleMainTask}
+                                data-id={task.id}></c-cibe_-new-event-task-detail>
+                        </div>
+                    </template>
+
+                    <template for:each={listAccountTask} for:item="task">
+                        <div key={task.id} class="cardMargin">
+                            <c-cibe_-new-event-task-detail tarea={task} new-event-header-id={newEventHeaderId}
+                                onsenddatafromtarea={buildTaskObj} onvinculateaction={handleVinculationTask}
+                                onvinculateactionalltask={handleVinculationAllTask}
+                                ondesvinculartask={desvincularTodasTask} onmainclick={handleMainTask}
+                                data-id={task.id}></c-cibe_-new-event-task-detail>
+
+                        </div>
+                    </template>
+                    <div style="height: 50px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-docked-form-footer">
+            <button type="submit" class="slds-button slds-button_stretch buttonStyleCancel"
+                disabled={disableButtonCancel} data-id="cancelButton" onclick={handleCancel}>{label.cancelar}</button>
+
+            <button type="submit" class="slds-button slds-button_stretch buttonStyle" data-id="closeMeetingButton"
+                name="closeMeeting" onclick={palabrasProhibidas}>Guardar</button>
+            <button if:true={createEventBasedOnEventType} type="submit"
+                class="slds-button slds-button_stretch buttonStyle" data-id="cierreAltaCita" name="save"
+                onclick={cierreAltaCita}>Cierre + Alta Cita</button>
+        </div>
+
+        <template if:true={isShowModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- modal header start -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={hideModalBox}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                                size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>Esta Cita no tiene vinculada una Oportunidad/Tarea, si continuas se registrará como una Cita
+                            sin Oportunidad/Tarea vinculada</p>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={hideModalBox}>Anterior</button>
+                        <button class="slds-button slds-button_brand" onclick={handleCreateEvent}>Guardar</button>
+                    </footer>
+
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+    </div>
+</template>

@@ -10,11 +10,11 @@
 .chev-icon{
 	vertical-align: top;
 }
-.opptask-title{
+.opp-title{
 	display: block;
     line-height: normal;
 }
-.opptask-stage{
+.opp-stage{
 	color: rgb(45 86 116);
 	font-size: 12px;
 	font-style: italic;
@@ -22,7 +22,7 @@
 	position: relative;
 	display: inline;
 }
-.opptask-name{
+.opp-name{
 	padding-top: 0.4rem;
 }
 .button-label{
@@ -42,7 +42,7 @@
 	font-size: 12px;
 	padding-right: 0.5rem;
 }
-.last-opptask-button{
+.last-opp-button{
 	margin-right: 0.3rem;
 	background-image: linear-gradient(#4e4e4e 33%, rgba(255, 255, 255, 0) 0%);
 	background-position: right;
@@ -56,11 +56,11 @@
 	/*padding-bottom: 0.3rem;
 	padding-top: 0.3rem;*/
 }
-.opptask-form{
+.opp-form{
 	margin-left: 1rem;
 	margin-right: 1rem;
 }
-.opptask-link{
+.opp-link{
 	text-decoration: none;
 }
 .help-text-icon{
@@ -91,6 +91,7 @@
 	margin-right: 1rem;
 }
 .label-priorizador{
+	margin-top: 8px;
 	width: 17rem;
 }
 .layout-padding{

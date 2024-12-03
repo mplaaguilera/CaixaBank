@@ -49,13 +49,11 @@ export default class Sac_Contratos extends LightningElement {
             this.isLoaded = !this.isLoaded;
             this.showBackdrop = !this.showBackdrop;
         }).catch(error => {
-            console.error(error);
 			this.mostrarToast('error', 'Problema recuperando los contratos', JSON.stringify(error));
         });
     }
 
     mostrarDetalle(event) {
-        console.log('prueba' + event.currentTarget.dataset.id);
         this.listProducts = this.listProducts.map(product => {
             if (product.codProduct == event.currentTarget.dataset.id) {
                 return { ...product, showDetail: !product.showDetail };
@@ -80,17 +78,13 @@ export default class Sac_Contratos extends LightningElement {
         }).then(data => {
             this.mostrarToast('success', 'Producto creado.', 'El contrato ha sido relacionado correctamente con la pretensión.');
         }).catch(error => {
-            console.error(error);
             this.mostrarToast('error', 'Problema relacionando el contrato con la pretensión.', JSON.stringify(error));
         });
     }
 
     setCargandoCasos(mostrar) {
-		console.log('entra');
         window.clearTimeout(this.idTimeouts.cargandoCasosTrue);
-        console.log('entra2');
 		if (mostrar) {
-            console.log('entra3');
 			this.template.querySelector('.solicitarContratos').classList.add('disabled');
 			this.cargandoCasos = true;
 			this.mostarSpinner = true;

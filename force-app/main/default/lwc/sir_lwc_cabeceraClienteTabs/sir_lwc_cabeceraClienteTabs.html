@@ -1,205 +1,27 @@
 <template>
     <lightning-card  variant="Narrow" title="Perfil Cliente" icon-name="standard:note">
         <lightning-tabset active-tab-value="">
-            <lightning-tab label={tabPRESOL} title={tabPRESOL} value="PRESOL">
-                <!-- P2253-704 - Modificacion 21/11/2022 - Helena Solana Cabañas - Se cambia la forma de construir la tabla para que sea responsive -->
-                <!--<div class="container">
+            <lightning-tab label={tabPRESOL} title={tabPRESOL} value="PRESOL">                
+                <table class="slds-table slds-table_header-hidden slds-table_bordered"> 
                     <template if:true={vacioPRESOL}>
-                        <div class="alignCentro">No existen registros asociados.</div>
-                    </template>
-                    <template if:false={vacioPRESOL}>
-                        <template for:each={wrapperPRESOL} for:item="keyValue"> 
-                            <lightning-layout vertical-align="center" class="x-large" key={keyValue.Id} multiple-rows>
-
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Estrategia PRESOL">Estrategia PRESOL</p>
-                                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.estrategiaPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Rating Scoring">Rating Scoring</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.rating}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Deuda Total">Deuda Total</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaTotalPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Fecha VTO carencia CBP">Fecha VTO carencia CBP</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.vtoCBP}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Tipo Persona">Tipo Persona</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.personaPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Saldo pasivo disponible medio 12m">Saldo pasivo disponible medio 12m</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.saldoPasivoPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Deuda Pendiente de vencer">Deuda Pendiente de vencer</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaPendienteVencerPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Fecha Vencimiento ICO">Fecha Vencimiento ICO</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.vtoICO}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Segmento PRESOL">Segmento PRESOL</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.segmentoPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Saldo activo">Saldo activo</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.saldoActivo}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Deuda vencida">Deuda vencida</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaVencidaPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Fecha VTO carenciaO">Fecha VTO carencia</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.vtoCarencia}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Prioridad PRESOL">Prioridad PRESOL</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.prioridadPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Saldo dispuesto">Saldo dispuesto</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.saldoDispuestoPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Días Impago Peor Contrato">Días Impago Peor Contrato</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.diasImpagoPeorPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Fecha VTO CCR">Fecha VTO CCR</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.vtoCCR}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Motivo Inclusión">Motivo Inclusión</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.motivoInclusion}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Circulante">Circulante</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.circulante}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Nº Ciclos Impago (últ 12 meses)">Nº Ciclos Impago (últ 12 meses)</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.numeroCiclosPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Aviso Centralizado">Aviso Centralizado</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.aviso}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Ind Envío meses ant">Ind Envío meses ant</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.indEnvio}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Nº Ciclos Impago Total">Nº Ciclos Impago Total</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.numeroCiclosTotalPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Tenencia ICO">Tenencia ICO</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.tenenciaICO}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Res Gestión meses ant">Res Gestión meses ant</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.resGestion}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="3" large-device-size="3">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Alerta PRESOL">Alerta PRESOL</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.alertaPRESOL}</span>
-                                    </div>
-                                </lightning-layout-item>
-                            </lightning-layout>
-                        </template>
-                    </template>
-                </div>-->
-                <table class="slds-table slds-table_cell-buffer slds-table_header-hidden slds-table_bordered"> 
-                    <template if:true={vacioPRESOL}>
-                        <div class="alignCentro">No existen registros asociados.</div>
+                        <div class="alignCentro"><lightning-formatted-text value={mensaje}></lightning-formatted-text></div>
                     </template> 
                     <template if:false={vacioPRESOL}>
                         <template for:each={wrapperPRESOL} for:item="keyValue">
                             <!-- Fila 1 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Estrategia PRESOL</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Estrategia PRESOL</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.estrategiaPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.estrategiaPRESOL}</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__label">Rating Scoring</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Rating Scoring</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.rating}</span>
-                                </td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.rating}</span>
+                                </td>                                
                                 <!--<td>
                                     <span class="slds-form-element__label">Deuda Total</span>
                                 </td>
@@ -207,25 +29,27 @@
                                     <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaTotalPRESOL}</span>
                                 </td>-->
                                 <td>
-                                    <span class="slds-form-element__label">Fecha VTO carencia CBP</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha VTO carencia CBP</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.vtoCBP}</span>
-                                </td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.vtoCBP} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span>
+                                </td>                                
                             </tr>
                             <!-- Fila 2 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Tipo Persona</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Tipo Persona</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.personaPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.personaPRESOL}</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__label">Saldo pasivo disponible medio 12m</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Saldo pasivo disponible medio 12m</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.saldoPasivoPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.saldoPasivoPRESOL}</span>
                                 </td>
                                 <!--<td>
                                     <span class="slds-form-element__label">Deuda Pendiente de vencer</span>
@@ -234,25 +58,27 @@
                                     <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVencerPRESOL}</span>
                                 </td>-->
                                 <td>
-                                    <span class="slds-form-element__label">Fecha Vencimiento ICO</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha Vencimiento ICO</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.vtoICO}</span>
-                                </td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.vtoICO} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span>
+                                </td>                                
                             </tr>
                             <!-- Fila 3 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Segmento PRESOL</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Segmento PRESOL</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.segmentoPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.segmentoPRESOL}</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__label">Saldo activo</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Saldo activo</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.saldoActivo}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.saldoActivo}</span>
                                 </td> 
                                 <!--<td>
                                     <span class="slds-form-element__label">Deuda vencida</span>
@@ -261,242 +87,172 @@
                                     <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaVencidaPRESOL}</span>
                                 </td>-->
                                 <td>
-                                    <span class="slds-form-element__label">Fecha VTO carencia</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha VTO carencia</span>
                                 </td>
-                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.vtoCarencia}</span>
-                                </td>
+                                <td>                                    
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.vtoCarencia} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span>
+                                </td>                                
                             </tr>
                             <!-- Fila 4 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Prioridad PRESOL</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Prioridad PRESOL</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.prioridadPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.prioridadPRESOL}</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__label">Saldo dispuesto</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Saldo dispuesto</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.saldoDispuestoPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.saldoDispuestoPRESOL}</span>
                                 </td> 
                                 <td>
-                                    <span class="slds-form-element__label">Fecha VTO CCR</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha VTO CCR</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.vtoCCR}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.vtoCCR} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span>                                    
                                 </td> 
                             </tr>
                             <!-- Fila 5 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Motivo Inclusión</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Motivo Inclusión</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.motivoInclusion}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.motivoInclusion}</span>
                                 </td>
                                 <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Circulante</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.circulante}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.circulante}</span>
                                 </td> 
                                 <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Aviso Centralizado</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.aviso}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.aviso}</span>
                                 </td> 
                             </tr>
                             <!-- Fila 6 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Ind Envío meses ant</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Ind Envío meses ant</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.indEnvio}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.indEnvio}</span>
                                 </td>
                                 <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosPRESOL}</span>
                                 </td>
                                 <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Tenencia ICO</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.tenenciaICO}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.tenenciaICO}</span>
                                 </td>  
                             </tr>
                             <!-- Fila 7 -->
                             <tr key={keyValue.Id}>
                                 <td>
-                                    <span class="slds-form-element__label">Res Gestión meses ant</span>
+                                    <span class="slds-form-element__label slds-cell-wrap">Res Gestión meses ant</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.resGestion}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.resGestion}</span>
                                 </td>
                                 <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosTotalPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosTotalPRESOL}</span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__label slds-cell-wrap">Alerta PRESOL</span>
+                                    <!--<span class="slds-form-element__label slds-cell-wrap">Alerta PRESOL</span>-->
+                                    <span class="slds-form-element__label slds-cell-wrap">Información Adicional</span>
+                                </td>
+                                <td style="max-width: 200px;">
+                                    <!-- <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.alertaPRESOL}</span>-->
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap" >{keyValue.alertaPRESOL}</span>
+                                </td>
+                            </tr> 
+                            <tr key={keyValue.Id}>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap"></span>
                                 </td>
                                 <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.alertaPRESOL}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha"></span>
                                 </td>
-                            </tr>   
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha cura</span>
+                                </td>
+                                <td>                                    
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.fechaProximaCura} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span> 
+                               </td>
+                            </tr>  
+                            <tr key={keyValue.Id}>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Cliente en Probation Period</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda">{keyValue.indicadorPP}</span>
+                                </td>
+
+
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Importe en PP </span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.importePP}</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Fecha estimada salida PP </span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">
+                                        <lightning-formatted-date-time value={keyValue.fechaEstimadaSalidaPP} year="numeric" month="2-digit" day="2-digit" ></lightning-formatted-date-time>
+                                    </span>
+                                </td>
+                            </tr>  
                         </template>
                     </template>
                 </table>
             </lightning-tab>
 
             <lightning-tab label={tabIMPA} title={tabIMPA} value="IMPA">
-                <!--<div class="container">-->
                 <table class="slds-table slds-table_cell-buffer slds-table_header-hidden slds-table_bordered">
                     <template if:true={vacioIMPA}>
-                        <div class="alignCentro">No existen registros asociados.</div>
+                        <div class="alignCentro"><lightning-formatted-text value={mensaje}></lightning-formatted-text></div>
                     </template>
                     <template if:false={vacioIMPA}>
-                        <template for:each={wrapperIMPA} for:item="keyValue"> 
-
-                            <!--<lightning-layout vertical-align="center" class="x-large" key={keyValue.Id} multiple-rows>
-
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Tipo Persona">Tipo Persona</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.persona}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Saldo Pasivo">Saldo Pasivo</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.saldoPasivo}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Deuda">Deuda</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaTotal}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Segmento SIREC">Segmento SIREC</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.segmento}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Ingresos Total">Ingresos Total</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.ingresosTotal}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Pendiente de Vencer">Pendiente de Vencer</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaPendienteVencer}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Prioridad">Prioridad</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.prioridad}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Nómina">Nómina</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.ingresosNomina}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Vencida">Vencida</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.deudaVencida}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Arquetipo">Arquetipo</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.arquetipo}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Pensión">Pensión</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.ingresosPension}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Días Impago Peor Contrato">Días Impago Peor Contrato</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.diasImpagoPeor}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Capacidad de Pago">Capacidad de Pago</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.capacidadDePago}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Paro">Paro</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.ingresosParo}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Nº Ciclos Impago (últ 12 meses)">Nº Ciclos Impago (últ 12 meses)</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.numeroCliclos}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Propuesta Motor Solución">Propuesta Motor Solución</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.motorSolucion}</span>
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                            
-                                        
-                                    </div>
-                                </lightning-layout-item>
-                                <lightning-layout-item flexibility="auto" style="padding:0.7%" size="12" small-device-size="6" medium-device-size="4" large-device-size="4">
-                                    <div class="header-column">
-                                        <p class="field-title slds-form-element__label" title="Nº Ciclos Impago Total">Nº Ciclos Impago Total</p>
-                                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.numeroCiclosTotal}</span>
-                                    </div>
-                                </lightning-layout-item>
-                            </lightning-layout>-->
-
-
+                        <template for:each={wrapperIMPA} for:item="keyValue">
                             <tr key={keyValue.Id}>
                                <td>
                                    <span class="slds-form-element__label">Tipo Persona</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.persona}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.persona}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Saldo Pasivo</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha ">{keyValue.saldoPasivo}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha ">{keyValue.saldoPasivo}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Deuda</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaTotal}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.deudaTotal}</span>
                                </td>
                            </tr>
                             <tr key={keyValue.Id}>
@@ -504,19 +260,19 @@
                                    <span class="slds-form-element__label">Segmento SIREC</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.segmento}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.segmento}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Ingresos Total</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosTotal}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosTotal}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Pendiente de Vencer</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVencer}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVencer}</span>
                                </td>
                            </tr>
                             <tr key={keyValue.Id}>
@@ -524,86 +280,111 @@
                                    <span class="slds-form-element__label">Prioridad</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.prioridad}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda">{keyValue.prioridad}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Nómina</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosNomina}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosNomina}</span>
                                </td>
                                <td>
                                     <span class="slds-form-element__label">Vencida</span>
                                </td>
                                <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaVencida}</span>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.deudaVencida}</span>
                                </td>
-                           </tr> 
+                            </tr> 
                             <tr key={keyValue.Id}>
-                               <td>
+                                <td>
                                    <span class="slds-form-element__label">Arquetipo</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.arquetipo}</span>
-                               </td>
-                               <td>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda">{keyValue.arquetipo}</span>
+                                </td>
+                                <td>
                                     <span class="slds-form-element__label">Pensión</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosPension}</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__label slds-cell-wrap">Días Impago Peor Contrato</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.diasImpagoPeor}</span>
-                               </td>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosPension}</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Deuda Refinanciada </span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.deudaRefinanciada}</span>
+                                </td>                               
                            </tr>
                             <tr key={keyValue.Id}>
-                               <td>
+                                <td>
                                    <span class="slds-form-element__label">Capacidad de Pago</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.capacidadDePago}</span>
-                               </td>
-                               <td>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda">{keyValue.capacidadDePago}</span>
+                                </td>
+                                <td>
                                     <span class="slds-form-element__label">Paro</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosParo}</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
-                               </td>
-                               <td>
-                                     <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCliclos}</span>
-                               </td>
-                           </tr>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosParo}</span>
+                                </td>
+
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Días Impago Peor Contrato</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.diasImpagoPeor}</span>
+                                </td>                               
+                            </tr>
                             <tr key={keyValue.Id}>
-                               <td>
+                                <td>
                                    <span class="slds-form-element__label slds-cell-wrap">Propuesta Motor Solución</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.motorSolucion}</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__label"></span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow"></span>
-                               </td>
-                               <td>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.motorSolucion}</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Cliente en Probation Period</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignIzquierda">{keyValue.indicadorPP}</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCliclos}</span>
+                                </td>                               
+                            </tr>                            
+                            <tr key={keyValue.Id}>
+                                <td>                                   
+                                </td>
+                                <td>                                   
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-cell-wrap">Importe en PP </span>
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.importePP}</span>
+                                </td>
+                                <td>
                                     <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
-                               </td>
-                               <td>
-                                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosTotal}</span>
-                               </td>
-                            </tr>                       
+                                </td>
+                                <td>
+                                    <span class="slds-form-element__label slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosTotal}</span>
+                                </td>								
+                            </tr>  
                         </template>
-                    </template>
-                <!--</div> -->   
+                    </template>  
                 </table>
+            </lightning-tab>  
+            
+            <lightning-tab label="Gestión Agencias Externas" title="Gestión Agencias Externas" value="AgenciasExternas">  
+                <div style="padding-left: 10px;padding-right: 10px;">            
+                    <c-sir_lwc_-View-Online-Agencias-Externas historico="false" record-id={recordId}></c-sir_lwc_-View-Online-Agencias-Externas>	
+                </div>  
             </lightning-tab>
+
         </lightning-tabset>        
     </lightning-card>
 </template>

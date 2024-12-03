@@ -1,5 +1,6 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
+import { CurrentPageReference } from 'lightning/navigation';
+import getAgrupacionesEstrategias from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getAgrupacionesEstrategias';
 import getQueryProcesos from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getQueryProcesos';
 import getQueryFormularios from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getQueryFormularios';
 import getQueryAcciones from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getQueryAcciones';
@@ -49,11 +50,15 @@ const columnsAcciones = [
 ];
 
 export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
-    @track listCharts;
-    @track arrayTitulosCajitas = ['E.1 – Frenar pase a contable', 'E.2 – Nuevos impagos', 'E.3 – Cura del subjetivo', 'E.4 – Frenar pase a siguiente tramo', 'E.5 – Colectivos Prioritarios', 'E.6 – Otras Estrategias'];
+
+    // Cajitas
+    @track arrayTitulosCajitas = [];
     @track cajitas;
-    @track estrategiasImpa = ['10001','10002', '10003','10004', '10005', '10006'];
-    @track estrategiasImpaOFI = ['30016','30017', '30018','30019', '30071', '30020'];
+    @track estrategiasImpaCodigo = [];
+    @track numCajitasFila = '';
+    @track numTotalCajitas = 0;
+
+    @track listCharts;
     @track resultQueryReport;
     @track procesos;
     @track columnsProceso = columnsProceso; 
@@ -95,14 +100,17 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     @track wiredResultFormularios=[];
     @track wiredResultAcciones=[];
 
+    @track showTableAccionesSincronizar = false;
+    @track showTableFormulariosSincronizar = false;
+
+    @track numMaxCajitasPorLinea = 0;
+
     /**
      * Executed when Aura parent component detects its tab is focused.
      */
-     @api
-     refreshCmp() {
+    @api
+    refreshCmp() {
         refreshApex(this.wiredResultProcesos);
-        //refreshApex(this.wiredResultFormularios);
-        //refreshApex(this.wiredResultAcciones);
         // Ponemos en la variable el dia y la hora actual
         this.now = Date.now();
     }
@@ -110,15 +118,13 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     @wire(CurrentPageReference)
     setCurrentPageReference(currentPageReference) {
         refreshApex(this.wiredResultProcesos);
-        //refreshApex(this.wiredResultFormularios);
-        //refreshApex(this.wiredResultAcciones);
         // Ponemos en la variable el dia y la hora actual
         this.now = Date.now();
     }
    
-    connectedCallback() {
-        loadStyle(this, recurso);     
-    }
+    connectedCallback() {        
+        loadStyle(this, recurso); 
+    }    
 
     @wire(getQueryProcesos, {})
     wiredData(result) {
@@ -130,317 +136,250 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
         this.numTotalProcesosActivo = 0;
         this.procesos = null;
         this.formularios = null;
-        this.formulariosSincronizar;
+        this.formulariosSincronizar = null;
         this.acciones = null;
         this.informeProcesosActivos = null;
         this.informeFormulariosPendientes = null;
         this.informeFormulariosSincro = null;
         this.informeAcciones = null;
         this.informeProcesosEstrategias = null;
-        if(result.data){ 
-            let estrategia1 = 0;
-            let estrategia2 = 0;
-            let estrategia3 = 0;
-            let estrategia4 = 0;
-            let estrategia5 = 0;
-            let estrategia6 = 0;
-            let currentData = [];
-            for(let i = 0; i < result.data.length; i++){        
-                // Calculamos los procesos que tienen la situacion 'Pendiente Inicio Gestion' y los clasificiamos por estrategia
-                if(result.data[i].SIR_fld_Situacion_SF__c == 'SF_INIGEST'){                
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[0] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[0]){
-                        estrategia1 = estrategia1 + 1;
+        this.showTableAccionesSincronizar = false;
+        this.showTableFormulariosSincronizar = false;
+        
+        this.numTotalCajitas = 0;
+        this.numCajitasFila = '';
+        this.numMaxCajitasPorLinea = 0;
+
+        getAgrupacionesEstrategias({}).then(resultAgrupaciones => {       
+            this.estrategiasImpaCodigo = [];
+            this.arrayTitulosCajitas = []; 
+            // Montamos las Estrategias Dinamicas, creando las variables con las estrategias
+            for(let i = 0; i < resultAgrupaciones.length; i++){ 
+                // Miramos cuantas cajas por linea es el maximo, lo miramos mediante el 'maxCajas'
+                if(resultAgrupaciones[i].Name === 'maxCajas'){
+                    this.numMaxCajitasPorLinea = resultAgrupaciones[i].SIREC__SIREC_fld_Codigo__c;
+                } else {
+                    if(!this.estrategiasImpaCodigo.includes(resultAgrupaciones[i].SIREC__SIREC_fld_CodigoAgrupador__c)){
+                        this.arrayTitulosCajitas.push(resultAgrupaciones[i].SIREC__SIREC_fld_DescAgrupador__c);
+                        this.estrategiasImpaCodigo.push(resultAgrupaciones[i].SIREC__SIREC_fld_CodigoAgrupador__c);
                     }
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[1] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[1]){
-                        estrategia2 = estrategia2 + 1;
-                    }
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[2] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[2]){
-                        estrategia3 = estrategia3 + 1;
-                    }
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[3] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[3]){
-                        estrategia4 = estrategia4 + 1;
-                    }
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[4] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[4]){
-                        estrategia5 = estrategia5 + 1;
-                    }
-                    if(result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpa[5] || result.data[i].SIREC__SIREC_fld_estrategia__c == this.estrategiasImpaOFI[5]){
-                        estrategia6 = estrategia6 + 1;
-                    }  
-                } 
-                // Calculamos los procesos ya inicioados pero que no esten finalizados
-                if(result.data[i].SIR_fld_Situacion_SF__c != 'SF_INIGEST'){ 
-                    let rowData = {};
-                    if(result.data[i].SIREC__SIREC_fld_cliente__c != null){
-                        rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIREC__SIREC_fld_cliente__c + '/view';
-                        rowData.cliente = result.data[i].SIREC__SIREC_fld_cliente__r.Name;
-                    } 
-                    rowData.estrategia = result.data[i].estrategia;
-                    rowData.fechaEstrategia = result.data[i].SIR_FechaInicioEstrategia__c;                    
-                    rowData.idProceso = '/lightning/r/SIREC__SIREC_obj_proceso__c/' + result.data[i].Id + '/view';
-                    rowData.procesoNombre = result.data[i].Name;  
-                    rowData.fechaInicio = result.data[i].SIREC__SIREC_fld_fechaInicio__c;
-                    if (result.data[i].SIR_FechaPaseContable__c == undefined) {
-                        rowData.fechaPaseContable = ''
-                    } else {
-                        rowData.fechaPaseContable = result.data[i].SIR_FechaPaseContable__c;
-                    }
-                    if(result.data[i].SIR_DeudaTotal__c == undefined){
-                        rowData.deudaTotal = ''; 
-                    } else {
-                        rowData.deudaTotal = result.data[i].SIR_DeudaTotal__c; 
-                    }
-                    if(result.data[i].SIR_DeudaVencidaImpagada__c == undefined){
-                        rowData.deudaVencida = ''; 
-                    } else {
-                        rowData.deudaVencida = result.data[i].SIR_DeudaVencidaImpagada__c; 
-                    }
-                    if(result.data[i].SIR_MaximoDiasImpago__c == undefined){
-                        rowData.diasImpago = ''; 
-                    } else {
-                        rowData.diasImpago = result.data[i].SIR_MaximoDiasImpago__c; 
-                    }
-                    if(result.data[i].SIR_AlertaSIREC__c == undefined){
-                        rowData.alerta = ''; 
-                    } else {
-                        rowData.alerta = result.data[i].SIR_AlertaSIREC__c; 
-                    }  
-                    if(result.data[i].SIR_FechaCompromisoPago__c == undefined){
-                        rowData.fechaCompromisoPago = ''; 
-                    } else {
-                        rowData.fechaCompromisoPago = result.data[i].SIR_FechaCompromisoPago__c; 
-                    }  
-                    if(result.data[i].SIR_CompromisoPagoIncumplido__c == undefined){
-                        rowData.icono = ''; 
-                    } else {
-                        if(result.data[i].SIR_CompromisoPagoIncumplido__c.includes('Red')){
-                            rowData.icono = 'rojo';
-                        } else {
-                            rowData.icono = 'naranja';  
-                        }
-                    }                              
-                    rowData.situacion = result.data[i].situacion;       
-                    rowData.fechaSituacion = result.data[i].SIREC__SIREC_fld_fechaSituacion__c;                                                  
-                    currentData.push(rowData);
-                    this.numTotalProcesosActivo = this.numTotalProcesosActivo + 1;
-                }
+                }                                     
             }
-
-            // Pendientes Inicio Gestion y su clasificacion por estrategia
+            this.numTotalCajitas = this.arrayTitulosCajitas.length;                       
+            // Creamos N posiciones de la variable array de forma dinamica, 1 posicion por estrategia
             var estrategiasCajitas = [];
-            estrategiasCajitas.push(estrategia1);
-            estrategiasCajitas.push(estrategia2);
-            estrategiasCajitas.push(estrategia3);
-            estrategiasCajitas.push(estrategia4);
-            estrategiasCajitas.push(estrategia5);
-            estrategiasCajitas.push(estrategia6);
-
-            // Ponemos los resultados de procesos ya iniciados en la variable de front
-            this.procesos = currentData;     
-            // Ordenamos por el campo Alerta
-            let cloneData = [...this.procesos];
-            cloneData.sort(this.sortBy('alerta', -1, undefined));
-            this.procesos = cloneData;
-            this.sortDirection = 'desc';
-            this.sortedBy = 'alerta';
-
-            // Query para traernos los formualrios  
-            getQueryFormularios({}).then(result => { 
-                if(result){ 
-                    let currentDataForm = [];
-                    let currentDataFormSincro = []; 
-                    for(let i = 0; i < result.length; i++){            
-                        // Calculamos los formualrios ya iniciados y los pendientes de sincronizar                    
+            for(let i = 0; i < this.numTotalCajitas; i++){ 
+                estrategiasCajitas[i] = 0;
+            }          
+            // Con la query montamos las cajitas y los procesos activos
+            if(result.data){ 
+                var currentData = [];            
+                for(let i = 0; i < result.data.length; i++){       
+                    // Cajitas
+                    if(result.data[i].SIR_agrupacionSituacion__c === 'Pendiente'){ 
+                        if(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c !== undefined){
+                            if(this.estrategiasImpaCodigo.includes(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c)){
+                                let numArray = this.estrategiasImpaCodigo.indexOf(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c);
+                                estrategiasCajitas[numArray] = estrategiasCajitas[numArray] + 1;
+                            }    
+                        }                                            
+                    }  
+                    // Tabla Procesos Activos
+                    // Calculamos los procesos ya inicioados pero que no esten finalizados
+                    if(result.data[i].SIR_fld_Situacion_SF__c !== 'SF_INIGEST'){ 
                         let rowData = {};
-                        if(result[i].SIR_Persona__c != null){
-                            rowData.idCliente = '/lightning/r/Account/' + result[i].SIR_Persona__c + '/view';
-                            rowData.cliente = result[i].SIR_Persona__r.Name;
+                        if(result.data[i].SIREC__SIREC_fld_cliente__c != null){
+                            rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIREC__SIREC_fld_cliente__c + '/view';
+                            rowData.cliente = result.data[i].SIREC__SIREC_fld_cliente__r.Name;
                         } 
-                        rowData.tipo = result[i].RecordType.Name;                   
-                        rowData.idFormulario = '/lightning/r/SIR_FormularioRefinanciacion__c/' + result[i].Id + '/view';
-                        rowData.formNombre = result[i].Name;  
-                        rowData.fechaSituacion = result[i].SIR_fechaSituacion__c;
-                        rowData.estado = result[i].SIR_Estado__c;
-                        rowData.lastModified = result[i].LastModifiedDate;
-                        if(result[i].SIR_deudaTotal__c == undefined){
+                        rowData.estrategia = result.data[i].estrategia;
+                        rowData.fechaEstrategia = result.data[i].SIR_FechaInicioEstrategia__c;                    
+                        rowData.idProceso = '/lightning/r/SIREC__SIREC_obj_proceso__c/' + result.data[i].Id + '/view';
+                        rowData.procesoNombre = result.data[i].Name;  
+                        rowData.fechaInicio = result.data[i].SIREC__SIREC_fld_fechaInicio__c;
+                        if (result.data[i].SIR_FechaPaseContable__c === undefined) {
+                            rowData.fechaPaseContable = '';
+                        } else {
+                            rowData.fechaPaseContable = result.data[i].SIR_FechaPaseContable__c;
+                        }
+                        if(result.data[i].SIR_DeudaTotal__c === undefined){
                             rowData.deudaTotal = ''; 
                         } else {
-                            rowData.deudaTotal = result[i].SIR_deudaTotal__c; 
-                        } 
-                        currentDataForm.push(rowData);
-                        this.numTotalFormulariosCurso = this.numTotalFormulariosCurso + 1;
-        
-                        // Calculamos los formualrios ya inicioados pero que no esten finalizados
-                        if(result[i].SIR_Estado__c == 'Pendiente de enviar'){  
+                            rowData.deudaTotal = result.data[i].SIR_DeudaTotal__c; 
+                        }
+                        if(result.data[i].SIR_DeudaVencidaImpagada__c === undefined){
+                            rowData.deudaVencida = ''; 
+                        } else {
+                            rowData.deudaVencida = result.data[i].SIR_DeudaVencidaImpagada__c; 
+                        }
+                        if(result.data[i].SIR_MaximoDiasImpago__c === undefined){
+                            rowData.diasImpago = ''; 
+                        } else {
+                            rowData.diasImpago = result.data[i].SIR_MaximoDiasImpago__c; 
+                        }
+                        if(result.data[i].SIR_AlertaSIREC__c === undefined){
+                            rowData.alerta = ''; 
+                        } else {
+                            rowData.alerta = result.data[i].SIR_AlertaSIREC__c; 
+                        }  
+                        if(result.data[i].SIR_FechaCompromisoPago__c === undefined){
+                            rowData.fechaCompromisoPago = ''; 
+                        } else {
+                            rowData.fechaCompromisoPago = result.data[i].SIR_FechaCompromisoPago__c; 
+                        }  
+                        if(result.data[i].SIR_CompromisoPagoIncumplido__c === undefined){
+                            rowData.icono = ''; 
+                        } else {
+                            if(result.data[i].SIR_CompromisoPagoIncumplido__c.includes('Red')){
+                                rowData.icono = 'rojo';
+                            } else {
+                                rowData.icono = 'naranja';  
+                            }
+                        }                              
+                        rowData.situacion = result.data[i].situacion;       
+                        rowData.fechaSituacion = result.data[i].SIREC__SIREC_fld_fechaSituacion__c;                                                  
+                        currentData.push(rowData);
+                        this.numTotalProcesosActivo = this.numTotalProcesosActivo + 1;
+                    }  
+                    this.procesos = currentData;               
+                    // Ordenamos por el campo Fecha Situacion
+                    let cloneData = [...this.procesos];
+                    cloneData.sort(this.sortBy('fechaSituacion', -1, undefined));
+                    this.procesos = cloneData;
+                    this.sortDirection = 'desc';
+                    this.sortedBy = 'fechaSituacion';                 
+                    
+                    // Indicamos en el frontal cuantas cajitas por linea debe de haber
+                    if(this.numTotalCajitas <= this.numMaxCajitasPorLinea){
+                        // Si el num de cajitas es menor al numMaxCajitasPorLinea ponemos unos estilos para dispersar correctamente las cajitas, ya que sino se quedan todas juntas a la derecha
+                        var elemento = this.template.querySelectorAll('lightning-layout-item');
+                        for (let i = 0; i < elemento.length; i++) {
+                            if (i === 0) {
+                                elemento[i].classList.add('paddingCajita');
+                            }
+                            elemento[i].classList.remove('slds-col');
+                        }
+                    } else {
+                        this.numCajitasFila = 'slds-size_1-of-' + this.numMaxCajitasPorLinea;
+                    }
+                    // Ponemos en la variable el dia y la hora actual
+                    this.now = Date.now();
+                }    
+                // Query para traernos los formualrios  
+                getQueryFormularios({}).then(result => { 
+                    if(result){ 
+                        let currentDataForm = [];
+                        let currentDataFormSincro = []; 
+                        for(let i = 0; i < result.length; i++){      
+                            // Calculamos los formualrios ya iniciados y los pendientes de sincronizar                    
                             let rowData = {};
                             if(result[i].SIR_Persona__c != null){
                                 rowData.idCliente = '/lightning/r/Account/' + result[i].SIR_Persona__c + '/view';
                                 rowData.cliente = result[i].SIR_Persona__r.Name;
-                            }                   
+                            } 
+                            rowData.tipo = result[i].RecordType.Name;                   
                             rowData.idFormulario = '/lightning/r/SIR_FormularioRefinanciacion__c/' + result[i].Id + '/view';
                             rowData.formNombre = result[i].Name;  
-                            rowData.fechaSituacion = result[i].SIR_fechaSituacion__c;                                      
-                            currentDataFormSincro.push(rowData);
-                            this.numTotalFormularios = this.numTotalFormularios + 1;
-                        }
-                    }
-                    // Ponemos los resultados de formularios en Curso y Pendientes de Sincro en la variable de front
-                    this.formularios = currentDataForm;
-                    // Ponemos los resultados de formularios pendientes sincronizar en la variable de front
-                    this.formulariosSincronizar = currentDataFormSincro;              
-                }
-
-                // Query para traernos las Acciones pendientes de sincronizar 
-                getQueryAcciones({}).then(result => { 
-                    if(result){ 
-                        let currentDataAcciones = []; 
-                        for(let i = 0; i < result.length; i++){            
-                            // Calculamos las Acciones              
-                            let rowData = {};
-                            if(result[i].SIREC__SIREC_fld_interviniente__c != null){
-                                rowData.idCliente = '/lightning/r/Account/' + result[i].SIREC__SIREC_fld_interviniente__c + '/view';
-                                rowData.cliente = result[i].SIREC__SIREC_fld_interviniente__r.Name;
+                            rowData.fechaSituacion = result[i].SIR_fechaSituacion__c;
+                            rowData.estado = result[i].SIR_Estado__c;
+                            rowData.lastModified = result[i].LastModifiedDate;
+                            if(result[i].SIR_deudaTotal__c === undefined){
+                                rowData.deudaTotal = ''; 
+                            } else {
+                                rowData.deudaTotal = result[i].SIR_deudaTotal__c; 
                             } 
-                            rowData.tipo = result[i].SIREC__SIREC_fld_tipo__c;                   
-                            rowData.idAccion = '/lightning/r/SIREC__SIREC_obj_acciones__c/' + result[i].Id + '/view';
-                            rowData.accionNombre = result[i].Name;  
-                            rowData.resultado = result[i].SIREC__SIREC_fld_resultado__c;
-                            rowData.situacion = result[i].SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c;
-                            rowData.fechaSituacion = result[i].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaSituacion__c;
-                            currentDataAcciones.push(rowData);
-                            this.numTotalAcciones = this.numTotalAcciones + 1;
-                        }
-                        // Ponemos los resultados de formularios en Curso en la variable de front
-                        this.acciones = currentDataAcciones;
-                    } 
+                            currentDataForm.push(rowData);
+                            this.numTotalFormulariosCurso = this.numTotalFormulariosCurso + 1;
+            
+                            // Calculamos los formualrios ya inicioados pero que no esten finalizados
+                            if(result[i].SIR_Estado__c === 'Pendiente de enviar'){  
+                                let rowData = {};
+                                if(result[i].SIR_Persona__c != null){
+                                    rowData.idCliente = '/lightning/r/Account/' + result[i].SIR_Persona__c + '/view';
+                                    rowData.cliente = result[i].SIR_Persona__r.Name;
+                                }                   
+                                rowData.idFormulario = '/lightning/r/SIR_FormularioRefinanciacion__c/' + result[i].Id + '/view';
+                                rowData.formNombre = result[i].Name;  
+                                rowData.fechaSituacion = result[i].SIR_fechaSituacion__c;                                      
+                                currentDataFormSincro.push(rowData);
+                                this.numTotalFormularios = this.numTotalFormularios + 1;                                    
+                                this.showTableFormulariosSincronizar = true;
+                            }
+                        }                        
+                        // Ponemos los resultados de formularios en Curso y Pendientes de Sincro en la variable de front
+                        this.formularios = currentDataForm;
+                        // Ponemos los resultados de formularios pendientes sincronizar en la variable de front
+                        this.formulariosSincronizar = currentDataFormSincro;              
+                    }
 
-                    // Query para traernos los ID's de los reports para que puedan ver el informe entero
-                    getQueryReports({}).then(result => { 
-                        // El resultado de la query esta ordenado alfabeticamente por apiname del report
-                        // Por lo que la posicion es determinante para saber que report es          
-                        this.resultQueryReport = result;
-                        // Posicion 0 (cero) esta el report de Formularios pendientes de sincro
-                        this.informeFormulariosSincro =  '/lightning/r/Report/' +  this.resultQueryReport[0].Id + '/view';
-                        // Posicion 1 esta el report de Acciones pendientes de sincro
-                        this.informeAcciones =  '/lightning/r/Report/' +  this.resultQueryReport[1].Id + '/view'; 
-                        // Montamos la estructura de datos de las cajitas Pendiente Inicio Gestion por Estrategia
-                        this.cajitas = [];
-                        for(let i = 0; i <= 5; i++){
-                            let cajitaIndividual = [];
-                            cajitaIndividual.titulo = this.arrayTitulosCajitas[i];
-                            // Posicion de la 2 a la 7 esta el report estrategias
-                            cajitaIndividual.url = '/lightning/r/Report/' +  this.resultQueryReport[i+2].Id + '/view';
-                            cajitaIndividual.numTotal = estrategiasCajitas[i];
-                            this.cajitas.push(cajitaIndividual);
+                    // Query para traernos las Acciones pendientes de sincronizar 
+                    getQueryAcciones({}).then(result => { 
+                        if(result){ 
+                            let currentDataAcciones = []; 
+                            for(let i = 0; i < result.length; i++){            
+                                // Calculamos las Acciones              
+                                let rowData = {};
+                                if(result[i].SIREC__SIREC_fld_interviniente__c != null){
+                                    rowData.idCliente = '/lightning/r/Account/' + result[i].SIREC__SIREC_fld_interviniente__c + '/view';
+                                    rowData.cliente = result[i].SIREC__SIREC_fld_interviniente__r.Name;
+                                } 
+                                rowData.tipo = result[i].SIREC__SIREC_fld_tipo__c;                   
+                                rowData.idAccion = '/lightning/r/SIREC__SIREC_obj_acciones__c/' + result[i].Id + '/view';
+                                rowData.accionNombre = result[i].Name;  
+                                rowData.resultado = result[i].SIREC__SIREC_fld_resultado__c;
+                                rowData.situacion = result[i].SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c;
+                                rowData.fechaSituacion = result[i].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaSituacion__c;
+                                currentDataAcciones.push(rowData);
+                                this.numTotalAcciones = this.numTotalAcciones + 1;
+                                this.showTableAccionesSincronizar = true;
+                            }
+                            // Ponemos los resultados de formularios en Curso en la variable de front
+                            this.acciones = currentDataAcciones;
                         }
-                        // Posicion 8 esta el report de Formularios en Curso
-                        this.informeFormulariosPendientes =  '/lightning/r/Report/' +  this.resultQueryReport[8].Id + '/view';
-                        // Posicion 9 esta el report de Procesos Estrategias
-                        this.informeProcesosEstrategias =  '/lightning/r/Report/' +  this.resultQueryReport[9].Id + '/view'; 
-                        // Posicion 10 esta el report de Procesos Activos
-                        this.informeProcesosActivos =  '/lightning/r/Report/' +  this.resultQueryReport[10].Id + '/view'; 
-              
-                        // Ponemos en la variable el dia y la hora actual.
-                        this.now = Date.now();           
+
+                        // Query para traernos los ID's de los reports para que puedan ver el informe entero
+                        getQueryReports({}).then(result => {
+                            // El resultado de la query esta ordenado alfabeticamente por apiname del report
+                            // Por lo que la posicion es determinante para saber que report es   
+                            this.resultQueryReport = result;
+                            // Posicion 0 (cero) esta el report de Formularios pendientes de sincro
+                            this.informeFormulariosSincro = '/lightning/r/Report/' + this.resultQueryReport[0].Id + '/view';
+                            // Posicion 1 esta el report de Acciones pendientes de sincro
+                            this.informeAcciones =  '/lightning/r/Report/' + this.resultQueryReport[1].Id + '/view';                         
+                            // Posicion 8 esta el report de Formularios en Curso
+                            this.informeFormulariosPendientes = '/lightning/r/Report/' + this.resultQueryReport[3].Id + '/view';
+                            // Posicion 9 esta el report de Procesos Estrategias
+                            this.informeProcesosEstrategias = '/lightning/r/Report/' + this.resultQueryReport[4].Id + '/view'; 
+                            // Posicion 10 esta el report de Procesos Activos
+                            this.informeProcesosActivos = '/lightning/r/Report/' + this.resultQueryReport[5].Id + '/view';                        
+                        
+                            // Montamos la estructura de datos de las cajitas Pendiente Inicio Gestion por Estrategia
+                            this.cajitas = [];
+                            for(let i = 0; i < this.arrayTitulosCajitas.length; i++){
+                                let cajitaIndividual = [];
+                                cajitaIndividual.titulo = this.arrayTitulosCajitas[i];
+                                // Posicion 2 resultante de la query es el report de Estrategias Dinamicas
+                                cajitaIndividual.url = '/lightning/r/Report/' + this.resultQueryReport[2].Id + '/view?fv0='+this.estrategiasImpaCodigo[i];
+                                cajitaIndividual.numTotal = estrategiasCajitas[i];
+                                this.cajitas.push(cajitaIndividual);
+                            }                                     
+                        })
+                        .catch(error => {
+                            this.mensajeError = error;
+                        });
                     })
                     .catch(error => {
                         this.mensajeError = error;
-                    }); 
+                    });
                 })
                 .catch(error => {
                     this.mensajeError = error;
-                }); 
-            })
-            .catch(error => {
-                this.mensajeError = error;
-            }); 
-        }     
-    }
-
-    /*@wire(getQueryFormularios, {})
-    wiredDataForm(result) {
-        this.wiredResultFormularios = result;        
-        if(result.data){ 
-            let currentDataForm = [];
-            let currentDataFormSincro = []; 
-            for(let i = 0; i < result.data.length; i++){            
-                // Calculamos los formualrios ya iniciados y los pendientes de sincronizar                    
-                let rowData = {};
-                if(result.data[i].SIR_Persona__c != null){
-                    rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIR_Persona__c + '/view';
-                    rowData.cliente = result.data[i].SIR_Persona__r.Name;
-                } 
-                rowData.tipo = result.data[i].RecordType.Name;                   
-                rowData.idFormulario = '/lightning/r/SIR_FormularioRefinanciacion__c/' + result.data[i].Id + '/view';
-                rowData.formNombre = result.data[i].Name;  
-                rowData.fechaSituacion = result.data[i].SIR_fechaSituacion__c;
-                rowData.estado = result.data[i].SIR_Estado__c;
-                rowData.lastModified = result.data[i].LastModifiedDate;
-                if(result.data[i].SIR_deudaTotal__c == undefined){
-                    rowData.deudaTotal = ''; 
-                } else {
-                    rowData.deudaTotal = result.data[i].SIR_deudaTotal__c; 
-                } 
-                currentDataForm.push(rowData);
-                this.numTotalFormulariosCurso = this.numTotalFormulariosCurso + 1;
-
-                // Calculamos los formualrios ya inicioados pero que no esten finalizados
-                if(result.data[i].SIR_Estado__c == 'Pendiente de enviar'){  
-                    let rowData = {};
-                    if(result.data[i].SIR_Persona__c != null){
-                        rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIR_Persona__c + '/view';
-                        rowData.cliente = result.data[i].SIR_Persona__r.Name;
-                    }                   
-                    rowData.idFormulario = '/lightning/r/SIR_FormularioRefinanciacion__c/' + result.data[i].Id + '/view';
-                    rowData.formNombre = result.data[i].Name;  
-                    rowData.fechaSituacion = result.data[i].SIR_fechaSituacion__c;                                      
-                    currentDataFormSincro.push(rowData);
-                    this.numTotalFormularios = this.numTotalFormularios + 1;
-                }
-            }
-            // Ponemos los resultados de formularios en Curso y Pendientes de Sincro en la variable de front
-            this.formularios = currentDataForm;
-            // Ponemos los resultados de formularios pendientes sincronizar en la variable de front
-            this.formulariosSincronizar = currentDataFormSincro;              
-        }     
-    }*/
-
-    // Query para traernos las Acciones pendientes de sincronizar
-    /*@wire(getQueryAcciones, {})
-    wiredDataAcciones(result) {
-        this.wiredResultAcciones = result;       
-        if(result.data){ 
-            let currentDataAcciones = []; 
-            for(let i = 0; i < result.data.length; i++){            
-                // Calculamos las Acciones              
-                let rowData = {};
-                if(result.data[i].SIREC__SIREC_fld_interviniente__c != null){
-                    rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIREC__SIREC_fld_interviniente__c + '/view';
-                    rowData.cliente = result.data[i].SIREC__SIREC_fld_interviniente__r.Name;
-                } 
-                rowData.tipo = result.data[i].SIREC__SIREC_fld_tipo__c;                   
-                rowData.idAccion = '/lightning/r/SIREC__SIREC_obj_acciones__c/' + result.data[i].Id + '/view';
-                rowData.accionNombre = result.data[i].Name;  
-                rowData.resultado = result.data[i].SIREC__SIREC_fld_resultado__c;
-                rowData.situacion = result.data[i].SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c;
-                rowData.fechaSituacion = result.data[i].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaSituacion__c;
-                currentDataAcciones.push(rowData);
-                this.numTotalAcciones = this.numTotalAcciones + 1;
-            }
-            // Ponemos los resultados de formularios en Curso en la variable de front
-            this.acciones = currentDataAcciones;
-        }     
-    }*/
-
-    goReport(event){
-        let urlReport = event.target.dataset.url;
-        this[NavigationMixin.Navigate]({
-            type: 'standard__recordPage',
-            attributes: {
-                recordId: urlReport,
-                objectApiName: 'Report',
-                actionName: 'view'
-            }           
-        });
+                });              
+            }                   
+        })
+        .catch(error => {
+            this.mensajeError = error;
+        });      
     }
     
     // Tabla ProcesosActivos
@@ -461,10 +400,16 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     onHandleSort(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.procesos];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idCliente'){
+			cloneData.sort(this.sortBy('cliente', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'idProceso'){
+			cloneData.sort(this.sortBy('procesoNombre', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.procesos = cloneData;
         this.sortDirection = sortDirection;
-        this.sortedBy = sortedBy;
+        this.sortedBy = sortedBy;       
     }
     // Tabla Formularios en curso
     sortedByFormularioCurso(field, reverse, primer) {
@@ -484,7 +429,13 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     onHandleSortFormularioCurso(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.formularios];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idCliente'){
+			cloneData.sort(this.sortBy('cliente', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'idFormulario'){
+			cloneData.sort(this.sortBy('formNombre', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.formularios = cloneData;
         this.sortDirectionFormularioCurso = sortDirection;
         this.sortedByFormularioCurso = sortedBy;
@@ -507,10 +458,16 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     onHandleSortFormularioSincro(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.formulariosSincronizar];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idCliente'){
+			cloneData.sort(this.sortBy('cliente', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'idFormulario'){
+			cloneData.sort(this.sortBy('formNombre', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.formulariosSincronizar = cloneData;
         this.sortDirectionFormularioSincro = sortDirection;
-        this.sortedByFormularioSincro = sortedBy;
+        this.sortedByFormularioSincro = sortedBy;        
     }
     // Tabla Acciones
     sortedByAcciones(field, reverse, primer) {
@@ -530,11 +487,15 @@ export default class Sir_lwc_HomeImpaAutoRefresh extends LightningElement {
     onHandleSortAcciones(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.acciones];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idCliente'){
+			cloneData.sort(this.sortBy('cliente', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'idAccion'){
+			cloneData.sort(this.sortBy('accionNombre', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.acciones = cloneData;
         this.sortDirectionAcciones = sortDirection;
-        this.sortedByAcciones = sortedBy;
-    }
-
-            
+        this.sortedByAcciones = sortedBy;      
+    }            
 }

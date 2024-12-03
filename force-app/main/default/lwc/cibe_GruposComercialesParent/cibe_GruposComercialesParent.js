@@ -1,7 +1,20 @@
 import { LightningElement, api, track } from 'lwc';
 
-export default class Cibe_GruposComercialesParent extends LightningElement {
+//Import labels 
+import grupoComercial from '@salesforce/label/c.CIBE_GrupoComercial';
+import oportunidades from '@salesforce/label/c.CIBE_Oportunidades';
+import citas from '@salesforce/label/c.CIBE_Eventos';
+import tareas from '@salesforce/label/c.CIBE_Tareas';
+import equipoCXBContactos from '@salesforce/label/c.CIBE_EquipoCXBContactos';
 
+export default class Cibe_GruposComercialesParent extends LightningElement {
+    labels = {
+        grupoComercial,
+        oportunidades,
+        citas,
+        tareas,
+        equipoCXBContactos
+    };
     @api recordId;
 
     @track isLoaded = false;

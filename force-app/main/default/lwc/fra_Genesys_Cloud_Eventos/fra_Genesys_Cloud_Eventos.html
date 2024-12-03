@@ -154,7 +154,7 @@
 	<template lwc:if={renderizarModales}>
 		<section role="dialog" tabindex="-1" aria-modal="true" class="modalModificarInputApex slds-modal slds-modal_small" onkeydown={modalTeclaPulsada}>
 			<div class="slds-modal__container modalContainer slds-var-p-top_large slds-var-p-bottom_large">
-				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
 				<div class="slds-modal__header slds-var-p-bottom_x-small" style="border-style: none;">
 					<h1 class="slds-modal__title slds-hyphenate">Modificar parámetros de entrada</h1>
 					<p class="slds-var-m-top_x-small">Indica el JSON con los parámetros de entrada para "<span class="negrita">{metodoApexInputEditando}</span>".</p>
@@ -171,7 +171,7 @@
 
 		<section role="dialog" tabindex="-1" aria-modal="true" class="modalSimularRecepcionEvento slds-modal slds-modal_medium" onkeydown={modalTeclaPulsada}>
 			<div class="slds-modal__container modalContainer slds-var-p-top_large slds-var-p-bottom_large">
-				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
 				<div class="slds-modal__header">
 					<h1 class="slds-modal__title slds-hyphenate">Simular recepción de evento</h1>
 					<p class="slds-var-m-top_x-small">Indica el JSON con los datos del evento entrante que quieres simular.</p>
@@ -213,7 +213,7 @@
 
 		<section role="dialog" tabindex="-1" aria-modal="true" class="modalSimularRespuestaApiPurecloud slds-modal slds-modal_medium" onkeydown={modalTeclaPulsada}>
 			<div class="slds-modal__container modalContainer slds-var-p-top_large slds-var-p-bottom_large">
-				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
 				<div class="slds-modal__header">
 					<h1 class="slds-modal__title slds-hyphenate">Simular respuesta API Purecloud</h1>
 					<p class="slds-var-m-top_x-small">Usar una respuesta fija en lugar de invocar a la API de Purecloud</p>

@@ -34,7 +34,7 @@ import oportunidadConfidencial from '@salesforce/label/c.CIBE_OportunidadConfide
 import oportunidadActualizada from '@salesforce/label/c.CIBE_OportunidadActualizada';
 import oportunidadActualizadaCorrectamente from '@salesforce/label/c.CIBE_OportunidadActualizadaCorrectamente';
 import problemaAlEnviarNotificaciones from '@salesforce/label/c.CIBE_ProblemaAlEnviarNotificaciones';
-import esgLabel from '@salesforce/label/c.CIBE_ESG';
+import esgLabel from '@salesforce/label/c.CIBE_FinanciacionSostenible';
 import problemUpdatingESG from '@salesforce/label/c.CIBE_ProblemUpdatingESG';
 import problemUpdatingECAS from '@salesforce/label/c.CIBE_ProblemUpdatingECAs';
 import problemUpdatingSindi from '@salesforce/label/c.CIBE_ProblemUpdatingSindi';

@@ -1,26 +1,54 @@
 <template>
     <lightning-card >
-        <div class= "slds-grid slds-grid_vertical-align-center slds-align_absolute-center ">
-            <div class="slds-col slds-grid slds-size_1-of-2 slds-m-around_medium slds-p-left_medium"> 
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-input class="slds-float_left" type="toggle" id ="esg" name="esg"  checked={esg} onchange={handleChangeESG}></lightning-input>
+        <template if:false={isCIB}>
+            <div class= "slds-grid slds-grid_vertical-align-center slds-align_absolute-center ">
+                <div class="slds-col slds-grid slds-size_1-of-2 slds-m-around_x-small slds-p-left_medium"> 
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input class="slds-float_left" type="toggle" id ="esg" name="esg"  checked={esg} onchange={handleChangeESG}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <label class="slds-float_left" for="ecas">{labels.esgLabel}</label>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_1-of-2">
-                    <label class="slds-float_left" for="ecas">{labels.esgLabel}</label>
+                <div class="slds-col slds-grid slds-size_1-of-2">
+                    <div class="slds-col slds-size_1-of-4">
+                        <lightning-input class="slds-float_left" type="toggle" id ="oportunidadConfidencial" name="oportunidadConfidencial"  checked={confidential} disabled={hasNotPermission} onchange={handleChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <label class="slds-float_left" for="oportunidadConfidencial">{labels.oportunidadConfidencial}</label>
+                    </div> 
+                    <template if:true={loading}>
+                        <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+                    </template>
                 </div>
             </div>
-            <div class="slds-col slds-grid slds-size_1-of-2 slds-p-right_xx-large">
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-input class="slds-float_left" type="toggle" id ="oportunidadConfidencial" name="oportunidadConfidencial"  checked={confidential} disabled={hasNotPermission} onchange={handleChange}></lightning-input>
+        </template>
+
+        <template if:true={isCIB}>
+            <div class= "slds-grid slds-grid_vertical-align-center slds-align_absolute-center ">
+                <div class="slds-col slds-grid slds-size_1-of-2 slds-m-around_x-small slds-p-left_medium"> 
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input class="slds-float_left" type="toggle" name="esg"  checked={esg} onchange={handleChangeESG}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <label class="slds-float_left" for="ecas">{labels.esgLabel}</label>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_1-of-2">
-                    <label class="slds-float_left" for="oportunidadConfidencial">{labels.oportunidadConfidencial}</label>
-                </div> 
-                <template if:true={loading}>
-                    <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
-                </template>
+                <div class="slds-col slds-grid slds-size_1-of-2 slds-p-right_xx-large">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input class="slds-float_left" type="toggle"  name="oportunidadConfidencial"  checked={confidential} disabled={hasNotPermission} onchange={handleChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <label class="slds-float_left" for="oportunidadConfidencial">{labels.oportunidadConfidencial}</label>
+                    </div> 
+                    <template if:true={loading}>
+                        <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+                    </template>
+                </div>
             </div>
-        </div>
+
+        </template>
+
         <template if:true={isCIB}>
             <div class= "slds-grid slds-grid_vertical-align-center slds-align_absolute-center">
                 <div class="slds-col slds-grid slds-size_1-of-2 slds-m-around_medium slds-p-left_medium"> 

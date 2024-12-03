@@ -1,5 +1,4 @@
 <template>
-
 	<lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
 
 	<!--dashboards sin donut charts-->
@@ -37,6 +36,16 @@
 									</div>
 								</article>
 								<div>
+									<template if:true={showLegendOpp7DaysEMP} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Empleado EMP">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.iniEmpleado}>{labels.iniEmpleado}</div> <br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Alerta Comercial EMP">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.alertaCom}>{labels.alertaCom}</div><br>
+										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Acción Comercial EMP">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.accCom}>{labels.accCom} </div><br>
+										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Sugerencia EMP" >  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.sugerencia}>{labels.sugerencia} </div><br>
+									</template>
 									<template if:true={showLegendClientsCIB} >
 										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Gestionar Priorizados CIB">  </div>
 										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.gestionarPri}>{labels.gestionarPri}</div> <br>
@@ -62,28 +71,61 @@
 										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.onboarding}>{labels.onboarding}</div>
 									</template>
 									<template if:true={showLegendNotify} >
-										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Llamadas">  </div>
-										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.llamadas}>{labels.llamadas}</div> <br>
-										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Muro">  </div>
-										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.muro}>{labels.muro}</div><br>
-										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Stop&Go">  </div>
-										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.stopandgo}>{labels.stopandgo} </div><br>
-										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Operaciones pendientes de firma" >  </div>
-										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.opPendFir}>{labels.opPendFir} </div><br>
+										<template if:true={showLlamadasLegend}>
+											<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Llamadas">  </div>
+											<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.llamadas}>{labels.llamadas}</div>
+											<br> 
+										</template>
+										<template if:true={showMuroLegend}>
+											<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Muro">  </div>
+											<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.muro}>{labels.muro}</div>
+											<br>
+										</template>
+										<template if:true={showStopandgoLegend}>
+											<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Stop&Go">  </div>
+											<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.stopandgo}>{labels.stopandgo} </div>
+											<br>
+										</template>
+										<template if:true={showopPendFirLegend}>
+											<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Operaciones pendientes de firma" >  </div>
+											<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.opPendFir}>{labels.opPendFir} </div>
+											<br>
+										</template>
 									</template>
 									<template if:true={showLegendAppointments}>
-										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Salida','001">  </div>
-										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend} data-id={labels.origenCli}>{labels.origenCli}</div><br>
-										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Entrada','002">  </div>
-										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.origenGes}>{labels.origenGes}</div>
+										<template if:true={showOrigenCliLegend}>
+											<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Salida','001">  </div>
+											<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend} data-id={labels.origenCli}>{labels.origenCli}</div>
+											<br>
+										</template>
+										<template if:true={showOrigenGesLegend}>
+											<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Entrada','002">  </div>
+											<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.origenGes}>{labels.origenGes}</div>
+											<br>
+										</template>
 									</template>
 									<template if:true={showLegendTasks7daysCIB}>
 										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a CIB">  </div>
 										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Iniciativa Gestor/a CIB">{labels.tareas}</div> <br>
 									</template>
 									<template if:true={showLegendTasks7daysEMP}>
-										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a EMP">  </div>
-										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Iniciativa Gestor/a EMP">{labels.tareas}</div> <br>
+										<!-- <div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Gestionar Priorizados EMP">  </div>
+                                        <div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.gestionarPri}>{labels.gestionarPri}</div> <br> -->
+										<template if:true={showIniciativaGesLegend}>
+											<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a EMP">  </div>
+											<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.iniciativaGes}>{labels.iniciativaGes} </div>
+											<br>
+										</template>
+										<template if:true={showExpCliLegend}>
+											<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Experiencia Cliente EMP">  </div>
+											<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.expCli}>{labels.expCli}</div>
+											<br>
+										</template>
+                                        <!-- <div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Alerta Comercial EMP" >  </div>
+                                        <div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.alertaComercial}>{labels.alertaComercial} </div><br>
+                                        <div class="dot-lighter-blue" onclick={navigateToReportWithFilterLegend} data-id="Onboarding EMP" >  </div>
+                                        <div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.onboarding}>{labels.onboarding}</div> -->
+									
 									</template>
 									<template if:true={showLegendWarningsCIB}>
 										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Avisos CIB">  </div>
@@ -114,9 +156,6 @@
 								<div class="slds-card__body slds-card__body_inner num-records-container">
 									<span class="cursor-default no-select">{numRecords}</span>
 								</div>
-						
-		
-
 						</article>
 					</template>
 					<!-- <template if:true={showButton}> -->
@@ -131,5 +170,4 @@
 		
 		</lightning-layout>
 	</template>
-
 </template>

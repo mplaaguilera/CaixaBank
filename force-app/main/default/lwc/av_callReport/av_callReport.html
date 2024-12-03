@@ -1,0 +1,75 @@
+<template>
+	<div class="masterDiv1">
+		<lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 3;position:fixed"></lightning-spinner>
+		<div class="masterDiv" if:true={loadedData}>
+			<!-- CABECERA -->
+			<template if:false={isShowNewEvent}>
+
+				<div class="slds-page-header slds-page-header_record-home">
+					<div class="slds-page-header__row">
+						<div class="slds-page-header__col-title">
+							<div class="slds-media">
+								<div class="slds-media__figure">
+									<lightning-icon icon-name="utility:call"></lightning-icon>
+								</div>
+								<div class="slds-media__body">
+									<div class="slds-page-header__name">
+										<div class="slds-page-header__name-title">
+											<h1>
+										
+												<span >Reportar llamada</span>
+												<ul class="slds-list_horizontal">
+													<li class="slds-m-right_x-small">
+														<span  class="slds-page-header__title slds-truncate">{callRecord.clientName}</span>
+													</li>
+												</ul>
+												
+											</h1>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				</template>
+				<template if:false={isShowNewEvent}>
+				<!-- FIN CABECERA -->
+				<div class="cardStyle" >
+					<c-av_contact-block-call-report  callinfo={callRecord} onsetsubject={setsubject} onseteventcoment={seteventcoment} oncheckboxinput={checkboxchange} shownolocalizadocb={nolocalizadocb} class="marginLayer"  islegalentity={isLegalEntity}  onradiobuttonselected={handleRadioButtonSelection} onchangenolocalizado={handleNoLocalizado} onchangeoptionevent={handleChangeOptionEvent}></c-av_contact-block-call-report>
+				</div>
+				<c-av_-opportunity-block-appointment if:true={showOpportunities} isreport={isReportOpportunity} onnameoppo={setOppoName}  recordid={recordId} accountid={callRecord.clientId} data-id="oppoCmp" onsetoppoforcontroller={setOppoForController} onevaluateagendeds={evaluateAgendeds} onsetinfoopp={setInfoOpp} class="marginLayer" nolocalizado ={nolocalizado} optionevent={optionevent} onsendvalueoppolist={valueOppoList} ></c-av_-opportunity-block-appointment>
+				<div style="height:2rem"></div>
+			</template>
+
+
+				<c-av_new-event if:true={isShowNewEvent} 
+				reportedetask={objectInfo}
+				opposlist={opposList} 
+				opposvinculed={opposVinculed}
+				oncancelback={restoreeventreport} 
+				opposscheduled={opposScheduled} 
+				comesfromevent=true
+				onfocustab ={handleError}
+				onclosetab ={handleCancel}
+				onfocusrecordtab ={focusRecord}
+				onfocusrecordtabandclose ={handleCloseAndFocus}
+				clientfromcall={callRecord}
+				></c-av_new-event>
+	
+			</div>
+		</div>
+
+	<!-- <FOOTER> -->
+		<template if:false={isShowNewEvent}>
+
+			<div class="customFooter">
+				<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Finalizar</button>
+				<button if:true={showOpportunities} type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndEvent}  data-id="saveAndEventButton" name="saveEvent" onclick={handleSaveAndEvent}>Guardar Reporte + Alta de Cita</button>
+			
+			</div>
+		</template>
+
+
+</template>

@@ -1,73 +1,61 @@
 ({
 	init: function(component, helper) {
-		let cargar = component.get('c.initComponent');
-		cargar.setParam('caseId', component.get('v.recordId'));
-		cargar.setCallback(this, response => {
-			let result = response.getReturnValue();
-			let state = response.getState();
+        let cargar = component.get('c.initComponent');
+        cargar.setParam('caseId', component.get('v.recordId'));
+        cargar.setCallback(this, response => {
+            let result = response.getReturnValue();
+            let state = response.getState();
 			if (state === 'SUCCESS') {
-				//getCaso
-				component.set('v.caseSubject', result.vGetCaso.Subject);
-				component.set('v.dIdioma', result.vGetCaso.SEG_Idioma__c);
-				component.set('v.caseStatus', result.vGetCaso.Status);
-				component.set('v.caseGrupo', result.vGetCaso.SEG_Grupo__c);
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
-				//cargarEmails
-				component.set('v.emailList', result.vCargarEmails);
-				let horaActual = new Date();
-				component.set('v.horaActualizacion', horaActual.getHours().toString().padStart(2, '0') + ':' + horaActual.getMinutes().toString().padStart(2, '0'));
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
-				//getPropietario
-				component.set('v.esPropietario', result.vGetPropietario);
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
-				//cargarFechaEmails
-				component.set('v.emailDatesList', result.vCargarFechaEmails);
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
-				//getDynamicUrlToApex
-				component.set('v.urlOrg', result.vGetDynamicUrlToApex);
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
-				//mostrarEmailReciente
-				component.set('v.infoEmailInicial', result.vMostrarEmailReciente);
-				component.set('v.currentEmail', result.vMostrarEmailReciente);
-
-				//mostrarContact
-				component.set('v.currentContact', result.vMostrarContact);
-				component.set('v.iniciando', component.get('v.iniciando') + 1);
-
+                //getCaso
+                component.set('v.caseSubject', result.vGetCaso.Subject);
+                component.set('v.dIdioma', result.vGetCaso.SEG_Idioma__c);
+                component.set('v.caseStatus', result.vGetCaso.Status);
+                component.set('v.caseGrupo', result.vGetCaso.SEG_Grupo__c);
+                component.set('v.iniciando', component.get('v.iniciando') + 1);  
+                
+                //cargarEmails
+                component.set('v.emailList', result.vCargarEmails);
+                let horaActual = new Date();
+                component.set('v.horaActualizacion', horaActual.getHours().toString().padStart(2, '0') + ':' + horaActual.getMinutes().toString().padStart(2, '0'));
+                component.set('v.iniciando', component.get('v.iniciando') + 1);
+                
+                //getPropietario
+                component.set('v.esPropietario', result.vGetPropietario);
+                component.set('v.iniciando', component.get('v.iniciando') + 1);
+                
+                //cargarFechaEmails
+                component.set('v.emailDatesList', result.vCargarFechaEmails);
+                component.set('v.iniciando', component.get('v.iniciando') + 1);
+                
+                //getDynamicUrlToApex
+                component.set('v.urlOrg', result.vGetDynamicUrlToApex);
+                component.set('v.iniciando', component.get('v.iniciando') + 1);
+                
+                //mostrarEmailReciente
+                component.set('v.infoEmailInicial', result.vMostrarEmailReciente);
+				component.set('v.currentEmail'    , result.vMostrarEmailReciente); 
+    
+                //mostrarContact	
+                component.set('v.currentContact', result.vMostrarContact);
+            	component.set('v.iniciando', component.get('v.iniciando') + 1);
+            
 			} else if (state === 'ERROR') {
 				let errors = response.getError();
 				console.error(JSON.stringify(errors));
 				helper.mostrarToast('error', 'Error recuperando correo', errors[0].message);
 			}
-		});
-		$A.enqueueAction(cargar);
-
-		component.set('v.columnasAnexos', [
+        });
+        $A.enqueueAction(cargar);
+        
+        component.set('v.columnasAnexos', [
 			{label: 'Nombre', fieldName: 'ContentUrl', type: 'url', typeAttributes: {label: {fieldName: 'Title'}, target: '_blank'}},
 			{label: 'Extensión', fieldName: 'FileExtension', type: 'text', initialWidth: 105},
-			{
-				label: 'Fecha', fieldName: 'CreatedDate', type: 'date', initialWidth: 137, typeAttributes: {
-					month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris'
-				}
-			},
+			{label: 'Fecha', fieldName: 'CreatedDate', type: 'date', initialWidth: 137, typeAttributes: {
+				month: '2-digit',day: '2-digit',year: 'numeric', hour:'2-digit', minute:'2-digit' ,timeZone:'Europe/Paris'}},
 			{label: 'Tamaño', fieldName: 'ContentSize', type: 'integer', initialWidth: 105}
 		]);
-	},
-
-	casoUpdatedDataService: function(component, event) {
-		if (event.getParams().changeType === 'LOADED' || event.getParams().changeType === 'CHANGED') {
-			const caso = component.get('v.caso');
-			component.set('v.noContacto', !caso.ContactId || !caso.SEG_Organizacion__c || !caso.SEG_Zona__c);
-		} else if (event.getParams().changeType === 'ERROR') {
-			console.error(component.get('v.errorLds'));
-		}
-	},
-
+    },
+        
 	cargarAnexos: function(component, event, helper) {
 		let getAnexos = component.get('c.getFilesEmailReciente');
 		getAnexos.setParam('caseId', component.get('v.recordId'));
@@ -89,7 +77,7 @@
 		});
 		$A.enqueueAction(getAnexos);
 	},
-
+        
 	cargarEmails: function(component) {
 		let cargar = component.get('c.recuperarEmails');
 		cargar.setParam('caseId', component.get('v.recordId'));
@@ -192,7 +180,7 @@
 		});
 		$A.enqueueAction(recuperarCaso);
 
-		/*component.set('v.columnasAnexos', [
+		/* component.set('v.columnasAnexos', [
 			{label: 'Nombre', fieldName: 'ContentUrl', type: 'url', typeAttributes: {
 				label: {fieldName: 'Title'}, target: '_blank'
 			}},
@@ -265,8 +253,8 @@
 	},
 
 	/*ELB: Modificado metodo para añadir el boton que se pulsa (Responder o ResponderTodos). Añadida llamada al metodo
-	* cargarEmailReciente para recargar los datos del ultimo email en caso de cancelar la edición del mensaje.
-	*/
+    * cargarEmailReciente para recargar los datos del ultimo email en caso de cancelar la edición del mensaje.
+    */
 	abrirPlantillas: function(component, event) {
 		let idBoton = event.getSource().getLocalId();
 		component.set('v.botonPulsado', idBoton);
@@ -392,10 +380,11 @@
 		} else if (idBoton === 'RespMultiple') {
 			let emails = component.get('v.infoEmailRespuesta');
 			let getResponderPara2 = component.get('c.getResponderPara');
-			let datos;
-			if (emails.ToAddress) {
-				datos = emails.FromAddress + '; ' + emails.ToAddress;
-			} else {
+			let datos ;
+			if (emails.ToAddress != null || emails.ToAddress != undefined){
+				datos = emails.FromAddress+'; '+ emails.ToAddress;
+			}
+			else{
 				datos = emails.FromAddress;
 			}
 			getResponderPara2.setParams({
@@ -476,5 +465,5 @@
 		window.scrollTo({top: 0, behavior: 'smooth'});
 	}
 
-
+	
 });

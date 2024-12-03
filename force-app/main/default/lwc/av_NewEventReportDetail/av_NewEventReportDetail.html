@@ -1,159 +1,187 @@
 <template>
-    <div class="slds-grid customInputs">
-        <div class="slds-col slds-size_6-of-12">
-
-            <c-av_-lookup 
-            data-id="clientlookup"
-            selection={initialclient}
-            onsearch={handleSearchClient}
-            onselectionchange={handleSelectionClient}
-            fieldlabel="Cliente"
-            placeholder="Buscar cliente"
-            required>
-            </c-av_-lookup>
-
-            <c-av_-lookup 
-            if:true={isPersonaJuridica}
-            data-id="contactpersonlookup"
-            onsearch={handleSearchContactPerson}
-            onselectionchange={handleSelectionContactPerson}
-            fieldlabel="Persona de contacto"
-            placeholder="Buscar contacto ..."
-            disabled={disabledContact}
-            ></c-av_-lookup>
-
-            <lightning-input type="text"  
-            data-id="subjectinput"
-            placeholder="Escribe aqui..." label="Asunto" 
-            onchange={handleChangeSubject} required
-            message-when-value-missing="Indica un asunto"
-            ></lightning-input>
-            
-      
-
-            <div if:true={isBpr} style="padding-top:.5rem">
-
-                <lightning-input type="checkbox" 
-                label="Entrevista memorable" 
-                onclick={handleMemorableInterview} 
-                data-id="memorableinterviewcheck">
-            </lightning-input>
-
-            </div>
-
-        <!-- <lightning-input type="text" placeholder="Escribe aqui..." label="Comentario" onchange={handleChangeComentary}></lightning-input> -->
-        </div>
-        <div class="slds-col slds-size_6-of-12">    
-            <c-av_-lookup class="lookup-cmp slds-size_1-of-4"
-                data-id="employeelookup"
-                selection={initialemployee}
-                onsearch={handleSearchEmployee}
-                onselectionchange={handleSelectionEmployee}
-                fieldlabel="Empleado/a asignado"
-                placeholder="Busca un empleado..."
-                required>
-            </c-av_-lookup>
-
-            <c-av_-lookup 
-            data-id="attendeeslookup"
-            onsearch={handleSearchAttendes}
-            onselectionchange={handleSelectionAttendee}
-            fieldlabel="Empleado/as acompañantes"
-            placeholder="Añade participantes al evento..."
-            >  </c-av_-lookup>
-
-            <div if:true={attendes} class="attendesBox">
-                <template for:each={selectedAttendes} for:item="att" >
-                    <div key={att.bucleId} data-id={att.id}>						
-                        <lightning-pill style="margin:8px 0" label={att.label} name ={att.id} onremove={handleRemoveAttende}>
-                                <lightning-icon icon-name="standard:user" alternative-text="user"></lightning-icon>
-                        </lightning-pill>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-    <lightning-textarea placeholder="Escribe aqui..." label="Comentario" onchange={handleChangeComentary}></lightning-textarea>
-
-
-    <!-- SEGUNDA MITAD DEL CMP -->
-    <div style="margin-top:2rem">
-
-        <h1><strong style="font-size:1rem">Detalles de la cita</strong></h1>
-    </div>
-    <div style="margin:1.25rem 0 .75rem 0">
-        <span style="color:red;">*</span>Tipo de cita
-    </div>
-    <div class="radioButtonStyle" data-id="radioButtonDiv">    
-                
-        <div if:false={isIntouch}>
-            <input type="radio" id="CTO"  name="typeInput" value="CTO" onchange={hnadleChangeEventType} checked>
-            <label for="CTO">Cita en la oficina</label>
-        </div>
-        <div if:true={isIntouch}>
-            <input type="radio" id="CTOi"  name="typeInput" value="CTO" onchange={hnadleChangeEventType}>
-            <label for="CTOi">Cita en la oficina</label>
-        </div>
-        <div if:false={isIntouch}>
-            <input type="radio" id="CTF"  name="typeInput" value="CTF" onchange={hnadleChangeEventType}>
-            <label for="CTF">Cita telefónica</label>
-        </div>
-        <div if:true={isIntouch}>
-            <input type="radio" id="CTFi"  name="typeInput" value="CTF" onchange={hnadleChangeEventType} checked>
-            <label for="CTFi">Cita telefónica</label>
-        </div>
-        <div>
-            <input type="radio" id="VLD"  name="typeInput" value="VLD" onchange={hnadleChangeEventType}>
-            <label for="VLD">Videollamada</label>
-        </div>
-        
-        <div>
-            <input type="radio" id="CTOOC"  name="typeInput" value="CTOOC" onchange={hnadleChangeEventType}>
-            <label for="CTOOC">Cita en otra oficina</label>
-        </div>
-        <div>
-            <input type="radio" id="001"  name="typeInput" value="001" onchange={hnadleChangeEventType}>
-            <label for="001">Visita del gestor</label>
-        </div>
-        
-    </div>
-
-    <div class="slds-grid typeRelatedInputs">
-        <div>
-            <lightning-input type="date" data-id="activityDateInput"
-            date-style="short" label="Fecha" value={tomorrow} min={today} 
-            message-when-range-underflow="Seleccione una fecha futura" 
-            message-when-value-missing="Indica una fecha para el evento"
-            message-when-bad-input="Introduce una fecha en el formato correcto"
-             required onchange={handleChangeActivityDate}></lightning-input> 
-        </div>
-
-        <div>
-            <lightning-combobox label="Tiempo estimado"
-            required options={optionsTime} 
-            onchange={handleChangeDuration} 
-            value={initialDuration}></lightning-combobox>
-        </div>
-
-        <div if:true={showUbication}>
-            <lightning-input label="Ubicación" 
-            style="display:block;width:12rem"
-                data-id="ubicationinput" 
-                onchange={handleChangeUbication} 
-                placeholder="Escribe la ubicación">
-            </lightning-input>
-        </div>
-
-        <div if:true={showOfficeInput}>
-            <c-av_-lookup 
-                data-id="officelookup"
-                style="display:block;width:15rem"
-                onsearch={handleSearchOffice}
-                onselectionchange={handleSelectionOffice}
-                fieldlabel="Oficina"
-                placeholder="Busca la oficina.."
-                required    
-            ></c-av_-lookup>
-        </div>
-    </div>
+	<div if:false ={issummary}>
+		<div class="slds-grid customInputs">
+			<div class="slds-col slds-size_6-of-12">
+				<c-av_-lookup 
+				data-id="clientlookup"
+				selection={initialclient}
+				onsearch={handleSearchClient}
+				onselectionchange={handleSelectionClient}
+				fieldlabel="Cliente"
+				placeholder="Buscar cliente"
+				required>
+				</c-av_-lookup>
+				<c-av_-lookup 
+				if:true={isPersonaJuridica}
+				data-id="contactpersonlookup"
+				onsearch={handleSearchContactPerson}
+				onselectionchange={handleSelectionContactPerson}
+				onclick={handleSearchContactPersonClick}
+				fieldlabel="Persona de contacto"
+				placeholder="Buscar contacto ..."
+				disabled={disabledContact}
+				></c-av_-lookup>
+				<lightning-input type="text"  
+				data-id="subjectinput"
+				placeholder="Escribe aqui..." label="Asunto" value={subjectToSend}
+				onchange={handleChangeSubject} required
+				message-when-value-missing="Indica un asunto"
+				></lightning-input>
+			</div>
+			<div class="slds-col slds-size_6-of-12">    
+				<c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+					data-id="employeelookup"
+					selection={initialemployee}
+					onsearch={handleSearchEmployee}
+					onselectionchange={handleSelectionEmployee}
+					fieldlabel="Empleado/a asignado"
+					placeholder="Busca un empleado..."
+					required>
+				</c-av_-lookup>
+				<c-av_-lookup 
+				data-id="attendeeslookup"
+				onsearch={handleSearchAttendes}
+				onselectionchange={handleSelectionAttendee}
+				fieldlabel="Empleado/as acompañantes"
+				placeholder="Añade participantes al evento..."
+				>  </c-av_-lookup>
+				<div if:true={attendes} class="attendesBox">
+					<template for:each={selectedAttendes} for:item="att" >
+						<div key={att.bucleId} data-id={att.id}>						
+							<lightning-pill style="margin:8px 0" label={att.label} name ={att.id} onremove={handleRemoveAttende}>
+									<lightning-icon icon-name="standard:user" alternative-text="user"></lightning-icon>
+							</lightning-pill>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+		<div style="margin:1.25rem 0 .75rem 0">
+			<span style="color:red;">*</span>Tipo de cita
+		</div>
+		<div class="radioButtonStyle" data-id="radioButtonDiv">        
+			<div if:false={isIntouch}>
+				<input type="radio" id="CTO"  name="typeInput" value="CTO" onchange={hnadleChangeEventType} checked>
+				<label for="CTO">Cita en la oficina</label>
+			</div>
+			<div if:true={isIntouch}>
+				<input type="radio" id="CTOi"  name="typeInput" value="CTO" onchange={hnadleChangeEventType}>
+				<label for="CTOi">Cita en la oficina</label>
+			</div>
+			<div if:false={isIntouch}>
+				<input type="radio" id="CTF"  name="typeInput" value="CTF" onchange={hnadleChangeEventType}>
+				<label for="CTF">Cita telefónica</label>
+			</div>
+			<div if:true={isIntouch}>
+				<input type="radio" id="CTFi"  name="typeInput" value="CTF" onchange={hnadleChangeEventType} checked>
+				<label for="CTFi">Cita telefónica</label>
+			</div>
+			<div>
+				<input type="radio" id="VLD"  name="typeInput" value="VLD" onchange={hnadleChangeEventType}>
+				<label for="VLD">Videollamada</label>
+			</div>
+			<div>
+				<input type="radio" id="CTOOC"  name="typeInput" value="CTOOC" onchange={hnadleChangeEventType}>
+				<label for="CTOOC">Cita en otra oficina</label>
+			</div>
+			<div>
+				<input type="radio" id="001"  name="typeInput" value="001" onchange={hnadleChangeEventType}>
+				<label for="001">Visita del gestor</label>
+			</div>
+		</div>
+		<div if:true={showUbication}>
+			<lightning-input label="Ubicación" 
+			style="display:block;width:12rem"
+				data-id="ubicationinput" 
+				onchange={handleChangeUbication} 
+				value={ubicationValue}
+				placeholder="Escribe la ubicación">
+			</lightning-input>
+		</div>
+		<div if:true={showOfficeInput}>
+			<c-av_-lookup 
+				data-id="officelookup"
+				selection={initialselection}
+				style="display:block;width:15rem"
+				onsearch={handleSearchOffice}
+				onselectionchange={handleSelectionOffice}
+				fieldlabel="Oficina"
+				placeholder="Busca la oficina.."
+				required    
+			></c-av_-lookup>
+		</div>
+		<div if:true={isBpr} style="padding-top:.5rem">
+			<lightning-input type="checkbox" label="Entrevista memorable" onclick={handleMemorableInterview} data-id="memorableinterviewcheck"></lightning-input>
+		</div>
+		<div style="padding-top:.5rem">
+			<lightning-input type="checkbox" label="Cita No Comercial (Gestión Operativa)" onclick={handleNoComercial} data-id="nocomercialcheck"></lightning-input>
+		</div>
+	</div>
+	<div if:true ={issummary}>
+		<div class="slds-clearfix">
+			<div class="slds-float_left">
+				<div>
+					<label>Cliente</label>
+					<p>&nbsp;{accountName}</p>
+				</div>
+				<br/>
+				<div>
+					<label>Tipo de cita</label>
+					<p>&nbsp;{typeName}</p>
+				</div>
+			</div>
+			<div class="slds-float_left slds-m-left_large">
+				<div>
+					<label>Asunto</label>
+					<p>&nbsp;{subjectToSend}</p>
+				</div>
+				<br/>
+				<div>
+					<label>Fecha</label>
+					<p>&nbsp;{timeinfo.date}</p>
+				</div>
+			</div>
+			<div class="slds-float_left slds-m-left_large">
+				<div class="slds-clearfix">
+					<div class="slds-float_left slds-m-left_large">
+						<label>Empleado/a asignado</label>
+						<p>&nbsp;{employeeName}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large" if:true={isPersonaJuridica}>
+						<label>Persona de contacto</label>
+						<p>&nbsp;{contactPersonName}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large">
+						<label>Empleado/as acompañantes</label>
+						<p>&nbsp;{attendeesNames}</p>
+					</div>
+				</div>
+				<br/>
+				<div class="slds-clearfix">
+					<div class="slds-float_left slds-m-left_large">
+						<label>Hora inicio</label>
+						<p>&nbsp;{timeinfo.hourini}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large">
+						<label>Hora fin</label>
+						<p>&nbsp;{timeinfo.hourfin}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large">
+						<label>Duración</label>
+						<p>&nbsp;{timeinfo.duration}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large" if:true={showUbication}>
+						<label>Ubicación</label>
+						<p>&nbsp;{ubicationToSend}</p>
+					</div>
+					<div class="slds-float_left slds-m-left_large" if:true={showOfficeInput}>
+						<label>Oficina</label>
+						<p>&nbsp;{officeName}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br/>
+	<lightning-textarea placeholder="Escribe aqui..." label="Comentario" onchange={handleChangeComentary} value={comentaryToSend}></lightning-textarea>
 </template>

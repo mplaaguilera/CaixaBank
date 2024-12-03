@@ -1,11 +1,11 @@
 <template>
     <lightning-card>
-		<div class="slds-p-horizontal_small">
-			<div>
+		<div class="">
+			<div class="divStyles">
 				<button class="slds-button test-id__section-header-button slds-section__title-action" name="Jerarquía Negocio NAME" title="Jerarquía Negocio Title" onclick={toggleShowHierarchy}>
-					<lightning-icon if:true={showHierarchy} size="xx-small" icon-name="utility:chevrondown" class="slds-m-rigth_x-small"></lightning-icon>
-					<lightning-icon if:false={showHierarchy} size="xx-small" icon-name="utility:chevronright" class="slds-m-rigth_x-small"></lightning-icon>
-					<p class="slds-p-horizontal_small" style="font-size: medium;">{labels.jerarCIB}</p>
+					<lightning-icon if:true={showHierarchy} size="x-small" icon-name="utility:chevrondown" class="slds-m-rigth_x-small"></lightning-icon>
+					<lightning-icon if:false={showHierarchy} size="x-small" icon-name="utility:chevronright" class="slds-m-rigth_x-small"></lightning-icon>
+					<p class="titleStyles">{labels.jerarCIB}</p>
 				</button>
 			</div>
 

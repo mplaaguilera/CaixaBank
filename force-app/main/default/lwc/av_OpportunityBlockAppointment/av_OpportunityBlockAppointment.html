@@ -22,7 +22,7 @@
         <div if:true={particularOpportunity} class="cardMargin">
 
             <div class="slds-text-body_regular" style="margin:1rem auto">
-                <div style="margin:1rem 0 .6rem 0">Oportunidad vinculada</div> 
+                <div style="margin:1rem 0 .6rem 0">Oportunidad vinculada</div>
                 <c-av_-detail-opportunity-appointment 
                 oppo={particularOpportunity} 
                 onvinculateaction={handleVinculation}
@@ -30,9 +30,11 @@
                 onsenddatafromoppo={buildOppoObj}
                 onnotifyagended={evaluateAgendeds}
                 data-id={particularOpportunity.Id}
-                oppislinked="true"
                 resolutionlist={resolutionList}
                 potentiallist={potentialList}
+                isnewprod ={particularOpportunity.IsNewProduct}
+                nolocalizado={nolocalizado}
+               
                 style="margin-top:.5rem"
             ></c-av_-detail-opportunity-appointment>
             </div>
@@ -45,10 +47,16 @@
                 onvinculateaction={handleVinculation}
                 onmainclick={handleMainOpp}
                 onsenddatafromoppo={buildOppoObj}
-                    onnotifyagended={evaluateAgendeds}
-                    data-id={opp.Id}
-                    resolutionlist={resolutionList}
-                    potentiallist={potentialList}
+                onnotifyagended={evaluateAgendeds}
+                data-id={opp.Id}
+                resolutionlist={resolutionList}
+                potentiallist={potentialList}
+	            isnewprod ={opp.IsNewProduct}
+                nolocalizado={nolocalizado}
+                
+               
+
+
                     ></c-av_-detail-opportunity-appointment>
                 </div>
             </template>
@@ -63,6 +71,9 @@
                     data-id={opp.Id}
                     resolutionlist={resolutionList}
                     potentiallist={potentialList}
+                    buttondelete={showButtonDelete}
+                    isnewprod ={opp.IsNewProduct}
+                    ondeleteoppo={handleOppoDelete}
                 ></c-av_-detail-opportunity-appointment>
             </div>
         </template>

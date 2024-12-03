@@ -8,7 +8,7 @@
                 <div class="slds-media__body">
                     <h2 class="slds-card__header-title">
                         <span class="slds-card__header-link slds-truncate" title="Citas del grupo">
-                            Citas del grupo
+                            {labels.citasGrupo}
                         </span>
                     </h2>
                 </div>
@@ -25,13 +25,13 @@
                 </lightning-datatable>
                 <template if:true={empty}>
                     <div class="slds-m-around_xx-small slds-text-align_center">
-                        <b>No hay citas asociadas a los clientes seleccionados del grupo comercial.</b>
+                        <b>{labels.message}</b>
                     </div>
                 </template>
             </div>
         </div>
         <footer class="slds-card__footer">
-            <lightning-button variant="base" label="Ver más" title="Ver más" onclick={viewMore} disabled={getViewMore}></lightning-button>
+            <lightning-button variant="base" label={labels.verMas} title="Ver más" onclick={viewMore} disabled={getViewMore}></lightning-button>
         </footer>
         <template if:false={isLoaded}>
             <lightning-spinner variant="brand" size="medium"></lightning-spinner>

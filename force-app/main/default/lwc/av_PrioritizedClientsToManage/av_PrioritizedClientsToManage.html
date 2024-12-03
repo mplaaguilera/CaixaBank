@@ -16,7 +16,7 @@
                                                 <span>Informe: Mis clientes</span>
                                             </li>
                                         </ul>
-                                        <span class= "slds-page-header__title slds-truncate">Clientes a gestionar priorizados</span>
+                                        <span class= "slds-page-header__title slds-truncate">{nameReport}</span>
                                     </h1>
                                 </div>
                             </div>    
@@ -45,15 +45,29 @@
         
             
             <div class="slds-border_top margin-right-search">
+                <div data-id="lookup1" class="slds-form-element__label assign-lookup slds-size_1-of-4 lookUp1" style="margin-left:2rem;margin-right:0;padding-right:0">
+                        <c-av_-lookup class="width-input" data-id="clookup2" selection={initialSelectionOffice} errors={errors} onsearch={handleSearcOffice} onselectionchange={handleSelectionChange} onclick={handleSearchOfficeClick} fieldlabel="Oficina" placeholder={officePlaceholder} is-multi-entry={isMultiEntry} required></c-av_-lookup>
+                </div> 
 
-                <div data-id="lookup1" class="" style="padding-top:1rem">            
+                <div class="slds-col slds-size_1-of-4 margin-toggle slds-form-element__label">
+                    <lightning-combobox class="width-input" name="owner" label="Empleado asignado" data-id = "employeesDropDown" options={optionsEmployee} value={employeeFilter} placeholder="--Seleccionar--" onchange={handleChangeEmployee} disabled={isDisabledEmployee} required></lightning-combobox>
+                    <div class="slds-form_vertical slds-grid margin-toggle not-margined">
+                        <lightning-input type="toggle" class="another-office" onchange={handleAnotherOffice} checked={isAnotherOffice} name="anotherOffice" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" disabled={isDisabledEmployee}></lightning-input>
+                        <label class="slds-form-element__label">Ver empleados de otras oficinas</label>
+                    </div>
+                    <lightning-spinner if:true={loadingEmployee} alternative-text="Loading" size="medium"></lightning-spinner>
                 </div>
+            </div>
+            <div class=" margin-right-search">
 
-                <lightning-input class="slds-size_1-of-4" type="text" name="subject" placeholder= "Buscar asunto..." onchange={handleChangeSubject}></lightning-input>
+                <div data-id="lookup1" class="slds-size_1-of-4" style="margin-left:2rem">            
                     
-                <div  style="width:fit-content">
+                <lightning-input  type="text" name="subject" placeholder= "Buscar asunto..." onchange={handleChangeSubject} disabled ={subjectDisabled}></lightning-input>
+                </div>
+                    
+                <div  style="width:fit-content;margin-left:0">
                     <lightning-combobox data-id="" name="origen" style="width:10rem"
-                        options={optionsOrigen} placeholder="Origen" onchange={handleChangeOrigen} value={origenFilter}>
+                        options={optionsOrigen} placeholder="Origen" onchange={handleChangeOrigen} value={origenFilter} disabled={originDisabled}>
                     </lightning-combobox>
                 </div>
                 
@@ -61,20 +75,20 @@
                    
                 
                 <div class="div-checkbox slds-grid">
-                    <lightning-input name="recordTypes" label="Preconcedido" type="checkbox" onchange={handleChangePreconcedido} checked={preconcedidoFilter}></lightning-input>
-                    <lightning-input name="status" label="MyBox" type="checkbox" onchange={handleChangeMyBox} checked={myBoxFilter}></lightning-input>
-                    <lightning-input name="owner" label="Target Auto" type="checkbox" onchange={handleChangeTargetAuto} checked={targetAutoFilter}></lightning-input>
+                    <lightning-input name="recordTypes" label="Preconcedido" type="checkbox" onchange={handleChangePreconcedido} checked={preconcedidoFilter} disabled={disabledCb}></lightning-input>
+                    <lightning-input name="status" label="MyBox" type="checkbox" onchange={handleChangeMyBox} checked={myBoxFilter} disabled={disabledCb}></lightning-input>
+                    <lightning-input name="owner" label="Target Auto" type="checkbox" onchange={handleChangeTargetAuto} checked={targetAutoFilter} disabled={disabledCb}></lightning-input>
                 </div>
             </div>  
 
 
 
-    <div class="slds-border_top">
+    <div class="slds-border_top" style="padding-bottom:1rem">
 
-        <div if:true={origenDiv} class=" slds-grid margin-pill">
+        <div if:true={origenDiv} class="slds-grid margin-pill">
             <template for:each={originSelect} for:item="origen" >
                 <div key={origen.bucleId} class="origen-select" data-id="origen.id">
-                    <span class="slds-pill" style="margin:8px .6rem 8px 0" >
+                    <span class="slds-pill" style="margin:8px .6rem 0px 0" >
                         <span class="slds-pill__label customPill" >{origen.typeLabel}<a href="#">{origen.label}</a></span>
                         <lightning-button-icon icon-name="utility:close" style="margin:-3px 0 0 5px"
                             variant="bare" name={origen.value} onclick={unSelectOrigen}>    
@@ -84,8 +98,18 @@
             </template>
         </div>
 
+    <div if:true={employeesDiv} class="slds-form_vertical slds-grid divPaddingEmployee  margin-fix" >
+        <ul class="slds-clearfix">
+            <template for:each={selectedEmployees} for:item="employee">
+                <li key={employee.bucleId} class="slds-float_left" data-id={employee.id} >
+                    <lightning-pill style="margin:8px 0" class="margin-pill-employee" label={employee.label} name ={employee.id} onremove={unSelectEmployee}>
+                        <lightning-icon icon-name="standard:user" alternative-text="user"></lightning-icon>
+                    </lightning-pill>
+                </li>
+            </template>
+        </ul>
     </div>
-        
+    </div>
             
 </article>
 <br>

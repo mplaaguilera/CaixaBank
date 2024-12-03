@@ -3,18 +3,19 @@
                 <template if:true={isImporte}>
                     <template if:false={hasOne}>
                         <div class="slds-col slds-size_1-of-1 slds-p-around_x-small">
-                            <lightning-input required={isImporteREQ} type="Number" label={labels.importe}  name="importeSaldo" value={importesaldo} onchange={handleChange}></lightning-input>
+                            <lightning-input  type="Number" label={labels.importe}  name="importeSaldo" value={importesaldo} onchange={handleChange}></lightning-input>
                         </div>
                     </template>
                     <template if:true={hasOne}>
                         <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
-                            <lightning-input required={isImporteREQ}  type="Number" label={labels.importe}  name="importeSaldo" value={importesaldo} onchange={handleChange}></lightning-input>
+                            <lightning-input type="Number" label={labels.importe}  name="importeSaldo" value={importesaldo} onchange={handleChange}></lightning-input>
+
                         </div>
                     </template>
                 </template>
             <template if:true={isNUni}>
                 <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
-                    <lightning-input required={isNUniREQ}  type="Number" label={labels.numeroUnidades} name="numeroUnidades" value={numerounidades} onchange={handleChange}></lightning-input>
+                    <lightning-input  type="Number" label={labels.numeroUnidades} name="numeroUnidades" value={numerounidades} onchange={handleChange}></lightning-input>
                 </div>
             </template>
     </div>

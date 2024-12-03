@@ -44,7 +44,7 @@
 							</lightning-combobox>
 						</div>
                         <div class="slds-col slds-size_1-of-4">
-							<lightning-combobox data-field="equipoOpo" label={labels.equipoOppo} options={optionsParticipe} name="equipoOpo" value={participeFilter} placeholder="--Seleccionar--" onchange={handleValueChangeEquipoOpo} >
+							<lightning-combobox data-field="equipoOpo" label={labels.equipoOppo} options={optionsParticipe} name="equipoOpo" value={participeFilter} placeholder={sectorValue} onchange={handleValueChangeEquipoOpo} >
 							</lightning-combobox>
 						</div>
 					</div>
@@ -54,16 +54,16 @@
 				<div>
                     <div class="slds-col slds-size_1-of-4 slds-form_vertical slds-m-around_x-small slds-float_right">
                             <div class="slds-col slds-size_1-of-4 slds-float_left">
-                                <lightning-input type="toggle" class="another-office" onchange={handleMisClientes} checked={isMisClientes} name="misClientes" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
+                                <lightning-input style= 'margin-left: 20px;' type="toggle" class="another-office" onchange={handleMisClientes} checked={isMisClientes} name="misClientes" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
                             </div>
                             <div class="slds-col slds-size_1-of-4 slds-float_left">
-                                <label class="slds-form-element__label">Mis Clientes</label>  
+                                <label class="slds-form-element__label">{labels.misClientes}</label>  
                             </div>
                             <div class="slds-col slds-size_1-of-4 slds-float_left">
-                                <lightning-input type="toggle" class="another-office" onchange={handleESG} checked={isESG} name="esg" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
+                                <lightning-input style= 'margin-left: 20px;' type="toggle" class="another-office" onchange={handleESG} checked={isESG} name="esg" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
                             </div>
                             <div class="slds-col slds-size_1-of-4 slds-float_left">
-                                <label class="slds-form-element__label">ESG</label>  
+                                <label class="slds-form-element__label">{labels.esg}</label>  
                         </div>
                     </div>
                     <!-- Fin Segunda fila -->
@@ -92,7 +92,7 @@
 							</div>
 							<!-- Industria Internacional  Buscará los valores de corporate bankin España cuando redes sea surcursales o ORS -->
                             <div class="slds-col slds-size_1-of-4">
-                                <lightning-combobox data-field="industriaInter" disabled={disabledIndustria}  label={labels.industriaInter} options={optionsIndustria} name="industraInter" value={industriaFilter} placeholder="--Seleccionar--" onchange={handleValueChangeIndustria} >
+                                <lightning-combobox data-field="industriaInter" disabled={disabledIndustria}  label={labels.industriaInter} options={optionsIndustria} name="industraInter" value={industriaFilter} placeholder={sectorValue} onchange={handleValueChangeIndustria} >
                                 </lightning-combobox>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
                             <!-- Employee's multiselection -->
-                            <h5 ><strong>Redes Segmentos seleccionadas</strong></h5>
+                            <h5 ><strong>{labels.redsegSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedRedes} for:item="redes" >
                                     <div key={redes.bucleId} class="slds-m-around_xxx-small">
@@ -119,7 +119,7 @@
                 <div if:true={sectoresDiv}>
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
-                            <h5 ><strong>Sectores Paises seleccionados</strong></h5>
+                            <h5 ><strong>{labels.sectPaisesSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedSect} for:item="sector" >
                                     <div key={sector.bucleId} class="slds-m-around_xxx-small">
@@ -136,7 +136,7 @@
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
                             <!-- Employee's multiselection -->
-                            <h5 ><strong>Centros Cartera seleccionados</strong></h5>
+                            <h5 ><strong>{labels.centrosCartSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedCent} for:item="centro" >
                                     <div key={centro.bucleId} class="slds-m-around_xxx-small" >						
@@ -152,7 +152,7 @@
                 <div if:true={equiposDiv}>
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
-                            <h5 ><strong>Equipo oportunidad seleccionados</strong></h5>
+                            <h5 ><strong>{labels.equipoOprSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedParticipe} for:item="equipo" >
                                     <div key={equipo.bucleId} class="slds-m-around_xxx-small">
@@ -169,7 +169,7 @@
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
                             <!-- Employee's multiselection -->
-                            <h5 ><strong>Etapas seleccionados</strong></h5>
+                            <h5 ><strong>{labels.etapasSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedStatus} for:item="status" >
                                     <div key={status.bucleId} class="slds-m-around_xxx-small" >
@@ -185,7 +185,7 @@
                 <div if:true={paisesDiv}>
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
-                            <h5 ><strong>Paises seleccionados</strong></h5>
+                            <h5 ><strong>{labels.paisesSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedPais} for:item="pais" >
                                     <div key={pais.bucleId} class="slds-m-around_xxx-small" >
@@ -201,7 +201,7 @@
                 <div if:true={fechaDiv}>
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
-                            <h5 ><strong>Fecha Cierre seleccionados</strong></h5>
+                            <h5 ><strong>{labels.fechaCirreSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                     <div class="slds-m-around_xxx-small">
                                         <template for:each={selectedFech} for:item="fecha" >
@@ -219,7 +219,7 @@
                 <div if:true={industriaDiv}>
                     <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
                         <div class="slds-col slds-size_1-of-4">
-                            <h5 ><strong>Industria Internacional seleccionados</strong></h5>
+                            <h5 ><strong>{labels.indInterSele}</strong></h5>
                             <div class="slds-list_horizontal">
                                 <template for:each={selectedInd} for:item="industria" >
                                     <div key={industria.bucleId} class="slds-m-around_xxx-small">

@@ -158,7 +158,9 @@ export default class SAC_EstadosReclamacion extends LightningElement {
         return getFieldValue(this.case.data, FASTTRACK_FIELD);
     }
 
-    get email(){}
+    get email(){
+        return undefined;
+    }
 
     @wire(esPropietario, {record: '$recordId'})
     propietarioRegistro({data, error}){
@@ -213,58 +215,69 @@ export default class SAC_EstadosReclamacion extends LightningElement {
         if(this.existenDatos.fields.Status.value=='SAC_001'){
             return 'Alta';
         } 
+        return undefined;
     }
     get analisis(){
         if(this.existenDatos.fields.Status.value=='SAC_002'){
             return 'Análisis';
         } 
+        return undefined;
     }
     get redaccion(){
         if(this.existenDatos.fields.Status.value=='SAC_003' && this.sentidoResolucion != 'SAC_004'){
             return 'Redacción';
         }  
+        return undefined;
     }
 
     get inadmision(){
         if(this.existenDatos.fields.Status.value=='SAC_005'  && this.sentidoResolucion == 'SAC_004'){
             return 'Inadmisión';
         }   
+        return undefined;
     }
     get subsanacion(){
         if(this.existenDatos.fields.Status.value=='SAC_006'){
             return 'Subsanación';
         }
+        return undefined;
     }
     get negociacion(){
         if(this.existenDatos.fields.Status.value=='SAC_007'){
             return 'Subsanación';
         }       
+        return undefined;
     }
     get negociacionReclamacion(){
         if(this.statusReclamacion=='SAC_007'){
             return 'Negociacion';
         }
+        return undefined;
     }
     get ejecucion(){
         if(this.existenDatos.fields.Status.value=='SAC_004'){
             return 'Ejecución';
         }
+        return undefined;
     }
     get derivacion(){
         if(this.existenDatos.fields.Status.value=='SAC_008'){
             return 'Derivación';
         }   
+        return undefined;
     }
     get baja(){
         if(this.existenDatos.fields.Status.value=='SAC_009'){
             return 'Baja';
         } 
+        return undefined;
     }
 
     get estadoCerrado(){
         if(this.existenDatos.fields.Status.value=='Cerrado'){
             return 'Cerrado';
         }
+        return undefined;
     }
     
     get recordType(){
@@ -275,6 +288,7 @@ export default class SAC_EstadosReclamacion extends LightningElement {
         if(rtNombre=='Pretension'){
             return false;
         }
+        return undefined;
     }
 
     get esPSD2YNoJunta(){

@@ -162,11 +162,8 @@
 				component.set('v.casoEnTercerNivel', caso.CC_En_Tercer_Nivel__c);
 				component.set('v.casoEnSegundoNivel', caso.CC_En_Segundo_Nivel__c);
 				component.set('v.tipoRegistro', caso.RecordType.DeveloperName);
+				component.set('v.derivadaCSBD', caso.CC_Oportunidad_Creada__c);
 				this.obtenerPermisos(component, caso);
-
-				if (caso.CC_MCC_Motivo__c) {
-					component.set('v.verSegundaOficina', caso.CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c);
-				}
 
 				if (caso.CC_Detalles_Consulta__c) {
 					component.set('v.comentariosTarea', caso.CC_Detalles_Consulta__c);

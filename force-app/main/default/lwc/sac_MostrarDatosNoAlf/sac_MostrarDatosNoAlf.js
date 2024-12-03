@@ -17,7 +17,6 @@ export default class Sac_MostrarDatosNoAlf extends NavigationMixin(LightningElem
         this._wiredResult = result; 
         
         if (result.data) {
-            console.log('_wthis.reclamantest -> ' + JSON.stringify(result.data));
             this.reclamantes = result.data.listReclamantes;
 
             let numReclamantesDatosNoAlf = 0;

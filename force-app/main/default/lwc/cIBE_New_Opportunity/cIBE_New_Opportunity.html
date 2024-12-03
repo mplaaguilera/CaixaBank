@@ -37,7 +37,7 @@
             <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">  
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
-                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">*</span>{labels.productoLabel}</label>
+                    <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">* </span>{labels.productoLabel}</label>
                         <c-av_-lookup
                             class="textBoxLeft"
                             data-id="clookupProductEMP"
@@ -53,24 +53,17 @@
                 </lightning-layout>
             </div>
 
-            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
-                <!--Sub Producto -->
-                <lightning-layout class="layout-padding">
-                    <lightning-layout-item size="12">
-                        <lightning-combobox
-                            field-level-help={labels.productoDebeSerMMPP}
-                            name="Sub Prodcuto"
-                            label={labels.subProducto}
-                            value={valueSubProducto}
-                            options={optionsSubProducto}
-                            onchange={handleSubProducto}>
-                        </lightning-combobox>
-                        <div if:true={showErrorMMPP}>
-                            <label class="slds-form-element__label"><span style="color: red;">{labels.productoNoMMPP}</span></label>
-                        </div>
-                    </lightning-layout-item>
-                </lightning-layout>
-            </div>
+
+            <!-- Comentario -->
+                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">               
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">{labels.comentario_label}</label>
+                            <lightning-input-field field-name="AV_Comentarios__c" field-type="textarea" variant="label-hidden" onchange={handleComentario} value={comentario} ></lightning-input-field>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+                
         </div>
 
         <!-- Tipo de Operacion-->
@@ -117,15 +110,17 @@
             </div>
         </div>
 
+        <!-- Nombre opportunidad -->
         <div class="slds-grid slds-wrap">
             <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">       
-                <!-- Nombre opportunidad -->
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
                         <lightning-input class="textBoxLeft user-input" required="true" type="text" label={labels.nombreOportunidad} name="oportunidad" value={oportunidad} onchange={handleOportunidad}></lightning-input>
                     </lightning-layout-item>
                 </lightning-layout> 
             </div>
+
+
             <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
             <!-- Propietario de la oportunidad -->
                 <lightning-layout class="layout-padding">
@@ -138,18 +133,40 @@
         </div>
 
         <div class="slds-grid slds-wrap">
-            <div class="slds-col slds-size_1-of-4 slds-p-horizontal_medium">
+            <div class="slds-col slds-size_2-of-4 slds-p-horizontal_medium">
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
-                        <div class="slds-form slds-form_stacked">
-                            <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.anadirParticipanteLabel}</label>
-                                <lightning-input type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" checked={anadirParticipante} onchange={handleAnadirParticipante}></lightning-input>
-                            </div>
-                        </div>
+                        <lightning-combobox
+                            name="Pais"
+                            label={labels.pais}
+                            value={valuePais}
+                            options={optionsPais}
+                            onchange={handlePais}>
+                        </lightning-combobox>
+
+                        <template for:each={_pais} for:item="val">
+                            <lightning-pill key={val} label={val} name={val} onremove={handleRemove}></lightning-pill>
+                        </template>
+
                     </lightning-layout-item>
                 </lightning-layout>
             </div>
+                        
+            <div class="slds-col slds-size_1-of-4 slds-p-horizontal_medium">
+                <div class="slds-col slds-p-horizontal_none slds-m-horizontal_none slds-float_right">
+                    <lightning-layout-item size="12">
+                        <div class="slds-form slds-form_stacked">
+                            <div class="slds-form-element slds-float_right">
+                                <label class="slds-form-element__label " for="toggle">{labels.anadirParticipanteLabel}</label>
+                                <lightning-input class="slds-float_right " type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" checked={anadirParticipante} onchange={handleAnadirParticipante}></lightning-input>
+                            </div>
+                        </div>
+                    </lightning-layout-item>
+                </div>
+            </div>
+
         </div>
+
+
     </lightning-record-edit-form>
 </template>

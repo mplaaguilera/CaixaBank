@@ -1,0 +1,116 @@
+<template>
+	<div if:false={refreshIco}>
+		<div style="text-align: right;">
+			
+			<lightning-button-menu alternative-text="Show menu" icon-name="utility:filterList" variant="border-filled" onselect={handleOnselect} style="width: 150px;">
+				<div style="text-align: left; padding-bottom: 6px;">
+					<lightning-radio-group 						
+						options={options}
+						value={value}
+						onchange={handleChange}
+						style="width: 100%; padding-left: 7px;"
+						>
+					</lightning-radio-group>
+				</div>
+			</lightning-button-menu>			
+
+			<lightning-button-icon icon-name="utility:loop" variant="border-filled" class="slds-m-left_xx-small" onclick={refresh}></lightning-button-icon>		
+		
+		
+		</div>
+
+		<template if:true={showResults}>
+		<lightning-layout multiple-rows>
+			<lightning-layout-item size="8" padding="around-small">
+
+				<div lwc-2nj244ovceg="" class="slds-form-element__control " style="display: -webkit-box; display: flex;" part="options">
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="cita" required="" checked={cita} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="cita">
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;">{labels.cita}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox" style="margin-left: 10%;  float: left;">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="oportunidad" required="" checked={oportunidad} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="oportunidad">
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;">{labels.oportunidad}</span>
+						</label>
+					</span>
+
+					<span lwc-2nj244ovceg="" class="slds-checkbox" style="margin-left: 10%;  float: left;">
+						<input lwc-2nj244ovceg="" type="checkbox" part="checkbox" name="checkboxGroup" id="tarea" required="" checked={tarea} onchange={handlecheckboxChange}>
+						<label lwc-2nj244ovceg="" class="slds-checkbox__label" part="input-checkbox" for="tarea" >
+							<span part="indicator" class="slds-checkbox_faux" lwc-2nj244ovceg=""></span>
+							<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label" style="margin-left: 10px;" >{labels.tarea}</span>
+						</label>
+					</span>
+				</div>
+					
+			</lightning-layout-item>
+		</lightning-layout>
+		
+
+
+			<div >
+				<lightning-input type="text"  placeholder={labels.buscar}  value={filterValue} onchange={handleFilterValue} class="slds-m-bottom_x-small"></lightning-input>
+			</div>
+			<!-- CABECERA -->
+
+			<div class={divClass}>
+				<div class="slds-media" style="padding-top: 12px;">
+					<div class="slds-media__figure">
+						<div class="slds-timeline__icon tm-div">
+						<lightning-icon icon-name={iconName} class="slds-timeline__icon"></lightning-icon>
+						</div>
+					</div>
+					<div class="slds-media__body">
+						<lightning-layout>
+						<lightning-layout-item class="layout-item-pad-top" size="5" small-device-size="4" medium-device-size="4" large-device-size="4">
+							<div class="div-inline">
+							
+							</div>
+						</lightning-layout-item>
+				
+						<lightning-layout-item class="layout-item-pad-top slds-m-left_large" style="text-align: left; padding-left: 20px;" size="2" small-device-size="2" medium-device-size="2" large-device-size="2">
+							<p>{labels.tipoConPro}</p>
+						</lightning-layout-item>
+				
+						<lightning-layout-item class="layout-item-pad-top" style="text-align: left; padding-left: 18px;" size="2" small-device-size="2" medium-device-size="2" large-device-size="2">
+							<p>{labels.estado}</p>
+						</lightning-layout-item>
+				
+						<lightning-layout-item class="layout-item-pad-top" style="text-align: left; padding-left: 14px;" size="2" small-device-size="2" medium-device-size="2" large-device-size="2">
+							<p>{labels.empleado}</p>
+						</lightning-layout-item>
+				
+						<lightning-layout-item class="layout-item-pad-top" style="text-align: left; padding-left: 12px;" size="2" small-device-size="2" medium-device-size="2" large-device-size="2">
+							<p>{labels.fechaCierre}</p>                    
+						</lightning-layout-item>
+				
+						</lightning-layout>
+					</div>
+				</div>
+			</div>
+			<!-- FIN DE CABECERA -->
+
+			<div >
+					<template for:each={nestedMap} for:item="mapKey">
+						<p class="slds-button test-id__section-header-button slds-section__title-action slds-m-bottom_x-small"  key={mapKey.key} >
+							{mapKey.key}
+						</p>
+						<template for:each={mapKey.value} for:item="comment">
+							<c-cibe_-Timeline-E-M-P-Item item={comment} key={comment}></c-cibe_-Timeline-E-M-P-Item>
+						</template>
+					</template>
+			</div>
+		</template>
+
+		<span if:false={showResults}>{labels.noDataFoundLabel}</span>
+	
+	</div>
+	<lightning-spinner if:true={loading} size="small" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+</template>

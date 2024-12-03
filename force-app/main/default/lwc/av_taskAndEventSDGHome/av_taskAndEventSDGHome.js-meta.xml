@@ -7,7 +7,7 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__HomePage">
-            <property name="sdgApiName" type="String" default="" label="Related SDG" description="Related SDG Tag"/>
+            <property name="objectType" type="String" default="" label="objectType" description="objectType"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

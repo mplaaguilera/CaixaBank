@@ -1,0 +1,117 @@
+.alta-icon {
+	--slds-c-icon-color-foreground: #04B94C !important;
+	--slds-c-icon-color-foreground-default: #04B94C !important;
+	--slds-g-color-neutral-base-50: #04B94C !important;
+	--slds-c-icon-radius-border: 100% !important;
+	line-height: 0;
+	background-color: #04B94C;
+	border: thin solid #04B94C;
+
+}
+.mediaAlta-icon {
+	--slds-c-icon-color-foreground: #56876D !important;
+	--slds-c-icon-color-foreground-default: #56876D !important;
+	--slds-g-color-neutral-base-50: #56876D !important;
+	--slds-c-icon-radius-border: 100% !important;
+	background-color: #56876D;
+	line-height: 0;
+	border: thin solid #56876D;
+
+}
+.media-icon {
+	--slds-c-icon-color-foreground: #F9F50C !important;
+	--slds-c-icon-color-foreground-default: #F9F50C !important;
+	--slds-g-color-neutral-base-50: #F9F50C !important;
+	--slds-c-icon-radius-border: 100% !important;
+	background-color: #F9F50C;
+	line-height: 0;
+	border: thin solid #F9F50C;
+}
+.mediaBaja-icon {
+	--slds-c-icon-color-foreground: #850000 !important;
+	--slds-c-icon-color-foreground-default: #850000 !important;
+	--slds-g-color-neutral-base-50: #850000 !important;
+	--slds-c-icon-radius-border: 100% !important;
+	background-color: #850000;
+	line-height: 0;
+	border: thin solid #850000;
+}
+.baja-icon {
+	--slds-c-icon-color-foreground: #F0011D !important;
+	--slds-c-icon-color-foreground-default: #F0011D !important;
+	--slds-g-color-neutral-base-50: #F0011D !important;
+	--slds-c-icon-radius-border: 100% !important;
+	background-color: #F0011D;
+	line-height: 0;
+	border: thin solid #F0011D;
+}
+.morosos-icon {
+	--slds-c-icon-color-foreground: black !important;
+	--slds-c-icon-color-foreground-default: black !important;
+	--slds-g-color-neutral-base-50: black !important;
+	--slds-c-icon-radius-border: 100% !important;
+	background-color: black;
+	line-height: 0;
+	border: thin solid black;
+}
+.inactivos-icon {
+	--slds-c-icon-color-foreground: white !important;
+	--slds-c-icon-color-foreground-default: white !important;
+	--slds-g-color-neutral-base-50: white !important;
+	--slds-c-icon-radius-border: 100% !important;
+	border: thin solid black;
+	background-color: white;
+	line-height: 0;
+}
+
+.default-icon {
+	line-height: 0;
+}
+
+.icono{
+	margin-top: -3.5px;
+	margin-left: 0px !important;
+}
+
+@media screen and (max-height: 900px) {
+    .icono {
+        margin-left:20px !important;
+    }
+
+	.sizeCol{
+		width: 100%;
+		padding-top: 0.75rem;
+		padding-left: 10px;
+	}
+}
+
+.caja2 {
+	border: 1px solid #c9c9c9;
+	border-radius: 0.25rem;
+	padding: 0.5rem;
+	width: 50%;
+	margin-left: 12px;
+	margin-top: 12px;
+	margin-right: 12px;
+}
+
+@media screen and (min-height: 910px) {
+
+	.sizeCol{
+		width: 50%;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+		padding-left: 10px;
+	}
+}
+
+
+.financiacionProyecto-icon {
+	--slds-c-icon-color-foreground: #999999 !important;
+	--slds-c-icon-color-foreground-default: #999999 !important;
+	--slds-g-color-neutral-base-50: #999999 !important;
+	--slds-c-icon-radius-border: 100% !important;
+	border: thin solid #999999;
+	background-color: #999999;
+	line-height: 0;
+}

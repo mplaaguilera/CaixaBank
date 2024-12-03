@@ -13,17 +13,18 @@
                 </div>
                 <div class="slds-page-header__col-actions">
                     <div class="slds-page-header__controls">
-                      <div class="slds-page-header__control" if:true={isShowAddMemberButton}>
-                        <ul class="slds-button-group-list">
-                          <li>
-                            <button class="slds-button slds-button_neutral" onclick={openModal} disabled={isDisabled}>{labels.anadirParticipante}</button>
-                          </li>
-                          <li>
-                          </li>
-                        </ul>
-                      </div>
+                        <div class="slds-page-header__control" if:true={isShowAddMemberButton}>
+                            <ul class="slds-button-group-list">
+                                <li>
+                                    <button class="slds-button slds-button_neutral" onclick={openModal} disabled={isDisabled}>{labels.anadirParticipante}</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <lightning-button-group>
+                            <lightning-button-icon icon-name="utility:refresh" size="medium" onclick={refresh} class="slds-m-left_xx-small"></lightning-button-icon>
+                        </lightning-button-group>
                     </div>
-                  </div>
+                </div>
             </header>
         </div>
         <div class="slds-card__body slds-card__body_inner">
@@ -54,7 +55,7 @@
                     <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
                 </template>
 
-                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideAddMember}></lightning-button-icon>
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={closeModal}></lightning-button-icon>
                 <div class="slds-modal__header">
                     <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{labels.addOppTM}</h1>
                 </div>

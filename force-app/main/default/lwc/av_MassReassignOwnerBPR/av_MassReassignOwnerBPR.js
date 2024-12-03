@@ -7,7 +7,7 @@ import lookupSearch from '@salesforce/apex/AV_MassReassignOwner_Controller.searc
 import lookupSearchAccount from '@salesforce/apex/AV_MassReassignOwner_Controller.searchAccount';
 import lookupSearchOffice from '@salesforce/apex/AV_MassReassignOwner_Controller.searchOffice';
 import getEmployees from '@salesforce/apex/AV_MassReassignOwner_Controller.getEmployees';
-import assign from '@salesforce/apex/AV_MassReassignOwnerBPR_Controller.assign';
+import assign from '@salesforce/apex/AV_MassReassignOwner_Controller.assign';
 import nameContactAssign from '@salesforce/apex/AV_MassReassignOwner_Controller.nameContactAssign';
 import isBankTeller from '@salesforce/apex/AV_AppUtilities.isBankTeller';
 import USER_ID from '@salesforce/user/Id';
@@ -15,6 +15,8 @@ import recordLimitLabel from '@salesforce/label/c.AV_BuscadorRecordLimit';
 import NAME_FIELD from '@salesforce/schema/User.Name';
 import FUNCTION from '@salesforce/schema/User.AV_Funcion__c';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
+import AV_NotAssigned from '@salesforce/label/c.AV_NotAssigned';
+
 
 
 const columnsTask = [
@@ -33,9 +35,7 @@ const columnsTask = [
 	{ label: 'My Box', fieldName: 'AV_MyBox__c', type: 'picklist', hideDefaultActions: true},//FORMULA
 	{ label: 'Target Auto', fieldName: 'AV_TargetAuto__c', type: 'picklist', hideDefaultActions: true},//FORMULA
 	{ label: 'Fecha vencimiento', fieldName: 'ActivityDate', type: "date-local", typeAttributes: { month: "2-digit", day: "2-digit" }, hideDefaultActions: true },
-	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url', typeAttributes: { label: { fieldName: 'OwnerName' } }, hideDefaultActions: true, wrapText: true }
-	
-	
+	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url', typeAttributes: { label: { fieldName: 'OwnerName' },tooltip:{fieldName:'OwnerName'}}, hideDefaultActions: true, wrapText: true }
 ];
 
 export default class Av_MassReassignOwner extends LightningElement {
@@ -166,7 +166,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 	get optionsTaskOrigen() {
 		let withoutManager;
 		for (let i = 0; i < this.selectedEmployees.length; i++) {
-			if ((this.selectedEmployees[i].label).includes('Sin Gestor')) {
+			if ((this.selectedEmployees[i].label).includes(AV_NotAssigned)) {
 				withoutManager = true;
 			}
 		}
@@ -228,7 +228,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 						this.employeeDisabled = true;
 					}
 					for (let i = 0; i < this.optionsEmployee.length; i++) {
-						if ((this.optionsEmployee[i].label).includes('Sin Gestor')) {
+						if ((this.optionsEmployee[i].label).includes(AV_NotAssigned)) {
 							this.employeeFilter = this.optionsEmployee[i].value;
 							this.selectedEmployees.splice(0, 2);
 							this.selectedEmployees.push({ label: this.optionsEmployee[i].label, id: this.optionsEmployee[i].value, bucleId: this.multiSelectionE });
@@ -304,19 +304,25 @@ export default class Av_MassReassignOwner extends LightningElement {
 								}
 							}
 
+
                             if(row.grupo == 'Sin grupo'){
+
                                 row.interlocName = row.accountName;
                                 row.interlocNameURL = '/' + row.accountId;
+
                             }else if(row.interlocName != undefined){
+
                                 row.interlocNameURL = '/' + row.interlocutionGroup?.Id;
+
                             }
 
+
 							if (row.subject) {
-								row.SubjectURL = '/' + row.taskId;
+								row.SubjectURL = '/' + row.Id;
 							}
 							if (row.ownerName) {
 								row.OwnerName = row.ownerName;
-								row.OwnerNameURL = '/' + row.ownerId;
+								row.OwnerNameURL = '/' + row.OwnerId;
 							}
 						}
 					}
@@ -338,7 +344,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 						this.helpMessage = true;
 						this.totalPage = this.MAX_PAGE_NUM;
 					} else {
-						this.totalRecountCount = 'Total ' + this.size;
+						this.totalRecountCount = 'Total prueba' + this.size;
 						this.totalPage = Math.ceil(this.size / this.pageSize);
 					}
 					if (this.totalPage <= 1) {
@@ -534,7 +540,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 		if(this.defaultOrigen == 'notAssigned'){
 			this.selectedEmployees = [];
 			for (let i = 0; i < this.optionsEmployee.length; i++) {
-				if ((this.optionsEmployee[i].label).includes('Sin Gestor')) {
+				if ((this.optionsEmployee[i].label).includes(AV_NotAssigned)) {
 					this.employeeFilter = this.optionsEmployee[i].value;
 					this.selectedEmployees.push({ label: this.optionsEmployee[i].label, id: this.optionsEmployee[i].value, bucleId: this.multiSelectionE });
 				}
@@ -661,7 +667,6 @@ export default class Av_MassReassignOwner extends LightningElement {
 				this.employeeFilter = null;
 			}
 		}
-		//this.optionsTaskOrigen;
 		this.setButtonVisibility();
 	}
 
@@ -735,11 +740,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 		var selected = el.getSelectedRows();
 		// pop up de confirmacion
 		if (selected != null && selected.length > 0) {
-			var selectedIds = [];
-			for(let i=0; i< selected.length ; i++){
-				selectedIds.push(selected[i].taskId);
-			}
-			assign({ objectName: this.targetObjName, contactId: this.filterList, selectedRowIds: selectedIds })
+			assign({ objectName: this.targetObjName, contactId: this.filterList, selectedRows: selected })
 				.then(result => {
 					if (result != null && result > 0) {
 						if (this.targetObjName == 'Task') {

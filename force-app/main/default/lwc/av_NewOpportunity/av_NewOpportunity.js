@@ -1,9 +1,19 @@
 import { LightningElement, track, api } from 'lwc';
 
+//Labels Error Copado
+import productRequiredLabel from '@salesforce/label/c.AV_ProductoObligatorio';
+import dateNextGestLabel from '@salesforce/label/c.AV_FechaProximaGestion';
+import validateOppCommReqLabel from '@salesforce/label/c.AV_ValidateOppCommentReq';
+import oppStagPotenLabel from '@salesforce/label/c.AV_LabelFlowStage';
+import oppNameLabel from '@salesforce/label/c.AV_ValidateOppName';
+import controlDateRecLabel from '@salesforce/label/c.AV_controlFechaRecordatorio';
+
+	
 export default class Av_NewOpportunity extends LightningElement {
 
     @api defaultStage;
     @api pfId;
+    @api accountId;
 
     @track isModalOpen = false;
     @track allStages = [];
@@ -177,6 +187,7 @@ export default class Av_NewOpportunity extends LightningElement {
         this._amount = event.detail.amount; 
         this._byProduct = event.detail.byProduct; 
         this._validationError = event.detail.validationError;
+
 	}
 
     handleProducto(event){
@@ -184,5 +195,59 @@ export default class Av_NewOpportunity extends LightningElement {
     }
     handleOportunidad(event){
         this._oportunidad=event.target.value;
+    }
+
+
+    @api
+    validate() {
+
+        let errorValidations = false;
+        let errorMessageV;
+        let returnOk = {isValid: true };
+        let returnKo;
+
+        if(!this._producto){
+            errorValidations = true;
+            errorMessageV = productRequiredLabel;
+        }
+
+        if(!this._oportunidad){
+            errorValidations = true;
+            errorMessageV = oppNameLabel;
+        }
+
+        if(!this._fechagestion && (this._path == 'En gestión/insistir' || this._path == 'No apto')){
+            errorValidations = true;
+            errorMessageV = dateNextGestLabel;
+        }
+
+        if(this._path == 'Potencial'){
+            errorValidations = true;
+            errorMessageV = oppStagPotenLabel;
+        }
+
+        if(this._resolucion == 'O' && !this._comentario){
+            errorValidations = true;
+            errorMessageV = validateOppCommReqLabel;	
+        }
+
+        let currentDate = new Date().toJSON().slice(0, 10);
+        if(this._incluir && this._fechagestion < currentDate){ 
+            errorValidations = true;
+            errorMessageV = controlDateRecLabel; 
+        }
+ 
+        if(errorMessageV) {
+            returnKo = {
+                isValid: false,
+                errorMessage: errorMessageV
+            };
+        }
+
+        if(!errorValidations) {
+            return returnOk;
+        }else {
+            return returnKo;
+        }    
     }
 }

@@ -1,0 +1,73 @@
+<template>
+	<div class="masterDiv1">
+		<lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 3;position:fixed"></lightning-spinner>
+		<div class="masterDiv" if:true={loadedData}>
+			<!-- CABECERA -->
+
+				<div class="slds-page-header slds-page-header_record-home">
+					<div class="slds-page-header__row">
+						<div class="slds-page-header__col-title">
+							<div class="slds-media">
+								<div class="slds-media__figure">
+									<lightning-icon class="slds-m-top_x-small" icon-name="standard:call"></lightning-icon>
+								</div>
+								<div class="slds-media__body">
+									<div class="slds-page-header__name">
+										<div class="slds-page-header__name-title">
+											<h1>
+												<span  class="slds-page-header__title slds-truncate marginCard slds-m-bottom_small">ASIGNAR CLIENTE</span>
+											</h1>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- FIN CABECERA -->
+				<div class="cardStyle">
+					<article class="slds-card">
+						<div class="slds-card__header slds-grid">
+							<header class="slds-media slds-media_center slds-has-flexi-truncate">
+								
+							</header>
+						</div>
+						<div class="slds-card__body slds-card__body_inner slds-p-bottom_large">
+							<template if:true={accounts.length}>
+								<div class="radio-group-container">
+									<template for:each={options} for:item="account">
+										<div key={account.value} class="slds-m-around_small">
+											<input class="slds-m-top_small" type="radio" id={account.id} value={account.value} onchange={handleRadioChange} name="radioGroup"/>
+											<!-- <a  class="slds-m-left_x-small" href="" onclick={navegateToAccount} for={account.value} name={account.id} >{account.label}</a> -->
+											<span  class="link-like" onclick={navegateToAccount} for={account.value} data-account={account.value} >{account.label}</span>
+											<p  class="slds-m-left_x-large">{account.eapGestor}</p>
+										</div>
+									</template>
+								</div>
+							</template>
+							<template if:false={accounts.length}>
+								<p>Teléfono no registrado</p>
+							</template>
+						</div>
+					</article>
+				</div>
+		</div>
+	<!-- <FOOTER> -->
+		<template if:true={accounts.length}>
+			<div class="customFooter" if:true={isMissed}>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="asignButton" name="save" onclick={handleSave}>Asignar</button>
+			</div>
+			<div class="customFooter" if:false={isMissed}>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="asignButton" name="save" onclick={handleSave}>Asignar</button>
+				<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndReport} data-id="reportButton" name="saveAndReport" onclick={handleSaveReport}>Asignar y Reportar</button>
+			</div>
+		</template>
+		<template if:false={accounts.length}>
+			<div class="customFooter">
+				<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+			</div>
+		</template>
+	</div>
+</template>

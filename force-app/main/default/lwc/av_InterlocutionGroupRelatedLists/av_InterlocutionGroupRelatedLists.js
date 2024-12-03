@@ -188,7 +188,9 @@ grpName;
 		this.recordsToDisplay = [];
 
 		for(let i=(page-1)*this.pageSize; i < page*this.pageSize; i++){
-			if(this.records[i] != null )this.recordsToDisplay.push(this.records[i]);
+			if(this.records[i] != null ){
+				this.recordsToDisplay.push(this.records[i]);
+			}
 		}
 	}
 

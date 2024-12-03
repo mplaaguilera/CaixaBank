@@ -1,0 +1,92 @@
+.main-container {
+    height: 83vh;
+}
+
+.card-container {
+    display: flex;
+    width: 25%;
+    height: 100px;
+    border: 1px solid #d4d4d4;
+    flex-direction: row;
+    background-color: #f3f3f3;
+    margin-left: 1%;
+    cursor: pointer;
+}
+
+.arrow-card {
+    display: flex;
+    width: 2.5%;
+    height: 100px;
+    border: 1px solid #d4d4d4;
+    flex-direction: row;
+    margin-left: 1%;
+    cursor: pointer;
+}
+
+.arrow-card-icon {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+.card-icon {
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+.card-name {
+    display: flex;
+    align-items: center;
+    width: 85%;
+    justify-content: flex-start;
+    font-size: larger;
+    font-weight: bold;
+    margin-left: 2%;
+}
+
+.each-section {
+    display: flex;
+    flex-direction: row;
+    height: inherit;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.opp-icon {
+    --slds-c-icon-color-background: #f59f71;
+}
+
+.meet-icon {
+    --slds-c-icon-color-background: #e46fbe;
+}
+
+.price-icon {
+    --slds-c-icon-color-background: #50ceb9;
+}
+
+.dash-icon {
+    --slds-c-icon-color-background: #6b92dc;
+}
+
+.support-icon {
+    --slds-c-icon-color-background: #b55d5b;
+}
+
+.in-progress {
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    margin-top: 15%;
+}
+
+.back-button {
+    display: flex;
+}

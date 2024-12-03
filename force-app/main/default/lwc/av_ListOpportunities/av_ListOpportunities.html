@@ -4,13 +4,14 @@
 			<div class="slds-card_boundary">
 				<lightning-card icon-name={icon}>
 					<h1 slot="title" class="card-title">{label.oppLinked}
-						<lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+						<lightning-icon icon-name="utility:link"  class="card-title-icon" size="xx-small"></lightning-icon>
 					</h1>
-					<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
-						<div key={optyTask.oppTask.Id} >
-							<c-av_-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} is-deletable={optyTask.isDeletable} onflow={callLaunchFlow} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner} nameobject={sobjname} idobject={recid}></c-av_-detail-opp-task>
+					<template if:true={listOpp} for:each={listOpp} for:item="opty">
+						<div key={opty.opp.Id} >
+							<c-av_-detail-opp-task opp={opty.opp} just-one={onlyOneOppTask} is-deletable={opty.isDeletable} onflow={callLaunchFlow} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner} nameobject={sobjname} idobject={recid} recinfo={taskHeaderId} is-main={opty.isMain}></c-av_-detail-opp-task>
 						</div>
-					</template><template if:false={listOppTask}>
+					</template>
+					<template if:false={listOpp}>
 						<div class="slds-card__body slds-card__body_inner">
 							<p>{label.noDataFoundLabel}</p>
 						</div>
@@ -32,11 +33,11 @@
 						<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
 						{label.oppUnLinkedMobile}
 					</h1>
-					<template if:true={listOpp} for:each={listOpp} for:item="opty">
+					<template if:true={listOppNotRelated} for:each={listOppNotRelated} for:item="opty">
 						<div key={opty.opp.Id}>
 							<c-av_-detail-opp opp={opty.opp} record-info={recordInfo} onrefreshlink={refreshCmp} onenablespin={enableSpinner}></c-av_-detail-opp> 
 						</div>
-					</template><template if:false={listOpp}>
+					</template><template if:false={listOppNotRelated}>
 						<div class="slds-card__body slds-card__body_inner">
 							<p>{label.noDataFoundLabel}</p>
 						</div>
@@ -56,18 +57,18 @@
 				<h1 slot="title" class="card-title">
 					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
 					{label.oppLinked}
-					<lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+					<lightning-icon icon-name="utility:link"  class="card-title-icon" size="xx-small"></lightning-icon>
 				</h1>
-				<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
-					<div key={optyTask.oppTask.Id}>
+				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+					<div key={opty.opp.Id}>
 						<template if:true={eventnoplanificado}>
-							<c-av_-new-opportunity-editable taskid={recid} isone={onlyOneOppTask} successfulsaving={successfulSaving}  onenablespin={enableSpinner} opptask={optyTask.oppTask} isreport=true onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendDataFlow}></c-av_-new-opportunity-editable>
+							<c-av_-new-opportunity-editable recinfo={taskHeaderId}  is-main={opty.isMain} taskid={recid} isone={onlyOneOppTask} successfulsaving={successfulSaving}  onenablespin={enableSpinner} opp={opty.opp} isreport=true onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendDataFlow}></c-av_-new-opportunity-editable>
 						</template>
 						<template if:false={eventnoplanificado}>
-							<c-av_-new-event-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp}  onrefreshunlink={refreshCmp}  onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task>
+							<c-av_-new-event-detail-opp-task opp={opty.opp} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp}  onrefreshunlink={refreshCmp}  onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task>
 						</template>
 					</div>
-				</template><template if:false={listOppTask}>
+				</template><template if:false={listOpp}>
 					<div class="slds-card__body slds-card__body_inner">
 						<p>{label.noDataFoundLabel}</p>
 					</div>
@@ -85,11 +86,11 @@
 					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
 					{label.oppUnLinked}
 				</h1>
-				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+				<template if:true={listOppNotRelated} for:each={listOppNotRelated} for:item="opty">
 					<div key={opty.opp.Id}>
 						<c-av_-new-event-detail-opp opp={opty.opp} record-info={recordInfo} task-header-id={taskHeaderId} onenablespin={enableSpinner} onrefreshlink={refreshCmp}></c-av_-new-event-detail-opp> 
 					</div>
-				</template><template if:false={listOpp}>
+				</template><template if:false={listOppNotRelated}>
 					<div class="slds-card__body slds-card__body_inner">
 						<p>{label.noDataFoundLabel}</p>
 					</div>
@@ -108,19 +109,19 @@
 				<h1 slot="title" class="card-title">
 					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
 					<template if:false={isEvent}>
-						{label.oppTask}
+						{label.opp}
 					</template>
 					<template if:true={isEvent}>
 						Oportunidad del evento
 					</template>
 				</h1>
-				<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
-					<div key={optyTask.oppTask.Id}>
-						<!--LINEA COMENTADA SIEMPRE <c-av_-new-event-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task> -->
-						<c-av_-new-opportunity-editable taskid={recid} isone={onlyOneOppTask} opptask={optyTask.oppTask} isreport=true onenablespin={enableSpinner} onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendData}></c-av_-new-opportunity-editable>
+				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+					<div key={opty.opp.Id}>
+						<!--LINEA COMENTADA SIEMPRE <c-av_-new-event-detail-opp-task opp={opty.opp} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task> -->
+						<c-av_-new-opportunity-editable recinfo={taskHeaderId}  is-main={opty.isMain} taskid={recid} isone={onlyOneOppTask} opp={opty.opp} isreport=true onenablespin={enableSpinner} onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendData}></c-av_-new-opportunity-editable>
 					</div>
 				</template>
-				<template if:false={listOppTask}>
+				<template if:false={listOpp}>
 					<div class="slds-card__body slds-card__body_inner">
 						<p>{label.noDataFoundLabel}</p>
 					</div>
@@ -138,11 +139,11 @@
 					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
 					{label.oppUnLinked}
 				</h1>
-				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+				<template if:true={listOppNotRelated} for:each={listOppNotRelated} for:item="opty">
 					<div key={opty.opp.Id}>
 						<c-av_-new-event-detail-opp opp={opty.opp} record-info={recordInfo} task-header-id={taskHeaderId} onrefreshlink={refreshCmp} onenablespin={enableSpinner} ></c-av_-new-event-detail-opp> 
 					</div>
-				</template><template if:false={listOpp}>
+				</template><template if:false={listOppNotRelated}>
 					<div class="slds-card__body slds-card__body_inner">
 						<p>{label.noDataFoundLabel}</p>
 					</div>

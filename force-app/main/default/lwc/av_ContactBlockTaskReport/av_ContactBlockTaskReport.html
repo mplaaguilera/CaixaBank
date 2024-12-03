@@ -47,6 +47,7 @@
 					<div style="display: inline-block; margin-right: 15px">
 						<lightning-combobox  label="Duración" name="duracion" placeholder="Duración" options={optionsDuration} onchange={handleChangeDuration} value ={durationValueInitial} ></lightning-combobox>
 					</div>
+					
 					<div if:true={islegalentity} style="display: inline-block; margin-right: 15px">
 						<c-av_-lookup class="lookup-cmp slds-size_1-of-5"
 							data-id="clookup6"
@@ -78,7 +79,7 @@
 						<lightning-input type="checkbox" label="Entrevista memorable" onchange={handleMemorableInterview}></lightning-input>
 					</div>
 					<div style="margin-top: 10px;">
-						<lightning-input type="checkbox" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
+						<lightning-input type="checkbox" data-id='citanocomercialcb' label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
 					</div>
 					<div style="margin-top: 10px;">
 						<lightning-textarea label="Comentario" name="comentario" onchange={handleComment}></lightning-textarea>
@@ -105,6 +106,7 @@
 					<div style="display: inline-block; margin-right: 15px">
 						<lightning-combobox  label="Estado" name="estado" options={optionsStatus} onchange={handleChangeStatus} value ={statusValue} ></lightning-combobox>
 					</div>
+					<lightning-textarea label="Comentario" onchange={handleChangeComentary}></lightning-textarea>
 				</lightning-tab>
 			</lightning-tabset>
 		</div>

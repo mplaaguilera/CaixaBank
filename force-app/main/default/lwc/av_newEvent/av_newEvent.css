@@ -19,7 +19,7 @@
     margin: 0 0 .5rem 1rem;
 }
 .cardStyle {
-    padding:.5rem 1rem;
+    padding: 0 1rem 0.5rem;
 }
 .cardMargin{
 	margin:1rem 0;
@@ -91,6 +91,26 @@
 	color: #009fe3;
 }
 
+.buttonStyleAdd{
+	width: fit-content;
+	color: #009fe3;
+	margin-top: 1.3rem;
+	padding: 0.9px 1rem 0.9px 1rem;
+	border-color: gainsboro;
+	border-radius: 5px;
+}
+
+.buttonStyleAdd:disabled{
+	background-color: gray;
+	color: white;
+	border-radius: 5px;
+}
+
+.buttonStyleAdd:hover:not([disabled]){
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
 .calendarStyle{
 	padding:.5rem 1rem;
 }
@@ -107,4 +127,39 @@
 
 .slds-backdrop{
 	--lwc-zIndexModal:90;
+}
+
+.typeRelatedInputs{
+    width: 60rem;
+    display: flex;
+}
+
+.inputTime {
+	width: 5rem;
+	margin-right: 1rem;
+}
+
+.inputDate {
+	margin-left: 1rem;
+	width: 8rem;
+	margin-right: 1rem;
+}
+
+.inputDuration {
+	width: 8rem;
+	margin-left: -0.5rem;
+	margin-right: 1rem;
+}
+
+.productNew{
+	margin: 0 0 .5rem 1rem
+}
+
+.buttonAñadir{
+	margin-top: 1.4rem;
+	margin-left:1rem;
+}
+
+.slds-form-element__help{
+    display:none;
 }

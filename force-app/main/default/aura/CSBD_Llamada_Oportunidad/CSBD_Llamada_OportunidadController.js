@@ -7,18 +7,14 @@
 				component.set('v.idOportunidad', response.getReturnValue());
 			} else {
 				console.error('Error recuperando la oportunidad vinculada a la llamada');
-				console.error(getIdOportunidad.getError());
 			}
-			component.set('v.cargando', false);
 		});
 		$A.enqueueAction(getIdOportunidad);
 	},
 
 	abrirDetalleOportunidad: function(component) {
-		if (component.get('v.idOportunidad')) {
-			let navEvt = $A.get('e.force:navigateToSObject');
-			navEvt.setParams({'recordId': component.get('v.idOportunidad')});
-			navEvt.fire();
-		}
+		let navEvt = $A.get('e.force:navigateToSObject');
+		navEvt.setParams({'recordId': component.get('v.idOportunidad')});
+		navEvt.fire();
 	}
 });

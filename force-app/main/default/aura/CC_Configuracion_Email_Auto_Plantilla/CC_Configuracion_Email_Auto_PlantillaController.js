@@ -89,7 +89,8 @@
        }
        else if (component.get("v.carpetaFinal") == 'CC_Rec_Auto_Colaborador_Cast' || component.get("v.carpetaFinal") == 'OS_Rec_Auto_Colaborador_Cast'
                 || component.get("v.carpetaFinal") == 'CC_Rec_Auto_Colaborador_CSI_Bankia_Cast' || component.get("v.carpetaFinal") == 'AM_Rec_Auto_Colaborador_Cast'
-                || component.get("v.carpetaFinal") == 'SACH_Rec_Auto_Colaborador_Cast' || component.get("v.carpetaFinal") == 'HDT_Rec_Auto_Colaborador_Cast')
+                || component.get("v.carpetaFinal") == 'SACH_Rec_Auto_Colaborador_Cast' || component.get("v.carpetaFinal") == 'HDT_Rec_Auto_Colaborador_Cast'
+                || component.get("v.carpetaFinal") == 'GRR_Rec_Auto_Colaborador_Cast')
        {
           	switch(reclamacion)
             {
@@ -120,7 +121,8 @@
             }
        }
        else if (component.get("v.carpetaFinal") == 'CC_Rec_Auto_Colaborador_Cat' || component.get("v.carpetaFinal") == 'OS_Rec_Auto_Colaborador_Cat'
-                || component.get("v.carpetaFinal") == 'AM_Rec_Auto_Colaborador_Cat' || component.get("v.carpetaFinal") == 'SACH_Rec_Auto_Colaborador_Cat' || component.get("v.carpetaFinal") == 'HDT_Rec_Auto_Colaborador_Cat')
+                || component.get("v.carpetaFinal") == 'AM_Rec_Auto_Colaborador_Cat' || component.get("v.carpetaFinal") == 'SACH_Rec_Auto_Colaborador_Cat' 
+                || component.get("v.carpetaFinal") == 'HDT_Rec_Auto_Colaborador_Cat' || component.get("v.carpetaFinal") == 'GRR_Rec_Auto_Colaborador_Cat')
        {
            	switch(reclamacion)
             {

@@ -3,81 +3,85 @@
 		<div class="masterDiv">
 			<lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 3;position:fixed"></lightning-spinner>
 			<div if:true={showAllsBlocks}>
-				<div class="slds-page-header slds-page-header_record-home">
-					<div class="slds-page-header__row">
-						<div class="slds-page-header__col-title">
-							<div class="slds-media">
-								<div class="slds-media__figure">
-									<lightning-icon icon-name="standard:task"></lightning-icon>
-								</div>
-								<div class="slds-media__body">
-									<div class="slds-page-header__name-title">
-										<h1>
-											<span>Reporte tareas</span>
-											<ul class="slds-list_horizontal">
-												<li class="slds-m-right_x-small">
-													<span class="slds-page-header__title slds-truncate">{recordTask.subjectTask}</span>
-												</li>
-											</ul>
-										</h1>
+				<template if:false={isShowNewEvent}>
+					<div class="slds-page-header slds-page-header_record-home">
+						<div class="slds-page-header__row">
+							<div class="slds-page-header__col-title">
+								<div class="slds-media">
+									<div class="slds-media__figure">
+										<lightning-icon icon-name="standard:task"></lightning-icon>
+									</div>
+									<div class="slds-media__body">
+										<div class="slds-page-header__name-title">
+											<h1>
+												<span>Reporte tareas</span>
+												<ul class="slds-list_horizontal">
+													<li class="slds-m-right_x-small">
+														<span class="slds-page-header__title slds-truncate">{recordTask.subjectTask}</span>
+													</li>
+												</ul>
+											</h1>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="slds-page-header__row slds-page-header__row_gutters">
-						<div class="slds-page-header__col-details">
-							<ul class="slds-page-header__detail-row">
-								<li class="slds-page-header__detail-block">
-									<div class="slds-text-title slds-truncate" title="Prioridad">Prioridad</div>
-									<div class="slds-truncate" title="Prioridad">{priorityTask}</div>
-								</li>
-								<li class="slds-page-header__detail-block">
-									<div class="slds-text-title slds-truncate" title="Estado">Estado</div>
-									<div class="slds-truncate" title="Estado">{statusTask}</div>
-								</li>
-								<li class="slds-page-header__detail-block">
-									<div class="slds-text-title slds-truncate" title="Fecha de vencimiento">Fecha de vencimiento</div>
-									<div title="Fecha de vencimiento">{activityDateTask}</div>
-								</li>
-								<li class="slds-page-header__detail-block">
-									<div class="slds-text-title slds-truncate" title="Relacionado con">Relacionado con</div>
-									<div class="slds-truncate" title="Relacionado con">
-										<a onclick={navegateToAccount}>{nameAccount}</a>
-									</div>
-								</li>
-							</ul>
+						<div class="slds-page-header__row slds-page-header__row_gutters">
+							<div class="slds-page-header__col-details">
+								<ul class="slds-page-header__detail-row">
+									<li class="slds-page-header__detail-block">
+										<div class="slds-text-title slds-truncate" title="Prioridad">Prioridad</div>
+										<div class="slds-truncate" title="Prioridad">{priorityTask}</div>
+									</li>
+									<li class="slds-page-header__detail-block">
+										<div class="slds-text-title slds-truncate" title="Estado">Estado</div>
+										<div class="slds-truncate" title="Estado">{statusTask}</div>
+									</li>
+									<li class="slds-page-header__detail-block">
+										<div class="slds-text-title slds-truncate" title="Fecha de vencimiento">Fecha de vencimiento</div>
+										<div title="Fecha de vencimiento">{activityDateTask}</div>
+									</li>
+									<li class="slds-page-header__detail-block">
+										<div class="slds-text-title slds-truncate" title="Relacionado con">Relacionado con</div>
+										<div class="slds-truncate" title="Relacionado con">
+											<a onclick={navegateToAccount}>{nameAccount}</a>
+										</div>
+									</li>
+								</ul>
+							</div>
 						</div>
 					</div>
-				</div>
-				<c-av_-contact-block-task-report recordid={recordId} recordtype={recordTask.recordType} accountid={idAccount} islegalentity={isLegalEntity} isintouch={isIntouch} onsenddata={getDataBlockTask} onchangecita={handleChangeCita} onchangeclient={handleChangeSinConClient} onradiobuttonselected={handleRadioButtonSelection}></c-av_-contact-block-task-report><br>
-				<c-av_-opportunity-block-event-task-report if:false={citaComercial} recordid={recordId} headerid={headerId} accountid={idAccount} data-id="oppoCmp" onsetoppoforcontroller={setOppoForController} onevaluateagendeds={evaluateAgendeds} class="marginLayer"></c-av_-opportunity-block-event-task-report>
-				<c-av_-task-block-appointment if:true={istheretasks} oncounttasks={setTaskVisibility} accountid={idAccount} onsettaskfromcontroller={settaskfromcontroller} class="marginLayer"></c-av_-task-block-appointment>
+				</template>
+				<template if:false={isShowNewEvent}>
+					<c-av_-contact-block-task-report data-id='contactBlock' recordid={recordId} recordtype={recordTask.recordType} accountid={idAccount} islegalentity={isLegalEntity} isintouch={isIntouch} onsenddata={getDataBlockTask} onchangecita={handleChangeCita} onchangeclient={handleChangeSinConClient} onradiobuttonselected={handleRadioButtonSelection}></c-av_-contact-block-task-report><br>
+					<c-av_-opportunity-block-event-task-report if:false={citaComercial} recordid={recordId} headerid={headerId} accountid={idAccount} data-id="oppoCmp" onsetoppoforcontroller={setOppoForController} onevaluateagendeds={evaluateAgendeds} onsendvalueoppolist={valueOppoList} class="marginLayer" ></c-av_-opportunity-block-event-task-report>
+					<c-av_-task-block-appointment if:true={istheretasks} recordid={recordId} oncounttasks={setTaskVisibility} accountid={idAccount} onsettaskfromcontroller={settaskfromcontroller} class="marginLayer"></c-av_-task-block-appointment>
+				</template>
+
+				<c-av_new-event if:true={isShowNewEvent} reportedetask={objectInfo}
+				 opposlist={opposList} 
+				 opposvinculed={opposVinculed}
+				 opposnewlistreport={opposnewlistReport}
+				 opposscheduled={opposScheduled} 
+				 oncancelback={restoreeventreport} 
+				 comesfromevent=true
+				 onfocustab ={handleError}
+				 onclosetab ={handleCancel}
+				 onfocusrecordtab ={focusRecord}
+				 onfocusrecordtabandclose ={handleCloseAndFocus}
+				 ></c-av_new-event>
 			</div>
 		</div>
 	</div>
-	 <div class="customFooter">
-		<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
-		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Guardar Reporte</button>
-		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndEvent}  name="saveEvent" onclick={handleSaveAndEvent}>Guardar Reporte + Alta de Evento</button>
-	</div>
-	<!--FLOW EVENT-->
-	<template if:true={isShowFlowAction}>
-		<section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
-			<div class="slds-modal__container">
-				<lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={closeModal}></lightning-button-icon>
-				<div class="slds-modal__header">
-					<h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
-				</div>
-				<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
-					<div class="slds-is-relative">
-						<lightning-flow flow-api-name="AV_NuevoEvento" flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
-					</div>
-				</div>
-			</div>
-		</section>
-		<div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+	<template if:false={isShowNewEvent}>
+	 	<div class="customFooter">
+			<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} onclick={handleCancel}>Cancelar</button>
+			<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Guardar Reporte</button>
+			<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSaveAndEvent} data-id="saveAndEventButton"  name="saveEvent" onclick={handleSaveAndEvent}>Guardar Reporte + Alta de Cita</button>
+		</div>
 	</template>
+	
+
 	<!-- POPUP GUARDAR SIN OPP VINCULADA  PARA EVENTO -->
 	<template if:true={showEventPopup}>
 		<template if:true={showNoOpportunityMessage}>
@@ -116,4 +120,31 @@
 			</div>
 		</template>
 	</template>
+
+
+	<template if:true={showModal}>
+        <div class="slds-modal slds-fade-in-open" role="dialog" tabindex="-1">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse iconClose" title="Close" onclick={handleCloseModal} >
+                        <lightning-icon icon-name="utility:close" alternative-text="close" size="small" class="iconX"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium">Reasignación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <h1 style="font-size: 13px;">
+                        Estás a punto de reportar algún registro  del que no eres propietario. ¿Deseas convertirte en el propietario de esos registros?
+                    </h1>
+                </div>
+                <footer class="slds-modal__footer slds-text-align_center">
+                    <lightning-button class="slds-button" label="Sí" onclick={handleYes}></lightning-button>
+                    <lightning-button class="slds-button" label="No" onclick={handleNo}></lightning-button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!---->
+	
 </template>

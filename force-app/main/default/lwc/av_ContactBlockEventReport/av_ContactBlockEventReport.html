@@ -69,16 +69,18 @@
                     is-multi-entry={isMultiEntry2}>
                 </c-av_-lookup>
             </div>
+
             <div if:true={showLocation} style="display: inline-block;">
                 <lightning-input type="text" label="Ubicación" name="ubicacion" onchange={handleChangeLocation} value ={location}></lightning-input>
             </div>
+           
         </div>
         <div if:true={isbpr} style="margin-top: 10px; margin-left: 10px;">
             <lightning-input type="checkbox" label="Entrevista memorable" onchange={handleMemorableInterview}></lightning-input>
         </div>
 
         <div style="margin-top: 10px; margin-left: 10px;">
-            <lightning-input type="checkbox" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
+            <lightning-input data-id='citanocomercialcb' type="checkbox" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
         </div>
     
         <div style="margin-top: 10px; margin-left: 10px; margin-right: 10px;">

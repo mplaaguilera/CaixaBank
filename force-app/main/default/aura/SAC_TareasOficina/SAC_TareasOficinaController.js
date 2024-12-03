@@ -8,7 +8,7 @@
     handleRowAction: function (cmp, event, helper) {
         var row = event.getParam('row');        
 
-        let shareA = cmp.get("c.ShareAccion");
+        let shareA = cmp.get("c.shareAccion");
         shareA.setParams({
             'accionId': row.Id
         });

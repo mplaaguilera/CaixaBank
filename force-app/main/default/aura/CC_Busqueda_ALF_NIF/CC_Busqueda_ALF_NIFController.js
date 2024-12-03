@@ -5,7 +5,7 @@
 		} else {
 			let recordType;
 			let cliente;
-			let contacto;
+            let contacto;
 			let datosRegistro = component.get('c.datosRegistro');
 			datosRegistro.setParam('recordId', component.get('v.recordId'));
 			/*
@@ -17,7 +17,7 @@
 			datosRegistro.setCallback(this, responseDatosRegistro => {
 				if (responseDatosRegistro.getState() === 'SUCCESS') {
 					let registro = responseDatosRegistro.getReturnValue();
-
+					
 					if (component.get('v.sObjectName') === 'CC_Llamada__c') {
 						component.set('v.identificacionPrevia', registro.CC_No_Identificado__c);
 						component.set('v.llamadaFinalizada', Boolean(registro.CC_Fecha_Fin__c));
@@ -27,7 +27,7 @@
 						component.set('v.llamadaFinalizada', false); //Este motivo no aplica para casos
 						recordType =  registro.RecordType.DeveloperName ? registro.RecordType.DeveloperName : '';
 						cliente = registro.AccountId ?  registro.AccountId : '';
-						contacto = registro.Contact && registro.Contact.RecordType && registro.Contact.RecordType.DeveloperName ? registro.Contact.RecordType.DeveloperName : '';
+                		contacto = registro.Contact && registro.Contact.RecordType && registro.Contact.RecordType.DeveloperName ? registro.Contact.RecordType.DeveloperName : '';
 					}
 
 					/*
@@ -45,7 +45,7 @@
 								if (response.getState() === 'SUCCESS') {
 									let oRetorno = response.getReturnValue();
 									if (oRetorno !== null) {
-										if (oRetorno[0].representante) {
+										if (oRetorno[0].representante != undefined) {
 											//Son representantes
 											component.set('v.oRepresentantes', oRetorno);
 											component.set('v.sTipoPersona', oRetorno[0].tipoPersonaCliente);
@@ -88,7 +88,7 @@
 
 	buscarAlfabetico: function(component, event, helper) {
 		if (component.get('v.sObjectName') === 'CC_Llamada__c' && component.get('v.llamadaFinalizada')) {
-			helper.mostrarToast('error', 'Operativa no disponible', 'No se permite identificar manualmente una vez la llamada ha finalizado');
+			helper.mostrarToast('error', 'Operativa no disponible', 'No se permite identificar manualmente porque la llamada está finalizada.');
 		} else {
 			//Gestión visual secciones
 			component.set('v.bEsperaALF', true);
@@ -97,13 +97,14 @@
 			component.set('v.bMostrarRepresentantesPersonaFisica', false);
 			component.set('v.bMostrarRepresentantesPersonaJuridica', false);
 			component.set('v.bError', false);
+			component.set('v.bInfo', false);
 
 			let getEsPropietarioCaso = component.get('c.getEsPropietarioCaso');
 			getEsPropietarioCaso.setParam('recordId', component.get('v.recordId'));
 			getEsPropietarioCaso.setCallback(this, response => {
 				if (response.getState() === 'SUCCESS') {
 					if (response.getReturnValue()) { //Es propietario
-						//component.set('v.bEsperaALF', true);
+						component.set('v.bEsperaALF', true);
 						let getIdentidad = component.get('c.getIdentidad');
 						getIdentidad.setParams({
 							'tipoBusqueda': component.find('tipoBusqueda').get('v.value'),
@@ -111,12 +112,13 @@
 						});
 						getIdentidad.setCallback(this, responseGetIdentidad => {
 							if (responseGetIdentidad.getState() === 'SUCCESS') {
-								let retorno = responseGetIdentidad.getReturnValue();
-								if (retorno) {
-									if (retorno.CUENTAS.length) {
+								let oMap = responseGetIdentidad.getReturnValue();
+								if (oMap !== null) {
+									if (oMap.CUENTAS.length > 0) {
 										component.set('v.bRes', true);
-										component.set('v.oCuentas', retorno.CUENTAS);
+										component.set('v.oCuentas', oMap.CUENTAS);
 									} else {
+										//Mostrar mensaje sin resultados
 										component.set('v.bError', true);
 										component.set('v.sMensErr', 'No se ha identificado ningún cliente.');
 									}
@@ -130,20 +132,19 @@
 								component.set('v.bError', true);
 								component.set('v.sMensErr', 'Se ha producido un error al realizar la consulta.');
 							}
-							helper.finSpinnerAlf(component);
-							$A.get('e.force:refreshView').fire(); //Refrescar vista
+							//Refrescar vista
+							$A.get('e.force:refreshView').fire();
+							component.set('v.bEsperaALF', false);
 						});
 						$A.enqueueAction(getIdentidad);
 					} else {
-						helper.finSpinnerAlf(component);
-						component.set('v.sMensErr', 'Debe ser propietario del registro para iniciar la búsqueda.');
 						component.set('v.bError', true);
+						component.set('v.sMensErr', 'Debe ser propietario del registro para poder iniciar la identificación.');
 					}
 				} else {
 					//Mostrar error
-					helper.finSpinnerAlf(component);
-					component.set('v.sMensErr', 'Se ha producido un error al realizar la consulta.');
 					component.set('v.bError', true);
+					component.set('v.sMensErr', 'Se ha producido un error al realizar la consulta.');
 				}
 			});
 			$A.enqueueAction(getEsPropietarioCaso);
@@ -157,12 +158,14 @@
 	},
 
 	asociarSoloAcc: function(component, event, helper) {
+		//Gestión visual secciones
 		component.set('v.bEsperaSFDC', true);
 		component.set('v.bRes', false);
 		component.set('v.bMostrarContactos', false);
 		component.set('v.bMostrarRepresentantesPersonaFisica', false);
 		component.set('v.bMostrarRepresentantesPersonaJuridica', false);
 		component.set('v.bError', false);
+		component.set('v.bInfo', false);
 
 		let sCuenta = event.getSource().get('v.name');
 		let sTipoRegistro = component.get('v.sObjectName');
@@ -174,8 +177,7 @@
 				sCasoId: component.get('v.recordId')
 			});
 			setClienteCaso.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -258,8 +260,7 @@
 				sLlamadaId: sLlamada
 			});
 			setClienteLlamada.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -340,11 +341,10 @@
 				recordId: component.get('v.recordId')
 			});
 			setClienteOpportunity.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					//Cuenta vinculada
-					helper.mostrarToast('success', 'Se actualizó el cliente de la oportunidad', 'Se actualizó el cliente de la oportunidad a ' + response.getReturnValue());
+					helper.mostrarToast('success', 'Se asoció correctamente la cuenta a la oportunidad', 'Se asoció correctamente la cuenta ' + response.getReturnValue() + ' a la oportunidad.');
 					component.set('v.sBusqueda', '');
 					$A.get('e.force:refreshView').fire();
 				} else if (response.getState() === 'ERROR') {
@@ -425,8 +425,7 @@
 				sCasoId: component.get('v.recordId')
 			});
 			setClienteCaso.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				component.set('v.bError', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
@@ -452,8 +451,7 @@
 				sLlamadaId: component.get('v.recordId')
 			});
 			setClienteLlamada.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				component.set('v.bError', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
@@ -478,6 +476,7 @@
 	},
 
 	asociarRepresentante: function(component, event, helper) {
+
 		let sRepresentanteId = event.getSource().get('v.name');
 		component.set('v.bEsperaSFDC', true);
 		component.set('v.bRes', false);
@@ -485,6 +484,7 @@
 		component.set('v.bMostrarRepresentantesPersonaJuridica', false);
 		component.set('v.bMostrarContactos', false);
 		component.set('v.bError', false);
+		component.set('v.bInfo', false);
 
 		let sTipoRegistro = component.get('v.sObjectName');
 
@@ -496,8 +496,7 @@
 				sCasoId: component.get('v.recordId')
 			});
 			setClienteCaso.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -528,8 +527,7 @@
 				sLlamadaId: component.get('v.recordId')
 			});
 			setClienteLlamada.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				component.set('v.bError', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
@@ -558,6 +556,7 @@
 		component.set('v.bMostrarRepresentantesPersonaJuridica', false);
 		component.set('v.bMostrarContactos', false);
 		component.set('v.bError', false);
+		component.set('v.bInfo', false);
 
 		const sTipoRegistro = component.get('v.sObjectName');
 		if (sTipoRegistro === 'Case') {
@@ -568,8 +567,7 @@
 				sCasoId: component.get('v.recordId')
 			});
 			setClienteCaso.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -600,8 +598,7 @@
 				sLlamadaId: component.get('v.recordId')
 			});
 			setClienteLlamada.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -634,8 +631,7 @@
 				recordId: component.get('v.recordId')
 			});
 			setClienteOpportunity.setCallback(this, response => {
-				//component.set('v.bEsperaSFDC', false);
-				helper.finSpinnerSf(component);
+				component.set('v.bEsperaSFDC', false);
 				if (response.getState() === 'SUCCESS') {
 					let sRetorno = response.getReturnValue();
 					if (sRetorno !== null) {
@@ -660,14 +656,14 @@
 		}
 	},
 
-	volverACuentas: function(component, event, helper) {
-		//component.set('v.bEsperaSFDC', false);
-		helper.finSpinnerSf(component);
+	volverACuentas: function(component) {
+		component.set('v.bEsperaSFDC', false);
 		component.set('v.bRes', true);
 		component.set('v.bMostrarContactos', false);
 		component.set('v.bMostrarRepresentantesPersonaFisica', false);
 		component.set('v.bMostrarRepresentantesPersonaJuridica', false);
 		component.set('v.bError', false);
+		component.set('v.bInfo', false);
 		$A.get('e.force:refreshView').fire();
 	},
 
@@ -698,8 +694,8 @@
 		$A.enqueueAction(actualizarIdentificacion);
 	},
 
-	handleChange: function(component, event) {
-		component.set('v.sBusqueda', event.getSource().get('v.value').toUpperCase());
+	handleChange: function(component) {
+		component.set('v.bInfo', false);
 		component.set('v.bError', false);
 		if (!component.get('v.sBusqueda')) {
 			component.set('v.bRes', false);

@@ -6,18 +6,20 @@ import getReportsUniqueName from '@salesforce/apex/CIBE_Tab_Custom_Oportunidades
 	
 import tabLabel from '@salesforce/label/c.CIBE_Tab';	
 import reportLabel from '@salesforce/label/c.CIBE_Report';
+import opportunities from '@salesforce/label/c.CIBE_Oportunidad';
+
 
 export default class Cibe_TabOportunidad extends NavigationMixin(LightningElement) {
     
     label = {
         tabLabel,
-        reportLabel
+        reportLabel,
+        opportunities
     };
 
     // Mapa que contiene los valores de los filtros, el id del reporte y el nombre del reporte.
     @track reportsForCurrentView = [];
     @track tabsForCurrentView = [];
-
 
     @track tabs = [];
     @track reports = [];
@@ -29,8 +31,7 @@ export default class Cibe_TabOportunidad extends NavigationMixin(LightningElemen
     @track isExpanded = false;
     @track isLoaded = false;
 
-    //Indicamos el filtro actual.
-    opportunities = 'Oportunidades';
+
 
     //Obtenemos los reportes de un Custom Metadata a traves de un Apex Controller y populamos el mapa reportsForCurrentView.
     @wire(getReportsUniqueName , { userId: Id })
@@ -97,7 +98,7 @@ export default class Cibe_TabOportunidad extends NavigationMixin(LightningElemen
             return 'utility:down'
         }
     }
- 
+
     // Controlador del evento que se lanza al seleccionar un filtro.
     handleFilterChangeButton(event) {
         console.log('handleFilterChangeButton: ' +event );
@@ -112,8 +113,7 @@ export default class Cibe_TabOportunidad extends NavigationMixin(LightningElemen
     }
 
       // Controlador del evento que se lanza al seleccionar un filtro.
-      handleFilterChangeButtonTabs(event) {
-        
+    handleFilterChangeButtonTabs(event) {    
         this.isLoaded = false;
         let filter = event.target.dataset.filter;
         this.isExpanded = !this.isExpanded;

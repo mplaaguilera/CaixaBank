@@ -1,15 +1,9 @@
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
-import {refreshTab} from 'lightning/platformWorkspaceApi';
-
-//import {getRecordNotifyChange, updateRecord } from 'lightning/uiRecordApi';
-//import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 
 //Apex
 import validarGuardar from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.validarGuardar';
-//import casoOrigenAbierto from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.casoOrigenAbierto';
-//import cerrarCasoOrigen from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.cerrarCasoOrigen';
 import getProductos from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.getProductos';
 import getSoluciones from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.getSoluciones';
 import getMotivos from '@salesforce/apex/HDT_Clasificacion_Casos_Controller.getMotivos';
@@ -244,9 +238,7 @@ export default class hdt_Case_Gestion extends LightningElement {
 				}
 				this.errorTf7 = getFieldValue(data, ERROR_TF7);
 			}
-
 			this.tieneActividadesTrasladoColaborador();
-			//this.esCasoPromoCaixa();
 		}
 	}
 
@@ -391,7 +383,6 @@ export default class hdt_Case_Gestion extends LightningElement {
 
 	gestionaGuardarCerrar(event) {
 		this.cerrarCaso = event.currentTarget.dataset.id === 'submitGuardarCerrar';
-		let esFalloalGuardar = false;
 		if (this.cerrarCaso) {
 			//Validaciones locales de campos obligatorios para el cierre
 			let camposObligatoriosNoInformados = ['\n'];
@@ -436,7 +427,6 @@ export default class hdt_Case_Gestion extends LightningElement {
 
 			if (camposObligatoriosNoInformados.length > 1) {
 				this.mostrarToast('info', 'Campos obligatorios', 'Es necesario que informes Los siguientes campos antes de cerrar el caso:' + camposObligatoriosNoInformados.join('\n\u00a0\u00a0\u00a0\u00a0\u00a0·\u00a0\u00a0'));
-				esFalloalGuardar = true;
 				return;
 			}
 		}
@@ -471,8 +461,6 @@ export default class hdt_Case_Gestion extends LightningElement {
 			let idMotivo = this.template.querySelector('[data-id="selectItemMotivo"]').value;
 			let idCausa = this.template.querySelector('[data-id="selectItemCausa"]').value;
 			let idSolucion = this.template.querySelector('[data-id="selectItemSolucion"]').value;
-			let idCanalOperativo = this.template.querySelector('[data-id="CC_Canal_Operativo__c"]').value;
-
 
 			this.template.querySelector('[data-id="tematicaSeleccionadaOculto"]').value = idTematica ? idTematica : null;
 			this.template.querySelector('[data-id="productoSeleccionadoOculto"]').value = idProducto ? idProducto : null;
@@ -497,59 +485,13 @@ export default class hdt_Case_Gestion extends LightningElement {
 				this.template.querySelector('[data-id="estado"]').value = getFieldValue(this.caso, STATUS);
 			}
 			this.template.querySelector('[data-id="recordEditForm"]').submit();
-			
-			if (!esFalloalGuardar) {
-
-				if(!this.cerrarCaso){ 	//Aqui vamos a coger si es el boton Guardar solamente da igual si el canal operativo esta vacio
-					/*Solo se ejecuta sino ha fallado el guardar cerrar
-					// Refrescamos el caso después de 5 segundos
-					setTimeout(() => {
-						// Refrescamos el caso para mostrar el mensaje de los activos del caso
-						window.location.reload();
-					}, 4000); // 3000 milisegundos = 3 segundos*/
-
-					// Si no se está cerrando el caso, refrescamos después de 4 segundos
-					this.refrescarPestana(4000);
-
-
-				}else{			//Aqui vamos a interferir si se ha pulsado sobre -Guardar Cerrar-
-					if(idCanalOperativo != null){
-						//Solo se ejecuta sino ha fallado el guardar cerrar
-						/* Refrescamos el caso después de 5 segundos
-						setTimeout(() => {
-							// Refrescamos el caso para mostrar el mensaje de los activos del caso
-							window.location.reload();
-						}, 3000); // 3000 milisegundos = 3 segundos*/
-
-						this.refrescarPestana(3000);
-
-						
-					}
-					
-				}
-			}
-			
 
 		}).catch(error => {
 			//Se muestra un Toast de error y no se sigue adelante con el update de la recordEditForm
 			this.mostrarToast('error', 'No se pudo actualizar Caso', error);
 			this.guardando = false;
 		});
-
-		
 	}
-
-	async refrescarPestana(delay) {
-        try {
-            const workspaceAPI = this.template.querySelector('lightning-platform-workspace-api');
-            const tabInfo = await workspaceAPI.getFocusedTabInfo();
-            setTimeout(async () => {
-                await workspaceAPI.refreshTab({ tabId: tabInfo.tabId, includeAllSubtabs: true });
-            }, delay);
-        } catch (error) {
-            console.error('Error al refrescar la pestaña:', error);
-        }
-    }
 
 	recordEditFormOnSuccess() {
 		this.guardando = false;
@@ -593,7 +535,6 @@ export default class hdt_Case_Gestion extends LightningElement {
 	}
 
 	getOptionsTematicas() {
-		
 		let selectItemTematica = this.template.querySelector('[data-id="selectItemTematica"]');
 		selectItemTematica.spinnerActive = true;
 		getTematicas({})
@@ -610,14 +551,8 @@ export default class hdt_Case_Gestion extends LightningElement {
 	}
 
 	getOptionsProductos() {
-		//let tipoCliente = getFieldValue(this.caso, RECORDTYPE_DEVELOPERNAME);
-		//let canalProcedencia = getFieldValue(this.caso, CANAL_PROCEDENCIA);
+		
 		let tematica = this.template.querySelector('[data-id="selectItemTematica"]').value;
-
-		//Parámetros getProductos OLD
-		//tipoCliente: tipoCliente,
-		//canalProcedencia: canalProcedencia
-
 		let selectItemProducto = this.template.querySelector('[data-id="selectItemProducto"]');
 		selectItemProducto.spinnerActive = true;
 		getProductos({tematica: tematica})
@@ -633,14 +568,7 @@ export default class hdt_Case_Gestion extends LightningElement {
 	}
 
 	getOptionsMotivos() {
-		//let tipoCliente = getFieldValue(this.caso, RECORDTYPE_DEVELOPERNAME);
-		//let canalProcedencia = getFieldValue(this.caso, CANAL_PROCEDENCIA);
 		let producto = this.template.querySelector('[data-id="selectItemProducto"]').value;
-
-		//Parámetros getSoluciones OLD
-		//tipoCliente: tipoCliente,
-		//canalProcedencia: canalProcedencia
-
 		let selectItemMotivo = this.template.querySelector('[data-id="selectItemMotivo"]');
 		selectItemMotivo.spinnerActive = true;
 		getMotivos({producto: producto})
@@ -657,14 +585,7 @@ export default class hdt_Case_Gestion extends LightningElement {
 	}
 
 	getOptionsCausas() {
-		//let tipoCliente = getFieldValue(this.caso, RECORDTYPE_DEVELOPERNAME);
-		//let canalProcedencia = getFieldValue(this.caso, CANAL_PROCEDENCIA);
 		let motivo = this.template.querySelector('[data-id="selectItemMotivo"]').value;
-
-		//Parámetros getCausas OLD
-		//tipoCliente: tipoCliente,
-		//canalProcedencia: canalProcedencia
-
 		let selectItemCausa = this.template.querySelector('[data-id="selectItemCausa"]');
 		selectItemCausa.spinnerActive = true;
 		getCausas({
@@ -682,14 +603,7 @@ export default class hdt_Case_Gestion extends LightningElement {
 	}
 
 	getOptionsSoluciones() {
-		//let tipoCliente = getFieldValue(this.caso, RECORDTYPE_DEVELOPERNAME);
-		//let canalProcedencia = getFieldValue(this.caso, CANAL_PROCEDENCIA);
 		let causa = this.template.querySelector('[data-id="selectItemCausa"]').value;
-
-		//Parámetros getSoluciones OLD
-		//tipoCliente: tipoCliente,
-		//canalProcedencia: canalProcedencia
-
 		let selectItemSolucion = this.template.querySelector('[data-id="selectItemSolucion"]');
 		selectItemSolucion.spinnerActive = true;
 		getSoluciones({
@@ -731,7 +645,6 @@ export default class hdt_Case_Gestion extends LightningElement {
 		this.dispatchEvent(new ShowToastEvent({variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000}));
 	}
 
-	
 	cambiarEstadoPendienteColaboradorOnchange(event) {
 		this.cambiarEstadoPendienteColaboradorChecked = event.detail.checked;
 	}

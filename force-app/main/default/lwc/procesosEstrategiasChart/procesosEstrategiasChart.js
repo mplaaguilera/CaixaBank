@@ -1,31 +1,62 @@
 import {LightningElement, wire, track, api} from 'lwc';
-import getProcesos from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getProcesos';
+import getProcesos from '@salesforce/apex/SIR_LCMP_HomeImpaAutoRefresh.getQueryProcesos';
 export default class ProcesosEstrategiasChart extends LightningElement {
 
 	@api informeProcesosEstrategias;
 	@track chartConfiguration;
-	
-	@wire(getProcesos, {})
-	getProcesos({error, data}) {
+	@track showChart = false;
+ 
+ 	@wire(getProcesos, {})
+	 getProcesos({error, data}) {
 		if (error) {
 			this.error = error;
 			this.chartConfiguration = undefined;
 		} else if (data) {
-			let chartData = [];
-			let chartLabels = [];
+			if(data.length > 0){
+				this.showChart = true;
+			}		
+
+			let totalEstrategias = [];
+			let totalSituaciones = [];
+			let numProcesosArray = [];
 
 			data.forEach(proceso => {
-				chartData.push(proceso.numProcesos);
+				totalEstrategias.push(proceso.estrategia);
+				totalSituaciones.push(proceso.situacion);
+			});
+
+            var numProcesos = 0;
+            data.forEach(proceso => {
+                numProcesos = 0;
+                for (var i = 0; i < totalEstrategias.length; i++) {
+                    if (proceso.estrategia === totalEstrategias[i] && proceso.situacion === totalSituaciones[i]) {
+                        if((proceso.SIR_fld_Situacion_SF__c !== 'SF_ILOCALI' || proceso.SIR_fld_Situacion_SF__c !== 'SF_NORECOBRO' || proceso.SIR_fld_Situacion_SF__c !== 'SF_FINALIZ')){
+                            numProcesos++;
+                        }
+                    }
+                }
+                numProcesosArray.push(numProcesos);
+            });
+			
+
+			let chartData = [];
+			let chartLabels = [];
+			var i = 0;
+			data.forEach(proceso => {
+				chartData.push(numProcesosArray[i]);
+				i++;
 				chartLabels.push(proceso.estrategia + ' - ' +proceso.situacion);
-			});			
+			});
+
 			let mapEstrategias = new Map();
-			var i = 0;			
+			var i = 0;
 			data.forEach(proceso => {
 				if(!mapEstrategias.has(proceso.estrategia)){
 					mapEstrategias.set(proceso.estrategia, i);
-					i ++;
+					i++;
 				}
 			});
+
 			var mapSituaciones = new Map();
 			data.forEach(proceso => {
 				var longitud = [];
@@ -33,15 +64,17 @@ export default class ProcesosEstrategiasChart extends LightningElement {
 					longitud.push(0);
 				}
 				mapSituaciones.set(proceso.situacion, longitud);
-			});			
+			});
+
 			var i = 0;
 			data.forEach(proceso => {
-				mapSituaciones.get(proceso.situacion)[mapEstrategias.get(proceso.estrategia)] = proceso.numProcesos;
-				i ++;				
+				mapSituaciones.get(proceso.situacion)[mapEstrategias.get(proceso.estrategia)] = numProcesosArray[i];
+				i++;
 			});
+			
 			let arraySituaciones = Array.from( mapSituaciones.keys() );
 			let arrayDS = [];
-			let color = ['#00A1E0', '#16325C', '#76DED9', '#08A69E', '#E2CE7D', '#E69F00', '#C26934'];
+			let color = ['#C6D2E1', '#064F70', '#007EAE', '#2BC0ED', '#A5EAFD', '#8775C9', '#884C93', '#13B8A0', '#38767E', '#FF5200', '#FF8D00', '#F5C78F', '#000000'];
 			let j = 0;
 			for(let posicion of arraySituaciones){
 				arrayDS.push({
@@ -68,7 +101,7 @@ export default class ProcesosEstrategiasChart extends LightningElement {
 						xAxes: [
 						{
 							stacked: true,
-							scaleLabel: { display: true, labelString: "# Procesos"},
+							scaleLabel: { display: true, labelString: "# Procesos" },
 							position: 'top',
 							gridLines: {
 								display: true
@@ -76,21 +109,20 @@ export default class ProcesosEstrategiasChart extends LightningElement {
 						}
 						],
 						yAxes: [
-						{
-							stacked: true,
-							scaleLabel: { display: true, labelString: "Estrategias" },
-							gridLines: {
-								display: false
-							},
-							maxBarThickness: 28,	
-							barPercentage: 0.8,	
-							categoryPercentage: 1.0
-						}
+							{
+								stacked: true,
+								scaleLabel: { display: true, labelString: "Estrategias" },
+								gridLines: {
+									display: false
+								},
+								maxBarThickness: 28,
+								barPercentage: 0.8,
+								categoryPercentage: 1.0
+							}
 						]
 					}
-				}				
-			};
-			this.error = undefined;
+				}		
+			}
 		}
 	}
 }

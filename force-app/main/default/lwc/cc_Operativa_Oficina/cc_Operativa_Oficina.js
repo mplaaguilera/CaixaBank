@@ -16,12 +16,14 @@ import obtenerGestoresBackup from '@salesforce/apex/CC_Operativa_Oficina_Control
 import recuperarCampoDerivar from '@salesforce/apex/CC_Operativa_Oficina_Controller.recuperarCampoDerivar';
 import obtenerFechasDisponiblidadGestor from '@salesforce/apex/CC_Operativa_Oficina_Controller.obtenerFechasDisponiblidadGestor';
 import obtenerHorasDisponiblidadGestor from '@salesforce/apex/CC_Operativa_Oficina_Controller.obtenerHorasDisponiblidadGestor';
-//import buscarGestores from '@salesforce/apex/CC_Operativa_Oficina_Controller.buscarGestores';
+import altaCitaRapida from '@salesforce/apex/CC_WS_Alta_Citas.crearAltaCita';
 //import preguntaEnrollmentDatosSi from '@salesforce/apex/CC_Operativa_Oficina_Controller.preguntaEnrollmentDatosSi';
 
 export default class ccOperativaOficina extends NavigationMixin(LightningElement) {
 	
 	@api recordId;
+
+	@api oportunidadCreadaAPI;
 	
 	@track gestores = [];
 	
@@ -117,11 +119,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	
 	crearTareaCitaGestor = false;
 	
-	tipoCita = 42;
+	tipoCita;
 	
 	clienteTieneGestor = false;
 	
-	ocultarBotonCita = false;
+	ocultarBotonCita = true;
 	
 	horaCitaSelecionada;
 	
@@ -199,6 +201,24 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 
 	gestorGenericoName;
 
+	citaRapida = false;
+
+	imagin;
+
+	fechaSeleccionada;
+
+	franjaSeleccionada;
+
+	citaRapidaPresencialToast;
+
+	textoOportunidadExistente;
+
+	hubImagin;
+
+	gestorSeleccionado;
+
+	numOficina;
+
 	filterGestor = {
 		criteria: [
 			{
@@ -206,11 +226,6 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				operator: 'eq',
 				value: 'CC_Empleado'
 			},
-			/*{
-				fieldPath: 'Account',
-				operator: 'eq',
-				value: this.oficinaPrincipal
-			}, */
 			{
 				fieldPath: 'Account.RecordType.DeveloperName',
 				operator: 'eq',
@@ -224,11 +239,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		additionalFields: ['CC_Matricula__c']
 	};
 	
-	opcionesCitaDigital = [{label: 'Llamada telefónica', value: '43'}];
+	opcionesCitaDigital = [{label: 'Cita telefónica', value: '43'}];
 	
 	opcionesCita = [
-		{label: 'Entrevista', value: '42'},
-		{label: 'Llamada telefónica', value: '43'}
+		{label: 'Cita presencial', value: '42'},
+		{label: 'Cita telefónica', value: '43'}
 	];
 	
 	@wire(getDatos, {recordId: '$recordId'})
@@ -257,8 +272,47 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.tituloCajerosIncidencias = resultado.tituloCajerosIncidencias;
 			this.toastNoCliente = resultado.toastNoCliente;
 			this.oficinaPrincipal = resultado.oficinaPrincipal;
+			this.numOficina = resultado.numOficina;
 			this.gestorGenericoName = resultado.gestorGenericoName;
-			console.log('VM data resultado.gestorGenericoName ' + this.gestorGenericoName);
+			this.citaRapida = resultado.citaRapida;
+			this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
+			this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
+			this.toastCrearOportunidad = resultado.toastCrearOportunidad;
+			this.preguntaCajeros = resultado.preguntaCajeros;
+			this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
+			this.toastCajerosExternos = resultado.toastCajerosExternos;
+			this.urlCajeros = resultado.urlCajeros;
+			this.preguntaSenal = resultado.preguntaSenal;
+			this.toastRemitir = resultado.toastRemitir;
+			this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
+			this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
+			this.gestor = resultado.gestor;
+			this.motivoVentas = resultado.motivoVentas;
+			this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
+			this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
+			this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
+			this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
+			//this.toastDniInvalido = resultado.toastDniInvalido;
+			this.cambioOficina = resultado.cambioOficina;
+			this.cambioGestor = resultado.cambioGestor;
+			this.clienteTieneGestor = resultado.clienteTieneGestor;
+			this.flowDerivar = resultado.flowDerivar;
+			this.urlTF = resultado.urlTF;
+			this.numperso = resultado.numperso;
+			this.nif = resultado.nif;
+			this.imagin = resultado.imagin;
+			this.citaRapidaPresencialToast = resultado.citaRapidaPresencialToast;
+			this.oportunidadCreada = resultado.oportunidadCreada;
+			this.oficinaFisica = resultado.oficinaFisica;
+
+			if(this.oportunidadCreadaAPI){
+				this.textoOportunidadExistente = resultado.textoOportunidadExistente;
+			}
+			this.hubImagin = resultado.hubImagin;
+
+			if(this.imagin) {
+				this.tipoCita = 42;
+			}
 			if(this.oficinaPrincipal) {
 				for(let i = 0; i < resultado.gestores.length; i++) {
 					this.gestores.push({label: resultado.gestores[i].Name, value: resultado.gestores[i].Id});
@@ -272,12 +326,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			} else if (this.realizarRemitidoDesdeMetodo && (this.alertaTexto || this.grupoColaborador || this.ambitoFraude)) {
 				this.abrirModal();
 			}
-			if(resultado.preguntaCSBDContratar) {
-				this.preguntaCSBDContratar = resultado.preguntaCSBDContratar;
-				this.preguntaCSBDContratar2 = resultado.preguntaCSBDContratar2;
-				this.toastCrearOportunidad = resultado.toastCrearOportunidad;
-			}
-			if(this.toastCSBDNoContratar && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
+			if(this.toastCSBDNoContratar && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.oportunidadCreadaAPI) {
 				this.crearOportunidad();
 			}
 			if(this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
@@ -292,12 +341,6 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			} else {
 				this.abrirModal();
 			}
-			if(resultado.preguntaCajeros) {
-				this.preguntaCajeros = resultado.preguntaCajeros;
-				this.preguntaCajerosExternos = resultado.preguntaCajerosExternos;
-				this.toastCajerosExternos = resultado.toastCajerosExternos;
-				this.urlCajeros = resultado.urlCajeros;
-			}
 			/*if(resultado.preguntaEnrollment){
 				this.preguntaEnrollment= resultado.preguntaEnrollment;
 				this.preguntaEnrollmentDatos= resultado.preguntaEnrollmentDatos;
@@ -305,50 +348,29 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				this.toastEnrollmentDatosSi = resultado.toastEnrollmentDatosSi;
 				this.toastEnrollmentDatosNo = resultado.toastEnrollmentDatosNo;
 			}*/
-			if(resultado.preguntaRealizarRemitido) {
-				this.preguntaSenal = resultado.preguntaSenal;
-				this.toastRemitir = resultado.toastRemitir;
-				this.preguntaRealizarRemitido = resultado.preguntaRealizarRemitido;
-				if(!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
+			if(this.preguntaRealizarRemitido) {
+				if(!this.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude) {
 					this.abrirModal();
 				}
-			} /*else {*/
-				if(resultado.comentarioCambioGestor) {
-					this.comentariosTarea = resultado.comentarioCambioGestor;
-				} else if(resultado.comentarioCambioOficina) {
-					this.comentariosTarea = resultado.comentarioCambioOficina;
-				}
-				/*this.grupoColaborador = resultado.grupoColaborador;
-				this.alertaTexto = resultado.alerta;*/
-				this.preguntaGrupoColaborador = resultado.preguntaGrupoColaborador;
-				this.gestor = resultado.gestor;
-				this.motivoVentas = resultado.motivoVentas;
-				this.mostrarModalGestionGestorAsignado = resultado.mostrarModalGestionGestorAsignado;
-				this.mostrarModalGestionGestorGenerico = resultado.mostrarModalGestionGestorGenerico;
-				this.mostrarModalCreacionTarea = resultado.mostrarModalCreacionTarea;
-				this.mostrarModalDNITestamentaria = resultado.mostrarModalDNITestamentaria;
-				//this.toastDniInvalido = resultado.toastDniInvalido;
-				this.cambioOficina = resultado.cambioOficina;
-				this.cambioGestor = resultado.cambioGestor;
-				this.clienteTieneGestor = resultado.clienteTieneGestor;
-				this.flowDerivar = resultado.flowDerivar;
-				this.urlTF = resultado.urlTF;
-				this.numperso = resultado.numperso;
-				this.nif = resultado.nif;
-				if((this.grupoColaborador === null || this.grupoColaborador === undefined) && this.flowDerivar === true){
-					this.mostrarFlowDerivar = this.flowDerivar;
-				}
-				if(this.comentariosTarea === undefined) {
-					this.comentariosTarea = resultado.detallesConsulta;
-				}				
-				if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar) {
-					this.handleContinuarProceso();
-				}
-				this.llamadaIntegracionClienteDigital();
-				if(!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
-					this.abrirModal();
-				}
-			//}
+			}
+			if(resultado.comentarioCambioGestor) {
+				this.comentariosTarea = resultado.comentarioCambioGestor;
+			} else if(resultado.comentarioCambioOficina) {
+				this.comentariosTarea = resultado.comentarioCambioOficina;
+			}
+			if((this.grupoColaborador === null || this.grupoColaborador === undefined) && this.flowDerivar === true){
+				this.mostrarFlowDerivar = this.flowDerivar;
+			}
+			if(this.comentariosTarea === undefined) {
+				this.comentariosTarea = resultado.detallesConsulta;
+			}				
+			if (!this.alertaTexto && !this.toastTrasladar3N && !this.toastCSBDNoContratar) {
+				this.handleContinuarProceso();
+			}
+			this.llamadaIntegracionClienteDigital();
+			if(!resultado.toastCajerosIncidencias && !this.alertaTexto && !this.grupoColaborador && !this.ambitoFraude && !this.realizarRemitidoDesdeMetodo) {
+				this.abrirModal();
+			}
 		}
 		window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('desactivarspinner', {detail: {data: null}})), 400);
 	}
@@ -403,6 +425,10 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	handleCrearTareaGestor() {
 		if(!this.template.querySelector('.comentariosTarea').value || !this.template.querySelector('.fechaActividad').value) {
 			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
+		} else if(this.cambioGestor && !this.gestorSeleccionado) {
+			this.toast('warning', 'Campos vacíos', 'Por favor, seleccione un gestor');
+		} else if(this.cambioOficina && !this.lookupOficinaResultadoSeleccionado) {
+			this.toast('warning', 'Campos vacíos', 'Por favor, seleccione una oficina');
 		} else {
 			this.showSpinner = true;
 			crearTarea({
@@ -456,9 +482,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 		this.cargandoGestor = true;
 		try {
 			const resultado = await esClienteDigital({recordId: this.recordId, tipoActividad: ''});
-			console.log('VM DATOS '  + JSON.stringify(resultado));
 			if (resultado.resultado === 'OK') {
 				this.esClienteDigital = resultado.clienteDigital;
+				if(this.esClienteDigital) {
+					this.tipoCita = 42;
+				}
 				if (resultado.empleado1) {
 					this.tieneGestor = true;
 					this.numeroGestor = resultado.empleado1;
@@ -466,10 +494,9 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					this.oficinaGestor = resultado.oficina1;
 					if (this.oficinaGestor === '3223' || this.oficinaGestor === '03223') {
 						this.ocultarOpcionCitaGestor = true;
+						this.tipoCita = 42;
 					}
-				} else {
-					console.log('VM resultado.gestorClienteName ' + resultado.gestorClienteName);
-					console.log('VM resultado.gestorGenericoName ' + this.gestorGenericoName);
+				} else {					
 					if (resultado.gestorClienteName === this.gestorGenericoName) {
 						this.nombreGestor = resultado.gestorClienteName;
 						this.gestorGenerico = true;
@@ -481,7 +508,6 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					this.nombreGestorAsignado = resultado.nombreGestorAsignado;
 				}
 			} else if (resultado.resultado === 'KO') {
-				console.log('VM DATOS '  + JSON.stringify(resultado));
 				this.numeroGestor = 'KO';
 				this.numeroGestorKO = true;
 				this.mensajeErrorInt = resultado.mensajeError;
@@ -492,8 +518,6 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.cerrarModal();
 		} finally {
 			this.cargandoGestor = false;
-			console.log('VM gestorAsignadoCoincide ' + this.gestorAsignadoCoincide);
-			console.log('VM gestorGenerico ' + this.gestorGenerico);
 		}
 	}
 	
@@ -509,10 +533,11 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 	
 	handleGestionGestorDistintoSi() {
-		this.mostrarModalCreacionTarea = true;
+		this.mostrarModalCita = true;
 		this.mostrarModalGestionGestorGenerico = false;
+		/*this.mostrarModalCreacionTarea = true;
 		this.enviarTareaOficinaCliente = true;
-		this.mostrarModalCita = false;
+		this.mostrarModalCita = false;*/
 	}
 	
 	handleGestionGestorDistintoNo() {
@@ -565,7 +590,7 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	
 	consultarFechasDisponibilidadGestor() {
 		var codigoEvento;
-		if(this.tipoCita == 'LLamada telefónica') {
+		if(this.tipoCita == 'Cita telefónica') {
 			codigoEvento = '43';
 		} else {
 			codigoEvento = '42';
@@ -585,12 +610,12 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	
 	consultarHorasDisponibilidadGestor() {
 		var codigoEvento;
-		if(this.tipoCita == 'LLamada telefónica') {
+		if(this.tipoCita == 'Cita telefónica') {
 			codigoEvento = '43';
 		} else {
 			codigoEvento = '42';
 		}
-		let fechasDisponibilidad = this.template.querySelector('lightning-combobox').value;
+		let fechasDisponibilidad = this.template.querySelector('.fechasDisponibilidad').value;
 		obtenerHorasDisponiblidadGestor({recordId: this.recordId, employeeId: this.numeroGestor, gestorElegidoId: this.numeroGestor, eventType: codigoEvento, fechaElegida: fechasDisponibilidad})
 		.then(resultado => {
 			this.horasDisponibilidad = resultado;
@@ -690,6 +715,19 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			}
 		}, 150);
 	}
+
+	nombreGestorSeleccionado(event) {
+		var gestorAnterior;
+		if(this.gestorSeleccionado) {
+			gestorAnterior = this.gestorSeleccionado;
+		}
+		this.gestorSeleccionado = this.gestores.find(gestor => gestor.value === event.detail.value);
+		if(this.comentariosTarea && this.comentariosTarea.includes('[gestor seleccionado]')) {
+			this.comentariosTarea = this.comentariosTarea.replace('[gestor seleccionado]', this.gestorSeleccionado.label);
+		} else if(this.comentariosTarea && !this.comentariosTarea.includes('[gestor seleccionado]')) {
+			this.comentariosTarea = this.comentariosTarea.replace(gestorAnterior.label , this.gestorSeleccionado.label);
+		}
+	}
 	
 	lookupOficinaSeleccionar(event) {
 		const oficina = this.lookupOficinaResultados.find(c => c.Id === event.currentTarget.dataset.id);
@@ -784,8 +822,8 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 	}
 	
 	confirmarCitaGestor() {
-		if (!this.template.querySelector('.asuntoEvento').value || !this.template.querySelector('.fechasDisponibilidad').value) {
-			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario');
+		if (!this.template.querySelector('.asuntoEvento').value || (!this.citaRapida && !this.template.querySelector('.fechasDisponibilidad').value) || this.tipoCita === undefined) {
+			this.toast('warning', 'Campos vacíos', 'Por favor, informe todos los campos del formulario y seleccione una opción de Tipo de Cita.');
 		} else {
 			if (this.esClienteDigital) {
 				this.tipoCita = 43;
@@ -793,15 +831,16 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 			this.cargandoGestor = true;
 			this.disponibilidadConsultada = false;
 			this.ocultarBotonCita = true;
-			altaCitaGestor({
-				recordId: this.recordId,
-				empleadoEx: this.gestorElegido,
-				nombreGestor: this.nombreGestorElegido,
-				centroEx: this.oficinaGestor,
-				asunto: this.template.querySelector('.asuntoEvento').value,
-				fecContacto: this.template.querySelector('.fechasDisponibilidad').value,
-				horaIni: this.horaCitaSelecionada,
-				medio: this.tipoCita})
+			if(!this.citaRapida) {
+				altaCitaGestor({
+					recordId: this.recordId,
+					empleadoEx: this.gestorElegido,
+					nombreGestor: this.nombreGestorElegido,
+					centroEx: this.oficinaGestor,
+					asunto: this.template.querySelector('.asuntoEvento').value,
+					fecContacto: this.template.querySelector('.fechasDisponibilidad').value,
+					horaIni: this.horaCitaSelecionada,
+					medio: this.tipoCita})
 				.then(resultado => {
 					if (resultado.resultat === 'OK') {
 						if(this.tipoCita == '43') {
@@ -820,193 +859,228 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 					this.toast('error', 'Error al confirmar la cita', error.body.message);
 					this.cerrarModal();
 				});
-			}
-		}
-		
-		checkCrearTareaOnchange() {
-			var checkBoxMostrarTarea = this.template.querySelector('.checkBoxCitaGestor').checked;
-			if(checkBoxMostrarTarea) {
-				this.mostrarTareaModalCitaGestor = true;
 			} else {
-				this.mostrarTareaModalCitaGestor = false;
-			}
-		}
-		
-		get inputVariables(){
-			return [
-				{
-					name: 'recordId',
-					type: 'String',
-					value: this.recordId
-				}
-        	];
-	   	}
-		
-		handleStatusChange(event) {
-			this.value = event.detail.status;
-			if (this.value === 'FINISHED') {
-				this.cerrarModal();
-			}
-		}
-	   
-		handleGrupoColaboradorDerivar() {
-			this.mostrarFlowDerivar = this.flowDerivar;
-			this.grupoColaborador = false;
-				if(this.realizarRemitidoDesdeMetodo) {	
-					if(!this.ambitoFraude) {
-						this.handleRemitir();
+				altaCitaRapida({
+					numOficina: this.numOficina,
+					numPer: this.numperso, 
+					fechaSeleccionada: this.fechaSeleccionada, 
+					franjaSeleccionada: this.franjaSeleccionada,
+					asunto: this.template.querySelector('.asuntoEvento').value,
+					recordId: this.recordId,
+					tipoCita: this.tipoCita
+				})
+				.then(retorno => {
+					if(retorno.resultado == 'OK') {
+						if(this.tipoCita == '43') {
+							this.toast('success', 'Cita creada con éxito', retorno.mensaje);
+						} else {
+							this.mostrarToastOficinaResultado(retorno.mensaje, this.oficinaPrincipal, 'Cita');
+						}
+
+					} else {
+						console.error('Error mensaje ' + retorno.resultadoMensaje);
+						this.toast('error', 'Problema creando la cita rápida', retorno.resultadoMensaje);
+						this.cerrarModal();
 					}
-				}
-				if(this.toastTrasladar3N && !this.preguntaSenal) {
-					this.realizarTraslado3N();
-				}
-				if(this.toastCSBDNoContratar) {
-					this.crearOportunidad();
-				}
-				if(this.toastCajerosIncidencias) {
-					this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
+				})
+				.catch(error => {
+					console.error('Error al crear la cita:', error);
+					this.toast('error', 'Problema creando la cita', error.body.message);
+				}).finally(() => {
+					this.cargandoGestor = false;
 					this.cerrarModal();
-				}
-				if(this.toastNoClienteError) {
-					this.toast('error', 'Error en los datos', this.toastNoClienteError);
-					this.cerrarModal();
-				}
-				if(this.preguntaRealizarRemitido) {
-					if(!this.toastCajerosIncidencias) {
-						this.abrirModal();
-					}
+				});
+			}
+		}
+	}
+		
+	checkCrearTareaOnchange() {
+		var checkBoxMostrarTarea = this.template.querySelector('.checkBoxCitaGestor').checked;
+		if(checkBoxMostrarTarea) {
+			this.mostrarTareaModalCitaGestor = true;
+		} else {
+			this.mostrarTareaModalCitaGestor = false;
+		}
+	}
+	
+	get inputVariables(){
+		return [
+			{
+				name: 'recordId',
+				type: 'String',
+				value: this.recordId
+			}
+		];
+	}
+	
+	handleStatusChange(event) {
+		this.value = event.detail.status;
+		if (this.value === 'FINISHED') {
+			this.cerrarModal();
+		}
+	}
+	
+	handleGrupoColaboradorDerivar() {
+		this.mostrarFlowDerivar = this.flowDerivar;
+		this.grupoColaborador = false;
+			if(this.realizarRemitidoDesdeMetodo) {	
+				if(!this.ambitoFraude) {
+					this.handleRemitir();
 				}
 			}
-		
-		handleGrupoColaboradorTrasladar() {
-			this.recuperarCampoDerivar();
-			if(!this.derivar) {
+			if(this.toastTrasladar3N && !this.preguntaSenal) {
+				this.realizarTraslado3N();
+			}
+			if(this.toastCSBDNoContratar) {
+				this.crearOportunidad();
+			}
+			if(this.toastCajerosIncidencias) {
+				this.toast('error', this.tituloCajerosIncidencias, this.toastCajerosIncidencias);
 				this.cerrarModal();
-				this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
+			}
+			if(this.toastNoClienteError) {
+				this.toast('error', 'Error en los datos', this.toastNoClienteError);
+				this.cerrarModal();
+			}
+			if(this.preguntaRealizarRemitido) {
+				if(!this.toastCajerosIncidencias) {
+					this.abrirModal();
+				}
+			}
+		}
+	
+	handleGrupoColaboradorTrasladar() {
+		this.recuperarCampoDerivar();
+		if(!this.derivar) {
+			this.cerrarModal();
+			this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
+		} else {
+			window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizartrasladocolaborador', {detail: {data: null}})), 400);
+			this.cerrarModal();
+		}
+	}
+
+	comprobarDNI() {
+		if(this.mostrarModalDNITestamentaria) {
+			this.dni = this.template.querySelector('.DNITestamentaria').value;
+			if(!this.template.querySelector('.DNITestamentaria').value) {
+				this.toast('warning', 'Campos vacíos', 'Por favor, informe un documento');
 			} else {
-				window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizartrasladocolaborador', {detail: {data: null}})), 400);
-				this.cerrarModal();
+				this.showSpinner = true;
+				dniTestamentaria({
+					dni: this.dni,
+					recordId: this.recordId})
+				.then(retorno => {
+					this.handleRemitir();
+				})
+				.catch(error => {
+					console.error(error);
+					this.toast('error', 'Problema estableciendo dni', error.body.message);
+					return false;
+				}).finally(() => {
+					this.showSpinner = false;
+				});
 			}
 		}
+	}
+	
+	handleRemitir() {
+		if(!this.derivar) {
+			this.cerrarModal();
+			this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
+		} else {
+			window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizarremitido', {detail: {data: null}})), 400);
+			this.cerrarModal();
+		}
+	}
 
-		comprobarDNI() {
-			if(this.mostrarModalDNITestamentaria) {
-				this.dni = this.template.querySelector('.DNITestamentaria').value;
-				if(!this.template.querySelector('.DNITestamentaria').value) {
-					this.toast('warning', 'Campos vacíos', 'Por favor, informe un documento');
-				} else {
-					this.showSpinner = true;
-					dniTestamentaria({
-						dni: this.dni,
-						recordId: this.recordId})
-					.then(retorno => {
-						this.handleRemitir();
-					})
-					.catch(error => {
-						console.error(error);
-						this.toast('error', 'Problema estableciendo dni', error.body.message);
-						return false;
-					}).finally(() => {
-						this.showSpinner = false;
-					});
-				}
+	handleMostrarMensajeRemitir() {
+		this.cerrarModal();
+		this.toast('warning', 'Atención', this.toastRemitir);
+	}
+	
+	preguntaCajerosSi() {
+		this.preguntaCajeros = '';
+	}
+	
+	preguntaCajerosNo() {
+		this.cerrarModal();
+		this.toast('success', 'Atención', this.toastCajerosExternos);
+	}
+	
+	preguntaCajerosExternosSi() {
+		this.cerrarModal();
+	}
+	
+	preguntaCajerosExternosNo() {
+		this[NavigationMixin.GenerateUrl]({
+			type: 'standard__webPage',
+			attributes: {
+				url: ''
 			}
-		}
-		
-		handleRemitir() {
-			if(!this.derivar) {
-				this.cerrarModal();
-				this.toast('alert', 'Alerta', this.toastTrasladarDesdeDerivar);
-			} else {
-				window.setTimeout(() =>	this.dispatchEvent(new CustomEvent('realizarremitido', {detail: {data: null}})), 400);
-				this.cerrarModal();
-			}
-		}
+		}).then(url => {
+			window.open(this.urlCajeros, "_blank");
+		});
+	}
 
-		handleMostrarMensajeRemitir() {
+	handleMostrarPreguntaRealizarRemitido(){
+		this.mostrarModalPreguntaRealizarRemitido = true;
+		this.preguntaSenal = false;
+	}
+
+	/*handleMostrarEnrollmentDatos(){
+		this.mostrarModalPreguntaEnrollmentDatos = true;
+	}*/
+
+	/*preguntaEnrollmentNo() {
+		this.preguntaEnrollment = false;
+		this.mostrarModalCreacionTarea = true;
+	}*/
+
+	/*preguntaEnrollmentDatosSi(){
+		this.showSpinner = true;
+		preguntaEnrollmentDatosSi({recordId: this.recordId})
+		.then(resultado => {
+			this.toast('success','Operativa realizada correctamente', this.toastEnrollmentDatosSi);
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast('error', 'Problema al realizar la operativa', error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
 			this.cerrarModal();
-			this.toast('warning', 'Atención', this.toastRemitir);
-		}
-		
-		preguntaCajerosSi() {
-			this.preguntaCajeros = '';
-		}
-		
-		preguntaCajerosNo() {
+		})
+	}*/
+
+	/*preguntaEnrollmentDatosNo(){
+		this.cerrarModal();
+		this.toast('success','Pendiente', this.toastEnrollmentDatosNo);
+	}*/
+	
+	realizarTraslado3N() {
+		this.showSpinner = true;
+		realizarTraslado3N({recordId: this.recordId})
+		.then(resultado => {
+			this.toast('success', 'Caso trasladado con éxito', this.toastTrasladar3N);
+		})
+		.catch(error => {
+			console.error(error);
+			this.toast('error', 'Problema al trasladar el caso a Tercer Nivel', error.body.message);
+		}).finally(() => {
+			this.showSpinner = false;
 			this.cerrarModal();
-			this.toast('success', 'Atención', this.toastCajerosExternos);
-		}
-		
-		preguntaCajerosExternosSi() {
-			this.cerrarModal();
-		}
-		
-		preguntaCajerosExternosNo() {
-			this[NavigationMixin.GenerateUrl]({
-				type: 'standard__webPage',
-				attributes: {
-					url: ''
-				}
-			}).then(url => {
-				window.open(this.urlCajeros, "_blank");
-			});
-		}
+			this.dispatchEvent(new CustomEvent('refrescartab', {detail: {}}));
+		});
+	}
 
-		handleMostrarPreguntaRealizarRemitido(){
-			this.mostrarModalPreguntaRealizarRemitido = true;
-			this.preguntaSenal = false;
-		}
-
-		/*handleMostrarEnrollmentDatos(){
-			this.mostrarModalPreguntaEnrollmentDatos = true;
-		}*/
-
-		/*preguntaEnrollmentNo() {
-			this.preguntaEnrollment = false;
-			this.mostrarModalCreacionTarea = true;
-		}*/
-
-		/*preguntaEnrollmentDatosSi(){
-			this.showSpinner = true;
-			preguntaEnrollmentDatosSi({recordId: this.recordId})
-			.then(resultado => {
-				this.toast('success','Operativa realizada correctamente', this.toastEnrollmentDatosSi);
-			})
-			.catch(error => {
-				console.error(error);
-				this.toast('error', 'Problema al realizar la operativa', error.body.message);
-			}).finally(() => {
-				this.showSpinner = false;
-				this.cerrarModal();
-			})
-		}*/
-
-		/*preguntaEnrollmentDatosNo(){
-			this.cerrarModal();
-			this.toast('success','Pendiente', this.toastEnrollmentDatosNo);
-		}*/
-		
-		realizarTraslado3N() {
-			this.showSpinner = true;
-			realizarTraslado3N({recordId: this.recordId})
-			.then(resultado => {
-				this.toast('success', 'Caso trasladado con éxito', this.toastTrasladar3N);
-			})
-			.catch(error => {
-				console.error(error);
-				this.toast('error', 'Problema al trasladar el caso a Tercer Nivel', error.body.message);
-			}).finally(() => {
-				this.showSpinner = false;
-				this.cerrarModal();
-				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: null}}));
-			});
-		}
-
-		crearOportunidad() {
-			this.showSpinner = true;
+	crearOportunidad() {
+		if(!this.oportunidadCreada) {
+			this.showSpinner = true;			
+			let oportunidadSuccess = false;
 			let toast;
 			crearOportunidad({recordId: this.recordId})
 			.then(resultado => {
+				oportunidadSuccess = true;
 				if(this.toastCSBDNoContratar) {
 					toast = this.toastCSBDNoContratar;
 				} else {
@@ -1018,57 +1092,94 @@ export default class ccOperativaOficina extends NavigationMixin(LightningElement
 				console.error(error);
 				this.toast('error', 'Problema al crear la oportunidad', error.body.message);
 			}).finally(() => {
-				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: null}}));
-				this.showSpinner = true;
+				this.dispatchEvent(new CustomEvent('refrescartab', {detail: {data: {'oportunidadSuccess': oportunidadSuccess}}}));
+				this.showSpinner = false;
 				this.cerrarModal();
 			});
 		}
+	}
 
-		preguntaCSBDContratarSi() {
-			this.preguntaCSBDContratar = null;
-		}
+	preguntaCSBDContratarSi() {
+		this.preguntaCSBDContratar = null;
+	}
 
-		preguntaCSBDContratarNo() {
-			this.crearOportunidad();			
-		}
+	preguntaCSBDContratarNo() {
+		this.crearOportunidad();			
+	}
 
-		preguntaCSBDContratar2Si() {
-			this.crearOportunidad();
-		}
+	preguntaCSBDContratar2Si() {
+		this.crearOportunidad();
+	}
 
-		preguntaCSBDContratar2No() {
-			this.toastCrearOportunidad = null;
-			this.preguntaCSBDContratar2 = false;
-		}
+	preguntaCSBDContratar2No() {
+		this.toastCrearOportunidad = null;
+		this.preguntaCSBDContratar2 = false;
+	}
 
-		linkTF() {
-			this[NavigationMixin.GenerateUrl]({
-				type: 'standard__webPage',
-				attributes: {
-					url: ''
-				}
-			}).then(url => {
-				this.urlTF = this.urlTF.replace('{numperso}', '{' + this.numperso + '}');
-				this.urlTF = this.urlTF.replace('{nif}', '{' + this.nif + '}');
-				window.open(this.urlTF, "_blank");
-			});
-		}
-
-		handlePreguntaSenalSi() {
-			this.ambitoFraude = false;
-			/*if(this.realizarRemitidoDesdeMetodo) {
-				this.handleRemitir();
-			}*/
-			this.preguntaSenal = false;
-			this.preguntaRealizarRemitido = false;
-			this.toastTrasladarDesdeDerivar = false;
-			this.toastRemitir = false;
-			if(!this.grupoColaborador && !this.ambitoFraude) {
-				this.handleGrupoColaboradorDerivar();
+	linkTF() {
+		this[NavigationMixin.GenerateUrl]({
+			type: 'standard__webPage',
+			attributes: {
+				url: ''
 			}
-		}
+		}).then(url => {
+			this.urlTF = this.urlTF.replace('{numperso}', '{' + this.numperso + '}');
+			this.urlTF = this.urlTF.replace('{nif}', '{' + this.nif + '}');
+			window.open(this.urlTF, "_blank");
+		});
+	}
 
-		get archivosLength() {
-			return this.archivos ? this.archivos.length : 0;
+	handlePreguntaSenalSi() {
+		this.ambitoFraude = false;
+		/*if(this.realizarRemitidoDesdeMetodo) {
+			this.handleRemitir();
+		}*/
+		this.preguntaSenal = false;
+		this.preguntaRealizarRemitido = false;
+		this.toastTrasladarDesdeDerivar = false;
+		this.toastRemitir = false;
+		if(!this.grupoColaborador && !this.ambitoFraude) {
+			this.handleGrupoColaboradorDerivar();
 		}
 	}
+
+	activarSpinner() {
+		this.showSpinner = true;
+	}
+
+	desactivarSpinner() {
+		this.showSpinner = false;
+	}
+
+	activarModalCita() {
+		this.mostrarTareaModalCitaGestor = true;
+	}
+
+	activarModalCita() {
+		this.mostrarTareaModalCitaGestor = false;
+	}
+
+	activarBotonCita() {
+		this.ocultarBotonCita = false;
+	}
+
+	desactivarBotonCita() {
+		this.ocultarBotonCita = true;
+	}
+
+	valorFechaCitaRapida(event) {
+		this.fechaSeleccionada = event.detail;
+	}
+	
+	valorFranjaCitaRapida(event) {
+		this.franjaSeleccionada = event.detail;
+	}
+
+	valorTipoCita(event) {
+		this.tipoCita =  event.target.value;
+	}
+
+	get archivosLength() {
+		return this.archivos ? this.archivos.length : 0;
+	}
+}

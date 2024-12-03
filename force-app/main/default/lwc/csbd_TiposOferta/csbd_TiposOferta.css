@@ -29,7 +29,7 @@ lightning-icon.iconoWarning {
 }
 
 span.iconoHeader.iconoHeaderFijo {
-    background-color: #eebd18;
+    background-color: #EC795E;
 }
 
 span.iconoHeader.iconoHeaderVariable {
@@ -37,7 +37,7 @@ span.iconoHeader.iconoHeaderVariable {
 }
 
 span.iconoHeader.iconoHeaderMixto {
-    background-color: #e29072;
+    background-color: #eebd18;
 }
 
 span.iconoHeader > lightning-icon {
@@ -93,11 +93,11 @@ div.slds-grid.lineaFormulario + div.slds-grid.lineaFormulario {
 }
 
 lightning-input.inputInteres {
-    --slds-c-input-color-background: #fffdf7;
+    --slds-c-input-color-background: #fffcf2;
 }
 
 lightning-input.inputCuota {
-    --slds-g-color-neutral-base-95: #f4f9ff;
+    --slds-g-color-neutral-base-95: #f2f6fe;
     --slds-g-color-neutral-base-50: rgb(24, 24, 24);
 }
 

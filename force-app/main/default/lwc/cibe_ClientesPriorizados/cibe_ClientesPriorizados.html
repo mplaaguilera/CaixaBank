@@ -26,21 +26,20 @@
     
         <article class="slds-card slds-m-top_x-small">
             <div class="slds-card__header slds-grid">
-              <header class="slds-media slds-media_center slds-has-flexi-truncate">
-                <div class="slds-media__body">
-                  <h2 class="slds-card__header-title">
-                      <span>{labels.filtrar}</span>
-                  </h2>
-                </div>
-                <div class="slds-no-flex">
-                  <lightning-button class="slds-m-horizontal_xx-small" variant="neutral" label={labels.reiniciar} onclick={resetFilters} disabled={buttonDisabled}></lightning-button>
-                  <lightning-button class="slds-m-horizontal_xx-small" variant="brand" label={labels.aplicar} onclick={handleSearchData} disabled={buttonDisabled}></lightning-button>
-    
-                </div>
-              </header>
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span>{labels.filtrar}</span>
+                        </h2>
+                    </div>
+                    <div class="slds-no-flex">
+                        <lightning-button class="slds-m-horizontal_xx-small" variant="neutral" label={labels.reiniciar} onclick={resetFilters} disabled={buttonDisabled}></lightning-button>
+                        <lightning-button class="slds-m-horizontal_xx-small" variant="brand" label={labels.aplicar} onclick={handleSearchData} disabled={buttonDisabled}></lightning-button>
+                    </div>
+                </header>
             </div>
-     
-              <div class="slds-grid slds-gutters slds-m-around_small slds-border_top">
+    
+            <div class="slds-grid slds-gutters slds-m-around_small slds-border_top">
                 <div class="slds-col slds-size_1-of-4">
                     <lightning-input  type="text" name="subject"  onchange={handleChangeSubject} placeholder={labels.buscarAsunto}></lightning-input>
                 </div>
@@ -52,12 +51,16 @@
                     onselectionchange={handleSelectionChange}
                     placeholder={labels.buscarGC}
                     selection={initialSelection}
+                    required
                     >
                 </c-av_-lookup>
                 </div>
-              </div>
+                <div class="slds-grid slds-gutters slds-m-top_medium slds-m-around_small slds-border_top">
+                    <lightning-button-icon icon-name="utility:refresh" size="medium" onclick={handleSearchData} ></lightning-button-icon>
+                </div>
+            </div>
     
-           <div if:true={showPill}>
+            <div if:true={showPill}>
                 <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_small slds-border_top">
                     <div class="slds-col slds-size_1-of-4">
                         <h5 ><strong>{labels.grupoComercial}</strong></h5>
@@ -72,12 +75,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-    
-    
-          </article>
-    
-          <lightning-spinner if:true={showSpinner} alternative-text={labels.cargando} variant="brand" size="medium"
+            </div>    
+        </article>
+
+        <lightning-spinner if:true={showSpinner} alternative-text={labels.cargando} variant="brand" size="medium"
             class="spin-cls"></lightning-spinner>
     
         <lightning-datatable

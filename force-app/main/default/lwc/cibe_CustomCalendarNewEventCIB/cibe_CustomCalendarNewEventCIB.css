@@ -1,0 +1,54 @@
+.size-event {
+    color:aquamarine
+}
+
+.fc-next-button, .fc-prev-button, .fc-today-button, .fc-agendaWeek-button, .fc-month-button {
+    background-color: #1644f1 !important;
+    color: white !important;
+}
+
+.lol{
+    background-color: black;
+}
+
+
+.tooltips{
+        border-radius: 10px;
+        /* width: 41px;
+        height: 72px;
+        position: fixed;
+        border: 2px solid red;
+        background: green; */
+}
+
+.ttlp {
+    position: absolute;
+    width: 99.72728000000001px;
+    height: 19.727280000000004px;
+    line-height: 20px;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    color: rgb(113, 157, 171);
+    background: rgb(255, 255, 255);
+    border: 3.63636px solid rgb(255, 255, 255);
+    border-radius: 5px;
+    text-shadow: rgba(0, 0, 0, 0.1) 1px 1px 1px;
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 2px 0px;
+}
+
+.ttlp:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-color: #FFFFFF transparent transparent transparent;
+    top: 44px;
+    left: 50px;
+}
+
+.fc-time:after{
+    content:"";
+}

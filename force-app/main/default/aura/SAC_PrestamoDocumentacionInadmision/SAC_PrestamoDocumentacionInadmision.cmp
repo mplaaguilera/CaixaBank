@@ -2,25 +2,13 @@
                 implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
     
     <aura:attribute name="recordId" type="String" />
-    <aura:attribute name="filetype" type="List" default="['.PDF']" />
-    <aura:attribute name="multiple" type="Boolean" default="false" />
-    <aura:attribute name="archivoSubido" type="Boolean" default="false" />
-    <aura:attribute name="disabled" type="Boolean" default="true" />
     <aura:attribute name="isLoading" type="Boolean" default="false" />
     <aura:attribute name="usarComponente" type="Boolean" default="false" />
-    <aura:attribute name="modalAdjuntar" type="Boolean" default="false" />
-    <aura:attribute name="stringRed" type="String" default="ResolucionRedaccion" />
-    <aura:attribute name="checkBoton" type="Boolean" default="false" />
-    <aura:attribute name="listaIds" type="String[]" />
-    <aura:attribute name="nombrePDF" type="String" />
     <aura:attribute name="documentoResolucion" type="ContentDocumentLink" />
-    <aura:attribute name="selectedContentVersionId" type="Id" />
     <aura:attribute name="contentVersions" type="List" />
     <aura:attribute name="columns" type="List" />
     <aura:attribute name="hayDocs" type="Boolean" default="false" />
     <aura:attribute name="tieneDocGuardado" type="Boolean" default="false" />
-    <aura:attribute name="carpetaRaiz" type="String" default="SAC_InadmisionPrestamos" />
-    <aura:registerEvent name="appEvent" type="c:SAC_PertimiteEmailRedaccion"/>
     <aura:attribute name="caso" type="Case" />
     <aura:attribute name="motivo" type="String" />
     

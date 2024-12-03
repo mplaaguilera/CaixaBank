@@ -6,11 +6,13 @@ import getRecordType            from '@salesforce/apex/AV_TabManagementTask_Cont
 import getShowAssignPurse       from '@salesforce/apex/AV_TabManagementTask_Controller.showAssignPurse';
 import isBankTeller from '@salesforce/apex/AV_AppUtilities.isBankTeller';
 import AV_CMP_ErrorMessage 		from '@salesforce/label/c.AV_CMP_ErrorMessage';
-import hasCustomPermission from '@salesforce/customPermission/AV_ReportClienteCP';
+import oldReports from '@salesforce/customPermission/AV_OldReports';
+import getName      from '@salesforce/apex/AV_Header_Controller.getAccountInfo';
 
 export default class AV_TaskTabs extends NavigationMixin(LightningElement) {
 	@api active;
 	@api recid;
+	@api recordId;
 	@track progressValue;
 	@track showDetail=true;
 	@track fecha;
@@ -19,7 +21,12 @@ export default class AV_TaskTabs extends NavigationMixin(LightningElement) {
 	@track disableBtn = false;
 	@track showAssignPurse = false;
 	showSpinner=false;
-	isCustomPermission = hasCustomPermission;
+	showOldReports = oldReports;
+	@track name;
+	@track recordType;
+	@track isIntouch;
+    @track account;
+	nameRecord;
 
 	// controls the visibility of closeTaskAndOppTab tab if current page is experiencia cliente
 	isExperiencia = false;
@@ -68,6 +75,24 @@ export default class AV_TaskTabs extends NavigationMixin(LightningElement) {
 		this.fecha=today.toISOString().substring(0,10);
 		this.getRecordType();
 		this.disableTabs();
+		this.getNameData();	
+	}
+
+	getNameData(){
+        getName({recordId:this.recid})
+            .then(data => {
+                if (data) {
+					this.name = data.accountName;
+                    this.recordType = data.rtDevName;
+                    this.isIntouch = data.isIntouch;
+                    this.nameRecord = data.nameRecord;
+                    this.account = data.accountId;
+                } else if (error) {
+                    console.log(error);
+                }
+            }).catch(error => {
+                console.log(error);
+            })
 	}
 
 	getRecordType() {
@@ -110,7 +135,7 @@ export default class AV_TaskTabs extends NavigationMixin(LightningElement) {
 				if(tarea.ActivityDate < this.fecha || tarea.Status == 'Gestionada positiva'){
 					this.disableBtn = true;
 				}
-				if(tarea.Status == 'Gestionada positiva')  {
+				if(tarea.Status == 'Gestionada positiva') { 
 					this.getAssignPurse();
 				}
 			} else if (this.recordType == 'AV_MorosidadNormativa') {
@@ -193,16 +218,22 @@ export default class AV_TaskTabs extends NavigationMixin(LightningElement) {
 				//Name of any CustomTab. Visualforce tabviweb tabs, Lightning Pages, and Lightning Component tabs
 				apiName: 'AV_TaskReportParentTab'
 			},state: {
-				c__recId: this.recid
+				c__recId: this.recid,
+				c__id:this.name,
+				c__rt:this.recordType,
+				c__intouch:this.isIntouch,
+				c__account:this.account
 			}
+			
 		});
 	}
 
 	disableTabs() {
 		isBankTeller()
 			.then((result) => {
-				if (result) {
-					this.preventClick = true};
+				if (result){
+					this.preventClick = true;
+				} 
 			})
 			.catch((error) => {
 				console.error('Disable tabs error', JSON.stringify(error));

@@ -16,12 +16,14 @@ import NAME_FIELD from '@salesforce/schema/User.Name';
 import FUNCTION from '@salesforce/schema/User.AV_Funcion__c';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
 import BPRPS from '@salesforce/customPermission/AV_PrivateBanking';
+import enanchedGetUserInfo from '@salesforce/apex/AV_OppSearch_Controller.enanchedGetUserInfo';
+import AV_NotAssigned from '@salesforce/label/c.AV_NotAssigned';
 
 
 const columnsTask = [
-	{ label: 'Cliente', fieldName: 'AccountNameURL', type: 'url', typeAttributes: { label: { fieldName: 'AccountName' } }, hideDefaultActions: true, wrapText: true, sortable: true, sortBy: 'AccountName' },
+	{ label: 'Cliente', fieldName: 'AccountNameURL', type: 'url', typeAttributes: { label: { fieldName: 'AccountName' }, tooltip:{fieldName: 'AccountName'} }, hideDefaultActions: true, wrapText: true, sortable: true, sortBy: 'AccountName' },
 	{ label: 'Origen', fieldName: 'AV_Origen__c', type: 'text', hideDefaultActions: true, sortable: true, sortBy: 'AV_Origen__c' },
-	{ label: 'Asunto', fieldName: 'SubjectURL', type: 'url', typeAttributes: { label: { fieldName: 'Subject' } }, hideDefaultActions: true, sortable: true, sortBy: 'Subject' },
+	{ label: 'Asunto', fieldName: 'SubjectURL', type: 'url', typeAttributes: { label: { fieldName: 'Subject' },tooltip:{fieldName: 'Subject'} }, hideDefaultActions: true, sortable: true, sortBy: 'Subject' },
 	{ label: 'Estado', fieldName: 'Status', hideDefaultActions: true, sortable: true, sortBy: 'Status' },
 	{ label: 'Prioridad', fieldName: 'Priority', type: 'text', hideDefaultActions: true, sortable: true, sortBy: 'Priority' },
 	{ label: 'Edad', fieldName: 'Av_Age__c', type: 'number', typeAttributes: { label: { fieldName: 'AccountAv_Age' } }, hideDefaultActions: true, sortable: true, sortBy: 'Av_Age__c' },
@@ -32,9 +34,7 @@ const columnsTask = [
 	{ label: 'My Box', fieldName: 'AV_MyBox__c', type: 'picklist', hideDefaultActions: true, sortable: true, sortBy: 'AV_MyBox__c' },//FORMULA
 	{ label: 'Target Auto', fieldName: 'AV_TargetAuto__c', type: 'picklist', hideDefaultActions: true, sortable: true, sortBy: 'AV_TargetAuto__c' },//FORMULA
 	{ label: 'Fecha vencimiento', fieldName: 'ActivityDate', type: "date-local", typeAttributes: { month: "2-digit", day: "2-digit" }, hideDefaultActions: true, sortable: true, sortBy: 'ActivityDate' },
-	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url', typeAttributes: { label: { fieldName: 'OwnerName' } }, hideDefaultActions: true, wrapText: true, sortable: true, sortBy: 'AV_MyBox__c' },
-	
-	
+	{ label: 'Empleado asignado', fieldName: 'OwnerNameURL', type: 'url', typeAttributes: { label: { fieldName: 'OwnerName' }, tooltip:{fieldName: 'OwnerName'} }, hideDefaultActions: true, wrapText: true, sortable: true, sortBy: 'AV_MyBox__c' }
 ];
 const bprcolsgrp = { label: 'Grupo', fieldName: 'grupo', type:'picklist', sortable: true, sortBy:'grupo'};
 const bprcolinter = { label: 'Interlocutor', fieldName: 'interlocName', type: 'text', sortable: true, sortBy:'interlocName'};
@@ -128,6 +128,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 	@track isMultipagina = true;
 	@track isMultiEntry2 = false;
 	@track filterProduct;
+	@track multigestor;
 	directores = ['DC', 'DT', 'DAN', 'SSCC'];
 
 	buttonDisabled;
@@ -136,22 +137,23 @@ export default class Av_MassReassignOwner extends LightningElement {
 	employeesDiv = true;
 	isDirector;
 	numOficinaEmpresa;
+	notAssigned = AV_NotAssigned;
 
 	
 
 	@wire(getRecord, { recordId: USER_ID, fields: [NAME_FIELD, FUNCTION, OFICINA] })
 	wiredUser({ error, data }) {
 		if (data) {
+			
 			this.empleFuncion = data.fields.AV_Funcion__c.value;
 			this.empleName = data.fields.Name.value;
 			this.empleOfi = data.fields.AV_NumeroOficinaEmpresa__c.value === null ? '': data.fields.AV_NumeroOficinaEmpresa__c.value;
 			this.isDirector = this.directores.includes(this.empleFuncion);
-			// if (!this.isDirector) {
 			this.selectedEmployees = [{ label: this.empleName, id: USER_ID, bucleId: this.multiSelectionE }];
 			this.employeeFilter = USER_ID;
 			this.getOptionsOffice();
 			this.setButtonVisibility();
-			// }
+		
 		} else if (error) {
 			console.log(error)
 		}
@@ -159,6 +161,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 	connectedCallback() {
 		this.showDetail = true;
 		this.columns = columnsTask;
+		this.getUserInfo();
 	}
 
 	get optionsTaskStatus() {
@@ -175,7 +178,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 	get optionsTaskOrigen() {
 		let withoutManager;
 		for (let i = 0; i < this.selectedEmployees.length; i++) {
-			if ((this.selectedEmployees[i].label).includes('Sin Gestor')) {
+			if ((this.selectedEmployees[i].label).includes(AV_NotAssigned)) {
 				withoutManager = true;
 			}
 		}
@@ -217,6 +220,20 @@ export default class Av_MassReassignOwner extends LightningElement {
 		];
 	}
 
+	getUserInfo(){
+		enanchedGetUserInfo({userId:USER_ID})
+		.then(data => {
+			if(data){
+				this.multigestor = data.multigestor;
+		}else if(error){
+			console.log(error);
+		}}).catch(error => {
+			console.error(error);
+		})
+	}
+
+
+
 	getOptionsEmployee(data) {
 		getEmployees({ oficina: data }).then(result => {
 			if (result != null && result.length > 0) {
@@ -225,7 +242,6 @@ export default class Av_MassReassignOwner extends LightningElement {
 					this.labelUserId = result.label;
 				}
 				if (!this.isAnotherOffice) {
-					// if (!this.isAnotherOffice && this.isDirector) {
 					if (!JSON.stringify(this.optionsEmployee).includes(USER_ID)) {
 						this.optionsEmployee.push({ value: USER_ID, label: this.empleName });
 					}
@@ -238,7 +254,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 						this.employeeDisabled = true;
 					}
 					for (let i = 0; i < this.optionsEmployee.length; i++) {
-						if ((this.optionsEmployee[i].label).includes('Sin Gestor')) {
+						if ((this.optionsEmployee[i].label).includes(AV_NotAssigned)) {
 							this.employeeFilter = this.optionsEmployee[i].value;
 							this.selectedEmployees.splice(0, 2);
 							this.selectedEmployees.push({ label: this.optionsEmployee[i].label, id: this.optionsEmployee[i].value, bucleId: this.multiSelectionE });
@@ -249,7 +265,11 @@ export default class Av_MassReassignOwner extends LightningElement {
 				} else {
 					if (this.isAnotherOffice === false) {
 						this.employeeFilter = this.employeeDefault;
-						this.selectedEmployees = [{ label: this.empleName, id: this.employeeDefault, bucleId: this.multiSelectionE }];
+						if(this.multigestor != undefined && this.multigestor != null){
+							this.selectedEmployees = [{label: this.empleName, id: this.employeeDefault, bucleId: this.multiSelectionE},{label:'Banca de Particulares',id:this.multigestor.Id,bucleId:++this.multiSelectionE}];
+						}else{
+							this.selectedEmployees = [{label: this.empleName, id: this.employeeDefault, bucleId: this.multiSelectionE}];
+						}
 						this.setButtonVisibility();
 					}
 				}
@@ -534,7 +554,7 @@ export default class Av_MassReassignOwner extends LightningElement {
 		if(this.defaultOrigen == 'notAssigned'){
 			this.selectedEmployees = [];
 			for (let i = 0; i < this.optionsEmployee.length; i++) {
-				if ((this.optionsEmployee[i].label).includes('Sin Gestor')) {
+				if ((this.optionsEmployee[i].label).includes(AV_NotAssigned)) {
 					this.employeeFilter = this.optionsEmployee[i].value;
 					this.selectedEmployees.push({ label: this.optionsEmployee[i].label, id: this.optionsEmployee[i].value, bucleId: this.multiSelectionE });
 				}
@@ -661,7 +681,6 @@ export default class Av_MassReassignOwner extends LightningElement {
 				this.employeeFilter = null;
 			}
 		}
-		//this.optionsTaskOrigen;
 		this.setButtonVisibility();
 	}
 

@@ -1,0 +1,76 @@
+.main-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.action-button-container {
+    margin-top: 2em;
+    margin-right: 12em;
+    display: flex;
+    justify-content: flex-end
+}
+
+lightning-button {
+    padding: 0.5em;
+}
+
+.info-docs-title {
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+    font-size: larger;
+    font-weight: 600;
+    margin-left: 15.5em;
+}
+
+.data-table-style {
+    width: 80%;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.container-data-table {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.input-container {
+    display: flex;
+}
+
+.button-margin {
+    margin-top: 20px;
+}
+
+.input-container lightning-input,
+.input-container lightning-button {
+    padding: 1em;
+}
+
+.second-table {
+    flex-direction: column;
+    align-items: center;
+}
+
+.data-info-style {
+    width: 40%;
+    margin-left: 30%;
+    margin-top: 4em;
+    margin-bottom: 4em;
+}
+
+.container-third-data-table {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-third-data-table div {
+    width: 60%;
+    margin-top: 4em;
+    margin-bottom: 4em;
+}

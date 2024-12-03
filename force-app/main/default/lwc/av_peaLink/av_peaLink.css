@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.label {
+    padding-left: var(--lwc-spacingSmall, 0.75rem);
+    margin-right: 160px; 
+    white-space: nowrap;
+}
+
+.combobox {
+    flex-shrink: 0; 
+    width: 600px; 
+    max-width: 100%; 
+}

@@ -63,7 +63,13 @@ export default class SAC_SeccionesInfoCualitativa extends LightningElement {
             );          
             refreshApex(this.mapaSecciones);
         }).catch(error =>{
-            console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         })
     } 
+
+    mostrarToast(tipo, titulo, mensaje) {
+		this.dispatchEvent(new ShowToastEvent({
+			variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000
+		}));
+	}
 }

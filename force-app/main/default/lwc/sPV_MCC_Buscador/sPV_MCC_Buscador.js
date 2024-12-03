@@ -67,6 +67,8 @@ export default class SPV_MCC_Buscador extends LightningElement {
             compruebaPermisoSPV({'caseId': this.recordId, 'idUsuario': this.userId}).then(result => {
                 if(result){
                     this.esPropietario = result;
+                    console.log('esProp' + this.esPropietario);
+                    console.log('status ' + this.status);
                     if(!this.esPropietario || this.status == 'Cerrado'){
                         this.puedeGuardar = false;
 

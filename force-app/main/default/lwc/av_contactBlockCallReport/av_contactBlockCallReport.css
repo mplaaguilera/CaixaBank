@@ -1,0 +1,48 @@
+/* .slds-form-element__control .slds-radio.horizontal {
+    display: inline-block !important;
+} */
+
+.card-title{
+    font-weight: bold;
+    font-size: 1em;
+}
+.card-title-icon{
+    margin-left: 0.3rem;
+}
+.slds-card{
+    /* margin-right: 200px; */
+}
+
+.estrecho{
+    height: 33px !important;
+}
+
+/* .slds-tabs_default__content.slds-is-active {
+    border-bottom-width: 150px;
+    
+} */
+.infoPills:first{
+    margin-left: 0;
+    margin-right: 1rem;
+}
+.fields{
+    margin-bottom: 2rem;
+}
+.fields div{
+    margin: 0 1rem;
+    width: 100%;
+}
+
+.fields div:first{
+    
+    margin-left: 0;
+    margin-right: 1rem;
+    width: 100%;
+}
+.masterDiv{
+    padding:2rem;
+}
+
+.checkInputs{
+    padding-top:1.75rem;
+}

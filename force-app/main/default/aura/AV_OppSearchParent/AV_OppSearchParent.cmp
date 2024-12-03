@@ -1,0 +1,10 @@
+<aura:component implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,force:hasSObjectName" access="global">
+    <lightning:workspaceAPI aura:id="workspaceCmp" />
+    <aura:attribute name="origenTab" type="String" />
+    <aura:attribute name="reportTab" type="String" />
+    <aura:attribute name="id" type="String" />
+    <aura:attribute name="origenTabUrl" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <c:av_OppSearch onclosetab="{!c.closeFocusedTab}" onrefreshtaboppsearch="{!c.refreshFocusedTab}" onrenametab="{!c.doInit}" onfocustab="{!c.focusedTab}" accountid="{!v.c__recId}" onfocusrecordtab = "{!c.focusRecordTab}" onfocusrecordtabandclose = "{!c.closeFocusedTabAndClose}"></c:av_OppSearch>
+</aura:component>

@@ -1,5 +1,6 @@
 import { LightningElement, wire, api, track } from 'lwc';
 import { getRecord } from 'lightning/uiRecordApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getResultados from '@salesforce/apex/SAC_LCMP_BuscadorTopic.getResultados';
 import setTopicACase from '@salesforce/apex/SAC_LCMP_BuscadorTopic.setTopicACase';
 import cargarDatos from '@salesforce/apex/SAC_LCMP_BuscadorTopic.cargarDatos';
@@ -131,7 +132,7 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
             this.enteredValue = '';
             refreshApex(this._wiredResult);
         }).catch(error =>{
-            console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         })
     }
 
@@ -149,7 +150,7 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
                         this.enteredValue = '';
                         refreshApex(this._wiredResult);
                     }).catch(error =>{
-                        console.log(error);
+                        this.mostrarToast('error', 'ERROR', JSON.stringify(error));
                     })    
                 }                
             }).catch(error =>{
@@ -191,7 +192,7 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
             this.listadoTopics = [...itempill];
             refreshApex(this._wiredResult);
         }).catch(error=>{
-            console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         })   
     }
 
@@ -225,4 +226,10 @@ export default class SAC_BuscadorTopic extends NavigationMixin(LightningElement)
         this.borrarTopic = false;
         this.nuevoTopic = false;
     }
+
+    mostrarToast(tipo, titulo, mensaje) {
+		this.dispatchEvent(new ShowToastEvent({
+			variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000
+		}));
+	}
 }

@@ -33,14 +33,14 @@
             </div> </br>
             <div class=" slds-text-align_right slds-m-top_xx-small">
                 <lightning-button-group>
-                    <!--<lightning-button-icon icon-name="utility:arrow_left" size="small" onclick={first}></lightning-button-icon>-->
+                    <!-- <lightning-button-icon icon-name="utility:arrow_left" size="small" onclick={first}></lightning-button-icon> -->
                     <lightning-button-icon icon-name="utility:left" size="small" onclick={previousHandler} disabled={getHasPrevius}></lightning-button-icon>
                     <lightning-button-icon icon-name="utility:right" size="small" onclick={nextHandler} disabled={getHasNext}></lightning-button-icon>
-                    <!--<lightning-button-icon icon-name="utility:arrow_right" size="small" onclick={last}></lightning-button-icon>-->
+                    <!-- <lightning-button-icon icon-name="utility:arrow_right" size="small" onclick={last}></lightning-button-icon> -->
                 </lightning-button-group>
-                <!--<div class="slds-m-top_xxx-small">
-                    ({getPageNumber} / {getTotalPageNumber})
-                </div>-->
+                <div class="slds-m-top_xxx-small">
+                    ({labels.pagina} {actualPagina})
+                </div>
             </div>
             <template if:true={isShowSpinner}> 
                 <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>

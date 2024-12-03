@@ -10,9 +10,11 @@ import USER_ID from '@salesforce/user/Id';
 import NAME_FIELD from'@salesforce/schema/User.Name';
 import FUNCTION from '@salesforce/schema/User.AV_Funcion__c';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
+import POOL from '@salesforce/schema/User.AV_Pool__c';
+import enanchedGetUserInfo from '@salesforce/apex/AV_OppSearch_Controller.enanchedGetUserInfo';
 
 const columnsCli = [
-    { label: 'Nombre Cliente', fieldName: 'nameUrl', type: "url", typeAttributes:{ label: { fieldName: 'name' } }, hideDefaultActions: true, wrapText:true , sortable: true, sortBy:'name'},
+    { label: 'Nombre Cliente', fieldName: 'nameUrl', type: "url", typeAttributes:{ label: { fieldName: 'name' }, tooltip:{fieldName: 'name'} }, hideDefaultActions: true, wrapText:true , sortable: true, sortBy:'name'},
     { label: 'Cesta/Cartera', fieldName: 'carteraName', type: 'text', sortable: true, sortBy:'carteraName' },
     { label: 'Modelo de atención', fieldName: 'modelo', type: 'text', sortable: true, sortBy:'modelo' },
     { label: 'NIF', fieldName: 'nif', type: 'text' , sortable: true, sortBy:'nif'},
@@ -24,7 +26,7 @@ const columnsCli = [
     { label: 'Negocio', fieldName: 'negocio', type: 'text', sortable: true, sortBy:'negocio'},
     { label: 'Vinculación', fieldName: 'vinculacion', type: 'text', sortable: true, sortBy:'vinculacion' },
     { label: 'Experiencia de Cliente', fieldName: 'experiencia', type: 'text', sortable: true, sortBy:'experiencia' },
-    { label: 'EAP/Gestor', fieldName: 'gestorUrl', type: "url", typeAttributes:{ label: { fieldName: 'gestorName' } }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'gestorName' },
+    { label: 'Empleado', fieldName: 'gestorUrl', type: "url", typeAttributes:{ label: { fieldName: 'gestorName' }, tooltip:{fieldName: 'gestorName'} }, hideDefaultActions: true, wrapText:true, sortable: true, sortBy:'gestorName' },
     { label: 'Oficina principal', fieldName: 'office', type: 'text', sortable: true, sortBy:'office' },
     { label: 'My Box', fieldName: 'myBox', type: 'picklist', sortable: true, sortBy:'myBox'},
     { label: 'Preconcedido', fieldName: 'preconceived', hideDefaultActions: true, sortable: true, sortBy:'preconceived', type: 'currency', typeAttributes: { currencyCode: 'EUR', maximumSignificantDigits: '20' }},
@@ -79,6 +81,7 @@ export default class Av_BuscadorClientes extends LightningElement {
 	preconceivedFilter = null;
 	targetAutoFilter = null;
 	numOficinaEmpresa = null;
+	multigestorId;
 
 	@track employeeFilter;
 	@track filterList;
@@ -121,19 +124,18 @@ export default class Av_BuscadorClientes extends LightningElement {
 	@track placeHolder;
     @track emptyBook;
 
-	@wire(getRecord,{recordId:USER_ID,fields:[NAME_FIELD,FUNCTION,OFICINA]})
+	@wire(getRecord,{recordId:USER_ID,fields:[NAME_FIELD,FUNCTION,OFICINA,POOL]})
 	wiredUser({error,data}){
 		if(data){
 			this.empleFuncion=data.fields.AV_Funcion__c.value;
 			this.empleName=data.fields.Name.value;
 			this.empleOfi = data.fields.AV_NumeroOficinaEmpresa__c.value === null ? '': data.fields.AV_NumeroOficinaEmpresa__c.value;
 			this.isDirector = this.directores.includes(this.empleFuncion);
-			//if (!this.isDirector) {
-				this.selectedEmployees = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
-				this.getOptionsOffice();
-				this.employeeFilter = USER_ID;
-				this.setButtonVisibility();
-			//}
+			this.selectedEmployees = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
+			this.getOptionsOffice();
+			this.employeeFilter = USER_ID;
+			this.setButtonVisibility();
+			
 		}else if(error){
 			console.log(error)
 		}
@@ -307,7 +309,6 @@ export default class Av_BuscadorClientes extends LightningElement {
 					for (var i = 0; i < rows.length; i++) {
 						var row = rows[i];
 						row.carteraName = row.cartera != null ? row.cartera.AV_Cartera__r.AV_ExternalID__c : null;
-						//row.carteraUrl = '/' + row.cartera.AV_Cartera__c;
 						row.modelo = row.modelo;
 						row.name = row.name;
 						row.nameUrl = '/' + row.id;
@@ -443,15 +444,48 @@ export default class Av_BuscadorClientes extends LightningElement {
 			this.dispatchEvent(toastEvent);
 		}
 	}
-	
+
 	handleSearchData() {
 		this.page = 1;
 		this.size = 0;
 		this.firstSearch = true;
 		this.data = null;
 		this.setMultiSelectors();
-		this.getDataList(this.numOficinaEmpresa, this.negocioFilter, this.employeeFilter, this.carteraFilter, this.modeloFilter, this.edadMinFilter, this.edadMaxFilter, this.ingresosMinFilter, this.ingresosMaxFilter, this.ahorroMinFilter, this.ahorroMaxFilter, this.financiacionMinFilter, this.financiacionMaxFilter, this.rentabilidadMinFilter, this.rentabilidadMaxFilter, this.experienciaFilter, this.myBoxFilter, this.preconMinFilter, this.preconMaxFilter, this.targetAutoFilter, this.page);
-		this.toggleSpinner();
+	
+		enanchedGetUserInfo({ userId: USER_ID })
+			.then(response => {
+				const gestor = response.gestor;
+				const hasPool = gestor.AV_Pool__c;
+				let searchEmployeeFilter = []; 
+
+				this.multigestorId = response.multigestor ? response.multigestor.Id : null;
+		
+				if (!this.isEmployeeSelectedManually) {
+					if (hasPool) {
+						searchEmployeeFilter = [gestor.Id];
+						if (response.multigestor) {
+							searchEmployeeFilter.push(this.multigestorId);
+						}
+					} else {
+						searchEmployeeFilter = [this.employeeFilter];
+					}
+				} else {
+					searchEmployeeFilter = [this.employeeFilter];
+					if (this.employeeFilter === USER_ID && hasPool) {
+						searchEmployeeFilter = [gestor.Id];
+						if (response.multigestor) {
+							searchEmployeeFilter.push(this.multigestorId);
+						}
+					}
+				}
+			
+				this.getDataList(this.numOficinaEmpresa, this.negocioFilter, searchEmployeeFilter, this.carteraFilter, this.modeloFilter, this.edadMinFilter, this.edadMaxFilter, this.ingresosMinFilter, this.ingresosMaxFilter, this.ahorroMinFilter, this.ahorroMaxFilter, this.financiacionMinFilter, this.financiacionMaxFilter, this.rentabilidadMinFilter, this.rentabilidadMaxFilter, this.experienciaFilter, this.myBoxFilter, this.preconMinFilter, this.preconMaxFilter, this.targetAutoFilter, this.page);
+				this.toggleSpinner();
+			})
+			.catch(error => {
+				console.error('Error al obtener información del usuario: ', error);
+				this.toggleSpinner();
+			});
 	}
 
 	toggleSpinner() {
@@ -538,7 +572,7 @@ export default class Av_BuscadorClientes extends LightningElement {
 	handleChangeEmployee(event) {
 		this.multiSelectionE++;
 		this.employeeFilter = event.target.value;
-		// this.employeMultiFilter = [this.employeeFilter];
+		this.isEmployeeSelectedManually = true;
 		this.getOptionsBooks(this.employeeFilter)
 		let employeeName = '';
 		for(let i=0;i<this.optionsEmployee.length;i++){
@@ -569,6 +603,7 @@ export default class Av_BuscadorClientes extends LightningElement {
 			this.selectedEmployees = []; //si se quita esto la multiseleccion vuelve a funcionar
 			this.selectedEmployees.push({label:employeeName,id:event.target.value,bucleId:this.multiSelectionE});
 		}
+	
 		this.employeesDiv = true;
 		this.setButtonVisibility();
 	}
@@ -613,6 +648,7 @@ export default class Av_BuscadorClientes extends LightningElement {
 		this.employeMultiFilter = [];
 		this.productsMultiFilter = [];
 		this.selectedEmployees.forEach(emp => {
+
 			if (!this.employeMultiFilter.includes(emp.id)) {
 				if (emp.label.includes('TODOS')) {
 					emp.id.split(',').forEach(id => {
@@ -700,8 +736,6 @@ export default class Av_BuscadorClientes extends LightningElement {
 			if (this.page*100 > this.data.length) {
 				this.setMultiSelectors();
 				this.getDataList(this.numOficinaEmpresa, this.negocioFilter, this.employeeFilter, this.carteraFilter, this.modeloFilter, this.edadMinFilter, this.edadMaxFilter, this.ingresosMinFilter, this.ingresosMaxFilter, this.ahorroMinFilter, this.ahorroMaxFilter, this.financiacionMinFilter, this.financiacionMaxFilter, this.rentabilidadMinFilter, this.rentabilidadMaxFilter, this.experienciaFilter, this.myBoxFilter, this.preconMinFilter, this.preconMaxFilter, this.targetAutoFilter, this.page);
-				//this.firstSearch = false;
-				//this.data = null;
 				this.toggleSpinner();
 			}
 			this.toggleSpinner();

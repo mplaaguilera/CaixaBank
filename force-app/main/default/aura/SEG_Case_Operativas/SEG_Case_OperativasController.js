@@ -685,7 +685,18 @@
 						//{label: 'ID', fieldName: 'Id', type: 'text'},
 						{label: 'Nombre', fieldName: 'Title', type: 'text'},
 						{label: 'Extensión', fieldName: 'FileExtension', type: 'text'},
-						{label: 'Descripción', fieldName: 'Description', type: 'text'}
+						{label: 'Descripción', fieldName: 'Description', type: 'text'},
+						{label: 'Fecha de subida', fieldName: 'CreatedDate', type: "date", typeAttributes:{
+							month: 'numeric',
+							day: 'numeric',
+							year: 'numeric',
+							hour:'2-digit' ,
+							minute:'2-digit',
+							second: '2-digit',
+							timeZone:'Europe/Paris'
+						  }
+						}
+						
 					]);
 					//eslint-disable-next-line @lwc/lwc/no-async-operation
 					window.setTimeout($A.getCallback(() => component.find('modalAORBotonCancelar').focus()), 200);
@@ -1436,6 +1447,7 @@
 	},
 
 	modalAORCerrar: function(component) {
+		component.set('v.spinner', false);
 		$A.util.removeClass(component.find('backdrop'), 'slds-fade-in-open');
 		$A.util.removeClass(component.find('modalAOR'), 'slds-fade-in-open');
 		if (component.get('v.caso.SEG_Identificador_AOR__c')) {
@@ -2031,6 +2043,8 @@
 	},
 
 	enviarAOR: function(component) {
+		//Spinner
+		component.set('v.spinner', true);
 		if (component.get('v.caso.SEG_Identificador_AOR__c')) {
 			component.find('modalAORBotonIniciarRitm').set('v.disabled', true);
 		} else {
@@ -2072,6 +2086,8 @@
 				component.find('tablaanexosAOR').set('v.currentSelectedRowsAnexos', []);
 				component.find('tipologiaN1').set('v.value', 'Seleccione un valor...');
 				component.find('tipologiaN2').set('v.value', 'Seleccione un valor...');
+				component.set('v.spinner', false);
+
 			});
 			$A.enqueueAction(envioAOR);
 		}

@@ -40,7 +40,7 @@
                                     <lightning-combobox style="padding:0px 4px 6px 4px" name="Interviniente" label="Interviniente" placeholder="--None--" value={interviniente} options={optionsInterviniente} onchange={changeInterviniente}  disabled={disableInterviniente} required="true"></lightning-combobox>
                                 </template>
                                 <template if:true={mostrarContacto}>
-                                    <lightning-combobox style="padding:0px 4px 6px 4px" name="Contacto" label="Contato - Cargo" placeholder="--None--" value={contacto} options={optionsContacto} onchange={changeContacto}  disabled={disableContacto} required="true"></lightning-combobox>
+                                    <lightning-combobox style="padding:0px 4px 6px 4px" name="Contacto" label="Contacto - Cargo" placeholder="--None--" value={contacto} options={optionsContacto} onchange={changeContacto}  disabled={disableContacto} required="true"></lightning-combobox>
                                 </template>
                                 <lightning-combobox style="padding:0px 4px 6px 4px"  name="Resultado" label="Resultado" placeholder="--None--" value={valueResultado} options={optionsResultado} onchange={changeResultado} disabled={disableResultado} > </lightning-combobox>
                                 <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentarios} onchange={changeComentarios} disabled={disableComentario}> </lightning-input-field>

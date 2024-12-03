@@ -5,7 +5,7 @@
             var focusedTabId = response.tabId;
             workspaceAPI.setTabLabel({
                 tabId: focusedTabId,
-                label: $A.get("$Label.c.CIBE_ComiteDirector")
+                label: $A.get("$Label.c.CIBE_ComiteDirector") + ' CIB'
             });
             workspaceAPI.setTabIcon({
                 tabId: focusedTabId,

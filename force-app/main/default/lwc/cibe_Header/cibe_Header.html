@@ -1,5 +1,4 @@
 <template>
-    
     <article class="slds-card">
         <template if:true={showHeader}>
             <div class="slds-page-header slds-page-header_record-home">
@@ -29,11 +28,13 @@
                                 </div>
                             </div>
                             <div class="slds-no-flex">
-                                <lightning-button-group>
-                                    <template for:each={actions} for:item="action">
-                                        <lightning-button key={action.name} class="slds-button_neutral" label={action.label} data-label={action.label} data-flow={action.name} data-output={action.output} onclick={fireFlowAction}></lightning-button>
-                                    </template>
-                                </lightning-button-group>
+                                <template if:true={name}>
+                                    <lightning-button-group>
+                                        <template for:each={actions} for:item="action">
+                                            <lightning-button key={action.name} class="slds-button_neutral" label={action.label} data-label={action.label} data-flow={action.name} data-type={action.type} data-output={action.output} onclick={fireFlowAction}></lightning-button>
+                                        </template>
+                                    </lightning-button-group>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -52,7 +53,6 @@
                                         
                                     </li>
                                 </template>
-
                                 <template if:true={field.isCustomField}>
                                     <li class="slds-m-left_x-small slds-m-vertical_x-small" key={field.name} data-id={field.name} >
                                         <lightning-output-field class="slds-float_left slds-has-left-magnet" field-name={field.name}></lightning-output-field>
@@ -69,7 +69,6 @@
             </template>
         </template>
     </article>
-
     <template if:true={isShowFlowAction}>
         <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
             <div class="slds-modal__container">

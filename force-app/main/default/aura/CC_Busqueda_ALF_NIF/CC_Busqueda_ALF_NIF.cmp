@@ -20,6 +20,8 @@
     <aura:attribute name="bMostrarRepresentantesPersonaJuridica" type="Boolean" default="false" />
     <aura:attribute name="bEsperaALF" type="Boolean" default="false" />
     <aura:attribute name="bEsperaSFDC" type="Boolean" default="false" />
+    <aura:attribute name="bInfo" type="Boolean" default="false" />
+    <aura:attribute name="sMensInfo" type="String" />
     <aura:attribute name="oportunidad" type="Object" />
     <aura:attribute name="caso" type="Case" />
     <aura:attribute name="errorLds" type="String" />
@@ -43,56 +45,87 @@
     </aura:if>
 
     <!--UI-->
+    <!--Card-->
     <article class="slds-card">
 
         <!--Spinners-->
         <aura:if isTrue="{!v.bEsperaALF}">
-            <div aura:id="spinnerALF" class="spinnerALF">
+            <div class="spinnerALF">
                 <lightning:spinner variant="brand" size="medium" alternativeText="Esperando la respuesta de Alfabético..." />
             </div>
         </aura:if>
         <aura:if isTrue="{!v.bEsperaSFDC}">
-            <div aura:id="spinnerSFDC" class="spinnerSFDC">
+            <div class="spinnerSFDC">
                 <lightning:spinner size="medium" alternativeText="Actualizando información..." />
             </div>
         </aura:if>
 
-        <div class="slds-card__header slds-grid slds-page-header" style="border-bottom: 1px solid #e3e3e3; border-radius: 4px 4px 0px 0px; padding-top: 6px; padding-bottom: 6px;">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid slds-var-p-top_x-small slds-var-m-bottom_x-small">
             <header class="slds-media slds-media_center slds-has-flexi-truncate">
                 <div class="slds-media__figure">
-                    <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta"/>
+                    <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta" />
                 </div>
-                <aura:if isTrue="{!v.sObjectName == 'Opportunity'}">
-                    <div class="slds-media__body slds-card__header-title" style="font-size: 14px;">Identificar cliente</div>
-                    <aura:set attribute="else">
-                        <div class="slds-media__body slds-card__header-title" style="font-size: 16px;">Identificar cliente</div>
-                    </aura:set>
-                </aura:if>
-                <aura:if isTrue="{!v.sObjectName != 'Opportunity'}">
-                    <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacion}" disabled="{! v.identificacionPrevia || v.llamadaFinalizada}"/>
-                    <aura:set attribute="else">
-                        <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacionCliente}" disabled="{!v.oportunidad.CSBD_No_Identificado__c}"/>
-                    </aura:set>
-                </aura:if>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Identificar Cliente</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                    <aura:if isTrue="{!v.sObjectName != 'Opportunity'}">
+                        <!-- <lightning:button
+                            label="No se identifica"
+                            variant="{!v.caso.CC_No_Identificado__c ? 'brand' : 'neutral'}"
+                            iconName="{!v.caso.CC_No_Identificado__c ? 'utility:check' : ''}"
+                            onclick="{!c.handleActualizarIdentificacion}"
+                            disabled="{! v.identificacionPrevia || v.llamadaFinalizada}"
+                        /> -->
+                        <lightning:button
+                            label="No se identifica"
+                            onclick="{!c.handleActualizarIdentificacion}"
+                            disabled="{! v.identificacionPrevia || v.llamadaFinalizada}"
+                        />
+                        <aura:set attribute="else">
+                            <!-- <lightning:button
+                                label="No se identifica"
+                                variant="{!v.oportunidad.CSBD_No_Identificado__c ? 'brand' : 'neutral'}"
+                                iconName="{!v.oportunidad.CSBD_No_Identificado__c ? 'utility:check' : ''}"
+                                onclick="{!c.handleActualizarIdentificacionCliente}"
+                                disabled="{!v.oportunidad.CSBD_No_Identificado__c}"
+                            /> -->
+                            <lightning:button
+                                label="No se identifica"
+                                onclick="{!c.handleActualizarIdentificacionCliente}"
+                                disabled="{!v.oportunidad.CSBD_No_Identificado__c}"
+                            />
+                        </aura:set>
+                    </aura:if>
+
+                </div>
             </header>
         </div>
-        <div class="slds-card__body slds-card__body_inner" style="padding: 0;">
-            <div class="slds-card__body slds-card__body_inner slds-var-m-top_x-small slds-var-p-bottom_xx-small">
-                <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-end">
-                    <div class="slds-col" style="width: 211px;"> <!--Tipo de búsqueda-->
-                        <lightning:combobox aura:id="tipoBusqueda" label="Tipo de búsqueda" value="{!v.sTipoBusqueda}" options="{!v.sTipoBusquedaOptions}" />
-                    </div>
-                    <div class="slds-col"> <!--Valor de búsqueda-->
-                        <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
-                            <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda" label="Valor" value="{!v.sBusqueda}" onchange="{!c.handleChange}" spellcheck="false" placeholder="Valor a buscar" />
-                        </span>
-                    </div>
-                    <div class="slds-col slds-grow-none" style="margin-bottom: 2px;"> <!--Botón para iniciar búsqueda-->
-                        <lightning:buttonIcon iconName="utility:search" variant="brand" onclick="{!c.buscarAlfabetico}" title="Buscar en Alfabético" disabled="{!v.sBusqueda == ''}" />
-                    </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner slds-var-m-top_x-small slds-var-p-bottom_xx-small">
+            <div class="slds-grid slds-gutters_direct-xx-small slds-grid_vertical-align-end">
+                <!--Tipo de búsqueda-->
+                <div class="slds-col" style="width: 200px;">
+                    <lightning:combobox aura:id="tipoBusqueda" name="tipoBusqueda" label="Tipo de búsqueda" value="{!v.sTipoBusqueda}" options="{!v.sTipoBusquedaOptions}" />
+                </div>
+                <!--Valor de búsqueda-->
+                <div class="slds-col">
+                    <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
+                        <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda" label="Valor" value="{!v.sBusqueda}" onchange="{!c.handleChange}" spellcheck="false" placeholder="Valor a buscar" />
+                    </span>
+                </div>
+                <!--Botón para iniciar búsqueda-->
+                <div class="slds-col slds-grow-none">
+                    <lightning:buttonIcon iconName="utility:search" variant="brand" onclick="{!c.buscarAlfabetico}" alternativeText="Buscar en Alfabético" disabled="{!v.sBusqueda == ''}" />
                 </div>
             </div>
         </div>
+
+        <!--Pie de la card (resultados)-->
         <footer class="slds-card__footer" style="text-align: left;">
             <!-- Mostrado de Contactos -->
             <aura:renderIf isTrue="{!v.bMostrarContactos}">
@@ -111,7 +144,7 @@
                                     <div class="slds-media__body">
                                         <div>
                                             <h2>
-                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oContacto.idContacto}" aura:id="{!oContacto.idContacto}" title="Ver detalle" onclick="{!c.navegarOrigen}">{!oContacto.nombre}</a>
+                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oContacto.idContacto}" aura:id="{!oContacto.idContacto}" title="Visualizar detalle" onclick="{!c.navegarOrigen}">{!oContacto.nombre}</a>
                                             </h2>
                                         </div>
                                         <div>
@@ -151,7 +184,7 @@
                                     <div class="slds-media__body">
                                         <div>
                                             <h2>
-                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oRepresentante.idRepresentante}" aura:id="{!oRepresentante.idRepresentante}" title="Ver detalle" onclick="{!c.navegarOrigen}">{!oRepresentante.nombre}</a>
+                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oRepresentante.idRepresentante}" aura:id="{!oRepresentante.idRepresentante}" title="Visualizar detalle" onclick="{!c.navegarOrigen}">{!oRepresentante.nombre}</a>
                                             </h2>
                                         </div>
                                         <div>
@@ -194,7 +227,7 @@
                                     <div class="slds-media__body">
                                         <div>
                                             <h2>
-                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oRepresentante.idRepresentante}" aura:id="{!oRepresentante.idRepresentante}" title="Ver detalle" onclick="{!c.navegarOrigen}">{!oRepresentante.nombre}</a>
+                                                <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oRepresentante.idRepresentante}" aura:id="{!oRepresentante.idRepresentante}" title="Visualizar detalle" onclick="{!c.navegarOrigen}">{!oRepresentante.nombre}</a>
                                             </h2>
                                         </div>
                                         <div>
@@ -231,10 +264,10 @@
                                         </span>
                                     </div>
                                     <div class="slds-media__body">
-                                        <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oCuenta.Id}" aura:id="{!oCuenta.Id}" title="Ver detalle" onclick="{!c.navegarOrigen}">{!oCuenta.Name}</a>
+                                        <a href="javascript:void(0)" class="slds-card__header-link slds-truncate" name="{!oCuenta.Id}" aura:id="{!oCuenta.Id}" title="Visualizar detalle" onclick="{!c.navegarOrigen}">{!oCuenta.Name}</a>
                                     </div>
                                     <div class="slds-no-flex">
-                                        <lightning:button label="Asociar" iconName="utility:check" variant="brand" name="{!oCuenta.Id}" onclick="{!c.asociarSoloAcc}" />
+                                        <lightning:button variant="brand" iconName="utility:check" label="Asociar" name="{!oCuenta.Id}" onclick="{!c.asociarSoloAcc}" />
                                     </div>
                                 </header>
                             </div>
@@ -243,11 +276,19 @@
                 </div>
             </aura:renderIf>
 
+            <aura:if isTrue="{!v.bInfo}">
+                <!--Sección de información-->
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding: 3px 0px 3px 0px;">
+                    <lightning:icon iconName="utility:info" size="x-small" variant="success" class="slds-is-relative" style="top: -1px;" />
+                    &nbsp;&nbsp;{!v.sMensInfo}
+                </div>
+            </aura:if>
+
             <aura:if isTrue="{!v.bError}">
                 <!--Sección de error-->
-                <div align="center" class="cc_blink" style="padding: 3px 0px 3px 0px;">
-                    <lightning:icon iconName="utility:warning" size="x-small" class="iconoWarning slds-is-relative slds-var-m-right_small" style="top: -2px;" />
-                    {!v.sMensErr}
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding: 3px 0px 3px 0px;">
+                    <lightning:icon iconName="utility:warning" size="x-small" variant="error" class="slds-is-relative" style="top: -1px;" />
+                    &nbsp;&nbsp;{!v.sMensErr}
                 </div>
             </aura:if>
         </footer>

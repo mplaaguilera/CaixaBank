@@ -6,32 +6,30 @@
   @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 -->
 <template>
-    <lightning-record-edit-form object-api-name="Opportunity" class="recordEditForm"> 
+    <lightning-record-edit-form object-api-name="Opportunity" class="recordEditForm">
         <!-- spinner -->
         <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
-        
+
         <!-- Estados -->
         <lightning-layout class="layout-padding slds-p-horizontal_medium">
             <lightning-layout-item size="12">
                 <label class="slds-form-element__label">{labels.estadoOportunidad}</label>
                 <c-av_-custom-path all-stages={allStages} current-stage='En curso'></c-av_-custom-path>
             </lightning-layout-item>
-        </lightning-layout> 
+        </lightning-layout>
 
         <!-- Cliente -->
         <template if:true={isSinCliente}>
             <div class="slds-grid slds-wrap">
-                <div class="slds-col slds-size_1-of-1 slds-p-horizontal_medium">  
+                <div class="slds-col slds-size_1-of-1 slds-p-horizontal_medium">
                     <lightning-layout class="layout-padding">
                         <lightning-layout-item size="12">
-                            <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">*</span>{labels.clienteLabel}</label>
-                            <c-av_-lookup
-                                data-id="lookupCliente"
-                                selection={initialCliente}
-                                onsearch={handleSearchCliente}
-                                onclick={handleSearchClienteClick}
-                                onselectionchange={handleSelectCliente}
-                                required=true>
+                            <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">
+                                <span style="color: red;">*</span>
+                                {labels.clienteLabel}</label>
+                            <c-av_-lookup data-id="lookupCliente" selection={initialCliente}
+                                onsearch={handleSearchCliente} onselectionchange={handleSelectCliente} required=true
+                                disabled={isdisabled}>
                             </c-av_-lookup>
                         </lightning-layout-item>
                     </lightning-layout>
@@ -41,20 +39,15 @@
 
         <!-- Producto -->
         <div class="slds-grid slds-wrap">
-            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">  
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
-                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">* </span>{labels.familia}</label>
-                        <c-av_-lookup
-                            data-id="clookupFamilyCIB"
-                            selection={initialSelection}
-                            errors={errorsFamily}
-                            onsearch={handleFamilia}
-                            onclick={handleSearchFamilyClick}
-                            onselectionchange={handleSelectFamily}
-                            placeholder={placeholderFamily}
-                            onblur={handleFamilyLoseFocus}
-                            required=true>
+                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span
+                                style="color: red;">* </span>{labels.familia}</label>
+                        <c-av_-lookup data-id="clookupFamilyCIB" selection={initialSelection} errors={errorsFamily}
+                            onsearch={handleFamilia} onclick={handleSearchFamilyClick}
+                            onselectionchange={handleSelectFamily} placeholder={placeholderFamily}
+                            onblur={handleFamilyLoseFocus} required=true>
                         </c-av_-lookup>
                     </lightning-layout-item>
                 </lightning-layout>
@@ -63,52 +56,43 @@
                 <!--Sub Producto -->
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
-                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">* </span>{labels.productoLabel}</label>
+                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span
+                                style="color: red;">* </span>{labels.productoLabel}</label>
                         <!-- <lightning-input-field class="textBoxLeft" field-name="AV_PF__c" required="true"  variant="label-hidden" value={subProductoCIB} name="subProductoCIB" onchange={handleSubProducto}></lightning-input-field> -->
-                        <c-av_-lookup
-                                class="deleteProduct"
-                                data-id="clookupOpCIB"
-                                selection={initialSelection}
-                                errors={errors}
-                                onsearch={handleSearch}
-                                onclick={handleSearchClick}
-                                onselectionchange={handleSubProducto}
-                                placeholder={placeholder}
-                                onblur={handProductLoseFocus}
-                                required=true>
-                            </c-av_-lookup>
+                        <c-av_-lookup class="deleteProduct" data-id="clookupOpCIB" selection={initialSelection}
+                            errors={errors} onsearch={handleSearch} onclick={handleSearchClick}
+                            onselectionchange={handleSubProducto} placeholder={placeholder}
+                            onblur={handProductLoseFocus} required=true>
+                        </c-av_-lookup>
                     </lightning-layout-item>
                 </lightning-layout>
-                
+
             </div>
         </div>
 
         <!-- Tipo de Operacion-->
         <div class="slds-grid slds-wrap">
-                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
-                    <lightning-layout class="layout-padding">
-                        <lightning-layout-item size="12">
-                            <lightning-combobox
-                                name="TipoOperacion"
-                                label={labels.tipoOperacion}
-                                value={valueOperacion}
-                                required="true"
-                                dropdown-alignment="auto"
-                                options={optionsTipoOpera}
-                                onchange={handleTipoOpera}
-                                disabled = {isTipoOpe}>
-                            </lightning-combobox>
-                        </lightning-layout-item>
-                    </lightning-layout>
-                </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <lightning-combobox name="TipoOperacion" label={labels.tipoOperacion} value={valueOperacion}
+                            required="true" dropdown-alignment="auto" options={optionsTipoOpera}
+                            onchange={handleTipoOpera} disabled={isTipoOpe}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
             <!-- Checks marcados -->
             <div class="slds-col slds-size_1-of-4 slds-p-horizontal_medium">
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
                         <div class="slds-form slds-form_stacked">
                             <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.esg}</label>
-                                <lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" checked={esg} onchange={handleESG}></lightning-input>
+                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+                                    for="toggle">{labels.esg}</label>
+                                <lightning-input type="toggle" variant="label-hidden" name="toggle"
+                                    message-toggle-active="" message-toggle-inactive="" checked={esg}
+                                    onchange={handleESG}></lightning-input>
                             </div>
                         </div>
                     </lightning-layout-item>
@@ -119,29 +103,37 @@
                     <lightning-layout-item size="12">
                         <div class="slds-form slds-form_stacked">
                             <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.confidencial}</label>
-                                <lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" checked={confidencial} onchange={handleConfidencial}></lightning-input>
+                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+                                    for="toggle">{labels.confidencial}</label>
+                                <lightning-input type="toggle" variant="label-hidden" name="toggle"
+                                    message-toggle-active="" message-toggle-inactive="" checked={confidencial}
+                                    onchange={handleConfidencial}></lightning-input>
                             </div>
                         </div>
                     </lightning-layout-item>
                 </lightning-layout>
             </div>
-            
-            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">       
+
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
                 <!-- Nombre opportunidad -->
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
-                        <lightning-input class="textBoxLeft user-input" required="true" type="text" label={labels.nombreOportunidad} name="oportunidad" value={oportunidad} onchange={handleOportunidad}></lightning-input>
+                        <lightning-input class="textBoxLeft user-input" required="true" type="text"
+                            label={labels.nombreOportunidad} name="oportunidad" value={oportunidad}
+                            onchange={handleOportunidad}></lightning-input>
                     </lightning-layout-item>
-                </lightning-layout> 
+                </lightning-layout>
             </div>
             <div class="slds-col slds-size_1-of-4 slds-p-horizontal_medium">
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
                         <div class="slds-form slds-form_stacked">
                             <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.ecas}</label>
-                                <lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" disabled={isEca} checked={ecas} onchange={handleECAs}></lightning-input>
+                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+                                    for="toggle">{labels.ecas}</label>
+                                <lightning-input type="toggle" variant="label-hidden" name="toggle"
+                                    message-toggle-active="" message-toggle-inactive="" disabled={isEca} checked={ecas}
+                                    onchange={handleECAs}></lightning-input>
                             </div>
                         </div>
                     </lightning-layout-item>
@@ -152,8 +144,11 @@
                     <lightning-layout-item size="12">
                         <div class="slds-form slds-form_stacked">
                             <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.sindicaciones}</label>
-                                <lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" disabled={isSindi} checked={sindicaciones} onchange={handleSindicaciones}></lightning-input>
+                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+                                    for="toggle">{labels.sindicaciones}</label>
+                                <lightning-input type="toggle" variant="label-hidden" name="toggle"
+                                    message-toggle-active="" message-toggle-inactive="" disabled={isSindi}
+                                    checked={sindicaciones} onchange={handleSindicaciones}></lightning-input>
                             </div>
                         </div>
                     </lightning-layout-item>
@@ -161,20 +156,46 @@
             </div>
             <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
                 <!-- Propietario de la oportunidad -->
-                    <lightning-layout class="layout-padding">
-                        <lightning-layout-item size="12">
-                            <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span style="color: red;">*</span>{labels.propietarioOportunidad}</label>
-                            <lightning-input-field class="textBoxLeft" field-name="OwnerId" variant="label-hidden" value={propietario} onchange={handlePropietario}></lightning-input-field>
-                        </lightning-layout-item>
-                    </lightning-layout>
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"><span
+                                style="color: red;">*</span>{labels.propietarioOportunidad}</label>
+                        <lightning-input-field class="textBoxLeft" field-name="OwnerId" variant="label-hidden"
+                            value={propietario} onchange={handlePropietario}></lightning-input-field>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <label
+                            class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">{labels.comentario_label}</label>
+                        <lightning-input-field field-name="AV_Comentarios__c" field-type="textarea"
+                            variant="label-hidden" value={comentario}
+                            onchange={handleComentario}></lightning-input-field>
+                    </lightning-layout-item>
+                </lightning-layout>
             </div>
+            <!-- Comentario 
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">               
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">{labels.comentario_label}</label>
+                        <lightning-input-field field-name="AV_Comentarios__c" field-type="textarea" variant="label-hidden" onchange={handleComentario} ></lightning-input-field>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>-->
+
+
             <div class="slds-col slds-size_1-of-4 slds-p-horizontal_medium">
                 <lightning-layout class="layout-padding">
                     <lightning-layout-item size="12">
                         <div class="slds-form slds-form_stacked">
                             <div class="slds-form-element">
-                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.linea}</label>
-                                <lightning-input type="toggle" variant="label-hidden" name="toggle" message-toggle-active="" message-toggle-inactive="" disabled={isLinea} checked={linea} onchange={handleLinea}></lightning-input>
+                                <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+                                    for="toggle">{labels.linea}</label>
+                                <lightning-input type="toggle" variant="label-hidden" name="toggle"
+                                    message-toggle-active="" message-toggle-inactive="" disabled={isLinea}
+                                    checked={linea} onchange={handleLinea}></lightning-input>
                             </div>
                         </div>
                     </lightning-layout-item>
@@ -183,5 +204,13 @@
         </div>
         <div class="slds-grid slds-wrap">
         </div>
+
+
     </lightning-record-edit-form>
+
+
+    <!-- <lightning-flow flow-api-name="CIBE_New_Opportunity_CIB" onstatuschange={handleStatusChange}> </lightning-flow> -->
+
+
+
 </template>

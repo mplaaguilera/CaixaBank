@@ -10,6 +10,12 @@ import saveOperation from '@salesforce/apex/CIBE_RAR_Integration.saveOperation';
 import getUrl  from '@salesforce/apex/CIBE_RAR_Integration.getUrl';
 import getSimulationId from '@salesforce/apex/CIBE_RAR_Integration.getSimulationId'
 import getUrlPrecios  from '@salesforce/apex/CIBE_OpportunityComitePrecios.getUrl';
+import sendEmailComitePrecio2  from '@salesforce/apex/CIBE_OpportunityEmail.sendEmailComitePrecio';
+import getEmailSindicaciones  from '@salesforce/apex/CIBE_OpportunityEmail.getEmailSindicaciones';
+import getEmailALM  from '@salesforce/apex/CIBE_OpportunityEmail.getEmailALM';
+import getOpportunity from '@salesforce/apex/CIBE_OpportunityComite.getOpportunity';
+import getLanguage from '@salesforce/apex/CIBE_OpportunityEmail.getLanguage';
+
 
 // Fields
 import SIMULATIONID from '@salesforce/schema/Opportunity.CIBE_Numero_de_Simulador__c';
@@ -25,6 +31,19 @@ import PLAZO from '@salesforce/schema/Opportunity.CIBE_RARPlazoMeses__c';
 
 import TIPO_SIMULA_OPP from '@salesforce/schema/Opportunity.CIBE_Tipo_de_simulacion__c';
 import NUMBER_SIMULA_OPP from '@salesforce/schema/Opportunity.CIBE_Numero_de_Simulador__c';
+
+
+import CREDITPORTFOLIORVW from '@salesforce/schema/Opportunity.CIBE_CreditPortAnalystReview__c';
+import SYNDICATIONTEAMOPN from '@salesforce/schema/Opportunity.CIBE_SyndicationTeamOpinion__c';
+import SYNDICATIONTEAM from '@salesforce/schema/Opportunity.CIBE_CredPortAnalystEmployee__c';
+import CREDITPORTFOLIO from '@salesforce/schema/Opportunity.CIBE_SyndicationTeamEmployee__c';
+import ALMEMPLOYEE from '@salesforce/schema/Opportunity.CIBE_DicALMEmployee__c';
+import ALM from '@salesforce/schema/Opportunity.CIBE_DicALM__c';
+import ALMCOMMENT from '@salesforce/schema/Opportunity.CIBE_DicALMComment__c';
+import CREDITPORTFOLIODATE from '@salesforce/schema/Opportunity.CIBE_DateAnalystTeam__c';
+import SYNDICATIONTEAMOPNDATE from '@salesforce/schema/Opportunity.CIBE_DateSyndicationTeam__c';
+import ALMDATE from '@salesforce/schema/Opportunity.CIBE_DateALM__c';
+
 
 //objects
 import OPPORTUNITY_OBJECT from '@salesforce/schema/Opportunity';
@@ -42,6 +61,7 @@ import simLoadedError from '@salesforce/label/c.CIBE_RARSimLoadedError';
 import opSaved from '@salesforce/label/c.CIBE_RAROpSaved';
 import opSavedText from '@salesforce/label/c.CIBE_RAROpSavedText';
 import opSavedError from '@salesforce/label/c.CIBE_RAROpSavedError';
+import refreshSimulation from '@salesforce/label/c.CIBE_RARRefreshSimulation';
 
 export default class Cibe_rarView extends LightningElement {
 
@@ -72,6 +92,9 @@ export default class Cibe_rarView extends LightningElement {
 
 
     fields = [SIMULATIONID, SIMULATIONTYPE];
+    fieldsBlank = [CREDITPORTFOLIO, SYNDICATIONTEAMOPN, SYNDICATIONTEAM, CREDITPORTFOLIORVW, ALM, ALMCOMMENT, ALMEMPLOYEE, CREDITPORTFOLIODATE, SYNDICATIONTEAMOPNDATE, ALMDATE];
+
+    
 
     @track tipoSimula = null;
     @track nSimula = null;
@@ -82,6 +105,20 @@ export default class Cibe_rarView extends LightningElement {
     buttonActive = false;
     @api id;
     @api label;
+
+    @track emailSindicaciones;
+    @track emailALM;
+
+    @track labelEmailSindicaciones = 'CIBE_EmailSyndicateSales';
+    @track labelEmailALM = 'CIBE_EmailALM';
+
+    @track syndicateSales;
+    @track alm;
+    @track syndicateSalesValue;
+    @track almValue;
+    @track almComment;
+
+    @track language;
 
     labels = {
         accesoInforme,
@@ -95,8 +132,40 @@ export default class Cibe_rarView extends LightningElement {
         simLoadedError,
         opSaved,
         opSavedText,
-        opSavedError
+        opSavedError,
+        refreshSimulation
     };
+
+
+
+    @wire(getLanguage)
+    getLanguage({ error, data }){
+        if(data){
+            this.language = data;
+        } else if(error){
+            console.log(error);
+        }
+    }
+
+
+
+    @wire(getEmailSindicaciones, {label : 'CIBE_EmailSyndicateSales'})
+    getEmailSindicaciones({ error, data }){
+        if(data){
+            this.emailSindicaciones = data;
+        } else if(error){
+            console.log(error);
+        }
+    }
+    
+    @wire(getEmailALM, { label : 'CIBE_EmailALM'})
+    getEmailALM({ error, data }){
+        if(data){
+            this.emailALM = data;
+        } else if(error){
+            console.log(error);
+        }
+    }
 
     @wire(getRecord, { recordId: '$recordId', fields: [TIPO_SIMULA_OPP, PLAZO] })
     getInformePrecios({ error, data }){
@@ -124,11 +193,9 @@ export default class Cibe_rarView extends LightningElement {
 
     @wire(getRecord, { recordId: '$recordId', fields: [NUMBER_SIMULA_OPP] })
     getInformePreciosC({ error, data }){
-
         if(data){
             this.nSimula = data.fields.CIBE_Numero_de_Simulador__c.value;
             this.ref_ext = this.tipoSimula+this.nSimula;
-
 
         } else if(error){
             console.log(error);
@@ -140,7 +207,7 @@ export default class Cibe_rarView extends LightningElement {
         if(data){
             this.urlprecios = data;
         } else if(error){
-            console.log(error);
+            console.log('getUrlInforme ',error);
         }
     }
 
@@ -151,11 +218,10 @@ export default class Cibe_rarView extends LightningElement {
     //@track simulationType;
     @wire(getUrl, { simulationId: '$simulationId', simulationType: '$simulationType'})
     getUrlTF({ error, data }){
-
         if(data){
             this.url = data;
         } else if(error){
-            console.log(error);
+            console.log('getUrlTF ',error);
         }
     }
 
@@ -173,7 +239,8 @@ export default class Cibe_rarView extends LightningElement {
             { label: data.fields.CIBE_RARIndiceReferencia__c.label, fieldName: 'referenceIndex', type: "number", cellAttributes: { alignment: 'center' }},
             { label: data.fields.CIBE_RARFloorindice__c.label, fieldName: 'hasWithoutFloorIndicator', type: "text", cellAttributes: { alignment: 'center' }},
             { label: data.fields.CIBE_ComisionSaldoMedio__c.label, fieldName: 'studyCommission', type: "currency", cellAttributes: { alignment: 'right' }, typeAttributes: { currencyCode: 'EUR',  minimumFractionDigits: 0, maximumFractionDigits: 0  }},
-            { label: data.fields.CIBE_RARComisionApertura__c.label, fieldName: 'openingCommission', type: "currency", cellAttributes: { alignment: 'right' }, typeAttributes: { currencyCode: 'EUR',  minimumFractionDigits: 0, maximumFractionDigits: 0  }},
+            { label: data.fields.CIBE_RARComisionApertura__c.label, fieldName:  'openingCommission' , type: "percent",  typeAttributes: {  maximumFractionDigits: 2}, cellAttributes: { alignment: 'right' }},
+            // , typeAttributes: { currencyCode: 'EUR',  minimumFractionDigits: 0, maximumFractionDigits: 0  }
             { label: data.fields.CIBE_RAROperacionRar__c.label, fieldName: 'rar', sortable: "true", type: "number", cellAttributes: { alignment: 'right' },  typeAttributes: { minimumFractionDigits: 0, maximumFractionDigits: 2  }},
             { label: data.fields.CIBE_RARGarantias__c.label, fieldName: 'guaranteeName', type: "text", cellAttributes: { alignment: 'right' }},
             { label: data.fields.CIBE_VAOperacion__c.label, fieldName: 'valueAdded', type: "currency", cellAttributes: { alignment: 'right' }, typeAttributes: { currencyCode: 'EUR',  minimumFractionDigits: 0, maximumFractionDigits: 0  }}];
@@ -238,12 +305,11 @@ export default class Cibe_rarView extends LightningElement {
     }
 
     simulationCall(simulationId, simulationType, fields){
-
         getSimulation({simulationId: simulationId, simulationType: simulationType, recordId: this.recordId})
         .then(result => {
-
             this.simulaciones = [];
             if(result.empresaResponse !== undefined){
+
                 let oSimulacion = {};
                 let simulacionesInt = [];
                 let operacionesInt = [];
@@ -263,7 +329,7 @@ export default class Cibe_rarView extends LightningElement {
                 let accordion = this.template.querySelector('lightning-accordion');
                 accordion.activeSectionName = result.empresaResponse.simulationId;         
                 this.selectedRow.push(result.empresaResponse.operationNumber);
-               
+                
             } else {
                 let simulacionesInt = [];
                 result.grupoResponse.simulations.forEach(simulacion => {
@@ -271,7 +337,7 @@ export default class Cibe_rarView extends LightningElement {
                     let operacionesPorSim = [];
                     operacionesPorSim = this.montarOperaciones(simulacion.operations, simulacion);
                     oSimulacion.nombre = this.labels.simulacion + ' ' + simulacion.simulationId + ' ' + simulacion.customerId + ' ' + simulacion.customerName;
-                   
+                
                     oSimulacion.operaciones = operacionesPorSim;
                     
                     oSimulacion.numero = simulacion.simulationId;
@@ -299,32 +365,85 @@ export default class Cibe_rarView extends LightningElement {
                 this.bGrupo= true;
                 this.bEmpresa = false;
             }
-            
-            if(fields !== null) {
-                this.template.querySelector('lightning-record-form').submit(fields);
-                this.simulationId = fields.CIBE_Numero_de_Simulador__c;
-                this.simulationType = fields.CIBE_Tipo_de_simulacion__c;
-            }
             this.cargando = false;
+
             if(this.bNuevoGuardado) {
-                console.log(this.labels.simLoaded);
-                console.log(this.labels.simLoadedText);
                 this.notifyUser(this.labels.simLoaded, this.labels.simLoadedText, 'success');
+                this.fieldsBlank.CIBE_CreditPortAnalystReview__c = 'NO';
+                this.fieldsBlank.CIBE_DateAnalystTeam__c = null;
+                this.fieldsBlank.CIBE_CredPortAnalystEmployee__c = null;
+
+                getOpportunity({recordId: this.recordId})
+                .then(result => {
+
+
+                    this.syndicateSales = result[0].CIBE_LoanSyndicateSales__c;
+                    this.alm = result[0].CIBE_ALM__c;
+                    this.syndicateSalesValue = result[0].CIBE_SyndicationTeamOpinion__c;
+                    this.almValue = result[0].CIBE_DicALM__c;
+                    this.almComment = result[0].CIBE_DicALMComment__c;
+
+                    
+
+                    if(this.syndicateSales && this.syndicateSalesValue != undefined){
+                        this.fieldsBlank.CIBE_SyndicationTeamOpinion__c = null;
+                        this.fieldsBlank.CIBE_SyndicationTeamEmployee__c = null;
+                        this.fieldsBlank.CIBE_DateSyndicationTeam__c = null;
+                        if(this.language === 'es'){
+                            sendEmailComitePrecio2({templateDevName: 'CIBE_OppNotificacionRequerimentoNuevaActuacion_es', oportunidad: this.recordId, correo: this.emailSindicaciones})
+                            .then((result) =>{
+                            }).catch((error) =>{
+                                console.log(error);
+                            })
+                        }else if(this.language === 'en_US'){
+                            sendEmailComitePrecio2({templateDevName: 'CIBE_OppNotificacionRequerimentoNuevaActuacion_en', oportunidad: this.recordId, correo: this.emailSindicaciones})
+                            .then((result) =>{
+                            }).catch((error) =>{
+                                console.log(error);
+                            })
+                        }
+                    }
+    
+                    if(this.alm && (this.almValue != undefined || this.almComment != undefined)){
+                        this.fieldsBlank.CIBE_DateALM__c = null;
+                        this.fieldsBlank.CIBE_DicALMComment__c = null;
+                        this.fieldsBlank.CIBE_DicALM__c = null;
+                        this.fieldsBlank.CIBE_DicALMEmployee__c = null;
+                        if(this.language === 'es'){
+                            sendEmailComitePrecio2({templateDevName: 'CIBE_OppNotificacionRequerimentoNuevaActuacion_es', oportunidad: this.recordId, correo: this.emailALM})
+                            .then((result) =>{
+                            }).catch((error) =>{
+                                console.log(error);
+                            })
+                        }else if(this.language === 'en_US'){
+                            sendEmailComitePrecio2({templateDevName: 'CIBE_OppNotificacionRequerimentoNuevaActuacion_en', oportunidad: this.recordId, correo: this.emailALM})
+                            .then((result) =>{
+                            }).catch((error) =>{
+                                console.log(error);
+                            })
+                        }
+                        
+                    }
+
+                    this.template.querySelector('lightning-record-form').submit(fields);
+                    this.template.querySelector('lightning-record-form').submit(this.fieldsBlank);
+                    this.simulationId = this.fields.CIBE_Numero_de_Simulador__c;
+                    this.simulationType = this.fields.CIBE_Tipo_de_simulacion__c;
+
+                })
+                .catch(error => {
+                    console.log(error);
+                });                
             }
             this.bNuevoGuardado = false;
-            
-            return 'OK';          
+            return 1;          
 
         })
         .catch(error => {
-
             this.cargando = false;
             this.notifyUser('Error', this.labels.simLoadedError + ' ' + error.body.message, 'error');
             return 'KO';
-            
         })
-
-  
 
     }
 
@@ -343,7 +462,7 @@ export default class Cibe_rarView extends LightningElement {
             oOperacion.rar = operacion.profitability.rar;
             oOperacion.alias = operacion.description;
             oOperacion.studyCommission = operacion.studyCommission;
-            oOperacion.openingCommission = operacion.openingCommission;
+            oOperacion.openingCommission = operacion.openingCommission / 100; // Se divide entre 100 para que en la tabla se muestren bien los decimales ya que salesforce interpreta el tipo porcentaje como un decimal (si llega 12.1 y no se divide entre 100 sacará 1201, y no 12,1)           
             oOperacion.guaranteeName = "";
             operacion.guarantees.forEach(garantia =>{
 
@@ -406,9 +525,7 @@ export default class Cibe_rarView extends LightningElement {
 
             if((tabla.data.length > 1 && selectedRows.length === tabla.data.length && selectedRows[0].simulationId === tabla.getSelectedRows()[0].simulationId) 
             || selectedRows[0].simulationId !== tabla.getSelectedRows()[0].simulationId) {
-
                 tabla.selectedRows = [];    
-         
             } else if(selectedRows[0].simulationId === tabla.getSelectedRows()[0].simulationId) {
 
                 if (selectedRows.length > 1) {
@@ -512,15 +629,18 @@ export default class Cibe_rarView extends LightningElement {
         .catch(error => {
             console.log(error);
             this.cargando = false;
-            this.notifyUser('error', this.labels.opSavedError + ' ' + error.message, 'error');
+            this.notifyUser('Se ha producido un error', this.labels.opSavedError + ' ' + error.body.message, 'error');
         })
     }
-
     handleRefresh() {
-
-        this.simulationCall(this.simulationId, 'refrescar');
+        this.cargando = true;
+        this.bNuevoGuardado = true;
+        let validaCarga = this.simulationCall(this.simulationId, 'refrescar', null);
+        if(validaCarga === 'OK') {
+            this.notifyUser(this.labels.simLoaded, this.labels.simLoadedText, 'success');
+        }
+        
     }
-
     handleToggleSection(event) {
         this.activeSectionMessage =
             'Open section name:  ' + event.detail.openSections;

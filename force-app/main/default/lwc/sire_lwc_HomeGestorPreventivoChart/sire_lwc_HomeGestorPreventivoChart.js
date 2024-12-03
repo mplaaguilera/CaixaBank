@@ -20,26 +20,28 @@ export default class Sire_lwc_HomeGestorPreventivoChart extends LightningElement
             let totalEstrategias = [];
             let totalSituaciones = [];
             let numProcesosArray = [];
+            let procesosChart = [];
 
             data.forEach(proceso => {
+                if((proceso.SIR_agrupacionSituacion__c === 'Pendiente' || proceso.SIR_agrupacionSituacion__c === 'Pendiente Riesgos' || proceso.SIR_agrupacionSituacion__c === 'Pendiente Consenso') || (proceso.SIR_fld_Situacion_SF__c === 'SF_PVCAP5' || proceso.SIR_fld_Situacion_SF__c === 'SF_PVACA3' || proceso.SIR_fld_Situacion_SF__c === 'SF_PVINRI')){
                     totalEstrategias.push(proceso.estrategia);
                     totalSituaciones.push(proceso.situacion);
+                    procesosChart.push(proceso);
+                }
             });
 
-            var numProcesos = 0;
-            data.forEach(proceso => {
-                numProcesos = 0;
-                for (var i = 0; i < totalEstrategias.length; i++) {
+            
+            procesosChart.forEach(proceso => {
+                let numProcesos = 0;
+                for (let i = 0; i < totalEstrategias.length; i++) {
                     if (proceso.estrategia === totalEstrategias[i] && proceso.situacion === totalSituaciones[i]) {
-                        if((proceso.SIR_agrupacionSituacion__c === 'Pendiente' || proceso.SIR_agrupacionSituacion__c === 'Pendiente Riesgos' || proceso.SIR_agrupacionSituacion__c === 'Pendiente Consenso') || (proceso.SIR_fld_Situacion_SF__c === 'SF_PVCAP5' || proceso.SIR_fld_Situacion_SF__c === 'SF_PVACA3' || proceso.SIR_fld_Situacion_SF__c === 'SF_PVINRI')){
-                            numProcesos++;
-                        }
+                        numProcesos++;
                     }
                 }
                 numProcesosArray.push(numProcesos);
             });
 
-            let chartData = [];
+      /*      let chartData = [];
 			let chartLabels = [];
 			var i = 0;
 
@@ -48,12 +50,13 @@ export default class Sire_lwc_HomeGestorPreventivoChart extends LightningElement
 				i++;
 				chartLabels.push(proceso.estrategia + ' - ' + proceso.situacion);
 			});
+*/
+            let mapSituaciones = new Map();
+            let mapEstrategias = new Map();
+            let i = 0;
+            let e = 0;
 
-            var mapSituaciones = new Map();
-            var i = 0;
-            var e = 0;
-
-            data.forEach(proceso => {
+            procesosChart.forEach(proceso => {
                 if(numProcesosArray[e] !== 0){
                     if(!mapSituaciones.has(proceso.situacion)){
                     mapSituaciones.set(proceso.situacion, i);
@@ -63,13 +66,13 @@ export default class Sire_lwc_HomeGestorPreventivoChart extends LightningElement
                 e++;
             });
 
-            var mapEstrategias = new Map();
-            var e = 0;
-            data.forEach(proceso => {
+  
+            e = 0;
+            procesosChart.forEach(proceso => {
                 if(numProcesosArray[e] !== 0){
                     if(!mapEstrategias.has(proceso.estrategia)){
-                        var longitud = [];
-                        for (var n = 0; n < i; n++) {
+                        let longitud = [];
+                        for (let n = 0; n < i; n++) {
                             longitud.push(0);
                         }
                         mapEstrategias.set(proceso.estrategia, longitud);
@@ -78,8 +81,8 @@ export default class Sire_lwc_HomeGestorPreventivoChart extends LightningElement
                 e++;
             });
 
-            var i = 0;
-            data.forEach(proceso => {
+            i = 0;
+            procesosChart.forEach(proceso => {
                 if(numProcesosArray[i] !== 0){
                     mapEstrategias.get(proceso.estrategia)[mapSituaciones.get(proceso.situacion)] = numProcesosArray[i];
                 }

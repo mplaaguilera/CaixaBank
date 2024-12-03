@@ -1,0 +1,153 @@
+<template>   
+    <div class="slds-modal__content slds-var-p-around_medium viewAPPP" >
+    <!-- LOADING -->
+	<template if:true={loadingVisible}>
+       
+            <div class="slds-modal__content slds-var-p-around_medium" style="height: 150px;">                      
+                <lightning-spinner alternative-text="Loading..." variant="brand" style="display: contents; "></lightning-spinner>                 
+            </div>
+    
+	</template>
+    <template lwc:if={camposVisible}>      
+        <div style="margin: 10px;">
+            <!-- Cabecera --> 
+            <div class="slds-page-header slds-page-header_record-home">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-people">
+                                    <lightning-icon icon-name="standard:people" alternative-text="people" size="medium" title="people" variant="inverse"></lightning-icon>                                
+                                </span>                           
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1><span>Cliente</span><span class="slds-page-header__title slds-truncate" title={nombreCliente}>{nombreCliente}</span></h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>           
+                </div>
+                <div class="slds-page-header__row slds-page-header__row_gutters">
+                    <div class="slds-page-header__col-details">
+                        <ul class="slds-page-header__detail-row">
+                            <li class="slds-page-header__detail-block">
+                                <div class="slds-text-title slds-truncate" title="DNI/CIF">DNI/CIF</div>
+                                <div class="slds-truncate" title={dniCif}>{dniCif}</div>
+                            </li>
+                            <li class="slds-page-header__detail-block">
+                                <div class="slds-text-title slds-truncate" title="Gestor Proceso">Gestor Proceso</div>
+                                <div class="slds-truncate" title={gestorProceso}>{gestorProceso}</div>
+                            </li>
+                            <li class="slds-page-header__detail-block">
+                                <div class="slds-text-title slds-truncate" title="Fecha Situación">Fecha Situación</div>
+                                <div class="slds-truncate" title={fechaSituacion}>{fechaSituacion}</div>                              
+                            </li>    
+                            <li class="slds-page-header__detail-block">
+                                <div class="slds-text-title slds-truncate" title="Fecha Alta">Fecha Alta</div>
+                                <div class="slds-truncate" title={fechaAlta}>{fechaAlta}</div>
+                            </li>  
+                            <li class="slds-page-header__detail-block">
+                                <div class="slds-text-title slds-truncate" title="Total deuda exigible">Total deuda exigible</div>
+                                <div class="slds-truncate" title={totalDeudaExigible}>{totalDeudaExigible}</div>
+                            </li>             
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h1 style="margin-top: 10px"><span class="slds-page-header__title slds-truncate" title={tituloFormulario}>{tituloFormulario}</span></h1>          
+            <!-- Campos Acuerdo Pago -->   
+            <template lwc:if={acuerdoPago}>
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">                        
+                        <span class="slds-form-element__label">Días de gracia: </span><span class="slds-form-element__label">{diasGracia}</span><br>
+                        <span class="slds-form-element__label">Importe total: </span><span class="slds-form-element__label">{importeTotal}</span>  
+                    </lightning-layout-item>       
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">
+                        <span class="slds-form-element__label">Porcentaje mínimo de pago: </span><span class="slds-form-element__label">{porcentajeMinPago}</span><br>
+                        <span class="slds-form-element__label">Importe pendiente: </span><span class="slds-form-element__label">{importePendiente}</span>                        
+                    </lightning-layout-item>  
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">
+                        <span class="slds-form-element__label">Fecha inicio: </span><span class="slds-form-element__label">{fechaInicio}</span>
+                    </lightning-layout-item>                    
+                </lightning-layout>               
+            </template>
+
+            <template lwc:if={planPago}>
+                <!-- Campos Plan Pago -->      
+                <lightning-layout multiple-rows> 
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">                        
+                        <span class="slds-form-element__label">Días de gracia: </span><span class="slds-form-element__label">{diasGracia}</span><br>
+                        <span class="slds-form-element__label">Importe total: </span><span class="slds-form-element__label">{importeTotal}</span><br>
+                        <span class="slds-form-element__label">Número cuotas: </span><span class="slds-form-element__label">{numCuotas}</span>   
+                    </lightning-layout-item>       
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">
+                        <span class="slds-form-element__label">Porcentaje mínimo de pago: </span><span class="slds-form-element__label">{porcentajeMinPago}</span><br>
+                        <span class="slds-form-element__label">Importe pendiente: </span><span class="slds-form-element__label">{importePendiente}</span><br>
+                        <span class="slds-form-element__label">Periodicidad: </span><span class="slds-form-element__label">{periodicidad}</span>   
+                    </lightning-layout-item>  
+                    <lightning-layout-item size="4" padding="around-small" style="padding-bottom: 0px;">
+                        <span class="slds-form-element__label">Fecha inicio: </span><span class="slds-form-element__label">{fechaInicio}</span><br>
+                        <span class="slds-form-element__label">Importe de la cuota: </span><span class="slds-form-element__label">{importeCuota}</span><br>
+                        <span class="slds-form-element__label">Días: </span><span class="slds-form-element__label">{dias}</span>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" padding="around-small" style="padding-top: 0px;">
+                        <span class="slds-form-element__label">Comentario: </span><span class="slds-form-element__label">{comentario}</span>  
+                    </lightning-layout-item>
+                </lightning-layout>                
+            </template>
+
+            <!-- Campos comunes Pago Ciclo Actual -->   
+            <h1 style="margin-top: 10px"><span class="slds-page-header__title slds-truncate" title="Pago ciclo actual">Pago ciclo actual</span></h1>
+            <lightning-layout multiple-rows> 
+                <lightning-layout-item size="4" padding="around-small">
+                    <span class="slds-form-element__label">Fecha vencimiento: </span><span class="slds-form-element__label">{fechaVencimiento}</span>   
+                </lightning-layout-item>
+                <lightning-layout-item size="4" padding="around-small">
+                    <span class="slds-form-element__label">Fecha límite: </span><span class="slds-form-element__label">{fechaLimite}</span>  
+                </lightning-layout-item>
+                <lightning-layout-item size="4" padding="around-small">
+                    <span class="slds-form-element__label">Importe acordado: </span><span class="slds-form-element__label">{importeAcordado}</span>   
+                </lightning-layout-item>
+            </lightning-layout>	
+
+            <!-- Historico -->   
+            <h1 style="margin-top: 10px; margin-bottom: 10px;"><span class="slds-page-header__title slds-truncate" title={historicoPagos}>{historicoPagos}</span></h1>
+            <div style="height: 200px;" class="slds-scrollable">
+                <lightning-datatable
+                    key-field="id"
+                    data={histPagos}
+                    columns={columns}
+                    hide-checkbox-column
+                    column-widths-mode>
+                </lightning-datatable>  
+            </div> 
+        </div>
+    </template>
+
+    <!-- Errores  -->
+    <template if:true={mensajeKO}>
+        <div style="align-content: center;margin: 10px;">
+            <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-utility-error" title="error">
+                        <lightning-icon icon-name="utility:error" alternative-text="error" size="small" title="error" variant="inverse"></lightning-icon>                                
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>{mensajeError}</p>
+                    <p>{codigoError}</p>
+                </div>
+            </div>  
+        </div>              
+    </template> 
+    </div>
+	<!-- BOTONES -->
+	<footer class="slds-modal__footer">
+		<lightning-button variant="neutral" label="Cerrar" title="Cerrar" onclick={cerrar} disabled={disabledCerrar} class="slds-var-m-left_x-small"></lightning-button>		
+	</footer>
+    
+</template>

@@ -7,9 +7,19 @@
             <div class="slds-form__item" role="listitem">
                 <div class="slds-form-element slds-form-element_stacked slds-is-editing">
                     <div class="slds-grid slds-wrap">
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpReclamadoNotaria__c">
+                                <lightning-input-field field-name="SAC_NotariaReclamado__c" onchange={handleChangeNotaria} required>
+                                </lightning-input-field>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_NotariaReclamado__c" disabled> 
+                                </lightning-input-field>
+                            </template>                            
+                        </div>
+                        <div class="slds-size_1-of-4">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoNotaria__c" value={impNotariaReclamado} onchange={changeImpNotariaRec} readonly={impNotariaBloqueado}>
                                 </lightning-input-field>
                             </template>
                             <template if:true={readOnly}>
@@ -17,9 +27,9 @@
                                 </lightning-input-field>
                             </template>                            
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpResueltoNotaria__c" >
+                                <lightning-input-field field-name="SAC_ImpResueltoNotaria__c"  value={impNotariaResuelto} onchange={changeImpNotariaRes} readonly={impNotariaBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -27,13 +37,23 @@
                                 </lightning-input-field>
                             </template>                                
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-input-field field-name="SAC_ImpAbonadoNotaria__c" readonly="true" data-id="overview" d>
                             </lightning-input-field>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpReclamadoGestoria__c" >
+                                <lightning-input-field field-name="SAC_GestoriaReclamado__c" onchange={handleChangeGestoria} required>
+                                </lightning-input-field>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_GestoriaReclamado__c" disabled> 
+                                </lightning-input-field>
+                            </template>                            
+                        </div>
+                        <div class="slds-size_1-of-4">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoGestoria__c" value={impGestoriaReclamado} onchange={changeImpGestoriaRec} readonly={impGestoriaBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -41,9 +61,9 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpResueltoGestoria__c" >
+                                <lightning-input-field field-name="SAC_ImpResueltoGestoria__c" value={impGestoriaResuelto} onchange={changeImpGestoriaRes} readonly={impGestoriaBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -51,13 +71,23 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-input-field field-name="SAC_ImpAbonadoGestoria__c" readonly="true">
                             </lightning-input-field>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpReclamadoRegistros__c" >
+                                <lightning-input-field field-name="SAC_RegistrosReclamado__c" onchange={handleChangeRegistros} required>
+                                </lightning-input-field>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_RegistrosReclamado__c" disabled> 
+                                </lightning-input-field>
+                            </template>                            
+                        </div>
+                        <div class="slds-size_1-of-4">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoRegistros__c" value={impRegistroReclamado} onchange={changeImpRegistroRec} readonly={impRegistrosBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -65,9 +95,9 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpResueltoRegistros__c" >
+                                <lightning-input-field field-name="SAC_ImpResueltoRegistros__c" value={impRegistroResuelto} onchange={changeImpRegistroRes} readonly={impRegistrosBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -75,13 +105,23 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-input-field field-name="SAC_ImpAbonadoRegistros__c" readonly="true">
                             </lightning-input-field>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpReclamadoTasacion__c" >
+                                <lightning-input-field field-name="SAC_TasacionReclamado__c" onchange={handleChangeTasacion} required>
+                                </lightning-input-field>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_TasacionReclamado__c" disabled> 
+                                </lightning-input-field>
+                            </template>                            
+                        </div>
+                        <div class="slds-size_1-of-4">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoTasacion__c" value={impTasacionReclamado} onchange={changeImpTasacionRec} readonly={impTasacionBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -89,9 +129,9 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpResueltoTasacion__c" >
+                                <lightning-input-field field-name="SAC_ImpResueltoTasacion__c" value={impTasacionResuelto} onchange={changeImpTasacionRes} readonly={impTasacionBloqueado}>
                                 </lightning-input-field>                                
                             </template>
                             <template if:true={readOnly}>
@@ -99,46 +139,46 @@
                                 </lightning-input-field>
                             </template>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-input-field field-name="SAC_ImpAbonadoTasacion__c" readonly="true">
                             </lightning-input-field>
                         </div>
-                        <div class="slds-size_1-of-3">
-                            <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpReclamadoInteresesLegales__c" >
-                                </lightning-input-field>                                
-                            </template>
-                            <template if:true={readOnly}>
+                        <template if:true={showImpInteresesLegales}>
+                            <div class="slds-size_1-of-4">
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="slds-size_1-of-4">
                                 <lightning-input-field field-name="SAC_ImpReclamadoInteresesLegales__c" readonly="true">
                                 </lightning-input-field>
-                            </template>
-                        </div>
-                        <div class="slds-size_1-of-3">
-                            <template if:false={readOnly}>
-                                <lightning-input-field field-name="SAC_ImpResueltoInteresesLegales__c" >
-                                </lightning-input-field>                                
-                            </template>
-                            <template if:true={readOnly}>
+
+                            </div>
+                            <div class="slds-size_1-of-4">
                                 <lightning-input-field field-name="SAC_ImpResueltoInteresesLegales__c" readonly="true">
                                 </lightning-input-field>
-                            </template>
-                        </div>
-                        <div class="slds-size_1-of-3">
-                            <lightning-input-field field-name="SAC_ImpAbonadoInteresesLegales__c" readonly="true">
-                            </lightning-input-field>
-                        </div>
+                            </div>
+                            <div class="slds-size_1-of-4">
+                                <lightning-input-field field-name="SAC_ImpAbonadoInteresesLegales__c" readonly="true">
+                                </lightning-input-field>
+                            </div>
+                        </template>
                         <template if:true={showSacOtrosGastos}>
-                            <div class="slds-size_1-of-3">
+                            <div class="slds-size_1-of-4">
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="slds-size_1-of-4">
                                 <lightning-input-field field-name="SAC_Otros_gastos__c" readonly="true">
                                 </lightning-input-field>
                             </div>
-                            <div class="slds-size_1-of-3">
+                            <div class="slds-size_1-of-4">
                                 <p>&nbsp;</p>
                             </div>
-                            <div class="slds-size_1-of-3">
+                            <div class="slds-size_1-of-4">
                                 <p>&nbsp;</p>
                             </div>
-                            <div class="slds-size_2-of-3">
+                            <div class="slds-size_1-of-4">
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="slds-size_3-of-4">
                                 <p class="slds-text-body_small slds-m-bottom_small slds-m-top_x-small">
                                     <strong>Otros gastos reclamados en el Formulario, es necesario revisar a qué concepto de importe reclamado corresponden</strong>
                                 </p>
@@ -146,15 +186,18 @@
                         </template>
                         <div class="slds-col slds-size_1-of-1 slds-border_top" style="margin-top: 12px; margin-bottom: 12px;"></div>
                         
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
+                                <p>&nbsp;</p>
+                            </div>
+                        <div class="slds-size_1-of-4">
                             <lightning-output-field field-name="CC_Importe_Reclamado__c" >
                             </lightning-output-field>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-output-field field-name="SAC_Importe_Resuelto__c" >
                             </lightning-output-field>
                         </div>
-                        <div class="slds-size_1-of-3">
+                        <div class="slds-size_1-of-4">
                             <lightning-output-field field-name="CC_Importe_Abonado__c" >
                             </lightning-output-field>
                         </div>

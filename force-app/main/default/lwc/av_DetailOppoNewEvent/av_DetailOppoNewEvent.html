@@ -4,22 +4,26 @@
 		<!-- PRIMERA FILA  -->
 		<div class="slds-clearfix" style="width:100%;">
 			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
-				<lightning-icon if:true={mainVinculed} size ="x-small" title ={label.mainOpp} class="main-icon slds-button slds-button_neutral" icon-name="utility:favorite" variant="warning" ></lightning-icon>
+				<lightning-icon if:true={mainVinculed} size ="x-small" title ={label.mainOpp}   class="main-icon slds-button slds-button_neutral" icon-name="utility:favorite" variant="warning" ></lightning-icon>
 				<div if:false={mainVinculed} class="vinculed">
-					<lightning-button-icon size ="medium" title={label.markMainOpp} icon-name="utility:favorite" variant="border-filled" onclick={handleMain} ></lightning-button-icon>
+					<lightning-button-icon size ="medium" title={label.markMainOpp}   icon-name="utility:favorite" variant="border-filled" onclick={handleMain} ></lightning-button-icon>
 				</div>
 			</div>
 			<div class="slds-float_left">
 				<div class="name-col">
 					<div style="width:fit-content">
 						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
-						<span if:false={isInserted} >{name}</span>
+						<span if:false={isInserted}>{name}</span>
 						<p>{label.statusOpp} <b>{statusNow}</b></p>
 					</div>
 				</div>
 			</div>
-			<div class="marginButtons itemSetting slds-float_left" style="margin-right:15px; margin-left: 15px; width:fit-content">
+			<div if:false={comesfromevent} class="marginButtons itemSetting slds-float_left" style="margin-right:15px; margin-left: 15px; width:fit-content">
 				<lightning-button-icon icon-name="utility:event" data-id="agendado" onclick={handlePath}  name="agendado" class={agendadoClass} variant="border" size="large" title="Agendar"></lightning-button-icon>
+			</div>
+			<div if:true={comesfromevent} style="margin:.7rem 15px 0 17.5rem">
+				<p style="color:gray">{historyCommentDateLabel}</p>
+				<p style="margin-top:.3rem">{historyComment}</p>
 			</div>
 			<div class="slds-float_left" if:true={unfoldCmp}>
 				<div class="slds-clearfix marginInput">
@@ -30,6 +34,13 @@
 				</div>
 			</div>
 			<lightning-button if:true={unfoldCmp} class="slds-float_right" label ={label.detail} onclick={openDetailWindow} style="margin-top:1.1rem"></lightning-button>
+			<div if:false={comesfromevent}>
+
+				<div if:false={unfoldCmp} style="margin:.7rem 15px 0 17.5rem">
+					<p style="color:gray">{historyCommentDateLabel}</p>
+					<p style="margin-top:.3rem">{historyComment}</p>
+				</div>
+			</div>
 			<!-- POPUP -->
 			<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open" if:true={isModalOpen}>
 				<div class="slds-modal__container">

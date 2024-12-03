@@ -17,7 +17,27 @@ import NAME_FIELD from'@salesforce/schema/User.Name';
 import FUNCTION from '@salesforce/schema/User.AV_Funcion__c';
 import OFICINA from '@salesforce/schema/User.AV_NumeroOficinaEmpresa__c';
 //labels
+import filtrosBusqueda from '@salesforce/label/c.CIBE_FiltrosBusqueda';
+import seeEmployeeOtherOffice from '@salesforce/label/c.CIBE_SeeEmployeeOtherOffice';
+import selectedEmployees from '@salesforce/label/c.CIBE_EmpleadosSeleccionados';
+import statusSelected from '@salesforce/label/c.CIBE_estadosSeleccionados';
+import subject from '@salesforce/label/c.CIBE_Asunto';
+import desde from '@salesforce/label/c.CIBE_DesdeFechaVencimiento';
+import hasta from '@salesforce/label/c.CIBE_HastaFechaVencimiento';
+import buscar from '@salesforce/label/c.CIBE_buscar';
+import reiniciar from '@salesforce/label/c.CIBE_Reiniciar';
+import resultadosBusqueda from '@salesforce/label/c.Cibe_resultadosBusqueda';
+import asignar from '@salesforce/label/c.CIBE_AsignarS';
+import asignacion from '@salesforce/label/c.CIBE_Asignacion';
+import anterior from '@salesforce/label/c.CIBE_Anterior';
+import posterior from '@salesforce/label/c.CIBE_Posterior';	
+import seleccionarOpcion from '@salesforce/label/c.CIBE_SeleccionarOpcion';
+import centro from '@salesforce/label/c.CIBE_Centro';
+import otraOficina from '@salesforce/label/c.CIBE_OtraOficina';
+import miOficina from '@salesforce/label/c.CIBE_MiOficinaT';
 import pendiente from '@salesforce/label/c.CIBE_Pendiente';
+
+
 import pendienteAsig from '@salesforce/label/c.CIBE_PendienteAsignacion';
 import pendienteNoLoc from '@salesforce/label/c.CIBE_PendienteNoLocalizado';
 import gestionPosi from '@salesforce/label/c.CIBE_GestionadaPositiva';
@@ -48,9 +68,29 @@ import buscarCli from '@salesforce/label/c.CIBE_buscarCliente';
 import buscarOfi from '@salesforce/label/c.CIBE_buscarOficina';
 import verMasF from '@salesforce/label/c.CIBE_debeInformar';
 
+import CIBE_NotAssigned from '@salesforce/label/c.CIBE_NotAssigned';
+
 export default class CIBE_MassReassignOwner extends LightningElement {
 
 	labels = {
+		filtrosBusqueda,
+		seeEmployeeOtherOffice,
+		selectedEmployees,
+		statusSelected,
+		subject,
+		desde,
+		hasta,
+		buscar,
+		reiniciar,
+		resultadosBusqueda,
+		asignar,
+		asignacion,
+		anterior,
+		posterior,
+		seleccionarOpcion,
+		centro,
+		otraOficina,
+		miOficina,
 		pendiente,
 		pendienteAsig,
 		pendienteNoLoc,
@@ -75,7 +115,8 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 		fechaMay,
 		reasigTar,
 		noContact,
-		debeInfo
+		debeInfo,
+		asignarA
 	}
 
 	@track data;
@@ -191,7 +232,6 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 				this.selectedEmployees = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
 				this.getOptionsOffice();
 			}
-			//this.getOptionsOffice();
 			this.setVisibilityOptions();
 		}else if(error){
 			console.log(error)
@@ -203,16 +243,7 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 		this.columns=this.columnsTask;
 	}
 
-	/*renderedCallback(){
-		console.log('renderedCallback: ');
-		console.log('this.origenFilter: '+this.origenFilter);
 
-		this.getApplicationN();
-		this.origenFilter;
-				console.log('this.origenFilter: '+this.origenFilter);
-
-	}
-	*/
 	get optionsTaskStatus() {
 		return [
 			{label: this.labels.pendiente, value: 'Open' },
@@ -242,14 +273,10 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 				if (result.value == USER_ID) {
 					this.labelUserId=result.label;
 				}
-				/*if (this.isDirector) {
-					this.optionsEmployee.push({value:USER_ID,label:this.empleName});
-				}
-				*/
 				const isUser = false;
 				if(this.fromMetricChart == "true"){ 
 					for(let i = 0; i < this.optionsEmployee.length; i++){
-						if((this.optionsEmployee[i].label).includes('Sin Gestor')){
+						if((this.optionsEmployee[i].label).includes(CIBE_NotAssigned)){
 							this.employeeFilter = this.optionsEmployee[i].value;
 							this.selectedEmployees.splice(0,2);
 							this.selectedEmployees.push({label:this.optionsEmployee[i].label,id:this.optionsEmployee[i].value,bucleId:this.multiSelectionE});
@@ -528,7 +555,6 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 		this.subjectFilter = event.target.value;
 	}
 	handleChangeOrigen(event) {
-		console.log('handleChangeOrigen: '+event.target.value);
 		this.origenFilter = event.target.value;
 		this.setVisibilityOptions();
 	}
@@ -590,8 +616,6 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 	handleChangeEmployee(event) {
 		this.multiSelectionE++;
 		this.employeeFilter = event.target.value;
-		console.log('this.employeeFilter: '+this.employeeFilter);
-		console.log('this.selectedEmployees: '+this.selectedEmployees);
 
 		for(let i=0;i<this.optionsEmployee.length;i++){
 			if(this.optionsEmployee[i]['value']===event.target.value){
@@ -884,25 +908,6 @@ export default class CIBE_MassReassignOwner extends LightningElement {
             return reverse * ((a > b) - (b > a));
         };
     }
-
-    /*onHandleSort(event) {
-		console.log('onHandleSort');
-		console.log(event.detail);
-        const  aux = { fieldName: sortedBy, sortDirection } = event.detail;
-		console.log(sortedBy);
-		console.log(sortDirection);
-        const cloneData = [...this.items];
-		const rowName = event.detail.row.id;
-        const hasChildrenContent = event.detail.hasChildrenContent;
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
-        this.items = cloneData;
-        this.sortDirection = sortDirection;
-        this.sortedBy = sortedBy;
-		console.log(this.sortDirection);
-		console.log(this.sortedBy);
-		console.log(this.items);
-    }*/
-
 	onHandleSort(event) {
 		let sortedBy = event.detail.fieldName;
 		let sortDirection = event.detail.sortDirection;
@@ -931,7 +936,6 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 		getApplicationN()
 			.then((result) => {
 				if (result) {
-					console.log('Aplicacion: '+JSON.stringify(result));
 					if(result =='CIBE_MisClientesEMP'){
 						this.appOrigin = true;
 						this.origenFilter = 'CIBE_GestionarPriorizadosEMP';
@@ -986,14 +990,8 @@ export default class CIBE_MassReassignOwner extends LightningElement {
 			this.isAnotherOffice = event.detail.checked;
 			this.selectedEmployees = [];
 			if (event.detail.checked === true) {
-				console.log(this.employeeFilter);
 				this.optionsEmployeeAux = this.optionsEmployee;
 				this.employeeFilter = null;
-				console.log(this.optionsEmployeeAux);
-				console.log(this.optionsEmployee);
-				console.log(this.empleOfi);
-				console.log(this.empleOfi.substring(4));
-				console.log(this.numOficinaEmpresa);
 				const data = this.empleOfi.substring(4) + '{|}' + this.statusFilter + '{|}' + this.origenFilter;
 				this.getOptionsEmployee(data);
 			} else {

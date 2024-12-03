@@ -8,6 +8,8 @@ import getTaskStatus             from '@salesforce/apex/CIBE_TabManagementTask_C
 import getExpClienteData		 from '@salesforce/apex/CIBE_TabManagementTask_Controller.getExperienciaClienteData';
 import CIBE_CMP_ErrorMessage 	 from '@salesforce/label/c.CIBE_CMP_ErrorMessage';
 import getPickList            	 from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId';
+import getPickList2            	 from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId2';
+
 import getResponseHGM			 from '@salesforce/apex/CIBE_TabManagementTask_Controller.validateHGM';
 import CIBE_CMP_ErrorValidateHGM from '@salesforce/label/c.CIBE_CMP_ErrorValidateHGM';
 
@@ -318,27 +320,29 @@ export default class Cibe_TabClosed extends LightningElement {
 	connectedCallback() {
 		var today = new Date();
 		this.fecha = today.toISOString().substring(0,10);
-		this.getRecordType();
 		if (!this.disableBtn) {
 			this.getPreviousData();
 		}
 		this.getPickListType('CBK_Activity_Extension__c', 'AV_MotivoCierreExperienciaCliente__c', 'AV_ActivityExtMotivoExperienciaCliente');
-		this.getPickListType('Task', 'AV_Tipo__c', 'CIBE_TaskTipo');
-		console.log(this.fecha);
+		this.getPickListType2('Task', 'AV_Tipo__c');
+		this.getRecordType();
 	}
 
 	handleSave() {
 		if (this.isExperiencia) {
 			this.isCommentRequired();
 			this.isMotivoAccionesRequired();
-			if(this.motivos.length == 0){
-				this.showToast(this.labels.error, this.labels.seleccionarMotivoAccion, 'error');
+			if(this.recordType === 'CIBE_ExperienciaClienteEMP'){
+				if(this.motivos.length === 0){
+					this.showToast(this.label.error, this.label.seleccionarMotivoAccion, 'error');
+				}
+				if(this.actions.length == 0){
+					this.showToast(this.label.error, this.label.seleccionarMotivoAccion, 'error');
+				}
 			}
-			if(this.actions.length == 0){
-				this.showToast(this.labels.error, this.labels.seleccionarMotivoAccion, 'error');
-			}
+			
 			if (this.requiredComment) {
-				this.showToast(this.labels.error, this.labels.relleneComentario, 'error');
+				this.showToast(this.label.error, this.label.relleneComentario, 'error');
 			}
 			if (this.percepcion) {
 				this.template.querySelector('p').style.display = 'block';
@@ -383,9 +387,7 @@ export default class Cibe_TabClosed extends LightningElement {
 				}
 			})
 			.catch(error => {
-				console.log(result);
-				// this.showToast('Error', 'Error cargando datos.', error);
-				
+				console.log(result);				
 			});
 	}
 
@@ -395,7 +397,17 @@ export default class Cibe_TabClosed extends LightningElement {
 		updateTask({id: this.recordId, estado: this.valueEstado, tipo: this.value, fecha: this.fecha, comentario: this.comment, acciones: acts, motivo: mots, valoracion: this.valoracion})
 			.then(result => {
                 if(result == 'OK') {
-					this.insertHistorialGestion();
+					this.progressValue = "ManagementHistory";
+					const selectedEvent = new CustomEvent("progressvaluechange", {
+						detail: {
+							progress: this.progressValue,
+							boton: this.boton,
+							closing: true
+						}
+						});
+
+				this.dispatchEvent(selectedEvent);		
+							
 				}else {
 					this.dispatchEvent(
 						new ShowToastEvent({
@@ -475,6 +487,10 @@ export default class Cibe_TabClosed extends LightningElement {
 				if ('CIBE_ExperienciaClienteCIB' == recordType || 'CIBE_ExperienciaClienteEMP' == recordType) {
 					this.isExperiencia = true;
 				}
+
+				if(recordType == 'CIBE_ExperienciaClienteEMP' || recordType == 'CIBE_GestionarPriorizadosEMP' || recordType == 'CIBE_OtrosEMP' || recordType == 'CIBE_AlertaComercialEMP' || recordType == 'CIBE_AvisosEMP' || recordType == 'CIBE_OnboardingEMP'){
+					this.value = 'LMD';
+				}
 				this.recordType = recordType;
 				this.botonDisabled();
             })
@@ -492,6 +508,25 @@ export default class Cibe_TabClosed extends LightningElement {
 	
 	getPickListType(objectName, field, picklistDevName) {
         getPickList({objectName: objectName, recordId: this.recordId, fieldApiName: field, picklistDevName: picklistDevName})
+            .then(result => {
+				if ('AV_Tipo__c' == field) {
+					this.options = result;
+				}
+            })
+            .catch(error => {
+				console.log('Display ShowToastEvent error (catch): ', error);
+                this.dispatchEvent(
+					new ShowToastEvent({
+						title: CIBE_CMP_ErrorMessage,
+						message: JSON.stringify(error),
+						variant: 'error'
+					})
+				);
+            });
+    }
+
+	getPickListType2(objectName, field) {
+        getPickList2({objectName: objectName, recordId: this.recordId, fieldApiName: field})
             .then(result => {
 				if ('AV_Tipo__c' == field) {
 					this.options = result;
@@ -546,8 +581,4 @@ export default class Cibe_TabClosed extends LightningElement {
     enableSpinner() {
         this.showSpinner = true;
     }
-
-
-
-
 }

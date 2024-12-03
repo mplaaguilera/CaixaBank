@@ -4,7 +4,6 @@
             <lightning-icon size="small" icon-name="standard:opportunity"></lightning-icon><strong>&nbsp;&nbsp; Oportunidades (Vinculadas {opposCount})</strong>
         </span>
     </div>
-    <!-- <lightning-spinner if:true={showSpinner} alternative-text="Loading" class = "customSpinner" size="large"  style="z-index: 3;"></lightning-spinner> -->
     <div class = "cardMargin">
         <div class="basicContainer cardMargin">
             <div class="slds-grid">
@@ -29,13 +28,13 @@
                     onsenddatafromoppo={buildOppoObj}
                     onnotifyagended={evaluateAgendeds}
                     data-id={opp.Id}
-                    oppislinked="true"
                     resolutionlist={resolutionList}
                     potentiallist={potentialList}
+                    isnewprod ={opp.IsNewProduct}
                 ></c-av_-detail-opportunity-appointment>
             </div>
         </template>
-        <span if:true={showOppoList}>Otras oportunidades del cliente</span>
+        <span if:true={showOtherOppsLabel}>Otras oportunidades del cliente</span>
         <template if:true={showOppoList} for:each={oppoList} for:item="opp">
             <div key={opp.Id} class="cardMargin"> 
                 <c-av_-detail-opportunity-appointment
@@ -47,7 +46,9 @@
                     data-id={opp.Id}
                     resolutionlist={resolutionList}
                     potentiallist={potentialList}
+                    isnewprod ={opp.IsNewProduct}
                 ></c-av_-detail-opportunity-appointment>
+                
             </div>
         </template>
         <template for:each={oppoNewList} for:item="opp">
@@ -61,7 +62,10 @@
                     data-id={opp.Id}
                     resolutionlist={resolutionList}
                     potentiallist={potentialList}
-                ></c-av_-detail-opportunity-appointment>
+                    buttondelete={showButtonDelete}
+                    ondeleteoppo={handleOppoDelete}
+                    isnewprod ={opp.IsNewProduct}
+                    ></c-av_-detail-opportunity-appointment>
             </div>
         </template>
     </div>

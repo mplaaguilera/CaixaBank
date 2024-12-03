@@ -13,7 +13,7 @@ export default class Av_ClientComments extends LightningElement {
     @track loading = false;
     @track refreshIco = false;
 
-    doneTypingInterval = 300;
+    doneTypingInterval = 900;
     typingTimer;
     showResults = false;
     nestedMap = [];

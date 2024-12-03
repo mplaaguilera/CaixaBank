@@ -1,0 +1,54 @@
+<template>
+    <lightning-card 
+            if:true={hasPermission}
+            variant="narrow"
+            icon-name="standard:call">
+                <h1 slot="title" style="color: inherit;font-weight: var(--lwc-cardFontWeight,700);">Llamadas perdidas ({callsData.length})</h1>
+                <!-- <lightning-button label="Descartar" title="Descartar" onclick={handleDescartar} slot="actions"></lightning-button> -->
+                <!-- Refresh button -->
+                <lightning-button-icon  icon-name="utility:refresh" alternative-text="Reload" slot="actions" onclick={refresh}></lightning-button-icon>
+                <template if:true={loading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+                <div>
+                    <template if:true={showTable}>
+                        <lightning-datatable
+                                            key-field="id"
+                                            data={pageData}
+                                            columns={columns}
+                                            sorted-by={sortByFieldName}
+                                            sorted-direction={sortDirection}
+                                            onsort={handleSortData}
+                                            default-sort-direction={defaultSort}
+                                            resize-column-disabled
+                                            onrowaction={handleRowAction}
+                                            onrowselection={handleRowSelection}
+                                            hide-checkbox-column
+                                            >
+                        </lightning-datatable>
+
+                        <div class="slds-form_inline slds-p-around_xx-small marginPagination2" if:true={isMultipagina}>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__label marginPagination">
+                                    <label class="slds-form-element__label" for="Page">Página</label>
+                                </div>
+                                <div class="slds-form-element__control slds-grow">
+                                    <lightning-combobox  class="comboSize" name="Page" id="Page" value={page} options={optionsPage} placeholder={page} onchange={handleChangePage} ></lightning-combobox>
+                                </div>
+                            </div>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__label marginPagination">
+                                    <label for="PageSize">Tamaño</label>
+                                </div>
+                                <div class="slds-form-element__control slds-grow">
+                                    <lightning-combobox class="comboSize" name="PageSize" id="PageSize" value={pageSize} options={optionsPageSize} placeholder={pageSize} onchange={handleChangePageSize}></lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template if:true={error}>
+                        {error}
+                    </template>
+                </div>
+    </lightning-card>
+</template>

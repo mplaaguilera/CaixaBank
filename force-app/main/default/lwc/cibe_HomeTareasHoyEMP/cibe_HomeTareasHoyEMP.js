@@ -27,11 +27,11 @@ export default class cibe_HomeTareasHoyEMP extends NavigationMixin(LightningElem
    
     @track columns = [
 
-        { label: this.labels.nombreCliente,           fieldName: 'idAccount',        sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},     initialWidth : 200,       typeAttributes: {label: {fieldName: 'AccountName'}}},
-        { label: this.labels.origen,                  fieldName: 'origen',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'},     initialWidth : 200},  
-        { label: this.labels.asunto,                  fieldName: 'idTask',           sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },    initialWidth : 200,       typeAttributes: {label: {fieldName: 'asunto'}}},
-        { label: this.labels.estado,                  fieldName: 'estado',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' },    initialWidth : 200},  
-        { label: this.labels.fechaVencimiento,        fieldName: 'fechaVencimiento', sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },   initialWidth : 100,       typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric"}}
+        { label: this.labels.nombreCliente,           fieldName: 'idAccount',        sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},       typeAttributes: {label: {fieldName: 'AccountName'}}},
+        { label: this.labels.origen,                  fieldName: 'origen',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'}},  
+        { label: this.labels.asunto,                  fieldName: 'idTask',           sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },      typeAttributes: {label: {fieldName: 'asunto'}}},
+        { label: this.labels.estado,                  fieldName: 'estado',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' }},  
+        { label: this.labels.fechaVencimiento,        fieldName: 'fechaVencimiento', sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },     typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric"}}
     ];
     
 
@@ -55,6 +55,8 @@ export default class cibe_HomeTareasHoyEMP extends NavigationMixin(LightningElem
         let dataWR = wireResult.data;
         let errorWR = wireResult.error;
         this._wiredData = wireResult;
+        console.log('dataWR');
+        console.log(dataWR);
         if(dataWR) {
             this.dataValues = dataWR;
             this.pageNumber = 0;

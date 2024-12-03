@@ -1,5 +1,5 @@
-import { LightningElement, api, wire, track } from 'lwc';
-import insertarPretension from '@salesforce/apex/SAC_LCMP_InsertarPretension.insertarPretension';
+import { LightningElement, api, wire } from 'lwc';
+//import insertarPretension from '@salesforce/apex/SAC_LCMP_InsertarPretension.insertarPretension';
 import tienePermisos from '@salesforce/apex/SAC_LCMP_InsertarPretension.tienePermisos';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { NavigationMixin } from 'lightning/navigation';
@@ -53,7 +53,7 @@ export default class SAC_InsertarPretension extends NavigationMixin(LightningEle
             const evt = new ShowToastEvent({
                 title: 'Pretensión Creada',
                 message: this.mensaje,
-                variant: 'success',
+                variant: 'success'
             });
             this[NavigationMixin.Navigate]({
                 type: 'standard__recordPage',
@@ -61,7 +61,7 @@ export default class SAC_InsertarPretension extends NavigationMixin(LightningEle
                     recordId: nuevaId,
                     objectApiName: 'Case',
                     actionName: 'view'
-                },
+                }
             });
             this.dispatchEvent(evt);
             this.isLoading = false;
@@ -72,7 +72,7 @@ export default class SAC_InsertarPretension extends NavigationMixin(LightningEle
                 const evt = new ShowToastEvent({
                     title: 'Fallo al crear Pretensión',
                     message: error.body.message,
-                    variant: 'error',
+                    variant: 'error'
                 });
 
                 this.dispatchEvent(evt);

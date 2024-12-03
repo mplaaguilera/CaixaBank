@@ -1,0 +1,25 @@
+.card-title{
+    font-weight: bold;
+    font-size: 1em;
+}
+.card-title-icon{
+    margin-left: 0.3rem;
+}
+.spin-cls{
+    display: block;
+}
+.not-first-card{
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+.client-opps-icon{
+    margin-right: 1rem;
+}
+.opptask-stage{
+	background-color: rgb(45 86 116);
+	font-size: 12px;
+	font-style: italic;
+	padding-bottom: 0.4rem;
+	position: relative;
+	display: inline;
+}

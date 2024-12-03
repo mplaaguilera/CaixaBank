@@ -22,7 +22,8 @@
             <property name="cliente" type="String" label="Cliente" description="AccountId" />
             <property name="linea" type="Boolean" label="Línea" description="Línea." />
             <property name="anadirParticipantes" type="Boolean" label="Añadir participantes a la oportunidad" description="Añadir participantes a la oportunidad" />
-
+            <property name="comentario" type="String" label="Comentario" description="." />
+            <property name="showSinCliente" type="Boolean" label="Mostrar o no sin cliente" description="." />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

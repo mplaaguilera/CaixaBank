@@ -1,4 +1,4 @@
 <aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
     <lightning:workspaceAPI aura:id="workspace" />
-    <c:cibe_TabListOpportunityComiteDirectorCIB onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:cibe_TabListOpportunityComiteDirectorCIB>
+    <c:cibe_TabListOppComiteDirectorCIB onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:cibe_TabListOppComiteDirectorCIB>
 </aura:component>

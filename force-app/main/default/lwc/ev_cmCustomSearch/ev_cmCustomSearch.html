@@ -1,0 +1,52 @@
+<template>
+    <lightning-card>
+      <lightning-layout multiple-rows="true" horizontal-align="center">
+        <lightning-layout-Item padding="around-small" size="12">
+               <!-- onrowselection fires when a new is selected or unselected, or page has 
+  changed with new rows in it -->
+  <span class="slds-p-horizontal_small">
+  <p>*En esta página se muestran solo 100 registros, es posible que haya más en siguientes páginas.</p>
+  </span>
+          <lightning-datatable
+            data-id="datarow"
+            columns={columns}
+            data={data}
+            key-field="Id"
+            selected-rows={selection}
+            onrowselection={rowSelection}
+          >
+          </lightning-datatable>
+        </lightning-layout-Item>
+        <lightning-layout-Item padding="around-small" flexibility="auto">
+          <lightning-button
+            label="Anterior"
+            icon-name="utility:chevronleft"
+            icon-position="left"
+            onclick={previousEve}
+            disabled={disPre}
+          >
+          </lightning-button>
+          <span class="slds-p-horizontal_small">
+            Pagina {pageNumber} | Mostrando {dataSize} registros
+          </span>
+          <lightning-button
+            label="Siguiente"
+            icon-name="utility:chevronright"
+            icon-position="right"
+            disabled={isLastPage}
+            onclick={nextEve}
+          >
+          </lightning-button>
+        </lightning-layout-Item>
+        <lightning-layout>
+            <lightning-layout-item flexibility="auto" padding="around-small">
+                <lightning-button
+                    label="Actualizar Asistencia"
+                    onclick={updateAttendance}
+                    disabled={isUpdateDisabled}
+                ></lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+      </lightning-layout>
+    </lightning-card>
+  </template>

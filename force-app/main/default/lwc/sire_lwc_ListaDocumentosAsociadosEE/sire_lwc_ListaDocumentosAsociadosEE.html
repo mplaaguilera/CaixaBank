@@ -1,0 +1,42 @@
+<template>
+    <lightning-card variant="Narrow" title={titulo} icon-name="custom:custom55" class="titulo">
+        <template if:true={tablaVisible}>
+            <div style="height: 200px;" class="slds-scrollable">  
+                <lightning-datatable
+                    key-field="id"
+                    data={documentos}
+                    columns={columnsDocumento}
+                    hide-checkbox-column="true"
+                    onrowaction={handleRowAction}>
+                </lightning-datatable> 
+            </div>
+        </template>
+
+        <!-- NO HAY DATOS  -->
+        <template if:true={noHayDatos}>
+            <hr style="color: #e5e5e5;margin-bottom: 15px;margin-top: 0px;">
+            <div class="slds-text-heading_small slds-text-align_center slds-var-p-around_small">No existen registros asociados.</div>
+        </template>
+        
+        <!-- ERROR  -->
+        <template if:true={mostrarError}>
+            <div class="slds-modal__content slds-var-p-around_medium error" >
+                <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+                    <div class="slds-notify_container slds-is-relative">
+                        <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                            <span class="slds-icon_container slds-icon-utility-error slds-var-m-right_small slds-no-flex slds-align-top" title="Error">
+                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                            </svg>
+                            </span>
+                            <div class="slds-notify__content">
+                                <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                                {codigoError}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>       
+    </lightning-card>     
+</template>

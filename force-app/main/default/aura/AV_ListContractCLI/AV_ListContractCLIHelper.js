@@ -58,7 +58,7 @@ Historial
 		var toastEvent = $A.get("e.force:showToast");
 		toastEvent.setParams({
 			"message": text,
-			"type": type,
+			"type": type
 		});
 		toastEvent.fire();
 	}

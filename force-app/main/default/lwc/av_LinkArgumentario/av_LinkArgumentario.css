@@ -1,0 +1,16 @@
+.divbutton a:hover{
+    background-color: orange !important; 
+}
+.divbutton a{
+    background-color: rgb(255, 89, 0) !important; 
+}
+.container {
+    position: relative;
+}
+
+.container lightning-spinner {
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+}

@@ -1,0 +1,13 @@
+<template>
+    <div class="container">
+        <template if:true={isLoading}>
+            <!-- Muestra el spinner de carga mientras se carga el contenido -->
+            <lightning-spinner alternative-text="Cargando" size="small"></lightning-spinner>
+        </template>
+        <template if:false={isLoading}>            
+                <div class="divbutton">
+                    <a href={listData.AV_URLArgumentario__c} target="_blank" class="slds-button slds-button_stretch slds-button_brand" style="background-color: #55ade8; border: 1px solid white;">Argumentario</a>
+                </div>
+        </template>
+    </div>
+</template>

@@ -28,18 +28,17 @@
 								<c-cibe_-tab-closed record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-tab-closed>
 							</lightning-tab>
 						</template>
-						<template if:true={isEMP}>
+						<!-- <template if:true={isEMP}>
 							<lightning-tab if:false={disableBtn} label={labels.noLocalizado} value="NoLocalizado">
 								<c-cibe_-tab-not-located record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-tab-not-located>
 							</lightning-tab>
 							<lightning-tab if:false={disableBtn} label={labels.posponer} value="Posponer">
 							<c-cibe_-postpone-call record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-postpone-call>
 							</lightning-tab>
-						</template>
-						<template if:false={isExperiencia}>	
+						</template> -->
+						<template if:true={isCIB}>	
 							<lightning-tab if:false={disableBtn}  label={labels.cerrarTarea} value="CerrarInformar" onactive={navigateToTab}></lightning-tab>
 						</template>
-						
 					</div>
 				</lightning-tabset>
 				

@@ -1,0 +1,49 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-p-horizontal_large">
+                <div class="slds-path">
+                    <div class="slds-grid slds-path__track">
+                        <div class="slds-grid slds-path__scroller-container">
+                            <div class="slds-path__scroller">
+                                <div class="slds-path__scroller_inner">
+                                    <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Planificada">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-1" role="option" tabindex="0" data-stage="Planificada">
+                                                <span class="slds-path__title" data-stage="Planificada">{labels.planificada}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Cancelada">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-2" role="option" tabindex="-1" data-stage="Cancelada">
+                                                <span class="slds-path__title" data-stage="Cancelada">{labels.cancelada}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Realizada">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-3" role="option" tabindex="-1" data-stage="Realizada">
+                                                <span class="slds-path__title" data-stage="Realizada">{labels.realizada}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Vencida">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-4" role="option" tabindex="-1" data-stage="Vencida">
+                                                <span class="slds-path__title" data-stage="Vencida">{labels.vencida}</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="slds-m-around_medium">
+            <div class="slds-m-top_x-small slds-align_absolute-center">          
+                <lightning-button id="submit1" type="submit" label={labels.guardar} disabled={disabledButton} onclick={handleClick} variant="brand"></lightning-button>
+            </div>
+        </footer>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+        </template>
+    </article>
+
+</template>

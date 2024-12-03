@@ -39,7 +39,3 @@ export function formatearIsoDate(isoDate) {
 	const minutes = date.getMinutes().toString().padStart(2, '0');
 	return `${day}/${month}/${year} a las ${hours}:${minutes}`;
 }
-
-export function toast(variant, title, message) {
-	dispatchEvent(new ShowToastEvent({variant, title, message, mode: 'dismissable', duration: 4000}));
-}

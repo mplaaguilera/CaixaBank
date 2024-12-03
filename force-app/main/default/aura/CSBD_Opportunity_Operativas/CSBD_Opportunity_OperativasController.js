@@ -48,7 +48,7 @@
 				botonesActivos.botonTrasladoImagin = !isClosed && imaginBank && ['CMB', 'CMN'].includes(oportunidad.RecordType.Name);
 				botonesActivos.botonPendienteInternoActivo = ['Activa', 'Pendiente Interno'].includes(estado);
 				botonesActivos.botonCerrarActivo = estado === 'Activa';
-				botonesActivos.botonReactivarActivo = isClosed && (component.get('v.esResponsable') && oportunidad.RecordType.Name !== 'Hipoteca' || oportunidad.RecordType.Name === 'Hipoteca' || oportunidad.RecordType.Name === 'Acción comercial');
+				botonesActivos.botonReactivarActivo = isClosed && ((component.get('v.esResponsable') && oportunidad.RecordType.Name !== 'Hipoteca') || oportunidad.RecordType.Name === 'Hipoteca' || oportunidad.RecordType.Name === 'Acción comercial');
 				botonesActivos.botonAutenticarActivo = !isClosed && oportunidad.AccountId && oportunidad.CSBD_Contact__c;
 				botonesActivos.botonAmpliarVencimiento = ['Activa', 'Pendiente Interno', 'Pendiente Cita', 'Pendiente Cliente'].includes(estado);
 				botonesActivos.botonInformeSiaActivo = !isClosed && estado !== 'Nueva';

@@ -38,12 +38,32 @@
                 </lightning-layout>
             </div>
 
-                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
-                    <!-- Fecha Proxima Gestión -->
-                    <lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY" class="user-input-fecha"  name="fechaProxGestion" value={fechaProxGestion} onchange={handleFechaProxGestion}></lightning-input>
-                </div>
-                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
-                </div>
+            <!-- Plazo/Duracion de la operacion -->
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-input label={labels.deadlineOpp} field-level-help={labels.helpTextDeadlineOpp} class="textBoxLeft user-input" type="Decimal" name="deadlineOpp" value={deadlineOpp} onchange={handleDeadlineOpp}></lightning-input>
+            </div>
+
+            <!-- Pais -->
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <lightning-combobox
+                            name="Pais"
+                            label={labels.pais}
+                            value={pais}
+                            options={optionsPais}
+                            onchange={handlePais}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Fecha Proxima Gestión -->
+                <lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY" class="user-input-fecha"  name="fechaProxGestion" value={fechaProxGestion} onchange={handleFechaProxGestion}></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+            </div>
                 
             <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
                 <!-- Importe -->
@@ -107,6 +127,7 @@
                         </lightning-layout-item>
                     </lightning-layout> 
             </div>
+            
             <!--<div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
                 Comision FIN AÑO 
                     <lightning-layout class="layout-padding">
@@ -120,11 +141,31 @@
                         </lightning-layout-item>
                     </lightning-layout> 
             </div> -->
+
+
+             <!-- Importe total operación en mercado -->
+             <div if:true={sindicaciones} class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-input label={labels.importeTotalMercado} class="textBoxLeft user-input" type="Number" name="deadlineOpp" value={importeTotalMercado} onchange={handleImporteTotalMercado}></lightning-input>
+            </div>
+
+            <div if:true={sindicaciones} class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+            </div>
+
+             <!-- Importe renovacion o modificacion -->
+             <div if:true={tipoOperacionMorV} class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-input required="true" label={labels.importeRenovacion} class="textBoxLeft user-input" type="Number" name="deadlineOpp" value={importeRenovacion} onchange={handleImporteRenovacion}></lightning-input>
+            </div>
+
+            <!-- Variacion sobre el importe anterior -->
+            <div if:true={tipoOperacionMorV} class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <lightning-input required="true" label={labels.importeVariacion} class="textBoxLeft user-input" type="Number" name="deadlineOpp" value={importeVariacion} onchange={handleImporteVariacion}></lightning-input>
+            </div>
+
         </div>    
         <!-- Toggle -->
         <lightning-layout class="layout-padding">
             <lightning-layout-item size="12"> 
-                <div class="slds-grid layout-padding">
+                <div class="slds-grid layout-padding slds-m-left_medium">
                     <lightning-input type="toggle" class="user-input" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" onchange={handleOtraEntidad} checked={hasOtherEntity}></lightning-input>
                     <label class="slds-form-element__label">{labels.productoEnOtraEntidad}</label>
                 </div>

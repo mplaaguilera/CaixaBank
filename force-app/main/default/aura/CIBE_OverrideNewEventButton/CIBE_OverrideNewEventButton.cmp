@@ -1,0 +1,22 @@
+<aura:component controller = 'CIBE_OverrideNewEventButtonController' implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName,flexipage:availableForAllPageTypes,lightning:hasPageReference"  access="global">
+    
+<aura:attribute name="value" type="String" />
+
+<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+<aura:attribute name="selectedRecordId" type="Id" />
+
+
+
+
+<!-- <aura:if isTrue="{AND(!v.value =='CIBE', !v.selectedRecordId != '0127a000002yMbzAAE')}"> -->
+<aura:if isTrue="{!v.value =='CIBE'}">
+  <c:cIBE_OverrideNewEventButtonChild ></c:cIBE_OverrideNewEventButtonChild>
+    <aura:set attribute="else">
+      <div class="Spinner">
+        <!-- <c:cibe_NewEventTab  onfocusrecordtabandclose = "{!c.closeFocusedTabAndClose}" onfocusrecordtab = "{!c.focusRecordTab}" onclosetabfinish="{!c.closeFocusedTabFinish}"  onfocustab="{!c.focusedTab}" onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}" comesfromevent="{!v.comesfromevent}"></c:cibe_NewEventTab> -->
+        <lightning:spinner alternativeText="Loading" size="medium" />
+      </div>
+    </aura:set>
+  </aura:if> 
+</aura:component>

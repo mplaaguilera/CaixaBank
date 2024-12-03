@@ -17,3 +17,12 @@
 .my-modal-footer {
     --sds-c-modal-footer-color-background: LightGray;
 }
+.titleStyles{
+    padding-left: 10px;
+}
+
+.divStyles{
+    margin: 0;
+    padding: 0;
+    height: 25px;
+}

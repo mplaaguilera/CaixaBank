@@ -1,43 +1,70 @@
-import { LightningElement , api, wire, track} from 'lwc';
+import { LightningElement, api, wire, track } from 'lwc';
 
 import getRecords from '@salesforce/apex/CIBE_TasksFromGroupsController.getRecords';
 
-const columns = [
-    { label: 'Cliente', fieldName: 'accountIdUrl', type: 'url', typeAttributes: { label: { fieldName: 'accountName' }, target: '_self' } },
-    { label: 'Nombre', fieldName: 'idUrl', type: 'url', typeAttributes: { label: { fieldName: 'name' }, target: '_self' } },
-    { label: 'Estado', fieldName: 'status', type: 'text' },
-    { label: 'Fecha de vencimiento', fieldName: 'activityDate',  type: 'date', sortable: 'true', cellAttributes: { alignment: 'right' } },
-    { label: 'Asignado a', fieldName: 'ownerIdUrl', type: 'url', typeAttributes: { label: { fieldName: 'owner' }, target: '_self' } },
-    { label: 'Origen', fieldName: 'recordType', type: 'text' }
-];
+
+
+
+//labels
+import cliente from '@salesforce/label/c.CIBE_Cliente';
+import nombre from '@salesforce/label/c.CIBE_Nombre';
+import estado from '@salesforce/label/c.CIBE_Estado';
+import fechaVencimiento from '@salesforce/label/c.CIBE_FechaDeVencimiento';
+import asignado from '@salesforce/label/c.CIBE_Asignado';
+import origen from '@salesforce/label/c.CIBE_Origen';
+import message from '@salesforce/label/c.CIBE_MessageTaskFromGroups';
+import verMas from '@salesforce/label/c.CIBE_VerMas';
+import tareasGrupo from '@salesforce/label/c.CIBE_TareasGrupo';
+
 
 export default class cibe_TasksFromGroups extends LightningElement {
+
+    labels = {
+        cliente,
+        nombre,
+        estado,
+        fechaVencimiento,
+        asignado,
+        origen,
+        message,
+        verMas,
+        tareasGrupo
+    }
+
+
+    columns = [
+        { label: this.labels.cliente, fieldName: 'accountIdUrl', type: 'url', hideDefaultActions: true, typeAttributes: { label: { fieldName: 'accountName' }, target: '_self' } },
+        { label: this.labels.nombre, fieldName: 'idUrl', type: 'url', hideDefaultActions: true, typeAttributes: { label: { fieldName: 'name' }, target: '_self' } },
+        { label: this.labels.estado, fieldName: 'status', type: 'text', hideDefaultActions: true, },
+        { label: this.labels.fechaVencimiento, fieldName: 'activityDate', type: 'date', hideDefaultActions: true, sortable: 'true', cellAttributes: { alignment: 'right' } },
+        { label: this.labels.asignado, fieldName: 'ownerIdUrl', type: 'url', hideDefaultActions: true, typeAttributes: { label: { fieldName: 'owner' }, target: '_self' } },
+        { label: this.labels.origen, fieldName: 'recordType', type: 'text', hideDefaultActions: true, }
+    ];
 
     @api recordIds;
 
     @track tasks = [];
-    @track columns = columns;
     @track isLoaded = false;
     @track offSet = 0;
 
-    @wire(getRecords, { offSet : 0, recordIds : '$recordIds' })
+    @wire(getRecords, { offSet: 0, recordIds: '$recordIds' })
     getRecordsData({ error, data }) {
         if (data) {
             this.offSet = 0;
             this.tasks = JSON.parse(JSON.stringify(data));
-            
+
             this.isLoaded = true;
             this.throwRefreshEvent();
         } else if (error) {
             console.log(error);
         }
     }
-    
+
     viewMore() {
         this.isLoaded = false;
         this.offSet = (this.offSet <= 1990) ? (this.offSet + 10) : this.offSet;
 
-        getRecords({ offSet : this.offSet, recordIds : this.recordIds })
+        getRecords({ offSet: this.offSet, recordIds: this.recordIds })
             .then((data) => {
                 const tasks = this.tasks;
                 this.tasks = tasks.concat(data);

@@ -2,8 +2,8 @@ import { LightningElement, track, api, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import uId from '@salesforce/user/Id';
-import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
-import LightningAlert from "lightning/alert";
+import { /*getObjectInfo,*/ getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
+//import LightningAlert from "lightning/alert";
 
 
 import comprobarPropietarioProceso from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.comprobarPropietarioProceso';
@@ -14,7 +14,7 @@ import getPicklistIntervinientes from '@salesforce/apex/SIR_LCMP_accionSinWorkfl
 import insertAccion from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.insertAccion';
 import updateAccion from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.updateAccion';
 import enviarAccion from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.enviarAccion';
-import buscarIdsProceso from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.buscarIdsProceso';
+//import buscarIdsProceso from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.buscarIdsProceso';
 import buscarIdsAccion from '@salesforce/apex/SIR_LCMP_accionSinWorkflow.buscarIdsAccion';
 import ACCIONES_OBJECT from '@salesforce/schema/SIREC__SIREC_obj_acciones__c';
 
@@ -31,6 +31,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
     @track recordTypeId;
     @track rtIdAccPRESOL;
     @track rtIdAccIMPA;
+    @track accionesMetadata;
 
     @track nuevaAccion = false;
     @track titulo = null;
@@ -51,6 +52,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
     @track proceso = null;
     @track nombreProceso = null;
     @track estrategia = null;
+    @track descEstrategia = null;
     @track fechaContacto = null;
     @track fechaCompromisoPago = null;
     @track fechaMinima = null;
@@ -95,51 +97,45 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
     accionObjectInfo;
 
     @wire(getObjectInfo, { objectApiName: PROCESOS_OBJECT })
-    procesoObjectInfo;*/
+    procesoObjectInfo;
+
     @wire(getObjectInfo, {objectApiName: ACCIONES_OBJECT})
-    accionesMetadata;
+    accionesMetadata;*/
     
-    @wire(getPicklistValuesByRecordType, { objectApiName: ACCIONES_OBJECT, recordTypeId: '$rtIdAccIMPA' })//0123Y000000RS4yQAG
+    @wire(getPicklistValuesByRecordType, { objectApiName: ACCIONES_OBJECT, recordTypeId: '$recordtypeAccionAmistoso' })
     resultPicklistValuesImpa;
 
-    @wire(getPicklistValuesByRecordType, { objectApiName: ACCIONES_OBJECT, recordTypeId: '$rtIdAccPRESOL' })//0121q000000663HAAQ
+    @wire(getPicklistValuesByRecordType, { objectApiName: ACCIONES_OBJECT, recordTypeId: '$recordtypeAccionPresol' })
     resultPicklistValuesPresol;
 
     
-    @wire(getProceso, { idProceso: '$recordId', accionesMetadata: '$accionesMetadata'})
+    @wire(getProceso, { idProceso: '$recordId'})
     getProceso({ error, data }) {
         if(data){
-            const rtisAcc = this.accionesMetadata.data.recordTypeInfos;
+            /*const rtisAcc = this.accionesMetadata.data.recordTypeInfos;
             this.rtIdAccPRESOL = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Preventivo');
-            this.rtIdAccIMPA = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Amistoso');
-            buscarIdsProceso({}).then(result => {
-                this.recordTypeIdProcesoPresol = result;                        
+            this.rtIdAccIMPA = Object.keys(rtisAcc).find(rti => rtisAcc[rti].name === 'Acción Amistoso');*/
+            //buscarIdsProceso({}).then(result => {
+                //this.recordTypeIdProcesoPresol = result;                        
                 buscarIdsAccion({}).then(result => { 
-                    for (var i = 0; i < result.length; i++) {
-                        if(result[i].Name == 'Acción Amistoso'){
-                            this.recordtypeAccionAmistoso = result[i].Id;
-                        }
-                        if(result[i].Name == 'Acción Preventivo'){
-                            this.recordtypeAccionPresol = result[i].Id;
-                        }
-                    }  
-                    
+                    this.recordtypeAccionAmistoso = result;
                     // Si hay resultado es Nueva Accion
                     if(data.length > 0){
                         this.proceso = data; 
                         this.nombreProceso = this.proceso[0].Name;
                         this.estrategia = this.proceso[0].SIREC__SIREC_fld_estrategia__c;
-                        if(this.proceso[0].RecordTypeId == this.recordTypeIdProcesoPresol){
+                        this.descEstrategia = this.proceso[0].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
+                        /*if(this.proceso[0].RecordTypeId === this.recordTypeIdProcesoPresol){
                             this.recordIdAccion = this.recordtypeAccionPresol;
                             this.fechaMinima = this.proceso[0].SIR_fechaCarga__c;                 
-                        } else {
+                        } else {*/
                             this.recordIdAccion = this.recordtypeAccionAmistoso;
                             this.fechaMinima = this.proceso[0].SIREC__SIREC_fld_fechaInicio__c;
-                        }
+                        //}
                         this.titulo = 'Nueva'; 
                         // Comprobamos si es propietario del proceso
                         comprobarPropietarioProceso({idProceso: this.recordId}).then(result => {                   
-                            if(result == 'OK'){                                           
+                            if(result === 'OK'){                                           
                                 this.crearFormAccion();
                             } else {
                                 this.mensajeError = result;
@@ -156,7 +152,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
                         this.titulo = 'Modificación';
                         // Comprobamos si es propietario de la accion
                         comprobarPropietarioAccion({idAccion: this.recordId}).then(result => {                     
-                            if(result == 'OK'){                    
+                            if(result === 'OK'){                    
                                 this.informarFormAccion();                       
                             } else {
                                 this.mensajeError = result;
@@ -171,13 +167,9 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
                 })
                 .catch(error => {
                     this.mensajeError = error;  
-                });                   
-            })
-            .catch(error => {
-                this.mensajeError = error;  
-            });           
-                
-        }                 
+                });                               
+                             
+        }
     }  
 
 
@@ -186,14 +178,14 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
         this.botonGuardar = true;
         this.nombreBoton = 'Guardar';               
         var today = new Date();
-        if(this.fechaContacto == '' ||  this.fechaContacto == null){
+        if(this.fechaContacto === '' ||  this.fechaContacto == null){
             this.fechaContacto = today.toISOString();            
         }
          
         getPicklistIntervinientes({idProceso: this.recordId}).then(result => { 
             this.optionsInterviniente = result; 
             for (var i = 0; i < result.length; i++) {
-                if(result[i].value == this.proceso[0].SIREC__SIREC_fld_cliente__c){
+                if(result[i].value === this.proceso[0].SIREC__SIREC_fld_cliente__c){
                     this.interviniente = result[i].value;
                 }
             }                     
@@ -207,7 +199,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
         this.idAccion = idAccion; 
 
         var today = new Date();
-        if(this.fechaContacto == '' ||  this.fechaContacto == null){
+        if(this.fechaContacto === '' ||  this.fechaContacto === null){
             this.fechaContacto = today.toISOString();            
         }
         getAccion({idAccion: this.idAccion}).then(result => { 
@@ -217,7 +209,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
             getPicklistIntervinientes({idProceso: this.accion[0].SIREC__SIREC_fld_proceso__c}).then(result => { 
                 this.optionsInterviniente = result; 
                 for (var i = 0; i < result.length; i++) {
-                    if(result[i].value == this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
+                    if(result[i].value === this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
                         this.interviniente = result[i].value;
                     }
                 } 
@@ -231,11 +223,11 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
                 this.responsable = this.accion[0].SIREC__SIREC_fld_responsable__c;
                 this.valueAccion = this.accion[0].SIREC__SIREC_fld_accion__c;
                 this.valueResultado = this.accion[0].SIREC__SIREC_fld_resultado__c;
-                if (this.accion[0].record == this.recordTypeIdProcesoPresol) {
+                /*if (this.accion[0].record === this.recordTypeIdProcesoPresol) {
                     this.fechaMinima = this.accion[0].SIR_fechaCarga__c;                 
-                } else {
+                } else {*/
                     this.fechaMinima = this.data[0].SIREC__SIREC_fld_fechaInicio__c;
-                }
+                //}
                 //Se mira el estado de la accion y si está en Pendiente sincronización se bloquea la edicion de los campos
                 if(this.accion[0].SIREC__SIREC_fld_estado__c === 'Pendiente Sincronización'){
                     this.disableAcciones = true;
@@ -261,7 +253,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
 
     informarFormAccion(){          
         var today = new Date();
-        if(this.fechaContacto == '' ||  this.fechaContacto == null){
+        if(this.fechaContacto === '' ||  this.fechaContacto == null){
             this.fechaContacto = today.toISOString();            
             this.today = this.fechaContacto;
         }      
@@ -270,18 +262,18 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
             this.disableAcciones = false;
             this.disableResultado = false; 
             
-            if(this.accion[0].SIREC__SIREC_fld_proceso__r.RecordTypeId == this.recordTypeIdProcesoPresol){
+            /*if(this.accion[0].SIREC__SIREC_fld_proceso__r.RecordTypeId === this.recordTypeIdProcesoPresol){
                 this.recordIdAccion = this.recordtypeAccionPresol;
                 this.fechaMinima = this.accion[0].SIREC__SIREC_fld_proceso__r.SIR_fechaCarga__c        
-            } else {
+            } else {*/
                 this.recordIdAccion = this.recordtypeAccionAmistoso;
                 this.fechaMinima = this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaInicio__c        
-            }
+            //}
 
             getPicklistIntervinientes({idProceso: this.accion[0].SIREC__SIREC_fld_proceso__c}).then(result => { 
                 this.optionsInterviniente = result; 
                 for (var i = 0; i < result.length; i++) {
-                    if(result[i].value == this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
+                    if(result[i].value === this.accion[0].SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_cliente__c){
                         this.interviniente = result[i].value;
                     }
                 } 
@@ -295,7 +287,7 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
                 this.responsable = this.accion[0].SIREC__SIREC_fld_responsable__c;
                 this.valueAccion = this.accion[0].SIREC__SIREC_fld_accion__c;
                 this.valueResultado = this.accion[0].SIREC__SIREC_fld_resultado__c;
-                if(this.accion[0].SIR_FechaCompromisoPago__c != null && this.accion[0].SIR_FechaCompromisoPago__c != ''){
+                if(this.accion[0].SIR_FechaCompromisoPago__c != null && this.accion[0].SIR_FechaCompromisoPago__c !== ''){
                     this.fechaCompromiso = this.accion[0].SIR_FechaCompromisoPago__c;
                 }                
 
@@ -318,21 +310,12 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
                 this.disabledGuardar = false;
                 this.formularioVisible = true; 
                 
-                if(this.recordIdAccion == this.recordtypeAccionPresol){
-                    let key = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
-                    //26 en este codigo es el valor de ilocalizado
-                    //25 en este codigo es el valor de Compromiso de pago incumplido
-                    //24 en este codigo es el valor de No colabora con acuerdo incumplido
-                    this.optionsResultado = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
-                } else {
-                    let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
-                    //26 en este codigo es el valor de ilocalizado
-                    //25 en este codigo es el valor de Compromiso de pago incumplido
-                    //24 en este codigo es el valor de No colabora con acuerdo incumplido
-                    this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
-                    }
-                
-                                                  
+                let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
+                //26 en este codigo es el valor de ilocalizado
+                //25 en este codigo es el valor de Compromiso de pago incumplido
+                //24 en este codigo es el valor de No colabora con acuerdo incumplido
+                this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
+                                              
             });
         });                          
     }
@@ -376,23 +359,12 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
             this.disabledGuardar = true;
         }*/
         this.validaciones();
-
-
-        if(this.recordIdAccion == this.recordtypeAccionPresol){
-            let key = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
-            //26 en este codigo es el valor de ilocalizado
-            //25 en este codigo es el valor de Compromiso de pago incumplido
-            //24 en este codigo es el valor de No colabora con acuerdo incumplido
-            this.optionsResultado = this.resultPicklistValuesPresol.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));                 
-        } else {
-            let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
-            //26 en este codigo es el valor de ilocalizado
-            //25 en este codigo es el valor de Compromiso de pago incumplido
-            //24 en este codigo es el valor de No colabora con acuerdo incumplido
-            this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
-            }
-
-        }
+        let key = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.controllerValues[this.valueAccion];
+        //26 en este codigo es el valor de ilocalizado
+        //25 en este codigo es el valor de Compromiso de pago incumplido
+        //24 en este codigo es el valor de No colabora con acuerdo incumplido
+        this.optionsResultado = this.resultPicklistValuesImpa.data.picklistFieldValues.SIREC__SIREC_fld_resultado__c.values.filter(opt => opt.validFor.includes(key)).filter(ilo => !ilo.value.includes(26) && !ilo.value.includes(25) && !ilo.value.includes(24));
+    }
     
 
     changeResultado(event){ 
@@ -450,45 +422,37 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
     validaciones(){
         //Validar que todos los campos requeridos estén informados para activar el botón guardar
         this.errorGeneral = false;
-        this.mensajeError = '';
-        if(this.valueResultado == 17){
+        this.mensajeError = '';        
+        if(this.valueResultado === '17'){
             this.activarFechaCompromiso = true;
         } else {
             this.activarFechaCompromiso = false;
             this.fechaCompromisoPago = null;
         }
 
-
-
         //Validación de comentario
         if (this.comentarios != null && this.comentarios.length > 500) {
             this.errorGeneral = true;
             this.mensajeError = this.mensajeError + '-El comentario no puede contener más de 500 caracteres.\n';
         }
-
-
         
         let today = new Date();
         today = today.toISOString(); 
 
-        if(this.valueResultado !='' && this.valueResultado != null && this.valueResultado != undefined && this.fechaContacto>today){ 
+        if(this.valueResultado !=='' && this.valueResultado != null && this.valueResultado !== undefined && this.fechaContacto>today){ 
             this.errorGeneral = true;
             this.mensajeError = this.mensajeError + '-La fecha no puede ser superior a la de hoy cuando se tiene un resultado informado. \n'; 
         }
-
-
-        console.log(this.fechaMinima);
-        console.log(this.fechaContacto);
 
         if (this.fechaContacto < this.fechaMinima) {
             this.errorGeneral = true;
             this.mensajeError = this.mensajeError + '-La fecha no puede ser inferior a la fecha de inicio/carga del proceso.'; 
         }
 
-        if(this.interviniente != undefined && this.responsable != undefined && this.responsable != '' && this.valueAccion != undefined 
-            && this.valueAccion != '' && this.valueAccion != null && this.valueTipo != undefined && this.fechaContacto != undefined && !this.errorGeneral){
+        if(this.interviniente !== undefined && this.responsable !== undefined && this.responsable !== '' && this.valueAccion !== undefined 
+            && this.valueAccion !== '' && this.valueAccion != null && this.valueTipo !== undefined && this.fechaContacto !== undefined && !this.errorGeneral){
             this.disabledGuardar = false;
-            if (this.valueResultado !='' && this.valueResultado != null && this.valueResultado != undefined) {
+            if (this.valueResultado !=='' && this.valueResultado != null && this.valueResultado !== undefined) {
                 this.nombreBoton = 'Guardar y enviar';
             }else{
                 this.nombreBoton = 'Guardar'; 
@@ -515,17 +479,18 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
         this.form.push(this.comprobarValor(this.interviniente));
         this.form.push(this.comprobarValor(this.recordId)); 
         this.form.push(this.comprobarValor(this.estrategia));
-        this.form.push(this.comprobarValor(this.fechaCompromisoPago));  
+        this.form.push(this.comprobarValor(this.fechaCompromisoPago));
+        this.form.push(this.comprobarValor(this.descEstrategia));   
           
         if(this.nuevaAccion){
             this.form.push(this.comprobarValor(this.recordIdAccion));
             insertAccion({data: this.form}).then(result => {
                 var resultadoInsert = result;
                 resultadoInsert = resultadoInsert.split('-');     
-                if(resultadoInsert[0] == 'OK'){
+                if(resultadoInsert[0] === 'OK'){
                     var resultadoInsertSplit2 = resultadoInsert[1].split('@');       
                     this.idAccion = resultadoInsertSplit2[1];                    
-                    if(resultadoInsertSplit2[0] == 'true'){
+                    if(resultadoInsertSplit2[0] === 'true'){
                         this.idAccion = resultadoInsertSplit2[1];
                         // Se llama al WS porque el resultado esta informado
                         this.enviarAccionWS();
@@ -555,8 +520,8 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
             updateAccion({data: this.form, idAccion: this.recordId}).then(result => {
                 var resultadoUpdate = result;
                 resultadoUpdate = resultadoUpdate.split('-');                 
-                if(resultadoUpdate[0] == 'OK'){                             
-                    if(resultadoUpdate[1] == 'true'){                            
+                if(resultadoUpdate[0] === 'OK'){                             
+                    if(resultadoUpdate[1] === 'true'){                            
                         // Se llama al WS porque el resultado esta informado
                         this.enviarAccionWS();
                     } else {                     
@@ -585,8 +550,8 @@ export default class Sir_lwc_accionSinWorkflow extends LightningElement {
     enviarAccionWS(){   
         enviarAccion({idAccion: this.idAccion}).then(result => {   
             if(result.length >= 0){
-                if(result[0] == 'OK'){   
-                    if(this.nuevaAccion == true){
+                if(result[0] === 'OK'){   
+                    if(this.nuevaAccion === true){
                         this.dispatchEvent(
                             new ShowToastEvent({
                                 title: 'Creado',

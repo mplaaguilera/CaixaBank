@@ -40,7 +40,9 @@ export default class Av_ReactivateOppo extends LightningElement {
 wiredOpportunity({data}) {
     if(data){
         let fecha = data.fields.AV_FechaActivacion__c.value;
-        if(fecha) this.hasActivationDate = true;
+        if(fecha){
+            this.hasActivationDate = true;
+        }
     }
 }
 
@@ -86,7 +88,9 @@ showExitToast(){
 
 showErrorToast(error){
     this.loading=false;
-    if(error==null) this.closeModalWindow();
+    if(error==null){
+        this.closeModalWindow();
+    } 
     let msg = (error!= null)?error:'Error desconocido. Consulta con tu administrador';
     this.dispatchEvent(
         new ShowToastEvent({

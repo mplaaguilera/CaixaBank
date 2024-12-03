@@ -11,7 +11,7 @@ export default class Av_PendingTask extends NavigationMixin(LightningElement)  {
 		return [
             { label: 'Actualizar estado', value: null},
 			{ label: 'Gestionada negativa', value: 'Gestionada negativa' },
-			{ label: 'Gestionada positiva', value: 'Gestionada positiva' },
+			{ label: 'Gestionada positiva', value: 'Gestionada positiva' }
 		];
 	}
 	handleChangeEstado(event) {

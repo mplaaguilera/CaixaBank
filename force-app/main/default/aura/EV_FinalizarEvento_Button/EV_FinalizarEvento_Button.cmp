@@ -1,4 +1,2 @@
-<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" 
-                controller="EV_EnviarComunicaciones_Controller">
-    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" >
 </aura:component>

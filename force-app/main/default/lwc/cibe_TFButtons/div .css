@@ -1,0 +1,294 @@
+div .contenidor-general {
+    background-color: #fff !important;
+    padding: 0;
+    margin: 0;
+}
+
+@media print {
+    div .contenidor-general {
+        background-color: #fff !important;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+.pestanyes-globals ul.pestanyes li.tab-form {
+    /* float: right; */
+    background: url();
+    display: inline-block;
+    white-space: nowrap
+}
+
+.pestanyes-globals form.vertical div.agrupador-horitzontal {
+    padding-bottom: 0em
+}
+
+.pestanyes-globals {
+    font-family: Arial;
+    background-color: #f6f6f6;
+    clear: both;
+    margin: 0 !important;
+    padding: 0 !important;
+    /* margin: 5px -15px 3px -15px */
+}
+
+.pestanyes-globals ul.pestanyes li {
+    background-color: #009ee0;
+    padding: 0.2em 3px 0.2em 3px;
+    text-align: center;
+}
+
+.pestanyes-globals ul.pestanyes li.seleccionat {
+    font-weight: bold
+}
+
+.pestanyes-globals ul.pestanyes li:hover,.pestanyes-globals ul.pestanyes li.seleccionat:hover {
+    background-color: #006a98
+}
+
+.pestanyes-globals ul.pestanyes li.seleccionat {
+    background-color: #f2f2f2
+}
+.pestanyes-globals.tf7tabPanel {
+    box-shadow: 0px 4px 10px -2px rgba(0,0,0,0.2);
+    margin-bottom: 10px
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes {
+    background-color: #007fb1;
+    height: 41px;
+    display: flex;
+    overflow: hidden
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li {
+    color: #fff;
+    background-color: transparent;
+    border-left: none;
+    height: 41px;
+    font-weight: normal
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li:hover {
+    background-color: transparent
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li a {
+    color: #fff;
+    border-radius: 7px;
+    padding: 7px 15px;
+    margin: 5px
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li a:hover {
+    background-color: #006085
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li.seleccionat a {
+    color: #fff;
+    background-color: #006085
+}
+
+.pestanyes-globals.tf7tabPanel ul.pestanyes li.seleccionat::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid #fff;
+    display: block;
+    margin: -6px auto
+}
+
+/* .navegacio-contextual,.pestanyes-globals,.paginador,.botons,.que-es,.intranet,.accions-globals {
+        display: none
+    }
+   */
+
+   ul.pestanyes {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style-type: none
+}
+
+ul.pestanyes a:link,ul.pestanyes a:visited {
+    color: #666;
+    text-decoration: none;
+    white-space: nowrap
+}
+
+ul.pestanyes li.seleccionat {
+    background-color: #f2f2f2
+}
+
+ul.pestanyes-submenu li.seleccionat:hover {
+    text-decoration: none
+}
+
+ul.pestanyes-submenu li.seleccionat a:hover {
+    color: #333;
+    text-decoration: none
+}
+
+ul.pestanyes li.seleccionat a:link,ul.pestanyes li.seleccionat a:visited {
+    color: #333;
+    font-size: 1.071em
+}
+
+ul.pestanyes {
+    /* background-color: #009ee0; */
+    height: 35px;
+    font-size: 1.071em
+}
+
+ul.pestanyes li {
+    height: 35px;
+    float: left;
+    border-left: 1px solid #fff
+}
+
+ul.pestanyes li .seleccionat {
+    color: #333
+}
+
+ul.pestanyes li:hover {
+    background-color: #006a98
+}
+
+ul.pestanyes li a {
+    display: block;
+    padding: 0.5em 20px 0.5em 20px;
+    margin-left: 4px
+}
+
+ul.pestanyes li.seleccionat a {
+    padding-bottom: 0.35em
+}
+
+ul.pestanyes li.deshabilitat {
+    float: left;
+    opacity: 0.5
+}
+
+ul.pestanyes li.deshabilitat a {
+    padding: 0.5em 14px 0.5em 14px;
+    color: #d5d5d5
+}
+
+ul.pestanyes a:link,ul.pestanyes a:visited {
+    color: #fff;
+    font-size: 1.071em
+}
+
+ul.pestanyes-submenu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    background-color: #f2f2f2;
+    height: 34px
+}
+
+ul.pestanyes-submenu a:link,ul.pestanyes-submenu a:visited {
+    color: #666;
+    text-decoration: none;
+    white-space: nowrap
+}
+
+ul.pestanyes-submenu li {
+    height: 34px;
+    float: left;
+    background: url(../img/tf_cabecera_menu_pestanas_separador_2o_nivel_1x17.png) right no-repeat
+}
+
+ul.pestanyes-submenu li.seleccionat {
+    font-weight: bold
+}
+
+ul.pestanyes-submenu li.seleccionat a:link,ul.pestanyes-submenu li.seleccionat a:visited {
+    color: #333;
+    font-size: 1.071em
+}
+
+ul.pestanyes-submenu li.deshabilitat a:link,ul.pestanyes-submenu li.deshabilitat a:visited {
+    color: #d6d6d6
+}
+
+ul.pestanyes-submenu li .seleccionat {
+    color: #333
+}
+
+ul.pestanyes-submenu li:hover {
+    color: #008ecc;
+    text-decoration: underline
+}
+
+ul.pestanyes-submenu li:last-child {
+    background: none
+}
+
+ul.pestanyes-submenu li a {
+    display: block;
+    padding: 0.5em 14px 0.7em 14px;
+    margin-left: 4px
+}
+
+ul.pestanyes-submenu li.seleccionat a {
+    padding-bottom: 0.35em
+}
+
+ul.pestanyes-submenu li.deshabilitat {
+    float: left
+}
+
+ul.pestanyes-submenu li.deshabilitat a {
+    padding: 0.5em 14px 0.3em 14px;
+    color: #d6d6d6
+}
+
+ul.pestanyes-submenu a:link,ul.pestanyes-submenu a:visited {
+    color: #333;
+    font-size: 1.071em
+}
+
+ul.pestanyes-submenu li a:hover {
+    color: #008ecc;
+    text-decoration: underline
+}
+
+div.pestanyes-fitxes div.fitxa ul.llistat.llistat-normal {
+    margin: -18px
+}
+
+
+div.pestanyes-fitxes div.fitxa ul.paginador {
+    margin: 0.2em 0 0.9em
+}
+
+div.pestanyes-fitxes div.fitxa ul.llistat li {
+    padding: 5px
+}
+
+div.pestanyes-fitxes div.fitxa .tf9-dataView div.missatge-notification ul.llistat.llistat-normal {
+    margin: 0px
+}
+
+div.pestanyes-fitxes div.fitxa .tf9-dataView div.missatge-notification ul.llistat li {
+    padding: 3px 0px 5px 12px
+}
+
+div.pestanyes-fitxes ul.pestanyes {
+    margin-bottom: 0
+}
+
+
+div.pestanyes-fitxes div.fitxa {
+    border-bottom: 1px solid #879bb3;
+    border-left: 1px solid #879bb3;
+    border-right: 1px solid #879bb3;
+    padding: 18px;
+    display: none
+}
+
+div.pestanyes-fitxes div.seleccionat {
+    display: block
+}

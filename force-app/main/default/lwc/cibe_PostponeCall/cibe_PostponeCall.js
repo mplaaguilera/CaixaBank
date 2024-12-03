@@ -1,10 +1,12 @@
-import { LightningElement, track, api} from 'lwc';
+import { LightningElement, track, api, wire} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { createRecord} from 'lightning/uiRecordApi';
 
 import updateTask 		        from '@salesforce/apex/CIBE_TabManagementTask_Controller.updateTaskReminder';
 import getTaskStatus            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getTaskStatus';
 import getRecordType            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getRecordType';
+import getRecord            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getRecord';
+
 import CIBE_CMP_ErrorMessage 		from '@salesforce/label/c.CIBE_CMP_ErrorMessage';
 
 //Labels 
@@ -38,6 +40,8 @@ export default class Cibe_PostponeCall extends LightningElement {
 	@track showSpinner = false;
 	@track disableBtn = false;
 	@track boton= false;
+
+	@track value = [];
 
 
 	
@@ -150,7 +154,19 @@ export default class Cibe_PostponeCall extends LightningElement {
 		updateTask({id: this.recordId, reminderDateTime: this.reminderDateTime, comentario: this.comment})
 			.then(result => {
                 if(result == 'OK') {
-					this.insertHistorialGestion();
+					if(this.value[0].Status == 'Pendiente no localizado' && this.comment == null){
+						this.insertHistorialGestion();
+					}else{
+						this.progressValue = "ManagementHistory";
+						const selectedEvent = new CustomEvent("progressvaluechange", {
+							detail: {
+								progress: this.progressValue,
+								boton: this.boton
+							}
+							});
+						this.dispatchEvent(selectedEvent);
+						this.disableSpinner();
+					}
 				}else {
 					this.dispatchEvent(
 						new ShowToastEvent({
@@ -172,7 +188,7 @@ export default class Cibe_PostponeCall extends LightningElement {
 					})
 				);
 				this.disableSpinner();
-			});
+			}).fin
 	}
 
 	insertHistorialGestion() {
@@ -224,4 +240,17 @@ export default class Cibe_PostponeCall extends LightningElement {
     enableSpinner() {
         this.showSpinner = true;
 	}
+
+
+	
+    @wire(getRecord, {recordId : '$recordId'})
+    wiredValues({error, data}){
+		if(data){
+			this.value = data;
+		}else if(error){
+			Console.log(error);
+		}
+	}
+
+	
 }

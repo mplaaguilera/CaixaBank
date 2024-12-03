@@ -1,0 +1,20 @@
+.marginPagination {
+    margin-top:1em;
+}
+.marginPagination2 {
+    margin-top:-1em;
+}
+.boldRow {
+    font-weight: bold;
+}
+.color-yelow {
+    background-color: yellow;
+}
+.comboSize{
+    width: 80px; 
+    height: auto; 
+    padding: 0; 
+    font-size: 12px; 
+    line-height: 1;
+    margin-top: 25px;
+}

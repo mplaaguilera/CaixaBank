@@ -23,6 +23,8 @@
         </div>
     </div>
 
+
+
     <article class="slds-card slds-m-top_small">
         <div class="slds-card__body slds-card__body_inner">
             <div class="slds-m-top_medium slds-float_right">
@@ -31,45 +33,88 @@
             </div>
             <div class="slds-grid slds-gutters slds-m-around_x-small">
                 <div class="slds-col slds-size_1-of-4 ">
-                    <lightning-combobox data-field="negocio" label={label.negociosLab} options={picklistValues} name="negocios" value={negocios} onchange={handleValueChange} onselect={picklistValues} placeholder={placeHol}>
+                    <lightning-combobox data-field="negocio" label={label.negociosLab} options={picklistValues} name="negocios" onchange={handleValueChange} onselect={picklistValues} value={negocios} >
                     </lightning-combobox>
                 </div>
                 <div class="slds-col slds-size_1-of-4 ">
-                    <lightning-combobox data-field="redes" label={label.redesLab} options={picklistValues2} name="redesSegmentos" value={redesSegmentos} onchange={handleValueChange2} placeholder={placeHol}>
+                    <lightning-combobox data-field="redes" label={label.redesLab} options={picklistValues2} name="redesSegmentos" onchange={handleValueChange2} value={redesSegmentos} >
                     </lightning-combobox>
                 </div>
                 <div class="slds-col slds-size_1-of-4 ">
-                    <lightning-combobox data-field="sectoresPaises" label={label.sectoresLab} options={picklistValues3} name="sectoresPaises" value={sectoresPaises} onchange={handleValueChange3} placeholder={placeHol}  >
+                    <lightning-combobox data-field="sectoresPaises" label={label.sectoresLab} options={picklistValues3} name="sectoresPaises" onchange={handleValueChange3} value={sectoresPaises}  >
                     </lightning-combobox>
                 </div>
                 <div class="slds-col slds-size_1-of-4">
-                    <lightning-combobox data-field="centroCartera" label={label.centroLab} options={picklistValues4} name="centroCartera" value={centroCartera} onselect={handleValueChange4} onchange={handleValueChange4} placeholder={placeHol} >
+                    <lightning-combobox data-field="centroCartera" label={label.centroLab} options={picklistValues4} name="centroCartera" onselect={handleValueChange4} onchange={handleValueChange4} value={centrosCarteras} >
                     </lightning-combobox>
                 </div>
             </div>
+
+            <lightning-layout multiple-rows>
+                <lightning-layout-item class="slds-m-top_x-small slds-m-bottom_x-small" style="margin-left: 20px;">
+                    <div class="slds-form-element__label ">
+                        <span>{label.comiteDirectorL}</span>
+                    </div>
+                    <div lwc-2nj244ovceg="" class="slds-form-element__control slds-card" style="display: -webkit-box; display: flex;" part="options">
+                        <span lwc-2nj244ovceg="" class="slds-radio">
+                            <input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="todas" data-id="todas" required="" value="todas" onchange={handleRadioChange} checked={checkedAll}>
+                            <label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="todas">
+                                <span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+                                <span lwc-2nj244ovceg="" class="slds-form-element__label slds-m-right_medium" part="label">Todas</span>
+                            </label>
+                        </span>
+        
+                        <span lwc-2nj244ovceg="" class="slds-radio">
+                            <input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="si" required="" value="true" onchange={handleRadioChange}>
+                            <label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="si">
+                                <span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+                                <span lwc-2nj244ovceg="" class="slds-form-element__label slds-m-right_medium" part="label">Si</span>
+                            </label>
+                        </span>
+        
+                        <span lwc-2nj244ovceg="" class="slds-radio">
+                            <input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="no" required="" value="false" onchange={handleRadioChange}>
+                            <label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="no">
+                                <span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+                                <span lwc-2nj244ovceg="" class="slds-form-element__label slds-m-right_medium" part="label">No</span>
+                            </label>
+                        </span>
+        
+                    </div>
+        
+                </lightning-layout-item>
+            </lightning-layout>
+
+
+
+
+
             <div class="slds-m-around_medium">
                 <div class="slds-grid">
-                    <div class="slds-col slds-col slds-size_1-of-3 slds-border_right" style={height}>
+                    <div class="slds-col slds-col slds-size_1-of-4 slds-border_right">
                         <c-cibe_-custom-datatable
                             key-field="Id"
                             data={data}
                             errors={errors}
                             columns={staticColumns}
                             draft-values={values} 
+                            onsave={handleSave}
+                            oncancel={handleCancel}
                             show-row-number-column
+                            row-number-offset={rowOffset}
                             hide-checkbox-column>
                         </c-cibe_-custom-datatable>
                     </div>
-                    <div class="slds-col slds-size_2-of-3" style={height}>
+                    <div class="slds-col slds-size_3-of-4">
                         <c-cibe_-custom-datatable
                             key-field="Id"
                             data={data}
                             errors={errors}
                             columns={columns} 
                             draft-values={values} 
-                            onsave={handleSave}
-                            oncancel={handleCancel}
                             min-column-width="150"
+                            show-row-number-column
+                            row-number-offset={rowOffset}
                             hide-checkbox-column>
                         </c-cibe_-custom-datatable>
                     </div>
@@ -80,6 +125,11 @@
                     <lightning-layout-item flexibility="auto">
                         <lightning-button label={label.anterior} icon-name="utility:chevronleft" onclick={previousHandler} disabled={getHasPrevius}></lightning-button>
                     </lightning-layout-item>
+                    <div class="header-column">
+                        <p class="field-title" title="Page"></p>
+                        <p>Pag</p>
+                        <div>{page} / {totalPage}</div>
+                    </div>     
                     <lightning-layout-item flexibility="auto">
                         <lightning-button label={label.posterior} icon-name="utility:chevronright" onclick={nextHandler} disabled={getHasNext} icon-position="right"></lightning-button>
                     </lightning-layout-item>

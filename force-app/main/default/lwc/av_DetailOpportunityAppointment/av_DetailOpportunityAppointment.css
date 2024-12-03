@@ -30,8 +30,13 @@
 	margin-top: .7rem;
 }
 .shortWidth{
-	width:10rem;
+	width:12rem;
 }
+
+.motivoWidth{
+	width:21rem;
+}
+
 .inputsDiv{
 	width: 100%;
 }
@@ -74,28 +79,47 @@
 	--sds-c-button-color-background:rgb(235, 112, 146);
 	--sds-c-button-text-color-hover:white;
 }
-.customCheck{
-	--slds-c-button-color-background:rgb(0,133,53);
-	--slds-g-color-neutral-base-50:white;
-}
 .customCheckDefault:hover{
 	--sds-c-button-color-background:rgb(0,133,53);
 	--sds-c-button-text-color-hover:white;
+}
+.customCheck{
+	--slds-c-button-color-background:rgb(0,133,53);
+	--slds-g-color-neutral-base-50:white;
 }
 .customCheck:hover{
 	--sds-c-button-color-background:rgb(0,133,53);
 	--sds-c-button-text-color-hover:white;
 }
+	
+.customCheckTask{
+	--slds-c-button-color-background:rgb(0,133,53);
+	--slds-g-color-neutral-base-50:white;
+	
+	--lwc-squareIconMediumContentAlt:2.5rem;
+}
+.customCheckDefaultTask{
+	--lwc-squareIconMediumContentAlt:2.5rem;
+
+}
+.customCheckDefaultTask:hover{
+	--sds-c-button-color-background:rgb(0,133,53);
+	--sds-c-button-text-color-hover:white;
+}
+.customCheckTask:hover{
+	--sds-c-button-color-background:rgb(0,133,53);
+	--sds-c-button-text-color-hover:white;
+}
 .customClose{
-	--slds-c-button-color-background:rgb(51,51,51);
+	--slds-c-button-color-background:rgb(189, 25, 25);
 	--slds-g-color-neutral-base-50:white;
 }
 .customCloseDefault:hover{
-	--sds-c-button-color-background:rgb(51,51,51);
+	--sds-c-button-color-background:rgb(189, 25, 25);
 	--sds-c-button-text-color-hover:white;
 }
 .customClose:hover{
-	--sds-c-button-color-background:rgb(51,51,51);
+	--sds-c-button-color-background:rgb(189, 25, 25);
 	--sds-c-button-text-color-hover:white;
 }
 .customBan{
@@ -110,6 +134,20 @@
 	--sds-c-button-color-background:rgb(229,16,41);
 	--sds-c-button-text-color-hover:white;
 }
+/*mio*/
+.customNoLocalizado{
+	--slds-c-button-color-background:rgb(210, 49, 51);
+	--slds-g-color-neutral-base-50:white;
+}
+.customNoLocalizado:hover{
+	--sds-c-button-color-background:rgb(210, 49, 51);
+	--sds-c-button-text-color-hover:white;
+}
+.customNoLocalizadoDefault:hover{
+	--sds-c-button-color-background:rgb(210, 49, 51);
+	--sds-c-button-text-color-hover:white;
+}
+/**/
 /* Estilos del pop-up modal */
 .modalContainer{
 	border:.5px solid rgb(238, 238, 238);
@@ -136,6 +174,15 @@
 .asterisk {
 	color: red;
 	left: 6.7rem;
+	top: 1.4rem;
+	position: relative;
+	z-index:10;
+	display: block;
+	height: 0;
+}
+.asteriskNoOfrecer {
+	color: red;
+	left: 7.4rem;
 	top: 1.4rem;
 	position: relative;
 	z-index:10;

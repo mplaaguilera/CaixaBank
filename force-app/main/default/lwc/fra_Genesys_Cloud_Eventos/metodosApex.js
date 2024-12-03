@@ -114,12 +114,13 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 				//connIdCognitivo: message.data.attributes['Participant.connIdCognitivo'] ?? '',
 
 				//casoId: null
-				casoId: await purecloudConversationApi(interactionId, 'casoIdFRA', scope)
+				casoId: await purecloudConversationApi(interactionId, 'casoIdFRA', scope),
 
 				//salesforceParentId: message.data.attributes['Participant.salesforceParentId'] ?? '',
 				//llamadaId: message.data.attributes['Participant.llamadaIdFRA'] ?? '',
 				//eslint-disable-next-line camelcase
 				//CC_Canal_del_Empleado__c: message.data.attributes['Participant.CC_Canal_del_Empleado__c'] ?? '',
+				urlGrabacion: message.data.attributes['Interaction.Url'] ?? ''
 			})
 		});
 
@@ -206,7 +207,8 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 					casoId: atributos.casoId,
 					//salesforceParentId: atributos.salesforceParentId
 					salesforceParentId: atributos.llamadaId
-				})
+				}),
+				servicioGen: message.data.attributes['Participant.servicio'] ?? ''
 			});
 
 		} else {
@@ -270,7 +272,8 @@ export async function conversionApexInputs(nombreMetodoApex, message, interactio
 					casoId: atributos.casoId,
 					//salesforceParentId: atributos.salesforceParentId
 					salesforceParentId: atributos.llamadaId
-				})
+				}),
+				servicioGen: message.data.attributes['Participant.servicio'] ?? ''
 			});
 
 		} else {
@@ -326,8 +329,9 @@ async function atributosLlamadaInicial(interactionId, scope) {
 async function purecloudConversationApi(interactionId, atributo, scope) {
 	let retorno;
 	if (!interactionId || interactionId === 'N/A') {
+		/*eslint no-console: ["error", { allow: ["error"]}]*/
 		console.error('Error API Genesys Cloud: Id de la interacción desconocido');
-		scope.logHistorial('error', 'Error API Genesys Cloud', 'Id de la interacción desconocido');
+		scope.logHistorial('error', 'Error API Genesys Cloud', 'Id de la interacción desconocido'); 
 	} else {
 		if (scope.simularRespuestaApiPurecloud) {
 			const plantillaSimularRespuestaApiPurecloud = scope.template.querySelector('.textareaJsonSimularApiPurecloud').value;
@@ -614,7 +618,7 @@ export const PLANTILLAS_MODAL_SIMULAR = {
 			isDone: false,
 			state: 'CONNECTED',
 			attributes: {
-				'Participant.estadoConsultaFRA': 'iniciando',
+				'Participant.estadoConsultaFRA': 'iniciandoFRA',
 				'Interaction.Url': 'https://apps.mypurecloud.ie/directory/#/engage/admin/interactions/3318ac29-b202-4ca9-909c-ffcc263b5bff',
 				'Participant.connIdCognitivo': '87654321',
 				'Participant.datos': 'Datos',
@@ -622,6 +626,7 @@ export const PLANTILLAS_MODAL_SIMULAR = {
 				'Participant.numPerso': '111111',
 				'Participant.asunto': 'Asunto',
 				'Participant.servicio': 'TARJETAS_TARJETAS',
+				'Participant.servicio_transferencia': 'SERVICIO TRANSF',
 				'Participant.URL_Interaction': 'https://apps.mypurecloud.ie/directory/#/engage/admin/interactions/3318ac29-b202-4ca9-909c-ffcc263b5bf'
 			},
 			isCallback: false,
@@ -633,7 +638,7 @@ export const PLANTILLAS_MODAL_SIMULAR = {
 			remoteName: 'Mobile Number, Spain',
 			recordingState: 'active',
 			displayAddress: '+34646626371',
-			queueName: 'Test_ColaSFC',
+			queueName: 'DESA_FRAUCTGT',
 			ani: '+34646626371',
 			calledNumber: '+34911042991',
 			totalIvrDurationSeconds: 1,

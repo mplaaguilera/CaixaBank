@@ -12,6 +12,8 @@ import detail from '@salesforce/label/c.AV_Detalle';
 
 const PROXIMGESTIONLABEL = 'Próxima Gestión';
 const NOOFRECERLABEL = 'No ofrecer hasta';
+const IDPROVISIONAL = 'idProvisional';
+const SEPARADOR = '{|}';
 export default class Av_DetailOpportunityAppointment extends NavigationMixin(LightningElement) {
 
 	label = {
@@ -22,6 +24,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		detail
 	};
 	@api oppo;
+	@api comesfromevent;
 	@track id;
 	@track name;
 	@track path;
@@ -39,6 +42,11 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	@track cuota;
 	@track mainPF;
 	@track isInserted = true;
+	@track historyCommentWithDate;
+	@track historyComment;
+	@track historyCommentDate;
+	@track historyCommentDateLabel;
+	@track owneridopp;  
 	statusNow;
 	checkedOld;
 	currentNameButton;
@@ -69,11 +77,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	GESTIONSPLIT = 'gestion';
 	AGENDARSPLIT = 'agendar';
 	pathMap = {
-		// 'arrow':(this.GESTION+'-'+this.GESTIONSPLIT),
 		'agendado':this.GESTION
-		// 'check':this.CERRPOSI,
-		// 'close':this.CERRNEGA,
-		// 'ban':this.NOAPTO
 	}
 	classMap = {
 		'arrow':'customArrowRight',
@@ -105,14 +109,14 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	isModalOpen = false;
 	isToggleActive = false;
 	get todayString() { return new Date().toJSON().slice(0,10)};
-	// todayString = this.getTodayString();
 	now = new Date(Date.now()).toISOString();
 	firstClickNewOppo = true;
 
 	@api initialState;
 
 	connectedCallback(){
-		this.fillVars();    
+		this.fillVars();
+		
 	}
 
 	getTodayString(){
@@ -121,11 +125,19 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	}
 	
 	renderedCallback(){
-		if(this.id.includes('idProvisional') && this.firstClickNewOppo){
+		if(this.id.includes(IDPROVISIONAL) && this.firstClickNewOppo && !this.comesfromevent){
 			this.template.querySelector('[data-id="agendado"]').click();
-			this.sendDataToController();
 			this.firstClickNewOppo = false;
 		}
+		
+		if(this.comesfromevent && this.firstClickNewOppo){
+			this.firstClickNewOppo = false;
+			this.sendDataToController();
+			if(this.oppo.isTheLastItem){
+				this.dispatchEvent( new CustomEvent('vinculateall'));
+			}
+		}
+		
 	}
 
 	parseTodayDate(){
@@ -156,7 +168,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		this.id = this.oppo.Id;
 		this.name = this.oppo.Name;
 		this.path = this.oppo.Stage;
-		this.oppoDate= this.oppo.Fecha;
+		this.oppoDate=  this.oppo.Fecha;
 		this.comentario = this.oppo.Comentarios;
 		this.fecha = this.oppo.Fecha;
 		this.initPotential = this.oppo.Potencial;
@@ -168,9 +180,19 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		this.otraEntidad = (this.oppo.OtraEntidad == 'S');
 		this.otraEntidadNombre = this.oppo.OtraEntidadNombre;
 		this.isInserted = (this.oppo.NotInserted == undefined);
-		this.vinculed = (this.oppo.isVinculed != undefined);
-		this.mainVinculed = false;
-		this.deleteCheckOnOffTask = (this.oppo.PrioritzingCustomer);
+		this.vinculed = (this.comesfromevent) ? this.oppo.isVinculed :  (this.oppo.isVinculed != undefined);
+		this.mainVinculed = (this.comesfromevent) ? (this.oppo.mainVinculed):false;
+		this.deleteCheckOnOffTask =  this.oppo.PrioritzingCustomer;
+		this.historyCommentWithDate = this.oppo.HistoryComment;
+		this.owneridopp = this.oppo.owneridopp;  
+		if(this.historyCommentWithDate != '' && this.historyCommentWithDate != undefined){
+			this.historyCommentDate = this.historyCommentWithDate.split(SEPARADOR)[0];
+			this.historyComment = this.historyCommentWithDate.split(SEPARADOR)[1];
+			this.historyCommentDateLabel = 'Último comentario - '+this.historyCommentDate;
+		}else{
+			this.historyCommentDateLabel = '';
+			
+		}
 
 		this.initialState = {
 			sobjectype:'Opportunity',
@@ -188,12 +210,10 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 			AV_ByProduct__c:this.oppo.SubProductId,
 			AV_OrigenApp__c:'AV_BackReport',
 			AV_IncludeInPrioritizingCustomers__c:this.oppo.PrioritzingCustomer
+			,OwnerId : this.owneridopp  
 
 		}
 
-		// if(!this.id.includes('idProvisional')){
-		// 	this.sendDataToController();
-		// }
 	}
 
 	navigateToRecord(event){
@@ -304,6 +324,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		}
 	}
 
+	@api
 	handleMain(){
 		this.dispatchEvent(
 			new CustomEvent('mainclick',{
@@ -314,6 +335,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		);
 	}
 
+	@api
 	handleVincular(){
 		this.vinculed = !this.vinculed;
 		this.dispatchEvent(
@@ -328,7 +350,6 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 
 	resetVars(){
 		this.comentarioToSend = null;
-		// this.proximaGestionToSend = null;
 		this.expectativaToSend = null;
 		this.expectativaToSend = '';
 		this.importePropioToSend = null;
@@ -365,7 +386,9 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 					isVinculed:this.vinculed,
 					priorizado:this.deleteCheckOnOffTask,
 					recordtype:this.oppo.RecordType
+					,owneridopp:this.owneridopp  
 				}
+				
 			})
 		)
 	}
@@ -408,11 +431,6 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	
 	handleChangeFechaOtraEntidad(e){
 		this.fechaOtraEntidadToSend = e.target.value;
-		// if(e.target.reportValidity()){
-		// }else{
-		// 	e.target.value = '';
-		// 	this.fechaOtraEntidadToSend = null;
-		// }
 		this.sendDataToController();
 	}
 

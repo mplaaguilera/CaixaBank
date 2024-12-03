@@ -1,0 +1,50 @@
+<template>
+    <lightning-card if:true={displayTable}
+    variant="narrow"
+    icon-name={iconName}>
+        <h1 slot="title" style="color: inherit;font-weight: var(--lwc-cardFontWeight,700);">{titleLabel} ({numRecords})</h1>
+        <!-- Refresh button -->
+        <lightning-button-icon  icon-name="utility:refresh" alternative-text="Reload" slot="actions" onclick={refresh}></lightning-button-icon>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+        <div>
+            <template if:true={showTable}>
+                <lightning-datatable data={recordsToDisplay}
+                                    columns={columns} 
+                                    key-field="Id"
+                                    default-sort-direction={defaultSortDirection}
+                                    sorted-by={sortByFieldName}
+                                    sorted-direction={sortDirection}
+                                    onsort={handleSortData}
+                                    onrowaction={handleRowAction}
+                                    hide-checkbox-column
+                                    resize-column-disabled
+                                    >
+                </lightning-datatable>
+
+                <div class="slds-form_inline slds-p-around_xx-small marginPagination2" if:true={isMultipagina}>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__label marginPagination">
+                            <label class="slds-form-element__label" for="Page">Page </label>
+                        </div>
+                        <div class="slds-form-element__control slds-grow">
+                            <lightning-combobox class="comboSize" name="Page" id="Page" value={page} options={optionsPage} placeholder={page} onchange={handleChangePage} ></lightning-combobox>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__label marginPagination">
+                            <label for="PageSize">Page Size </label>
+                        </div>
+                        <div class="slds-form-element__control slds-grow">
+                            <lightning-combobox class="comboSize" name="PageSize" id="PageSize" value={pageSize} options={optionsPageSize} placeholder={pageSize} onchange={handleChangePageSize}></lightning-combobox>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template if:true={error}>
+                {error}
+            </template>
+        </div>
+</lightning-card>   
+</template>

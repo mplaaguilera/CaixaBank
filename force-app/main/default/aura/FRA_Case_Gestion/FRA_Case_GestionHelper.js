@@ -94,6 +94,29 @@
 		$A.enqueueAction(getSoluciones);
 	},
 
+	getCampanasPicklistFMW: function(component) {
+		let getPicklistValues = component.get('c.getPicklistValuesFMW');
+		getPicklistValues.setCallback(this, response => {
+			if (response.getState() === 'SUCCESS') {
+				let picklistValues = response.getReturnValue();
+
+				// Ordenar de forma ascendente
+				picklistValues.sort((a, b) => {
+					return a.label.localeCompare(b.label);
+				});
+				
+				component.set('v.opcionesCampanaFMW', picklistValues);
+				component.set('v.opcionesCargadas.campanasFMW', true);
+
+				if (response.getReturnValue().length === 1) {
+					component.find('desplegableCampanaCustom').set('v.value', response.getReturnValue()[0].value);
+					$A.enqueueAction(component.get('c.campanaCustomSeleccionada'));
+				}
+			}
+		});
+		$A.enqueueAction(getPicklistValues);
+	},
+
 	mostrarToast: function(tipo, titulo, mensaje) {
 		let toastEvent = $A.get('e.force:showToast');
 		toastEvent.setParams({'title': titulo, 'message': mensaje, 'type': tipo, 'mode': 'dismissable', 'duration': 4000});

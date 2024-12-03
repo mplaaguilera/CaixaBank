@@ -12,6 +12,9 @@
             <property label="Opportunity Team Members" name="records" type="{T[]}"  role="outputOnly"/>
             <property name="EAPGestor" type="String" label="eapGestorID" description="EAPGestor" role="inputOnly"/>
             <property name="recordId" type="String" label="record Id" description="recordId" role="inputOnly"/>
+            <property name="valuePais" type="String" label="Pais" description="Pais." />
+            <property name="valueCountries" type="{T[]}" label="Paises" />
+            <property name="paisesArr" type="String[]" datasource="Active" label="Array de paises" description="Paises" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

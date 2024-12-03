@@ -1,0 +1,227 @@
+<template>
+    <lightning-card>
+        <div onclick={toggleSection} style="display: flex; width: 100%;">
+            <button class="slds-button test-id__section-header-button slds-section__title-action" aria-controls="section-content" aria-expanded="true" style="display: flex; width: 100%;">
+                <lightning-icon  icon-name={iconName} size="x-small" alternative-text="Expandir/Contraer"></lightning-icon>
+                <span style="color:#000000; margin-left: 0.5rem;">Campaign Statistics</span>
+            </button>
+        </div>
+        <div if:true={fisFesti}>
+            <div if:true={isExpanded} style="display: flex; justify-content: space-between;">
+                <!-- Campos a la izquierda Eventos Fisicos -->
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                            <div style="display: flex; align-items: center; width: 6rem;">
+                                <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{totalInscritosLabel}</label>
+                                <span style="display: flex; align-items: center; margin-left: 0.5vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <lightning-helptext content="Personas que se han inscrito al evento."></lightning-helptext>
+                                </span> 
+                            </div>
+                            <span style="margin-left: 2.2rem;">{totalInscritos}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{totalAsistentesLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas que han asistido al evento."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{totalAsistentes}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; width: 7rem; overflow: hidden; text-overflow: ellipsis;">{asistDiferidoLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{asistDiferido}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                </div>
+                <!-- Campos a la derecha -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 13rem;">
+                            <label style=" font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numLeadsLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Del total de inscritos, personas que no se han inscrito a través de invitación centralizada."></lightning-helptext>
+                            </span>
+                            <span style="margin-left: 2.1rem;">{numLeads}</span>
+                        </div>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style=" font-size: 0.9em; overflow:  hidden; text-overflow: ellipsis;">{numContactsLabel}</label>
+                            <span style="display: flex; width: 4rem; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas a las que se envía invitación centralizada."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1rem;">{numContacts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style="font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numAccountLabel}</label>
+                        </div>
+                        <span style="margin-left: 1rem;">{numAccounts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                </div>
+            </div>
+        </div>
+        <div if:true={virtual}>
+            <div if:true={isExpanded} style="display: flex; justify-content: space-between;">
+                    <!-- Campos a la izquierda Eventos Fisicos -->
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                            <div style="display: flex; align-items: center; width: 6rem;">
+                                <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{totalInscritosLabel}</label>
+                                <span style="display: flex; align-items: center; margin-left: 0.5vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <lightning-helptext content="Personas que se han inscrito al evento."></lightning-helptext>
+                                </span> 
+                            </div>
+                        <span style="margin-left: 2.2rem;">{totalInscritos}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{totalAsistentesLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas que han asistido al evento."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{totalAsistentes}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; width: 7rem; overflow: hidden; text-overflow: ellipsis;">{asistDiferidoLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{asistDiferido}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                </div>
+                <!-- Campos a la derecha -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 13rem;">
+                            <label style=" font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numLeadsLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Del total de inscritos, personas que no se han inscrito a través de invitación centralizada."></lightning-helptext>
+                            </span>
+                            <span style="margin-left: 2.1rem;">{numLeads}</span>
+                        </div>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style=" font-size: 0.9em; overflow:  hidden; text-overflow: ellipsis;">{numContactsLabel}</label>
+                            <span style="display: flex; width: 4rem; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas a las que se envía invitación centralizada."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1rem;">{numContacts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style="font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numAccountLabel}</label>
+                        </div>
+                        <span style="margin-left: 1rem;">{numAccounts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                </div>
+            </div>
+        </div>
+        <div if:true={hibAcc}>
+            <div if:true={isExpanded} style="display: flex; justify-content: space-between;">
+                <!-- Campos a la izquierda Eventos Fisicos -->
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                            <div style="display: flex; align-items: center; width: 6rem;">
+                                <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{inscritosFisVirLabel}</label>
+                            </div>
+                        <span style="margin-left: 2.2rem;">{inscritosFisVir}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 6rem;">
+                            <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis">{inscritosFisicosLabel}</label>
+                        </div>
+                        <span style="margin-left: 2.2rem;">{inscritosFisicos}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; width: 6rem; overflow: hidden; text-overflow: ellipsis">{inscritosVirtualesLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{inscritosVirtuales}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em;  width: 5rem; overflow: hidden; text-overflow: ellipsis;">{totalAsistentesLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas que han asistido al evento."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{totalAsistentes}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; width: 6rem; overflow: hidden; text-overflow: ellipsis;">{asistentesFisicosLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{asistentesFisicos}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{asistentesVirtualesLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{asistentesVirtuales}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1vw;">
+                        <div style="display: flex; align-items: center; width: 7rem;">
+                            <label style="font-size: 0.9em; width: 7rem; overflow: hidden; text-overflow: ellipsis;">{asistDiferidoLabel}</label>
+                        </div>
+                        <span style="margin-left: 1.2rem;">{asistDiferido}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1vw;">
+                </div>
+                <!-- Campos a la derecha -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; margin-top: 0.5rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 13rem;">
+                            <label style=" font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numLeadsLabel}</label>
+                            <span style="display: flex; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Del total de inscritos, personas que no se han inscrito a través de invitación centralizada."></lightning-helptext>
+                            </span>
+                            <span style="margin-left: 2.1rem;">{numLeads}</span>
+                        </div>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style=" font-size: 0.9em; overflow:  hidden; text-overflow: ellipsis;">{numContactsLabel}</label>
+                            <span style="display: flex; width: 4rem; align-items: center; margin-left: 0.2vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <lightning-helptext content="Número de personas a las que se envía invitación centralizada."></lightning-helptext>
+                            </span>
+                        </div>
+                        <span style="margin-left: 1rem;">{numContacts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                    <div if:true={newArch} style="display: flex; align-items: center; margin-bottom: 0.25rem; margin-left: 1.5vw;">
+                        <div style="display: flex; align-items: center; width: 10rem;">
+                            <label style="font-size: 0.9em; overflow: hidden; text-overflow: ellipsis;">{numAccountLabel}</label>
+                        </div>
+                        <span style="margin-left: 1rem;">{numAccounts}</span>
+                    </div>
+                    <hr style="border: none; height: 1px; width: 80%; background-color: #E0E0E0; margin: 5px 0; margin-left: 1.5vw;">
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

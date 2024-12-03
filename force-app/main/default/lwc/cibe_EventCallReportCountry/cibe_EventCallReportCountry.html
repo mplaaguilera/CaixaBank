@@ -1,0 +1,67 @@
+<template>
+        <div onclick={toggleSection} style="display: flex; width: 100%;">
+            <button class="slds-button test-id__section-header-button slds-section__title-action" aria-controls="section-content" aria-expanded="true" style="display: flex; width: 100%;">
+                <lightning-icon icon-name={iconName} size="x-small" alternative-text="Expandir/Contraer"></lightning-icon>
+                <span style="color:#000000; margin-left: 0.5rem;">{labels.detalleTitle}</span>
+            </button>
+        </div>
+        <div if:true={isExpanded} style="display: flex; flex-direction: column; height: 100%;">
+            <div class="slds-p-around_medium" style="flex: 1;">
+                <!-- Modo de solo lectura -->
+                <template if:false={isEditing}>
+                    <div style="display: flex; flex-direction: column; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 0.25rem; width: 20rem;">
+                            <div style="display: flex; align-items: center; flex-grow: 1;">
+                                <label class="slds-form-element__label" style="margin-right: 0.5rem;">{labels.reportCountry}</label>
+                                <span style="display: flex; align-items: center; margin-left: 1vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {vCountry}
+                                </span>
+                            </div>
+                            <div style="margin-left: auto; margin-right: 1rem;">
+                                <lightning-button-icon
+                                    icon-name="utility:edit"
+                                    alternative-text="Edit"
+                                    size="medium"
+                                    variant="bare"
+                                    onclick={toggleEdit}>
+                                </lightning-button-icon>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <hr style="border: none; height: 1px; width: 19rem; background-color: #E0E0E0; margin: 5px 0;">
+                        </div>
+                    </div>
+                </template>
+                <!-- Modo de edición -->
+                <template if:true={isEditing}>
+                    <div style="padding: 0.5rem; display: flex; flex-direction: column; height: 100%;">
+                        <div style="display: flex; align-items: center;">
+                            <span style="margin-right: 15px; line-height: 2; display: inline-block;">{labels.reportCountry}</span>
+                            <lightning-combobox
+                                name="picklist"
+                                value={selectedValue}
+                                placeholder="Selecciona una opción"
+                                options={picklistOptions}
+                                onchange={handlePicklistChange}
+                                style="width: 230px; margin-bottom:15px;">
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    <div style="flex: 1; margin-top: 15px;">
+                        <div style="display: flex; justify-content: center;">
+                            <lightning-button
+                                label="Cancelar"
+                                onclick={cancel}
+                                style="margin-right: 1rem;">
+                            </lightning-button>
+                            <lightning-button
+                                variant="brand"
+                                label="Guardar"
+                                onclick={save}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+</template>

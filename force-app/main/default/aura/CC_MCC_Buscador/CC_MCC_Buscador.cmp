@@ -75,13 +75,13 @@
                         </aura:if>
                         <aura:if isTrue="{!v.caso.SEG_Detalle__r.Name.length > 0}">
                             <span class="cc_flecha">→</span>
-                            <c:CC_MCC_Buscador_Badge text="{!v.caso.SEG_Detalle__r.Name}" fontWeight="500" enteredValue="@@@"/>
-                        </aura:if>
+                            <c:CC_MCC_Buscador_Badge text="{!v.caso.SEG_Detalle__r.Name}" fontWeight="500" enteredValue="@@@"/> 
+                        </aura:if>   
                     </div>
                     <div class="slds-col slds-grow-none">
                         <span style="padding-right: 10px;">
-                            <span>
-                                <lightning:buttonIcon iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" tooltip="{!v.mostrarBuscador ? 'Cerrar buscador de clasificaciones' : 'Abrir buscador de clasificaciones'}" disabled="{!v.readOnly}"/>
+                            <span style="{!v.negocio == 'CC' ? 'visibility: hidden;' : 'visibility: unset;'}">
+                                <lightning:button iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" title="Abrir buscador de clasificaciones" disabled="{!v.readOnly}"/>
                             </span>
                         </span>
                     </div>
@@ -90,11 +90,10 @@
         </aura:if>
         <aura:set attribute="else">
             <aura:if isTrue="{!!empty(v.caso.CC_MCC_Motivo__r.Name.length)                                                                                                                                                                                                                          }">
-                <div class="divClasificacionActual" onclick="{!c.mostrarBuscador}">
+                <div style="padding-top: 5px; padding-bottom: 6px; padding-left: 0.2rem; background-color: #fafbff; border-radius: 5px; border-style: solid; border-width: 1px; border-color: #d2d5d5; cursor: pointer;" onclick="{!c.mostrarBuscador}">
                     <div class="slds-grid slds-grid_vertical-align-center">
                         <div class="slds-col">
-                            <span style="padding-left: 6px;"/>
-                            <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="x-small" style="position: relative; top: -2px;" class="slds-var-m-right_medium"/>
+                            <span style="padding-left: 8px;"/>
                             <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Tematica__r.Name}" fontWeight="500" enteredValue="@@@"/>
                             <span class="cc_flecha">→</span>
                             <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_ProdServ__r.Name}" fontWeight="500" enteredValue="@@@"/>
@@ -107,8 +106,8 @@
                         </div>
                         <div class="slds-col slds-grow-none">
                             <span style="padding-right: 10px;">
-                                <span>
-                                    <lightning:buttonIcon iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" tooltip="{!v.mostrarBuscador ? 'Cerrar buscador de clasificaciones' : 'Abrir buscador de clasificaciones'}" disabled="{!v.readOnly}"/>
+                                <span style="{!v.negocio == 'CC' ? 'visibility: hidden;' : 'visibility: unset;'}">
+                                    <lightning:button iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" title="Abrir buscador de clasificaciones" disabled="{!v.readOnly}"/>
                                 </span>
                             </span>
                         </div>
@@ -120,8 +119,8 @@
 
     <!--Card-->
     <aura:if isTrue="{!v.mostrarBuscador}">
-        <div style="height: 0.5rem;"/>
-        <article class="slds-card slds-var-m-bottom_small">
+        <div style="height: 0.9rem;"/>
+        <article class="slds-card">
             <!--Cabecera de la card-->
             <div class="slds-card__header slds-grid">
                 <header class="slds-media slds-media_center slds-has-flexi-truncate">
@@ -145,7 +144,7 @@
                     <div class="slds-col">
                         <aura:if isTrue="{!empty(v.selectedObjectDisplayName)}">
                             <!--Campo de búsqueda sin elemento seleccionado-->
-                            <span onkeyup="{!c.searchRecords}">
+                            <span onkeyup="{!c.searchRecords}"> 
                                 <lightning:input disabled="{!or(and(v.caso.Status == 'Cerrado', !v.esAuditorSAC), v.caso.Status == 'Rechazado')}" name="lookUpInputElement" aura:id="lookUpInputElement" label="Buscar clasificación" value="{!v.enteredValue}" type="search" onblur="{!c.inputBlurred}" onchange="{!c.searchRecords}" onfocus="{!c.inputInFocus}" placeholder="buscar temática, producto/servicio, motivo..." autocomplete="off" variant="label-hidden"/>
                             </span>
                             <!--Resultados de la búsqueda-->
@@ -154,10 +153,10 @@
                                     <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-is-relative" role="presentation">
                                         <aura:iteration items="{!v.objectList}" var="obj" indexVar="ind" end="15">
                                             <li role="presentation" class="{!v.selectedIndex == ind ? 'slds-has-focus highlightDark' : 'slds-has-focus'}" data-current-index="{!ind}" onclick="{!c.onRowSelected}" onmouseover="{!c.showColorOnMouseEnter}" onmouseout="{!c.hideColorOnMouseLeave}">
-                                                <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option" style="position: relative; top: 1px;">
+                                                <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
                                                     <span class="slds-media__figure">
                                                         <span class="slds-icon_container" title="Clasificación">
-                                                            <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="x-small" style="position: relative; top: -2px;"/>
+                                                            <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="small" style="position: relative; top: -2px;"/>
                                                         </span>
                                                     </span>
                                                     <span class="slds-media__body">
@@ -169,11 +168,11 @@
                                                 <hr class="hrStyle"/>
                                             </aura:if>
                                         </aura:iteration>
-                                        <aura:if isTrue="{!v.negocio == 'SEG'}">
-                                            <div align="center" style="padding-top: 10px; padding-bottom: 10px;">
+                                        <aura:if isTrue="{!v.negocio == 'SEG'}"> 
+                                            <div align="center" style="padding-top: 10px; padding-bottom: 10px;"> 
                                                 <lightning:button iconName="utility:back" label="Anterior" onclick="{!c.beforePage}" disabled="{!v.pagina == 1}" />&nbsp;
                                                 <lightning:button iconName="utility:forward" label="Siguiente" onclick="{!c.nextPage}" disabled="{!v.pagina == v.totalPaginas}" />
-                                            </div>
+                                            </div> 
                                         </aura:if>
                                     </ul>
                                 </div>
@@ -185,7 +184,7 @@
                                     <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-is-relative" role="presentation">
                                         <li role="presentation">
                                             <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
-
+                                                
                                                 <span class="slds-media__body" style="{!and(!v.searching, !v.queryErrorFound) ? '' : 'display:none;'}">
                                                     <span class="slds-listbox__option-text_entity">
                                                         <center>
@@ -218,14 +217,14 @@
                                 </div>
                             </aura:if>
                             <!--Fin resultados de búsqueda-->
-
+                            
                             <aura:set attribute="else">
                                 <!--Campo de búsqueda con elemento seleccionado-->
                                 <div class="slds-form-element">
                                     <div class="slds-form-element__control">
                                         <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" style="z-index: 100;">
-                                            <span class="cc-fade-in" style="position: absolute; display: inline-block; top: 1px; padding-top: 3px; padding-left: 12px;">
-                                                <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="x-small" style="position: relative; top: -2px; margin-bottom: 4px;"/>
+                                            <span class="cc-fade-in" style="position: absolute; display: inline-block; padding-top: 3px; padding-left: 12px;">
+                                                <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="small" style="position: relative; top: 1px; margin-bottom: 4px;"/>
                                                 <span style="padding-left: 12px;"/>
                                                 <aura:if isTrue="{!v.selectedObject.CC_Tematica_Formula__c.length > 0}">
                                                     <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.CC_Tematica_Formula__c}" fontWeight="500" enteredValue="@@@"/>
@@ -233,7 +232,7 @@
 
                                                 <aura:if isTrue="{!v.selectedObject.CC_Producto_Servicio_Formula__c.length > 0}">
                                                     <span class="cc_flecha">→</span>
-                                                    <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.CC_Producto_Servicio_Formula__c}" fontWeight="500" enteredValue="@@@"/>
+                                                    <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.CC_Producto_Servicio_Formula__c}" fontWeight="500" enteredValue="@@@"/> 
                                                 </aura:if>
                                                 <aura:if isTrue="{!v.showDetalle}">
                                                     <aura:if isTrue="{!v.negocio == 'SEG'}">
@@ -272,7 +271,7 @@
                                                     </aura:set>
                                                 </aura:if>
                                             </span>
-                                            <input type="text" class="slds-input slds-combobox__input" role="textbox" disabled="true"/>
+                                            <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id" role="textbox" disabled="true"/>
                                             <lightning:buttonIcon iconName="utility:close" size="small" onclick="{!c.removeSelectedOption}" variant="bare" class="slds-input__icon slds-input__icon_right"/>
                                         </div>
                                     </div>
@@ -289,7 +288,7 @@
                 <aura:if isTrue="{!v.trasladoRemitidoCops == 'remitido' || v.trasladoRemitidoCops == 'traslado'}">
                     <div class="slds-grid slds-wrap">
                         <div class="slds-size_1-of-1">
-                            <p style="color: darkred;">El motivo seleccionado enviará un correo de {!v.trasladoRemitidoCops} automático.</p>
+                            <p style="color: darkred;">El motivo seleccionado enviará un correo de {!v.trasladoRemitidoCops} automático.</p>  
                         </div>
                     </div>
                 </aura:if>
@@ -317,7 +316,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> 
         </section>
     </aura:if>
 </aura:component>

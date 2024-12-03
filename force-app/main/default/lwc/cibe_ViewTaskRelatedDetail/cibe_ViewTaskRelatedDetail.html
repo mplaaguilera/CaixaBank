@@ -1,0 +1,47 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer slds-m-vertical_small">
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
+				<lightning-icon if:true={mainVinculed} size ="x-small" title ={label.mainOpp}   class="main-icon slds-button slds-button_neutral botonDorado" icon-name="utility:favorite" variant="warning" ></lightning-icon>
+				<div if:false={mainVinculed} class="vinculed">
+					<lightning-button-icon size ="medium" title={label.markMainOpp}   icon-name="utility:favorite" variant="border-filled" onclick={handleMain} ></lightning-button-icon>
+				</div>
+			</div>
+			<div class="slds-float_left">
+				<div class="name-col">
+					<div style="width:fit-content">
+						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
+						<span if:false={isInserted}>{name}</span>
+						<p>{label.statusOpp} <b>{statusNow}</b></p>
+						<p>{label.fechaCierre}: <b>{activityDate}</b></p>
+					</div>
+				</div>
+			</div>
+			<div  class="marginButtons itemSetting slds-float_left" style="margin-right:15px; margin-left: 15px; width:fit-content">
+				<div if:false={isFuture} class="slds-float_left">
+					<lightning-button-icon if:true={vinculed} icon-name="utility:arrow_right" data-id="noAgendado" onclick={handlePath}  name="noAgendado" class={insisClass} variant="border" size="large" title='Insistir' ></lightning-button-icon>
+					<lightning-button-icon if:false={vinculed} icon-name="utility:arrow_right" data-id="agendado" onclick={handlePath}  name="agendado" class={insisClass} variant="border" size="large" title='Insistir' ></lightning-button-icon>
+					<lightning-button-icon if:true={isOwner} icon-name="utility:check" data-id="check" onclick={handlePath}  name="check" class={checkClass} variant="border" size="large" title={label.gestionadaPositiva} ></lightning-button-icon>
+					<lightning-button-icon if:true={isOwner} icon-name="utility:close" data-id="close" onclick={handlePath} name="close" class={closeClass}  variant="border" size="large" title={label.gestionadaNegativa} ></lightning-button-icon>
+				</div>
+				<div if:true={isFuture}>
+					<lightning-button-icon if:true={vinculed} icon-name="utility:arrow_right" data-id="noAgendado" onclick={handlePath}  name="noAgendado" class={insisClass} variant="border" size="large" title='Insistir' ></lightning-button-icon>
+					<lightning-button-icon if:false={vinculed} icon-name="utility:arrow_right" data-id="agendado" onclick={handlePath}  name="agendado" class={insisClass} variant="border" size="large" title='Insistir' ></lightning-button-icon>
+				</div>
+			</div><!-- Fin Margin -->
+
+			<fieldset class="slds-form-element slds-form-element_compound slds-form-element_address">
+				<div class="slds-form-element__control">
+					<div class="slds-form-element__row">
+						<div class="slds-size_2-of-3">
+							<label class="slds-form-element__label" for="form-element-id-01">{label.comentario}</label>
+							<textarea if:true={isOwner}  class="slds-textarea" value={comentario} onchange={handleChangeComentario}>{comentarioToSend}</textarea>
+							<textarea if:false={isOwner} class="slds-textarea" value={comentario} disabled>{comentarioToSend}</textarea>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</template>

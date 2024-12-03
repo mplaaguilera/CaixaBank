@@ -14,7 +14,7 @@
                 <div class="slds-page-header__name-title">
                   <!--Titulo del Header en variable fija en el JS -->
                     <h1>
-                      <span class="slds-page-header__title  slds-truncate">{opportunities}</span>
+                      <span class="slds-page-header__title  slds-truncate">{label.opportunities}</span>
                     </h1>
                 </div>
                 <div class="slds-page-header__name-switcher">
@@ -38,7 +38,7 @@
                                             data-filter={option.value} onclick={handleFilterChangeButton}>
                                             <span class="slds-media__figure slds-listbox__option-icon" data-filter={option.value}></span>
                                             <span class="slds-media__body" data-filter={option.value}>
-                                             <span class="slds-truncate" title="Option A" data-filter={option.value}>{option.value}</span>
+                                            <span class="slds-truncate" title="Option A" data-filter={option.value}>{option.value}</span>
                                             </span>
                                           </div>
                                       </li>
@@ -52,7 +52,7 @@
                                             data-filter={option.label} onclick={handleFilterChangeButtonTabs}>
                                             <span class="slds-media__figure slds-listbox__option-icon" data-filter={option.label}></span>
                                             <span class="slds-media__body" data-filter={option.label}>
-                                             <span class="slds-truncate" title="Option A" data-filter={option.label}>{option.label}</span>
+                                            <span class="slds-truncate" title="Option A" data-filter={option.label}>{option.label}</span>
                                             </span>
                                           </div>
                                       </li>
@@ -66,4 +66,4 @@
           </div>
       </div>
     </div>
- </template>
+</template>

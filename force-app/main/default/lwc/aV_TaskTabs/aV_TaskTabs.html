@@ -34,10 +34,10 @@
 					</template>	
 					
 					<template if:false={isExperiencia}>
-						<template if:false={isCustomPermission}>
+						<template if:true={showOldReports}>
 							<lightning-tab if:false={disableBtn}  label="✏️ Cerrar tarea" value="CerrarInformar" onactive={navigateToTab}></lightning-tab>
 						</template>
-						<template if:true={isCustomPermission}>
+						<template if:false={showOldReports}>
 							<lightning-tab if:false={disableBtn}  label="✏️ Cerrar tarea" value="CerrarInformar" onactive={navigateToTabVersion2}></lightning-tab>
 						</template>
 					</template>

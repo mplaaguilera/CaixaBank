@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
+            <lightning-input class="fechaBuscar" type="date" value={fechaDefault} label="Seleccione una fecha" required="true"></lightning-input>
+        </div>
+    </div>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
+            <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Buscar disponibilidad" onclick={disponibilidadCitas}></lightning-button>
+        </div>
+    </div>
+    <div lwc:if={mostrarHoras} class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
+            <lightning-combobox class="franjaSeleccionada" name="horarioDisponible" label="Seleccione una hora disponible" placeholder="Seleccione una hora" options={opcionesDisponibles} onchange={onChangeFranjaSeleccionada}></lightning-combobox>
+        </div>
+    </div>
+</template>

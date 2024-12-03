@@ -1,10 +1,21 @@
 import { LightningElement, api, track, wire } from "lwc";
 import { NavigationMixin} from "lightning/navigation";
 import { CurrentPageReference } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import getTaskData from "@salesforce/apex/AV_TableGroupedByClient_Controller.getData";
 import BPRPS from '@salesforce/customPermission/AV_PrivateBanking';
-
+import OLDHOMETSK from '@salesforce/customPermission/AV_OldHomeTask';  
+import lookupSearchOffice from '@salesforce/apex/AV_OppSearch_Controller.searchOffice';
+import USER_ID from '@salesforce/user/Id';
+import enanchedGetUserInfo from '@salesforce/apex/AV_OppSearch_Controller.enanchedGetUserInfo';
+import getEmployees from '@salesforce/apex/AV_TableGroupedByClient_Controller.getEmployees';
+import AV_NotAssigned from '@salesforce/label/c.AV_NotAssigned';
+import  Only_three_at_time from '@salesforce/label/c.AV_Only_three_at_time';
+import  Maximum_Employees from '@salesforce/label/c.AV_Maximum_Employees';
+import  Inform_Office from '@salesforce/label/c.AV_Inform_Office';
+import  Wrong_Filter from '@salesforce/label/c.AV_Wrong_Filter';
+import  Banca_Privada from '@salesforce/label/c.AV_Banca_Privada';
 
 
 const VALUEWIDTH = 70;
@@ -20,7 +31,7 @@ const columnsTask = [
 	
     { label: 'Origen', fieldName: 'origen', type: 'text',initialWidth: 140, hideDefaultActions: true, sortable: true, sortBy: 'origen' },
 	
-    { label: 'Asunto', fieldName: 'taskIdURL', type: 'url', typeAttributes: { label: { fieldName: 'subject' } }, hideDefaultActions: true, sortable: true, sortBy: 'subject',minWidth:'5rem' },
+    { label: 'Asunto', fieldName: 'taskIdURL', type: 'url', typeAttributes: { label: { fieldName: 'subject' },tooltip:{fieldName:'subject'} }, hideDefaultActions: true, sortable: true, sortBy: 'subject',minWidth:'5rem' },
 	
     { label: 'Estado', fieldName: 'status', hideDefaultActions: true,initialWidth: 180, sortable: true, sortBy: 'status' },
     
@@ -38,7 +49,10 @@ const columnsTask = [
 	
     { label: 'My Box', fieldName: 'mybox',initialWidth: VALUEWIDTH, type: 'picklist', hideDefaultActions: true, sortable: true, sortBy: 'mybox' },
 	
-    { label: 'Target Auto', fieldName: 'targetAuto',initialWidth:   VALUEWIDTH2, type: 'picklist', hideDefaultActions: true, sortable: true, sortBy: 'targetAuto' }
+    { label: 'Target Auto', fieldName: 'targetAuto',initialWidth:   VALUEWIDTH2, type: 'picklist', hideDefaultActions: true, sortable: true, sortBy: 'targetAuto' },
+
+    { label: 'Empleado', fieldName: 'gestorName',initialWidth:   VALUEWIDTH2, type: 'text', typeAttributes:{label: {fieldName: 'gestorName'}},hideDefaultActions: true, sortable: true, sortBy: 'targetAuto' }
+    
 ];
 
 const columnsTaskBPR = [
@@ -69,7 +83,8 @@ const columnsTaskBPR = [
 	
     { label: 'My Box', fieldName: 'mybox',initialWidth: VALUEWIDTH, type: 'picklist', hideDefaultActions: true},
 	
-    { label: 'Target Auto', fieldName: 'targetAuto',initialWidth:   VALUEWIDTH2, type: 'picklist', hideDefaultActions: true }
+    { label: 'Target Auto', fieldName: 'targetAuto',initialWidth:   VALUEWIDTH2, type: 'picklist', hideDefaultActions: true },
+    { label: 'Empleado', fieldName: 'gestorName',initialWidth:   VALUEWIDTH2, type:'text', typeAttributes:{label: {fieldName: 'gestorName'}},hideDefaultActions: true }
 ];
 
 
@@ -95,17 +110,255 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
     @track subjectAndOriginSelect = [];
     @track originSelect = [];
     @track subjectSelect=[]; 
+    firstLoad = true;
+    gestor;
+    multigestor;
+	multiSelectionE=0;
+	multiSelectionS=0;
+    isDirector;
+	directores = ['DC','DT','DAN','SSCC'];
+    isMultiOffi = false;
+    @track selectedEmployees = [];
+    isAnotherOffice = false;
+    initialSelectionOffice = [];
+    errors = [];
+    handleSearch;
+	@track employeeLabel = 'Oficina';
+	@track employeePlaceholder = 'Buscar empleado...';
+    isMultiEntry = false;
+    selectedEmployeesDefault = [];
+    empleOfi;
+    optionAll;
+    employeesDiv = true;
+    employeeDefault = USER_ID;
+	@track employeeFilter = this.employeeDefault;
     multiSelectionDouble = 0;
-                 rtLabelApiNameMap = new Map([
-                ['Priorizador', 'AV_Priorizador'],
-                ['Alertas Comerciales', 'AV_AlertaComercial'],
-                ['Experiencia Cliente', 'AV_ExperienciaCliente'],
-                ['Iniciativa Gestor/a', 'AV_Otros'],
-                ['Onboarding', 'AV_Onboarding'],
-                ['Onboarding Intouch', 'AV_Onboarding']
-            ]);
+    optionsEmployeeAux = [];
+    selectedEmployeesDefault = [];
+    defaultOffice;
+    subjectDisabled = false;
+    originDisabled = false;
+    disabledCb = false;
+    rtLabelApiNameMap = new Map([
+        ['Priorizador', 'AV_Priorizador'],
+        ['Alertas Comerciales', 'AV_AlertaComercial'],
+        ['Alerta Comercial', 'AV_AlertaComercial'],
+        ['Experiencia Cliente', 'AV_ExperienciaCliente'],
+        ['Iniciativa Gestor/a', 'AV_Otros'],
+        ['Onboarding', 'AV_Onboarding'],
+        ['Onboarding Intouch', 'AV_Onboarding']
+    ]);
+ 
+    handleChangeEmployee(event) {
+        if((this.selectedEmployees.length + 1 ) > 3){
+            this.showToast(Maximum_Employees,Only_three_at_time,'warning','dismissable');
+            this.employeeFilter = this.selectedEmployees[this.selectedEmployees.length -1 ].id;
+            let comboboxEmp = this.template.querySelector("[data-id='employeesDropDown']");
+            if(comboboxEmp != null){
+                comboboxEmp.value = this.employeeFilter;
+            }
+            return;
+        }
+        this.multiSelectionE++;
+        this.employeeFilter = event.target.value;
+        let employeeName = '';
+        for(let i=0;i<this.optionsEmployee.length;i++){
+            if(this.optionsEmployee[i]['value']===event.target.value){
+                employeeName=this.optionsEmployee[i]['label'];
+                if (employeeName.includes('Todos')) {
+                    this.selectedEmployees = [];
+                }
+                break;
+            }
+        }
+        let insert = true;
+        if(this.selectedEmployees.length > 0 ){
+            if (this.selectedEmployees[0]['label'].includes('Todos')) {
+                this.selectedEmployees.splice(0, 1);
+            }
+            for (let i = 0; i < this.selectedEmployees.length; i++) {
+                if (this.selectedEmployees[i]['label']===employeeName) {
+                    insert = false;
+                    break;
+                }				
+            }
+        }
+        if (insert && employeeName != '') {
+            this.buttonDisabled = false;
+            this.selectedEmployees.push({label:employeeName,id:event.target.value,bucleId:this.multiSelectionE});
+        }
+        this.employeesDiv = true;
+    }
 
 
+    handleSearcOffice(event){
+		lookupSearchOffice({searchTerm: event.detail.searchTerm, selectedIds: null})
+		.then((results) => {
+			this.template.querySelector('[data-id="clookup2"]').setSearchResults(results.listOfi);
+			this.optionAll = results.optionAll;
+			this.isMultiOffi = results.isMultiOffi;
+		})
+		.catch((error) => {
+			console.error('Lookup error', JSON.stringify(error));
+			this.errors = [error];
+		});
+    }
+
+    handleSearchOfficeClick(event){
+        if (this.find == '' && this.numOficinaEmpresa == null) {
+			lookupSearchOffice({searchTerm: event.detail.searchTerm, selectedIds: null})
+			.then((results) => {
+				this.template.querySelector('[data-id="clookup2"]').setSearchResults(results.listOfi);
+				this.optionAll = results.optionAll;
+				this.isMultiOffi = results.isMultiOffi;
+			})
+			.catch((error) => {
+				console.error('Lookup error', JSON.stringify(error));
+				this.errors = [error];
+			});
+		}
+    }
+    showToast(title, message, variant, mode) {
+		var event = new ShowToastEvent({
+			title: title,
+			message: message,
+			variant: variant,
+			mode: mode
+		});
+		this.dispatchEvent(event);
+	}
+
+    getOptionsOffice() {
+		lookupSearchOffice({searchTerm: this.empleOfi.substring(4), selectedIds: null})
+		.then(result => {
+			if (result != null && result.listOfi != null) {
+				if(this.template.querySelector('[data-id="clookup2"]') != null) {
+					this.template.querySelector('[data-id="clookup2"]').setSearchResults(result.listOfi);
+				}
+				this.numOficinaEmpresa = this.empleOfi.substring(4);
+				this.initialSelectionOffice = [{id: result.listOfi[0].id, icon:result.listOfi[0].icon, title: result.listOfi[0].title}];
+				this.officeSelectedDefault = [{id: result.listOfi[0].id, icon:result.listOfi[0].icon, title: result.listOfi[0].title}];
+				this.selectedOffice = this.selectedOffice === '' ? this.empleOfi.substring(4) : this.selectedOffice;
+				this.optionAll = result.optionAll;
+				this.getOptionsEmployee(this.empleOfi.substring(4));
+                
+             
+			}
+		}).catch(error => {
+			console.log(error);
+		});
+	}
+
+    loadingEmployee;
+	getOptionsEmployee(data){
+		this.loadingEmployee = true;
+		this.multiSelectionE++;
+		getEmployees({officeFilterData: data})
+		.then(result => {
+			if(result != null && result.length > 1) {
+                result = result.filter(r => !(r.label.includes('Todos')));
+				if((this.origenFilter === 'all') && result.length > 0 && result[0].label.includes('Todos')){
+					result.shift();
+				}
+				this.optionsEmployee = result;
+				if ((!this.isAnotherOffice && this.isDirector) || (!this.isDirector && this.isMultiOffi)) {
+					if (!JSON.stringify(this.optionsEmployee).includes(USER_ID)) {
+						this.optionsEmployee.push({value:USER_ID,label:this.empleName});
+					}
+				}
+				this.optionsEmployee.push({value:'',label:''});
+				if(this.isAnotherOffice === false){
+					if (this.currentPageReference.state.c__singestor != null && this.currentPageReference.state.c__singestor[0] === AV_NotAssigned) {
+                        this.employeeFilter = this.currentPageReference.state.c__singestor[1];
+						this.selectedEmployees = [{label:this.currentPageReference.state.c__singestor[0],id:this.currentPageReference.state.c__singestor[1],bucleId:this.multiSelectionE}];
+					}
+					
+				}
+			} else if (result != null) {
+				this.optionsEmployee = result;
+				if (!this.isDirector && this.isMultiOffi) {
+					if (!JSON.stringify(this.optionsEmployee).includes(USER_ID)) {
+						this.optionsEmployee.push({value:USER_ID,label:this.empleName});	
+					}
+				}
+				this.optionsEmployee.push({value:'',label:''});
+				if (this.isMultiOffi) {
+					if (this.currentPageReference.state.c__singestor != null && this.currentPageReference.state.c__singestor[0] === AV_NotAssigned) {
+						this.employeeFilter = this.currentPageReference.state.c__singestor[1];
+						this.selectedEmployees = [{label:this.currentPageReference.state.c__singestor[0],id:this.currentPageReference.state.c__singestor[1],bucleId:this.multiSelectionE}];
+					}else{
+						this.employeeFilter = this.employeeDefault;
+						if(this.multigestor != undefined && this.multigestor != null){
+							this.selectedEmployees = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE},{label:Banca_Privada,id:this.multigestor,bucleId:++this.multiSelectionE}];
+						}else{
+							this.selectedEmployees = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
+                            
+						}
+					}
+				} else {
+					this.employeeFilter = '';
+					this.selectedEmployees = [];
+				}
+			}
+            this.selectedEmployeesDefault = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
+            if(this.multigestor != undefined && this.multigestor != null){
+                this.selectedEmployeesDefault.push({label:Banca_Privada,id:this.multigestor,bucleId:++this.multiSelectionE});
+            }
+			this.loadingEmployee = false;
+            if(this.firstLoad){
+
+                this.buildComponent();
+                this.firstLoad = false;
+            }
+		}).catch(error => {
+			this.loadingEmployee = false;
+			console.log(error);
+		});
+	}
+    handleSelectionChange(e){
+        const selection = this.template.querySelector(`[data-id="clookup2"]`).getSelection();
+
+        if(selection.length !== 0){
+            for(let sel of selection) {
+                this.buttonDisabled = this.employeeFilter == '';
+                this.isDisabledEmployee = false;
+                this.subjectDisabled = false;
+                this.originDisabled = false;
+                this.disabledCb = false;
+                if (sel.title == 'Todas') {
+                    this.numOficinaEmpresa = this.optionAll;
+                    this.employeeFilter = this.employeeDefault;
+                    this.selectedEmployees = [{label:this.empleName,id:this.employeeDefault,bucleId:this.multiSelectionE}];
+                    this.isDisabledEmployee = true;
+                    this.isAnotherOffice = false;
+                    this.employeesDiv = true;
+                } else {
+                    this.find = '';
+                    this.employeeFilter = '';
+                    this.numOficinaEmpresa = sel.title.substring(0,5);
+                    this.isDisabledEmployee = false;
+                    this.getOptionsEmployee(this.numOficinaEmpresa);
+                }
+            }
+        } else {
+            this.selectedEmployees = []
+            this.optionsEmployee = [];
+            this.originSelect = [];
+            this.isDisabledEmployee = true;
+            this.buttonDisabled = true;
+            this.subjectDisabled = true;
+            this.originDisabled = true;
+            this.disabledCb = true;
+            this.numOficinaEmpresa = null;
+            
+            let comboboxEmp = this.template.querySelector("[data-id='employeesDropDown']");
+            this.employeeFilter = '';
+            if(comboboxEmp != null){
+                comboboxEmp.value = this.employeeFilter;
+            }
+            this.template.querySelector('.another-office').checked = false;
+        }
+    }
     @api columns = columnsTask;
     sortedBy;
 	sortDirection = 'asc';
@@ -120,14 +373,71 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
     @track hasSubject = false;
     @track isBpr = (BPRPS != undefined);
     @track origenFilter;
+    @track isOldHomeTsk = (OLDHOMETSK!= undefined);
+    nameReport;
     
-    
+   
+	unSelectEmployee(cmp){
+		let divToDel = cmp.target.parentNode;
+		for(let i=0;i<this.selectedEmployees.length;i++){
+			if(this.selectedEmployees[i].id === cmp.target.name){
+				this.selectedEmployees.splice(i,1);
+			}
+		}
+		divToDel.classList.add('delete');
+		cmp.target.remove();
+		if (this.selectedEmployees.length === 0) {
+			this.employeesDiv = false;
+			this.employeeFilter = '';
+		}
+        if(this.selectedEmployees.length > 0){
+            this.buttonDisabled = false;
+            this.employeeFilter = this.selectedEmployees[this.selectedEmployees.length -1].id;
+        }else{
+            this.buttonDisabled = true;
+
+        }
+	}
+    getUserInfo(){
+		enanchedGetUserInfo({userId:USER_ID})
+		.then(data => {
+            if(data){
+                let gestor = data.gestor;
+                this.empleFuncion = gestor.AV_Funcion__c;
+                this.empleName = gestor.Name;
+                this.empleOfi = gestor.AV_NumeroOficinaEmpresa__c === null ? '': gestor.AV_NumeroOficinaEmpresa__c;
+                
+                this.numOficinaEmpresa = this.empleOfi.split('-')[1];
+                this.defaultOffice = this.empleOfi.split('-')[1];
+                this.numOfficeDefault = this.empleOfi.split('-')[1];
+                this.isDirector = this.directores.includes(this.empleFuncion);
+                this.selectedEmployeesDefault = [{label:this.empleName,id:USER_ID,bucleId:this.multiSelectionE}];
+                if(data.multigestor != undefined && data.multigestor != null){
+					this.multigestor = data.multigestor.Id;
+                    this.selectedEmployeesDefault.push({label:Banca_Privada,id:data.multigestor.Id,bucleId:++this.multiSelectionE});
+                }
+                this.selectedEmployees = [];
+                this.selectedEmployeesDefault.forEach(emp =>{
+                emp.bucleId = ++this.multiSelectionE;
+                if(!this.employeesDiv){
+                    this.employeesDiv = true;
+                }
+		        });
+		        this.selectedEmployeesDefault.forEach( emp => {this.selectedEmployees.push(emp)});
+                this.getOptionsOffice();
+            }
+        }).catch(error => {
+            console.error(error);
+        })
+    }
     filterResults = {
         subjectFilterValue: null,
         preconcedidoFilterValue: null,
         myBoxFilterValue: null,
         targetAutoFilterValue: null,
-        origenFilterValue : null
+        origenFilterValue : null,
+        employeesFilter : [],
+        officeFilter : null
     };
 
     get optionsPreconcedido() {
@@ -158,7 +468,6 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
 
         this.dataClient.forEach((product) => {
             if (groupedDataMap.has(product.name)) {
-                //entra aquí si YA ESTABA ESE CLIENTE
                 groupedDataMap.get(product.name).products.push(product);
                 let newProduct = {};
                 newProduct.name = product.name;
@@ -181,7 +490,6 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
                 previousAccount = product.accountId;
 
             } else {
-                //ENTRA AQUÍ SI NO ESTABA ESE CLIENTE
                 let newProduct = {};
                 newProduct.name = product.name;
 
@@ -218,16 +526,24 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
     @wire(CurrentPageReference)
 	setCurrentPageReference(currentPageReference) {
 		this.currentPageReference = currentPageReference;
+        
 	}
     
     connectedCallback() { 
+		this.getUserInfo();
+
+    }
+    buildComponent() { 
+
         this.filterRt = this.currentPageReference.state.c__fv9;
+        
 
         if(this.filterRt != null){
             this.filterRt = this.filterRt.replace(/[']+/g,'').trim();
             
             this.mainClickFilter  = this.rtLabelApiNameMap.get(this.filterRt);
             this.origenMultiFilter  = this.rtLabelApiNameMap.get(this.filterRt);
+           
         }
         this.isBpr = BPRPS;
         this.callApexToGetDataFiltered();
@@ -236,6 +552,13 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
         }else{
             this.columns = columnsTask;
         }
+
+        if(!this.isOldHomeTsk){
+            this.nameReport = 'Tareas';
+        }else{
+            this.nameReport ='Clientes a gestionar priorizados';
+        }
+        
 
     }
 
@@ -392,6 +715,16 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
 	}
 
     resetFilters() {
+        this.buttonDisabled = false;
+        this.isDisabledEmployee = false;
+        this.subjectDisabled = false;
+        this.originDisabled = false;
+        this.disabledCb = false;
+        this.numOficinaEmpresa = this.defaultOffice;
+        if(this.isAnotherOffice){
+            this.handleAnotherOffice(new Object({'detail':{'checked':false}}));
+        }
+        this.employeeFilter = this.employeeDefault;
         this.template.querySelectorAll("lightning-input").forEach((each) => {
             each.value = "";
         });
@@ -404,8 +737,18 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
             preconcedidoFilterValue: null,
             myBoxFilterValue: null,
             targetAutoFilterValue: null,
-            origenFilterValue : null
+            origenFilterValue : null,
+            employeesFilter : []
         };
+        this.selectedEmployees = [];
+        this.selectedEmployeesDefault.forEach(emp =>{
+			emp.bucleId = ++this.multiSelectionE;
+			if(!this.employeesDiv){
+				this.employeesDiv = true;
+			}
+		});
+		this.selectedEmployeesDefault.forEach( emp => {this.selectedEmployees.push(emp)});
+        this.buttonDisabled = false;
         this.buttonDisabled = true;
         this.mainClickFilter = null;
         this.selectedOrigen = [];
@@ -421,7 +764,10 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
         this.originalLookupAuxOptions.forEach(org => {
             this.originalLookUpOptions.push(org);
         })
-        this.template.querySelector("[data-id='clookup5']").setSearchResults(this.originalLookUpOptions);
+        this.initialSelectionOffice = JSON.parse(JSON.stringify(this.officeSelectedDefault));
+        this.getOptionsEmployee(this.numOficinaEmpresa);
+        this.template.querySelector("[data-id='clookup2']").setSearchResults(this.originalLookUpOptions);
+        this.callApexToGetDataFiltered();
         
     }
 
@@ -431,13 +777,14 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
         this.originSelect.forEach(org => {
             if (org.type == 'origen' && !this.origenMultiFilter.includes(org.value)) {
                 this.origenMultiFilter.push(  org.value );
+                
             }
 
             if(org.type == 'subject' && !this.filterResults.subjectFilterValue.includes(org.value)){
                 this.filterResults.subjectFilterValue.push(org.value);
             }
         });
-        
+
         this.callApexToGetDataFiltered();
     }
 
@@ -508,6 +855,8 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
 
 
     callApexToGetDataFiltered() {
+        this.filterResults.employeesFilter = this.selectedEmployees.map(emp => emp.id);
+        this.filterResults.officeFilter = this.numOficinaEmpresa;
         getTaskData({ filterResults: this.filterResults, origenFilter: this.origenMultiFilter })
             .then((result) => {
                 this.showTable = true;
@@ -522,6 +871,7 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
                     result.forEach((d)=>{
                         d.accountIdURL = '/'+d.accountId;
                         d.taskIdURL = '/'+d.taskId ;
+                        d.gestorId = '/'+d.gestorId;
 
                         if(d.groupField == 'Sin grupo'){
 
@@ -586,7 +936,52 @@ export default class AV_PrioritizedClientsToManage extends NavigationMixin(Light
     
 
      
+    handleAnotherOffice(event) {
+		if (this.numOficinaEmpresa != null) {
+			this.isAnotherOffice = event.detail.checked;
+			this.selectedEmployees = [];
+			if (event.detail.checked === true) {
+				this.optionsEmployeeAux = this.optionsEmployee;
+				this.employeeFilter = '';
+				var data = this.numOficinaEmpresa+'{|}';
+                if(this.originSelect != null && this.originSelect.length != 0){
+                    this.originSelect.map(origin => origin.value).forEach(origenValue => {
+                        data += (origenValue + ',');
+                        })
+                }else{
+                    data += 'all';
+                }
+				this.getOptionsEmployee(data);
+				this.employeesDiv = false;
+			} else {
+				this.optionsEmployee = this.optionsEmployeeAux;
+                this.selectedEmployees = [];
+				this.handleChangeEmployee(new Object({'target': {'value':USER_ID}}));
+                if(this.multigestor != null){
+                    this.handleChangeEmployee(new Object({'target': {'value':this.multigestor}}));
 
+                }
+				this.employeeFilter = this.employeeDefault;
+				this.employeesDiv = true;
+			}
+		} else {
+			const el = this.template.querySelector('.another-office');
+			el.checked = false;
+			this.optionsEmployee = this.optionsEmployeeAux;
+			this.employeeFilter = this.employeeDefault;
+			this.handleChangeEmployee(new Object({'target': {'value':this.employeeFilter}}));
+			this.employeesDiv = true;
+			this.isAnotherOffice = false;
+			const evt = new ShowToastEvent({
+				title: Wrong_Filter,
+				message: Inform_Office,
+				variant: 'info',
+				mode: 'dismissable'
+			});
+			this.dispatchEvent(evt);
+		}
+
+	}
 
     
 }

@@ -1,6 +1,6 @@
 <template>
     <lightning-tabset class="flexipage-tabset">
-        <lightning-tab label="Grupo Comercial" value="1" onactive={handleActive}>
+        <lightning-tab label={labels.grupoComercial} value="1" onactive={handleActive}>
             <div class="slds-card__body slds-card__body_inner">
                 <c-cibe_-Grupos-Comerciales 
                     record-id={recordId} 
@@ -8,7 +8,7 @@
                 </c-cibe_-Grupos-Comerciales>
             </div>
         </lightning-tab>
-        <lightning-tab label="Oportunidades" value="2" onactive={handleActive}>
+        <lightning-tab label={labels.oportunidades} value="2" onactive={handleActive}>
             <div class="slds-card__body slds-card__body_inner">
                 <c-cibe_-Opportunities-From-Groups
                     record-ids={recordIdsOpportunity}
@@ -19,7 +19,7 @@
                 </template>
             </div>
         </lightning-tab>
-        <lightning-tab label="Citas" value="3" onactive={handleActive}>
+        <lightning-tab label={labels.citas} value="3" onactive={handleActive}>
             <div class="slds-card__body slds-card__body_inner">
                 <c-cibe_-Events-From-Groups
                     record-ids={recordIdsEvent}
@@ -30,7 +30,7 @@
                 </template>
             </div>
         </lightning-tab>
-        <lightning-tab label="Tareas" value="4" onactive={handleActive}>
+        <lightning-tab label={labels.tareas} value="4" onactive={handleActive}>
             <div class="slds-card__body slds-card__body_inner">
                 <c-cibe_-Tasks-From-Groups
                     record-ids={recordIdsTasks}
@@ -41,11 +41,20 @@
                 </template>
             </div>
         </lightning-tab>
-        <lightning-tab label="Equipo Caixabank" value="5" onactive={handleActive}>
+        <lightning-tab label={labels.equipoCXBContactos}  value="5" onactive={handleActive}>
             <div class="slds-card__body slds-card__body_inner">
                 <c-cibe_-C-X-B-Visualizacion-G-C
                     record-ids={recordIdsEquipoCB}>
                 </c-cibe_-C-X-B-Visualizacion-G-C>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <c-cibe_-Contactos_-G-C
+                    record-id={recordId}>
+                    
+                </c-cibe_-Contactos_-G-C>
+                <!-- <template if:false={isLoaded}>
+                    <lightning-spinner variant="brand" size="medium"> </lightning-spinner>
+                </template> -->
             </div>
         </lightning-tab>
     </lightning-tabset>

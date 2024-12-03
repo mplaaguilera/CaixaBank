@@ -47,8 +47,22 @@
           </div>
           <div if:true={isDATA}>
             <h1 class="titulo" slot="title">{req_questionDAT}</h1>
-            <lightning-textarea maxlength="255" label={labelDATA} value={valueDATA} disabled={disableDATA} onchange={getSelection} required></lightning-textarea>
+            <lightning-textarea maxlength="2000" label={labelDATA} value={valueDATA} disabled={disableDATA} onchange={getSelection} required></lightning-textarea>
             </br>
+            <template if:true={errorGeneral}>
+              <div class="slds-notify_container slds-is-relative">
+                  <div class="slds-notify slds-notify_toast slds-theme_error" role="status" id="errorGeneral">                  
+                      <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                          <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                          <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                          </svg>
+                      </span>
+                      <div class="slds-notify__content">
+                          <h2 class="slds-text-heading_small"><lightning-formatted-text value={mensajeErrorComentario} ></lightning-formatted-text> </h2>
+                      </div>
+                  </div>
+              </div>
+          </template>
             <!--lightning-record-edit-form object-api-name="SIREC__SIREC_obj_tarea__c" id="tareaNew3">
               <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentario} onchange={changeComentarios}> </lightning-input-field>
             </lightning-record-edit-form-->

@@ -10,6 +10,7 @@ import tipo from '@salesforce/label/c.CIBE_Tipo';
 import asunto from '@salesforce/label/c.CIBE_Asunto';
 import estado from '@salesforce/label/c.CIBE_Estado';
 import fechaInicio from '@salesforce/label/c.CIBE_FechaInicio';
+import pagina from '@salesforce/label/c.CIBE_Pagina';
 
 //import
 import events12Months  from '@salesforce/apex/CIBE_HomeEventos12Meses_Controller.events12Months';
@@ -22,16 +23,17 @@ export default class cibe_HomeTareasHoyCIB extends NavigationMixin(LightningElem
         asunto,
         tipo,
         fechaInicio,
-        estado
+        estado,
+        pagina
     };
 
     @track columns = [
 
-        { label: this.labels.nombreCliente,           fieldName: 'idAccount',               sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},     initialWidth : 200,       typeAttributes: {label: {fieldName: 'AccountName'}}}, 
-        { label: this.labels.asunto,                  fieldName: 'idEvent',                 sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },    initialWidth : 200,       typeAttributes: {label: {fieldName: 'asunto'}}},
-        { label: this.labels.tipo,                    fieldName: 'tipo',                    sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'},     initialWidth : 150}, 
-        { label: this.labels.fechaInicio,             fieldName: 'fechaInicio',             sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },   initialWidth : 250,       typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute:"2-digit", second: '2-digit' }},
-        { label: this.labels.estado,                  fieldName: 'estado',                  sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' },    initialWidth : 150}  
+        { label: this.labels.nombreCliente,           fieldName: 'idAccount',               sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},            typeAttributes: {label: {fieldName: 'AccountName'}}}, 
+        { label: this.labels.asunto,                  fieldName: 'idEvent',                 sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },           typeAttributes: {label: {fieldName: 'asunto'}}},
+        { label: this.labels.tipo,                    fieldName: 'tipo',                    sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'}}, 
+        { label: this.labels.fechaInicio,             fieldName: 'fechaInicio',             sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },          typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute:"2-digit", second: '2-digit' }},
+        { label: this.labels.estado,                  fieldName: 'estado',                  sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' }}  
         
     ];
     
@@ -43,6 +45,7 @@ export default class cibe_HomeTareasHoyCIB extends NavigationMixin(LightningElem
     @track totalPages = 0;
     @track pageData = [];
     @track offSet = 0;
+    @track actualPagina = 1;
 
     @track isShowSpinner = true;
 
@@ -119,23 +122,23 @@ export default class cibe_HomeTareasHoyCIB extends NavigationMixin(LightningElem
         this.pageData = this.dataValues.slice(this.pageNumber*10, this.pageNumber*10+10);
     }
     
-    /* previous() {
+    previous() {
         this.pageNumber = Math.max(0, this.pageNumber - 1);
         this.updatePage();
     }
-    */
+    
     
     first() {
         this.pageNumber = 0;
         this.updatePage();
     }
     
-    /*next() {
+    next() {
         if((this.pageNumber+1)<=this.totalPages) {
             this.pageNumber = this.pageNumber + 1;
             this.updatePage();
         }
-    }*/
+    }
     
     last() {
         this.pageNumber = this.pageNumber = this.totalPages;
@@ -170,18 +173,19 @@ export default class cibe_HomeTareasHoyCIB extends NavigationMixin(LightningElem
     previousHandler() {
         this.isShowSpinner = true;
         console.log(this.offSet);
-
         this.offSet = this.offSet >= 10 ? (this.offSet - 10) : this.offSet;
         console.log(this.offSet);
+        this.actualPagina--;
+        
 
     }
 
     nextHandler() {
         this.isShowSpinner = true;
         console.log(this.offSet);
-
         this.offSet = (this.offSet <= 1990) ? (this.offSet + 10) : this.offSet;
         console.log(this.offSet);
+        this.actualPagina++;
 
     }
 }

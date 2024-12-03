@@ -84,6 +84,7 @@ export default class fra_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 				window.setTimeout(() => this.mostrarControles(), 400);
 			}
 		} else if (error) {
+			/*eslint no-console: ["error", { allow: ["error"]}]*/
 			console.error(error);
 		}
 	}
@@ -111,6 +112,7 @@ export default class fra_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 			try {
 				//Añadir custom attributes antes de la invocación al método Apex
 				const estadoConsultaFRA = message.data.attributes?.['Participant.estadoConsultaFRA'];
+				
 				switch (nombreMetodoApex) {
 					case 'iniciarTransferenciaCiega':
 						await this.addCustomAttributes({estadoConsultaFRA: 'blindTransferFRA', agenteOrigenId: USER_ID, agenteDestinoId: null});
@@ -147,7 +149,7 @@ export default class fra_Genesys_Cloud_Eventos extends NavigationMixin(Lightning
 					await this.addCustomAttributes({estadoConsultaFRA: null, agenteOrigenId: null, agenteDestinoId: null});
 				}*/
 
-				//Se realiza la invocación al método Apex si aplica
+				//Se realiza la invocación al método Apex si aplica 
 				const metodoApexInput = await conversionApexInputs(nombreMetodoApex, message, this.interactionId, this);
 				if (metodoApexInput) {
 					await this.invocarMetodoApex(nombreMetodoApex, metodoApexInput);

@@ -1,0 +1,47 @@
+.classAlta svg{
+    fill: #04B94C;
+    border-radius: 100%;
+    background-color: #04B94C;
+}
+
+.classMediaAlta svg{
+    fill: #56876D;
+    border-radius: 100%;
+    background-color: #56876D;
+}
+.classMedia svg{
+    fill: #F9F50C;
+    border-radius: 100%;
+    background-color: #F9F50C;
+}
+.classMediaBaja svg{
+    fill: #850000;
+    border-radius: 100%;
+    background-color: #850000;
+    
+}
+.classBaja svg{
+    fill: #F0011D;
+    border-radius: 100%;
+    background-color: #F0011D;
+}
+
+.classBaMorosos svg{
+    fill: black;
+    border-radius: 100%;
+    background-color: black;
+}
+.classInactivos svg{
+    fill: white;
+    border: thin solid black;
+    border-radius: 100%;
+    background-color: white;
+
+}
+
+.classFinanciacionProyecto svg{
+    fill: #999999;
+    border-radius: 100%;
+    background-color: #999999;
+
+}

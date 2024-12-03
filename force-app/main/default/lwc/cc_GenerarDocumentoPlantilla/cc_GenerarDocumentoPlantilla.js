@@ -2,9 +2,9 @@ import {LightningElement, api, wire, track} from 'lwc';
 import {NavigationMixin} from 'lightning/navigation';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 
-import verCarpetaInicialApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.verCarpetaInicial';
+// import verCarpetaInicialApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.verCarpetaInicial';
 import verCarpetaApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.verCarpeta';
-import buscarPlantillasApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.buscarPlantillas';
+// import buscarPlantillasApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.buscarPlantillas';
 //import cuerpoPlantillaApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.cuerpoPlantilla';
 
 import cuerpoPlantillaApex from '@salesforce/apex/CC_GenerarDocumentoPlantilla_Apex.obtenerDatosTemplate';
@@ -25,8 +25,6 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 
 	plantillas;
 
-	plantillasFiltro;
-
 	@track ruta = [];
 
 	plantillaSeleccionada;
@@ -37,14 +35,19 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 
 	lookupBusquedaTimeout;
 
+	checkboxBuscarPlantillas = false;
+
+	plantillasMCC = true;
+
+	lstSearchPlantillas;
+	
+	inputValueBuscadorPlantillas = '';
+
 	@wire(cargarPlantillasMCCApex, {idCaso: '$recordId'})
 	wiredCargarPlantillasMCC({error, data}) {
 		
 		if (data) {
 			this.plantillas = data;
-			this.plantillasFiltro = data;
-		} else if (error) {
-			console.error(error);
 		}
 	}
 
@@ -79,7 +82,6 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 				this.template.querySelector('.lookupBusquedaInput').disabled = !this.carpetaActual.plantillas.length;
 
 			}).catch(error => {
-				console.error(error);
 				this.toast('error', 'Problema recuperando contenido de la carpeta');
 			});
 		}
@@ -109,34 +111,36 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 		}
 	}
 
-	lookupBusquedaSeleccionarResultado(event) {	
-		
-		const resultadoSeleccionado = this.plantillas.find(plantilla => plantilla.Id === event.currentTarget.dataset.id);
-		
+	lookupBusquedaSeleccionarResultado(event) {
+		const resultadoSeleccionado = this.plantillas.find(plantilla => plantilla.Id === event.target.value);
 		this.plantillaSeleccionada = resultadoSeleccionado;
 		this.lookupBusquedaInputValue = '';
 		this.lookupBusquedaResultados = [];
 		this.template.querySelector('.botonAplicar').disabled = false;
 	}
 
-	lookupBusquedaInputOnchange(event) {
-		console.log('::: dentro onchange');
-		console.log('::: event.detail.value: ' + event.detail.value);
-		window.clearTimeout(this.lookupBusquedaTimeout);
-		console.log('::: lookupBusquedaTimeout: ' + this.lookupBusquedaTimeout);
-		this.lookupBusquedaInputValue = event.detail.value;
-		console.log('::: lookupBusquedaInputValue: ' + lookupBusquedaInputValue);
-		if (this.lookupBusquedaInputValue.length > 1) {
-			console.log('::: dentro if');
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			this.lookupBusquedaTimeout = window.setTimeout(() => this.buscarPlantillas(this.carpetaActual.carpeta.Id, this.lookupBusquedaInputValue), 500);
-		} else {
-			console.log('::: dentro else');
-			const lookupBusqueda = this.template.querySelector('.lookupBusqueda');
-			lookupBusqueda.classList.remove('slds-is-open');
-			this.lookupBusquedaResultados = [];
-		}
+	lookupBusquedaInputSeleccionarResultado(event) {
+		const plantillaId = event.target.dataset.id || event.currentTarget.dataset.id;
+		const resultadoSeleccionado = this.lstSearchPlantillas.find(plantilla => plantilla.Id === plantillaId);
+		
+		this.plantillaSeleccionada = resultadoSeleccionado;
+		this.lstSearchPlantillas = null;
+		this.inputValueBuscadorPlantillas = resultadoSeleccionado.Name;
+		this.template.querySelector('.botonAplicar').disabled = false;
 	}
+
+	// lookupBusquedaInputOnchange(event) {
+	// 	window.clearTimeout(this.lookupBusquedaTimeout);
+	// 	this.lookupBusquedaInputValue = event.detail.value;
+	// 	if (this.lookupBusquedaInputValue.length > 1) {
+	// 		//eslint-disable-next-line @lwc/lwc/no-async-operation
+	// 		this.lookupBusquedaTimeout = window.setTimeout(() => this.buscarPlantillas(this.carpetaActual.carpeta.Id, this.lookupBusquedaInputValue), 500);
+	// 	} else {
+	// 		const lookupBusqueda = this.template.querySelector('.lookupBusqueda');
+	// 		lookupBusqueda.classList.remove('slds-is-open');
+	// 		this.lookupBusquedaResultados = [];
+	// 	}
+	// }
 
 	lookupBusquedaInputOnkeydown(event) {
 		if (event.keyCode === 27 && event.currentTarget.value) { //ESC
@@ -144,24 +148,19 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 		}
 	}
 
-	buscarPlantillas(idCarpeta, cadenaBusqueda) {
-		console.log('::: dentro buscarPlantillas');
-		const lookupBusqueda = this.template.querySelector('.lookupBusqueda');
-		const lookupBusquedaInput = lookupBusqueda.querySelector('.lookupBusquedaInput');
-		lookupBusquedaInput.isLoading = true;
-		console.log('::: antes buscarPlantillasApex: ' + idCarpeta);
-		buscarPlantillasApex({idCarpeta, cadenaBusqueda})
-		.then(plantillas => {
-			console.log('::: dentro then: ' + plantillas);
-			this.lookupBusquedaResultados = plantillas;
-			console.log('::: lookupBusquedaResultados: ' + lookupBusquedaResultados);
-			lookupBusqueda.classList.add('slds-is-open');
-		}).catch(error => {
-			console.log('::: dentro error');
-			console.error(error);
-			this.toast('error', 'Problema buscando plantillas', error.body.message);
-		}).finally(() => lookupBusquedaInput.isLoading = false);
-	}
+	// buscarPlantillas(idCarpeta, cadenaBusqueda) {
+	// 	const lookupBusqueda = this.template.querySelector('.lookupBusqueda');
+	// 	const lookupBusquedaInput = lookupBusqueda.querySelector('.lookupBusquedaInput');
+	// 	lookupBusquedaInput.isLoading = true;
+	// 	buscarPlantillasApex({idCarpeta, cadenaBusqueda})
+	// 	.then(plantillas => {
+	// 		this.lookupBusquedaResultados = plantillas;
+	// 		lookupBusqueda.classList.add('slds-is-open');
+	// 	}).catch(error => {
+	// 		console.error(error);
+	// 		this.toast('error', 'Problema buscando plantillas', error.body.message);
+	// 	}).finally(() => lookupBusquedaInput.isLoading = false);
+	// }
 
 	lookupBusquedaAbrir(event) {
 		if (event.currentTarget.value.length > 1) {
@@ -189,10 +188,9 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 		cuerpoPlantillaApex({idPlantilla: this.plantillaSeleccionada.Id, recordId: this.recordId})
 		.then(cuerpoPlantilla => {
 
-			this.dispatchEvent(new CustomEvent('eventoaplicar', {detail: {cuerpo: cuerpoPlantilla.cuerpo,  header: cuerpoPlantilla.header, footer: cuerpoPlantilla.footer,  idPlantilla: this.plantillaSeleccionada.Id}}));
+			this.dispatchEvent(new CustomEvent('eventoaplicar', {detail: {cuerpo: cuerpoPlantilla.cuerpo,  header: cuerpoPlantilla.header, footer: cuerpoPlantilla.footer,  idPlantilla: this.plantillaSeleccionada.Id, encabezado: cuerpoPlantilla.encabezado, pieFirma: cuerpoPlantilla.pieFirma, firma: cuerpoPlantilla.firma}}));
 			this.cerrarModalPlantillas();
 		}).catch(error => {
-			console.error(error);
 			this.toast('error', 'Error', 'Error al obtener los datos de la plantillas');
 		}).finally(() => botonAplicar.disabled = false);
 	}
@@ -225,19 +223,29 @@ export default class ccGenerarDocumentoPlantilla extends NavigationMixin(Lightni
 		});
 	}
 
-	test(event) {
-		console.log('::: dentro test');
-		console.log('::: plantillas: ' + event.target.value);
-		input = event.target.value;
-		this.plantillas = this.plantillasFiltro
-            .filter( p => p.Name.includes(input));
-		// buscarPlantillasMCCApex({plantillas})
-		// .then(plantillas => {
-		// 	console.log('::: dentro then: ' + this.plantillas);
-		// }).catch(error => {
-		// 	console.log('::: dentro error');
-		// 	console.error(error);
-		// 	this.toast('error', 'Problema buscando plantillas', error.body.message);
-		// }).finally(() => console.log('::: test'));
+	checkboxPlantillasOnChange(event) {
+		const valorToggle = event.target.checked;
+		this.checkboxBuscarPlantillas = valorToggle;
+		this.plantillasMCC = !valorToggle;
+	}
+
+	buscadorPlantillas(event) {
+		this.inputValueBuscadorPlantillas = event.target.value;
+		if (this.inputValueBuscadorPlantillas.length > 2) {
+			buscarPlantillasMCCApex({cadenaBusqueda: this.inputValueBuscadorPlantillas})
+			.then(plantillas => {
+				this.lstSearchPlantillas = plantillas;
+			}).catch(error => {
+				this.toast('error', 'Problema buscando plantillas', error.body.message);
+			});
+		} else {
+			this.lstSearchPlantillas = null;
+		}
+	}
+
+	limpiarInputBuscadorPlantillas() {
+		this.inputValueBuscadorPlantillas = '';
+		this.plantillaSeleccionada = null;
+		this.lstSearchPlantillas = null;
 	}
 }

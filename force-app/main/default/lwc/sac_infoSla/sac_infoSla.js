@@ -41,7 +41,6 @@ export default class Sac_infoSla extends NavigationMixin(LightningElement){
 
         }else if(this.estadoActual != null){
             this.reclamacionPadreId = getFieldValue(this.case.data, RECLAMACION);
-            console.log('this.reclamacionPadreId ' + this.reclamacionPadreId);
             if(this.reclamacionPadreId != null) {
                 comprobarEstadoPausaPadre({ caseId: this.reclamacionPadreId })
                 .then(result => {

@@ -1,7 +1,6 @@
 /*eslint-disable dot-notation */
 import {LightningElement, api, wire} from 'lwc';
 import {getRecord, getFieldValue, updateRecord} from 'lightning/uiRecordApi';
-import LightningConfirm from 'lightning/confirm';
 
 import OPP_ACCOUNT_ID from '@salesforce/schema/Opportunity.AccountId';
 import OPP_ACCOUNT_NUMPERSO from '@salesforce/schema/Opportunity.Account.CC_NumPerso__c';

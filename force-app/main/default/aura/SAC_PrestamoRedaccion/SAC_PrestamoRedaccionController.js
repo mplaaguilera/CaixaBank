@@ -60,6 +60,7 @@
                             var state = response.getState();
                             if (state === "SUCCESS") {
                                 var permisoUsuario = response.getReturnValue();
+                                console.log('permisoUsuario ' +permisoUsuario);
                                 if(permisoUsuario == true){
                                     component.set('v.usarComponente', true);
                                     //obtener info email
@@ -117,6 +118,8 @@
                     component.set('v.mensaje', 'El campo naturaleza de la reclamación debe ser Reclamación.');
                 } else if(caso.CC_Idioma__c == null){
                     component.set('v.mensaje', 'El campo idioma de la reclamación no está informado.');
+                } else if(caso.SAC_TipoConsumidor__c == null){
+                    component.set('v.mensaje', 'El campo consumidor  de la reclamación no está informado.');
                 }
             }
         });

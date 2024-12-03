@@ -1,0 +1,160 @@
+<template>
+    <div class="main-container" if:true={renderComponent}>
+        <header class="slds-media slds-media_center slds-has-flexi-truncate display-location">
+            <h2 class="slds-card__header-title">
+                Informa el tipo de Contacto
+            </h2>
+            <div class="slds-form-element">
+                <div if:false={hideInputsDateTime}>
+                    <lightning-input type="toggle" label="Añadir Empresa Grupo" variant="label-stacked" name="toggle"
+                        message-toggle-active="" message-toggle-inactive="" checked={empresaGr} onchange={handleEmpresaGrupo}>
+                    </lightning-input>
+                </div>
+                <lightning-input type="toggle" label={labels.confidencialidad} variant="label-stacked" name="toggle"
+                    checked={confidencial} onchange={handleConfidencial} message-toggle-active="" message-toggle-inactive="">
+                </lightning-input>
+            </div>
+        </header>
+        <lightning-radio-group class="radio-combo-inline" options={contactTypeOptions} value={contactType}
+            onchange={handleChangeContactType} message-toggle-active="" message-toggle-inactive="" type="radio">
+        </lightning-radio-group>
+
+        <div class="fields-container">
+            <!-- ###EMPIEZA -> PRIMERA FILA DATE STARTIME DURATION -->
+            <lightning-layout-item if:false={hideInputsDateTime} class="slds-size_1-of-3" padding="around-small">
+                <div class="slds-grid typeRelatedInputs">
+
+                    <div class="inputDate">
+                        <lightning-input type="date" data-id="activityDateInput" date-style="short" label={labels.fecha}
+                            value={activityDateToSend} message-when-value-missing="Indica una fecha para el evento"
+                            message-when-bad-input="Introduce una fecha en el formato correcto" required
+                            onchange={handleChangeActivityDate}></lightning-input>
+                    </div>
+                    <div class="inputTime">
+                        <lightning-input type="time" data-id="timeInicioInput" label={labels.horainicio}
+                            value={currentHour} required
+                            message-when-value-missing="Indica una hora de inicio para el evento"
+                            onchange={handleChangeTimeInicio}></lightning-input>
+                    </div>
+
+                    <div class="inputDuration">
+                        <lightning-combobox label={labels.duracion} required options={optionsTime}
+                            onchange={handleChangeDuration} value={duration}></lightning-combobox>
+                    </div>
+                </div>
+            </lightning-layout-item>
+            <!-- ###FIN -> PRIMERA FILA DATE STARTIME DURATION -->
+
+            <!--###EMPIEZA -> SEGUNDA FILA SUBJECT OWNER MAIN CONTACT -->
+            <lightning-layout multiple-rows>
+                <lightning-layout-item class="slds-size_1-of-3" padding="around-small">
+                    <lightning-input type="text" data-id="prueba" value={asunto} default={asunto} required
+                        label={labels.asunto} onchange={handleAsunto}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-size_1-of-3" padding="around-small">
+                    <c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="employeelookup"
+                        selection={initialemployee} onsearch={handleSearchEmployee}
+                        onselectionchange={handleSelectionEmployee} fieldlabel={labels.owner}
+                        placeholder={labels.buscaEmpleado} required>
+                    </c-av_-lookup>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-size_1-of-3" padding="around-small">
+                    <lightning-combobox name="progress" label={labels.contactoprincipal} value={apoderado}
+                        placeholder='Contacto no informado' options={optionsApoderados} onchange={handleChangeApoderado}
+                        field-level-help={labels.msjnoapoderado}>
+                    </lightning-combobox>
+                </lightning-layout-item>
+            </lightning-layout>
+            <!--###fin -> SEGUNDA FILA SUBJECT OWNER MAIN CONTACT -->
+
+            <!--###EMPIEZA -> TERCERA FILA SUBJECT OWNER MAIN CONTACT -->
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="4" padding="around-small">
+                    <c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="attendeeslookupCXB"
+                        onsearch={handleSearchAttendes} onselectionchange={handleSelectionAttendee}
+                        onclick={handleSearchClick} fieldlabel={labels.asisCXB} placeholder={labels.buscaContacto}>
+                    </c-av_-lookup>
+
+                    <div if:true={attendesCXB} class="attendesBox">
+                        <template for:each={selectedAttendesCXB} for:item="att">
+                            <div key={att.bucleId} data-id={att.id}>
+                                <lightning-pill style="margin:8px 0" data-id="attendeesCXB" label={att.label}
+                                    name={att.id} onremove={handleRemoveAttende}>
+                                    <lightning-icon icon-name="standard:contact"
+                                        alternative-text="contact"></lightning-icon>
+                                </lightning-pill>
+                            </div>
+                        </template>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item size="4" padding="around-small">
+                    <c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="attendeeslookupEMP"
+                        onsearch={handleSearchAttendes} onselectionchange={handleSelectionAttendee}
+                        fieldlabel={labels.asistentesEmpresas} placeholder={labels.buscaContacto}>
+                    </c-av_-lookup>
+                    <div if:true={attendesEMP} class="attendesBox">
+                        <template for:each={selectedAttendesEMP} for:item="att">
+                            <div key={att.bucleId} data-id={att.id}>
+                                <lightning-pill style="margin:8px 0" data-id="attendeesEMP" label={att.label}
+                                    name={att.id} onremove={handleRemoveAttende}>
+                                    <lightning-icon icon-name="standard:contact"
+                                        alternative-text="contact"></lightning-icon>
+                                </lightning-pill>
+                            </div>
+                        </template>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item class="slds-size_1-of-4" padding="around-small">
+                    <div>
+                        <lightning-input type="tel" value={phoneField} label='Teléfono' disabled></lightning-input>
+                    </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item class="slds-size_1-of-12 slds-m-top_medium slds-m-top_xx-small"
+                    padding="around-small">
+                    <div class="slds-m-top_xx-small">
+                        <lightning-button-icon icon-name="utility:call" alternative-text="Click-to-Call"
+                            title="Click-to-Call" onclick={handlePhone}></lightning-button-icon>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <!--###FIN -> TERCERA FILA SUBJECT OWNER MAIN CONTACT -->
+
+            <lightning-layout multiple-rows >
+                <lightning-layout-item class="slds-size_1-of-3" padding="around-small" if:true={showLocationInput}>
+                    <lightning-input type="text" value={ubicacionText} label={labels.ubicacion}
+                        onchange={handleUbicacion}></lightning-input>
+                </lightning-layout-item>
+                    <!-- Clientes Grupo Comercial -->
+					<lightning-layout-item size="4" padding="around-small" if:true={empresaGr}>
+						<lightning-combobox name="progress" label="Clientes Grupo Comercial"
+							options={optionsGC} value={empresaGCSel} onchange={handleChangeGC}>
+						</lightning-combobox>
+						<div class="slds-no-flex" if:false={issummary}>
+							<div  class="slds-col slds-col slds-size_2-of-3">
+								<template for:each={selectedClientsGC} for:item="cli">
+									<div key={cli.value} data-id={cli.id}>
+										<lightning-pill style="margin:8px 0" label={cli.value} name={cli.id}
+											onremove={handleRemoveAttendeGC}>
+											<lightning-icon icon-name="standard:account"
+												alternative-text="Account"></lightning-icon>
+										</lightning-pill>
+									</div>
+								</template>
+							</div>
+						</div>
+					</lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="12" padding="around-small">
+                    <lightning-textarea name="input3" value={comentarios} label={labels.comentario}
+                        placeholder={labels.commentPlaceholder} onchange={handleComentarios}></lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+
+        </div>
+    </div>
+</template>

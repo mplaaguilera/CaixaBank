@@ -5,11 +5,12 @@
                 <div class="slds-media">
                     <div class="slds-media__figure">
                         <span class="slds-icon_container slds-icon-standard-opportunity">
-                            <lightning-icon icon-name="standard:opportunity" alternative-text="Opportunity" title="Opportunity" size="medium"></lightning-icon>
+                            <lightning-icon icon-name="standard:price_book_entries" alternative-text="Opportunity"
+                                title="Opportunity" size="medium" class="price-icon"></lightning-icon>
                         </span>
                     </div>
                     <div class="slds-media__body">
-                        <div class="slds-page-header__name">           
+                        <div class="slds-page-header__name">
                             <div class="slds-page-header__name-title">
                                 <h1>
                                     <span>{label.oportunidades}</span>
@@ -25,68 +26,378 @@
 
     <article class="slds-card slds-m-top_small">
         <div class="slds-card__body slds-card__body_inner">
-            <div class="slds-m-top_medium slds-float_right">
-                <lightning-button class="slds-m-horizontal_medium" label={label.reiniciar} onclick={resetFilters}></lightning-button>
-                <lightning-button class="slds-m-horizontal_medium" variant="brand" label={label.exportar} onclick={exportData} disabled={exportDisabled}></lightning-button>
-            </div>
-            <div class="slds-grid slds-gutters">
-                <div class="slds-col slds-size_3-of-12">
-                    <lightning-input disabled={disabledDate} type="date" name="startDateInterval" label={label.fechaAprobacionPrecioDesde} min={validateDate} value={fechaDesde} onchange={handleChangeDateDesde}></lightning-input>
+            <lightning-card variant="Narrow">
+                <div>
+                    <div class="slds-grid slds-gutters slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-5 ">
+                            <lightning-combobox data-field="negocio" label={label.negociosLab} options={picklistValues1}
+                                name="negocios" value={negocios} onchange={handleValueChange} onselect={picklistValues1}
+                                placeholder={placeHol}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-5 ">
+                            <lightning-combobox data-field="redes" label={label.redesLab} options={picklistValues2}
+                                name="redesSegmentos" value={redesSegmentos} onchange={handleValueChange2}
+                                placeholder={placeHol}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-5 ">
+                            <lightning-combobox data-field="sectoresPaises" label={label.sectoresLab}
+                                options={picklistValues3} name="sectoresPaises" value={sectoresPaises}
+                                onchange={handleValueChange3} placeholder={placeHol}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-5">
+                            <lightning-combobox data-field="centroCartera" label={label.centroLab}
+                                options={picklistValues4} name="centroCartera" value={centroCartera}
+                                onselect={handleValueChange4} onchange={handleValueChange4} placeholder={placeHol}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_3-of-12">
-                    <lightning-input disabled={disabledDate} type="date" name="startDateInterval" label={label.fechaAprobacionPrecioHasta} min={validateDate} value={fechaHasta} onchange={handleChangeDateHasta}></lightning-input>
+
+                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-input disabled={disabledDate} type="date" name="startDateInterval"
+                            label={label.fechaAprobacionPrecioDesde} min={validateDate} value={fechaDesde}
+                            onchange={handleChangeDateDesde}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-input disabled={disabledDate} type="date" name="startDateInterval"
+                            label={label.fechaAprobacionPrecioHasta} min={validateDate} value={fechaHasta}
+                            onchange={handleChangeDateHasta}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-input disabled={disabledDates} type="date" name="startDateInterval"
+                            label={label.fechaAprobacionPrecio} min={validateDate} value={fecha}
+                            onchange={handleChangeDate}></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-combobox label={label.tipoAprobacion} options={optionsTipoAprobacion}
+                            value={valueTipoAprobacion} onselect={handleChangeTipoAprobacion}
+                            onchange={handleChangeTipoAprobacion} placeholder={placeHol}>
+                        </lightning-combobox>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_3-of-12">
-                    <lightning-input disabled={disabledDates}  type="date" name="startDateInterval" label={label.fechaAprobacionPrecio} min={validateDate} value={fecha} onchange={handleChangeDate}></lightning-input>
+
+                <div class="slds-grid slds-gutters slds-m-around_x-small">
+
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-input type="number" name="startImporte" label={label.importeDesde} min="0"
+                            value={importeDesde} onchange={handleChangeImporteDesde}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-input type="number" name="stopImporte" label={label.importeHasta} min="0"
+                            value={importeHasta} onchange={handleChangeImporteHasta}></lightning-input>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-combobox label={label.sector} options={optionsSector} value={valueSector}
+                            onselect={handleChangeSector} onchange={handleChangeSector} placeholder={placeHol}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5 ">
+                        <lightning-combobox label={label.cartera} options={optionsCartera} value={valueCartera}
+                            onselect={handleChangeCartera} onchange={handleChangeCartera} placeholder={placeHol}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-m-around_medium slds-float_right">
+                        <lightning-button class="slds-m-horizontal_medium" label={label.reiniciar}
+                            onclick={resetFilters}></lightning-button>
+                        <lightning-button class="slds-m-horizontal_medium" variant="brand" label={label.exportar}
+                            onclick={exportData} disabled={exportDisabled}></lightning-button>
+                    </div>
                 </div>
-            </div>
+            </lightning-card>
+
+
             <div class="slds-m-around_medium">
                 <div class="slds-grid">
-                    <div class="slds-col slds-col slds-size_1-of-3 slds-border_right slds-scrollable_x" style={height}>
-                        <c-cibe_-custom-datatable
-                            key-field="Id"
-                            data={data}
-                            errors={errors}
-                            columns={staticColumns}
-                            draft-values={values} 
-                            show-row-number-column
-                            row-number-offset={rowOffset}
-                            hide-checkbox-column>
+                    <div class="slds-col slds-size_3-of-6 slds-border_right" style={height}>
+                        <c-cibe_-custom-datatable key-field="Id" data={data} errors={errors} columns={staticColumns2}
+                            draft-values={values} show-row-number-column row-number-offset={rowOffset}
+                            hide-checkbox-column onrowaction={handleRowAction} initinial>
                         </c-cibe_-custom-datatable>
                     </div>
-                    <div class="slds-col slds-size_2-of-3 slds-scrollable" style={height}>
-                        <c-cibe_-custom-datatable
-                            key-field="Id"
-                            data={data}
-                            errors={errors}
-                            columns={columns} 
-                            draft-values={values} 
-                            onsave={handleSave}
-                            oncancel={handleCancel}
-                            min-column-width="150"
-                            min-column-height="150"
-                            row-number-offset={rowOffset}
-                            hide-checkbox-column>
+                    <div class="slds-col slds-size_3-of-6" style={height}>
+                    <!-- <div style={height}> -->
+                        <c-cibe_-custom-datatable key-field="Id" data={data} errors={errors} columns={columns2}
+                            draft-values={values} onsave={handleSave} oncancel={handleCancel} min-column-height="150"
+                            row-number-offset={rowOffset} onrowaction={handleRowAction} hide-checkbox-column>
                         </c-cibe_-custom-datatable>
                     </div>
                 </div>
             </div>
+
             <div>
                 <lightning-layout horizontal-align="space">
                     <lightning-layout-item flexibility="auto">
-                        <lightning-button label={label.anterior} icon-name="utility:chevronleft" onclick={previousHandler} disabled={getHasPrevius}></lightning-button>
+                        <lightning-button label={label.anterior} icon-name="utility:chevronleft"
+                            onclick={previousHandler} disabled={getHasPrevius}></lightning-button>
                     </lightning-layout-item>
                     <div class="header-column">
                         <p class="field-title" title="Page"></p>
-                        <p>Pag</p>
-                        <div>{page}</div>
-                    </div>                    
+                        <h3>Pag</h3>
+                        <div>{page}/{totalPage}</div>
+                    </div>
                     <lightning-layout-item flexibility="auto">
-                        <lightning-button label={label.posterior} icon-name="utility:chevronright" onclick={nextHandler} disabled={getHasNext} icon-position="right"></lightning-button>
+                        <lightning-button label={label.posterior} icon-name="utility:chevronright" onclick={nextHandler}
+                            disabled={getHasNext} icon-position="right"></lightning-button>
                     </lightning-layout-item>
                 </lightning-layout>
             </div>
         </div>
         <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
     </article>
+
+
+    <!-- modal start -->
+    <template if:true={isShowModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <lightning-spinner if:true={isLoadingComite} alternative-text="Loading"
+                    size="medium"></lightning-spinner>
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={hideModalBox}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.comite}</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-record-edit-form record-id={idOpp} object-api-name="Opportunity">
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small"
+                                    title="Section Title">{label.comite}</span>
+                            </h3>
+                            <div class="slds-section__content">
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_PriceApprove__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_ApprovalRisk__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_Fechaaprobacionprecio__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_Centro__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_ApprovalType__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_ApproveDate__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_Observacionesprecio__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_Observacionesriesgo__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <!-- ///////// -->
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small"
+                                    title="Section Title">{label.equipoAnalistas}</span>
+                            </h3>
+                            <div class="slds-section__content">
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_CreditPortAnalystReview__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_CredPortAnalystEmployee__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ///////// -->
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small"
+                                    title="Section Title">{label.equipoRelacionados}</span>
+                            </h3>
+                            <div class="slds-section__content">
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RelatedTeams__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_TeamEmployee__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                </div>
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_SyndicationTeamOpinion__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_SyndicationTeamEmployee__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ///////// -->
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small" title="Section Title">SIA/ENS</span>
+                            </h3>
+                            <div class="slds-section__content">
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_NumberExpedient__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ///////// -->
+
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small"
+                                    title="Section Title">{label.calculadora}</span>
+                            </h3>
+                            <div class="slds-section__content">
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RARImporte__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RAROperacionRar__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RARConjunto__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RARPost__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+                                </div>
+
+                                <div class="slds-grid slds-gutters slds-m-around_x-small">
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong><lightning-output-field field-name="CIBE_RARNomOperacion__c">
+                                            </lightning-output-field></strong>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 ">
+                                        <strong>{label.RARPlazoVidaMediaAños}</strong>
+                                        <div>{plazoAnios} </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-record-edit-form>
+
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={hideModalBox}>{label.cancelar}</button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+    <!-- modal start file-->
+    <template if:true={isShowModalFile}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <lightning-spinner if:true={isLoadingComite} alternative-text="Loading"
+                    size="medium"></lightning-spinner>
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={hideModalBox}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">{label.cancelar}</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate"></h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium" if:true={hasDocuments}>
+                    <lightning-datatable
+                            key-field="id"
+                            data={documents}
+                            columns={columnsDocuments}
+                            hide-checkbox-column
+                            class="slds-table slds-table_cell-buffer slds-table_header-hidden slds-table_bordered"
+                            >
+                    </lightning-datatable>
+                </div>
+
+
+
+                <div class="slds-modal__content slds-p-around_medium slds-text-align_center" if:false={hasDocuments}>
+                   <p>{label.documentos}</p>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={hideModalBox}>{label.cancelar}</button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
 </template>

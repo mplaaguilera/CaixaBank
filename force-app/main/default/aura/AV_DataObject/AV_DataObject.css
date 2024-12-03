@@ -105,3 +105,11 @@
 .THIS .slds-float_right{
     margin-top: -3rem;
 }
+
+.THIS .IconInfoButton  {
+    --slds-c-icon-color-foreground:grey; 
+}
+
+.THIS .IconInfoButton:hover  {
+    --slds-c-icon-color-foreground:rgba(0, 126, 178, 1); 
+}

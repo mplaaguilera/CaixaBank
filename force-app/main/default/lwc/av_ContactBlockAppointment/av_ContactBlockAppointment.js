@@ -35,7 +35,18 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 	firstRender = true;
 	isbpr;
 	statusValue = 'Gestionada positiva';
+	comentaryToSend;
+	showNoLocalizado = false; 
+	isCheckedNoLocalizado = false; 
+	@api get checkboxStatus(){
+		return this.showComentary;
+	}
 
+	@api
+	switchCitaCheckBox(value){
+		this.template.querySelector("[data-id='citanocomercialcb']").checked = value;
+
+	}
 	get optionsStatus(){
 		return [
 			{label:'Gestionada positiva',value:'Gestionada positiva'},
@@ -52,6 +63,11 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 		this.durationValueInitial = (this.isintouch) ? '30' : '5';
 		this.durationValue = (this.isintouch) ? 30 : 5;
 		this.selectedOption = (this.isintouch) ? 'CTF' : 'LMD';
+		  
+		if(this.selectedOption == 'LMD'){
+			this.showNoLocalizado = true;
+		}
+		
 	}
 	
 	renderedCallback(){
@@ -74,8 +90,13 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 	}
 
 	handleComment(e) {
- 		this.commentary=e.target.value;
-		this.sendDataToReportEvent();
+		if(this.isCheckedNoLocalizado){
+			this.comentaryToSend = e.target.value;
+			this.sendDataToReportTask();
+		}else{
+			this.commentary=e.target.value;
+			this.sendDataToReportEvent();
+		}
 	}
 
 	handleMemorableInterview(e){
@@ -98,10 +119,17 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 				}
 			})
 		)
-		this.sendDataToReportEvent();
+		
+		if(this.isCheckedNoLocalizado){
+			this.sendDataToReportTask();
+		}else{
+			this.sendDataToReportEvent();
+		}
+		
 	}
 
 	handleOptionChange(event){
+		
 		this.selectedOption = event.target.value;
 		if(this.selectedOption === 'LMD'){
 			this.durationValueInitial = '5';
@@ -110,6 +138,7 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showLocation = false;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = true;  
 		}else if(this.selectedOption === 'CTO'){
 			this.durationValueInitial = '60';
 			this.durationValue = 60;
@@ -117,6 +146,8 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showLocation = false;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = false;  
+			this.isCheckedNoLocalizado = false; 			
 		}else if(this.selectedOption === 'CTF'){
 			this.durationValueInitial = '30' ;
 			this.durationValue = 30 ;
@@ -124,6 +155,8 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showLocation = false;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = false;  
+			this.isCheckedNoLocalizado = false; 
 		}else if(this.selectedOption === 'VLD'){
 			this.durationValueInitial = '30' ;
 			this.durationValue = 30 ;
@@ -131,6 +164,8 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showLocation = false;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = false;  
+		    this.isCheckedNoLocalizado = false; 
 		}else if(this.selectedOption === 'CTOOC'){
 			this.durationValueInitial = '60';
 			this.durationValue = 60;
@@ -138,6 +173,8 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showOffice = event.target.value;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = false;  
+			this.isCheckedNoLocalizado = false; 
 		}else if(this.selectedOption === '001'){
 			this.durationValueInitial = '60';
 			this.durationValue = 60;
@@ -145,13 +182,29 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 			this.showLocation = event.target.value;
 			this.location = null;
 			this.officeNumberCompany= null;
+			this.showNoLocalizado = false;  
+			this.isCheckedNoLocalizado = false; 
 		}
-		this.sendDataToReportEvent();
+		
+
+		if(this.isCheckedNoLocalizado == false){
+			this.sendDataToReportEvent();
+		}
+
+		
+		this.dispatchEvent(
+			new CustomEvent('changeoptionevent',
+			{
+				detail:{
+					value:event.target.value
+				}
+			})
+		)
 	}
 
 	handleOptionChangeTask(event){
 		this.selectedOptionTask = event.target.value;
-		if (this.selectedOptionTask === '030' || this.selectedOptionTask === 'ESE' || this.selectedOptionTask === 'OFT') {
+		if ((this.selectedOptionTask === '030' || this.selectedOptionTask === 'ESE' || this.selectedOptionTask === 'OFT')) {   
 			this.radioButtonSelected = true;
 		} else {
 			this.radioButtonSelected = false;
@@ -246,10 +299,28 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 	handleTabActive(event){
 		this.selectedTab = event.target.value;
 		if(this.selectedTab === 'tabEvent'){
-		 	this.sendDataToReportEvent();
+			this.sendDataToReportEvent();
 		}else if(this.selectedTab === 'tabTask'){
 			this.sendDataToReportTask();
 		}
+		
+		if(this.selectedTab == 'tabTask'){
+			const checkbox =this.template.querySelector('lightning-input[data-id="no-localizado"]');
+			if (checkbox) {
+				checkbox.click();
+				checkbox.checked= false;
+			}
+		}
+		
+		this.dispatchEvent(
+			new CustomEvent('changetabconsincliente',
+			{
+				detail:{
+					value:this.selectedTab
+				}
+			})
+		)
+		
 	}
 	
 	notifyUser(title, message, variant) {
@@ -290,9 +361,62 @@ export default class Av_ContactBlockAppointment extends LightningElement {
 					type: 'task',
 					typeTask: this.selectedOptionTask,
 					accountId:this.accountid,
-					statusTask: this.statusValue
+					statusTask: this.statusValue,
+					comentaryTask: this.comentaryToSend
 				}
 			})
 		);
 	}
+
+	handleChangeComentary(e){
+		this.comentaryToSend = e.detail.value;
+		this.sendDataToReportTask();
+	}
+
+	handleNoLocalizado(event){
+		
+		if(this.selectedOption == 'LMD' && this.selectedTab=='tabEvent'){
+		    this.isCheckedNoLocalizado = event.target.checked;
+		}else{
+			this.isCheckedNoLocalizado = false;
+		}
+		
+		if(this.selectedTab=='tabTask'){
+		    this.isCheckedNoLocalizado = false;
+
+		}
+		
+
+		
+		
+		this.dispatchEvent(
+			new CustomEvent('changenolocalizado',
+			{
+				detail:{
+					value: this.isCheckedNoLocalizado
+				}
+			})
+		)
+		if(this.isCheckedNoLocalizado && this.selectedTab=='tabEvent'){
+			this.dispatchEvent(
+				new CustomEvent('setinfo',
+				{
+					detail:{ 
+						type: 'task',
+						accountId:this.accountid,
+						statusTask: this.statusValue
+						
+					}
+				})
+			);
+		}
+		
+		else if(this.isCheckedNoLocalizado == false && this.selectedTab=='tabEvent'){
+			this.sendDataToReportEvent();
+		}
+		
+		
+	}
+
+	
 }

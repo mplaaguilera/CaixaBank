@@ -1,0 +1,158 @@
+.basicContainer{
+    width: 85%;
+    margin: 0 auto;
+}
+
+.basicContainer lightning-card{
+    margin-bottom: 2.5rem;
+}
+
+.newOppoContainer{
+	border:.5px solid rgb(220, 220, 220);
+	box-shadow: .125rem 0.25rem 1px 1px rgb(220, 220, 220, 0.5)  ;
+	border-radius: 5px;
+	padding:.75em;
+    margin:1rem 0;
+	position: relative;
+}
+.newOppoContainer div c-av_-lookup{
+    margin: 0 0 .5rem 1rem;
+}
+.cardStyle {
+    padding: 0 1rem 0.5rem;
+}
+.cardMargin{
+	margin:1rem 0;
+	position: relative;
+}
+
+.buttonAnadir{
+	margin-top: 1.4rem;
+	margin-left:1rem;
+}
+.customFooter{
+	position: fixed;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	background-color: transparent;
+	width: 70%;
+	margin:0 15%;
+	height:2.5rem;
+	bottom: 0;
+	left:0;
+	padding:.25rem 0;
+	z-index: 1001;
+}
+
+.buttonStyle{
+	background-color: #009fe3;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+
+.buttonStyle:disabled{
+	background-color: gray;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+
+.buttonStyle:hover:not([disabled]){
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
+.buttonStyleCancel{
+	width: fit-content;
+	padding: 0 .5rem;
+	color: #009fe3;
+	margin-right: 1rem;
+	border-color: gainsboro;
+	border-radius: 5px;
+}
+
+.buttonStyleCancel:disabled{
+	background-color: gray;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+
+.buttonStyleCancel:hover:not([disabled]){
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
+.buttonStyleAdd{
+	width: fit-content;
+	color: #009fe3;
+	margin-top: 1.3rem;
+	padding: 0.9px 1rem 0.9px 1rem;
+	border-color: gainsboro;
+	border-radius: 5px;
+}
+
+.buttonStyleAdd:disabled{
+	background-color: gray;
+	color: white;
+	border-radius: 5px;
+}
+
+.buttonStyleAdd:hover:not([disabled]){
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
+.calendarStyle{
+	padding:.5rem 1rem;
+}
+
+.customModal{
+	max-width: none !important;
+	min-width: none !important;
+	width: 70% !important;
+	margin:10rem auto;
+	height:75%;
+	--lwc-squareIconLargeBoundary:1rem;
+	--lwc-squareIconLargeBoundaryAlt:1rem;
+}
+
+.slds-backdrop{
+	--lwc-zIndexModal:90;
+}
+
+.typeRelatedInputs{
+    width: 60rem;
+    display: flex;
+}
+
+.inputTime {
+	width: 5rem;
+	margin-right: 1rem;
+}
+
+.inputDate {
+	margin-left: 1rem;
+	width: 8rem;
+	margin-right: 1rem;
+}
+
+.inputDuration {
+	width: 8rem;
+	margin-left: -0.5rem;
+	margin-right: 1rem;
+}
+
+.inputCalendar {
+	width: 8rem;
+	margin-left: -0.5rem;
+	margin-right: 1rem;
+}

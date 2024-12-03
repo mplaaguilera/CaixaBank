@@ -1,7 +1,3 @@
-/*h1 {
-    color: rgb(0, 112, 210);
-}*/
-
 p {
     font-family: 'Salesforce Sans', Arial, sans-serif;
     color: rgb(62, 62, 60);
@@ -19,7 +15,11 @@ p {
 .bgColor {
     background-color: rgb(243, 243, 243);
 }
+:host{
+    --lwc-colorBackgroundWarning:pink !important;
+    --slds-g-color-warning-base-60:pink !important;
 
+}
 .align-right {
     text-align: right;
 }
@@ -64,9 +64,10 @@ th {
 }
 
 .divPadding {
-    /* padding-top: 1rem;
-    padding-bottom: 2rem; */
     padding:1rem .5rem 2rem .5rem;
+}
+.divPaddingEmployee {
+    padding:1rem .5rem 0rem 1.2rem;
 }
 
 .buttonAlign {
@@ -95,9 +96,9 @@ margin:.4rem 0;
 }
 
 .margin-right-search div:first-child{
-    margin-right:.5rem;
+    margin-right:1rem;
 }
-.margin-right-search div{
+.margin-right-search div:not(.not-margined){
     margin:0 1rem;
     
 }
@@ -108,7 +109,7 @@ margin:.4rem 0;
 }
 
 .margin-pill {
-   padding:.65rem 1rem;
+   padding:.65rem 1rem 0 1rem;
    flex-wrap: wrap;
    row-gap: .5rem;
    
@@ -117,9 +118,9 @@ margin:.4rem 0;
 .margin-pill div{
     margin: 0 .25rem;
 }
-
-/* .marginPill div:w */
-
+.margin-pill-employee{
+    margin-right:0.5rem !important;
+}
 .customPill{
     padding-left: .3rem ;
     
@@ -128,10 +129,26 @@ margin:.4rem 0;
 .slds-pill__icon_container{
     width: inherit !important;
 }
-
-
-
-
 .miDiv{
     margin-top: 3.5px;
+}
+
+.another-office {
+	padding: 0 0.5em 0 0em;
+}
+.margin-toggle {
+	margin-top: 0.5rem;
+}
+
+.padding-block1 {
+	padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.margin-pill {
+	margin-right: 0.5rem;
+}
+
+.lookUp1{
+    margin-left: 2rem;
 }

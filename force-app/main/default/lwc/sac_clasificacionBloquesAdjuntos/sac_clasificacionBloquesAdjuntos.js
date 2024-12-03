@@ -24,6 +24,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     @api esUserGeneral;
     @api esRecAsociadaASPV;
     @api recordTypeRegistro;
+    @api deleteLastCV;
     @track recordTypeId;
     @track sacBloqueValues;
     @track modalClasificar = false;
@@ -42,8 +43,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     opcionesMaestroAdjuntosBackup = [];  //Copia de seguridad para el filtrado de tipo documentos
     resultadoEncontrado = true;
     mensaje = '';
-    nombreTipoAdjunto = '';
-    
+    nombreTipoAdjunto = '';    
     
     @wire(getRecord, { recordId: '$recordId', fields })
     case;
@@ -54,6 +54,16 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
 
     get numExpRecSPV() {
         return getFieldValue(this.case.data, NUMEXPSPV);
+    }
+
+    get getDeleteLastCV(){
+        if(this.deleteLastCV === '1'){ //Se ha eliminado un fichero que no es el último, ni el de ultima posicion de la lista (si hay mas de uno)
+            return false;
+        }else if(this.deleteLastCV === '2'){ //Se ha eliminado el ultimo fichero
+            return true;
+        }else{ //Se ha eliminado el de ultima posicion de la lista (si hay mas de uno)
+            return true;
+        }
     }
 
     @wire(getObjectInfo, { objectApiName: CONTENTVERSION_OBJECT })
@@ -141,7 +151,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
         let validado = event.target.checked;
 
         if(this.recordTypeRegistro.startsWith('SPV')){
-            if (event.target.name.startsWith(this.numExpRecSPV) && validado == false) {
+            if (event.target.name.startsWith(this.numExpRecSPV) && validado === false) {
                 // Realiza la lógica adicional aquí
                 cambiarTituloFichero({idAdjunto: idFichero, titulo: nameFichero, prefijo: this.numExpRecSPV, validadoCV : validado})
                 .then(()=>{
@@ -157,7 +167,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
                     this.dispatchEvent(actualizarVistaEvent);
                 });
     
-            } else if(!event.target.name.startsWith(this.numExpRecSPV) && validado == true) {
+            } else if(!event.target.name.startsWith(this.numExpRecSPV) && validado === true) {
                 // Realiza otra lógica aquí si es necesario
                 cambiarTituloFichero({idAdjunto: idFichero, titulo: nameFichero, prefijo: this.numExpRecSPV, validadoCV : validado})
                 .then(()=>{
@@ -175,7 +185,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
     
             }
         }else{
-            if (event.target.name.startsWith(this.caseNumberReclamacion) && validado == false) {
+            if (event.target.name.startsWith(this.caseNumberReclamacion) && validado === false) {
                 // Realiza la lógica adicional aquí
                 cambiarTituloFichero({idAdjunto: idFichero, titulo: nameFichero, prefijo: this.caseNumberReclamacion, validadoCV : validado})
                 .then(()=>{
@@ -191,7 +201,7 @@ export default class Sac_clasificacionBloquesAdjuntos extends LightningElement {
                     this.dispatchEvent(actualizarVistaEvent);
                 });
     
-            } else if(!event.target.name.startsWith(this.caseNumberReclamacion) && validado == true) {
+            } else if(!event.target.name.startsWith(this.caseNumberReclamacion) && validado === true) {
                 // Realiza otra lógica aquí si es necesario
                 cambiarTituloFichero({idAdjunto: idFichero, titulo: nameFichero, prefijo: this.caseNumberReclamacion, validadoCV : validado})
                 .then(()=>{

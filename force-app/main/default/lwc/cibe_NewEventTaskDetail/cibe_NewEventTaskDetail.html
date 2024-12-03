@@ -1,0 +1,84 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer slds-m-vertical_small">
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
+				<lightning-icon if:true={mainVinculed} size="x-small" title={label.mainOpp}
+					class="main-icon slds-button slds-button_neutral" icon-name="utility:favorite"
+					variant="warning"></lightning-icon>
+				<div if:false={mainVinculed} class="vinculed">
+					<lightning-button-icon size="medium" title={label.markMainOpp} icon-name="utility:favorite"
+						variant="border-filled" onclick={handleMain}></lightning-button-icon>
+				</div>
+			</div>
+			<div class="slds-float_left">
+				<div class="name-col">
+					<div style="width:fit-content">
+						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
+						<span if:false={isInserted}>{name}</span>
+						<p>{label.statusOpp} <b>{status}</b></p>
+						<p>{label.fechaCierre}: <b>{tareaDateFront}</b></p>
+						<p if:true={showName}>Nombre del cliente : <b>{tarea.accountName}</b></p>
+					</div>
+				</div>
+			</div>
+
+			<div class="marginButtons itemSetting slds-float_left"
+				style="margin-right:15px; margin-left: 15px; width:fit-content">
+				<div if:false={isFuture}>
+					<div if:true={isOwner}>
+
+						<div if:true={noEvento}>
+							<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}
+								name="check" class={checkClass} variant="border" size="large"
+								title={label.gestionadaPositiva}></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath}
+								name="close" class={closeClass} variant="border" size="large"
+								title={label.gestionadaNegativa}></lightning-button-icon>
+						</div>
+						<div if:false={noEvento}>
+							<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}
+								name="check" class={checkClass} variant="border" size="large"
+								title={label.gestionadaPositiva}></lightning-button-icon>
+							<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath}
+								name="close" class={closeClass} variant="border" size="large"
+								title={label.gestionadaNegativa}></lightning-button-icon>
+						</div>
+					</div>
+				</div>
+				<div if:true={isFuture}>
+					<div if:false={noEvento}>
+						<lightning-button-icon if:true={vinculed} icon-name="utility:arrow_right" data-id="noAgendado"
+							onclick={handlePath} name="noAgendado" class={insisClass} variant="border" size="large"
+							title='Desagendar'></lightning-button-icon>
+						<lightning-button-icon if:false={vinculed} icon-name="utility:arrow_right" data-id="agendado"
+							onclick={handlePath} name="agendado" class={insisClass} variant="border" size="large"
+							title={label.agendar}></lightning-button-icon>
+					</div>
+				</div>
+			</div>
+
+			<div if:true={showComents}>
+				<fieldset
+					class="slds-form-element slds-form-element_compound slds-form-element_address slds-grid_vertical-align-start">
+					<div class="slds-form-element__control slds-grid_vertical-align-start">
+						<div class="slds-form-element__row slds-grid_vertical-align-start">
+							<div class="slds-size_2-of-3 slds-grid_vertical-align-start">
+								<div class="slds-form-element slds-grid_vertical-align-start">
+									<label class="slds-form-element__label"
+										for="form-element-id-01">{label.comentario}</label>
+									<textarea if:true={isOwner} class="slds-textarea" value={comentario}
+										onchange={handleChangeComentario}>{comentario}</textarea>
+									<textarea if:false={isOwner} class="slds-textarea" value={comentario}
+										disabled>{comentario}</textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+
+		</div>
+
+	</div>
+</template>

@@ -1,0 +1,22 @@
+.modalAttende{
+    max-width: 70rem !important;
+    width:70% !important;
+}
+
+.slds-modal__content{
+    height:60% !important;
+}
+
+@media screen and (min-height: 600px) {
+    .slds-modal__content {
+        height:40% !important;
+    }
+}
+
+.classError svg{
+    fill: red;
+}
+
+.classCheck svg{
+    fill: green;
+}

@@ -15,7 +15,7 @@ export default class Av_NewEventDetailOpp extends LightningElement {
     @api opp;
     @api taskHeaderId;
     @api recordInfo;
-    
+    @track stageLabel;
     @track isModalOpen = false;
     @track actionType;
 
@@ -25,7 +25,9 @@ export default class Av_NewEventDetailOpp extends LightningElement {
         productFieldLabel,
         recordtypeFieldLabel
     };
-
+    connectedCallback(){
+        this.stageLabel = (this.opp.StageName == 'En gestión/insistir') ? 'En Gestión' : this.opp.StageName;
+    }
     showDetail = false;
 
     toggleShowOpp() {

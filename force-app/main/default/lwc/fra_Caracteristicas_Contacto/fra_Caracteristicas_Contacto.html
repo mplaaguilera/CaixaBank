@@ -1,28 +1,61 @@
-<template>    
+<template>     
     <article class="slds-card">
-        <div class="slds-card__header slds-grid">
-            <header class="slds-media slds-media_center slds-has-flexi-truncate">
-                <div class="slds-media__figure">
-                    <lightning-icon icon-name="custom:custom57" size="small"></lightning-icon>
-                </div>
-                <div class="slds-media__body">
-                    <h2 class="slds-card__header-title">Características del contacto FRA</h2>
-                </div>
-            </header>
-        </div>
+    <!--Header-->
+    <div class="slds-card__header slds-grid">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="custom:custom57" size="small"></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Características del Contacto FRA</span>
+                </h2>
+            </div>
+             <!-- Botón desplegable para añadir características -->
+             <div class="slds-no-flex">
+                <lightning-button-menu icon-size="small" menu-alignment="right" onselect={handleSeleccionar}>
+                    <lightning-menu-item label="Añadir característica" value="add"></lightning-menu-item>
+                </lightning-button-menu>
+            </div>
+        </header>
+    </div>
 
-        <div lwc:if={caracteristicas.length} class="slds-card__body slds-card__body_inner slds-var-p-vertical_x-small">
-            <ul class="listaCaracteristicas">
-                <template for:each={caracteristicas} for:item="c">
-                    <li key={c.CC_Caracteristica__c} class="slds-var-m-bottom_large" title={c.CC_Caracteristica__r.CC_Descripcion__c}>
-                        <span onclick={navigateToCaracteristica} data-id={c.CC_Caracteristica__c}>
-                            <lightning-icon class="warning slds-var-m-horizontal_medium" icon-name="utility:warning" size="x-small"></lightning-icon>
-                            <lightning-icon class="icono slds-var-m-right_medium" icon-name="custom:custom57" size="x-small"></lightning-icon>
-                            <span class="titulo">{c.CC_Caracteristica__r.Name}</span>
-                        </span>
-                    </li>
-                </template>
-            </ul>
+    <!--Body-->
+    <div class="slds-card__body slds-card__body_inner" style="padding-top: 7px;">
+        <template for:each={ccaracteristics.data} for:item="oReg">
+            <!--Para cada característica asociada-->
+            <li key={oReg.CC_Caracteristica__r.Id} id={oReg.CC_Caracteristica__r.Id} style="display: block;">
+
+                <!--Icono de advertencia-->
+                <lightning-icon class="cc_blinkFra" icon-name="utility:warning" alternative-text="¡Atención!" variant="warning" size="x-small" style="padding-left: 10px;"></lightning-icon>
+                &nbsp;&nbsp;
+
+                <!--Icono de característica o de marca-->
+                <lightning-icon class="cc_opacidad90" icon-name="custom:custom57" alternative-text="¡Atención!" size="x-small" title={oReg.CC_Caracteristica__r.CC_Descripcion__c}></lightning-icon>
+                &nbsp;&nbsp;
+
+                <!--Enlace de navegación al detalle de la característica-->
+                <a href={oReg.CC_Caracteristica__r.CC_URL__c} class="slds-text-link_reset">
+                    <span class="slds-text-link" title={oReg.CC_Caracteristica__r.CC_Descripcion__c}>{oReg.CC_Caracteristica__r.Name}</span>
+                </a>
+
+                <!--Espacio vertical para separar los elementos de la lista-->
+                <div style="height: 14px;"></div>
+
+            </li>
+        </template>
+    </div>
+
+    <template if:true={mostrarComboBox}>
+        <div class="slds-card__body slds-card__body_inner" style="padding-top: 7px;">
+            <lightning-combobox name="characteristics"
+                                label="Selecciona una característica"
+                                placeholder="Elige una opción"
+                                options={caracteristicasFRA}
+                                onchange={handleComboboxChange}
+                                >
+            </lightning-combobox>
         </div>
-    </article>
+    </template>
+</article>
 </template>

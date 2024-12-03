@@ -3,7 +3,6 @@ import { loadScript } from 'lightning/platformResourceLoader';
 import chartjs2 from '@salesforce/resourceUrl/AV_ChartJS';
 
 export default class AV_SeguimientoOportunidades extends LightningElement {
-  //@api selection;
   @api measureColumn;
   @api labelColumn;
   @api targetPage;
@@ -15,7 +14,6 @@ export default class AV_SeguimientoOportunidades extends LightningElement {
   @api setState;
 
   selectedBar = false;
-
   chart;
   chartjsInitialized = false;
 
@@ -34,14 +32,6 @@ export default class AV_SeguimientoOportunidades extends LightningElement {
   }
 
   set results(results) {
-
-    /*
-    if(this._results !== results && this.chartjsInitialized){
-      console.log('generateCanvas results');
-      this.generateCanvas();
-      console.log('this.results');
-    }
-    */
     this._results = results;
     if (this.chartjsInitialized) {
       this.generateCanvas();
@@ -187,7 +177,6 @@ export default class AV_SeguimientoOportunidades extends LightningElement {
       () => {
 
         let canvas = document.createElement('canvas');
-        // disable Chart.js CSS injection
         window.Chart.platform.disableCSSInjection = true;
 
         const divPrincipal = this.template.querySelector('div.divContainer');
@@ -212,7 +201,7 @@ export default class AV_SeguimientoOportunidades extends LightningElement {
         this.chart = new window.Chart(ctx, this.makeConfig());
 
       }).catch((error) => {
-        this.showNotification(this.errorTitle, error.body.message, this.errorVariant);
+        this.showNotification(this.errorTitle, error.body?.message, this.errorVariant);
       });
 
   }

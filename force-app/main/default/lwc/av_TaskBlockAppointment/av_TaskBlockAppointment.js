@@ -5,7 +5,7 @@ import getTask from '@salesforce/apex/AV_ReportAppointment_Controller.retrieveAc
 export default class Av_TaskBlockAppointment extends LightningElement {
 
 	@api accountid;
-	@api recordId;
+	@api recordid;
 	@track listTasks;
 	emptyCmp = false;
 	gp = "gp";
@@ -14,7 +14,7 @@ export default class Av_TaskBlockAppointment extends LightningElement {
 	taskObj = {};
 	
 	connectedCallback() {
-		getTask({ accountId: this.accountid})
+		getTask({ accountId: this.accountid,recordId:this.recordid})
 		.then(result=> {
 			if (result != null) {
 				this.emptyCmp = true;
@@ -33,7 +33,7 @@ export default class Av_TaskBlockAppointment extends LightningElement {
 	}
 
 	buildTaskObj(event){
-		if(Object.keys(this.taskObj).includes(event.detail.id) && this.taskObj[event.detail.id].status == event.detail.status && (this.taskObj[event.detail.id].comment != null && this.taskObj[event.detail.id].comment == event.detail.comment)){
+		if(!event.detail.vinculed){
 			delete this.taskObj[event.detail.id];
 		}else{
 			this.taskObj[event.detail.id] = event.detail;

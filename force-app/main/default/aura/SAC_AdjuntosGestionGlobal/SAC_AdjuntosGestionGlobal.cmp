@@ -55,6 +55,7 @@
     <aura:attribute name="idCasoVinculado" type="String"/>
     <aura:attribute name="esRecAsociadaASPV" type="Boolean" default="false" />
     <aura:attribute name="rtRegistro" type="String"/>
+    <aura:attribute name="deleteLastCV" type="String" default="1" /> <!-- 1: Hay +1 fichero, 2: Borrado ultimo fichero, idFichero: Id del último fichero borrado (lista de CV cuando hay más de 1)-->
 
 
 
@@ -86,7 +87,7 @@
                                             <!-- Contenido de la sección del acordeón -->
                                             <aura:iteration items="{!v.ficherosAdjuntos}" var="file">
                                                 <c:sac_clasificacionBloquesAdjuntos fichero="{!file}" bloqueAcordeon="{!valueBloque.value}" mostrarOculto="{!v.mostrarOculto}" esUserGeneral="{!v.esUserGeneral}" esRecAsociadaASPV="{!v.esRecAsociadaASPV}" recordTypeRegistro="{!v.rtRegistro}"
-                                                    onactualizarvista="{!c.handleActualizarVista}" onmostrarminiaturadocumento="{!c.handleMostrarMiniatura}" recordId="{!v.recordId}"/>
+                                                    onactualizarvista="{!c.handleActualizarVista}" onmostrarminiaturadocumento="{!c.handleMostrarMiniatura}" recordId="{!v.recordId}" deleteLastCV="{!v.deleteLastCV}"/>
                                                 <!-- Fin item archivo-->
                                             </aura:iteration>
                                             <!-- Fin deccion acordeon -->

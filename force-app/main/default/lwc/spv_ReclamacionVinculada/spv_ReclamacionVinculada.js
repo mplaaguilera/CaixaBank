@@ -75,27 +75,4 @@ export default class Spv_ReclamacionVinculada extends  NavigationMixin(Lightning
     });
 }
 
-
-navigateToCase(evt) {
-
-    evt.preventDefault();
-    var variableAuxiliarCodigoboton = evt.currentTarget.id;
-    for (var i = 0; i < variableAuxiliarCodigoboton.length - 1; i++) {
-        if (variableAuxiliarCodigoboton.charAt(i) == '-') {
-            this.caseId = variableAuxiliarCodigoboton.substring(0, i);
-        }
-    }
-    evt.stopPropagation();
-
-    this[NavigationMixin.Navigate]({
-        type: 'standard__recordPage',
-        attributes: {
-            "recordId": this.caseId,
-            "objectApiName": "Case",
-            "actionName": "view"
-        }
-    });
-
-}
-
 }

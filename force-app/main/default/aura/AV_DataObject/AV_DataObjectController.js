@@ -50,13 +50,11 @@
 		var typeMessage = 'warning';
 		var message = 'Conectando C2C...';
 		console.log(message);
-
 		var calledDevice = event.getSource().get("v.label");
 		if (calledDevice=='' || calledDevice.length==0){
 			helper.displayToastError(component, $A.get("$Label.c.AV_CMP_C2C_ERR_PHONE_NUMBER"));
 			return;
 		}
-		var actionProcess = component.get('c.c2cMakeCall');
 		actionProcess.setParams({"calledDevice": calledDevice});
 		actionProcess.setCallback(this, function (response) {
 			//check state of response
@@ -94,4 +92,56 @@
 	testFunction: function(component, event, helper) {
 		console.log('llamada a metodo');
 	}
+
+
+	,getGestores: function(component, event, helper) {
+        let recordId = component.get("v.recordId");
+		let action = component.get("c.getGestoresMultigestor");
+		action.setParams({
+            recordId: recordId
+        });
+		
+        action.setCallback(this, function(response) {
+            let state = response.getState();
+            if (state === "SUCCESS") {
+                let gestoresNames = response.getReturnValue();
+                component.set("v.gestoresNames", gestoresNames);
+            } else if (state === "ERROR") {
+                let errors = response.getError();
+                console.error(errors);
+            }
+        });
+        $A.enqueueAction(action);
+    }
+
+	,showTooltip: function(component, event, helper) {
+        var tooltip = component.find('tooltip');
+        $A.util.removeClass(tooltip, 'slds-hide');
+    },
+    
+    hideTooltip: function(component, event, helper) {
+        var tooltip = component.find('tooltip');
+        $A.util.addClass(tooltip, 'slds-hide');
+    }
+
+	,isBParticularesEAPGestor: function(component, event, helper) {
+        let recordId = component.get("v.recordId");
+		let action = component.get("c.isBancaParticularesEAPGestor");
+		action.setParams({
+            recordId: recordId
+        });
+		
+        action.setCallback(this, function(response) {
+            let state = response.getState();
+            if (state === "SUCCESS") {
+                let isBancaParticulares = response.getReturnValue();
+                component.set("v.isBancaParticulares",isBancaParticulares);
+            } else if (state === "ERROR") {
+                let errors = response.getError();
+                console.error(errors);
+            }
+        });
+        $A.enqueueAction(action);
+    }
+	
 })

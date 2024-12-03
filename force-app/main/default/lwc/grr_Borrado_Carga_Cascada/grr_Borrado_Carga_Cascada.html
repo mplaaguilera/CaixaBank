@@ -1,0 +1,48 @@
+<template>
+    <template if:false={datosCargados}>
+		<div style="min-height: 46px;">
+            <lightning-spinner size="small"></lightning-spinner>
+        </div>
+	</template>
+	<template if:true={datosCargados}>
+        <div class="slds-card">
+            <!-- Cabecera de la card -->
+            <div class="slds-card__header slds-grid">
+                <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Eliminar</span>
+                        </h2>
+                    </div>
+                    <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                        <lightning-button label="Eliminar" onclick={modalBorradoAbrir} class="slds-var-m-left_small" disabled={BorradoDisabled}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalBorrado" onkeydown={modalTeclaPulsada}>
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <lightning-button-icon icon-name="utility:close" size="large" alternative-text="Cerrar modal" onclick={closeModals} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">Borrado de la carga</h1>
+                </div>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-text-align_center" style="padding-top: 12px; padding-bottom: 16px;">
+                    <p class="slds-var-m-top_x-small">Por favor, confirme si desea eliminar esta carga o pulse cancelar en caso contrario.</p>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                            <lightning-button class="modalBorradoConfirmar" label="Confirmar" variant="brand" onclick={modalBorradoConfirmado}></lightning-button> <!-- Añadir disabled-->
+                            <lightning-button class="modalBorradoCancelar slds-var-m-left_medium" label="Cancelar" onclick={closeModals}></lightning-button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop backdropModales"></div>
+	</template>
+</template>

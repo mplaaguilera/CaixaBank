@@ -1,0 +1,17 @@
+<template>
+    <div class="slds-card">
+        <!-- Cabecera de la card -->
+        <div class="slds-card__header slds-grid">
+            <div class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Generación individual de caso</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                    <lightning-button label="Generar" onclick={handleGenerarCasoIndividual} disabled={guardando}></lightning-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

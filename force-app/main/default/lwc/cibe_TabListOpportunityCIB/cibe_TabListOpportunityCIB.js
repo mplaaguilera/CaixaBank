@@ -6,6 +6,9 @@ import { refreshApex } from '@salesforce/apex';
 import { updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
+import LWC_DATATABLE_CSS from '@salesforce/resourceUrl/CIBE_EquipoSoporteIcon'
+import { loadStyle } from 'lightning/platformResourceLoader';
+
 import { getPicklistValues, getObjectInfo } from 'lightning/uiObjectInfoApi';
 
 // //Fields
@@ -67,6 +70,11 @@ import oportunidades from '@salesforce/label/c.CIBE_Oportunidades';
 import select from '@salesforce/label/c.CIBE_SeleccionaOpcion';
 import confidencial from '@salesforce/label/c.CIBE_Confidencial';
 import linea from '@salesforce/label/c.CIBE_Linea';
+import segmentoRentabilidadEA from '@salesforce/label/c.CIBE_SegmentoRentabilidadEA';
+import segmentoRentabilidadER from '@salesforce/label/c.CIBE_SegmentoRentabilidadER';
+import segmentoRentabilidadGA from '@salesforce/label/c.CIBE_SegmentoRentabilidadGA';
+import segmentoRentabilidadGR from '@salesforce/label/c.CIBE_SegmentoRentabilidadGR';
+
 
 export default class Cibe_TabListOpportunityCIB extends LightningElement {
 
@@ -82,7 +90,11 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
         oportunidades,
         select, 
         confidencial,
-        linea
+        linea,
+        segmentoRentabilidadEA,
+        segmentoRentabilidadER,
+        segmentoRentabilidadGA,
+        segmentoRentabilidadGR
     }
 
     @api recordId;
@@ -114,9 +126,9 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
     @track exportDisabled = false;
     
     columnHeader = [cliente, numeroDocumento, gruposEconomico, grupoComercial, name, familia, producto, importe, divisa, importeEuros, impactoBalance, impactoComisiones, impactoBalanceEuros, 
-		impactoComisionesEuros, tipoOperacion, probabilidadExito, etapa, motivoCerrada, fechaCierre, diasUltimaGestion, fechaDeAlta, primerPropietario, owner,	centroCarteras,
+		impactoComisionesEuros, tipoOperacion, probabilidadExito, etapa, motivoCerrada, fechaCierre, diasUltimaGestion, fechaDeAlta, primerPropietario, owner, centroCarteras,
         sectoresPaises,redesSegmentos,negocios,gestorCliente, gestorClienteCC, gestorInternacional, fechaComiteRiesgo, fechaComitePrecios,
-		esg, ecas,algunaOperacionRAR, dictamenALM, visto, nivel, sindicaciones, observaciones,vigenciaOferta, confidencial, linea];
+		esg, ecas,algunaOperacionRAR, dictamenALM, visto, nivel, sindicaciones, observaciones,vigenciaOferta, confidencial, linea, segmentoRentabilidadEA,segmentoRentabilidadER, segmentoRentabilidadGA, segmentoRentabilidadGR ];
 
     @track minDate = new Date();
     @track todayDate = new Date();
@@ -159,23 +171,126 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
             for(var key in this.oppVisto){
                 options2.push({label : this.oppVisto[key].label, value: this.oppVisto[key].value})
             }
-            
-            this.data = data.map(
-                record  => Object.assign(
-                    {
-                        "AccountLink": record.accountId !== undefined ? "/" + record.accountId : "",
-                        "ownerLink": record.ownerId !== undefined ? "/" + record.ownerId : "",
-                        "firstOwnerLink": record.firstOwnerId !== undefined ? "/" + record.firstOwnerId : "",
-                        "grupoComercialLink": record.grupoComercialId !== undefined ? "/" + record.grupoComercialId : "",
-                        "OpportunityName": record.name,
-                        "OpportunityLink": record.iden !== undefined ? "/" + record.iden : "",
-                        "familiaLink": record.familiaId !== undefined ? "/" + record.familiaId : "",
-                        "productoLink": record.pFId !== undefined ? "/" + record.pFId : "",
-                        "pickListOptions" : options,
-                        "pickListOptionsVisto": options2
-                    },
-                    record
-                    ));
+
+                this.data = data.map((item) => {
+                    const iconObj = {...item};
+
+                    iconObj.pickListOptions = options;
+                    iconObj.pickListOptionsVisto = options2;
+    
+                    //empresa absoluta
+                    if(item.empresaAbsoluta === 'Alta' || item.empresaAbsoluta === 'High'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classAlta'
+                    }else if(item.empresaAbsoluta === 'Media Alta' || item.empresaAbsoluta === 'Medium High'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classMediaAlta'
+                    }else if(item.empresaAbsoluta === 'Media' || item.empresaAbsoluta === 'Medium'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classMedia'
+                    }else if(item.empresaAbsoluta === 'Media Baja' || item.empresaAbsoluta === 'Medium Low'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classMediaBaja'
+                    }else if(item.empresaAbsoluta === 'Baja' || item.empresaAbsoluta === 'Low'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classBaja'
+                    }else if(item.empresaAbsoluta === 'Morosos' || item.empresaAbsoluta === 'Default'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classBaMorosos'
+                    }else if(item.empresaAbsoluta === 'Inactivos' || item.empresaAbsoluta === 'Inactive'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classInactivos'
+                    }else if(item.empresaAbsoluta === 'Project Finance'){
+                        iconObj.priorityiconEA = "utility:record" ;
+                        iconObj.classEstadoEA = 'classFinanciacionProyecto'
+                    }
+    
+                    //empresa relativa
+    
+                    if(item.empresaRelativa === 'Alta' || item.empresaRelativa === 'High'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classAlta'
+                    }else if(item.empresaRelativa === 'Media Alta' || item.empresaRelativa === 'Medium High'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classMediaAlta'
+                    }else if(item.empresaRelativa === 'Media' || item.empresaRelativa === 'Medium'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classMedia'
+                    }else if(item.empresaRelativa === 'Media Baja' || item.empresaRelativa === 'Medium Low'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classMediaBaja'
+                    }else if(item.empresaRelativa === 'Baja' || item.empresaRelativa === 'Low'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classBaja'
+                    }else if(item.empresaRelativa === 'Morosos' || item.empresaRelativa === 'Default'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classBaMorosos'
+                    }else if(item.empresaRelativa === 'Inactivos' || item.empresaRelativa === 'Inactive'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classInactivos'
+                    }else if(item.empresaRelativa === 'Project Finance'){
+                        iconObj.priorityiconER = "utility:record" ;
+                        iconObj.classEstadoER = 'classFinanciacionProyecto'
+                    }
+    
+    
+                    //grupo absoluta
+                    if(item.grupoAbsoluta === 'Alta' || item.grupoAbsoluta === 'High'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classAlta'
+                    }else if(item.grupoAbsoluta === 'Media Alta' || item.grupoAbsoluta === 'Medium High'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classMediaAlta'
+                    }else if(item.grupoAbsoluta === 'Media' || item.grupoAbsoluta === 'Medium'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classMedia'
+                    }else if(item.grupoAbsoluta === 'Media Baja' || item.grupoAbsoluta === 'Medium Low'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classMediaBaja'
+                    }else if(item.grupoAbsoluta === 'Baja' || item.grupoAbsoluta === 'Low'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classBaja'
+                    }else if(item.grupoAbsoluta === 'Morosos' || item.grupoAbsoluta === 'Default'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classBaMorosos'
+                    }else if(item.grupoAbsoluta === 'Inactivos' || item.grupoAbsoluta === 'Inactive'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classInactivos'
+                    }else if(item.grupoAbsoluta === 'Project Finance'){
+                        iconObj.priorityiconGA = "utility:record" ;
+                        iconObj.classEstadoGA = 'classFinanciacionProyecto'
+                    }
+    
+                    //grupo relativa
+                    if(item.grupoRelativa === 'Alta' || item.grupoRelativa === 'High'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classAlta'
+                    }else if(item.grupoRelativa === 'Media Alta' || item.grupoRelativa === 'Medium High'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classMediaAlta'
+                    }else if(item.grupoRelativa === 'Media' || item.grupoRelativa === 'Medium'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classMedia'
+                    }else if(item.grupoRelativa === 'Media Baja' || item.grupoRelativa === 'Medium Low'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classMediaBaja'
+                    }else if(item.grupoRelativa === 'Baja' || item.grupoRelativa === 'Low'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classBaja'
+                    }else if(item.grupoRelativa === 'Morosos' || item.grupoRelativa === 'Default'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classBaMorosos'
+                    }else if(item.grupoRelativa === 'Inactivos' || item.grupoRelativa === 'Inactive'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classInactivos'
+                    }else if(item.grupoRelativa === 'Project Finance'){
+                        iconObj.priorityiconGR = "utility:record" ;
+                        iconObj.classEstadoGR = 'classFinanciacionProyecto'
+                    }
+                    
+                    return iconObj;
+                    
+                });        
             this.isLoading = false;
         } else if(error) {
             this.isLoading = false;
@@ -184,6 +299,7 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
     }
 
     connectedCallback() {
+        loadStyle(this, LWC_DATATABLE_CSS);
         const selectedEvent = new CustomEvent("renametab");
 		this.dispatchEvent(selectedEvent);
     }
@@ -250,7 +366,6 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
     }
 
     exportData() {
-        console.log('Button click!');
         this.exportDisabled = true;
         this.dispatchEvent(
             new ShowToastEvent({
@@ -315,7 +430,6 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
             returnValues.CIBE_Nivel__c = row.nivel !== undefined ? row.nivel : this.data[num].nivel,
             returnValues.CIBE_VigenciaOferta__c = row.vigenciaOferta !== undefined ? row.vigenciaOferta : this.data[num].vigenciaOferta
             const fields = Object.assign({},returnValues);
-            console.log(fields);
             return {fields} 
         });
 
@@ -368,7 +482,7 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
     }
 
     staticColumns = [
-        { label: cliente, fieldName: 'AccountLink', type: 'url', typeAttributes: { label: { fieldName: 'accountName' } } },
+        { label: cliente, fieldName: 'accountId', type: 'url', typeAttributes: { label: { fieldName: 'accountName' } } },
         { label: numeroDocumento, fieldName: 'accountCif' },
         { label: importe, fieldName: 'amountDivisa', cellAttributes: { alignment: 'right' }, initialWidth : 100 },
         { label: divisa, fieldName: 'divisa', initialWidth : 90 }
@@ -376,10 +490,10 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
 
     columns = [
         { label: gruposEconomico, fieldName: 'grupoEconomico' },
-        { label: grupoComercial, fieldName: 'grupoComercialLink', type: 'url', typeAttributes: {label: { fieldName: 'grupoComercialName' } }},
-        { label: name, fieldName: 'OpportunityLink', type: 'url', typeAttributes: {label: { fieldName: 'OpportunityName' } }},
-        { label: familia, fieldName: 'familiaLink', type: 'url', typeAttributes: {label: { fieldName: 'familiaName' } }},
-        { label: producto, fieldName: 'productoLink', type: 'url', typeAttributes: {label: { fieldName: 'pFName' } }},
+        { label: grupoComercial, fieldName: 'grupoComercialId', type: 'url', typeAttributes: {label: { fieldName: 'grupoComercialName' } }},
+        { label: name, fieldName: 'iden', type: 'url', typeAttributes: {label: { fieldName: 'name' } }},
+        { label: familia, fieldName: 'familiaId', type: 'url', typeAttributes: {label: { fieldName: 'familiaName' } }},
+        { label: producto, fieldName: 'pFId', type: 'url', typeAttributes: {label: { fieldName: 'pFName' } }},
         { label: importeEuros, fieldName: 'amountEuro', cellAttributes: { alignment: 'right' }},
         { label: impactoBalance, fieldName: 'balanceDivisa', cellAttributes: { alignment: 'right' }},
         { label: impactoComisiones, fieldName: 'comisionesDivisa', cellAttributes: { alignment: 'right' }},
@@ -392,8 +506,8 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
         { label: fechaCierre, fieldName: 'closeDate', type : 'date', typeAttributes : { day : '2-digit' , month : '2-digit', year : 'numeric' } },
         { label: diasUltimaGestion, fieldName: 'diasUltimaGestion'},
         { label: fechaDeAlta, fieldName: 'fechaAlta', type : 'date', typeAttributes : { day : '2-digit' , month : '2-digit', year : 'numeric' } },
-        { label: primerPropietario, fieldName: 'firstOwnerLink', type: 'url', typeAttributes: { label: { fieldName: 'firstOwnerName' } } },
-        { label: owner, fieldName: 'ownerLink', type: 'url', typeAttributes: {label: { fieldName: 'ownerName' } }},
+        { label: primerPropietario, fieldName: 'firstOwnerId', type: 'url', typeAttributes: { label: { fieldName: 'firstOwnerName' } } },
+        { label: owner, fieldName: 'ownerId', type: 'url', typeAttributes: {label: { fieldName: 'ownerName' } }},
         { label: centroCarteras, fieldName: 'centrosCarteras'},
         { label: sectoresPaises, fieldName: 'sectoresPaises'},
         { label: redesSegmentos, fieldName: 'redesSegmentos'},
@@ -413,7 +527,13 @@ export default class Cibe_TabListOpportunityCIB extends LightningElement {
         { label: vigenciaOferta, fieldName: 'vigenciaOferta', editable : true, type: 'picklistColumn', wrapText: true, typeAttributes: { options: { fieldName: 'pickListOptions' }, value: { fieldName: 'vigenciaOferta' }, placeholder: this.label.select } } ,
         { label: observaciones, fieldName: 'observaciones', editable : true },
         { label: confidencial, fieldName: 'confidencial', cellAttributes: { alignment: 'center' }, type: 'boolean' },
-        { label: linea, fieldName: 'linea', cellAttributes: { alignment: 'center' }, type: 'boolean' }
+        { label: linea, fieldName: 'linea', cellAttributes: { alignment: 'center' }, type: 'boolean' },
+        { label: this.label.segmentoRentabilidadEA, fieldName : 'empresaAbsoluta',  type: 'text', cellAttributes: { iconName: { fieldName: 'priorityiconEA' }, class: {fieldName: 'classEstadoEA'}}},
+        { label: this.label.segmentoRentabilidadER, fieldName : 'empresaRelativa',  type: 'text', cellAttributes: { iconName: { fieldName: 'priorityiconER' }, class: {fieldName: 'classEstadoER'}}},
+        { label: this.label.segmentoRentabilidadGA, fieldName : 'grupoAbsoluta',  type: 'text', cellAttributes: { iconName: { fieldName: 'priorityiconGA' }, class: {fieldName: 'classEstadoGA'}}},
+        { label: this.label.segmentoRentabilidadGR, fieldName : 'grupoRelativa',  type: 'text', cellAttributes: { iconName: { fieldName: 'priorityiconGR' }, class: {fieldName: 'classEstadoGR'}}}
+        
+        
     ];
 
 }

@@ -310,8 +310,8 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                 //Si el modal no se ha abierto y SI que vengo de la ventana de eliminar, elimino el reclamante principal poniendo un secundario como nuevo principal
                 this.eliminarCambiandoPrincipal();
             }                    
-        }else{      
-            comprobarMultiplesCasosCliente({ caseId: this.recordId, ownerId: this.ownerId, pretPrincipalownerId: this.pretPrincipalOwnerId, reclamanteId: this.idReclamantePulsado })
+        }else{            
+            comprobarMultiplesCasosCliente({ ownerId: this.ownerId, pretPrincipalownerId: this.pretPrincipalOwnerId, reclamanteId: this.idReclamantePulsado })
             .then(result => {
                 let existenCasosAbiertos = result;
                 if (existenCasosAbiertos) {

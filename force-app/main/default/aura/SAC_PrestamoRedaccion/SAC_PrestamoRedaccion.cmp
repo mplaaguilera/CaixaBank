@@ -63,14 +63,16 @@
                 <c:SAC_PrestamoSentidoInadmision recordId="{!v.recordId}" senRes="{!v.senRes}" argRes="{!v.argRes}" motivoInad="{!v.motivoInad}"/>
             </div>
             <!-- Email -->
-            <div>
-                <aura:if isTrue="{!and(v.metodoEnvio == 'Email', v.showEmailSender)}">
-                    <c:SAC_PrestamoGestionEmails ficherosAdjuntos="{!v.ficherosAdjuntos}" para="{!v.para}" copiaOculta="{!v.CCO}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" caso="{!v.caso}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" seleccionarReclamacion="true" />
-                </aura:if>                               
+            <div>                               
                 <aura:if isTrue="{!v.mensaje}">
                     <div class="slds-align_absolute-center">
                         <h1 style="color: red;">No puede resolver. {!v.mensaje}</h1>
                     </div>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!and(v.metodoEnvio == 'Email', v.showEmailSender)}">
+                            <c:SAC_PrestamoGestionEmails ficherosAdjuntos="{!v.ficherosAdjuntos}" para="{!v.para}" copiaOculta="{!v.CCO}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" caso="{!v.caso}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" seleccionarReclamacion="true" />
+                        </aura:if>
+                    </aura:set>
                 </aura:if>
             </div>
         </aura:if>

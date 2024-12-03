@@ -10,6 +10,7 @@ import getAppDefinition 	    from '@salesforce/apex/cibe_secondNewOpportunity_CI
 import OPPORTUNITY_OBJECT       from '@salesforce/schema/Opportunity';
 import DIVISA_FIELD             from '@salesforce/schema/Opportunity.CIBE_Divisa__c';
 import getOpportunityFields     from '@salesforce/apex/CIBE_NewOpportunity_Controller_CIB.getOpportunityFields';
+import getPaisPicklist 	    from '@salesforce/apex/cibe_secondNewOpportunity_CIB_Controller.getPaisPicklist';
 
 
 //Labels
@@ -32,8 +33,17 @@ import impactFinAn from '@salesforce/label/c.CIBE_ImpactoFinAnio';
 import impactoBalFinAnio from '@salesforce/label/c.CIBE_ImpactoBalFinAnio';	
 import fechaProxGestionLabel from '@salesforce/label/c.CIBE_FechaProxGestion';
 import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados';
+import helpTextDeadlineOpp from '@salesforce/label/c.CIBE_HelpTextDeadlineOpp';
+import deadlineOpp from '@salesforce/label/c.CIBE_DeadlineOpp';
+import pais from '@salesforce/label/c.CIBE_Pais';
+import importeTotalMercado from '@salesforce/label/c.CIBE_ImporteTotalMercado';
+import importeRenovacion from '@salesforce/label/c.CIBE_ImporteRenovacion';
+import importeVariacion from '@salesforce/label/c.CIBE_ImporteVariacion';
+
+
 
     export default class CIBE_Second_New_Opportunity_CIB extends NavigationMixin(LightningElement) {
+
         
         @api pfId; 
         @api developerName;
@@ -52,11 +62,22 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
         @api margen;
         @api divisa;
         @api AppDefinition;
+        @api deadlineOpp;
+        @api deadlineOpp2;
+        @api pais;
+        @api importeTotalMercado;
+        @api importeRenovacion;
+        @api bancoTicket;
+        @api importeVariacion;
+        @api sindicaciones;
+        @api valueOperacion;
+        @track tipoOperacionMorV = false;
 
         @api fechaProxGestion;
         @api incluirCliente = false;
 
         @track optionsExito;
+        @track optionsPais;
         @track otraentidad;
         @track otraentidadpick;
         @track optionsDivisa;
@@ -67,7 +88,14 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
         @track isBalance = true;
         @track isImporte = true;
         @track isDivisa = true;
-        @track isImpBalance = true;   
+        @track isImpBalance = true;
+        @track sindicacion = false;   
+
+
+        @track tipoOperacion;
+
+
+
 
         labels = {
             fechaCierreLabel,
@@ -87,7 +115,13 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
             impactFinAn,
             impactoBalFinAnio,
             fechaProxGestionLabel,
-            incluirClienteLabel
+            incluirClienteLabel,
+            helpTextDeadlineOpp,
+            deadlineOpp,
+            pais,
+            importeTotalMercado,
+            importeRenovacion,
+            importeVariacion
         }
 
         @track show = false;   
@@ -95,6 +129,14 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
             this.show = event.target.checked;
         }
         connectedCallback(){
+            if(this.deadlineOpp != null){
+                let aux = this.deadlineOpp.toString();
+                aux = aux.replace('.', ',');
+                this.deadlineOpp = aux;
+            }
+            if(this.valueOperacion === 'Renovación' || this.valueOperacion === 'Modificación'){
+                this.tipoOperacionMorV = true;
+            }
             if(this.exito!=undefined){
                 this.exito=this.exito;
             }else{
@@ -124,6 +166,16 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
         getOptionsExito({error,data}) {
             if(data){
                 this.optionsExito=JSON.parse(JSON.stringify(data));
+            }else if(error) {
+                console.log(error);
+            }
+        }
+
+        @wire(getPaisPicklist, {})
+        getOptionsPais({error,data}) {
+            //this.callChild();
+            if(data){
+                this.optionsPais=JSON.parse(JSON.stringify(data));
             }else if(error) {
                 console.log(error);
             }
@@ -211,14 +263,38 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
             this.sendData();
         }
 
+        handleDeadlineOpp(event){
+            this.deadlineOpp = event.target.value;
+            this.sendData();
+
+        }
+
+        handlePais(event){
+            this.pais=event.target.value;  
+            this.sendData();
+        }
+
+        handleImporteTotalMercado(event){
+            this.importeTotalMercado=event.target.value;  
+            this.sendData();
+        }
+        handleImporteRenovacion(event){
+            this.importeRenovacion=event.target.value;  
+            this.sendData();
+        }
+
+
+        handleImporteVariacion(event){
+            this.importeVariacion=event.target.value;  
+            this.sendData();
+        }
+
         @wire(getOpportunityFields, {productoName: '$productoid'})
         getOpportunityFields({error,data}) {
             this.isComDivisa = true;
-            // this.isImpComisiones = true;
             this.isBalance = true;
             this.isImporte = true;
             this.isDivisa = true;  
-            //this.isImpBalance = true; 
 
             if(data){
                 data.forEach(d => {
@@ -231,12 +307,10 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
                         if(d == 'CIBE_ComisionesDivisa__c') {
                             this.isComDivisa = false;            
                         }
-                        /* if(d == 'CIBE_ImpactoDivisaComisionesCierreAnio__c') {
-                            this.isImpComisiones = false;            
+                        if(d == 'CIBE_Sindicaciones__c'){
+                            this.sindicacion = true;
                         }
-                        if(d == 'CIBE_ImpactoDivisaBalanceCierreAnio__c') {
-                            this.isImpBalance = false;            
-                        }*/
+                       
                         if(d == 'CIBE_BalanceDivisa__c') {
                             this.isBalance = false;
                         }
@@ -247,13 +321,7 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
                     if(this.isBalance){
                         this.balance = 0;           
                     }
-                    /*
-                    if(this.isImpComisiones){
-                        this.impactoComFinA = 0;           
-                    }
-                    if(this.isImpBalance){
-                        this.impactoBalFinA = 0;           
-                    }*/
+                   
                     if(this.isImporte){
                         this.importeSaldo = 0;           
                     }
@@ -263,6 +331,7 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
         }
 
         sendData() {
+
             this.dispatchEvent(new CustomEvent('datareport', {
                 detail: {
                     fechaCierre: this.fechaCierre,
@@ -278,9 +347,13 @@ import incluirClienteLabel from '@salesforce/label/c.CIBE_IncluirCliPriorizados'
                     divisa: this.divisa,
                     impactoComFinA: this.impactoComFinA,
                     fechaProxGestion: this.fechaProxGestion,
-                    incluirCliente: this.incluirCliente
+                    incluirCliente: this.incluirCliente,
+                    deadlineOpp: this.deadlineOpp,
+                    pais: this.pais,
+                    importeTotalMercado: this.importeTotalMercado,
+                    importeRenovacion: this.importeRenovacion,
+                    importeVariacion: this.importeVariacion
                 }
             }));
         }
-    
     }

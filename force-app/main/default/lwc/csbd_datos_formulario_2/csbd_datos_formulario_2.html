@@ -35,7 +35,7 @@
                                     <div class="atributoNombre slds-col slds-size_1-of-4 slds-text-align_right slds-truncate">
                                         <span class="iconoCopiar slds-col slds-var-m-right_medium">
                                             <!-- sldsValidatorIgnoreNextLine -->
-                                            <lightning-button-icon icon-name="utility:copy" variant="border-filled" onclick={copiarValor} title="Copiar valor" data-valor={atributo.nombre}></lightning-button-icon>
+                                            <lightning-button-icon icon-name="utility:copy" variant="bare" onclick={copiarValor} title="Copiar valor" data-valor={atributo.nombre}></lightning-button-icon>
                                         </span>
                                         {atributo.nombre}:
                                     </div>
@@ -45,7 +45,7 @@
                                             {atributo.valor}
                                             <span class="iconoCopiar slds-col slds-var-m-left_medium">
                                                 <!-- sldsValidatorIgnoreNextLine -->
-                                                <lightning-button-icon icon-name="utility:copy" variant="border-filled" title="Copiar valor" onclick={copiarValor} data-valor={atributo.valor}></lightning-button-icon>
+                                                <lightning-button-icon icon-name="utility:copy" variant="bare" title="Copiar valor" onclick={copiarValor} data-valor={atributo.valor}></lightning-button-icon>
                                             </span>
                                         </span>
                                         <span lwc:else class="atributoValorSinValor">Sin valor</span>

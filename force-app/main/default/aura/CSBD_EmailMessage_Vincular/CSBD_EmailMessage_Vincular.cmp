@@ -77,10 +77,7 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <!--<lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalVincularOportunidad}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>-->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalVincularOportunidad}">
-                    <lightning:icon iconName="utility:close" size="small"></lightning:icon>
-                </button>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalVincularOportunidad}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
                 <!--Título-->
                 <h2 class="slds-text-heading_medium slds-hyphenate">Vincular correo a oportunidad</h2>
                 <p class="slds-var-m-top_x-small">
@@ -158,10 +155,7 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <!--<lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalConfirmacion}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>-->
-                <button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalConfirmacion}">
-                    <lightning:icon iconName="utility:close" size="small"></lightning:icon>
-                </button>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalConfirmacion}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
                 <!--Título del modal-->
                 <h2 class="slds-text-heading_medium slds-hyphenate">Confirmar rechazo</h2>
                 <p class="slds-var-m-top_x-small slds-text-color_destructive">

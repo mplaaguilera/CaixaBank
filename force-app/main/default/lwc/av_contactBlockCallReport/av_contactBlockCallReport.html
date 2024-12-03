@@ -1,0 +1,52 @@
+<template>
+<div class="masterDiv slds-card">
+
+    <div class="fields slds-grid">
+        <div>
+        <label>Cliente</label>    
+        <p>{callinfo.clientName}</p>
+        </div>
+        <div>
+            <label>Tipo de cita</label>  
+            <p>{callinfo.typeAppointment}</p>
+        </div>
+        <div>
+            <label>Fecha</label>  
+            <p>{callinfo.dateCall}</p>
+        </div>
+        <div>
+            <label>Hora inicio</label>  
+            <p>{callinfo.initTime}</p>
+        </div>
+        <div>
+            <label>Duración</label>  
+            <p>{callinfo.duration} s</p>
+        </div>
+        <div>
+            <label>Empleado/a asignado</label>  
+            <p>{callinfo.assignedEmployeeName}</p>
+        </div>
+        <div>
+            <label>Origen</label>  
+            <p>{callinfo.origin}</p>
+        </div>
+        <div>
+            <label>Teléfono</label>  
+            <p>{callinfo.phone}</p>
+        </div>
+    </div>
+
+    <div class="inputsDiv slds-grid">
+        <div class="textInputs slds-col slds-size_7-of-12">
+            <lightning-input required label="Asunto" placeholder="Introduce el asunto..." value={callinfo.subject} onchange={sendSubject}></lightning-input>
+            <lightning-textarea label="Comentario" placeholder="Escribe aqui..." onchange={seteventcoment}></lightning-textarea>
+        </div>
+        <div class=" slds-col slds-size_1-of-12"></div>
+        <div class="checkInputs slds-col slds-size_4-of-12">
+            <lightning-input if:true={shownolocalizadocb} type="checkbox" data-id="cb1"   name = '1' onchange={handleClickCBOptions} label= "No localizado"></lightning-input>
+            <lightning-input type="checkbox" data-id="cb2" onchange={handleClickCBOptions} name = '2' label= "Cita no comercial (Gestión operativa)"></lightning-input>
+            <lightning-input type="checkbox" data-id="cb3" onchange={handleClickCBOptions} name = '3' label= "Personal"></lightning-input>
+        </div>
+    </div>
+</div>
+</template>

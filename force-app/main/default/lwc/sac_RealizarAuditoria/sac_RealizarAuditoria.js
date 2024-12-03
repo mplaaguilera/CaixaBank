@@ -106,7 +106,7 @@ export default class Sac_RealizarAuditoria extends LightningElement {
             }
             this.objetoCase = objetoInterno;
         } else if (error) {
-            console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         }
     }
 
@@ -240,4 +240,10 @@ export default class Sac_RealizarAuditoria extends LightningElement {
             })
         }
     }
+
+        mostrarToast(tipo, titulo, mensaje) {
+		this.dispatchEvent(new ShowToastEvent({
+			variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000
+		}));
+	}
 }

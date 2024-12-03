@@ -6,9 +6,9 @@ import getRecords 	        from '@salesforce/apex/CIBE_CXBVisualizacionGC_Contro
 import getUserRole 	        from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.getUserRole';
 import showAddMemberButton  from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.showAddMemberButton';
 import lookupSearchUser     from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.searchUser';
-import createTeamMember     from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.createTeamMember';
-import updateTeamMember     from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.updateTeamMember';
-import deleteTeamMember     from '@salesforce/apex/CIBE_CXBVisualizacionGC_Controller.deleteTeamMember';
+import createTeamMember     from '@salesforce/apex/CIBE_UtilitiesWOS.createTeamMember';
+import updateTeamMember     from '@salesforce/apex/CIBE_UtilitiesWOS.updateTeamMember';
+import deleteTeamMember     from '@salesforce/apex/CIBE_UtilitiesWOS.deleteTeamMember';
 
 //schema fields
 import USER_ID from '@salesforce/user/Id';

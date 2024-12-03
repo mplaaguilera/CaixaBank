@@ -80,6 +80,7 @@ export default class csbdTiposOferta extends LightningElement {
 					const ingresosAnualesTitular1 = getFieldValue(data, OPPTY_TITULAR1_INGRESOS) ?? 0;
 					const ingresosAnualesTitular2 = getFieldValue(data, OPPTY_TITULAR2_INGRESOS) ?? 0;
 					const ingresosAnualesTitulares = ingresosAnualesTitular1 + ingresosAnualesTitular2;
+
 					let categoriaTitular;
 					if (ingresosAnualesTitular1 >= 36000 || ingresosAnualesTitular2 >= 36000 || ingresosAnualesTitulares >= 48000) {
 						categoriaTitular = 'Premium';
@@ -167,8 +168,6 @@ export default class csbdTiposOferta extends LightningElement {
 				const interes = this.precios[inputCuota.dataset.name];
 				inputCuota.value = interes ? this.interesToCuota(importeHipoteca, plazo, interes) : null;
 			});
-		} else {
-			this.template.querySelectorAll('lightning-input.inputCuota').forEach(inputCuota => inputCuota.value = null);
 		}
 	}
 

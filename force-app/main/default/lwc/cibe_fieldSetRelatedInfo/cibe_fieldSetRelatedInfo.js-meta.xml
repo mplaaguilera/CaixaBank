@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="filterObject" type="String" default="" label="Object API Name" description="Object API Name." required="true"/>
+            <property name="fieldSetName" type="String" default="" label="FieldSet Name" description="FieldSet Name. Required if showBody is true." required="true"/>
+            <property name="phoneFieldInput" type="String" default="" label="Phone Field" description="Api Name of Phone Field with Call Center Integration."/>
+            <property name="numberOfColumns" type="Integer" default="1" label="Number of Columns" description="Define the number of columns to display data. Max 3"/>
+            <property name="accordionTitle" type="String" default="" label="Accordion Title" description="Title of Accordion."/>
+
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

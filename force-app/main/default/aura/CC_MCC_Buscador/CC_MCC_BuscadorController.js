@@ -16,7 +16,7 @@
 			}
 
 			//Se muestra el campo de búsqueda si el caso no está clasificado
-			if (!component.get('v.caso.CC_MCC_Motivo__r.Name')) {
+			if (component.get('v.negocio') === 'CC' || !component.get('v.caso.CC_MCC_Motivo__r.Name')) {
 				component.set('v.mostrarBuscador', true);
 			}
 			if (component.get('v.negocio') === 'OS') {
@@ -331,7 +331,7 @@
 		actualizarCaso.setCallback(this, response => {
 			if (response.getState() === 'SUCCESS') {
 				//ocultar el buscador.
-				if (component.get('v.negocio') !== 'HDT') {
+				if (component.get('v.negocio') !== 'CC' || component.get('v.negocio') !== 'HDT') {
 					component.set('v.mostrarBuscador', false);
 				}
 
@@ -376,12 +376,14 @@
 		component.set('v.value', null);
 		component.set('v.lookupId', '');
 
-		if (component.get('v.mostrarBuscador')) {
-			component.set('v.mostrarBuscador', false);
-		} else {
-			component.set('v.mostrarBuscador', true);
-			//eslint-disable-next-line @lwc/lwc/no-async-operation
-			window.setTimeout($A.getCallback(() => component.find('lookUpInputElement').focus()), 15);
+		if (component.get('v.negocio') !== 'CC') {
+			if (component.get('v.mostrarBuscador')) {
+				component.set('v.mostrarBuscador', false);
+			} else {
+				component.set('v.mostrarBuscador', true);
+				//eslint-disable-next-line @lwc/lwc/no-async-operation
+				window.setTimeout($A.getCallback(() => component.find('lookUpInputElement').focus()), 15);
+			}
 		}
 	},
 

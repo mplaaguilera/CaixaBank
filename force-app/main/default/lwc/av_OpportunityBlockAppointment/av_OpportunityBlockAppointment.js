@@ -3,10 +3,12 @@ import getOppos from '@salesforce/apex/AV_ReportAppointment_Controller.retrieveA
 import lookupSearchProduct from '@salesforce/apex/AV_ReportAppointment_Controller.searchProduct';
 import getComboboxValues from '@salesforce/apex/AV_ReportAppointment_Controller.getPicklistValues';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import USER_ID 						   						   from '@salesforce/user/Id';
+
 
 export default class Av_OpportunityBlockAppointment extends LightningElement {
 	@api accountid;
-@api recordid;
+	@api recordid;
 	@api isreport;
 	opposCount = 0;
 	@track oppoList;
@@ -26,24 +28,37 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 	@track requiredClass;
 	numAgendeds = 0;
 	selectedIds = [];
-@track particularOpportunity;
+	@track particularOpportunity;
+	@track showButtonDelete = false;
+	@api nolocalizado; 
+	
 
 	connectedCallback(){
 		this.retriveOpps();
 	}
-	
+	@api
+	sendInitialStates(){
+		let mapInitialSates = {};
+
+		for(let id in this.oppoObj){
+			mapInitialSates[id] = this.template.querySelector('[data-id="'+id+'"]').initialState;
+		}
+
+		return mapInitialSates;
+	}
 	retriveOpps() {
 		getOppos({ accountId:this.accountid})
 		.then(result=> {
 			if (result != null) {
-
 				this.oppoList = (!this.isreport) ? result : [];
+				this.valueOppoList();
 				result.forEach(opp => {
 					this.selectedIds.push(opp.ProductoMain);
-					
 					if(this.isreport){
 						if(this.recordid === opp.Id){
+							
 							this.particularOpportunity = opp;
+							this.valueOppoList();
 							this.dispatchEvent(
 								new CustomEvent('nameoppo',{
 									detail:{
@@ -55,16 +70,15 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 							this.oppoList.push(opp);
 						}
 					}
-
-
 				})
+				
 				this.otherOpposLabel = this.isreport && this.oppoList.length > 0
 				this.showSpinner = false;
 			}else {
 				this.showSpinner = false;
 			}
 		}).catch(error => {
-			console.log(error);
+			console.log('Error: '+error);
 			this.showSpinner = false;
 		}).finally( () =>{
 			if(this.particularOpportunity != undefined){
@@ -80,7 +94,8 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 		let error = wireResult.error;
 		let data = wireResult.data;
 		if(data){
-			this.resolutionList = data[0].filter(item => item.value !== 'VD');
+			this.resolutionList = data[0].filter(item => item.value !== 'VD' && item.value !== 'Vencida' && item.value !== 'No Apto');
+			this.resolutionList.unshift(data[0].find(item => item.value=='No Apto'));			
 			this.potentialList = data[1];
 		}else if(error){
 			console.log('Error => ',error);
@@ -88,6 +103,7 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 	}
 
 	handleAddOppo(){
+		this.showButtonDelete = true;
 		let cmp = this.template.querySelector("[data-id='clookup1']");
 		let selection = cmp.getSelection()[0];
 		if(selection != null){
@@ -100,7 +116,9 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 					ProductoMain:selection.id,
 					Fecha: new Date().toJSON().slice(0, 10),
 					NotInserted:true,
-					unFoldCmp:true
+					unFoldCmp:true,
+					IsNewProduct: selection.prodNewAction
+					,owneridopp : USER_ID 
 				}
 			);
 			cmp.handleClearSelection();
@@ -149,6 +167,8 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 				this.oppoObj[opp.Id].mainVinculed = (opp.Id == itemOppId);
 			}
 		})
+		
+
 		this.dispatchEvent(
 			new CustomEvent('setoppoforcontroller',{
 				detail:this.oppoObj
@@ -175,12 +195,14 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 	@api
 	highlightOppo(id){
 		let b =  this.template.querySelector('[data-id="'+id+'"]');
-		if(this.oppoObj[id].newPath == 'No apto'){
-			this.showToast('Faltan datos','Indica una fecha de no ofrecer hasta que sea mayor o igual a hoy.','error','pester');
-		}else if(this.oppoObj[id].newPath == 'En gestión/insistir'){
+		let closedStatus = ['No interesado','Producto Rechazado'];
+		if(this.oppoObj[id].newPath == 'En gestión/insistir'){
 			this.showToast('Faltan datos','Indica una fecha de próxima gestión que sea mayor o igual a hoy.','error','pester');
-		}else if(this.oppoObj[id].newPath == 'No interesado' &&  this.oppoObj[id].resolucion == 'O' &&  (this.oppoObj[id].comentario == null | this.oppoObj[id].comentario == '')){
+		}else if(closedStatus.includes(this.oppoObj[id].newPath) &&  this.oppoObj[id].resolucion == 'O' &&  (this.oppoObj[id].comentario == null | this.oppoObj[id].comentario == '')){
 			this.showToast('Faltan datos', 'Debes de rellenar el campo de comentario.', 'error', 'pester');
+		}else if(closedStatus.includes(this.oppoObj[id].newPath) && this.oppoObj[id].resolucion == 'No Apto' && this.oppoObj[id].noofrecerhasta == null){
+			this.showToast('Faltan datos', 'Por favor, rellena los campos obligatorios', 'error', 'pester');
+
 		}
 		b.scrollIntoView({
 			behavior: 'auto',
@@ -201,7 +223,11 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 	}
 
 	evaluateAgendeds(e){
-		e.detail.sum ? this.numAgendeds++ : this.numAgendeds--;
+		if(e.detail.sum){
+			this.numAgendeds++;
+		}else if((this.numAgendeds - 1) != -1 ){
+			this.numAgendeds --;
+		}
 		this.dispatchEvent(
 			new CustomEvent(
 				'evaluateagendeds',{
@@ -220,9 +246,42 @@ export default class Av_OpportunityBlockAppointment extends LightningElement {
 		}else{
 			this.oppoObj[id] = nextOppo;
 		}
+		
 		this.dispatchEvent(
 			new CustomEvent('setoppoforcontroller',{
 				detail:this.oppoObj
+			})
+		)
+	}
+
+	handleOppoDelete(event) {   
+		const oppoIdToDelete = event.detail;
+		const deletedOppo = this.oppoNewList.find(oppo => oppo.Id === oppoIdToDelete);
+		if (deletedOppo) {
+			this.selectedIds = this.selectedIds.filter(id => id !== deletedOppo.ProductoMain);
+		}
+		this.oppoNewList = this.oppoNewList.filter(oppo => oppo.Id !== oppoIdToDelete);
+		this.handleVinculation({ detail: { sum: false, oppoId: oppoIdToDelete } });
+	
+		if (this.oppoObj[oppoIdToDelete]) {
+			delete this.oppoObj[oppoIdToDelete];
+		}
+
+		this.dispatchEvent(
+			new CustomEvent('setoppoforcontroller',{
+				detail:this.oppoObj	
+			})
+		)
+	}
+
+	valueOppoList(){
+		this.dispatchEvent(
+			new CustomEvent('sendvalueoppolist',
+			{
+				detail:{
+					opportunitiesList: this.oppoList,
+					opportunitiesVinculed: this.particularOpportunity
+				}
 			})
 		)
 	}

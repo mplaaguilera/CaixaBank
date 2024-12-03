@@ -1,0 +1,102 @@
+<template>
+  <div class="slds-box">
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__body">
+              <h1 class="slds-card__header-title">
+                  {labels.productosVinculados}
+              </h1>
+            </div>
+            <div class="slds-no-flex">
+              <lightning-button-group>
+                <lightning-button-icon icon-name="utility:refresh" size="medium" onclick={refreshCmp}></lightning-button-icon>
+                <button onclick={handleAddProduct} class="slds-button slds-button_neutral">{labels.nuevoProducto}</button>
+              </lightning-button-group>
+            </div>
+          </header>
+        </div>
+        <hr style="margin-top: 5px;">
+        <div class="slds-card__body slds-card__body_inner" style="margin-top: -20px;">
+
+          <div if:true={addProduct}  class="slds-grid slds-gutters slds-m-bottom_large">
+            <div class="slds-col">
+              <c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+              data-id="familySearch"
+              selection={initialSelection}
+              onsearch={handleSearchFamily}
+              onclick={handleSearchFamilyClick}
+              onselectionchange={handleFamily}
+              fieldlabel={labels.familia}
+              placeholder={labels.buscarFamilia}
+              >
+            </c-av_-lookup>
+            </div>
+            
+            <div class="slds-col">
+              <c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+              data-id="productSearch"
+              onsearch={handleSearchProduct}
+              onselectionchange={handleProduct}
+              fieldlabel={labels.producto}
+              placeholder={labels.buscarProducto}
+              onclick={handleSearchProductClick}
+              >
+            </c-av_-lookup>
+            </div>
+            <div class="slds-col">
+              <lightning-input data-id="comentarioProduct" type="text" label={labels.comentario} value={productComment} onchange={handleProdComment}></lightning-input>
+            </div>
+            <div class="slds-col slds-m-top_medium" style="margin-top: 21px;">
+              <lightning-button label={labels.anyadir} disabled={buttonDisabled} title="Non-primary action" onclick={handleClickProduct} class="slds-m-left_x-small"></lightning-button>
+            </div>
+          </div>
+
+            <lightning-datatable 
+              key-field="id"
+              data={productData}
+              columns={columnsProduct}
+              onrowaction={handleRowActionProduct}
+              hide-checkbox-column="true">
+          </lightning-datatable>
+          
+        </div>
+
+        <template if:true={loading}>
+          <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+      </template>
+
+      </article>
+  </div>
+
+
+      <!--Modal Delete Product -->
+      <template if:true={isModalOpenDelete}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{labels.eliminarProducto}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                   <span>
+                    {labels.eliminarProducto2}
+                   </span>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">{labels.guardar}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+      
+</template>

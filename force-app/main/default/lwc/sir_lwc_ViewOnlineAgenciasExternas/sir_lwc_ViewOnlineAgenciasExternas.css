@@ -1,0 +1,33 @@
+.ocultos {
+    display: none;
+}
+
+label {
+	font-weight: 600;
+}
+
+.colorAzul {
+	color: #0b5cab;
+	font-weight: 500;
+}
+
+.negrita {
+    font-weight: bold;
+}
+
+.sizeTexto {
+    font-size: 0.75rem;
+}
+
+.slds-timeline__item_expandable.slds-is-open .slds-timeline__item_details {
+	padding: 10px !important;
+}
+
+.slds-timeline__item_expandable {
+	padding-bottom: 0px !important;
+}
+
+.alignCentro{
+    text-align: center !important;
+    padding-bottom: 1%;
+}

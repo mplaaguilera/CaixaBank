@@ -351,6 +351,7 @@
 			if (nombreBoton === 'operativaOficina') {
 				component.set('v.spinnerActivado', true);
 				helper.reiniciarDerivar(component);
+				component.set('v.bloqueadoBotonDerivar', true);
 			}
 			let comprobarBotonOficinaEmpleado = component.get('c.getMostrarBotonOficinaEmpleadoCaixaBank');
 			comprobarBotonOficinaEmpleado.setCallback(this, response => {
@@ -385,6 +386,7 @@
 						title: 'Error permisos propietario', message: 'Esta operativa solo está disponible si es propietario del caso',
 						type: 'error', mode: 'dismissible', duration: 4000
 					});
+					component.set('v.bloqueadoBotonDerivar', false);
 					toastPropietario.fire();
 				} else {
 					//Sí es propietario
@@ -407,7 +409,6 @@
 							component.set('v.solucion', datos.CC_MCC_Solucion__c);
 							component.set('v.canalOperativo', datos.CC_Canal_Operativo__c);
 							component.set('v.noIdentificado', datos.CC_No_Identificado__c);
-
 							if (datos.AccountId) {
 								component.set('v.emailAccountCase', datos.Account.PersonEmail);
 								component.set('v.nombreAccountCase', datos.Account.Name);
@@ -462,6 +463,7 @@
 
 												if (mensaje !== '') {
 													helper.mostrarToast('error', 'Operativa no disponible', mensaje);
+													component.set('v.bloqueadoBotonDerivar', false);
 												}
 											} else {
 												//Validación de campo OK
@@ -545,6 +547,7 @@
 												} else if (['tareaGestor', 'citaGestor', 'operativaOficina'].includes(nombreBoton)) {
 													if ((!component.get('v.AccountId') || !component.get('v.ContactId') && !component.get('v.representanteId')) && !component.get('v.noIdentificado')) {
 														helper.mostrarToast('error', 'Datos del Caso', 'Para poder realizar esta operativa, el caso debe estar vinculado a una cuenta, un contacto o un representante');
+														component.set('v.bloqueadoBotonDerivar', false);
 													} else {
 														if (nombreBoton === 'tareaGestor') {
 															$A.enqueueAction(component.get('c.modalTareaGestorAbrir'));
@@ -553,8 +556,9 @@
 														} else if (nombreBoton === 'operativaOficina') {
 															if (!component.get('v.solucion')) {
 																helper.mostrarToast('error', 'Datos del Caso', 'Debes informar los campos Causa y Solución');
+																component.set('v.bloqueadoBotonDerivar', false);
 															} else {
-																$A.enqueueAction(component.get('c.handleModalOficina'));
+																$A.enqueueAction(component.get('c.handleModalOficina'));													
 															}
 														}
 													}
@@ -3595,7 +3599,8 @@
 		component.set('v.spinnerActivado', true);
 	},
 
-	handleModalOficinaCerrado: function(component, event) {
+	handleModalOficinaCerrado: function(component, event) {	
+		component.set('v.bloqueadoBotonDerivar', false);
 		component.set('v.mostrarModalOficina', false);
 	},
 
@@ -3628,7 +3633,15 @@
 		$A.enqueueAction(component.get('c.abrirModalTrasladarColaborador'));
 	},
 
-	refreshTab: function(component) {
+	refreshTab: function(component, event) {
+		try {
+			let myData = event.getParam('data') || {};
+			if(myData && myData.oportunidadSuccess != null) {
+				component.set('v.derivadaCSBD', myData.oportunidadSuccess);
+			}
+		} catch(e) {
+			console.error('Error ' + e);
+		}
 		let workspaceAPI = component.find('workspace');
 		workspaceAPI.getFocusedTabInfo().then(response => {
 			let focusedTabId = response.tabId;

@@ -1,3 +1,12 @@
+/**
+ *  Name: Ev_ButtomImportMassEvent
+ *  Copyright © 2024  CaixaBank
+ * ----------------------------------------------------------------------------------------------------------------------
+ * Historial
+ * ----------------------------------------------------------------------------------------------------------------------
+ *  VERSION         AUTHOR             USER_STORY               DATE               Description
+ *   1.0            Carolina Lopez     FIX                      22/04/2024         Logic included NavigationMixin in handleButtonClick.
+ **/
 import { LightningElement, track, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -19,6 +28,7 @@ export default class Ev_ButtomImportMassEvent extends NavigationMixin(LightningE
                 }
             })
             .catch(error => {
+                console.log('@@entro en error ' + error);
                 this.showMissingErrorToast();
             });
     }
@@ -39,15 +49,21 @@ export default class Ev_ButtomImportMassEvent extends NavigationMixin(LightningE
         });
         this.dispatchEvent(event);
     }
-    
+
     handleButtonClick(event) {
-        var evt = eval("$A.get('e.force:navigateToComponent')");
-        evt.setParams({
+        console.log('@@handleButtonClick ' + this.recordId);
+        let cmpDef ={
             componentDef: "c:Ev_lwc_ImportMassEvent",
-            componentAttributes: {
-                recordId: this.recordId
+            attributes: {
+                c__recordId: this.recordId
+            }
+        };
+        let encodedDef = btoa(JSON.stringify(cmpDef));
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: '/one/one.app#' + encodedDef
             }
         });
-        evt.fire();
     }
 }

@@ -1,6 +1,7 @@
 import { LightningElement, wire, api, track } from 'lwc';
 import getConsultasTareas from '@salesforce/apex/SAC_LCMP_ConsultasTareas.getActionConsultaOffice';
 import getURLHomeOficinas from '@salesforce/apex/SAC_LCMP_ConsultasTareas.getURLHomeOficinas';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 
 const columns = [   
@@ -93,9 +94,15 @@ export default class SAC_ConsultasTareas extends LightningElement {
             this.tituloTabla = 'Reclamaciones pendientes (URGENTES 24 h.) (' +  (listaTareas.length + listaConsultas.length) + ')';
             this.ConsultasList = [...currentDataA, ...currentDataB];
         }else{
-            console.log('ERROR' + error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         }
     }
+
+    mostrarToast(tipo, titulo, mensaje) {
+		this.dispatchEvent(new ShowToastEvent({
+			variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000
+		}));
+	}
 
     goToHomeOficinas(){
         getURLHomeOficinas({}).then(result => {            
@@ -103,7 +110,7 @@ export default class SAC_ConsultasTareas extends LightningElement {
             window.open(result); 
         })
         .catch(error => {
-        console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         });
     }
 

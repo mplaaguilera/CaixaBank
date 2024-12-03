@@ -1,0 +1,37 @@
+<template>
+	<div class="slds-form-element selectbox">
+		<div class="slds-form-element__control">
+			<div class="slds-combobox_container slds-size_small">
+				<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" onmouseleave={handleleave}>
+					<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+						<input style="font-size: 10px;" type="text" class="slds-input slds-combobox__input slds-has-focus" placeholder="Buscar" readonly value={selectedmessage} onclick={handleShowdropdown}/>
+						<span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+							<lightning-icon icon-name="utility:down" size="x-small"></lightning-icon>
+						</span>
+					</div>
+					<div if:true={showdropdown} class="slds-dropdown slds-dropdown_fluid pading-all-show" style="margin-top: 0rem;">	
+						<lightning-input style="font-size: 10px;" type="search" onchange={searchOptions} placeholder="Buscar valor..." value={labelOptions}> </lightning-input>
+						<ul class="slds-listbox slds-listbox_vertical">
+							<c-av_-value-multi-picklist label='Todos' selected={valueAll} onclick={handleAll}></c-av_-value-multi-picklist>
+						</ul>
+						<hr class="hr-division"/>
+						<div if:false={search} class="slds-dropdown_length-5">
+							<ul class="slds-listbox slds-listbox_vertical">
+								<template for:each={values} for:item="eachvalue">
+									<c-av_-value-multi-picklist key={eachvalue.label} label={eachvalue.label} value={eachvalue.value} selected={eachvalue.selected}></c-av_-value-multi-picklist>
+								</template>
+							</ul>
+						</div>
+						<div if:true={search} class="slds-dropdown_length-5">
+							<ul class="slds-listbox slds-listbox_vertical">
+								<template for:each={listValueSearch} for:item="eachvalue">
+									<c-av_-value-multi-picklist key={eachvalue.label} label={eachvalue.label} value={eachvalue.value} selected={eachvalue.selected}></c-av_-value-multi-picklist>
+								</template>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

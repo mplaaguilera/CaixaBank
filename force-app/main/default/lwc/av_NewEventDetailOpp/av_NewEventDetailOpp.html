@@ -7,7 +7,7 @@
             </lightning-layout-item>
             <lightning-layout-item>
                 <label class="opp-name opp-title">{opp.Name}</label>
-                <small if:true={opp.AV_PF__c}>{opp.AV_PF__r.Name} | </small><small class="opp-stage">{opp.StageName}</small>
+                <small if:true={opp.AV_PF__c}>{opp.AV_PF__r.Name} | </small><small class="opp-stage">{stageLabel}</small>
             </lightning-layout-item>
             <lightning-layout-item alignment-bump="left" class="center-buttons">
                 <div class="button-group" onclick={handleLink}>

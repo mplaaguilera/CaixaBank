@@ -5,6 +5,8 @@ import getPretensiones from '@salesforce/apex/SAC_LCMP_PretensionesRelacionContr
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import STATUS_FIELD from '@salesforce/schema/Case.Status';
 import validarPretension from '@salesforce/apex/SAC_LCMP_PretensionesRelacionController.validarPretension';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
 
 
 const fields = [STATUS_FIELD];
@@ -55,8 +57,6 @@ export default class SAC_LCMP_PretensionesRelacionadas extends NavigationMixin(L
             return sortedData.map(prete => {
                 const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
                 const formattedDate = new Intl.DateTimeFormat('es-ES', options).format(new Date(prete.CreatedDate));
-                console.log('case IDDD' + prete.Id);
-                console.log('check' + prete.SAC_ValidacionMCC__c);
                 return {
                     idCaso: prete.Id,
                     numeroCaso: prete.CaseNumber,

@@ -3,23 +3,17 @@
         $A.get("e.force:closeQuickAction").fire();
         var workspaceAPI = cmp.find("workspaceCmp");
         let action = cmp.get('c.getAccountInfo');
-
         action.setParams({recordId : cmp.get('v.recordId')});
-
         action.setCallback(this,function(response){
             if(response.getState() === 'SUCCESS'){
-
                 let data = response.getReturnValue();
                 let pageReferenceCustom = {
                     type: 'standard__navItemPage',
                     attributes: {
                         apiName: 'AV_PlanificarCita'
                     },state: {
-                        c__recId:cmp.get('v.recordId'),
-                        c__id:data[0],
-                        c__rt:data[1],
-                        c__intouch:data[2],
-                        c__account:data[4]
+                        c__matricula : data.contactPlate,
+                        c__clientNumper: data.clientNumper
                     }
                 };
                 workspaceAPI.getFocusedTabInfo().then(enclosingTab =>{
@@ -29,7 +23,9 @@
                         id:null
                     })
                 })
+                
             }
+            
         })
             $A.enqueueAction(action);
         

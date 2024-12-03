@@ -32,6 +32,9 @@
                     <div lwc:elseif={preguntaCajerosExternos} style="text-align: center;">
                         <p>{preguntaCajerosExternos}</p>
                     </div>
+                    <div lwc:elseif={textoOportunidadExistente} style="text-align: center;">
+                        <p>{textoOportunidadExistente}</p>
+                    </div>
                     <div lwc:elseif={preguntaCSBDContratar} style="text-align: center;">
                         <p>{preguntaCSBDContratar}</p>
                         <br>
@@ -104,8 +107,7 @@
                                     </div>
                                 </div>
                                 <br><p>Se han subido {archivosLength} archivos</p>
-                                <div class="slds-var-m-top_xx-large slds-var-m-bottom_large"
-                                style="font-size: 14px; font-weight: 700;">Asignada </div>
+                                <div class="slds-var-m-top_xx-large slds-var-m-bottom_large" style="font-size: 14px; font-weight: 700;">Asignada </div>
                                 <template lwc:if={cambioOficina}>
                                     <template lwc:if={toastNoCliente}>
                                         La oficina destino.
@@ -117,21 +119,43 @@
                                 <template if:false={cambioGestor}>
                                     <template if:false={cambioOficina}>
                                         <template if:false={mostrarBuscadorGestor}>
-                                            <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon>{nombreGestor}
+                                            <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon>
+                                            <template lwc:if={hubImagin}>
+                                                Hub Imagin.
+                                            </template>
+                                            <template lwc:elseif={oficinaFisica}>
+                                                Oficina principal del cliente.
+                                            </template>
+                                            <template lwc:elseif={citaRapida}>
+                                                Oficina del gestor.
+                                            </template>
+                                            <template lwc:else>
+                                                {nombreGestor}
+                                            </template>
                                             <div style="margin-top: 15px;">
                                                 <template if:false={gestorAsignadoCoincide}>
+                                                    <template if:false={hubImagin}>
+                                                        <template if:false={oficinaFisica}>
                                                     <template lwc:if={gestorGenerico}>
                                                         <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
                                                             <div class="slds-col slds-grow-none">
                                                                 <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
                                                             </div>
                                                             <div class="slds-col">
-                                                                El gestor disponible para su atención no coincide con el asignado al cliente: {nombreGestorAsignado}.
+                                                                    El gestor disponible para su atención no coincide con el asignado al cliente: {nombreGestorAsignado}.
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </template>
                                                     </template>
                                                 </template>
-                                                <template lwc:if={gestorGenerico}> Se asignará a un gestor genérico.</template>
+                                                </template>
+                                                <template lwc:if={gestorGenerico}>
+                                                    <template if:false={hubImagin}>
+                                                        <template if:false={oficinaFisica}>
+                                                            Se asignará a un gestor genérico.
+                                                        </template>
+                                                    </template>
+                                                </template>
                                             </div>
                                         </template>
                                     </template>
@@ -211,7 +235,7 @@
                                     </div>
                                 </template>
                                 <template lwc:if={cambioGestor}>
-                                    <lightning-combobox name="comboboxGestor" label="Gestores disponibles" value="" placeholder="Selecciona un gestor" options={gestores} required></lightning-combobox>
+                                    <lightning-combobox name="comboboxGestor" label="Gestores disponibles" value="" onchange={nombreGestorSeleccionado} placeholder="Selecciona un gestor" options={gestores} required></lightning-combobox>
                                 </template>
                                 <template lwc:if={mostrarBuscadorGestor}>
                                     <!-- Lookup Gestor -->
@@ -292,7 +316,6 @@
                     </template>
                     <!-- INICIO CITA GESTOR-->
                     <template lwc:elseif={mostrarModalCita}>
-                        <!--<c-cc_-modal_-cita_-gestor record-id={recordId}></c-cc_-modal_-cita_-gestor>-->
                         <div lwc:if={cargandoGestor} style="height: 55px;" align="center">
                             <lightning-spinner size="small" variant="brand" style="position: absolute;"
                             alternativetext="Cargando..."></lightning-spinner>
@@ -310,28 +333,32 @@
                             </template>
                             <template lwc:else>
                                 <template lwc:if={tieneGestor}>
-                                    <div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
-                                    <div class="slds-var-m-top_medium">
-                                        <template lwc:if={esClienteDigital}>
-                                            <lightning-select class="tipoCitaDigital" name="tipoCita" label="Tipo de cita" required="true" options={opcionesCitaDigital}></lightning-select>
-                                        </template>
-                                        <template lwc:else>
-                                            <template lwc:if={ocultarOpcionCitaGestor}>
-                                                <lightning-select class="tipoCitaOcultada" name="tipoCita" label="Tipo de cita" required="true" onchange={resetDisponibilidadConsultada} options={opcionesCitaDigital}></lightning-select>
+                                        <div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
+                                        <div class="slds-var-m-top_medium">
+                                            <template lwc:if={citaRapida}>
+                                                <lightning-combobox class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" placeholder="Seleccione un tipo de cita" onchange={valorTipoCita} options={opcionesCita}></lightning-combobox>
+                                            </template>
+                                            <template lwc:elseif={imagin}>
+                                                <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={valorTipoCita} options={opcionesCitaDigital}></lightning-select>
+                                            </template>
+                                            <template lwc:elseif={esClienteDigital}>
+                                                <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={valorTipoCita} options={opcionesCitaDigital}></lightning-select>
+                                            </template>
+                                            <template lwc:elseif={ocultarOpcionCitaGestor}>
+                                                <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={resetDisponibilidadConsultada} options={opcionesCitaDigital}></lightning-select>
                                             </template>
                                             <template lwc:else>
-                                                <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={resetDisponibilidadConsultada} options={opcionesCita}></lightning-select>
+                                                <lightning-combobox class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" placeholder="Seleccione un tipo de cita" onchange={resetDisponibilidadConsultada} options={opcionesCita}></lightning-combobox>
                                             </template>
-                                        </template>
-                                        <lightning-input name="asuntoEvento" required="true" label="Asunto" maxlength="200"
-                                        class="asuntoEvento slds-var-m-top_medium"></lightning-input>
-                                        <template if:false={gestorBackupActivo}>
-                                            <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">
-                                                Asignado a</div>
+                                            <lightning-input name="asuntoEvento" required="true" label="Asunto" maxlength="200"
+                                            class="asuntoEvento slds-var-m-top_medium"></lightning-input>
+                                            <template if:false={gestorBackupActivo}>
+                                                <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">
+                                                    Asignado a
+                                                </div>
                                                 <div style="margin-top:10px;">
                                                     <span style="padding-right:10px;" class="slds-icon">
-                                                        <lightning-icon class="slds-var-m-right_small" icon-name="standard:user"
-                                                        size="x-small"></lightning-icon>
+                                                        <lightning-icon class="slds-var-m-right_small" icon-name="standard:user" size="x-small"></lightning-icon>
                                                     </span>
                                                     {nombreGestor}
                                                 </div>
@@ -340,236 +367,218 @@
                                                         <span style="margin-right: 5px" class="slds-icon_container">
                                                             <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
                                                         </span>
-                                                        El gestor disponible no coincide con el asignado al
-                                                        cliente: {nombreGestorAsignado}.
+                                                        El gestor disponible no coincide con el asignado al cliente: {nombreGestorAsignado}.
                                                     </template>
                                                 </div>
                                                 <div>
-                                                    <div class="slds-var-m-top_xx-large"
-                                                    style="font-size:14px;font-weight:700; margin-bottom:10px;">
-                                                    Fecha y hora</div>
-                                                    <template if:false={disponibilidadConsultada}>
-                                                        <lightning-button label="Consultar disponibilidad"
-                                                        icon-name="utility:search" title="Consultar disponibilidad"
-                                                        onclick={consultarFechasDisponibilidadGestor}></lightning-button>
+                                                    <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                                                        Fecha y hora
+                                                    </div>
+                                                    <template lwc:if={citaRapida}>
+                                                        <c-cc_-disponibilidad_-cita num-oficina={numOficina} onactivarspinner={activarSpinner} ondesactivarspinner={desactivarSpinner} onactivarmodalcita={activarModalCita} ondesactivarmodalcita={desactivarModalCita} ondesactivarbotoncita={desactivarBotonCita} onactivarbotoncita={activarBotonCita} onfechaseleccionada={valorFechaCitaRapida} onfranjaseleccionada={valorFranjaCitaRapida}></c-cc_-disponibilidad_-cita>
                                                     </template>
-                                                    <template if:true={disponibilidadConsultada}>
-                                                        <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
-                                                            <div class="citaGestorFechaBackUpFalse slds-col slds-size_1-of-2">
-                                                                <lightning-combobox label="Fecha" class="fechasDisponibilidad"
-                                                                placeholder="--Seleccione una fecha--"
-                                                                options={fechasDisponibilidad}
-                                                                onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
+                                                    <template lwc:else>
+                                                        <template if:false={disponibilidadConsultada}>
+                                                            <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadGestor}></lightning-button>
+                                                        </template>
+                                                        <template if:true={disponibilidadConsultada}>
+                                                            <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                                <div class="citaGestorFechaBackUpFalse slds-col slds-size_1-of-2">
+                                                                    <lightning-combobox label="Fecha" class="fechasDisponibilidad" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
+                                                                </div>
+                                                                <div class="horasDisponibilidad1 slds-col slds-size_1-of-2">
+                                                                    <lightning-combobox label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad} onchange={guardarHorasDisponibilidad}></lightning-combobox>
+                                                                </div>
                                                             </div>
-                                                            <div class="horasDisponibilidad1 slds-col slds-size_1-of-2">
-                                                                <lightning-combobox label="Hora"
-                                                                placeholder="--Seleccione una hora--"
-                                                                options={horasDisponibilidad}
-                                                                onchange={guardarHorasDisponibilidad}></lightning-combobox>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                            <template if:false={citaRapida}>
+                                                <div>
+                                                    <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                                                        Otros gestores
+                                                    </div>
+                                                    <lightning-input name="checkbox" type="toggle" checked={gestorBackupActivo} onchange={mostrarGestorBackup} messagetoggleactive="Gestor backup" messagetoggleinactive="Gestor asignado" disabled="true"></lightning-input>
+                                                </div>                                                
+                                                <template if:true={gestorBackupActivoDos}>
+                                                    <template if:true={existeBackup}>
+                                                        <div class="slds-col slds-size_1-of-1" style="margin-top:15px; margin-bottom:10px;">
+                                                            <lightning-combobox label="Gestor backup" placeholder="--Seleccione un gestor--" options={gestoresBackup} onchange={resetDisponibilidadConsultada}></lightning-combobox>
+                                                            <div>
+                                                                <div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
+                                                                    Fecha y hora
+                                                                </div>
+                                                                <template if:false={disponibilidadConsultada}>
+                                                                    <lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadBackup}></lightning-button>
+                                                                </template>
+                                                                <template if:true={disponibilidadConsultada}>
+                                                                    <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                                        <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                                                            <lightning-combobox class="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
+                                                                        </div>
+                                                                        <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                                                            <lightning-combobox label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad}></lightning-combobox>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
                                                             </div>
                                                         </div>
                                                     </template>
-                                                </div>
+                                                </template>
+                                                <template if:false={existeBackup}>
+                                                    <div style="margin-top:15px;">
+                                                        <span style="margin-right: 5px; margin-left: 5px;" class="slds-icon_container">
+                                                            <lightning-icon icon-name="utility:info_alt" size="small"></lightning-icon>
+                                                        </span>
+                                                        No existen backups asignados al gestor de este cliente.
+                                                    </div>
+                                                </template>
                                             </template>
                                             <div>
-                                                <div class="slds-var-m-top_xx-large"
-                                                style="font-size:14px;font-weight:700; margin-bottom:10px;">
-                                                Otros gestores
+                                                <div class="slds-var-m-top_xx-large" style="margin-top:15px;font-size:14px;font-weight:700; margin-bottom:10px;">
+                                                    La cita no cumple las expectativas del cliente. Quiero crear una tarea.
+                                                </div>
+                                                <div >
+                                                    <lightning-input class ="checkBoxCitaGestor" type="toggle" onchange={checkCrearTareaOnchange}></lightning-input>
+                                                </div>
                                             </div>
-                                            <lightning-input name="checkbox" type="toggle"
-                                            checked={gestorBackupActivo} onchange={mostrarGestorBackup}
-                                            messagetoggleactive="Gestor backup" messagetoggleinactive="Gestor asignado"
-                                            disabled="true"></lightning-input>
                                         </div>
-                                        <template if:true={gestorBackupActivoDos}>
-                                            <template if:true={existeBackup}>
-                                                <div class="slds-col slds-size_1-of-1"
-                                                style="margin-top:15px; margin-bottom:10px;">
-                                                <lightning-combobox label="Gestor backup"
-                                                placeholder="--Seleccione un gestor--" options={gestoresBackup}
-                                                onchange={resetDisponibilidadConsultada}></lightning-combobox>
-                                                <div>
-                                                    <div
-                                                    style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
-                                                    Fecha y hora
-                                                </div>
-                                                <template if:false={disponibilidadConsultada}>
-                                                    <lightning-button label="Consultar disponibilidad"
-                                                    icon-name="utility:search" title="Consultar disponibilidad"
-                                                    onclick={consultarFechasDisponibilidadBackup}></lightning-button>
-                                                </template>
-                                                <template if:true={disponibilidadConsultada}>
-                                                    <div
-                                                    class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
-                                                    <div class="horasDisponibilidad slds-col slds-size_1-of-2">
-                                                        <lightning-combobox class="fechasDisponibilidad"
-                                                        label="Fecha" placeholder="--Seleccione una fecha--"
-                                                        options={fechasDisponibilidad}
-                                                        onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
-                                                    </div>
-                                                    <div class="horasDisponibilidad slds-col slds-size_1-of-2">
-                                                        <lightning-combobox
-                                                        label="Hora" placeholder="--Seleccione una hora--"
-                                                        options={horasDisponibilidad}></lightning-combobox>
-                                                    </div>
-                                                </div>
-                                            </template>
-                                        </div>
+                                </template>
+                                <template lwc:else>
+                                    <div style="margin: 10px">
+                                        <span style="margin-right: 10px" class="slds-icon_container">
+                                            <lightning-icon icon-name="utility:warning" variant="warning"
+                                            size="x-small"></lightning-icon>
+                                        </span>
+                                        <b>No es posible agendar un evento</b>
+                                        <p style="margin-top: 10px">El cliente relacionado con este caso no tiene un gestor asignado. </p>
                                     </div>
                                 </template>
-                                <template if:false={existeBackup}>
-                                    <div style="margin-top:15px;">
-                                        <span style="margin-right: 5px; margin-left: 5px;"
-                                        class="slds-icon_container">
-                                        <lightning-icon icon-name="utility:info_alt"
-                                        size="small"></lightning-icon>
-                                    </span>
-                                    No existen backups asignados al gestor de este cliente.
-                                </div>
                             </template>
                         </template>
-                        <div>
-                            <div class="slds-var-m-top_xx-large" style="margin-top:15px;font-size:14px;font-weight:700; margin-bottom:10px;">
-                                La cita no cumple las expectativas del cliente. Quiero crear una tarea.
-                            </div>
-                            <div >
-                                <lightning-input class ="checkBoxCitaGestor" type="toggle" onchange={checkCrearTareaOnchange}></lightning-input>
-                            </div>
-                        </div>
+                    </template>
+                    <!-- FIN CITA GESTOR-->
+                    <div lwc:elseif={mostrarModalGestionGestorAsignado} style="text-align: center;">
+                        <p>¿La gestión a realizar es con el gestor del cliente?</p>
                     </div>
-                </template>
-                <template lwc:else>
-                    <div style="margin: 10px">
-                        <span style="margin-right: 10px" class="slds-icon_container">
-                            <lightning-icon icon-name="utility:warning" variant="warning"
-                            size="x-small"></lightning-icon>
-                        </span>
-                        <b>No es posible agendar un evento</b>
-                        <p style="margin-top: 10px">El cliente relacionado con este caso no tiene un
-                            gestor asignado. </p>
+                    <div lwc:elseif={mostrarModalGestionGestorGenerico} style="text-align: center;">
+                        <p>¿La gestión a realizar es con la oficina del cliente?</p>
+                    </div>
+                    <template lwc:elseif={mostrarModalDNITestamentaria}>
+                        <div style="text-align: center;">
+                            <lightning-input class="DNITestamentaria slds-align_absolute-center" label="Introduzca el documento de identidad del difunto" placeholder="Documento" value={DNITestamentaria} required="true"></lightning-input>
                         </div>
                     </template>
-                </template>
-            </template>
-        </template>
-        <!-- FIN CITA GESTOR-->
-        <div lwc:elseif={mostrarModalGestionGestorAsignado} style="text-align: center;">
-            <p>¿La gestión a realizar es con el gestor del cliente?</p>
-        </div>
-        <div lwc:elseif={mostrarModalGestionGestorGenerico} style="text-align: center;">
-            <p>¿La gestión a realizar es con la oficina gestora del cliente?</p>
-        </div>
-        <template lwc:elseif={mostrarModalDNITestamentaria}>
-            <div style="text-align: center;">
-                <lightning-input class="DNITestamentaria slds-align_absolute-center" label="Introduzca el documento de identidad del difunto" placeholder="Documento" value={DNITestamentaria} required="true"></lightning-input>
-            </div>
-        </template>
-        <template lwc:elseif={mostrarFlowDerivar}>
-            <lightning-flow flow-api-name='CC_Procesos_Cajeros' flow-input-variables={inputVariables} onstatuschange={handleStatusChange}> </lightning-flow>
-        </template>
-    </template>
-</div>
-<div class="slds-modal__footer">
-    <div lwc:if={alertaTexto} style="text-align: center;">
-        <lightning-button label="Continuar" variant="brand" onclick={handleContinuarProceso}></lightning-button>
-        <lightning-button class="botonCancelar slds-var-m-left_small" label="Cancelar" onclick={cerrarModal}></lightning-button>
-    </div>
-    <div lwc:elseif={ambitoFraude} style="text-align: center;">
-        <template if:false={mostrarModalPreguntaRealizarRemitido}>
-            <template lwc:if={preguntaSenal}>
-                <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
-            </template>
-        </template>
-        <template if:true={mostrarModalPreguntaRealizarRemitido}>
-            <template lwc:if={preguntaRealizarRemitido}>
-                <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
-            </template>
-        </template>
-    </div>    
-    <div lwc:elseif={grupoColaborador} style="text-align: center;">
-        <lightning-button label="Derivar" variant="brand" onclick={handleGrupoColaboradorDerivar}></lightning-button>
-        <lightning-button label="Trasladar" onclick={handleGrupoColaboradorTrasladar} class="botonCancelar slds-var-m-left_small"></lightning-button>
-    </div>
-    <div lwc:else style="text-align: center;">
-        <template lwc:if={mostrarModalDNITestamentaria}>
-            <div style="text-align: center; margin-top:15px; margin-bottom:10px;">
-                <lightning-button label="Aceptar" variant="brand" onclick={comprobarDNI} class="slds-m-horizontal_small"></lightning-button>
-                <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-m-horizontal_small"></lightning-button>
-            </div>
-        </template>
-        <template lwc:elseif={mostrarModalCreacionTarea}>
-            <lightning-button label="Crear tarea" variant="brand"
-            onclick={handleCrearTareaGestor}></lightning-button>
-            <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" style="position: absolute;"></lightning-spinner>
-            <lightning-button class="slds-var-m-left_small" label="Cancelar"
-            onclick={cerrarModal}></lightning-button>
-        </template>
-        <template lwc:elseif={preguntaCajeros}>
-            <lightning-button label="Si" variant="brand" onclick={preguntaCajerosSi}></lightning-button>
-            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCajerosNo}></lightning-button>
-        </template>
-        <template lwc:elseif={preguntaCajerosExternos}>
-            <lightning-button label="Si" variant="brand" onclick={preguntaCajerosExternosSi}></lightning-button>
-            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCajerosExternosNo}></lightning-button>
-        </template>
-        <template lwc:elseif={preguntaCSBDContratar}>
-            <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratarSi}></lightning-button>
-            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratarNo}></lightning-button>
-        </template>
-        <template lwc:elseif={preguntaCSBDContratar2}>
-            <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratar2Si}></lightning-button>
-            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratar2No}></lightning-button>
-        </template>
-        <!--<template if:false={mostrarModalPreguntaEnrollmentDatos}>
-            <template lwc:if={preguntaEnrollment}>
-                <lightning-button label="Si" variant="brand" onclick={handleMostrarEnrollmentDatos}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaEnrollmentNo}></lightning-button>
-            </template>
-        </template>-->
-        <!--<template if:true={mostrarModalPreguntaEnrollmentDatos}>
-            <template lwc:if={preguntaEnrollmentDatos}>
-                <lightning-button label="Si" variant="brand" onclick={preguntaEnrollmentDatosSi}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaEnrollmentDatosNo}></lightning-button>
-            </template>
-        </template>-->
-        <!--<template if:false={mostrarModalPreguntaRealizarRemitido}>
-            <template lwc:if={preguntaSenal}>
-                <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
-            </template>
-        </template>-->
-        <template lwc:elseif={mostrarModalPreguntaRealizarRemitido}>
-            <template lwc:if={preguntaRealizarRemitido}>
-                <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
-                <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
-            </template>
-        </template>
-        <template lwc:elseif={mostrarModalGestionGestorAsignado}>
-            <lightning-button label="Si" variant="brand" onclick={handleAbrirModalCita}></lightning-button>
-            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleGestionGestorAsignadoNo}></lightning-button>
-        </template>
-        <template lwc:elseif={mostrarModalGestionGestorGenerico}>
-            <lightning-button label="Si" variant="brand" onclick={handleGestionGestorDistintoSi}></lightning-button>
-            <lightning-button label="No" onclick={handleGestionGestorDistintoNo} class="botonCancelar slds-var-m-left_small"></lightning-button>
-        </template>
-        <template lwc:elseif={mostrarModalCita}>
-            <template if:false={numeroGestorKO}>
-                <template lwc:if={tieneGestor}>
-                    <template lwc:if={mostrarTareaModalCitaGestor}>
-                        <lightning-button label="Crear tarea" variant="brand" onclick={ocultarModalCitaGestor}></lightning-button>
+                    <template lwc:elseif={mostrarFlowDerivar}>
+                        <lightning-flow flow-api-name='CC_Procesos_Cajeros' flow-input-variables={inputVariables} onstatuschange={handleStatusChange}> </lightning-flow>
                     </template>
-                    <template if:false={mostrarTareaModalCitaGestor}>
-                        <lightning-button label="Agendar cita gestor" variant="brand" disabled={ocultarBotonCita} onclick={confirmarCitaGestor}></lightning-button>
-                    </template>
-                    <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-var-m-left_small"></lightning-button>
                 </template>
-            </template>
-        </template>
-    </div>
-</div>
-</div>
-</section>
-<div class="backdrop slds-backdrop"></div>
+            </div>
+            <div class="slds-modal__footer">
+                <div lwc:if={alertaTexto} style="text-align: center;">
+                    <lightning-button label="Continuar" variant="brand" onclick={handleContinuarProceso}></lightning-button>
+                    <lightning-button class="botonCancelar slds-var-m-left_small" label="Cancelar" onclick={cerrarModal}></lightning-button>
+                </div>
+                <div lwc:elseif={ambitoFraude} style="text-align: center;">
+                    <template if:false={mostrarModalPreguntaRealizarRemitido}>
+                        <template lwc:if={preguntaSenal}>
+                            <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
+                        </template>
+                    </template>
+                    <template if:true={mostrarModalPreguntaRealizarRemitido}>
+                        <template lwc:if={preguntaRealizarRemitido}>
+                            <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
+                        </template>
+                    </template>
+                </div>    
+                <div lwc:elseif={grupoColaborador} style="text-align: center;">
+                    <lightning-button label="Derivar" variant="brand" onclick={handleGrupoColaboradorDerivar}></lightning-button>
+                    <lightning-button label="Trasladar" onclick={handleGrupoColaboradorTrasladar} class="botonCancelar slds-var-m-left_small"></lightning-button>
+                </div>
+                <div lwc:else style="text-align: center;">
+                    <template lwc:if={mostrarModalDNITestamentaria}>
+                        <div style="text-align: center; margin-top:15px; margin-bottom:10px;">
+                            <lightning-button label="Aceptar" variant="brand" onclick={comprobarDNI} class="slds-m-horizontal_small"></lightning-button>
+                            <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-m-horizontal_small"></lightning-button>
+                        </div>
+                    </template>
+                    <template lwc:elseif={mostrarModalCreacionTarea}>
+                        <lightning-button label="Crear tarea" variant="brand"
+                        onclick={handleCrearTareaGestor}></lightning-button>
+                        <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" style="position: absolute;"></lightning-spinner>
+                        <lightning-button class="slds-var-m-left_small" label="Cancelar"
+                        onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaCajeros}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaCajerosSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCajerosNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaCajerosExternos}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaCajerosExternosSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCajerosExternosNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={textoOportunidadExistente}>
+                        <lightning-button label="Aceptar" variant="brand" onclick={cerrarModal}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaCSBDContratar}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratarSi}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratarNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={preguntaCSBDContratar2}>
+                        <lightning-button label="Si" variant="brand" onclick={preguntaCSBDContratar2Si}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaCSBDContratar2No}></lightning-button>
+                    </template>
+                    <!--<template if:false={mostrarModalPreguntaEnrollmentDatos}>
+                        <template lwc:if={preguntaEnrollment}>
+                            <lightning-button label="Si" variant="brand" onclick={handleMostrarEnrollmentDatos}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaEnrollmentNo}></lightning-button>
+                        </template>
+                    </template>-->
+                    <!--<template if:true={mostrarModalPreguntaEnrollmentDatos}>
+                        <template lwc:if={preguntaEnrollmentDatos}>
+                            <lightning-button label="Si" variant="brand" onclick={preguntaEnrollmentDatosSi}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={preguntaEnrollmentDatosNo}></lightning-button>
+                        </template>
+                    </template>-->
+                    <!--<template if:false={mostrarModalPreguntaRealizarRemitido}>
+                        <template lwc:if={preguntaSenal}>
+                            <lightning-button label="Si" variant="brand" onclick={handlePreguntaSenalSi}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarPreguntaRealizarRemitido}></lightning-button>
+                        </template>
+                    </template>-->
+                    <template lwc:elseif={mostrarModalPreguntaRealizarRemitido}>
+                        <template lwc:if={preguntaRealizarRemitido}>
+                            <lightning-button label="Si" variant="brand" onclick={handleRemitir}></lightning-button>
+                            <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleMostrarMensajeRemitir}></lightning-button>
+                        </template>
+                    </template>
+                    <template lwc:elseif={mostrarModalGestionGestorAsignado}>
+                        <lightning-button label="Si" variant="brand" onclick={handleAbrirModalCita}></lightning-button>
+                        <lightning-button label="No" class="botonCancelar slds-var-m-left_small" onclick={handleGestionGestorAsignadoNo}></lightning-button>
+                    </template>
+                    <template lwc:elseif={mostrarModalGestionGestorGenerico}>
+                        <lightning-button label="Si" variant="brand" onclick={handleGestionGestorDistintoSi}></lightning-button>
+                        <lightning-button label="No" onclick={handleGestionGestorDistintoNo} class="botonCancelar slds-var-m-left_small"></lightning-button>
+                    </template>
+                    <template lwc:elseif={mostrarModalCita}>
+                        <template if:false={numeroGestorKO}>
+                            <template lwc:if={tieneGestor}>
+                                <template lwc:if={mostrarTareaModalCitaGestor}>
+                                    <lightning-button label="Crear tarea" variant="brand" onclick={ocultarModalCitaGestor}></lightning-button>
+                                </template>
+                                <template if:false={mostrarTareaModalCitaGestor}>
+                                    <lightning-button label="Agendar cita gestor" variant="brand" disabled={ocultarBotonCita} onclick={confirmarCitaGestor}></lightning-button>
+                                </template>
+                                <lightning-button label="Cancelar" onclick={cerrarModal} class="slds-var-m-left_small"></lightning-button>
+                            </template>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="backdrop slds-backdrop"></div>
 </template>

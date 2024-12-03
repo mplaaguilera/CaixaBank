@@ -1,0 +1,14 @@
+<template>
+    <lightning-card>
+        <div class="accordionContainer">
+            <lightning-accordion allow-multiple-sections-open
+                                onsectiontoggle={handleSectionToggle}
+                                active-section-name={activeSections}>
+                <lightning-accordion-section name="A" label="Comentario" class="accordionStyle">
+                    <p>Descripción: </p>
+                    <p>{comentarioCita}</p>
+                </lightning-accordion-section>
+            </lightning-accordion>
+        </div>
+    </lightning-card>
+</template>

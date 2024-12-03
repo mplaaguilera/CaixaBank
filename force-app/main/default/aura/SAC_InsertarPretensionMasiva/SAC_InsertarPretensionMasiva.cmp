@@ -39,7 +39,7 @@
                     <div class="slds-modal__content modal_pretensiones_content slds-p-around_medium" id="modal-content-id-1">
                         <div class="buscador">
                             <!-- <c:SAC_MCC_Buscador recordId="{!v.recordId}" listMCC="{!v.listMCC}"/> -->
-                            <c:sac_BuscadorMCC aura:id="lwcBusquedaMCC" onsenddata="{!c.receiveLWCData}" nuevaPretension="false"/>
+                            <c:sac_BuscadorMCC aura:id="lwcBusquedaMCC" onsenddata="{!c.receiveLWCData}" nuevaPretension="true"/>
                         </div>
                         <div class="tabla">
                             <table id="tablaId" class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">

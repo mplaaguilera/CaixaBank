@@ -20,7 +20,6 @@ export default class sac_ContratoDetail extends LightningElement {
     contratos = [];
 
     toggleShowDetail() {
-        console.log(this.showDetail);
         if(this.showDetail === true){
             this.showDetail = false;
         }else{
@@ -29,7 +28,6 @@ export default class sac_ContratoDetail extends LightningElement {
                 numPerso: this.customerId,
                 codProducto: this.con.codProduct
             }).then(data => {
-                console.log(data);
                 this.description = data.description;
                 this.state = data.state;
                 this.revDate = data.revDate;
@@ -45,7 +43,6 @@ export default class sac_ContratoDetail extends LightningElement {
                 
                 this.isShowModal = true;
             }).catch(error => {
-                console.error(error);
                 this.mostrarToast('error', 'Problema recuperando los contratos', JSON.stringify(error));
             });
         }
@@ -67,7 +64,6 @@ export default class sac_ContratoDetail extends LightningElement {
         }).then(data => {
             this.mostrarToast('success', 'Producto creado.', 'El contrato ha sido relacionado correctamente con la pretensión.');
         }).catch(error => {
-            console.error(error);
             this.mostrarToast('error', 'Problema relacionando el contrato con la pretensión.', JSON.stringify(error));
         });
     }

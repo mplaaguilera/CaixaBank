@@ -1,24 +1,22 @@
 import {LightningElement,api,wire,track} from 'lwc';
 import {CurrentPageReference} from 'lightning/navigation';
-import getQueryRecordTypeProceso from '@salesforce/apex/SIRE_LCMP_HomeGestorFlujo.getQueryRecordTypeProceso';
+import getAgrupacionesEstrategias from '@salesforce/apex/SIRE_LCMP_HomeGestorFlujo.getAgrupacionesEstrategias';
 import getQueryProcesos from '@salesforce/apex/SIRE_LCMP_HomeGestorFlujo.getQueryProcesos';
 import getQueryReports from '@salesforce/apex/SIRE_LCMP_HomeGestorFlujo.getQueryReports';
-import {getPicklistValues} from 'lightning/uiObjectInfoApi';
-import ESTRATEGIA_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c';
 import {refreshApex} from '@salesforce/apex';
 
 const columnsProceso = [
     {label: 'Cliente',  fieldName: 'idCliente',  type: 'url',  typeAttributes: {label: { fieldName: 'cliente' }}, sortable: true }, 
     {label: 'Grupo', fieldName: 'grupo', type: 'text', sortable: true},
-    {label: 'Estrategia', fieldName: 'estrategia', type: 'text', sortable: true},
-    {label: 'Fecha Inicio Estrategia', fieldName: 'fechaEstrategia', type: 'date', sortable: true},
     {label: 'Proceso',  fieldName: 'idProceso',  type: 'url',  typeAttributes: {label: { fieldName: 'procesoNombre' }}, sortable: true }, 
-    {label: 'Fecha Inicio', fieldName: 'fechaInicio', type: 'date', sortable: true},   
     {label: 'Deuda Total', fieldName: 'deudaTotal', type: 'currency', sortable: true},     
     {label: 'Máx. nº días impago', fieldName: 'diasImpago', type: 'number', sortable: true},   
     {label: 'Situación SF', fieldName: 'situacion', type: 'text', sortable: true},
     {label: 'Fecha Situación', fieldName: 'fechaSituacion', type: 'date', sortable: true},
     {label: 'Alerta SIREC', fieldName: 'alerta', type: 'text', sortable: true},
+    {label: 'Días superando umbral (Máx. Núm)', fieldName: 'diasSuperaUmbral', type: 'number', sortable: true},
+    {label: 'Salida PP estimada', fieldName: 'fechaSalidaPP', type: 'date', sortable: true},
+    {label: 'Impacto dudoso', fieldName: 'impactoDudoso', type: 'currency', sortable: true},
     {label: 'Gestor', fieldName: 'gestor', type: 'text', sortable: true} 
 ];
 
@@ -36,7 +34,6 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
     @track resultQueryReport;
     @track now = Date.now();
     @track wiredResultProcesos= [];
-    @track idRecordType = '';
 
     // Cajitas
     @track arrayTitulosCajitas = [];
@@ -52,7 +49,6 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
     @track columnsProceso = columnsProceso;    
     @track defaultSortDirection = 'asc';
     @track procesosSortDirection = 'asc'; 
-    @track procesosSortDirection = 'asc';
     @track procesosSortedBy;
 
     // Grafico Procesos-Estrategias
@@ -65,7 +61,9 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
     @track showTableTareas = false;
     @track sortDirectionTareas = 'asc';
     @track sortedByTareas;
-    @track informeTareasPendientes;    
+    @track informeTareasPendientes;  
+    
+    @track numMaxCajitasPorLinea = 0;
 
     // Actualizar datos al cambiar de pestaña
     @api
@@ -81,88 +79,101 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
         this.now = Date.now();
     }
     // Fin Actualizar datos al cambiar de pestaña
-  
-    connectedCallback() { 
-        getQueryRecordTypeProceso({}).then(result => {            
-            this.idRecordType = result;        
-        })
-        .catch(error => {
-            this.mensajeError = error;
-        }); 
-    } 
-    
-    @wire(getPicklistValues, { recordTypeId: '$idRecordType', fieldApiName: ESTRATEGIA_FIELD })
-    estrategiasFlujo;
-
-    @wire(getQueryProcesos, {estrategiasFlujo: '$estrategiasFlujo'})
+      
+    @wire(getQueryProcesos, {})
     wiredData(result) {
         this.wiredResultProcesos = result;
         // Inicializamos las variables para que cuando se actualice las queries
         this.numTotalProcesosActivo = 0;
         this.procesos = null;     
-        this.informeProcesosActivos = null;       
-        // Se comprueba si ya se ha lanzado el wire de la picklist de estrategia, ya que si no se ha lanzado dara error
-        if(this.estrategiasFlujo.data != undefined){
+        this.informeProcesosActivos = null;   
+        
+        this.numMaxCajitasPorLinea = 0;
+        this.numTotalCajitas = 0;
+        this.numCajitasFila = '';
+        
+        getAgrupacionesEstrategias({}).then(resultAgrupaciones => {       
+            this.estrategiasFlujoCodigo = [];
+            this.arrayTitulosCajitas = [];
             // Montamos las Estrategias Dinamicas, creando las variables con las estrategias
-            for(let i = 0; i < this.estrategiasFlujo.data.values.length; i++){ 
-                this.arrayTitulosCajitas.push(this.estrategiasFlujo.data.values[i].label);
-                this.estrategiasFlujoCodigo.push(this.estrategiasFlujo.data.values[i].value);
+            for(let i = 0; i < resultAgrupaciones.length; i++){
+                // Miramos cuantas cajas por linea es el maximo, lo miramos mediante el 'maxCajas'
+                if(resultAgrupaciones[i].Name === 'maxCajas'){
+                    this.numMaxCajitasPorLinea = resultAgrupaciones[i].SIREC__SIREC_fld_Codigo__c;
+                } else {
+                    if(!this.estrategiasFlujoCodigo.includes(resultAgrupaciones[i].SIREC__SIREC_fld_CodigoAgrupador__c)){
+                        this.arrayTitulosCajitas.push(resultAgrupaciones[i].SIREC__SIREC_fld_DescAgrupador__c);
+                        this.estrategiasFlujoCodigo.push(resultAgrupaciones[i].SIREC__SIREC_fld_CodigoAgrupador__c);
+                    } 
+                }                                   
             }
+            this.numTotalCajitas = this.arrayTitulosCajitas.length;                       
             // Creamos N posiciones de la variable array de forma dinamica, 1 posicion por estrategia
             var estrategiasCajitas = [];
-            for(let i = 0; i < this.estrategiasFlujo.data.values.length; i++){ 
+            for(let i = 0; i < this.numTotalCajitas; i++){ 
                 estrategiasCajitas[i] = 0;
-            } 
-            this.numTotalCajitas = estrategiasCajitas.length;
+            }      
+           
             // Con la query montamos las cajitas y los procesos activos
             if(result.data){ 
                 let currentData = [];
                 let currentDataTareas = [];      
                 for(let i = 0; i < result.data.length; i++){        
                     // Calculamos los procesos que tienen la situacion 'Pendiente Inicio Gestion' y los clasificiamos por estrategia
-                    if(result.data[i].SIR_fld_Situacion_SF__c == 'FEPEIN'){                
-                        if(this.estrategiasFlujoCodigo.includes(result.data[i].SIREC__SIREC_fld_estrategia__c)){
-                            let numArray = this.estrategiasFlujoCodigo.indexOf(result.data[i].SIREC__SIREC_fld_estrategia__c);
-                            estrategiasCajitas[numArray] = estrategiasCajitas[numArray] + 1;
+                    if(result.data[i].SIR_fld_Situacion_SF__c === 'FEPEIN'){     
+                        if(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c !== undefined){           
+                            if(this.estrategiasFlujoCodigo.includes(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c)){
+                                let numArray = this.estrategiasFlujoCodigo.indexOf(result.data[i].SIREC__SIREC_fld_codigoAgrupador__c);
+                                estrategiasCajitas[numArray] = estrategiasCajitas[numArray] + 1;
+                            }
                         }                    
                     }                          
                     // Calculamos los procesos ya iniciados pero que no esten finalizados
-                    if(result.data[i].SIR_fld_Situacion_SF__c != 'FEPEIN'){ 
+                    if(result.data[i].SIR_fld_Situacion_SF__c !== 'FEPEIN'){ 
                         let rowData = {};
                         if(result.data[i].SIREC__SIREC_fld_cliente__c != null){
                             rowData.idCliente = '/lightning/r/Account/' + result.data[i].SIREC__SIREC_fld_cliente__c + '/view';
                             rowData.cliente = result.data[i].SIREC__SIREC_fld_cliente__r.Name;
                         } 
-                        rowData.grupo = result.data[i].SIREC__SIREC_fld_cliente__r.CIBE_GrupoEconomico__c;
-                        rowData.estrategia = result.data[i].estrategia;
-                        rowData.fechaEstrategia = result.data[i].SIR_FechaInicioEstrategia__c;                    
+                        rowData.grupo = result.data[i].SIREC__SIREC_fld_cliente__r.CIBE_GrupoEconomico__c;                   
                         rowData.idProceso = '/lightning/r/SIREC__SIREC_obj_proceso__c/' + result.data[i].Id + '/view';
-                        rowData.procesoNombre = result.data[i].Name;  
-                        rowData.fechaInicio = result.data[i].SIREC__SIREC_fld_fechaInicio__c;                        
-                        if(result.data[i].SIR_DeudaTotal__c == undefined){
+                        rowData.procesoNombre = result.data[i].Name;                         
+                        if(result.data[i].SIR_DeudaTotal__c === undefined){
                             rowData.deudaTotal = ''; 
                         } else {
                             rowData.deudaTotal = result.data[i].SIR_DeudaTotal__c; 
                         }                        
-                        if(result.data[i].SIR_MaximoDiasImpago__c == undefined){
+                        if(result.data[i].SIR_MaximoDiasImpago__c === undefined){
                             rowData.diasImpago = ''; 
                         } else {
                             rowData.diasImpago = result.data[i].SIR_MaximoDiasImpago__c; 
                         }
-                        if(result.data[i].SIR_AlertaSIREC__c == undefined){
+                        if(result.data[i].SIR_AlertaSIREC__c === undefined){
                             rowData.alerta = ''; 
                         } else {
                             rowData.alerta = result.data[i].SIR_AlertaSIREC__c; 
                         }                        
                         rowData.situacion = result.data[i].situacion;       
                         rowData.fechaSituacion = result.data[i].SIREC__SIREC_fld_fechaSituacion__c; 
+                        
+                        if(result.data[i].SIR_DiasSuperandoUmbrales__c === undefined){
+                            rowData.diasSuperaUmbral = ''; 
+                        } else {
+                            rowData.diasSuperaUmbral = result.data[i].SIR_DiasSuperandoUmbrales__c; 
+                        } 
+                        rowData.fechaSalidaPP = result.data[i].SIR_FechaEstimadaSalidaPP__c; 
+                        if(result.data[i].SIR_ImpactoDudoso__c === undefined){
+                            rowData.impactoDudoso = ''; 
+                        } else {
+                            rowData.impactoDudoso = result.data[i].SIR_ImpactoDudoso__c; 
+                        }                        
                         rowData.gestor = result.data[i].Owner.Name;                                                  
                         currentData.push(rowData);
                         this.numTotalProcesosActivo = this.numTotalProcesosActivo + 1;
                     }
                     // Procesos con TAREAS Pendientes de Sincronizar y Enviadas
-                    if(result.data[i].SIREC__SIREC_fld_tarea__c != undefined 
-                        && (result.data[i].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_estado__c == 'Pendiente Sincronización'
+                    if(result.data[i].SIREC__SIREC_fld_tarea__c !== undefined 
+                        && (result.data[i].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_estado__c === 'Pendiente Sincronización'
                         || result.data[i].SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_estado__c === 'Enviada')){ 
                         this.showTableTareas = true;              
                         let rowData = {};
@@ -177,20 +188,18 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
                         this.numTareasPendientes = this.numTareasPendientes + 1;              
                     }
                 } 
-                if(this.numTotalCajitas >= 8){
-                    this.numCajitasFila = 'slds-size_1-of-8';
-                } else {
-                    if(this.numTotalCajitas >= 4){
-                        this.numCajitasFila = 'slds-size_1-of-' + this.numTotalCajitas;
-                    } else {
-                        var elemento = this.template.querySelectorAll('lightning-layout-item');
-                        for (let i = 0; i < elemento.length; i++) {
-                            if (i === 0) {
-                                elemento[i].classList.add('paddingCajita');
-                            }
-                            elemento[i].classList.remove('slds-col');
+                // Indicamos en el frontal cuantas cajitas por linea debe de haber
+                if(this.numTotalCajitas <= this.numMaxCajitasPorLinea){
+                    // Si el num de cajitas es menor al numMaxCajitasPorLinea ponemos unos estilos para dispersar correctamente las cajitas, ya que sino se quedan todas juntas a la derecha
+                    var elemento = this.template.querySelectorAll('lightning-layout-item');
+                    for (let i = 0; i < elemento.length; i++) {
+                        if (i === 0) {
+                            elemento[i].classList.add('paddingCajita');
                         }
-                    }             
+                        elemento[i].classList.remove('slds-col');
+                    }
+                } else {
+                    this.numCajitasFila = 'slds-size_1-of-' + this.numMaxCajitasPorLinea;
                 }
                 // Ponemos los resultados de procesos ya iniciados en la variable de front
                 this.procesos = currentData;     
@@ -235,7 +244,10 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
                     this.mensajeError = error;
                 });                                   
             }
-        }              
+        })
+        .catch(error => {
+            this.mensajeError = error;
+        });            
     }
 
     sortBy(field, reverse, primer) {
@@ -256,7 +268,13 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
     onHandleSort(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.procesos];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idCliente'){
+			cloneData.sort(this.sortBy('cliente', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'idProceso'){
+			cloneData.sort(this.sortBy('procesoNombre', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}    
         this.procesos = cloneData;
         this.procesosSortDirection = sortDirection;
         this.procesosSortedBy = sortedBy;
@@ -265,7 +283,11 @@ export default class Sire_lwc_HomeGestorFlujo extends LightningElement {
     onHandleSortTareas(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.tareasPendientes];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'idProceso'){
+			cloneData.sort(this.sortBy('proceso', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		} 
         this.tareasPendientes = cloneData;
         this.sortDirectionTareas = sortDirection;
         this.sortedByTareas = sortedBy;

@@ -1,0 +1,67 @@
+<template>    
+    <template lwc:if={formularioVisible}>
+		<div style="margin: 5% 3% 5% 3%; width: 590px;">
+			<h1 style="font-weight: bold;font-size: 14px;padding-bottom: 2%;">{tituloFormulario}</h1>
+			<div class="slds-grid slds-wrap slds-modal__content slds-var-p-around_medium">
+				
+				<!-- Aqui empieza la parte dinamica de crear campos mediante un for -->
+				<template for:each={campos} for:item="campo">
+					<div class={campo.claseColumnas} key={campo}>
+						<template lwc:if={campo.campoInput}>
+							<div style={campo.anchoCampo}>
+								<lightning-input type={campo.tipo} formatter={campo.formato} step={campo.step} name={campo.codigoHito} label={campo.label} 
+									value={campo.valor} required={campo.requerido} disabled={campo.disabled} onchange={getCambioValor}></lightning-input>
+							</div> 
+						</template>
+						<template lwc:elseif={campo.campoSelect}>
+							<div style={campo.anchoCampo}>
+								<lightning-combobox
+									name={campo.codigoHito}
+									label={campo.label}
+									value={campo.valor}
+									placeholder="Seleccione una opción"
+									options={campo.opciones}
+									required={campo.requerido}
+									disabled={campo.disabled}
+									onchange={getCambioValor} >
+								</lightning-combobox>
+							</div> 
+						</template>   
+						<template lwc:elseif={campo.campoTextArea}>
+							<div style={campo.anchoCampo}>
+								<lightning-textarea name={campo.codigoHito} label={campo.label} value={campo.valor} max-length="200"
+									required={campo.requerido} disabled={campo.disabled} onchange={getCambioValor}
+									field-level-help="Máximo 200 caracteres"></lightning-textarea>
+							</div> 
+						</template>                         
+					</div>
+				</template>
+			</div>
+        </div>
+    </template>
+    <!-- Errores  -->
+    <template if:true={mensajeKO}>
+        <div class="slds-modal__content slds-var-p-around_medium error" >
+          	<div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+            	<div class="slds-notify_container slds-is-relative">
+					<div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+						<span class="slds-icon_container slds-icon-utility-error slds-var-m-right_small slds-no-flex slds-align-top" title="Error">
+							<svg class="slds-icon slds-icon_small" aria-hidden="true">
+							<use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+							</svg>
+						</span>
+						<div class="slds-notify__content">
+							<h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+							{codigoError}
+						</div>
+					</div>
+            	</div>
+          	</div>
+        </div>
+    </template>  
+	<!-- BOTONES -->
+	<footer class="slds-modal__footer">
+		<lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={closeQuickAction} disabled={disabledCerrar} class="slds-var-m-left_x-small"></lightning-button>
+		<lightning-button variant="brand" label={nombreBoton} title={nombreBoton} onclick={guardar} disabled={disabledGuardar} class="slds-var-m-left_x-small"></lightning-button>
+	</footer>   
+</template>

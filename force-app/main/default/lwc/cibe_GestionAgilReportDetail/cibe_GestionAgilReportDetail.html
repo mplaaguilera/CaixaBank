@@ -1,0 +1,244 @@
+<template>
+	<div if:true={renderComponent}>
+		<article class="slds-card">
+			<div class="slds-card__header slds-grid">
+				<header class="slds-media slds-media_center slds-has-flexi-truncate">
+					<div class="slds-media__body">
+						<h2 class="slds-card__header-title">
+							<span>Informa el tipo de Contacto</span>
+						</h2>
+					</div>
+					<div class="slds-no-flex" if:false={issummary}>
+						<lightning-layout class="layout-padding">
+							<lightning-layout-item size="12">
+								<div class="slds-form slds-form_stacked">
+									<div class="slds-form-element">
+										<label
+											class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none"
+											for="toggle">{labels.confidencialidad}</label>
+										<lightning-input type="toggle" variant="label-hidden" name="toggle"
+											message-toggle-active="" message-toggle-inactive="" checked={confidencial}
+											onchange={handleConfidencial}></lightning-input>
+									</div>
+								</div>
+							</lightning-layout-item>
+						</lightning-layout>
+					</div>
+				</header>
+			</div>
+			<div class="slds-card__body slds-card__body_inner">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="12" padding="around-small">
+						<!-- <div style="margin:1.25rem 0 .75rem 0">
+							<span style="color:red;">*</span>{labels.tipoCita}
+						</div> -->
+						<div lwc-2nj244ovceg="" class="slds-form-element__control "
+							style="display: -webkit-box; display: flex;" part="options">
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="VC" required=""
+									value="VC" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="VC">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">{labels.visitaCliente}</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="EC" required=""
+									value="EC" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="EC">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">{labels.entrevistaCentro}</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="LMD" required=""
+									value="LMD" onchange={handleRadioChange} checked>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="LMD">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">{labels.llamada}</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="VLD" required=""
+									value="VLD" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="VLD">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">{labels.videollamada}</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="ESE" required=""
+									value="ESE" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="ESE">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">Email,sms,etc</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="030" required=""
+									value="030" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="030">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label"
+										part="label">{labels.muro}</span>
+								</label>
+							</span>
+							<span lwc-2nj244ovceg="" class="slds-radio">
+								<input lwc-2nj244ovceg="" type="radio" part="radio" name="radioGroup" id="GSCC" required=""
+									value="GSCC" onchange={handleRadioChange}>
+								<label lwc-2nj244ovceg="" class="slds-radio__label" part="input-radio" for="GSCC">
+									<span part="indicator" class="slds-radio_faux" lwc-2nj244ovceg=""></span>
+									<span lwc-2nj244ovceg="" class="slds-form-element__label" part="label">Gestión sin
+										contacto comercial</span>
+								</label>
+							</span>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+
+			<div class="slds-card__body slds-card__body_inner">
+				<lightning-layout-item size="12" padding="around-small">
+					<div class="slds-grid typeRelatedInputs">
+
+						<div class="status-combobox" if:true={clientinfo.isTask}>
+							<lightning-combobox name="estado" label="Estado" value={estadoPorDefecto}
+								options={optionsEstado} onchange={handleChangeEstado}>
+							</lightning-combobox>
+						</div>
+
+						<div class="inputDate" if:false={issummary}>
+							<lightning-input type="date" data-id="activityDateInput" date-style="short" label={labels.fecha}
+								value={activityDateToSend} max={today}
+								message-when-value-missing="Indica una fecha para el evento"
+								message-when-bad-input="Introduce una fecha en el formato correcto" required
+								onchange={handleChangeActivityDate}></lightning-input>
+						</div>
+						<div class="inputTime" if:false={issummary}>
+							<lightning-input type="time" data-id="timeInicioInput" label={labels.horainicio}
+								value={horaActual} required
+								message-when-value-missing="Indica una hora de inicio para el evento"
+								onchange={handleChangeTimeInicio}></lightning-input>
+						</div>
+						<!-- <div class="inputTime">
+							<lightning-input type="time" data-id="timeFinInput" label={labels.horafin} value={timeFin} required message-when-value-missing="Indica una hora de fin para el evento" onchange={handleChangeTimeFin}></lightning-input> 
+						</div> -->
+						<div class="inputDuration" if:false={issummary}>
+							<lightning-combobox label={labels.duracion} required options={optionsTime}
+								onchange={handleChangeDuration} value={initialDuration}></lightning-combobox>
+						</div>
+					</div>
+				</lightning-layout-item>
+				<lightning-layout-item size="4" padding="around-small">
+				</lightning-layout-item>
+			</div>
+
+			<div class="slds-card__body slds-card__body_inner">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item if:false={issummary} class="slds-size_1-of-3" padding="around-small">
+						<lightning-input type="text" data-id="prueba" value={asunto} default={asunto} required
+							label={labels.asunto} onchange={handleAsunto}></lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item if:false={issummary} class="slds-size_1-of-3" padding="around-small">
+						<c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="employeelookup"
+							selection={initialemployee} onsearch={handleSearchEmployee}
+							onselectionchange={handleSelectionEmployee} fieldlabel={labels.owner}
+							placeholder={labels.buscaEmpleado} required>
+						</c-av_-lookup>
+					</lightning-layout-item>
+					<lightning-layout-item class="slds-size_1-of-3" padding="around-small" if:false={gestionSC}>
+						<lightning-combobox name="progress" label={labels.contactoprincipal} value={apoderado}
+							placeholder='Contacto no informado' options={optionsApoderados} onchange={handleChangeApoderado}
+							field-level-help={labels.msjnoapoderado}>
+						</lightning-combobox>
+					</lightning-layout-item>
+
+					<div if:true={issummary} class="slds-p-around_small">
+						<lightning-layout-item class="slds-size_1-of-4" if:false={gestionSC}>
+							<lightning-input type="tel" value={phoneField} label='Teléfono' disabled></lightning-input>
+						</lightning-layout-item>
+					</div>
+					<div if:true={issummary} class="slds-p-around_medium slds-m-top_medium">
+						<lightning-layout-item class="slds-size_1-of-12" if:false={gestionSC}>
+							<lightning-button-icon icon-name="utility:call" alternative-text="Click-to-Call"
+								title="Click-to-Call" onclick={handlePhone}></lightning-button-icon>
+						</lightning-layout-item>
+					</div>
+				</lightning-layout>
+				<lightning-layout multiple-rows if:false={issummary}>
+					<lightning-layout-item size="4" padding="around-small">
+						<c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="attendeeslookupCXB"
+							onsearch={handleSearchAttendes} onselectionchange={handleSelectionAttendee}
+							onclick={handleSearchClick} fieldlabel={labels.asisCXB} placeholder={labels.buscaContacto}>
+						</c-av_-lookup>
+
+						<div if:true={attendesCXB} class="attendesBox">
+							<template for:each={selectedAttendesCXB} for:item="att">
+								<div key={att.bucleId} data-id={att.id}>
+									<lightning-pill style="margin:8px 0" label={att.label} name={att.id}
+										onremove={handleRemoveAttende}>
+										<lightning-icon icon-name="standard:contact"
+											alternative-text="contact"></lightning-icon>
+									</lightning-pill>
+								</div>
+							</template>
+						</div>
+					</lightning-layout-item>
+					<lightning-layout-item size="4" padding="around-small">
+						<c-av_-lookup class="lookup-cmp slds-size_1-of-3" data-id="attendeeslookupEMP"
+							onsearch={handleSearchAttendes2} onselectionchange={handleSelectionAttendee2}
+							fieldlabel={labels.asistentesEmpresas} placeholder={labels.buscaContacto}>
+						</c-av_-lookup>
+						<div if:true={attendesEMP} class="attendesBox">
+							<template for:each={selectedAttendesEMP} for:item="att">
+								<div key={att.bucleId} data-id={att.id}>
+									<lightning-pill style="margin:8px 0" label={att.label} name={att.id}
+										onremove={handleRemoveAttende2}>
+										<lightning-icon icon-name="standard:contact"
+											alternative-text="contact"></lightning-icon>
+									</lightning-pill>
+								</div>
+							</template>
+						</div>
+					</lightning-layout-item>
+
+					<lightning-layout-item class="slds-size_1-of-4" padding="around-small">
+						<div if:false={gestionSC}>
+							<lightning-input type="tel" value={phoneField} label='Teléfono' disabled></lightning-input>
+						</div>
+					</lightning-layout-item>
+
+					<lightning-layout-item class="slds-size_1-of-12 slds-m-top_medium slds-m-top_xx-small"
+						padding="around-small">
+						<div if:false={gestionSC} class="slds-m-top_xx-small">
+							<lightning-button-icon icon-name="utility:call" alternative-text="Click-to-Call"
+								title="Click-to-Call" onclick={handlePhone}></lightning-button-icon>
+						</div>
+					</lightning-layout-item>
+				</lightning-layout>
+
+				<lightning-layout multiple-rows if:true={ubicacion}>
+					<lightning-layout-item class="slds-size_1-of-3" padding="around-small">
+						<lightning-input type="text" value={ubicacionText} label={labels.ubicacion}
+							onchange={handleUbicacion}></lightning-input>
+					</lightning-layout-item>
+				</lightning-layout>
+
+
+				<lightning-layout multiple-rows if:false={issummary}>
+					<lightning-layout-item size="12" padding="around-small">
+						<lightning-textarea name="input3" value={comentarios} label={labels.comentario}
+							placeholder={labels.commentPlaceholder} onchange={handleComentarios}></lightning-textarea>
+					</lightning-layout-item>
+				</lightning-layout>
+			</div>
+
+
+		</article>
+	</div>
+</template>

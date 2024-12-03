@@ -1,0 +1,57 @@
+<template>    
+    <template if:true={parteSincronizar}>
+
+        <lightning-modal-header label="Sincronizar Proceso" >
+
+        </lightning-modal-header>
+        <lightning-modal-body>
+            <!-- LOADING -->
+            <template if:true={loadingVisible}>
+                <div class="slds-modal__content slds-var-p-around_medium" style="height: 150px;">                      
+                    <lightning-spinner alternative-text="Loading..." variant="brand" style="display: contents; "></lightning-spinner>                   
+                    <h2 style="padding: 20px;">Sincronizando el Proceso. Espere por favor.</h2>                    
+                </div>
+            </template>   
+
+            <!-- MENSAJE OK -->
+            <template if:true={mensajeOKVisible}>
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <h2 style="padding: 20px;">El Proceso se ha sincronizado correctamente.</h2>                    
+                </div>
+            </template> 
+
+            <!-- MENSAJE KO -->
+            <template if:true={mensajeKO}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error" role="status">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-utility-error" title="error">
+                            <lightning-icon icon-name="utility:error" alternative-text="error" size="small" title="error" variant="inverse"></lightning-icon>                                
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>{mensajeError}</p>
+                        <p>{codigoError}</p>
+                    </div>
+                </div>                
+            </template>
+        
+        </lightning-modal-body>
+        <lightning-modal-footer>
+            <template if:true={botonCancelarVisible}>
+                <button class="slds-button slds-button_neutral" onclick={cancelar} disabled={disabledCancelar}>Cancelar</button>
+            </template>
+
+            <template if:true={botonCerrarVisible}>
+                <button class="slds-button slds-button_neutral" onclick={cerrar} disabled={disabledCerrar}>Cerrar</button>        
+            </template>
+        
+            <button class="slds-button slds-button_brand" onclick={continuarGestion} disabled={disabledContinuar}>Continuar Gestionando Proceso</button>
+        </lightning-modal-footer>
+
+        
+    </template>
+    
+    <template if:true={parteGestionar}>       
+        <c-sir_lwc_-Gestion-Tarea-Pendiente record-id={recordId}></c-sir_lwc_-Gestion-Tarea-Pendiente>    
+    </template>
+</template>

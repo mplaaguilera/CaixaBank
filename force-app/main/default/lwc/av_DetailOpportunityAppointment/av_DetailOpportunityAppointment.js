@@ -10,6 +10,9 @@ import statusOpp from '@salesforce/label/c.AV_CurrentStatus';
 import amount from '@salesforce/label/c.AV_Importe';
 import detail from '@salesforce/label/c.AV_Detalle';
 
+
+const SEPARADOR = '{|}';
+
 export default class Av_DetailOpportunityAppointment extends NavigationMixin(LightningElement) {
 
 	label = {
@@ -19,8 +22,14 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		amount,
 		detail
 	};
+	@api comesfromevent;
+	@api opposselected;
+	@api opposselectedagended;
 	@api oppislinked;
 	@api oppo;
+	@api initialState;
+	@api nolocalizado; 
+	isPotencial;  
 	@track id;
 	@track name;
 	@track path;
@@ -40,6 +49,12 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	@track closedate;
 	@track neededToggle = false; 
 	@track isInserted = true;
+	@track prioritingCustomer;
+	@track noofrecerhastaToSend;
+	@track productName;
+	@track isnewprodtosend;
+	@track owneridopp;  
+	subestado;   
 	statusNow;
 	checkedOld;
 	currentNameButton;
@@ -65,40 +80,63 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	@track switchOtherEntity = false;
 	@track switchSubImport = false;
 	isAgendado = false;
+	@track historyCommentWithDate;
+	@track historyComment;
+	@track historyCommentDate;
+	@track historyCommentDateLabel;
 	@track especialInputLabel = 'Próxima Gestión';
 	@api potentiallist;
 	@api resolutionlist;
+	@api buttondelete;
+	@track showButtonDelete = false;
+	isModalDeleteOpen = false
 	arrowClass = "customArrowRightDefault";
 	agendadoClass = "customEventDefault";
-	checkClass = "customCheckDefault";
+	@api isnewprod;
+	checkClass = this.isnewprod ? "customCheckDefaultTask":"customCheckDefault";
 	closeClass = "customCloseDefault";
+	nolocalizadoClass = 'customNoLocalizadoDefault';  
 	banClass = "customBanDefault";
 	gestion = 'En gestión/insistir-gestion';
 	gestionAgendar = 'En gestión/insistir-agendar';
-	pathMap = {
-		'arrow':'En gestión/insistir-gestion',
+	CLOSED_STATUS_OK;
+	CLOSED_STATUS_BAD;
+	LABEL_CLOSED_BAD;
+	@track showNoOfrecerHasta = false;
+	@track asteriskNoOfrecer = true;
+	get pathMap()  {
+		return {'arrow':'En gestión/insistir-gestion',
 		'agendado':'En gestión/insistir-agendar',
-		'check':'Cerrado positivo',
-		'close':'No interesado',
-		'ban':'No apto'
+		'check':(this.isnewprod) ?'Producto Contratado' :'Cerrado positivo',
+		'close': (this.isnewprod) ?'Producto Rechazado' :'No interesado'
+		,'nolocalizado':'Potencial' 
+		}
 	}
-	classMap = {
+
+
+	get classMap () 
+{	 return {
 		'arrow':'customArrowRight',
 		'agendado':'customEvent',
-		'check':'customCheck',
+		'check': (this.isnewprod) ? 'customCheckTask':'customCheck',
 		'close':'customClose',
-		'ban':'customBan'
+		'nolocalizado': 'customNoLocalizado'  
 	}
-	classMapDefault = {
+}
+	get classMapDefault () {	
+		return {
 		'arrow':'customArrowRightDefault',
 		'agendado':'customEventDefault',
-		'check':'customCheckDefault',
+		'check': (this.isnewprod) ? 'customCheckDefaultTask':'customCheckDefault',
 		'close':'customCloseDefault',
-		'ban':'customBanDefault'
-	}
+		'nolocalizado':'customNoLocalizadoDefault'  
+	    }
+    }
+	
 	find = '';
 	pathToSend;
 	proximaGestionToSend;
+	subestadoToSend; 
 	expectativaToSend;
 	resolucionToSend;
 	importePropioToSend;
@@ -114,24 +152,70 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	todayString = this.getTodayString();
 	now = new Date(Date.now()).toISOString();
 	firstClickNewOppo = true;
-
+	firstOpp = true;
 	validable  = false;
+	actualValuePath;
+	interruptor= false; 
+	interruptor2= false; 
+	interruptor3 = false; 
+	
 
-	connectedCallback(){
-		this.fillVars();    
+	connectedCallback(){	
+		this.fillVars();
 	}
-
+	
 	getTodayString(){
 		let d = new Date();
 		return d.getFullYear() + '-'+(d.getMonth() +1) +'-' + d.getDate()
 	}
+
+	@api
+	clickbutton(){
+		this.template.querySelector('[data-id="agendado"]').click();	
+	}
 	
 	renderedCallback(){
-		if(this.id.includes('idProvisional') && this.firstClickNewOppo){
-			this.template.querySelector('[data-id="arrow"]').click();
-			this.sendDataToController();
-			this.firstClickNewOppo = false;
+		this.showButtonDelete = true;
+		if(!this.comesfromevent){
+			if(this.nolocalizado != true){
+				if(this.id.includes('idProvisional') && this.firstClickNewOppo){
+					this.template.querySelector('[data-id="arrow"]').click();
+					this.sendDataToController();
+					this.firstClickNewOppo = false;
+				}
+				if(this.vinculed && this.firstOpp){
+					this.template.querySelector('[data-id="arrow"]').click();
+					this.firstOpp= false;
+				}
+				
+				if(this.mainVinculed && this.interruptor && this.interruptor2 == false){
+					this.interruptor2 = true;
+					this.template.querySelector('[data-id="arrow"]').click();
+					this.interruptor = false; 
+	
+				}
+				if(this.mainVinculed == false && this.vinculed == true && this.nolocalizado == false && this.interruptor == true && this.interruptor3 == false){
+					this.interruptor3 = true;
+					this.template.querySelector('[data-id="arrow"]').click();
+					this.interruptor = false;
+					
+					
+				}
+				
+			}else if(this.nolocalizado){
+				
+				if(this.vinculed && this.interruptor == false && this.initialState.StageName =='Potencial'  ){  
+					this.template.querySelector('[data-id="nolocalizado"]').click();
+					this.interruptor = true;
+					this.interruptor2 = false; 
+					this.interruptor3 = false;  
+				}
+				
+			} 
+
 		}
+		
+		 
 	}
 
 	parseTodayDate(){
@@ -156,7 +240,11 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	}
 
 	fillVars(){
-		this.statusNow = this.oppo.Stage;
+		this.checkClass = this.isnewprod ? "customCheckDefaultTask":"customCheckDefault";
+		this.CLOSED_STATUS_OK = (this.isnewprod) ?'Producto Contratado' :'Cerrado positivo';
+		this.CLOSED_STATUS_BAD = (this.isnewprod) ?'Producto Rechazado' :'No interesado';
+		this.LABEL_CLOSED_BAD =(this.isnewprod) ?'Producto Rechazado' :'Cerrada negativa';
+		this.statusNow = (this.oppo.Stage == 'En gestión/insistir') ? 'En Gestión' : this.oppo.Stage;
 		this.id = this.oppo.Id;
 		this.name = this.oppo.Name;
 		this.path = this.oppo.Stage;
@@ -173,8 +261,46 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		this.otraEntidadNombre = this.oppo.OtraEntidadNombre;
 		this.closeDate = this.oppo.CloseDate;
 		this.isInserted = (this.oppo.NotInserted == undefined);
-		this.vinculed = (this.oppo.isVinculed != undefined);
-		this.mainVinculed = false;
+		this.vinculed = (this.comesfromevent) ? this.oppo.isVinculed :  (this.oppo.isVinculed != undefined);
+		this.mainVinculed = (this.comesfromevent) ? (this.oppo.mainVinculed):false;
+		this.prioritingCustomer = this.oppo.Prioritzed;
+		this.productName = this.oppo.ProductName;
+		this.subestadoToSend = this.oppo.Subestado;  
+		this.isnewprodtosend = this.oppo.IsNewProduct;
+		this.proximaGestionToSend = this.oppo.Fecha;
+		this.historyCommentWithDate = this.oppo.HistoryComment;
+		this.owneridopp = this.oppo.owneridopp;  
+		if(this.historyCommentWithDate != '' && this.historyCommentWithDate != undefined){
+			this.historyCommentDate = this.historyCommentWithDate.split(SEPARADOR)[0];
+			this.historyComment = this.historyCommentWithDate.split(SEPARADOR)[1];
+			this.historyCommentDateLabel = 'Último comentario - '+this.historyCommentDate;
+		}else{
+			this.historyCommentDateLabel = '';
+			
+		}
+		if(this.path ==='Potencial'){
+			this.isPotencial = true;
+		}
+		this.initialState = {
+			sobjectype:'Opportunity',
+			Id:this.id,
+			StageName:this.path,
+			AV_Comentarios__c:this.comentario,
+			AV_FechaProximoRecordatorio__c:this.oppoDate,
+			AV_Potencial__c:this.initPotential,
+			AV_MarginEuro__c:this.margin,
+			AV_PF__c:this.mainPF,
+			AV_Cuota__c:this.cuota,
+			Amount:this.ImporteOtraEntidad,
+			AV_Tenencia__c:this.oppo.OtraEntidad,
+			AV_Entidad__c:this.otraEntidadNombre,
+			AV_ByProduct__c:this.oppo.SubProductId,
+			AV_OrigenApp__c:'AV_BackReport',
+			AV_IncludeInPrioritizingCustomers__c:this.prioritingCustomer
+			,OwnerId : this.owneridopp  
+
+		}
+
 	}
 
 	navigateToRecord(event){
@@ -231,8 +357,8 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		if(buttonToAvoid != 'close'){
 			this.closeClass = this.classMapDefault['close'];
 		}
-		if(buttonToAvoid != 'ban'){
-			this.banClass = this.classMapDefault['ban'];            
+		if(buttonToAvoid != 'nolocalizado'){
+			this.nolocalizadoClass = this.classMapDefault['nolocalizado'];            
 		}
 	}
 
@@ -246,52 +372,98 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 	}
 
 	handlePath(e){
+		this.showNoOfrecerHasta = false;
+		this.firstOpp= false;
 		this.validable = true;
 		this.template.querySelector('[data-id="'+e.target.name+'"]').blur();
 		this.resetCustomButtons(e.target.name);
-		let oldValue = this.currentNameButton;
+		let oldValue = this.currentNameButton; 
+		this.actualValuePath = e.target.name;
 		this.currentNameButton = e.target.name;
 		this.especialInputLabel = 'Próxima Gestión';
 		this.path = this.pathMap[e.target.name];
 		this.isAgendado = false;
 		var auxPath;
+		
 		if(this.path.split('-').length > 1){
 			auxPath = this.path.split('-');
 			this.path = auxPath[1];
 			this.neededToggle = true;
 		}else{
-			this.neededToggle = (this.path != 'Cerrado positivo');
+			this.neededToggle = (this.path != this.CLOSED_STATUS_OK);
 		}
 		if (!this.id.includes('idProvisional')) {
 			if (this.checkedOld == this.path) { //Para poner el valor antiguo si quita el check
-				this.statusNow = this.oppo.Stage;
+				this.statusNow = (this.oppo.Stage == 'En gestión/insistir') ? 'En Gestión' : this.oppo.Stage;
 				this.checkedOld = null;
 			} else {
 				this.checkedOld = this.path;
 			}
 		} else {
-			if (this.path != 'Cerrado positivo' && this.path != 'No interesado' && this.path == 'agendar' && this.path == 'gestion'){ // Para que no se ponga el apiname de los valores de cerrados
-				this.statusNow = this.path;
-			} else if (this.path == 'Cerrado positivo') {
-				this.statusNow = 'Cerrada positiva';
-			} else if (this.path == 'No interesado') {
-				this.statusNow = 'Cerrada negativa';
+			if (this.path != this.CLOSED_STATUS_OK && this.path != this.CLOSED_STATUS_BAD && this.path == 'agendar' && this.path == 'gestion'){ // Para que no se ponga el apiname de los valores de cerrados
+				this.statusNow = (this.oppo.Stage == 'En gestión/insistir') ? 'En Gestión' : this.oppo.Stage;
+			} else if (this.path == this.CLOSED_STATUS_OK) {
+				this.statusNow = this.CLOSED_STATUS_OK;
+			} else if (this.path == this.CLOSED_STATUS_BAD) {
+				this.statusNow = this.LABEL_CLOSED_BAD;
 			} else if (this.path == 'agendar' || this.path == 'gestion') {
-				this.statusNow = 'En gestión/insistir';
-			} else if (this.path == 'No apto'){
-				this.statusNow = 'No apto';
-			}
+				this.statusNow = 'En Gestión';
+			} 
 			if (this.checkedOld == this.path) { //Para poner el valor antiguo si quita el check
-				this.statusNow = this.oppo.Stage;
+				this.statusNow = (this.oppo.Stage == 'En gestión/insistir') ? 'En Gestión' : this.oppo.Stage;
 				this.checkedOld = null;
 			} else {
 				this.checkedOld = this.path;
 			}
 		}
+		
 		if(this.path === 'Potencial'){
 			this.unfoldCmp = false;
 			this.switchOtherEntity = false;
+			this.nolocalizadoClass = (this.nolocalizadoClass == this.classMapDefault[e.target.name])
+			?this.classMap[e.target.name]            
+			:this.classMapDefault[e.target.name];;   
+			
+			
+			if(this.nolocalizado){ 
+				if(this.vinculed == false){
+					this.unfoldCmp = true; 
+				}
+				this.subestadoToSend = 'No localizada';
+				const fechaYHoraActual = new Date();
+
+				const dia = fechaYHoraActual.getDate().toString().padStart(2, '0'); 
+				const mes = (fechaYHoraActual.getMonth() + 1).toString().padStart(2, '0'); // Se suma 1 ya que los meses van de 0 a 11
+				const año = fechaYHoraActual.getFullYear();
+
+				const fechaFormateada = `${dia}/${mes}/${año}`;
+				const horas = fechaYHoraActual.getHours().toString().padStart(2, '0');
+				const minutos = fechaYHoraActual.getMinutes().toString().padStart(2, '0');
+				const horaFormateada = horas + ':' + minutos;
+				
+				this.comentarioToSend = 'No localizado - '+horaFormateada+' - '+ fechaFormateada;  
+				
+				if(oldValue == this.currentNameButton){
+					this.handleVincular();
+				}
+				else if((oldValue == undefined || oldValue == null) && this.currentNameButton == 'nolocalizado'){ 
+					
+					if(!this.vinculed){
+						this.vinculed = false;
+						this.mainVinculed= false;
+						this.interruptor = true;
+						this.handleVincular();
+					}	
+				}
+			}
+			
+			
 		}else{
+			if(this.interruptor2){
+				oldValue = 'nolocalizado';
+			}
+			
+				
 			if(oldValue != this.currentNameButton){
 				this.unfoldCmp = true;
 				this.switchOtherEntity = this.otraEntidad;
@@ -312,10 +484,16 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 				if(this.currentNameButton == 'agendado'){
 					this.evaluateAgendeds(this.unfoldCmp);
 				}
+
 				if(this.oppislinked == null) {
-				this.handleVincular();
+					this.handleVincular();
 				} else {
 					this.validable = false;
+					if(this.vinculed == false){
+						this.vinculed =true
+					}else{
+						this.vinculed = false;
+					}
 				}
 			}
 			if(this.path != 'Vencido'){
@@ -371,7 +549,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 				if(fieldComentary){
 					fieldComentary.value = '';
 				}
-			}else if(this.path == 'Cerrado positivo'){
+			}else if(this.path == this.CLOSED_STATUS_OK){
 				this.resetVars();
 				this.resetFieldsPopUp();
 				if(!this.isInserted){               
@@ -393,7 +571,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 				if(fieldComentary){
 					fieldComentary.value = '';
 				}
-			}else if(this.path == 'No interesado'){
+			}else if(this.path == this.CLOSED_STATUS_BAD){
 				this.resetVars();
 				this.resetFieldsPopUp();
 				if(!this.isInserted){
@@ -413,41 +591,13 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 				if(fieldComentary){
 					fieldComentary.value = '';
 				}
-			}else if(this.path == 'No apto'){
-				this.resetVars();
-				this.resetFieldsPopUp();
-				this.proximaGestion = null;
-				this.proximaGestionToSend = null;
-				this.subProductInitial = null;
-				this.path = this.pathMap[e.target.name];
-				this.asterisk = true;
-				this.asteriskComentary = false;
-				this.switchImportSelf = true;
-				this.especialInputLabel = 'No ofrecer hasta';
-				this.switchNextManagement = true;
-				this.oppoDate = '';
-				const fieldOppoDate = this.template.querySelector('[data-id="nextManagementeDate"]');
-				if(fieldOppoDate){
-					fieldOppoDate.value = '';
-				}
-				this.switchImportOtherEntity = true;
-				this.switchComentary = true;
-				this.switchSubProduct = true;
-				this.switchImportOtherEntity = true;
-				this.switchMargin = true;
-				this.banClass = 
-				(this.banClass == this.classMapDefault[e.target.name])
-				? this.classMap[e.target.name]
-				: this.classMapDefault[e.target.name];
-				const fieldComentary =  this.template.querySelector('[data-id="comentario"]');
-				if(fieldComentary){
-					fieldComentary.value = '';
-				}
 			}
 		}
 		if(auxPath != null){
 			this.path=auxPath[0];
 		}
+	
+	
 		this.sendDataToController();
 		this.computeSwitch();
 	}
@@ -540,6 +690,10 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		this.marginToSend = null;
 		this.cuotaToSend = null;
 		this.importeOtraEntidadToSend = null;
+		this.subProductoToSend = null;  
+		this.noofrecerhastaToSend = null;
+		this.asteriskNoOfrecer = true;
+		this.asterisk = true;
 	}
 	@api
 	sendDataToController(){
@@ -567,11 +721,19 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 					mainVinculed:this.mainVinculed,
 					isVinculed:this.vinculed,
 					agendado:this.isAgendado,
-					validable:this.validable
+					validable:this.validable,
+					prioritzingCustomer:this.prioritingCustomer,
+					productName : this.productName,
+					subestado : this.subestadoToSend,  
+					noofrecerhasta: this.noofrecerhastaToSend,
+					isnewprod: this.isnewprodtosend
+					,owneridopp : this.owneridopp      
 				}
 			})
 		)
 	}
+
+
    
 	handleChangeFecha(e){
 		if(e.target.value != null){
@@ -592,15 +754,18 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 
 	handleChangeResolucion(e){
 		this.resolucionToSend = e.target.value;
-
 		if(this.resolucionToSend == 'O'){
+			this.showNoOfrecerHasta = false;
 			if (e.target.value != null){
 				this.asteriskComentary = true;
 			}else{
 				this.asteriskComentary = false;
 			}
-		}
-		else{
+		}else if(this.resolucionToSend == 'No Apto'){
+			this.asteriskComentary = false;
+			this.showNoOfrecerHasta = true;
+		}else{
+			this.showNoOfrecerHasta = false;
 			this.asteriskComentary = false;
 		}
 		this.sendDataToController();
@@ -620,6 +785,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		}
 		this.comentarioToSend = e.target.value;
 		this.sendDataToController();
+		
 	}
 
 	handleChangeOtraEntidad(e){
@@ -650,7 +816,7 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 
 	handleChangeCuota(e){
 		this.cuotaToSend = e.target.value;
-		this.sendDataToController()
+		this.sendDataToController();
 	}
 
 	openDetailWindow(){
@@ -711,7 +877,16 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 		}
 	}
 
+	handleChangeNoOfrecerHasta(e){
+		this.noofrecerhastaToSend = e.target.value;
+		if(this.noofrecerhastaToSend != null ){
+			this.asteriskNoOfrecer = false;
+		}else{
+			this.asteriskNoOfrecer = true;
+		}
+		this.sendDataToController();
 
+	}
 	@api
 	highlightBadInput(){
 		this.template.querySelector('[data-id="mainDiv"]').style.border = "solid 1.5px rgba(255,0,0,1)";
@@ -734,4 +909,22 @@ export default class Av_DetailOpportunityAppointment extends NavigationMixin(Lig
 				}
 				,2500);//Tiempo que tarda en empezar a desaparecer 
 	}
+
+	openDeleteWindow(){
+		this.isModalDeleteOpen = true;
+	}
+
+	closeDeleteWindow(){
+		this.isModalDeleteOpen = false;
+	}
+
+	handleDelete() {
+        const deleteEvent = new CustomEvent('deleteoppo', {
+            detail: this.oppo.Id
+        });
+		this.evaluateAgendeds(false);
+        this.dispatchEvent(deleteEvent);
+		
+    }
+	
 }

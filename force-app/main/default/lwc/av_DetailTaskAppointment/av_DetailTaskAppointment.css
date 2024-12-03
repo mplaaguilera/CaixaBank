@@ -61,6 +61,22 @@
     --sds-c-button-color-background:rgb(51,51,51);
     --sds-c-button-text-color-hover:white;
 }
+
+
+.customNoLocalizado{
+	--slds-c-button-color-background:rgb(210, 49, 51);
+	--slds-g-color-neutral-base-50:white;
+}
+.customNoLocalizado:hover{
+	--sds-c-button-color-background:rgb(210, 49, 51);
+	--sds-c-button-text-color-hover:white;
+}
+.customNoLocalizadoDefault:hover{
+	--sds-c-button-color-background:rgb(210, 49, 51);
+	--sds-c-button-text-color-hover:white;
+}
+
+
 .textarea{
     margin-top: 18px; 
     height: 2rem; 

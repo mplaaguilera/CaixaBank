@@ -1,0 +1,21 @@
+<template>
+    <li class="slds-listbox__item">
+        <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-is-selected" onclick={handleSelect}>
+            <span class="slds-media__figure slds-listbox__option-icon" >
+                <span if:true={selected} class="slds-icon_container slds-icon-utility-check slds-current-color">
+                    <lightning-icon class="slds-p-top_xxx-small" 
+                                    icon-name="utility:check" 
+                                    size="x-small" 
+                                    alternative-text="Selected" 
+                                    title="Selected">
+                    </lightning-icon>
+                </span>
+            </span>
+            <span class="slds-media__body" >
+                <span class="slds-truncate" title={label} >
+                    {label}
+                </span>
+            </span>
+        </div>
+    </li>
+</template>

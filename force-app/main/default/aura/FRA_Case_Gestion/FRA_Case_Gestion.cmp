@@ -9,13 +9,14 @@
 												   
 
     <!--Opciones de los desplegables-->
-    <aura:attribute name="opcionesCargadas" type="Map" default="{'tematicas': false, 'productos': false, 'motivos': false, 'causas': false, 'soluciones': false}"/>
-    <aura:attribute name="nivelSeleccionado" type="Map" default="{'tematica': false, 'producto': false, 'motivo': false, 'causa': false, 'solucion': false}"/>
+    <aura:attribute name="opcionesCargadas" type="Map" default="{'tematicas': false, 'productos': false, 'motivos': false, 'causas': false, 'soluciones': false, 'campanasFMW': false}"/>
+    <aura:attribute name="nivelSeleccionado" type="Map" default="{'tematica': false, 'producto': false, 'motivo': false, 'causa': false, 'solucion': false, 'campanaFMW': false}"/>
     <aura:attribute name="opcionesTematicas" type="List" default="[]"/>
     <aura:attribute name="opcionesProductos" type="List" default="[]"/>
     <aura:attribute name="opcionesMotivos" type="List" default="[]"/>
     <aura:attribute name="opcionesCausas" type="List" default="[]"/>
     <aura:attribute name="opcionesSoluciones" type="List" default="[]"/>
+    <aura:attribute name="opcionesCampanaFMW" type="List" default="[]" />
 
     <!--Datos del caso-->
     <aura:attribute name="caso" type="Case"/>
@@ -29,7 +30,7 @@
     <aura:attribute name="motivoAnterior" type="String"/>    
     <aura:attribute name="canalProcedenciaAnterior" type="String"/>
     <aura:attribute name="cambioCanalProcedencia" type="Boolean" default="false"/> 
-    <aura:attribute name="cambiarEstadoPendienteColaborador" type="Boolean" default="false"/> 
+    <aura:attribute name="cambiarEstadoPendienteColaborador" type="Boolean" default="false"/>
 
     <!--Escucha los cambios de estado y propietario del caso para recalcular los disabled-->
     <force:recordData aura:id="recordData" recordId="{!v.recordId}" layoutType="FULL" mode="EDIT"
@@ -82,19 +83,19 @@
             <div class="slds-form-element slds-form-element_stacked slds-is-editing">
                 <div class="slds-grid slds-wrap">
                     <div class="slds-size_1-of-3">
-                        <div class="slds-var-m-around_xx-small">
+                        <div class="slds-var-m-around_xx-small" data-selenium-id="FRA_ComboboxTematica">
                             <lightning:combobox aura:id="desplegableTematica" label="Temática" placeholder="--Selecciona una temática--"
                                 spinnerActive="{!!v.opcionesCargadas.tematicas}" onfocus="{!c.tematicaFocus}" onchange="{!c.tematicaSeleccionada}" options="{!v.opcionesTematicas}" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
                     </div>
                     <div class="slds-size_1-of-3">
-                        <div class="slds-var-m-around_xx-small" style="padding-left: 10px; padding-right: 10px;">
+                        <div class="slds-var-m-around_xx-small" style="padding-left: 10px; padding-right: 10px;" data-selenium-id="FRA_ComboboxProducto">
                             <lightning:combobox aura:id="desplegableProducto" label="Producto/Servicio" placeholder="--Seleccione un producto--"
                                 spinnerActive="{!!v.opcionesCargadas.productos}" onfocus="{!c.productoFocus}" onchange="{!c.productoSeleccionado}" options="{!v.opcionesProductos}" disabled="{!v.casoCerrado || !v.esPropietario || !v.nivelSeleccionado.tematica}"/>
                         </div>
                     </div>
                     <div class="slds-size_1-of-3">
-                        <div class="slds-var-m-around_xx-small">
+                        <div class="slds-var-m-around_xx-small" data-selenium-id="FRA_ComboboxMotivo">
                             <lightning:combobox aura:id="desplegableMotivo" label="Motivo" placeholder="--Seleccione un motivo--"
                                 spinnerActive="{!!v.opcionesCargadas.motivos}" onfocus="{!c.motivoFocus}" onchange="{!c.motivoSeleccionado}" options="{!v.opcionesMotivos}" disabled="{!v.casoCerrado || !v.esPropietario || !v.nivelSeleccionado.producto}"/>
                         </div>
@@ -102,13 +103,13 @@
                 </div>
                 <div class="slds-grid slds-wrap">
                     <div class="slds-size_1-of-2">
-                        <div class="slds-var-m-around_xx-small" style="padding-right: 5px;">
+                        <div class="slds-var-m-around_xx-small" style="padding-right: 5px;" data-selenium-id="FRA_ComboboxCausa">
                             <lightning:combobox aura:id="desplegableCausa" label="Causa" placeholder="--Seleccione una causa--"
                                 spinnerActive="{!!v.opcionesCargadas.causas}" onfocus="{!c.causaFocus}" onchange="{!c.causaSeleccionada}" options="{!v.opcionesCausas}" disabled="{!v.casoCerrado || !v.esPropietario || !v.nivelSeleccionado.motivo}"/>
                         </div>
                     </div>
                     <div class="slds-size_1-of-2">
-                        <div class="slds-var-m-around_xx-small" style="padding-left: 5px;">
+                        <div class="slds-var-m-around_xx-small" style="padding-left: 5px;" data-selenium-id="FRA_ComboboxSolucion">
                             <lightning:combobox aura:id="desplegableSolucion" label="Solución" placeholder="--Seleccione una solución--"
                                 spinnerActive="{!!v.opcionesCargadas.soluciones}" onfocus="{!c.solucionFocus}" onchange="{!c.solucionSeleccionada}" options="{!v.opcionesSoluciones}" disabled="{!v.casoCerrado || !v.esPropietario || !v.nivelSeleccionado.causa}"/>
                         </div>
@@ -140,36 +141,43 @@
                 <lightning:recordEditForm aura:id="recordEditForm" recordId="{!v.recordId}" objectApiName="Case"
                     onload="{!c.recordEditFormOnLoad}" onsuccess="{!c.recordEditFormOnSuccess}" onerror="{!c.recordEditFormOnError}" >
                     <div class="slds-grid slds-wrap slds-gutters_direct-x-small">
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning:inputField fieldName="Origin"/>
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Canal_Entrada">
+                            <lightning:inputField fieldName="Origin" disabled="true"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Canal_Procedencia">
                             <lightning:inputField aura:id="CC_Canal_Procedencia__c" fieldName="CC_Canal_Procedencia__c" disabled="{!v.casoCerrado || !v.esPropietario || v.caso.Origin != 'Phone'}" onchange="{!c.canalProcedenciaOnChange}"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Tipo_Contacto">
                             <lightning:inputField aura:id="CC_Tipo_Contacto__c" fieldName="CC_Tipo_Contacto__c" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Canal_Resolucion">
                             <lightning:inputField aura:id="CC_Canal_Resolucion__c" fieldName="CC_Canal_Resolucion__c" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">							   
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Idioma">							   
                             <lightning:inputField fieldName="CC_Idioma__c" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-1">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Combobox_Campana">
+                            <lightning:combobox aura:id="desplegableCampanaCustom" label="Campaña Fraude" spinnerActive="{!!v.opcionesCargadas.campanasFMW}" variant= "label-inline"
+                            placeholder="--Seleccione una campaña--" onfocus="{!c.campanaCustomFocus}" onchange="{!c.campanaCustomSeleccionada}" options="{!v.opcionesCampanaFMW}" disabled="{!v.casoCerrado || !v.esPropietario}"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Origen_Creacion">							   
+                            <lightning:inputField fieldName="FRA_Origen_Creacion__c" disabled="true"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1" data-selenium-id="FRA_Campo_Detalles_Consulta">
                             <lightning:inputField fieldName="CC_Detalles_Consulta__c" disabled="{!v.casoCerrado || !v.esPropietario}" class="slds-form-element_1-col"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-1">
+                        <div class="slds-col slds-size_1-of-1" data-selenium-id="FRA_Campo_Detalles_Solucion">
                             <lightning:inputField fieldName="CC_Detalles_Solucion__c" disabled="{!v.casoCerrado || !v.esPropietario}" class="slds-form-element_1-col"/>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Contacto_Relacionado">
                             <lightning:inputField aura:id="CC_ContactoRelacionado__c" fieldName="CC_ContactoRelacionado__c" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
                     
-                        <div class="slds-col slds-size_1-of-2">
+                        <div class="slds-col slds-size_1-of-2" data-selenium-id="FRA_Campo_Oficina_Lookup">
                             <lightning:inputField aura:id="CC_Oficina_Lookup__c" fieldName="CC_Oficina__c" disabled="{!v.casoCerrado || !v.esPropietario}"/>
                         </div>
 
-                        <div class="slds-col slds-size_1-of-1">
+                        <div class="slds-col slds-size_1-of-1" data-selenium-id="FRA_Campo_Comments">
                             <lightning:inputField fieldName="Comments" disabled="{!v.casoCerrado || !v.esPropietario}" class="slds-form-element_1-col"/>
                         </div>      
                     </div>
@@ -183,12 +191,13 @@
                     <lightning:inputField aura:id="producto" fieldName="CC_MCC_ProdServ__c" class="slds-hide"/>
                     <lightning:inputField aura:id="motivo" fieldName="CC_MCC_Motivo__c" class="slds-hide"/>
                     <lightning:inputField aura:id="causa" fieldName="CC_MCC_Causa__c" class="slds-hide"/>
-                    <lightning:inputField aura:id="solucion" fieldName="CC_MCC_Solucion__c" class="slds-hide"/>                        
+                    <lightning:inputField aura:id="solucion" fieldName="CC_MCC_Solucion__c" class="slds-hide"/>    
+                    <lightning:inputField aura:id="campana" fieldName="FRA_CampanaFraude__c" class="slds-hide"/>                        
                     <lightning:inputField aura:id="cerradoOperativa" fieldName="CC_Cerrado_Operativa__c" class="slds-hide"/> <!--Fecha de cierre del caso-->
                 </lightning:recordEditForm>
 
                 <!--Botones-->
-                <div style="text-align: right;">
+                <div style="text-align: right;" data-selenium-id="FRA_Botonera">
                     <aura:if isTrue="{!!v.casoCerrado}">
                         <!--Guardar-->
                         <lightning:button aura:id="botonGuardar" label="Guardar" variant="{!(v.cambiarEstadoPendienteColaborador || v.cambioCanalProcedencia) ? 'destructive-text' : 'neutral'}" onclick="{!c.botonGuardarCerrar}" disabled="{!v.guardando || !v.esPropietario || v.casoCerrado}"/>&nbsp;
@@ -199,7 +208,7 @@
                                 <lightning:menuItem label="Rechazar" value="rechazar" disabled="{!v.guardando || !v.esPropietario || v.cambiarEstadoPendienteColaborador}"/>
                             	<aura:if isTrue="{!v.caso.Status != 'FRA_001'}">
                 					<lightning:menuItem label="Pendiente contactar cliente" value="pendienteContactarCliente" disabled="{!v.guardando || !v.esPropietario || v.cambiarEstadoPendienteColaborador}"/>
-            					</aura:if>
+                                </aura:if>
                             </lightning:buttonMenu>
                         </lightning:buttonGroup>
                         <aura:set attribute="else">
@@ -221,20 +230,20 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalRechazarCerrar}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalRechazarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
                 <!--Título-->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Rechazar caso</h2>
                 <p class="slds-var-m-top_x-small">Para continuar la gestión de un caso rechazado deberá reactivarlo previamente.</p>
             </header>
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1" data-selenium-id="FRA_Modal_Rechazar_Motivo">
                 <lightning:textarea label="Motivo del rechazo" aura:id="inputEnviarMotivoRechazo" placeholder="Indique el motivo" required="true" maxlength="400"/>
             </div>
 
             <!--Pie del modal-->
-            <footer class="slds-modal__footer">
-                <lightning:button label="Rechazar" variant="brand" onclick="{!c.modalRechazarRechazar}" disabled="{!v.guardando}"/>
-                <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalRechazarCerrar}"/>
+            <footer class="slds-modal__footer" data-selenium-id="FRA_Modal_Rechazar_Botones">
+                <lightning:button name="FRA_Modal_Rechazar_Boton_Rechazar" label="Rechazar" variant="brand" onclick="{!c.modalRechazarRechazar}" disabled="{!v.guardando}"/>
+                <lightning:button name="FRA_Modal_Rechazar_Boton_Cancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalRechazarCerrar}"/>
             </footer>
         </div>
     </section>
@@ -245,21 +254,21 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalReactivarCerrar}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalReactivarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
                 <!--Título-->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reactivar caso</h2>
                 <p class="slds-var-m-top_x-small">El caso pasará a estado "Activo" para que sea posible continuar su gestión.</p>
             </header>
 
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1" data-selenium-id="FRA_Modal_Reactivar_Motivo">
                 <lightning:textarea label="Motivo de la reactivación" aura:id="inputEnviarMotivoReactivar" placeholder="Indique el motivo" required="true" maxlength="400"/>
             </div>
 
             <!--Pie del modal-->
-            <footer class="slds-modal__footer">
-                <lightning:button label="Reactivar" variant="brand" onclick="{!c.modalReactivarReactivar}" disabled="{!v.guardando}"/>
-                <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalReactivarCerrar}"/>
+            <footer class="slds-modal__footer" data-selenium-id="FRA_Modal_Reactivar_Botones">
+                <lightning:button name="FRA_Modal_Reactivar_Boton_Reactivar" label="Reactivar" variant="brand" onclick="{!c.modalReactivarReactivar}" disabled="{!v.guardando}"/>
+                <lightning:button name="FRA_Modal_Reactivar_Boton_Cancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalReactivarCerrar}"/>
             </footer>
         </div>
     </section>
@@ -270,20 +279,20 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCerrarCerrar}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCerrarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
                 <!--Título-->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Cerrar caso</h2>
                 <p class="slds-var-m-top_x-small">Para continuar la gestión de un caso cerrado deberá reactivarlo previamente.</p>
             </header>
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1" data-selenium-id="FRA_Modal_Cerrar_Motivo">
                 <lightning:textarea label="Motivo del cierre" aura:id="inputEnviarMotivoCierre" placeholder="Indique el motivo" required="true" maxlength="400"/>
             </div>
 
             <!--Pie del modal-->
-            <footer class="slds-modal__footer">
-                <lightning:button label="Cerrar" variant="brand" onclick="{!c.modalCerrarFinal}" disabled="{!v.guardando}"/>
-                <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalCerrarCerrar}"/>
+            <footer class="slds-modal__footer" data-selenium-id="FRA_Modal_Cerrar_Botones">
+                <lightning:button name="FRA_Modal_Cerrar_Boton_Cerrar" label="Cerrar" variant="brand" onclick="{!c.modalCerrarFinal}" disabled="{!v.guardando}"/>
+                <lightning:button name="FRA_Modal_Cerrar_Boton_Cancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalCerrarCerrar}"/>
             </footer>
         </div>
     </section>
@@ -295,20 +304,20 @@
             <!--Cabecera del modal-->
             <header class="slds-modal__header">
                 <!--Icono de cierre-->
-                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalPendienteContactarClienteCerrar}" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalPendienteContactarClienteCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
                 <!--Título-->
                 <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modificar estado caso</h2>
                 <p class="slds-var-m-top_x-small">El caso cambiará a estado "Pendiente Contactar Cliente" debido a que no se ha recibido contestación.</p>
             </header>
             <!--Contenido del modal-->
-            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1" data-selenium-id="FRA_Modal_Pendiente_Motivo">
                 <lightning:textarea label="Motivo de pendiente contactar cliente" aura:id="inputEnviarMotivoPendienteContactoCliente" placeholder="Indique el motivo" required="true" maxlength="400"/>
             </div>
 
             <!--Pie del modal-->
-            <footer class="slds-modal__footer">
-                <lightning:button label="Pendiente Contacto Cliente" variant="brand" onclick="{!c.modalPendienteContactarClienteFinal}" disabled="{!v.guardando}"/>
-                <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalPendienteContactarClienteCerrar}"/>
+            <footer class="slds-modal__footer" data-selenium-id="FRA_Modal_Pendiente_Botones">
+                <lightning:button name="FRA_Modal_Pendiente_Boton_Pendiente" label="Pendiente Contacto Cliente" variant="brand" onclick="{!c.modalPendienteContactarClienteFinal}" disabled="{!v.guardando}"/>
+                <lightning:button name="FRA_Modal_Pendiente_Boton_Cancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalPendienteContactarClienteCerrar}"/>
             </footer>
         </div>
     </section>

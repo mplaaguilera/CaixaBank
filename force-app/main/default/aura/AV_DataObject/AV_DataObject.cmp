@@ -37,6 +37,14 @@ VERSION		USER_STORY			AUTHOR				DATE				Description
 	<!-- INIT AURA COMPONENT -->
 	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
+	
+	<aura:attribute name="gestoresNames" type="String" />
+	<aura:handler name="init" value="{!this}" action="{!c.getGestores}" />
+	
+	<aura:attribute name="isBancaParticulares" type="Boolean" />
+	<aura:handler name="init" value="{!this}" action="{!c.isBParticularesEAPGestor}" />
+	
+
 	<!-- LWC COMPONENT CLI PREMIUM API CALL -->
 	<!--<c:av_Update_Cli_Premium recid="{!v.recordId}" onrefresh="{!c.doInit}" />-->
 	
@@ -110,9 +118,40 @@ VERSION		USER_STORY			AUTHOR				DATE				Description
 										<lightning:button iconName="action:call" iconPosition="left" title="{!$Label.c.AV_CMP_C2C_Call}" label="{!field.value}" onclick="{!c.makeCall}" variant="base"/>
 									</lightning:layoutItem>
 									<aura:set attribute="else">
-										<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">	
-												<lightning:outputField fieldName="{!field.fieldPath}" variant="{!v.displayLabel}" class="{!v.textStyle + ' ' + v.contentStyle}"/>									
-										</lightning:layoutItem>
+										
+										<aura:if isTrue="{!field.fieldPath != 'AV_EAPGestor__c'}">
+											<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">	
+													<lightning:outputField fieldName="{!field.fieldPath}" variant="{!v.displayLabel}" class="{!v.textStyle + ' ' + v.contentStyle}"/>								
+											</lightning:layoutItem>
+										</aura:if>
+										<aura:if isTrue="{!field.fieldPath == 'AV_EAPGestor__c'}">
+											<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">
+												<div style="display: flex; align-items: center;">	
+													<div style="display: flex; flex-direction: column;">
+														<aura:if isTrue="{!v.isBancaParticulares}">
+															<span class="{!'slds-form-element__label' + v.textStyle + ' ' + v.contentStyle}" style="display: block;">{!field.label}</span>
+															<span style="display: block;">Banca de Particulares</span>
+															<aura:set attribute="else">
+																<lightning:outputField fieldName="{!field.fieldPath}" variant="{!v.displayLabel}" class="{!v.textStyle + ' ' + v.contentStyle}"/>
+															</aura:set>
+														</aura:if>
+													</div>
+													<aura:if isTrue="{!field.value != null}">
+														<div style="position: relative; margin-left: auto; margin-left: 20px; margin-top:20px" onmouseover="{!c.showTooltip}" onmouseout="{!c.hideTooltip}">
+															<aura:if isTrue="{!v.gestoresNames != null}">
+																<lightning:button iconName="action:info" iconPosition="left" variant="base" class="IconInfoButton"/>
+															    <!-- Tooltip personalizado -->
+																 <div aura:id="tooltip" class="slds-popover slds-popover_tooltip  slds-hide slds-nubbin_bottom-left" role="tooltip" style="position: absolute; bottom: 100%; left: -15px; z-index: 1; margin-bottom: 5px;width: 200px; ">
+																	 <div class="slds-popover__body">
+																		 {!v.gestoresNames}
+																	 </div>
+																 </div>
+															 </aura:if>
+														</div>
+													</aura:if>
+												</div>	
+											</lightning:layoutItem>
+										</aura:if>
 									</aura:set>
 								</aura:if>
 							</aura:iteration>

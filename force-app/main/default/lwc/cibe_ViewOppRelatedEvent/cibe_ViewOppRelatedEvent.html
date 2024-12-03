@@ -1,0 +1,104 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer" >
+
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+            <!-- <lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 93;position:fixed"></lightning-spinner> -->
+            <!-- PARTE DE LAS OPORTUNIDADES  -->
+            <div style="position: relative;">
+                <lightning-spinner if:true={loadingOppos} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+
+                <span> 
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_5-of-6">
+                            <lightning-icon size="small" icon-name="standard:opportunity"></lightning-icon><strong>&nbsp;&nbsp; {label.oportunidades} ({label.vinculadas} {contadorOpp})</strong>
+                        </div>
+                        <div class="slds-col slds-size_1-of-6">
+                            <button onclick={handleComboBoxChange} id="boton" class="slds-button slds-button_neutral" style="margin-top: -2%; font-weight: normal;">{label.nuevaOportunidad}</button>
+                        </div>
+                    </div>
+                </span>
+                
+                <template for:each={listAccountOpportunities} for:item="opp">
+                    <div key={opp.id} class="cardMargin"> 
+                        <c-cibe_-view-opp-related-detail 
+                            oppo={opp}
+							eventid={recordId}
+							main-vinculed={opp.isPrincipal}
+							onresfreshdataoppo={refreshDataoppo}
+                            onrecountoppos={recountoppos}
+                            onstartload={startload}
+                            ></c-cibe_-view-opp-related-detail>
+                            <!-- onsenddatafromoppo={buildOppoObj} -->
+                        </div>
+                    </template>				
+                </div>   
+                
+                <div style="height: 50px;"></div>
+
+                <!-- PARTE DE LAS TAREAS  -->
+                <div style="position:relative">
+                    <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+                    <span> 
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-icon size="small" icon-name="standard:task"></lightning-icon><strong>&nbsp;&nbsp; Tareas ({label.vinculadas} {contador})</strong>
+                            </div>
+                            
+                        </div>
+                    </span>
+                    
+                    <div class="newOppoContainer">
+                        <div class="slds-grid slds-m-vertical_small">
+                            <lightning-input data-id="newTask" onchange={handleNewTask} value={nameTask} type="text" label="Añadir tarea" placeholder="Introduce el nombre"></lightning-input>
+                            <lightning-button class="buttonAnadir" label={label.add}  onclick={handleAddTask}></lightning-button>
+                        </div>
+                    </div>
+                    
+                    <template for:each={listAccountTask} for:item="task">
+                    <div key={task.id} class="cardMargin"> 
+                        <c-cibe_-view-task-related-detail 
+                        tsk={task}
+                        eventid={recordId}
+                        main-vinculed={task.isPrincipal}
+                        onsenddatafromoppo={buildOppoObj}
+                        onresfreshdatatask={refreshDatatask}
+                        is-future={isFuture}
+                        onrecounttasks={recounttasks}
+                        ></c-cibe_-view-task-related-detail>
+                    </div>
+                </template>				
+            </div>
+                <div style="height: 50px;"></div>
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{flowlabel}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-card>				
+						<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+							<div class="slds-is-relative">
+								<lightning-flow flow-api-name={flowName} flow-input-variables={inputVariables} onstatuschange={handleStatusChangeOpp}> </lightning-flow>
+							</div>
+						</div>
+					</lightning-card>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

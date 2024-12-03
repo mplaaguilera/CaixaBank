@@ -1,0 +1,227 @@
+<template>
+    <div if:true={readyToRender} class="main-container">
+        <!-- OPPORTUNITIES -->
+        <div class="each-section" if:true={showOpp}>
+            <div class="card-container" onclick={redirect} data-origin="Buscador Oportunidades">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:events" alternative-text={oppFinder} title={oppFinder}
+                            class="opp-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{oppFinder}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Alta oportunidades">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:action_list_component" alternative-text={newOpp}
+                            title={newOpp} class="opp-icon"></lightning-icon>
+                    </div>
+
+                </div>
+                <div class="card-name">{newOpp}</div>
+            </div>
+            <div class="card-container" onclick={redirect} data-origin="Dashboard Oportunidades">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="custom:custom102" alternative-text={oppDashboard}
+                            title={oppDashboard} class="opp-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{oppDashboard}</div>
+            </div>
+        </div>
+        <!-- FIN OPP -->
+        <!-- MEETING AND CALENDAR -->
+        <div class="each-section" if:true={showCalendar}>
+            <div class="card-container" onclick={redirect} data-origin="Calendario">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:date_input" alternative-text={calendar} title={calendar}
+                            class="meet-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{calendar}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Alta de cita">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:key_dates" alternative-text={newMeeting} title={newMeeting}
+                            class="meet-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{newMeeting}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Dashboard Citas">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:record_delete" alternative-text={eventDashboard}
+                            title={eventDashboard} class="meet-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{eventDashboard}</div>
+            </div>
+
+        </div>
+        <!-- FIN MEET&CALE -->
+        <!-- PRECIOS -->
+        <div class="each-section" if:true={showPrecios}>
+            <div class="card-container" onclick={redirect} data-origin="Comite de Precios">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:price_book_entries" alternative-text={priceComittee}
+                            title={priceComittee} class="price-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{priceComittee}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Aprobacion por firmas">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:approval" alternative-text={approvalSignatures}
+                            title={approvalSignatures} class="price-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{approvalSignatures}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Dashboard de precios">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:lightning_usage" alternative-text={pricingDashboard}
+                            title={pricingDashboard} class="price-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{pricingDashboard}</div>
+            </div>
+
+        </div>
+        <!-- FIN PRECIOS -->
+        <!-- DASHBOARDS -->
+        <div class="each-section" if:true={showDashboards}>
+            <div class="card-container" onclick={redirect} data-origin="Dashboard Oportunidades">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:dashboard_component" alternative-text={oppDashboard}
+                            title={oppDashboard} class="dash-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{oppDashboard}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Dashboard Citas">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:dashboard_ea" alternative-text={eventDashboard}
+                            title={eventDashboard} class="dash-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{eventDashboard}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Dashboard de precios">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:lightning_usage" alternative-text={pricingDashboard}
+                            title={pricingDashboard} class="dash-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{pricingDashboard}</div>
+            </div>
+
+        </div>
+        <!-- FIN DASHBOARDS -->
+        <!-- SOPORTE -->
+        <div class="each-section" if:true={showSupport}>
+            <div class="card-container" onclick={redirect} data-origin="Listado equipos de soporte">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:date_input" alternative-text={listSupportTeams}
+                            title={listSupportTeams} class="support-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{listSupportTeams}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Enlace al COE">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:record_delete" alternative-text={linkCOE} title={linkCOE}
+                            class="support-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{linkCOE}</div>
+            </div>
+
+        </div>
+        <!-- FIN SOPORTE -->
+
+        <!-- OPORTUNIDADES CON CLIENTE SIN CLIENTE -->
+        <div if:true={altaOpp} class="each-section">
+            <div class="arrow-card" onclick={redirect} data-origin="backOpp">
+                <div class="arrow-card-icon">
+                    <div><lightning-icon icon-name="utility:back" size="x-small" alternative-text="Volver"
+                            title="Volver"></lightning-icon></div>
+                </div>
+            </div>
+            <div class="card-container" onclick={redirect} data-origin="Buscador de cliente">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:date_input" alternative-text={clientFinder}
+                            title={clientFinder} class="opp-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{clientFinder}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Oportunidad sin cliente">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:record_delete" alternative-text={oppWithoutClient}
+                            title={oppWithoutClient} class="opp-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{oppWithoutClient}</div>
+            </div>
+        </div>
+
+        <template if:true={launchFlow}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03"
+                class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container"
+                        icon-name="utility:close" icon-class="slds-icon-text-light" size="medium"
+                        onclick={hideFlowAction}></lightning-button-icon>
+                    <div class="slds-modal__header">
+                        <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowTitle}</h1>
+                    </div>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                        <div class="slds-is-relative">
+                            <lightning-flow flow-api-name={flowApiName} flow-input-variables={inputVariables}
+                                onstatuschange={handleStatusChange}>
+                            </lightning-flow>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
+
+        <!-- FIN OPORTUNIDADES CON CLIENTE SIN CLIENTE -->
+
+
+        <!-- ALTA CITA -->
+        <div if:true={altaCita} class="each-section">
+            <div class="arrow-card" onclick={redirect} data-origin="backCita">
+                <div class="arrow-card-icon">
+                    <div><lightning-icon icon-name="utility:back" size="x-small" alternative-text="Volver"
+                            title="Volver"></lightning-icon></div>
+                </div>
+            </div>
+            <div class="card-container" onclick={redirect} data-origin="Buscador de cliente en cita">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:date_input" alternative-text={clientFinder}
+                            title={clientFinder} class="meet-icon"></lightning-icon></div>
+
+                </div>
+                <div class="card-name">{meetingWithClient}</div>
+            </div>
+
+            <div class="card-container" onclick={redirect} data-origin="Cita sin cliente">
+                <div class="card-icon">
+                    <div><lightning-icon icon-name="standard:record_delete" alternative-text={eventWithoutClient}
+                            title={eventWithoutClient} class="meet-icon"></lightning-icon></div>
+                </div>
+                <div class="card-name">{eventWithoutClient}</div>
+            </div>
+        </div>
+        <!-- FIN ALTA CITA -->
+        <div if:true={showMessage} class="in-progress">
+            <div class="arrow-card" onclick={goback}>
+                <div class="arrow-card-icon">
+                    <div><lightning-icon icon-name="utility:back" size="x-small" alternative-text="Volver"
+                            title="Volver"></lightning-icon></div>
+                </div>
+            </div>
+            <p style="margin-left: 1%;">{soon}</p>
+        </div>
+    </div>
+</template>

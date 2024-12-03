@@ -13,6 +13,7 @@ const COLUMNS = [
     { type: 'text', fieldName: 'estrategia', label: 'Estrategia' },
     { type: 'text', fieldName: 'situacion', label: 'Situación' },
     { type: 'date', fieldName: 'fechaSituacion', label: 'Fecha Situación' },
+    { type: 'text', fieldName:'alertaSirec', label: 'Alerta SIREC'}, //PRUEBAS AÑADIR CAMPO ALERTASIREC
     { type: 'text', fieldName: 'gestor', label: 'Gestor' }   
 ];
 

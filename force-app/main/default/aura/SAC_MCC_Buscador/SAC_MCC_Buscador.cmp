@@ -101,7 +101,7 @@
                             <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Tematica__r.Name}" fontWeight="500" enteredValue="@@@"/>
                             <span class="cc_flecha">→</span>
                             <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_ProdServ__r.Name}" fontWeight="500" enteredValue="@@@"/>
-                            <span class="cc_flecha">→ </span>
+                            <span class="cc_flecha">→</span>
                             <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Motivo__r.Name}" fontWeight="500" enteredValue="@@@"/>
                             <aura:if isTrue="{!and(v.showDetalle, v.negocio != 'SEG')}">
                                 <span class="cc_flecha">→</span>

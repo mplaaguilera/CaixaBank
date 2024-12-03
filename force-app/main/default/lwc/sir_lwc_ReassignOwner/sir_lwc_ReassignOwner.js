@@ -9,12 +9,15 @@ import buscarProcesos from '@salesforce/apex/SIR_LCMP_ReassignOwner.buscarProces
 import changeGestor from '@salesforce/apex/SIR_LCMP_ReassignOwner.changeGestor';
 import getOficinas from '@salesforce/apex/SIR_LCMP_ReassignOwner.getOficinas';
 import findRecords  from '@salesforce/apex/SIR_LCMP_ReassignOwner.findRecords';
+import getEstrategiasNegocio  from '@salesforce/apex/SIR_cls_Utils.getEstrategiasNegocio';
 import USER_ID from '@salesforce/user/Id';
 import LightningConfirm from 'lightning/confirm';
 
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import ESTRATEGIA_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c';
 import SITUACION_FIELD from '@salesforce/schema/SIREC__SIREC_obj_proceso__c.SIR_fld_Situacion_SF__c';
+
+import { RefreshEvent } from "lightning/refresh";
 
 const columnsProceso = [
 	{label: 'Proceso', fieldName: 'enlaceProceso', type: 'url',  typeAttributes: {label: { fieldName: 'nombreProceso' }}, sortable: true },
@@ -35,8 +38,12 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 	@track clienteId; 
 	@track fechaInicio;
 	@track optionSituacion = [];
+	@track optionSituacionPresol = [];
+	@track optionSituacionImpa = [];
 	@track valueSituacion;
 	@track optionEstrategia = [];
+	@track optionEstrategiaPresol = [];
+	@track optionEstrategiaImpa = [];
 	@track valueEstrategia;
 	@track optionTipoProceso = [];
 	@track valueTipoProceso;
@@ -109,7 +116,14 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 
 	@track idRecordTypeImpa = '';
 	@track idRecordTypePresol = '';
-	@track todosRecordTypes = '';
+		
+	//@track todosRecordTypes = '';
+	@track idProcesoImpa = '';
+	@track todasSituaciones = '';
+	@track todasSituacionesPresol = '';
+	@track todasSituacionesImpa = '';	
+	@track negocioPRESOL = 'PRESOL';
+	@track negocioIMPA = 'IMPA';
 
 	connectedCallback() { 
         getQueryRecordTypeProceso({}).then(result => { 
@@ -117,17 +131,24 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
             this.idRecordTypeImpa = result[1].Id; 
 			this.optionTipoProceso.push({'label': 'PRESOL - Preventivo', 'value': result[0].Id});
 			this.optionTipoProceso.push({'label': 'Impagados 1-90', 'value': result[1].Id});
-			this.todosRecordTypes = result[0].Id + ',' + result[1].Id ;
+			this.valueTipoProceso = result[1].Id;
+			this.idProcesoImpa = result[1].Id;
         })
         .catch(error => {
             this.mensajeError = error;
         }); 
     }
 
-	@wire(getPicklistValues, { recordTypeId: '$idRecordTypePresol', fieldApiName: ESTRATEGIA_FIELD })
-    estrategiasPresol;
-	@wire(getPicklistValues, { recordTypeId: '$idRecordTypeImpa', fieldApiName: ESTRATEGIA_FIELD })
-    estrategiasImpa;
+	//@wire(getPicklistValues, { recordTypeId: '$idRecordTypePresol', fieldApiName: ESTRATEGIA_FIELD })
+    //estrategiasPresol;
+	//@wire(getPicklistValues, { recordTypeId: '$idRecordTypeImpa', fieldApiName: ESTRATEGIA_FIELD })
+    //estrategiasImpa;
+
+	@wire(getEstrategiasNegocio, { negocio: '$negocioPRESOL' }) 
+	estrategiasPresol;
+	
+	@wire(getEstrategiasNegocio, { negocio: '$negocioIMPA' })
+	estrategiasImpa;
 
 	@wire(getPicklistValues, { recordTypeId: '$idRecordTypePresol', fieldApiName: SITUACION_FIELD })
     situacionesPresol;
@@ -136,34 +157,42 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 
 	@wire(getOficinaGestorActual, {estrategiasPresol: '$estrategiasPresol', estrategiasImpa: '$estrategiasImpa', situacionesPresol: '$situacionesPresol', situacionesImpa: '$situacionesImpa'})
     wiredData(result) {
-		if(result != null) {      
+		if(result != null) {      	
 			// Se comprueba si ya se ha lanzado el wire de la picklist de estrategia y de situaciones, ya que si no se ha lanzado dara error
-			if(this.estrategiasPresol.data != undefined && this.estrategiasImpa.data != undefined && this.situacionesPresol.data != undefined && this.situacionesImpa.data != undefined){
-				for(let i = 0; i < this.estrategiasPresol.data.values.length; i++){ 
-					this.optionEstrategia.push({'label': this.estrategiasPresol.data.values[i].label, 'value':this.estrategiasPresol.data.values[i].value});
+			if(this.estrategiasPresol.data !== undefined && this.estrategiasImpa.data !== undefined && this.situacionesPresol.data !== undefined && this.situacionesImpa.data !== undefined){
+				for(let i = 0; i < this.estrategiasPresol.data.length; i++){									
+					this.optionEstrategiaPresol.push({'label': this.estrategiasPresol.data[i].SIREC__SIREC_fld_Descripcion__c, 'value':this.estrategiasPresol.data[i].SIREC__SIREC_fld_Codigo__c});					
 				}
-				for(let i = 0; i < this.estrategiasImpa.data.values.length; i++){ 
-					if(this.estrategiasImpa.data.values[i].value != '30014' && this.estrategiasImpa.data.values[i].value != '10000' && this.estrategiasImpa.data.values[i].value != '10007'){
-						this.optionEstrategia.push({'label': this.estrategiasImpa.data.values[i].label, 'value':this.estrategiasImpa.data.values[i].value});
+				for(let i = 0; i < this.estrategiasImpa.data.length; i++){ 
+					if(this.estrategiasImpa.data[i].SIREC__SIREC_fld_Codigo__c !== '30014' && this.estrategiasImpa.data[i].SIREC__SIREC_fld_Codigo__c !== '10000' && this.estrategiasImpa.data[i].SIREC__SIREC_fld_Codigo__c !== '10007'){
+						this.optionEstrategiaImpa.push({'label': this.estrategiasImpa.data[i].SIREC__SIREC_fld_Descripcion__c, 'value':this.estrategiasImpa.data[i].SIREC__SIREC_fld_Codigo__c});
 					}
 				}
+				this.optionEstrategia = this.optionEstrategiaImpa;
 				for(let i = 0; i < this.situacionesPresol.data.values.length; i++){ 
-					if(this.situacionesPresol.data.values[i].value != 'SF_FINALIZ'){
-						this.optionSituacion.push({'label': this.situacionesPresol.data.values[i].label, 'value':this.situacionesPresol.data.values[i].value});
+					if(this.situacionesPresol.data.values[i].value !== 'SF_FINALIZ'){
+						this.optionSituacionPresol.push({'label': this.situacionesPresol.data.values[i].label, 'value':this.situacionesPresol.data.values[i].value});
+						// Informamos la variable todasSituaciones con todas las situaciones de PRESOL
+						if(this.todasSituacionesPresol === ''){
+							this.todasSituacionesPresol = this.situacionesPresol.data.values[i].value;
+						} else {
+							this.todasSituacionesPresol = this.todasSituacionesPresol + ',' + this.situacionesPresol.data.values[i].value;
+						}						
 					}                
-				}
-				for(let i = 0; i < this.situacionesImpa.data.values.length; i++){ 
-					var existe = false;
-					for(var j = 0; j < this.optionSituacion.length; j++) {
-						if (this.optionSituacion[j].value == this.situacionesImpa.data.values[i].value) {
-							existe = true;
-							break;
-						} 					
-					}     
-					if(!existe && this.situacionesImpa.data.values[i].value != 'SF_FINALIZ') {
-						this.optionSituacion.push({'label': this.situacionesImpa.data.values[i].label, 'value':this.situacionesImpa.data.values[i].value});
+				}				
+				for(let i = 0; i < this.situacionesImpa.data.values.length; i++){					 
+					if(this.situacionesImpa.data.values[i].value !== 'SF_FINALIZ') {
+						this.optionSituacionImpa.push({'label': this.situacionesImpa.data.values[i].label, 'value':this.situacionesImpa.data.values[i].value});
+						// Informamos la variable todasSituaciones con todas las situaciones de IMPA
+						if(this.todasSituacionesImpa === ''){
+							this.todasSituacionesImpa = this.situacionesImpa.data.values[i].value;
+						} else {
+							this.todasSituacionesImpa = this.todasSituacionesImpa + ',' + this.situacionesImpa.data.values[i].value;
+						}
 					}          
 				}
+				this.todasSituaciones = this.todasSituacionesImpa;
+				this.optionSituacion = this.optionSituacionImpa;
 				var infoOficina = result.data.split('*');
 				this.oficinaGestorActual = infoOficina[0];
 				this.oficina = infoOficina[0];
@@ -179,7 +208,8 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 						this.valueOficina = this.oficinaIdOriginal;
 						getEmployees({													
 							idOficina: this.oficinaIdOriginal, 													
-							opcionTodasOficinas: false								
+							opcionTodasOficinas: false,
+							numOficina: this.oficinaGestorActual								
 						}).then(result => {
 							if(result != null && result.length > 0) {
 								this.optionsEmpleado = result;
@@ -193,8 +223,7 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 				})
 			}
         }  
-		           
-    }	
+	}	
 	
 	buscar() {
 		this.toggleSpinner();
@@ -211,19 +240,10 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 		this.selectedRecordId = '';
 		this.selectedValue = '';
 		this.totalRecountCount  = 0;
-		if(this.clienteId == ''){
+		if(this.clienteId === ''){
 			this.clienteId = null;
 		}
 		this.data = null;		
-	
-		var especial = '';
-		if(this.esIntouch == 'siIntouch' && this.funcionUsuario == 'Oficina'){
-			especial = 'siIntouch/Oficina';
-		}else if(this.esDan == 'siDan'){
-			especial = 'siDan';
-		} else {
-			especial = 'No';
-		}
 		let oficinaParaQuery;
 		if(this.valueOficina != null){
 			oficinaParaQuery = this.valueOficina;
@@ -235,19 +255,19 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 			opcionTodasOficinas = true;
 		} else {
 			opcionTodasOficinas = false;
-		}
-		var recordTypeQuery = '';
-		if(this.valueTipoProceso != undefined && this.valueTipoProceso != ''){
-			recordTypeQuery = this.valueTipoProceso;
+		}		
+		var situacion = '';
+		if(this.valueSituacion !== undefined && this.valueSituacion !== '' && this.valueSituacion != null){
+			situacion = this.valueSituacion;
 		} else {
-			recordTypeQuery = this.todosRecordTypes;
+			situacion = this.todasSituaciones;
 		}
         buscarProcesos({
 			clienteId: this.clienteId, 
 			fechaInicio: this.fechaInicio, 
-			valueSituacion: this.valueSituacion, 
+			valueSituacion: situacion, 
 			valueEstrategia: this.valueEstrategia, 
-			valueTipoProceso: recordTypeQuery, 
+			valueTipoProceso: this.valueTipoProceso, 
 			valueEmpleado: this.valueEmpleado, 
 			oficina: oficinaParaQuery,			
 			opcionTodasOficinas: opcionTodasOficinas
@@ -262,27 +282,27 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 						rowData.enlaceProceso = '/' + row.Id ;
 						rowData.nombreProceso = row.Name;
 					} 
-					if(row.SIREC__SIREC_fld_cliente__c != null && row.SIREC__SIREC_fld_cliente__c != ''){
+					if(row.SIREC__SIREC_fld_cliente__c != null && row.SIREC__SIREC_fld_cliente__c !== ''){
 						rowData.enlaceCliente = '/lightning/r/Account/' + row.SIREC__SIREC_fld_cliente__r.Id+'/view';
 						rowData.nombreCliente = row.SIREC__SIREC_fld_cliente__r.Name;
 						rowData.numDocumento = row.SIREC__SIREC_fld_cliente__r.CC_Numero_Documento__c;
-						if(row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != null && row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != ''){
+						if(row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c != null && row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c !== ''){
 							rowData.oficina = row.SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__r.Name;
 						}   
-						if(row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != null && row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != ''){  
+						if(row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c != null && row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__c !== ''){  
 							rowData.eap = row.SIREC__SIREC_fld_cliente__r.AV_EAPGestor__r.Name;
 						}						
+					}				
+					if(row.SIREC__SIREC_fld_descEstrategiaCatalogo__c != null && row.SIREC__SIREC_fld_descEstrategiaCatalogo__c !== '') {
+							rowData.estrategia = row.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
 					}
-					if(row.SIREC__SIREC_fld_estrategia__c != null && row.SIREC__SIREC_fld_estrategia__c != '') {
-						rowData.estrategia = row.SIREC__SIREC_fld_estrategia__c;
-					} 
-					if(row.SIREC__SIREC_fld_fechaInicio__c != null && row.SIREC__SIREC_fld_fechaInicio__c != '') {
+					if(row.SIREC__SIREC_fld_fechaInicio__c != null && row.SIREC__SIREC_fld_fechaInicio__c !== '') {
 						rowData.fechaInicio = row.SIREC__SIREC_fld_fechaInicio__c;
 					} 
-					if(row.SIR_fld_Situacion_SF__c != null && row.SIR_fld_Situacion_SF__c != '') {
+					if(row.SIR_fld_Situacion_SF__c != null && row.SIR_fld_Situacion_SF__c !== '') {
 						rowData.situacion = row.SIR_fld_Situacion_SF__c;
 					}
-					if(row.SIR_DeudaTotal__c != null && row.SIR_DeudaTotal__c != '') {
+					if(row.SIR_DeudaTotal__c != null && row.SIR_DeudaTotal__c !== '') {
 						rowData.deudaTotal = row.SIR_DeudaTotal__c;
 					}  
 					if(row.OwnerId) {
@@ -329,8 +349,11 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
         this.clienteId = null;
 		this.fechaInicio = null;
         this.valueSituacion = null;
-        this.valueTipoProceso = null;
+        this.valueTipoProceso = this.idProcesoImpa;
         this.valueEstrategia = null;
+		this.optionEstrategia = this.optionEstrategiaImpa;
+		this.optionSituacion = this.optionSituacionImpa;
+		this.todasSituaciones = this.todasSituacionesImpa;
 		this.optionsEmpleado = this.valorInicialCampoEmpleados;	
         this.valueEmpleado = USER_ID;
 		this.firstSearch = false;
@@ -367,7 +390,7 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 			this.numRegistrosSeleccionados = 'Registros seleccionados: 0';
 			this.procesosSeleccionados = [];
 		}
-		if(this.procesosSeleccionados != null && this.procesosSeleccionados.length > 0 && this.nuevoGestor != null && this.nuevoGestor != '' && this.nuevoGestor != undefined){
+		if(this.procesosSeleccionados != null && this.procesosSeleccionados.length > 0 && this.nuevoGestor != null && this.nuevoGestor !== '' && this.nuevoGestor !== undefined){
 			this.disabledButtonAsignar = false; 
 		} else {
 			this.disabledButtonAsignar = true; 
@@ -417,6 +440,11 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
         return function(a, b) {
             a = key(a);
             b = key(b);
+			if(a == null || a === undefined) {
+				a = '';	
+			} else if(b == null || b === undefined) {	
+				b = '';			
+			}
             return reverse * ((a > b) - (b > a));
         };
     }
@@ -424,7 +452,13 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
     onHandleSort(event) {
         const { fieldName: sortedBy, sortDirection } = event.detail;
         const cloneData = [...this.items];
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+        if(sortedBy === 'enlaceProceso'){
+			cloneData.sort(this.sortBy('nombreProceso', sortDirection === 'asc' ? 1 : -1));
+		} else if(sortedBy === 'enlaceCliente'){
+			cloneData.sort(this.sortBy('nombreCliente', sortDirection === 'asc' ? 1 : -1));
+		} else {
+			cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
+		}
         this.items = cloneData;
         this.sortDirection = sortDirection;
         this.sortedBy = sortedBy;
@@ -443,7 +477,17 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
     }
 
     changeTipoProceso(event){
-        this.valueTipoProceso = event.target.value;  
+        this.valueTipoProceso = event.target.value; 
+		let labelTipoProceso = event.target.options.find(opt => opt.value === event.detail.value).label; 
+		if(labelTipoProceso === 'Impagados 1-90'){
+			this.optionEstrategia = this.optionEstrategiaImpa;
+			this.optionSituacion = this.optionSituacionImpa;
+			this.todasSituaciones = this.todasSituacionesImpa;
+		} else {
+			this.optionEstrategia = this.optionEstrategiaPresol;
+			this.optionSituacion = this.optionSituacionPresol;
+			this.todasSituaciones = this.todasSituacionesPresol;
+		}
     }
 
     changeEmpleado(event){
@@ -485,7 +529,7 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 		this.selectedRecordId = '';
 		this.selectedValue = '';
 		this.oficina = '';        
-		if(event.target.value != ''){			
+		if(event.target.value !== ''){			
 			this.oficinaId = event.target.value;
 			if(this.oficinaId != null){
 				getOficinaString({oficina: this.oficinaId}).then(result => {
@@ -499,11 +543,11 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
     
 	onLeave(event) {  
 		setTimeout(() => {  
-		 this.searchKey = "";  
-		 this.recordsList = null;  
+			this.searchKey = "";  
+			this.recordsList = null;  
 		}, 300);  
-	}  
-		 
+	}
+
 	onRecordSelection(event) {  
 		this.selectedRecordId = event.target.dataset.key;  
 		this.selectedValue = event.target.dataset.name;  
@@ -579,15 +623,16 @@ export default class Sir_lwc_ReassignOwner extends LightningElement {
 		if(procesosId != null && procesosId.length > 0){
 			changeGestor({nuevoGestor: this.nuevoGestor, procesos: procesosId})  
 			.then((result) => {  
-				if(result == 'OK') {					
+				if(result === 'OK') {
 					const evt = new ShowToastEvent({
 						title: 'Operación correcta',
 						message: 'Se han asignado correctamente',
 						variant: 'success',
 						mode: 'dismissable'
 					});
-					this.dispatchEvent(evt);
-					this.buscar();
+					this.dispatchEvent(evt);						
+					this.dispatchEvent(new RefreshEvent());	
+					this.buscar();	
 					this.toggleSpinner();					
 				}				
 			})  

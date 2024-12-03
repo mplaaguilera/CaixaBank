@@ -1,0 +1,583 @@
+<template>
+	
+	<lightning-card>
+		<div class="margen">
+			<button class="slds-button test-id__section-header-button slds-section__title-action"
+				name="Jerarquía Negocio NAME" title="Jerarquía Negocio Title" onclick={toggleShowEquipoAnalista}>
+				<lightning-icon if:true={showEquipoAnalista} size="xx-small" icon-name="utility:chevrondown"
+					class="slds-m-rigth_x-small"></lightning-icon>
+				<lightning-icon if:false={showEquipoAnalista} size="xx-small" icon-name="utility:chevronright"
+					class="slds-m-rigth_x-small"></lightning-icon>
+				<p class="slds-p-horizontal_small" style="font-size: medium;">{labels.equipoRelaCP}</p>
+			</button>
+		</div>
+
+
+		<div class="slds-grid slds-gutters slds-m-around_small" if:true={showEquipoAnalista}>
+			<div class="slds-col">
+				<div class="slds-form-element">
+					<div class="slds-form-element__control">
+					  <div class="slds-checkbox">
+						<input type="checkbox" name="options" id="analystTeam" value="analystTeam" checked="" disabled="" />
+						<label class="slds-checkbox__label" for="analystTeam">
+						  <span class="slds-checkbox_faux"></span>
+						  <span class="slds-form-element__label">{labels.analystTeam}</span>
+						</label>
+					  </div>
+					</div>
+				  </div>
+			</div>
+
+			<div class="slds-col">
+				<div class="slds-form-element">
+					<div class="slds-form-element__control">
+					  <div class="slds-checkbox">
+						<input type="checkbox" name="options" id="syndicateSales" value={syndicateSales} onchange={handleSyndicateSales} checked={syndicateSales}/>
+						<label class="slds-checkbox__label" for="syndicateSales">
+						  <span class="slds-checkbox_faux"></span>
+						  <span class="slds-form-element__label">{labels.syndicateSales}</span>
+						</label>
+					  </div>
+					</div>
+				  </div>
+			</div>
+
+		
+			<div class="slds-col">
+				<div class="slds-form-element">
+					<div class="slds-form-element__control">
+					  <div class="slds-checkbox">
+						<input type="checkbox" name="options" id="alm" value="alm" onchange={handleALM}  checked={alm}/>
+						<label class="slds-checkbox__label" for="alm">
+						  <span class="slds-checkbox_faux"></span>
+						  <span class="slds-form-element__label">{labels.alm}</span>
+						</label>
+					  </div>
+					</div>
+				  </div>
+			</div>
+
+			<div class="slds-col">
+				<div class="slds-form-element">	
+					<div class="slds-form-element__control">
+					  <div class="slds-checkbox">
+						<input type="checkbox" name="options" id="chiefOpOff" value="chiefOpOff" onchange={handleChief} checked={chiefOpOff} />
+						<label class="slds-checkbox__label" for="chiefOpOff">
+						  <span class="slds-checkbox_faux"></span>
+						  <span class="slds-form-element__label">{labels.chiefOpOff}</span>
+						</label>
+					  </div>
+					</div>
+				  </div>
+			</div>
+		</div>
+
+		<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+			<template if:false={editMode}>
+				<div class="slds-grid slds-gutters slds-m-top_large">
+					<div class="slds-col slds-size_1-of-4" >
+						<div class="card">
+							<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+								<b>{labels.analystTeam}</b>
+							</div>
+								<hr class="linea">
+								<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_CreditPortAnalystReview__c'>
+													<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+														icon-name="utility:edit" size="medium" variant="bare"
+														alternative-text="Edit" onclick={buttonEditAnalyst}></lightning-button-icon> 
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_DateAnalystTeam__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element "
+													field-name='CIBE_CredPortAnalystEmployee__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+								</lightning-record-edit-form>
+						</div>
+					</div>
+					
+					<div class="slds-col slds-size_1-of-4" if:true={syndicateSales}>
+						<div class="card" >
+							<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+								<b>{labels.syndicateSales}</b>
+							</div>
+							<hr class="linea">
+							<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_SyndicationTeamOpinion__c'>
+													<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+													icon-name="utility:edit" size="medium" variant="bare"
+													alternative-text="Edit" onclick={buttonEditSyndicate}></lightning-button-icon> 
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_DateSyndicationTeam__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element "
+													field-name='CIBE_SyndicationTeamEmployee__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+								</lightning-record-edit-form>
+						</div>
+					</div>
+
+					<div class="slds-col slds-size_1-of-4" if:true={alm}>
+						<div class="card">
+							<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+								<b>{labels.alm}</b>
+							</div>
+							<hr class="linea">
+							<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_DicALM__c'>
+													<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+													icon-name="utility:edit" size="medium" variant="bare"
+													alternative-text="Edit" onclick={buttonEditALM}></lightning-button-icon> 
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+													field-name='CIBE_DicALMComment__c'>
+													<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+													icon-name="utility:edit" size="medium" variant="bare"
+													alternative-text="Edit" onclick={buttonEditALM}></lightning-button-icon> 
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+			
+									
+			
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element "
+													field-name='CIBE_DateALM__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+		
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="12" class="slds-border_bottom">
+												<lightning-output-field class="slds-form-element "
+													field-name='CIBE_DicALMEmployee__c'>
+													
+												</lightning-output-field>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+								</lightning-record-edit-form>
+						</div>
+					</div>
+
+					<div class="slds-col slds-size_1-of-4" if:true={chiefOpOff}>
+						<div class="card">
+							<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+								<b>{labels.chiefOpOff}</b>
+							</div>
+							<hr class="linea">
+							<p class="slds-m-left_medium">{labels.notificationChief}</p>
+						</div>
+					</div>
+
+				  </div>
+
+			</template>
+
+
+			<template if:true={editMode}>
+				<div class="slds-grid slds-gutters slds-m-top_large">
+						<div class="slds-col slds-size_1-of-4" if:true={analystEdit}>
+							<div class="card">
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.analystTeam}</b>
+								</div>
+									<hr class="linea">
+									<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-input-field class="slds-form-element slds-form-element_stacked"
+														field-name='CIBE_CreditPortAnalystReview__c' value={valueCreditoPortfolio} onchange={handleValueCredPort}>
+													</lightning-input-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DateAnalystTeam__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_CredPortAnalystEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+						</div>
+						
+
+						<div class="slds-col slds-size_1-of-4" if:false={analystEdit}>
+							<div class="card">
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.analystTeam}</b>
+								</div>
+									<hr class="linea">
+									<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_stacked"
+														field-name='CIBE_CreditPortAnalystReview__c'>
+														<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+															icon-name="utility:edit" size="medium" variant="bare"
+															alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon> 
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DateAnalystTeam__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_CredPortAnalystEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+						</div>
+
+						
+
+
+						<div class="slds-col slds-size_1-of-4" if:true={syndicateSales}>
+							<div class="card" if:false={syndicateEdit}>
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.syndicateSales}</b>
+								</div>
+								<hr class="linea">
+								<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_SyndicationTeamOpinion__c'>
+														<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+														icon-name="utility:edit" size="medium" variant="bare"
+														alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon> 
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DateSyndicationTeam__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_SyndicationTeamEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+
+							<div class="card" if:true={syndicateEdit}>
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.syndicateSales}</b>
+								</div>
+								<hr class="linea">
+								<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-input-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_SyndicationTeamOpinion__c' value={valueEquipoSind}
+														onchange={handleValueEquipoSind}>
+													</lightning-input-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DateSyndicationTeam__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_SyndicationTeamEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+						</div>
+
+
+
+
+
+						<div class="slds-col slds-size_1-of-4" if:true={alm}>
+							<div class="card" if:false={almEdit}>
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.alm}</b>
+								</div>
+								<hr class="linea">
+								<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DicALM__c'>
+														<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+														icon-name="utility:edit" size="medium" variant="bare"
+														alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon> 
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DicALMComment__c'>
+														<lightning-button-icon class="slds-float_right force-button-style slds-m-right_x-small"
+														icon-name="utility:edit" size="medium" variant="bare"
+														alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon> 
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_DateALM__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+			
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_DicALMEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+
+							<div class="card" if:true={almEdit}>
+								<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+									<b>{labels.alm}</b>
+								</div>
+								<hr class="linea">
+								<lightning-record-edit-form if:true={showEquipoAnalista} record-id={recordId} object-api-name="Opportunity" onsubmit={handleSubmitDef} onsuccess={handleSuccess} onerror={handleError}>
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-input-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DicALM__c' value={valueALM} onchange={handleValueALM}> 
+													
+													</lightning-input-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-input-field class="slds-form-element slds-form-element_horizontal"
+														field-name='CIBE_DicALMComment__c' value={commentALM} onchange={handleValueALMComment}>
+														
+													</lightning-input-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+				
+										
+				
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_DateALM__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+			
+										<lightning-layout-item class="slds-form-element_readonly" size="12">
+											<lightning-layout>
+												<lightning-layout-item size="12" class="slds-border_bottom">
+													<lightning-output-field class="slds-form-element "
+														field-name='CIBE_DicALMEmployee__c'>
+														
+													</lightning-output-field>
+												</lightning-layout-item>
+											</lightning-layout>
+										</lightning-layout-item>
+									</lightning-record-edit-form>
+							</div>
+
+
+							
+					</div>
+
+					<div class="slds-col slds-size_1-of-4" if:true={chiefOpOff}>
+						<div class="card">
+							<div class="slds-p-around_x-small slds-text-align_center slds-m-top_x-small">
+								<b>{labels.chiefOpOff}</b>
+							</div>
+							<hr class="linea">
+							<p class="slds-m-left_medium">{labels.notificationChief}</p>
+						</div>
+					</div>
+
+				  </div>
+		
+
+				<div class="slds-docked-form-footer">
+					<lightning-button label={labels.cancel} onclick={handleCancel}></lightning-button>
+					<lightning-button label={labels.save} class="slds-m-left_small" variant="brand"
+						type="submit"></lightning-button>
+				</div>
+
+			</template>
+		</lightning-record-edit-form>
+
+
+		<lightning-spinner if:true={isShowSpinner} alternative-text="Loading" size="medium"></lightning-spinner>
+
+	</lightning-card>
+
+
+</template>

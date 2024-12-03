@@ -12,9 +12,10 @@ import validarPretensiones from '@salesforce/apex/SAC_LCMP_RecuperarPlantillas.v
 
 //Campos reclamación
 import IDIOMA_FIELD from '@salesforce/schema/Case.CC_Idioma__c';
+import RECORDTYPE_FIELD from '@salesforce/schema/Case.RecordTypeId';
 
 
-const fields = [IDIOMA_FIELD];
+const fields = [IDIOMA_FIELD, RECORDTYPE_FIELD];
 
 export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
     // Variable que se comunica con el lwc sAC_GeneracionDocumento
@@ -51,6 +52,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
 
     @track caso;
     @track idiomaReclamacion = '';
+    @track recordTypeCaso;
 
 
     //Se obtiene cuál es el idioma del caso
@@ -59,12 +61,9 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
         if(data){
             this.caso = data;
             this.idiomaReclamacion = data.fields.CC_Idioma__c.value;
+            this.recordTypeCaso = data.fields.RecordTypeId.value;
         }
     }
-
-
-
-
 
     // Se obtiene los datos de la carpeta Raiz
     @wire(recuperarDirectorioRaiz, {carpetaRaiz: '$carpetaRaiz'}) 
@@ -86,7 +85,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
 
         }
         if(error){
-            console.log(error);
+			this.mostrarToast('error', 'ERROR', JSON.stringify(error));
         }        
     };
 
@@ -257,7 +256,7 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
             this.dispatchEvent(new RefreshEvent());
 		}
 		else {
-            obtenerDatosTemplate({'idTemplate': this.idPlantilla, 'idObject': this.recordId, 'idioma': this.idiomaReclamacion}).then(result => {              
+            obtenerDatosTemplate({'idTemplate': this.idPlantilla, 'idObject': this.recordId, 'idioma': this.idiomaReclamacion, 'recordType' : this.recordTypeCaso}).then(result => {              
                 if(result){
                     this.cuerpoPlantilla = result.cuerpo;
                     this.headerPlantilla = result.header;
@@ -418,4 +417,10 @@ export default class Sac_RecuperarPlantillasRedaccion extends LightningElement {
         //Hacemos el dispatch event del evento que hemos creado
         this.dispatchEvent(sendDataEvent);
     }
+
+    mostrarToast(tipo, titulo, mensaje) {
+		this.dispatchEvent(new ShowToastEvent({
+			variant: tipo, title: titulo, message: mensaje, mode: 'dismissable', duration: 4000
+		}));
+	}
 }

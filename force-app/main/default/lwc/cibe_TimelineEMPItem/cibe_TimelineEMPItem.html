@@ -1,0 +1,146 @@
+<template>
+
+  <div if:false={isOpp} class={divClass}>
+    <div class="slds-media">
+      <div class="slds-media__figure">
+        <div class="slds-timeline__icon tm-div">
+          <lightning-icon icon-name={iconName} class="slds-timeline__icon"></lightning-icon>
+        </div>
+      </div>
+      <div class="slds-media__body">
+        <lightning-layout>
+          <lightning-layout-item class="layout-item-pad-top" size="5" small-device-size="4" medium-device-size="4" large-device-size="4" padding="around-small">
+            <div class="div-inline">
+              <h1>
+                <a class="va-top" onclick={viewRecord}>{item.subject}</a>
+              </h1>
+              <div>
+                <label>{item.comment}</label>
+              </div>
+            </div>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top slds-m-left_large" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isType}>{item.contactType}</p>
+            <p if:true={isProduct}>{item.product}</p>
+            <p if:true={isChannel}>{item.caseChannel}</p>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isStatus}>{item.status}</p>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isEmployee} class="desbordarText" title={item.employee}>{item.employee}</p>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top " size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isDate}>{item.dateField}</p>                    
+          </lightning-layout-item>
+
+        </lightning-layout>
+      </div>
+    </div>
+
+    <template if:true={hasOpps}>
+      <template for:each={item.nestedOpportunities} for:item="nestedOpportunity" for:index="index">
+        <div class="slds-media" key={nestedOpportunity.id}>
+          <div class="contendedor-general-oppo" >                   
+            <div class="slds-media__body margin-sub-opp" >
+              <lightning-layout>
+                <lightning-layout-item  class="layout-item-pad-top-subject cont-opp" size="10" small-device-size="7" medium-device-size="7" large-device-size="7" padding="around-small">
+                  <div class="div-inline-2">
+                    <div class="slds-media__figure" > 
+                      <lightning-icon icon-name="standard:opportunity" class="slds-timeline__icon" size="small"></lightning-icon >   
+                    </div>
+                    <h1 class="desbordarText3">
+                      <a onclick={viewRecordOpp} data-record-id={nestedOpportunity.recordId} title={nestedOpportunity.subject}>{nestedOpportunity.subject} &nbsp;</a>         
+                    </h1>
+                    <span class="slds-badge" if:true={isStatus} data-id={nestedOpportunity.recordId} >{nestedOpportunity.status}</span> 
+                  </div>
+                </lightning-layout-item>
+
+                <lightning-layout-item class="layout-item-pad-top slds-m-left_large" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+                  <p if:true={isProduct}>{nestedOpportunity.product}</p>
+                </lightning-layout-item>
+
+                <lightning-layout-item class="layout-item-pad-top" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+                  <p if:true={isEmployee} class="desbordarText" title={item.employee}>{nestedOpportunity.employee}</p>
+                </lightning-layout-item>
+      
+                <lightning-layout-item class="layout-item-pad-top " size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+                  <p if:true={isDate}>{nestedOpportunity.dateField}</p>                    
+                </lightning-layout-item>
+
+              </lightning-layout>
+              <div class="comentario-class" >
+								<template if:true={hasOpps}>
+									<template for:each={nestedOpportunity.comentarios} for:item="comentario" for:index="idx">
+										<div key={nestCom}>
+											<div class="comentario-inside2">
+												<p><span style="color:gray">{comentario.fechaComentario} - </span>{comentario.comentario}</p>
+											</div>
+										</div>
+									</template>
+								</template>
+							</div>
+            </div>   
+          </div>
+        </div>
+      </template>
+    </template>
+  </div>
+
+  
+
+  <div if:true={isOpp} class={divClass}>
+    <div class="slds-media">
+      <div class="slds-media__figure">
+        <div class="slds-timeline__icon tm-div">
+          <lightning-icon icon-name={iconName} class="slds-timeline__icon"></lightning-icon>
+        </div>
+      </div>
+      <div class="slds-media__body">
+        <lightning-layout>
+
+          <lightning-layout-item  class="layout-item-pad-top-subject cont-opp" size="10" small-device-size="7" medium-device-size="7" large-device-size="7" padding="around-small">
+            <div class="div-inline-2">
+              <h1 class="desbordarText3">
+                <a onclick={viewRecord} data-record-id={item.recordId} title={item.subject}>{item.subject} &nbsp;</a>         
+              </h1>
+              <span class="slds-badge" if:true={isStatus} data-id={item.recordId} >{item.status}</span> 
+              
+            </div>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top slds-m-left_large" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isType}>{item.contactType}</p>
+            <p if:true={isProduct}>{item.product}</p>
+            <p if:true={isChannel}>{item.caseChannel}</p>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top" size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isEmployee} class="desbordarText" title={item.employee}>{item.employee}</p>
+          </lightning-layout-item>
+
+          <lightning-layout-item class="layout-item-pad-top " size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+            <p if:true={isDate}>{item.dateField}</p>                    
+          </lightning-layout-item>
+
+        </lightning-layout>
+        <div class="comentario-class2" >
+            <template for:each={item.comentarios} for:item="comentario" for:index="idx">
+              <div key={nestCom}>
+                <div class="comentario-inside2">
+                  <p><span style="color:gray">{comentario.fechaComentario} - </span>{comentario.comentario}</p>
+                </div>
+              </div>
+            </template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</template>

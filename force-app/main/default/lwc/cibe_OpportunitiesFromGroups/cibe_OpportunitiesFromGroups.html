@@ -8,7 +8,7 @@
                 <div class="slds-media__body">
                     <h2 class="slds-card__header-title">
                         <span class="slds-card__header-link slds-truncate" title="Oportunidades del grupo">
-                            Oportunidades del grupo
+                            {labels.grupoOportunidades}
                         </span>
                     </h2>
                 </div>
@@ -25,7 +25,7 @@
                 </lightning-datatable>
                 <template if:true={empty}>
                     <div class="slds-m-around_xx-small slds-text-align_center">
-                        <b>No hay oportunidades asociadas a los clientes seleccionados del grupo comercial.</b>
+                        <b>{labels.message}</b>
                     </div>
                 </template>
             </div>

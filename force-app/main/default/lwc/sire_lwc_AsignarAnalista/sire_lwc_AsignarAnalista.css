@@ -1,5 +1,5 @@
 .table-container {
-	height: 25rem;
+	height: 20rem;
 }
 
 .slds-form-element_horizontal .slds-form-element__control, .slds-form_horizontal .slds-form-element .slds-form-element__control, .slds-form_stacked .slds-form-element_horizontal .slds-form-element__control {
@@ -8,11 +8,7 @@
 }
 
 .buttonStyle{
-    margin-left: 20%;
-}
-
-.divPadding{
-	padding-top: 1rem;
+    margin-left: 10%;
 }
 
 .title{
@@ -26,10 +22,14 @@
 	height: 90%!important;
 }
 
-.table-container-paginacion{
-	margin-bottom: 60px;
+.marginBoton {
+    margin-bottom: 270px;
 }
 
-.marginBoton {
-    margin-bottom: 30px;
+:host .slds-form-element__control .slds-radio {
+	display: contents !important;
+}
+
+.table-container-paginacion{
+	margin-bottom: 50px;
 }

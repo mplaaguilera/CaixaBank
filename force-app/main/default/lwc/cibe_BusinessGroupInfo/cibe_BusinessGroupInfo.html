@@ -1,0 +1,43 @@
+<template>
+    <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls"
+        style="z-index: 3;"></lightning-spinner>
+    <lightning-card if:true={readyToRender}>
+        <div class="title-container">
+            <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+            <div class="title-BG"><a name={businessGroupId} onclick={viewAccount}>{businessGroupName}</a></div>
+        </div>
+
+        <div class="main-container">
+            <div class="left-sub-container">
+                <div class="info-container">
+                    <p>{interlocutor}</p>
+                    <div><a name={interlocutorId} onclick={viewAccount}>{interlocutorName}</a></div>
+                </div>
+                <div class="info-container members">
+                    <p>{members} ({membersNumber})</p>
+                    <template for:each={membersList} for:item="member">
+                        <div key={member.id}>
+                            <a name={member.Id} onclick={viewAccount}>{member.Name}</a>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="right-sub-container">
+                <div>
+                    <lightning-icon icon-name="standard:opportunity" class="icon-style" size="small"></lightning-icon>
+                    {opp} ({totalOpp})
+                </div>
+                <div>
+                    <lightning-icon icon-name="standard:event" class="icon-style" size="small"></lightning-icon>
+                    {events} ({totalEvents})
+                </div>
+                <div>
+                    <lightning-icon icon-name="standard:task" class="icon-style" size="small"></lightning-icon>
+                    {task} ({totalTask})
+                </div>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

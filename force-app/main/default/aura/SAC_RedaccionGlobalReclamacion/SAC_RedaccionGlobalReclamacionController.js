@@ -166,7 +166,7 @@
                                                                 component.set('v.copia', wrapper.copia);
 
                                                                 component.set('v.caso', wrapper.caso);
-                                                                component.set('v.ficherosAdjuntos', wrapper.adjuntos);
+                                                                //component.set('v.ficherosAdjuntos', wrapper.adjuntos);
 
                                                         
                                                             }
@@ -232,7 +232,7 @@
                                                         component.set('v.copia', wrapper.copia);
 
                                                         component.set('v.caso', wrapper.caso);
-                                                        component.set('v.ficherosAdjuntos', wrapper.adjuntos);
+                                                        //component.set('v.ficherosAdjuntos', wrapper.adjuntos);
 
                                                         
                                                     }

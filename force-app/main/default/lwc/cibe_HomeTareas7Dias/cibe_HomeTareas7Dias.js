@@ -27,11 +27,11 @@ export default class cibe_HomeTareas7Dias extends NavigationMixin(LightningEleme
    
     @track columns = [
 
-        { label: this.labels.nombreCliente,           fieldName: 'idAccount',        sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},     initialWidth : 200,       typeAttributes: {label: {fieldName: 'AccountName'}}},
-        { label: this.labels.origen,                  fieldName: 'origen',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'},     initialWidth : 200},  
-        { label: this.labels.asunto,                  fieldName: 'idTask',           sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },    initialWidth : 200,       typeAttributes: {label: {fieldName: 'asunto'}}},
-        { label: this.labels.estado,                  fieldName: 'estado',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' },    initialWidth : 200},  
-        { label: this.labels.fechaVencimiento,        fieldName: 'fechaVencimiento', sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },   initialWidth : 100,       typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric"}}
+        { label: this.labels.nombreCliente,           fieldName: 'idAccount',        sortable: true,       type: 'url',       cellAttributes: { alignment: 'left'},       typeAttributes: {label: {fieldName: 'AccountName'}}},
+        { label: this.labels.origen,                  fieldName: 'origen',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left'}},  
+        { label: this.labels.asunto,                  fieldName: 'idTask',           sortable: true,       type: 'url',       cellAttributes: { alignment: 'left' },      typeAttributes: {label: {fieldName: 'asunto'}}},
+        { label: this.labels.estado,                  fieldName: 'estado',           sortable: true,       type: 'text',      cellAttributes: { alignment: 'left' }},  
+        { label: this.labels.fechaVencimiento,        fieldName: 'fechaVencimiento', sortable: true,       type: 'date',      cellAttributes: { alignment: 'right' },     typeAttributes:{day: "2-digit", month: "2-digit", year: "numeric"}}
     ];
     
 

@@ -1,0 +1,225 @@
+<template>
+    <div class="slds-box">
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                      <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                          <h2 class="slds-card__header-title">
+                            <span>{labels.assCXB}</span>
+                          </h2>
+                        </div>
+                        <div class="slds-no-flex">
+                          <button class="slds-button slds-button_neutral" onclick={openModal}>{labels.add}</button>
+                        </div>
+                      </header>
+                    </div>
+
+                    <div class="slds-card__body slds-card__body_inner">
+                        <lightning-datatable 
+                        key-field="id"
+                        data={dataCXB}
+                        columns={columnsCXB}
+                        hide-checkbox-column="true"
+                        onrowaction={handleRowAction}
+                        sorted-by={sortByFieldName}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortDataCXB}
+                        default-sort-direction={defaultSort}
+                        >
+                        </lightning-datatable>
+                    </div>
+
+                  </article>    
+                  
+            </div>
+        </article>
+    </div>
+
+
+    <div class="slds-box slds-m-top_medium">
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                      <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                          <h2 class="slds-card__header-title">
+                            <span>{labels.assClientes}</span>
+                          </h2>
+                        </div>
+                        <div class="slds-no-flex">
+                          <button class="slds-button slds-button_neutral" onclick={openModal}>{labels.add}</button>
+                        </div>
+                      </header>
+                    </div>
+
+                    <div class="slds-card__body slds-card__body_inner">
+                        <lightning-datatable 
+                        key-field="id"
+                        data={dataClientes}
+                        columns={columnsClientes}
+                        hide-checkbox-column="true"
+                        onrowaction={handleRowAction}
+                        sorted-by={sortByFieldName}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortDataClientes}
+                        default-sort-direction={defaultSort}>
+                        </lightning-datatable>
+                    </div>
+
+                  </article>    
+                  
+            </div>
+        </article>
+    </div>
+
+
+    <div class="slds-box slds-m-top_medium">
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                      <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                          <h2 class="slds-card__header-title">
+                            <span>{labels.assNoRegistrados}</span>
+                          </h2>
+                        </div>
+                        <div class="slds-no-flex">
+                          <button class="slds-button slds-button_neutral" onclick={openModal}>{labels.add}</button>
+                        </div>
+                      </header>
+                    </div>
+
+                    <div class="slds-card__body slds-card__body_inner">
+                        <lightning-datatable 
+                        key-field="id"
+                        data={dataNoRegistrados}
+                        columns={columnsNoRegistrados}
+                        hide-checkbox-column="true"
+                        onrowaction={handleRowAction}
+                        sorted-by={sortByFieldName}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortDataNoRegistrados}
+                        default-sort-direction={defaultSort}
+                        >
+                        </lightning-datatable>
+                    </div>
+
+                  </article>    
+                  
+            </div>
+        </article>
+    </div>
+
+
+    <!-- Modal -->
+
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container modalAttende">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{labels.asistentes}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                  <template if:true={showSpinnerAdd}> 
+                    <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+                  </template>
+                    <div class="slds-card__body slds-card__body_inner">
+                        <div class="slds-grid slds-gutters slds-m-around_large">
+                            <div class="slds-col">
+                                <c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+                                data-id="attendeeslookupClientes"
+                                onsearch={handleSearchAttendes3}
+                                onselectionchange={handleSelectionAttendee3}
+                                fieldlabel={labels.assClientes}
+                                placeholder={labels.buscaContacto}
+                                >
+                            </c-av_-lookup>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-input data-id="email"
+                                type="email"
+                                label={labels.asistentesNoRegistrados}
+                                placeholder={labels.escribirEmail}
+                                onchange={handleEmail}
+                                onkeypress={handleEnter}
+                                value={email}>
+                                </lightning-input>
+                            </div>
+                            <div class="slds-col">
+                                <c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+                                data-id="attendeeslookupCXB"
+                                onsearch={handleSearchAttendes}
+                                onselectionchange={handleSelectionAttendee}
+                                fieldlabel={labels.asistentesCaixa}
+                                placeholder={labels.buscaContacto}
+                                >
+                            </c-av_-lookup>
+                            </div>
+                            <div class="slds-col slds-m-top_medium" style="margin-top: 21px;">
+                                <lightning-button label={labels.anyadir} disabled={buttonDisabled} title="Non-primary action" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+                            </div>
+                          </div>
+                    </div>
+
+                    <lightning-datatable if:true={añadirAttende}
+                        key-field="id"
+                        data={attendeData}
+                        columns={columnsAttendes}
+                        onrowaction={handleRowAction}
+                        onrowselection={handleRowSelection}
+                        selected-rows={preSelectedRows}
+                        >
+                    </lightning-datatable>
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">{labels.add}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+    <!-- Modal delete CXB -->
+    <template if:true={isModalOpenDelete}>
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+          <div class="slds-modal__container">
+              <header class="slds-modal__header"> 
+                  <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalDelete}>
+                      <lightning-icon icon-name="utility:close"
+                          alternative-text="close"
+                          variant="inverse"
+                          size="small" ></lightning-icon>
+                      <span class="slds-assistive-text">Close</span>
+                  </button>
+                  <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">{labels.deleteAttende2}</h2>
+              </header>
+              <div class="slds-modal__content slds-p-around_medium slds-text-align_center" id="modal-content-id-2">
+                <template if:true={showSpinner}> 
+                  <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+              </template>
+                {labels.deleteAtt}
+              </div>
+              <footer class="slds-modal__footer">
+                  <button class="slds-button slds-button_neutral" onclick={closeModalDelete} title="Cancel">{labels.cancelar}</button>
+                  <button class="slds-button slds-button_brand" onclick={submitDetailsDelete} title="OK">{labels.eliminar}</button>
+              </footer>
+          </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+
+</template>

@@ -4,10 +4,10 @@ import getURL from '@salesforce/apex/SIR_LCMP_ListaProcesosClientePRESOL.getURL'
 
 const columns = [
     {label: 'PROCESO', fieldName: 'Name', type: 'text'},
-    {label: 'ESTRATEGIA', fieldName: 'SIREC__SIREC_fld_estrategia__c', type: 'text'},
+    {label: 'ESTRATEGIA', fieldName: 'SIREC__SIREC_fld_descEstrategiaCatalogo__c', type: 'text'},
     {label: 'SITUACIÓN', fieldName: 'SIREC__SIREC_fld_situacion__c', type: 'text'},
     {label: 'FECHA SITUACIÓN', fieldName: 'SIREC__SIREC_fld_fechaSituacion__c', type: 'date'}, 
-    {label: 'FECHA INICIO', fieldName: 'SIREC__SIREC_fld_fechaInicio__c', type: 'date'},    
+    {label: 'FECHA INICIO', fieldName: 'SIREC__SIREC_fld_fechaInicio__c', type: 'date'}    
 ];
 
 export default class Sir_lwc_ListaProcesosClientePRESOL extends LightningElement {
@@ -24,7 +24,7 @@ export default class Sir_lwc_ListaProcesosClientePRESOL extends LightningElement
             data.forEach((row) => {
                 let rowData = {};
                 rowData.Name = row.Name;
-                rowData.SIREC__SIREC_fld_estrategia__c = row.SIREC__SIREC_fld_estrategia__c;
+                rowData.SIREC__SIREC_fld_descEstrategiaCatalogo__c = row.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                 rowData.SIREC__SIREC_fld_situacion__c = row.SIREC__SIREC_fld_situacion__c;
                 rowData.SIREC__SIREC_fld_fechaSituacion__c = row.SIREC__SIREC_fld_fechaSituacion__c;
                 rowData.SIREC__SIREC_fld_fechaInicio__c = row.SIREC__SIREC_fld_fechaInicio__c;
@@ -32,7 +32,7 @@ export default class Sir_lwc_ListaProcesosClientePRESOL extends LightningElement
             });
             this.procesos = currentData;
             this.tituloTabla = 'PRESOL - Preventivo Activos (' +  data.length + ')'; 
-            if(data.length == 0){
+            if(data.length === 0){
                 this.visible = false;
             } else {
                 this.visible = true;
@@ -40,11 +40,9 @@ export default class Sir_lwc_ListaProcesosClientePRESOL extends LightningElement
         }                 
     }
 
-
     goToCliente(){
         getURL({idCliente: this.recordId}).then(result => {            
             window.open(result);
         });
     }
-
 }

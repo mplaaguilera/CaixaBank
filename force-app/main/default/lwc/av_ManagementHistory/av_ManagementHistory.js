@@ -22,7 +22,7 @@ const columns = [
 		month: 'numeric',
 		year: 'numeric',
 		hour: '2-digit',
-		minute: '2-digit',
+		minute: '2-digit'
 	  },
 	  cellAttributes: { class: { fieldName: 't1' }  }, hideDefaultActions: true
 	}

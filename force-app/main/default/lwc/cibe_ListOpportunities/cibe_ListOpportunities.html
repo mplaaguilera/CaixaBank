@@ -3,10 +3,13 @@
     <div class="slds-container">
         <div>
             <div class="slds-box slds-box_small">
-                <h1 slot="title" class="card-title">
+                <h1 slot="title" class="card-title slds-m-bottom_medium">
                     <lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
                     {labels.oppVinculadas}
                     <lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+                        <div if:true={roleCib} class="slds-float_right">
+                            <button onclick={handleComboBoxChange} id="boton" class="slds-button slds-button_neutral" style="margin-top: -2%; font-weight: normal;">{labels.nuevaOportunidad}</button>
+                      </div>
                 </h1>
                 <template if:true={recInfo} for:each={recInfo} for:item="optyTask">
                     <div key={optyTask.Id} >
@@ -15,6 +18,7 @@
                 </template>
             </div>
         </div>
+
         <!-- Posibles Vinculos -->
         <div class="not-first-card">
             <div class="slds-box slds-box_small ">
@@ -38,4 +42,34 @@
             <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
         </template>
     </div>
+
+
+    <!-- Modal -->
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{flowlabel}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-card>				
+						<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+							<div class="slds-is-relative">
+								<lightning-flow flow-api-name={flowName} flow-input-variables={inputVariables} onstatuschange={handleStatusChangeOpp}> </lightning-flow>
+							</div>
+						</div>
+					</lightning-card>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
 </template>

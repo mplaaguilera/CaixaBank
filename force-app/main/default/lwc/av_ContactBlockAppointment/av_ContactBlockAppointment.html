@@ -39,6 +39,11 @@
                     <div style="display: inline-block; margin-right: 15px">
                         <lightning-combobox  label="Duración" name="duracion" placeholder="Duración" options={optionsDuration} onchange={handleChangeDuration} value ={durationValueInitial} ></lightning-combobox>
                     </div>
+                   
+                    <div if:true={showNoLocalizado} style="display: inline-block; margin-right: 15px">
+                        <lightning-input type="checkbox" data-id="no-localizado" label="No Localizado" onclick={handleNoLocalizado}></lightning-input>
+                    </div>
+
                     <div if:true={islegalentity} style="display: inline-block; margin-right: 15px">
                         <c-av_-lookup class="lookup-cmp slds-size_1-of-5"
                             data-id="clookup6"
@@ -77,7 +82,7 @@
                     </div>
                     <div if:false={isreport}>
                         <div style="margin-top: 10px;">
-                            <lightning-input type="checkbox" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
+                            <lightning-input type="checkbox" data-id = "citanocomercialcb" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
                         </div>
                         <!-- <div if:true={showComentary} style="margin-top: 10px;"> -->
                             <lightning-textarea label="Comentario" name="comentario" onchange={handleComment}></lightning-textarea>
@@ -105,6 +110,9 @@
                     <div if:true={isreport} style="display: inline-block; margin-right: 15px">
 						<lightning-combobox  label="Estado" name="estado" options={optionsStatus} onchange={handleChangeStatus} value ={statusValue} ></lightning-combobox>
 					</div>
+                    <div>
+                        <lightning-textarea label="Comentario" onchange={handleChangeComentary}></lightning-textarea>
+                    </div>
                 </lightning-tab>
             </lightning-tabset>
         </div>

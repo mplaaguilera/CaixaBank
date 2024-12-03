@@ -2,6 +2,7 @@
     implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId"
     access="global">
     <aura:attribute name="opcionesPlantilla" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaInteraccion" type="List" default="[]" />
     <aura:attribute name="readonly" type="Boolean" default="true" />
 
     <aura:handler name="init" value="{! this }" action="{! c.init }" />
@@ -23,12 +24,19 @@
                                 value="" required="false" dropdownAlignment="right" variant="estandar"
                                 onchange="{!c.update}" options="{!v.opcionesPlantilla}" disabled="{!v.readonly}" />
 
+                            <lightning:combobox aura:id="PlantillaInteraccionName" name="plantilla"
+                                label="Plantilla interacción" placeholder="-Selecciona una plantilla-"
+                                value="" required="false" dropdownAlignment="right" variant="estandar"
+                                onchange="{!c.update}" options="{!v.opcionesPlantillaInteraccion}" disabled="{!v.readonly}" />
+
                             <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}"
                                 objectApiName="CC_Grupo_Colaborador__c" onload="{!c.recordLoaded}">
                                 <lightning:inputField fieldName="SAC_PlantillaConsultaId__c"
                                     aura:id="PlantillaConsultaId" class="slds-hide" />
                                 <lightning:inputField fieldName="SAC_PlantillaReclamacionId__c"
                                     aura:id="PlantillaReclamacionId" class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_PlantillaInteraccionId__c"
+                                    aura:id="PlantillaInteraccionId" class="slds-hide" />
                                 <lightning:inputField fieldName="SAC_PlantillaReclamanteId__c"
                                     aura:id="PlantillaReclamanteId" class="slds-hide" />
 

@@ -213,7 +213,7 @@ export default class Sac_Reclamantes extends NavigationMixin(LightningElement) {
                             }
                         } else {
                             listCaract = Object.assign({caracteristicas : caractElement}, {OficinaDiferente : false}, this.reclamantes[i]);
-                        }
+                        } nm
                         this.reclamantesSecundarios.push(listCaract);
                     }else{
                         let listaReclamantes = [];

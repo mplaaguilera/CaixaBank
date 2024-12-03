@@ -13,5 +13,14 @@
     </template>
     <template if:true={tipoOPC}>
         <!-- Llamar al LWC -->
+        <c-sire_lwc_-Formulario-Dinamico-O-P-C record-id={recordId} onsiguiente={calcularTarea}></c-sire_lwc_-Formulario-Dinamico-O-P-C>        
+    </template>
+    <template if:true={tipoOPCListaContratos}>
+        <!-- Llamar al LWC -->
+        <c-sir_lwc_-Lista-Contratos-O-P-C record-id={recordId} onsiguiente={calcularTarea}></c-sir_lwc_-Lista-Contratos-O-P-C>        
+    </template>
+    <template if:true={tipoDAT_EE}>
+        <!-- Llamar al LWC -->
+        <c-sire_lwc_-Lista-Documento-E-E record-id={recordId} onsiguiente={calcularTarea}></c-sire_lwc_-Lista-Documento-E-E>
     </template>
 </template>

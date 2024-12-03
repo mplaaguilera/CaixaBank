@@ -134,6 +134,7 @@
                     <lightning:button class="slds-button slds-button_text-destructive" aura:id="Emergencia" label="Emergencia" title="Emergencia" onclick="{!c.emergenciaAut}" disabled="{!v.disabledBotones}"/>
                 </aura:if>
                 <lightning:button class="slds-button slds-button_neutral" aura:id="Cliente Digital" label="Cliente Digital" title="Cliente Digital" onclick="{!c.clienteDigitalAut}" disabled="{!v.disabledBotones}"/>
+                <lightning:button class="slds-button slds-button_neutral" aura:id="Autenticacion" label="Autenticacion" title="Autenticacion" onclick="{!c.test}"/>
             </div>
             <!-- <aura:if isTrue="{!v.bEsperaSFDC}">
                 <div class="spinnerSFDC">

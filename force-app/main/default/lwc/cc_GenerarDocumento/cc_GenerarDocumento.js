@@ -12,6 +12,9 @@ import CASE_OWNER_ID from '@salesforce/schema/Case.OwnerId';
 import CASE_HTML_DOC from '@salesforce/schema/Case.CC_GenerarDocumentoHtml__c';
 import CASE_HEADER from '@salesforce/schema/Case.CC_Header__c';
 import CASE_FOOTER from '@salesforce/schema/Case.CC_Footer__c';
+import CASE_ENCABEZADO from '@salesforce/schema/Case.CC_Encabezado__c';
+import CASE_PIEFIRMA from '@salesforce/schema/Case.CC_PieFirma__c';
+import CASE_FIRMA from '@salesforce/schema/Case.CC_Firma__c';
 
 
 //eslint-disable-next-line new-cap
@@ -40,6 +43,12 @@ export default class ccGenerarDocumento extends NavigationMixin(LightningElement
 
 	footer;
 
+	encabezado;
+
+	pieFirma;
+
+	firma;
+
 	plantillaId;
 
 	@wire(getRecord, {recordId: '$recordId', fields: [CASE_OWNER_ID, CASE_HTML_DOC, CASE_HEADER, CASE_FOOTER]})
@@ -51,7 +60,6 @@ export default class ccGenerarDocumento extends NavigationMixin(LightningElement
 			this.footer = getFieldValue(data, CASE_FOOTER)?.trim();
 			this.abrirModalX();
 		} else if (error) {
-			console.error(error);
 			this.toast('error', 'Problema recuperando los datos del caso.', error.body.message);
 		}
 	}
@@ -99,8 +107,9 @@ export default class ccGenerarDocumento extends NavigationMixin(LightningElement
 		fieldsCase[CASE_HTML_DOC.fieldApiName] = this.cuerpo;
 		fieldsCase[CASE_HEADER.fieldApiName] = this.header;
 		fieldsCase[CASE_FOOTER.fieldApiName] = this.footer;
-		console.log('NMAAAA this.header: '+this.header);
-		console.log('NMAAAA this.footer: '+this.footer);
+		fieldsCase[CASE_ENCABEZADO.fieldApiName] = this.encabezado;
+		fieldsCase[CASE_PIEFIRMA.fieldApiName] = this.pieFirma;
+		fieldsCase[CASE_FIRMA.fieldApiName] = this.firma;
 		updateRecord({fields: fieldsCase})
 		.then(async () => {
 			this.rutaVisualforce = await this.getrutaVisualforce();
@@ -123,7 +132,6 @@ export default class ccGenerarDocumento extends NavigationMixin(LightningElement
 			this.toast('success', 'Se creó documento', 'Se creó correctamente el documento "' + documento.Title + '"');
 			this.cerrarModal();
 		}).catch(error => {
-			console.error(error);
 			this.toast('error', 'Error al generar el documento', error);
 		}).finally(() => {
 			botonVistaPrevia.disabled = false;
@@ -142,12 +150,12 @@ export default class ccGenerarDocumento extends NavigationMixin(LightningElement
 	modalPlantillasSeleccionada(event) {
 		this.template.querySelector('.botonGenerarPdf').disabled = true;
 		this.cuerpo = event.detail.cuerpo;
-		console.log('event.detail.cuerpo;: '+event.detail.cuerpo);
 		this.header = event.detail.header;
-		console.log('event.detail.cabecera;: '+event.detail.header);
 		this.footer = event.detail.footer;
-		console.log('event.detail.pie;: '+event.detail.footer);
 		this.plantillaId = event.detail.idPlantilla;
+		this.encabezado = event.detail.encabezado;
+		this.pieFirma = event.detail.pieFirma;
+		this.firma = event.detail.firma;
 	}
 
 	async getrutaVisualforce() {

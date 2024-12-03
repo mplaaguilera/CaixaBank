@@ -1,0 +1,116 @@
+.container-div {
+    width: 1250px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.buttonStyle {
+    background-color: #009fe3;
+    width: fit-content;
+    padding: 0 .5rem;
+    color: white;
+    margin-right: 1rem;
+    border-radius: 5px;
+}
+
+.buttonStyle:disabled {
+    background-color: gray;
+    width: fit-content;
+    padding: 0 .5rem;
+    color: white;
+    margin-right: 1rem;
+    border-radius: 5px;
+}
+
+.buttonStyle:hover:not([disabled]) {
+    background-color: gainsboro;
+    color: #009fe3;
+}
+
+.buttonStyleCancel {
+    width: fit-content;
+    padding: 0 .5rem;
+    color: #009fe3;
+    margin-right: 1rem;
+    border-color: gainsboro;
+    border-radius: 5px;
+}
+
+.buttonStyleCancel:disabled {
+    background-color: gray;
+    width: fit-content;
+    padding: 0 .5rem;
+    color: white;
+    margin-right: 1rem;
+    border-radius: 5px;
+}
+
+.buttonStyleCancel:hover:not([disabled]) {
+    background-color: gainsboro;
+    color: #009fe3;
+}
+
+.calendarStyle {
+    padding: .5rem 1rem;
+}
+
+.inputCalendar {
+    width: 8rem;
+    margin-left: -0.5rem;
+    margin-right: 1rem;
+}
+
+.inputDate {
+    margin-left: 1rem;
+    width: 8rem;
+    margin-right: 1rem;
+    /* --lwc-fontSize2: 0; */
+}
+
+.typeRelatedInputs {
+    width: 60rem;
+    display: flex;
+}
+
+.inputTime {
+    width: 5rem;
+    margin-right: 1rem;
+}
+
+.inputDuration {
+    width: 8rem;
+    margin-left: -0.5rem;
+    margin-right: 1rem;
+}
+
+.margin-card {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.buttonStyleAdd {
+    width: fit-content;
+    color: #009fe3;
+    margin-top: 1.3rem;
+    padding: 0.9px 1rem 0.9px 1rem;
+    border-color: gainsboro;
+    border-radius: 5px;
+}
+
+.buttonStyleAdd:disabled {
+    background-color: gray;
+    color: white;
+    border-radius: 5px;
+}
+
+.buttonStyleAdd:hover:not([disabled]) {
+    background-color: gainsboro;
+    color: #009fe3;
+}
+
+.cardStyle {
+    padding: 0 1rem 0.5rem;
+}

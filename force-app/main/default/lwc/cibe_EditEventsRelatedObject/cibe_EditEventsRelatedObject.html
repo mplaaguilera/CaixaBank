@@ -1,0 +1,151 @@
+<template>
+    <!-- <div data-id="mainDiv" class="slds-grid basicContainer" > -->
+    <div class="slds-form-element">
+        <div if:true={renderComponent} >
+            <lightning-layout >
+                <!-- Clientes Grupo Comercial -->
+                <lightning-layout-item size="4" class="slds-p-right_xx-large slds-m-horizontal_medium" if:true={empresaGr}>
+                    <lightning-combobox name="progress" label="Clientes Grupo Comercial" options={optionsGC} value={empresaGCSel} onchange={handleChangeGC}></lightning-combobox>
+                    <div class="slds-no-flex">
+                        <div  class="slds-col slds-col slds-size_2-of-3">
+                            <template for:each={selectedClientsGC} for:item="cli">
+                                <div key={cli.value} data-id={cli.id}>
+                                    <lightning-pill style="margin:8px 0" label={cli.value} name={cli.id} onremove={handleRemoveAttendeGC}>
+                                        <lightning-icon icon-name="standard:account" alternative-text="Account"></lightning-icon>
+                                    </lightning-pill>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item  class="slds-m-around_small slds-float_right">
+                    <lightning-input type="toggle" label="Añadir Empresa Grupo" variant="label-stacked" name="toggle"
+                        message-toggle-active="" message-toggle-inactive="" checked={empresaGr} onchange={handleEmpresaGrupo}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+            <!--Nueva lista-->
+
+            <div class="handler-opp-task-container">
+                <div class="add-opp">
+                    <div class="icon-handler-position">
+                        <lightning-icon size="small" icon-name="standard:opportunity"></lightning-icon>
+                    </div>
+                    <c-av_-lookup data-id="newproductlookup" onsearch={handleSearchProduct}
+                        onselectionchange={handleSelectionProduct} fieldlabel={labels.addOpp}
+                        placeholder={labels.searhProduct}></c-av_-lookup>
+                    <lightning-select class="slds-m-left_x-small" name="clients" label="Empresa Grupo"
+                        value={valueClient} options={optionsClients}
+                        onchange={handleChangeClients}></lightning-select>
+                    <lightning-button class="buttonAnadir" label={labels.add} disabled={productToAdd}
+                        onclick={handleAddOppo} data-id="addnewoppo"></lightning-button>
+                </div>
+                <div class="add-task">
+                    <div class="icon-handler-position">
+                        <lightning-icon size="small" icon-name="standard:task"></lightning-icon>
+                    </div>
+                    <lightning-input data-id="newTask" onchange={handleNewTask} value={nameTask} type="text"
+                        label="Añadir tarea" placeholder="Introduce el nombre"></lightning-input>
+                    <lightning-select class="slds-m-left_x-small" name="clients" label="Empresa Grupo"
+                        value={valueClientTask} options={optionsClients}
+                        onchange={handleChangeClientsTask}></lightning-select>
+                    <lightning-button class="buttonAnadir" label={labels.add}
+                        onclick={handleAddTask}></lightning-button>
+                </div>
+            </div>
+    
+                    <!-- FIN CABECERA AÑADIR OPP Y TASK -->
+                    <!-- <template if:true={showOportunidadVinculada}>
+                        <div class="title-object-section"> <lightning-icon class="obj-icon" size="small"
+                                icon-name="standard:opportunity"></lightning-icon> Oportunidades Vinculadas</div>
+                        <template for:each={oportunidadVinculada} for:item="opp">
+                            <div key={opp.id} class="cardMargin">
+                                <c-cibe_-new-event-opp-detail oppo={opp} onvinculateaction={handleVinculationOpp}
+                                    onmainclick={handleMainOpp} onsenddatafromoppo={buildOppoObj} data-id={opp.id}
+                                    onvinculateactionall={handleVinculationAll} ondesvincular={desvincularTodas}
+                                    potentiallist={potentialList} new-event-header-id={recordId}
+                                    is-future={disableButtonCloseMeeting} main-vinculed={opp.isPrincipal}
+                                    oportunidad-vin={oportunidadVin}></c-cibe_-new-event-opp-detail>
+                            </div>
+                        </template>
+                    </template> -->
+    
+    
+            <template if:true={showOppNewList}>
+                <div class="title-object-section"> <lightning-icon class="obj-icon" size="small"
+                        icon-name="standard:opportunity"></lightning-icon> Nuevas Oportunidades</div>
+                <template for:each={oppoNewList} for:item="opp">
+                    <div key={opp.id} class="cardMargin">
+                        <c-cibe_-new-event-opp-detail oppo={opp}  onmainclick={handleMainOpp} 
+                            new-event-header-id={recordId} is-future={isEventFuture} main-vinculed={opp.isPrincipal}
+                            oportunidad-vin={oportunidadVin} show-name=true onsenddatafromoppo={buildOppoObj} ondeleteoppo={handleOppoDelete}>
+                        </c-cibe_-new-event-opp-detail>
+
+                    </div>
+                </template>
+            </template>
+    <!--Nueva TAREA  onvinculateaction={handleVinculationTask}-->
+            <template if:true={showTaskNewList}>
+                <div class="title-object-section"> <lightning-icon class="obj-icon" size="small" icon-name="standard:task"></lightning-icon> Nuevas Tareas</div>
+                <template for:each={taskNewList} for:item="task">
+                    <div key={task.id} class="cardMargin">
+                        <c-cibe_-new-event-task-detail tarea={task} new-event-header-id={recordId} show-name=true
+                            onsenddatafromtarea={buildTaskObj} onmainclick={handleMainTask} data-id={task.id} is-future={isEventFuture}>
+                        </c-cibe_-new-event-task-detail>
+                    </div>
+                </template>
+            </template>
+    
+            <template for:each={infoByClientOppAndTasks} for:item="cli">
+                <div key={cli.cliente} class="cardMargin">
+                    <div class="accordionContainer">
+                        <lightning-accordion allow-multiple-sections-open onsectiontoggle={handleSectionToggle}
+                            active-section-name={activeSections}>
+                            <lightning-accordion-section name="A" label={cli.cliente} class="accordionStyle">
+                                <div class="title-object-section"> <lightning-icon class="obj-icon" size="small"
+                                        icon-name="standard:opportunity"></lightning-icon> Oportunidades</div>
+                            
+                                <div if:true={isEventFuture}>
+                                    <template for:each={cli.lstOppWr} for:item="oppf">
+                                            <c-cibe_-view-opp-related-detail 
+                                                oppo={oppf}
+                                                eventid={recordId}
+                                                main-vinculed={oppf.isPrincipal}
+                                                key={opoof}>
+                                            </c-cibe_-view-opp-related-detail>
+                                    </template>
+                                </div>
+
+                                <div if:false={isEventFuture}>
+                                    <template for:each={cli.lstOppWr} for:item="opp">
+                                            <c-cibe_-new-event-opp-detail oppo={opp} new-event-header-id={recordId}
+                                                onsenddatafromoppo={buildOppoObj} onvinculateaction={handleVinculationOpp}
+                                                onmainclick={handleMainOpp} is-future={isEventFuture}
+                                                data-id={opp.id} key={opooa}>
+                                            </c-cibe_-new-event-opp-detail>
+                                    </template>
+                                </div>
+
+                                <div class="title-object-section"><lightning-icon class="obj-icon" size="small"
+                                        icon-name="standard:task"></lightning-icon>Tareas
+                                </div>
+                                <template for:each={cli.twList} for:item="task">
+                                    <div key={task.id} class="cardMargin">
+                                        <c-cibe_-view-task-related-detail 
+                                            tsk={task}
+                                            eventid={recordId}
+                                            onsenddatafromtarea={buildTaskObj}
+                                            main-vinculed={task.isPrincipal}
+                                            onresfreshdatatask={refreshDatatask}
+                                            is-future={isEventFuture}>
+                                        </c-cibe_-view-task-related-detail>
+                                    </div>
+                                </template>
+                            </lightning-accordion-section>
+                        </lightning-accordion>
+                    </div>
+                </div>
+            </template>
+    </div><!--FIN-->
+</template>

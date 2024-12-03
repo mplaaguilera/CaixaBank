@@ -1,0 +1,31 @@
+<aura:component implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller='AV_Header_Controller'>
+     
+<lightning:workspaceAPI aura:id="workspaceCmp" />
+    <aura:attribute name="callId" type="String" />
+    <aura:attribute name="callPhone" type="String" />
+    <aura:attribute name="callTipo" type="String" />
+    <aura:attribute name="isMissed" type="String" />
+
+
+    <aura:attribute name = "origenTab" type = 'String'></aura:attribute>
+    <!-- <aura:attribute name="origenTab" type="String" /> -->
+    <aura:attribute name="origenTabUrl" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <!-- <aura:handler name="datachange" event="c:DataChangeEvent" action="{!c.handleDataChange}"/> -->
+        <!-- <aura:registerEvent name="appEvent" type="c:AV_ReportAppEvent"/> -->
+    <c:av_callAssignment 
+        onclosetabfinish="{!c.closeFocusedTabFinish}" 
+        onfocustab="{!c.focusedTab}" 
+        onclosetab="{!c.closeFocusedTab}" 
+        onrenametab="{!c.doInit}" 
+        callId="{!v.c__callId}"
+        callPhone="{!v.c__callPhone}"
+        callTipo="{!v.c__callTipo}"
+        isMissed="{!v.c__isMissed}"
+        onfocusrecordtab = "{!c.focusRecordTab}"
+        onfocusrecordtabandclose = "{!c.closeFocusedTabAndClose}">
+    </c:av_callAssignment>
+    <!-- ondatachange="{!c.handleDataChange}" -->
+</aura:component>

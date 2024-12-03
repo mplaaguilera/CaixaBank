@@ -1,268 +1,135 @@
-<template>
-    <lightning-card  variant="Narrow" title="Perfil Cliente" icon-name="standard:note">
-        <template if:true={vacio}>
-            <div class="slds-text-heading_small slds-text-align_center slds-p-around_small"> No existen registros asociados.</div>
-        </template>         
-
-        <div class="slds-grid slds-wrap">
-            <template for:each={wrapper} for:item="keyValue">
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Saldos CXB Activo</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosActivos}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Deuda</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deuda}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
+<template>  
+     <div style="border:1px solid #c9c9c9;border-radius:0.25rem;">       
+        <lightning-tabset active-tab-value="">
+            <lightning-tab icon-name="standard:note" label="Perfil Cliente" title="Perfil Cliente" value="Actual">
+            <template if:true={vacio}>
+                    <div class="slds-text-align_center slds-var-p-around_small"><lightning-formatted-text value={mensaje}></lightning-formatted-text></div>
+                </template>
             
-            
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Saldos CXB Pasivo</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosPasivos}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Deuda Pendiente de vencer</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVender}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>           
-                                     
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                   
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                <div class="slds-grid slds-wrap">
+                    <template for:each={wrapper} for:item="keyValue">        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label">Saldos CXB Activo</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosActivos}</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label">Deuda</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deuda}</span>
+                        </div>  
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
                     
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Deuda vencida</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.deudaVencida}</span>
-                </div>    
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>               
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
                     
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label">Saldos CXB Pasivo</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosPasivos}</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label">Deuda Pendiente de vencer</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVender}</span>
+                        </div>  
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>           
+                                                
+        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>                    
+                            <span class="slds-form-element__label slds-cell-wrap">Cliente en Probation Period</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.indicadorPP}</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Deuda vencida</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.deudaVencida}</span>
+                        </div>    
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>               
+                    
+        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Importe en PP </span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.importePP}</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Deuda Refinanciada</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.deudaRefinanciada}</span>
+                        </div>  
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
+                    
+        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Días impago máx.</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.diasImpagoMax}</span>
+                        </div>  
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                
+                    
+        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label">Sector</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignIzquierda ">{keyValue.sector}</span>
+                        </div>                  
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpago12m}</span>
+                        </div> 
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>     
+                        
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>                  
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
+                        </div>
+                        <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
+                            <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpagoTotal}</span>
+                        </div> 
+                        <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>  
+                    </template>     
                 </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                   
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Días impago máx.</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.diasImpagoMax}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
+            </lightning-tab>
             
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                   
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpago12m}</span>
-                </div>   
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Sector</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignIzquierda ">{keyValue.sector}</span>
-                </div>                  
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpagoTotal}</span>
-                </div>   
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>          
-                 <!--
-                    ESTOS SON TODOS LOS CMAPOS QUE HABRA EN UN FUTURO PERO DE MOMENTO LO DEJAMOS COMENTADO PORQUE AHORA SALDRAN MENOS CAMPOS
-
-                    <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Saldos CXB Activo</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosActivos}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                   <span class="slds-form-element__label slds-cell-wrap">Ebitda</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ebitda}</span>
-                </div>
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
-            
-            
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Saldos CXB Pasivo</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.saldosPasivos}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">% Cuota CIRBE CXB (directo)</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.cuotaCirbe}</span>
-                </div>      
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>             
-            
-            
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Total activo (k€)</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.totalActivo}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Morosidad CIRBE</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.morosidadCirbe}</span>
-                </div>   
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">FFPP: importe(%)</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ffpp}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Deuda</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deuda}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Deuda financiera</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaFinanciera}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Deuda Pendiente de vencer</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVender}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Ventas</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ventas}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Deuda vencida</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.deudaVencida}</span>
-                </div>    
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>               
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Resultado</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.resultado}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Días impago máx.</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.diasImpagoMax}</span>
-                </div>  
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                 
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">CF</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.cf}</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpago12m}</span>
-                </div>   
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>                
-            
-
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label">Sector</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignIzquierda ">{keyValue.sector}</span>
-                </div>                  
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}></div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
-                </div>
-                <div class="slds-col slds-size_2-of-12" key={keyValue.Id}>
-                    <span class="slds-form-element__static slds-grow alignDerecha slds-cell-wrap">{keyValue.ciclosImpagoTotal}</span>
-                </div>   
-                <div class="slds-col slds-size_1-of-12" key={keyValue.Id}></div>  
-                 -->           
-            </template>     
-        </div>  
-        <hr class="linea">     
-    </lightning-card>
+            <template if:true={mostrarTabs}>
+                <lightning-tab label="Gestión Agencias Externas" title="Gestión Agencias Externas" value="AgenciasExternas">  
+                    <div style="padding-left: 10px;padding-right: 10px;">            
+                        <c-sir_lwc_-View-Online-Agencias-Externas historico="false" record-id={recordId}></c-sir_lwc_-View-Online-Agencias-Externas>	
+                    </div>  
+                </lightning-tab>
+            </template>
+        </lightning-tabset>
+    </div>
 </template>

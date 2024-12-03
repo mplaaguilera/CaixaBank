@@ -63,9 +63,49 @@ import centCar from '@salesforce/label/c.CIBE_CentroCartera';
 import selectOptionLB from '@salesforce/label/c.CIBE_SeleccionaOpcion';
 import selectLB from '@salesforce/label/c.CIBE_SeleccionarOpcion';
 
+import filtrosBusqueda from '@salesforce/label/c.CIBE_FiltrosBusqueda';
+import verEmpleadosOtraOficina from '@salesforce/label/c.CIBE_SeeEmployeeOtherOffice';
+import empleadosSeleccionados from '@salesforce/label/c.CIBE_SeeEmployeeOtherOffice';
+import estadosSeleccionados from '@salesforce/label/c.CIBE_estadosSeleccionados';
+import desde from '@salesforce/label/c.CIBE_DesdeFechaVencimiento';
+import hasta from '@salesforce/label/c.CIBE_HastaFechaVencimiento';	
+import buscar from '@salesforce/label/c.CIBE_buscar';
+import reiniciar from '@salesforce/label/c.CIBE_Reiniciar';
+import resultadosBusqueda from '@salesforce/label/c.Cibe_resultadosBusqueda';
+import anterior from '@salesforce/label/c.CIBE_Anterior';
+import posterior from '@salesforce/label/c.CIBE_Posterior';
+import pagina from '@salesforce/label/c.CIBE_Pagina';
+import de from '@salesforce/label/c.CIBE_of';
+import asignacion from '@salesforce/label/c.CIBE_Asignacion';
+import miOficina from '@salesforce/label/c.CIBE_MiOficinaT';
+import otraOficina from '@salesforce/label/c.CIBE_OtraOficina';
+import verMenosFiltros from '@salesforce/label/c.CIBE_Menosfiltros';
+import verMasFiltros from '@salesforce/label/c.CIBE_masFiltros';
+
+import customer from '@salesforce/label/c.CIBE_Customer';
+
+
+
+
 export default class Cibe_MassreassignOwnerCIB extends LightningElement {
 
 	labels = {
+		filtrosBusqueda,
+		verEmpleadosOtraOficina,
+		empleadosSeleccionados,
+		estadosSeleccionados,
+		desde,
+		hasta,
+		buscar,
+		reiniciar,
+		resultadosBusqueda,
+		anterior,
+		posterior,
+		pagina,
+		de,
+		asignacion,
+		miOficina,
+		otraOficina,
 		negocio,
 		redeSeg,
 		sectorPai,
@@ -94,7 +134,11 @@ export default class Cibe_MassreassignOwnerCIB extends LightningElement {
 		fechaMay,
 		reasigTar,
 		noContact,
-		debeInfo
+		debeInfo,
+		verMenosFiltros,
+		verMasFiltros,
+		customer
+
 	}
 
 	@track data;
@@ -873,12 +917,13 @@ export default class Cibe_MassreassignOwnerCIB extends LightningElement {
 	showMoreFilters(){
 		if (this.showMoreFiltersDiv == false) {
 			this.showMoreFiltersDiv = true;
-			this.seeFiltersLabel = 'Ver menos filtros';
+			this.seeFiltersLabel = this.labels.verMenosFiltros;
 		} else if (this.showMoreFiltersDiv == true) {
 			this.showMoreFiltersDiv = false;
-			this.seeFiltersLabel = 'Ver más filtros';
+			this.seeFiltersLabel = this.labels.verMasFiltros;
 		}
 	}
+	
 
 	/**
 	 * show App value
@@ -904,9 +949,10 @@ export default class Cibe_MassreassignOwnerCIB extends LightningElement {
 	setVisibilityOptions() {
 		if (this.statusFilter != null && this.origenFilter!=null) {
 				this.buttonDisabled = false;
-				this.seeFiltersLabel = 'Ver más filtros';
+				this.seeFiltersLabel = this.labels.verMasFiltros;
 		}
 	}
+
 
 	setButtonVisibility() {
 		if (this.employeeFilter == null || typeof this.employeeFilter == 'undefined' ||

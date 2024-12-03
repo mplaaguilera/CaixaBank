@@ -11,7 +11,6 @@ export default class Sir_lwc_cabeceraCliente extends LightningElement {
     wrapperCabecera({ error, data }) {
         if (data) {
             this.wrapper = data;
-            console.log(this.wrapper);
             if(data.length === 0){
                 this.vacio = true;
             }

@@ -1,0 +1,16 @@
+<template>
+    <div class="slds-box">
+        <header slot="title" class="card-title" style="font-weight: bold; margin-bottom: 10px;  font-size: medium;">
+			<lightning-icon class="slds-media__figure" icon-name="standard:work_plan" size="small"></lightning-icon>
+			<span style="margin-top: 2px;">{labels.callReport}</span>
+		</header>
+        <lightning-record-edit-form object-api-name="CBK_Activity_Extension__c" record-id={extensionId} 
+        onsuccess={handleSuccess} onerror={handleError}>
+            <lightning-input-field field-name="CIBE_ComentarioCita__c" value={comentario}> </lightning-input-field>
+            <lightning-input-field field-name="CIBE_ConclusionesCita__c" value={conclusion}> </lightning-input-field>
+            <!--<lightning-input-field field-name="CIBE_ComentarioCita__c" value={comentario} onmouseover={handleComentario} onclick={handleComentario}> </lightning-input-field>
+            <lightning-input-field field-name="CIBE_ConclusionesCita__c" value={conclusion} onmouseover={handleConclusion} onclick={handleConclusion}> </lightning-input-field>-->
+            <lightning-button class="slds-align_absolute-center" variant="brand" type="submit" label={labels.guardar}></lightning-button>
+        </lightning-record-edit-form>
+    </div>
+</template>

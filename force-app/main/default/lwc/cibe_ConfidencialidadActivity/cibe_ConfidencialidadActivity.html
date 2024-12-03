@@ -1,7 +1,7 @@
 <template>
     <lightning-card>
-        <div class= "slds-grid slds-grid_vertical-align-center slds-grid_align-center">
-            <div class="slds-col slds-m-around_medium slds-p-right_xx-large"> 
+        <div class= "slds-grid slds-grid_vertical-align-center slds-grid_align-center" style="height: 80px;">
+            <div class="slds-col slds-m-around_medium slds-p-right_xx-large" > 
                 <lightning-input type="toggle" name="toggle" label={labels.confidencial} onchange={handleChange} checked={confidential} disabled={hasNotPermission}></lightning-input>
                 <template if:true={loading}>
                     <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
@@ -10,10 +10,10 @@
         </div>
     </lightning-card>
     
-    <template if:true={showModal}>
+    <template if:true={showModal} >
         <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
-                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleClose}>
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleClose} >
                     <lightning-icon icon-name="utility:close" alternative-text={labels.cerrar} variant="inverse" size="x-small"></lightning-icon>
                     <span class="slds-assistive-text">{labels.cancelar}</span>
                 </button>

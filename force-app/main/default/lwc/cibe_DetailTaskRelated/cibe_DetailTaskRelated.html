@@ -1,0 +1,89 @@
+<template>
+    <article class="slds-card slds-m-top_x-small">
+        <div class="slds-card__header slds-grid slds-theme_shade slds-m-bottom_none slds-p-bottom_x-small">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-button-icon if:true={showDetail} variant="border-filled" icon-name="utility:chevrondown" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                    <lightning-button-icon if:false={showDetail} variant="border-filled" icon-name="utility:chevronright" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                </div>
+
+                <div class="slds-media__body">
+                  <h2 class="slds-card__header-title">
+                    <div class="slds-grid slds-grid_vertical">
+                        <div class="slds-col" onclick={handleNavigateOpp}>
+                          <lightning-icon if:true={principal} icon-name="utility:favorite" size="x-small" variant="warning" class="main-icon" title={labels.oppPrincipal}></lightning-icon>
+                          <span class="opptask-title">{currentName}</span>
+                        </div>
+                    </div>
+                  </h2>
+                </div>
+
+                <div class="slds-no-flex">
+                    <lightning-button-icon if:false={principal} icon-name="utility:favorite" icon-class="slds-icon-text-warning" variant="border-inverse" alternative-text={labels.marcarPrincipal} class="slds-m-left_xx-small linked-opptask-button last-opptask-button" title={labels.marcarPrincipal} onclick={updateMainEventTask}></lightning-button-icon>
+                    <lightning-button-icon if:true={showVincular} icon-name="utility:link" variant="brand" alternative-text={labels.desvincularOportunidad} class="slds-m-left_xx-small linked-opptask-button last-opptask-button" title={labels.desvincularOportunidad} onclick={handleUnlink}></lightning-button-icon>
+                </div>
+            </header>
+        </div>
+
+        <template if:true={showDetail}>
+          <div slot="footer">
+
+              <div class="slds-grid slds-gutters slds-m-left_x-small">
+                  <div class="slds-col">
+                      <div class="slds-form-element">
+                          <label class="slds-form-element__label" for="text-input-id-47">{labels.asunto}</label>
+                          <div class="slds-form-element__control">
+                            <input type="text" id="text-input-id-47" readonly="" placeholder="" class="slds-input" value={currentName} />
+                          </div>
+                        </div>
+                  </div>
+                  <div class="slds-col">
+                      <div class="slds-form-element">
+                          <label class="slds-form-element__label" for="text-input-id-47">{labels.cliente}</label>
+                          <div class="slds-form-element__control">
+                            <input type="text" id="text-input-id-48" readonly="" placeholder="" class="slds-input" value={account} />
+                          </div>
+                        </div>
+                  </div>
+                  <div class="slds-col">
+                      <div class="slds-form-element">
+                          <label class="slds-form-element__label" for="text-input-id-47">{labels.fechaVencimiento}</label>
+                          <div class="slds-form-element__control">
+                            <input type="text" id="text-input-id-49" readonly="" placeholder="" class="slds-input" value={activityDate} />
+                          </div>
+                        </div>
+                  </div>
+                </div>
+
+                <div class="slds-grid slds-gutters slds-m-left_x-small">
+                  
+                  <div class="slds-col">
+                      <div class="slds-form-element">
+                          <label class="slds-form-element__label" for="text-input-id-47">{labels.propietario}</label>
+                          <div class="slds-form-element__control">
+                            <input type="text" id="text-input-id-50" readonly="" placeholder="" class="slds-input" value={owner} />
+                          </div>
+                        </div>
+                  </div>
+
+
+                </div>
+
+                <div class="slds-grid slds-gutters slds-m-left_x-small">
+                  <div class="slds-col">
+                      <div class="slds-form-element">
+                          <label class="slds-form-element__label" for="text-input-id-47">{labels.comentario}</label>
+                          <div class="slds-form-element__control">
+                            <input type="text" id="text-input-id-51" readonly="" placeholder="" class="slds-input" value={comment} />
+                          </div>
+                        </div>
+                  </div>
+
+                </div>
+          </div>
+      </template>
+        <template if:true={showSpinner}> 
+            <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        </template>
+    </article>
+</template>

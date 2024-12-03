@@ -1,0 +1,100 @@
+<template>
+    <div if:true={renderComponent} class="container-div">
+        <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large"
+            style="z-index: 93;position:fixed"></lightning-spinner>
+        <div data-id="headerEvent" class="slds-page-header slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon icon-name="standard:event"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span>{labels.cita}</span>
+                                    <ul class="slds-list_horizontal">
+                                        <li class="slds-m-right_x-small">
+                                            <span class="slds-page-header__title slds-truncate">{inforecord.name}</span>
+                                        </li>
+                                    </ul>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <lightning-card class="margin-card">
+            <div class="cardStyle">
+                <c-cibe_-record-form inforecord={inforecord} oneventinfo={setEventObject}
+                    origin="editEvent"></c-cibe_-record-form>
+            </div>
+        </lightning-card>
+
+
+        <lightning-card>
+            <div class="cardStyle">
+                <div style="display:flex;margin-bottom:1rem">
+                    <lightning-icon icon-name='utility:event' size="medium"></lightning-icon>
+                    <h1><strong style="font-size:1.5rem">&nbsp;{label.fechahora}</strong></h1>
+                </div>
+                <div class="slds-grid typeRelatedInputs">
+                    <div class="inputCalendar">
+                        <lightning-combobox label={label.modocal} class="slds-m-left_large" options={optionsCalendario}
+                            onchange={handleCalendarMode} value={calendarValue}></lightning-combobox>
+                    </div>
+                    <div class="inputDate">
+                        <lightning-input type="date" data-id="activityDateInput" date-style="short" label={label.fecha}
+                            value={activityDateToSend} message-when-value-missing="Indica una fecha para el evento"
+                            message-when-bad-input="Introduce una fecha en el formato correcto" required
+                            onchange={handleChangeActivityDate}></lightning-input>
+                    </div>
+                    <div class="inputTime">
+                        <lightning-input type="time" data-id="timeInicioInput" label={label.horainicio}
+                            value={timeInicio} required
+                            message-when-value-missing="Indica una hora de inicio para el evento"
+                            onchange={handleChangeTimeInicio}></lightning-input>
+                    </div>
+                    <div class="inputTime">
+                        <lightning-input type="time" data-id="timeFinInput" label={label.horafin} value={timeFin}
+                            required message-when-value-missing="Indica una hora de fin para el evento"
+                            onchange={handleChangeTimeFin}></lightning-input>
+                    </div>
+                    <div class="inputDuration">
+                        <lightning-combobox label={label.duracion} required options={optionsTime}
+                            onchange={handleChangeDuration} value={initialDuration}></lightning-combobox>
+                    </div>
+                    <div>
+                        <button type="submit" class="slds-button slds-button_stretch buttonStyleAdd" data-id="addButton"
+                            name="add" onclick={handleTime}>Modificar</button>
+                    </div>
+
+                </div>
+                <div if:true={renderCalendar}>
+                    <div if:true={calendarBoolean} class="calendarStyle">
+                        <c-cibe_-custom-calendar-new-event data-id='customcalendar' timerange={durationToCalendar}
+                            currentdate={activityDateToCalendar} userid={employeeToCalendar}
+                            evsubject={subjectToCalendar} gestoroverwrite={overlapToCalendar}
+                            oneventcreatecalendar={eventCreateCalendar} clientname={inforecord.name} origin="editEvent"
+                            eventid={recordId}></c-cibe_-custom-calendar-new-event>
+                    </div>
+                    <div if:false={calendarBoolean} class="calendarStyle">
+                        <c-cibe_-calendar-hour-complete data-id='customcalendar' timerange={durationToCalendar}
+                            currentdate={activityDateToCalendar} userid={employeeToCalendar}
+                            evsubject={subjectToCalendar} gestoroverwrite={overlapToCalendar}
+                            oneventcreatecalendar={eventCreateCalendar} clientname={inforecord.name} origin="editEvent"
+                            eventid={recordId}></c-cibe_-calendar-hour-complete>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+
+    </div>
+    <div class="slds-docked-form-footer" if:true={showFooter}>
+        <button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" data-id="cancelButton"
+            onclick={handleCancel}>Cancelar</button>
+        <button type="submit" class="slds-button slds-button_stretch buttonStyle" data-id="saveButton"
+            name="closeMeeting" onclick={handleCreateEvent}>Cerrar</button>
+    </div>
+</template>

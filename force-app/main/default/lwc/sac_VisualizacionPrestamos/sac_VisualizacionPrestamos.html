@@ -328,8 +328,10 @@
     </lightning-card>
     <!-- No Préstamo records -->
     <lightning-card style="margin-bottom: 40px;">
-       <template if:false={prestamosRT}>
-          <p>No hay préstamos asociados con esta cuenta.</p>
+      <template if:true={showMessage}>
+         <template if:false={prestamosRT}>
+            <p>No hay préstamos asociados con esta cuenta.</p>
+         </template>
        </template>
     </lightning-card>
  </template>

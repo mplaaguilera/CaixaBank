@@ -10,6 +10,7 @@ import getTaskFields  from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Contr
 import getTaskRecordType  from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.getTaskRecordTypeName';
 import roleEmp             from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.roleEMP';
 import roleCib             from '@salesforce/apex/CIBE_Oportunidades_Vinculadas_Controller.roleCIB';
+import getName              from '@salesforce/apex/CIBE_Header_Controller.getAccountInfo';
 
 //Labels
 import paraReportar from '@salesforce/label/c.CIBE_ParaReportarCorrectamenteOportunidades';
@@ -29,7 +30,7 @@ import citaCreada from '@salesforce/label/c.CIBE_CitaCreada';
 import altaEvento from '@salesforce/label/c.CIBE_AltaEvento';
 import altaTarea from '@salesforce/label/c.CIBE_AltaTarea';
 
-export default class Cibe_CloseTaskTab extends LightningElement {
+export default class Cibe_CloseTaskTab extends NavigationMixin(LightningElement) {
 
     labels = {
         paraReportar, 
@@ -58,6 +59,12 @@ export default class Cibe_CloseTaskTab extends LightningElement {
     @track comentario;
     @track contacto;
     @track rtAccCliente;
+
+    @track name;
+    @track recordTypeName;
+    @track isIntouch;
+    @track nameRecord;
+    @track account;
 
 
     @track comment;
@@ -106,6 +113,27 @@ export default class Cibe_CloseTaskTab extends LightningElement {
         const selectedEvent = new CustomEvent("renametab");
 		this.dispatchEvent(selectedEvent);
     }
+
+    @wire(getName, {recordId: '$recordId'})
+	getNameData(wireResult) {
+		let data = wireResult.data;
+		let error = wireResult.error; 
+		this._wiredName = wireResult;
+        
+		if (data) {
+			//this.name = data[0]; Cambio para que use el name bien en Opportunity.
+            this.name =  data[0];
+
+			this.recordTypeName = data[1];
+			this.isIntouch = data[2];
+            this.nameRecord =  data[0];
+			this.account = data[4];
+
+		} else if (error) {
+			console.log(error);
+		}
+        
+	}
 
 
     @wire(getTaskFields, {taskId : '$recordId'})
@@ -282,7 +310,7 @@ export default class Cibe_CloseTaskTab extends LightningElement {
 		this.dispatchEvent(selectedEvent);
     }
 
-    handleSaveCreateMeeting(){
+    /*handleSaveCreateMeeting(){
         //this.enableSpinner();
         this.flowSpinner = true;
         this.actionSetting = 'CIBE_AltaDeEvento';
@@ -311,8 +339,64 @@ export default class Cibe_CloseTaskTab extends LightningElement {
         this.flowSpinner = false;
 
 
+    }*/
+
+
+    handleSaveCreateMeeting(){
+        //this.enableSpinner();
+        console.log('### handleSaveCreateMeeting ');
+        this.flowSpinner = true;
+        //this.actionSetting = 'CIBE_AltaDeEvento';
+        //this.launchFlow = true;
+        //this.flowHeader = this.labels.altaEvento;
+
+        /*this.inputVariables = [{
+            name: 'recordId',
+            type: 'String',
+            value: this.accountId
+        }];*/
+
+        if(Object.keys(this.listUpdateValues).length>0) {
+            updateRecords({listOppRecords: Object.values(this.listUpdateValues)})
+                .then(result => {
+                    this.updateTask2();
+                    this.insertHistorialGestion();
+                })
+                .catch(error => {
+                    this.showToast(this.labels.error, error, 'error', 'pester');
+            });
+        } else {
+            this.updateTask2();
+            this.insertHistorialGestion();
+        }
+
+        
+        this.flowSpinner = false;
+
+        this.handleCloseTab();
+
+        this.navigateToTab('CIBE_PlanificarCita');
+
+        
     }
 
+    navigateToTab(tabName){
+		this[NavigationMixin.Navigate]({
+			type: 'standard__navItemPage',
+			attributes: {
+				// CustomTabs from managed packages are identified by their
+				// namespace prefix followed by two underscores followed by the
+				// developer name. E.g. 'namespace__TabName'
+				apiName: tabName
+			},state: {
+				c__recId: this.account,
+				c__id:this.name,
+				c__rt:this.recordTypeName,
+				c__intouch:this.isIntouch,
+				c__account:this.account
+			}
+		});
+	}
 
     handleSaveCreateTask(){
         //this.enableSpinner();
@@ -361,6 +445,13 @@ export default class Cibe_CloseTaskTab extends LightningElement {
     handleClose(){
 		this.launchFlow = false;
         this.handleSave();
+		const selectedEvent = new CustomEvent("closetab");
+		this.dispatchEvent(selectedEvent);
+	}
+
+    handleCloseTab(){
+		//this.launchFlow = false;
+        //this.handleSave();
 		const selectedEvent = new CustomEvent("closetab");
 		this.dispatchEvent(selectedEvent);
 	}

@@ -1,0 +1,11 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+    <lightning:workspaceAPI aura:id="workspaceAPI"/>
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+
+    <c:grr_Case_Operativa
+        recordId="{!v.recordId}"
+        onrellenarmail="{!c.handleRellenarMail}"
+        oncerrarpestana="{!c.handleCerrarPestana}"/>
+
+</aura:component>

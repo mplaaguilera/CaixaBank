@@ -1,13 +1,13 @@
+/*eslint-disable @lwc/lwc/no-async-await */
 import {LightningElement, api, track, wire} from 'lwc';
 import {getRecord, getFieldValue} from 'lightning/uiRecordApi';
 import {ShowToastEvent} from 'lightning/platformShowToastEvent';
 import {NavigationMixin} from 'lightning/navigation';
 import UserId from '@salesforce/user/Id';
-import {errorApex} from 'c/csbd_lwcUtils';
 import {RESOLUCIONES, ETAPAS} from './options';
 
 import obtenerOportunidadesHijasApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.obtenerOportunidadesHijas';
-import crearOportunidadesHijasApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.crearOportunidadesHijas';
+import crearOportunidadesApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.crearOportunidadesHijas';
 import obtenerProductosApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.obtenerProductos';
 import buscarCuentasApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.searchAccounts';
 import duplicarApex from '@salesforce/apex/CSBD_ProductoOportunidadHija.duplicarOpp';
@@ -59,23 +59,17 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 
 	lookupClienteTimeout;
 
-	productosCreados = [];
-
-	get oportunidadesHijasCount() {
-		return this.oportunidadesHijas.enCurso.length + this.oportunidadesHijas.formalizadas.length + this.oportunidadesHijas.perdidas.length;
-	}
+	productosCreados=[];
 
 	@wire(getRecord, {recordId: '$recordId', fields: [OPP_RECORD_TYPE, OPP_OWNER, OPP_STAGE, OPP_RECORD_TYPE_DEVELOPER, CSBD_RESUMEN, CSBD_PARENTID]})
 	wiredRecord({error, data}) {
 		if (data) {
-			if (!this.oportunidad) { //Carga inicial
-				this.obtenerOportunidadesHijas();
-			}
 			this.oportunidad = data;
 			this.habilitar2oTitular = !getFieldValue(data, CSBD_PARENTID);
+			this.obtenerOportunidadesHijas();
 		} else if (error) {
 			console.error(error);
-			this.toast('error', 'Problema obteniendo los datos de la oportunidad', error);
+			this.mostrarToast('error', 'Problema obteniendo los datos de la oportunidad', '');
 		}
 	}
 
@@ -104,7 +98,7 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 			} else {
 				this.mostrarOportunidadesHijas = false;
 			}
-		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de acciones comerciales'));
+		}).catch(error => console.error(error));
 	}
 
 	async modal1Abrir() {
@@ -120,11 +114,11 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 		} else if (ESTADOS_FINALES.includes(getFieldValue(this.oportunidad, OPP_STAGE))) {
 			mensajeToast = 'La oportunidad debe estar activa';
 		} else if (!this.comboboxProductosOptions.length) {
-			mensajeToast = 'No hay acciones comerciales definidas para oportunidades de tipo ' + getFieldValue(this.oportunidad, OPP_RECORD_TYPE);
+			mensajeToast = 'No hay acciones comerciales definidas para oportunnidades de tipo "' + getFieldValue(this.oportunidad, OPP_RECORD_TYPE) + '"';
 		}
 
 		if (mensajeToast) {
-			this.toast('info', 'Alta de acciones comerciales no disponible', mensajeToast);
+			this.mostrarToast('info', 'Alta de acciones comerciales no disponible', mensajeToast);
 		} else {
 			this.productosSeleccionados = [];
 			this.modal1Abierto = true;
@@ -145,7 +139,7 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 			this.comboboxProductosOptionsMaster.sort((a, b) => a.value.toUpperCase().localeCompare(b.value.toUpperCase()));
 			this.comboboxProductosOptionsMaster = [...this.comboboxProductosOptionsMaster];
 			this.comboboxProductosOptions = [...this.comboboxProductosOptionsMaster];
-		}).catch(error => errorApex(this, error, 'Problema recuperando los productos seleccionables'));
+		}).catch(error => console.error(error));
 	}
 
 	modal1Cerrar() {
@@ -209,9 +203,9 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 		const modal1Guardar = this.template.querySelector('.modal1Guardar');
 		modal1Guardar.disabled = true;
 		const comboboxResolucion = this.template.querySelector('.comboboxResolucion');
-		crearOportunidadesHijasApex({
+		crearOportunidadesApex({
 			productos: this.productosSeleccionados,
-			etapa: this.template.querySelector('.comboboxEtapa').value,
+			estado: this.template.querySelector('.comboboxEtapa').value,
 			parentId: this.recordId,
 			nombreRecordType: getFieldValue(this.oportunidad, OPP_RECORD_TYPE),
 			resolucion: comboboxResolucion && comboboxResolucion.value
@@ -223,13 +217,15 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 			} else {
 				mensajeToast = 'Se crearon correctamente ' + identificadores.length + ' acciones comerciales: ' + identificadores.join(', ');
 			}
-			this.toast('success', 'Se crearon Acciones comerciales', mensajeToast);
+			this.mostrarToast('success', 'Se crearon Acciones comerciales', mensajeToast);
 			this.obtenerOportunidadesHijas();
-		}).catch(error => errorApex(this, error, 'Problema creando las acciones comerciales'))
-		.finally(() => modal1Guardar.disabled = false);
+		}).catch(error => {
+			console.error(error);
+			this.mostrarToast('error', 'No se han creado correctamente las Acciones comerciales ');
+		}).finally(() => modal1Guardar.disabled = false);
 	}
 
-	toast(variant, title, message) {
+	mostrarToast(variant, title, message) {
 		this.dispatchEvent(new ShowToastEvent({variant: variant, title: title, message: message, mode: 'dismissable', duration: 4000}));
 	}
 
@@ -239,7 +235,7 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 		window.setTimeout(() => {
 			this.template.querySelector('.backdrop').classList.add('slds-backdrop_open');
 			this.template.querySelector('.modal2').classList.add('slds-fade-in-open');
-			this.template.querySelector('.modal2Cancelar').focus();
+			this.template.querySelector('.lookupClienteInput').focus();
 		}, 200);
 	}
 
@@ -262,11 +258,13 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 				accId: this.lookupClienteSeleccionado.Id
 			}).then(result => {
 				this.modal2Cerrar();
-				this.toast('success', 'Oportunidad creada correctamente');
+				this.mostrarToast('success', 'Oportunidad creada correctamente.', '');
 				this.navegarRegistro(result.Id);
 				this.obtenerOportunidadesHijas();
-			}).catch(error => errorApex(this, error, 'Problema creando la oportunidad'))
-			.finally(() => modal2Guardar.disabled = true);
+			}).catch(error => {
+				console.error(error);
+				this.mostrarToast('error', 'Error al crear la oportunidad', error.body.message);
+			}).finally(() => modal2Guardar.disabled = true);
 		} else {
 			const lookupClienteInput = this.template.querySelector('.lookupClienteInput');
 			lookupClienteInput.setCustomValidity('Completa este campo.');
@@ -389,7 +387,7 @@ export default class csbdProductoOportunidadHija extends NavigationMixin(Lightni
 				this.lookupClienteResultados = clientes;
 				this.template.querySelector('.lookupCliente').classList.add('slds-is-open');
 			}
-		}).catch(error => errorApex(this, error, 'Problema recuperando la lista de clientes seleccionables'))
+		}).catch(error => console.error(error))
 		.finally(() => lookupClienteInput.isLoading = false);
 	}
 }

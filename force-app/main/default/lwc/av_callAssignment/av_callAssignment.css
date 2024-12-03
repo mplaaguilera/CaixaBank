@@ -1,0 +1,113 @@
+.marginLayer{
+	margin-top: 4rem;
+}
+
+.buttonStyle{
+	background-color: #009fe3;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+
+.buttonStyle:disabled{
+	background-color: gray;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+.cardStyle {
+    padding: 0 1rem 0.5rem;
+}
+.buttonStyle:hover{
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
+.buttonStyleCancel{
+	width: fit-content;
+	padding: 0 .5rem;
+	color: #009fe3;
+	margin-right: 1rem;
+	border-color: gainsboro;
+	border-radius: 5px;
+}
+
+.buttonStyleCancel:disabled{
+	background-color: gray;
+	width: fit-content;
+	padding: 0 .5rem;
+	color: white;
+	margin-right: 1rem;
+	border-radius: 5px;
+}
+
+.buttonStyleCancel:hover{
+	background-color: gainsboro;
+	color: #009fe3;
+}
+
+.buttonAlign{
+	text-align: center;
+	margin-top: 15px;
+	margin-bottom: -20px;
+}
+
+.postionButton{
+	padding-bottom: 11em;
+}
+
+.masterDiv{
+	width:80%;
+	padding-bottom: 3rem;
+}
+
+.masterDiv1 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.customFooter{
+	position: fixed;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	background-color: transparent;
+	width: 70%;
+	margin:0 15%;
+	height:2.5rem;
+	bottom: 0;
+	left:0;
+	padding:.25rem 0;
+	z-index: 1001;
+}
+.cardStyle{
+	padding:3rem 0;
+}
+
+.marginCard{
+	margin-top: 0.75rem;
+}
+
+.radio-group-container::before {
+    content: "Seleccione un cliente al que asignar la llamada:";
+    white-space: pre;
+    font-weight: bold;
+    display: block;
+	padding: 1rem;
+}
+
+.link-like {
+	margin-left: 0.25rem;
+	color: #0070d2;
+	text-decoration: underline; 
+	cursor: pointer; 
+}
+
+.link-like:hover {
+	color: #005fb2; 
+}

@@ -2,10 +2,11 @@ import { LightningElement, track, api,wire} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { createRecord } from 'lightning/uiRecordApi';
 
-import getPickList            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId';
+import getPickList            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getPickListValuesByRecordTypeId2';
 import getRecordType            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getRecordType';
 import updateTask 		        from '@salesforce/apex/CIBE_TabManagementTask_Controller.updateTaskNotLocated';
 import getTaskStatus            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getTaskStatus';
+import getRecord            from '@salesforce/apex/CIBE_TabManagementTask_Controller.getRecord';
 import CIBE_CMP_ErrorMessage 	from '@salesforce/label/c.CIBE_CMP_ErrorMessage';
 
 // Labels 
@@ -36,10 +37,13 @@ export default class Cibe_TabNotLocated extends LightningElement {
 	@track disableBtn = false;
 	@track boton = false;
 	@api experienciaCliente = false;
+	@track values = [];
+	@track valorCambiado = false;
 
 	//picklist tipo
 	@track value = 'LT';
 	handleChange(event) {
+		this.valorCambiado = true;
 		this.value = event.detail.value;
 	}
 
@@ -126,7 +130,20 @@ export default class Cibe_TabNotLocated extends LightningElement {
 		updateTask({id: this.recordId, estado: this.value2, tipo: this.value, fecha: this.fecha, comentario: this.comment})
 			.then(result => {
                 if(result == 'OK') {
-					this.insertHistorialGestion();
+					if(this.values[0].Status == 'Pendiente no localizado' && this.comment == null && this.value == this.values[0].AV_Tipo__c){
+						this.insertHistorialGestion();
+					}else{
+						this.progressValue = "ManagementHistory";
+						const selectedEvent = new CustomEvent("progressvaluechange", {
+							detail: {
+								progress: this.progressValue,
+								boton: this.boton
+							}
+						});
+
+						this.dispatchEvent(selectedEvent);
+						this.disableSpinner();
+					}
 				}else {
 					this.dispatchEvent(
 						new ShowToastEvent({
@@ -171,6 +188,7 @@ export default class Cibe_TabNotLocated extends LightningElement {
 				this.fecha=today.toISOString().substring(0,10);
 				this.progressValue = "ManagementHistory";
 				// Creates the event with the data.
+
 				const selectedEvent = new CustomEvent("progressvaluechange", {
 				detail: {
 					progress: this.progressValue,
@@ -180,6 +198,7 @@ export default class Cibe_TabNotLocated extends LightningElement {
 
 				// Dispatches the event.
 				this.dispatchEvent(selectedEvent);
+
 			})
 			.catch(error => {
 				this.dispatchEvent(
@@ -203,7 +222,11 @@ export default class Cibe_TabNotLocated extends LightningElement {
 				this.botonDisabled();
 				if(this.recordType == 'CIBE_ExperienciaClienteCIB' || this.recordType == 'CIBE_ExperienciaClienteEMP'){
 					this.experienciaCliente = true;
-				}				
+				}
+				
+				if(this.recordType == 'CIBE_ExperienciaClienteEMP' || this.recordType == 'CIBE_GestionarPriorizadosEMP' || this.recordType == 'CIBE_OtrosEMP' || this.recordType == 'CIBE_AlertaComercialEMP' || this.recordType == 'CIBE_AvisosEMP' || this.recordType == 'CIBE_OnboardingEMP'){
+					this.value = 'LMD';
+				}
             })
             .catch(error => {
 				console.log('Display ShowToastEvent error (catch): ', error);
@@ -218,7 +241,7 @@ export default class Cibe_TabNotLocated extends LightningElement {
 	}
 
 	getPickListType() {
-        getPickList({objectName: 'Task', recordId: this.recordId, fieldApiName: 'AV_Tipo__c', picklistDevName: 'CIBE_TaskTipo'})
+        getPickList({objectName: 'Task', recordId: this.recordId, fieldApiName: 'AV_Tipo__c'})
             .then(result => {
                 this.options=result;
 			 })
@@ -240,4 +263,13 @@ export default class Cibe_TabNotLocated extends LightningElement {
     enableSpinner() {
         this.showSpinner = true;
     }
+
+	@wire(getRecord, {recordId : '$recordId'})
+    wiredValues({error, data}){
+		if(data){
+			this.values = data;
+		}else if(error){
+			Console.log(error);
+		}
+	}
 }

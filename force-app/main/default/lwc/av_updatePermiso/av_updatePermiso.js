@@ -115,7 +115,7 @@ displayDateErrors(condition,type,endOrStart){
     this.dispatchEvent(new ShowToastEvent({
         title: title,
         message: msg,
-        variant: 'error',
+        variant: 'error'
     }));
     
 }
@@ -140,13 +140,13 @@ executeUpdt(event){
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Permiso actualizado',
                 message: '',
-                variant: 'success',          
+                variant: 'success'         
             }));
         }else{
             this.dispatchEvent(new ShowToastEvent({
                 title: 'No se ha podido actualizar el permiso ',
                 message: 'Contacta con tu administrador',
-                variant: 'error',          
+                variant: 'error'
             }));
         }
         this.switchSpinner();

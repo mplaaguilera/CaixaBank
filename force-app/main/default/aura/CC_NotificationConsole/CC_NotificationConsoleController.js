@@ -22,16 +22,7 @@
 		});	
 		$A.enqueueAction(get3NUser);
        
-		let getCCUser = component.get('c.getCCUser');
-		getCCUser.setCallback(this, response => {
-			if (response.getState() === "SUCCESS") {
-                if(response.getReturnValue()){
-					helper.subscribeNotificacionAgrupador(component);
-                }
-			}
-		});	
-		$A.enqueueAction(getCCUser);
-		
+        helper.subscribeNotificacionAgrupador(component);
 		
 		//Get Current Profile User
 		helper.getCurrentUser(component);

@@ -6,7 +6,7 @@ const columns = [
     { label: 'Situación', fieldName: 'descSituacion', type: 'text',hideDefaultActions: true },
     { label: 'Fecha situación', fieldName: 'fechaSituac', type: 'text',hideDefaultActions: true },
     { label: 'Gestor', fieldName: 'empleado', type: 'text',hideDefaultActions: true },    
-    { label: 'Fecha Inicio', fieldName: 'fechaInicio', type: 'text',hideDefaultActions: true },
+    { label: 'Fecha Inicio', fieldName: 'fechaInicio', type: 'text',hideDefaultActions: true }
 ];
 export default class Sir_lwc_ProcesosAgencia extends LightningElement {
     columns = columns;
@@ -32,7 +32,7 @@ export default class Sir_lwc_ProcesosAgencia extends LightningElement {
                     this.todoKO = false; 
                     this.isEmpty = false; 
                     this.sumProcesos = this.otrosProcesos.length;
-                    if(this.sumProcesos == 0){
+                    if(this.sumProcesos === 0){
                         this.isEmpty = true;
                     }                
                 } if(data[0] == 'KO'){
