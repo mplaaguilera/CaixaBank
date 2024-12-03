@@ -37,19 +37,21 @@ public with sharing class OS_EmailService implements Messaging.InboundEmailHandl
             List<OS_Correo__mdt> correoDependencia = [SELECT OS_Email__c, OS_Cola_Procedencia__c, OS_Canal_Procedencia__c, OS_Correo__c, OS_Recordtype_Caso_Defecto__c
                                                         FROM OS_Correo__mdt WHERE OS_Email__c = :envelope.toAddress LIMIT 1];
 
-            List<SEG_Buzon__mdt> buzonesSEG = SEG_Buzon__mdt.getAll().values();
-            List<String> direccionesSEG = new List<String>();
-            for (SEG_Buzon__mdt buzon : buzonesSEG) {
-                direccionesSEG.add(buzon.SEG_Correo_de_procedencia__c);
-            }
-            Boolean segMailRelated =false;
+            Boolean segMailRelated = false;
 
-            for (String address : direccionesSEG){ 
-                if((email.toAddresses!=null && !email.toAddresses.isEmpty() && email.toAddresses.contains(address)) || (email.ccAddresses!=null && !email.ccAddresses.isEmpty() && email.ccAddresses.contains(address))) {
-                    segMailRelated = true;       
+            if (!correoDependencia.isEmpty() && (correoDependencia[0].OS_Canal_Procedencia__c == 'Buzón UAFE' || correoDependencia[0].OS_Canal_Procedencia__c == 'Buzón UAFE Express')) {
+                List<SEG_Buzon__mdt> buzonesSEG = SEG_Buzon__mdt.getAll().values();
+                List<String> direccionesSEG = new List<String>();
+                for (SEG_Buzon__mdt buzon : buzonesSEG) {
+                    direccionesSEG.add(buzon.SEG_Correo_de_procedencia__c);
+                }
+
+                for (String address : direccionesSEG){ 
+                    if((email.toAddresses!=null && !email.toAddresses.isEmpty() && email.toAddresses.contains(address)) || (email.ccAddresses!=null && !email.ccAddresses.isEmpty() && email.ccAddresses.contains(address))) {
+                        segMailRelated = true;       
+                    }
                 }
             }
-            
 
             List<Group> colasTotalesCOPS = [SELECT Id, Name, DeveloperName, Type FROM Group WHERE DeveloperName LIKE 'OS_%'];
             List<Group> colas = new List<Group>();

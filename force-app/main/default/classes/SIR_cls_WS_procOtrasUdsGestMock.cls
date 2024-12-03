@@ -12,8 +12,8 @@ Proposito:   Clases Mock necesario de la clase de test del WS en la clase SIR_cl
 *****************************************************************/
 
 @isTest
-global with sharing class SIR_cls_WS_procOtrasUdsGestMock implements HttpCalloutMock{
-    global HTTPResponse respond(HTTPRequest req) {
+public with sharing class SIR_cls_WS_procOtrasUdsGestMock implements HttpCalloutMock{
+    public HTTPResponse respond(HTTPRequest req) {
         SIR_cls_WS_procOtrasUdsGest.ProcOtrasUdsGestRequest request = (SIR_cls_WS_procOtrasUdsGest.ProcOtrasUdsGestRequest)JSon.deserialize(req.getBody(), SIR_cls_WS_procOtrasUdsGest.ProcOtrasUdsGestRequest.class);
         SIR_cls_WS_procOtrasUdsGest.ProcOtrasUdsGestResponse responseJson = new SIR_cls_WS_procOtrasUdsGest.ProcOtrasUdsGestResponse();
         List<SIR_cls_WS_procOtrasUdsGest.ProcesoOtrasUnidGestDto> lstprocesos = new List<SIR_cls_WS_procOtrasUdsGest.ProcesoOtrasUnidGestDto>();

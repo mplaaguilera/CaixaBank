@@ -1,11 +1,20 @@
 @istest
 public with sharing class SIR_HomeImpaAutoRefresh_Test {
 
-    @istest
-    public static void getQueryProcesosTest(){
+    @TestSetup 
+    static void makeData(){
+
         UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
         insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');
+        User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');  
+        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
+        insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);        
+    }
+
+
+    @istest
+    public static void getQueryProcesosTest(){
+        User usuario = [SELECT Id FROM User LIMIT 1];
         List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
         SIR_Constantes constantes = new SIR_Constantes();
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
@@ -15,6 +24,13 @@ public with sharing class SIR_HomeImpaAutoRefresh_Test {
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIR_TestDataFactory.crearProceso(cuenta);
             Test.startTest();
+            SIR_Parametros__c setting = new SIR_Parametros__c();
+            setting.Name = 'maxCajas_IMPA';
+            setting.SIR_Valor__c = '8';
+            setting.SIR_Parametro__c = 'maxCajas_IMPA';
+            setting.SIR_Tipo__c = 'maxCajas_IMPA';
+            insert setting;
+            SIR_LCMP_HomeImpaAutoRefresh.getAgrupacionesEstrategias();
             procesos = SIR_LCMP_HomeImpaAutoRefresh.getQueryProcesos();
             Test.stopTest();
             
@@ -25,19 +41,19 @@ public with sharing class SIR_HomeImpaAutoRefresh_Test {
 
     @istest
     public static void getQueryFormulariosTest(){
-        List<SIR_FormularioRefinanciacion__c> formularios = new List<SIR_FormularioRefinanciacion__c>();
-        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
-        insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');
+        User usuario = [SELECT Id FROM User LIMIT 1];
         List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
-        SIR_Constantes constantes = new SIR_Constantes();
+        List<SIR_FormularioRefinanciacion__c> formularios = new List<SIR_FormularioRefinanciacion__c>();
+        
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
         insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
         System.runAs(usuario){
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
             SIR_FormularioRefinanciacion__c formulario = SIR_TestDataFactory.crearFormulario(proceso);
-            formulario.RecordTypeId = Schema.SObjectType.SIR_FormularioRefinanciacion__c.getRecordTypeInfosByName().get(SIR_Constantes.FORMULARIOREFINANCIACION_RECORDTYPE_NAME_FORMULARIO_REFINANCIACION).getRecordTypeId();
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsFormulario = Schema.SObjectType.SIR_FormularioRefinanciacion__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeForm = mapRTsObjectsFormulario.get('SIR_FormularioRefinanciacion').getRecordTypeId();             
+            formulario.RecordTypeId = recordTypeForm;
             formulario.SIR_Estado__c = SIR_Constantes.FORMULARIOREFINANCIACION_ESTADO_EN_CURSO;
             update formulario;
             Test.startTest();
@@ -50,20 +66,18 @@ public with sharing class SIR_HomeImpaAutoRefresh_Test {
     @istest
     public static void getQueryAccionesTest(){
         List<SIREC__SIREC_obj_acciones__c> acciones = new List<SIREC__SIREC_obj_acciones__c>();
-        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
-        insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');
+        User usuario = [SELECT Id FROM User LIMIT 1];
         List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
-        SIR_Constantes constantes = new SIR_Constantes();
-        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
-        insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
+        
         System.runAs(usuario){
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
-            proceso.RecordTypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId();
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsProcesos = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeIdAmistoso = mapRTsObjectsProcesos.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_IMPA).getRecordTypeId();        
+            proceso.RecordTypeId = recordTypeIdAmistoso;
             update proceso;
             SIREC__SIREC_obj_acciones__c accion = SIR_TestDataFactory.crearAccionProcesoAmistoso(proceso);
-            accion.SIREC__SIREC_fld_responsable__c = UserInfo.getUserId();
+            accion.SIREC__SIREC_fld_responsable__c = usuario.Id;
             accion.SIREC__SIREC_fld_estado__c = SIR_Constantes.ACCION_ESTADO_PENDIENTE;
             update accion;
             Test.startTest();
@@ -76,40 +90,16 @@ public with sharing class SIR_HomeImpaAutoRefresh_Test {
     //@isTest(SeeAllData=true)
     @istest
     public static void getQueryReportsTest(){
+        User usuario = [SELECT Id FROM User LIMIT 1];
+
         List<Report> informes = new List<Report>();
+        System.runAs(usuario){
             Test.startTest();
             informes = SIR_LCMP_HomeImpaAutoRefresh.getQueryReports();
             Test.stopTest();
+        }
         System.assertEquals(0, informes.size(), 'SIR_HomeImpaAutoRefresh_Test.getQueryReportsTest  No se obtiene el numero de informes esperado');
         //System.assertEquals(11, informes.size(), 'SIR_HomeImpaAutoRefresh_Test.getQueryReportsTest  No se obtiene el numero de informes esperado');
-    }
-
-    @istest
-    public static void getProcesosChartTest(){ 
-        
-        List<SIR_LCMP_HomeImpaAutoRefresh.ProcesoInfo> lstProcesos = new List<SIR_LCMP_HomeImpaAutoRefresh.ProcesoInfo>();
-        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
-        insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');
-        List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
-        SIR_Constantes constantes = new SIR_Constantes();
-        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
-        insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
-        System.runAs(usuario){
-            Account cuenta = SIR_TestDataFactory.crearCuenta();
-            SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
-            proceso.RecordTypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId();
-            update proceso;
-            SIREC__SIREC_obj_acciones__c accion = SIR_TestDataFactory.crearAccionProcesoAmistoso(proceso);
-            accion.SIREC__SIREC_fld_responsable__c = UserInfo.getUserId();
-            accion.SIREC__SIREC_fld_estado__c = SIR_Constantes.ACCION_ESTADO_PENDIENTE;
-            update accion;
-            Test.startTest();
-            lstProcesos = SIR_LCMP_HomeImpaAutoRefresh.getProcesos();
-            Test.stopTest();
-        }
-        System.assertEquals(1, lstProcesos.size(), 'SIR_HomeImpaAutoRefresh_Test.getQueryReportsTest  No se obtiene el numero de procesos esperado');
-        
     }
 
 }

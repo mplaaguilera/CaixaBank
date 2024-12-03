@@ -6,42 +6,49 @@ Proposito:
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-    VERSION		USER_STORY                                          AUTHOR             
+    VERSION		USER_STORY                                 AUTHOR                         DATE           Description              
     1.0         SF - Integración con API's de Divisas      Jose Maria Fernandez       
+    1.1         US841839                                   Borja Lavesiera                12/03/2024     Eliminar Http, HttpRequest y HttpResponse Constructor  
 ***********************************************************************************************************************/
 
 @isTest
 public with sharing class CIBE_CambioDivisas_Controller_Test {
-
-
     public static final String RESPONSE_DIVISAS	= '[{"ccyData":{"ccyCode":1,"ccyDigits":13,"swiftCode":"ESP","ccyCodeBE":0,"ccyShortName":"PESETA","ccyLongName":""},"exchangeData":{"fixingPurchaseExchange":0,"fixingSaleExchange":166.386,"standardPurchaseExchange":166.386,"standardSaleExchange":166.386,"exchangeOperator":"D","agreementIndicator":""},"rangeData":{"standardPurchaseRange":0,"standardSaleRange":0,"fixingPurchaseRange":0},"decimalNumbers":0,"decimalRoundNumbers":3,"ccyGender":0,"correspondentBank":0,"ccyCountry":0,"isoCcyCode":0,"riskLetterCode":"","validityTime":0,"umeCcyIndicator":"","signalsData":{"quotableSignal":"S","purchaseAllowedSignal":"S","saleAllowedSignal":"S","forcedExchangeSignal":"N","fx4cashCcySignal":"N"}},{"ccyData":{"ccyCode":100,"ccyDigits":7,"swiftCode":"ESP","ccyCodeBE":0,"ccyShortName":"PESETA","ccyLongName":""},"exchangeData":{"fixingPurchaseExchange":0,"fixingSaleExchange":166.386,"standardPurchaseExchange":166.386,"standardSaleExchange":166.386,"exchangeOperator":"D","agreementIndicator":""},"rangeData":{"standardPurchaseRange":0,"standardSaleRange":0,"fixingPurchaseRange":0},"decimalNumbers":0,"decimalRoundNumbers":3,"ccyGender":0,"correspondentBank":0,"ccyCountry":0,"isoCcyCode":0,"riskLetterCode":"","validityTime":0,"umeCcyIndicator":"","signalsData":{"quotableSignal":"S","purchaseAllowedSignal":"S","saleAllowedSignal":"S","forcedExchangeSignal":"N","fx4cashCcySignal":"N"}},{"ccyData":{"ccyCode":102,"ccyDigits":33,"swiftCode":"GBP","ccyCodeBE":0,"ccyShortName":"LIBRA ES","ccyLongName":""},"exchangeData":{"fixingPurchaseExchange":0,"fixingSaleExchange":0.85885,"standardPurchaseExchange":0.88015,"standardSaleExchange":0.84019,"exchangeOperator":"D","agreementIndicator":""},"rangeData":{"standardPurchaseRange":0,"standardSaleRange":0,"fixingPurchaseRange":0},"decimalNumbers":2,"decimalRoundNumbers":5,"ccyGender":0,"correspondentBank":0,"ccyCountry":0,"isoCcyCode":0,"riskLetterCode":"","validityTime":0,"umeCcyIndicator":"","signalsData":{"quotableSignal":"S","purchaseAllowedSignal":"S","saleAllowedSignal":"S","forcedExchangeSignal":"N","fx4cashCcySignal":"N"}},{"ccyData":{"ccyCode":103,"ccyDigits":46,"swiftCode":"USD","ccyCodeBE":0,"ccyShortName":"DOL.USA.","ccyLongName":""},"exchangeData":{"fixingPurchaseExchange":0,"fixingSaleExchange":1.0375,"standardPurchaseExchange":1.059,"standardSaleExchange":1.0109,"exchangeOperator":"D","agreementIndicator":""},"rangeData":{"standardPurchaseRange":0,"standardSaleRange":0,"fixingPurchaseRange":0},"decimalNumbers":2,"decimalRoundNumbers":4,"ccyGender":1,"correspondentBank":0,"ccyCountry":0,"isoCcyCode":0,"riskLetterCode":"","validityTime":0,"umeCcyIndicator":"","signalsData":{"quotableSignal":"S","purchaseAllowedSignal":"S","saleAllowedSignal":"S","forcedExchangeSignal":"N","fx4cashCcySignal":"N"}}]';
 
-   
- 
-
+    @TestSetup
+    static void makeData() {
+    user usrAdm = CIBE_TestHelper.createUser('System Administrator', '1234');
+    CBK_IntegrationSetting__c endpointConf = new CBK_IntegrationSetting__c(Name='changeCurrency', NamedCredential__c = 'changeCurrency');
+    insert endpointConf;
+    test.setCreatedDate(endpointConf.id, dateTime.newInstance(2023, 5, 1));
+    update endpointConf;
+    }
      @isTest
     private static void testSendRequestCheckReponse() {
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
+        User cIBUser;
+        System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+        }
         CIBE_CambioDivisas_Controller.Response eventResponse = new CIBE_CambioDivisas_Controller.Response();
         CIBE_CambioDivisas_Controller.Response eventResponseFakeJson = new CIBE_CambioDivisas_Controller.Response();
 
         Test.setMock(HttpCalloutMock.class, new CIBE_MockCallout_Test('DIVISAS','OK'));
         eventResponseFakeJson.data = (List<CIBE_CambioDivisas_Controller.ResponseData>)JSON.deserialize(RESPONSE_DIVISAS, List<CIBE_CambioDivisas_Controller.ResponseData>.class);  
-
         Test.StartTest();
-        eventResponse= CIBE_CambioDivisas_Controller.sendRequest('{"option":4,"requestType":"D"}');
+        System.runAs(cIBUser) {
+            eventResponse= CIBE_CambioDivisas_Controller.sendRequest('{"option":4,"requestType":"D"}');
+        }
         Test.StopTest();
-
-        System.debug('eventResponseFakeJson.data: ' + eventResponseFakeJson.data);
-        System.debug('eventResponse.data: ' + eventResponse.data);  
-
         System.assertEquals(200, eventResponse.statusCode);
-
-
     }
-    
-
     @isTest
     private static void testSendRequestCompareDivisas() {
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
+        User cIBUser;
+        System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+        }
         CIBE_CambioDivisas_Controller.Response eventResponse = new CIBE_CambioDivisas_Controller.Response();
         CIBE_CambioDivisas_Controller.Response eventResponseFakeJson = new CIBE_CambioDivisas_Controller.Response();
 
@@ -52,19 +59,12 @@ public with sharing class CIBE_CambioDivisas_Controller_Test {
         eventResponseFakeJson.data = (List<CIBE_CambioDivisas_Controller.ResponseData>)JSON.deserialize(RESPONSE_DIVISAS, List<CIBE_CambioDivisas_Controller.ResponseData>.class);  
 
         Test.StartTest();
-       
+        System.runAs(cIBUser) {
         divisas = CIBE_CambioDivisas_Controller.getDivisas();
-        divisasFake = CIBE_CambioDivisas_Controller.jsonToDatabase( eventResponseFakeJson.data);
+        divisasFake = CIBE_CambioDivisas_Controller.jsonToDatabase(eventResponseFakeJson.data);
+        }
         Test.StopTest();
 
-        System.debug('eventResponseFakeJson.data: ' + eventResponseFakeJson.data);
-        System.debug('eventResponse.data: ' + eventResponse.data);  
-
         System.assertEquals(divisasFake, divisas);
-
-
     }
-
-
-   
 }

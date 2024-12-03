@@ -484,7 +484,7 @@ public class OS_Case_Gestion_Controller_Test {
             OS_Case_Gestion_Controller.crearActividadRetipificacion(caso.Id, 'TEMATICA', 'PRODUCTE', 'MOTIVO');
             Test.stopTest();
             
-            System.assertNotEquals(0, [SELECT COUNT() FROM Task where WhatId = :caso.Id], 'Comprobamos que existe tarea.');
+            System.assertNotEquals(0, [SELECT Id FROM Task where WhatId = :caso.Id].size(), 'Comprobamos que existe tarea.');
         }
     }
     

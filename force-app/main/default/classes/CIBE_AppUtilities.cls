@@ -202,6 +202,18 @@ public with sharing class CIBE_AppUtilities {
         
         return userLoggeado;
 	}
+
+        /**
+     * Retrieve API User info
+     */
+    public static User getUserGCF(){
+        User userGcf = new User();
+        if(Schema.SObjectType.USER.fields.Id.isAccessible()){
+            userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
+        }
+        
+        return userGcf;
+	}
 	
 	/**
      * Retrieve the application from user is logged in the system
@@ -448,17 +460,30 @@ public with sharing class CIBE_AppUtilities {
 
     @AuraEnabled(cacheable=true) 
 	public static String getAppDefinition() {
-
-        UserAppInfo userAppInfo;
-        AppDefinition appDefinition;
-	    if(Schema.sObjectType.UserAppInfo.isAccessible() && Schema.sObjectType.AppDefinition.isAccessible()){
-            userAppInfo = [SELECT Id, AppDefinitionId FROM UserAppInfo WHERE UserId = :UserInfo.getUserId() LIMIT 1];
-            if(userAppInfo!=null){
-                appDefinition = [SELECT DurableId, DeveloperName FROM AppDefinition Where DurableId = :userAppInfo.AppDefinitionId LIMIT 1];
+        if(Schema.sObjectType.UserAppInfo.isAccessible() && Schema.sObjectType.AppDefinition.isAccessible()){
+            List <UserAppInfo> lstUsAppInfo = new List <UserAppInfo>();
+            Set<Id> setIds = new Set<Id>();
+            AppDefinition appDefinition = null;
+            try{
+                lstUsAppInfo = [SELECT Id, AppDefinitionId FROM UserAppInfo WHERE UserId = :UserInfo.getUserId() AND FormFactor ='Large'];
+            }catch(Exception e){
+                AV_LogDebug.printException('getAppDefinition - userAppInfo ', e);
             }
-        }
-        if(appDefinition!=null){
-            return appDefinition.DeveloperName;
+            if(lstUsAppInfo!=null && !lstUsAppInfo.isEmpty()){
+                for(UserAppInfo uai: lstUsAppInfo){
+                    setIds.add(uai.AppDefinitionId);
+                }
+                if(setIds!=null && !setIds.isEmpty()){
+                    try{
+                        appDefinition = [SELECT id, DurableId, DeveloperName FROM AppDefinition WHERE DurableId = :setIds LIMIT 1];
+                    }catch(Exception e){
+                        AV_LogDebug.printException('getAppDefinition - appDefinition ', e);
+                    }
+                }
+            }
+            if(appDefinition!=null){
+                return appDefinition.DeveloperName;
+            }
         }
         return null;
     }

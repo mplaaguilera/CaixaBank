@@ -126,60 +126,6 @@ public without sharing class SAC_Reclamacion {
 
 */
 
-
-        /*****************************************************************
-     * Proposito: 
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0             US832968       Álex Polo      20/08/24      Creación
-    *****************************************************************/
-    /*public static void actualizarTAE(List<Case> listaReclamaciones, List<Case> listaCasos){
-        
-    
-        List<Id> listaIdPrincipales = new List<Id>();
-        List<Case> listaPretensionesPrincipales = new List<Case>();
-        Map<Id, Case> mapaPretensiones = new Map<Id, Case>();
-        Map<Id,Case> mapaReclamaciones = new Map<Id, Case>();
-
-        Map<Id,Case> mapaCasos = new Map<Id, Case>();
-
-        //Se crea un mapa con las reclamaciones actualizadas y se llena una lista con todas las pretensiones principales
-        for(Case reclamacion : listaReclamaciones){
-            mapaReclamaciones.put(reclamacion.Id, reclamacion);
-            listaIdPrincipales.add(reclamacion.SAC_PretensionPrincipal__c);
-        }
-    
-        //Mapa con todos los casos
-        for(Case caso : listaCasos){
-            mapaCasos.put(caso.Id, caso); 
-        }
-
-        //Se crea un mapa con todas las pretensiones principales
-        for(Id id : listaIdPrincipales){
-            if(mapaCasos.containsKey(id)){
-                listaPretensionesPrincipales.add(mapaCasos.get(id));
-                if(!mapaPretensiones.containsKey(id)){
-                    mapaPretensiones.put(id, mapaCasos.get(id));
-                }
-
-            }
-        }
-
-        //Para cada reclamación, si el mapa de pretensiones tiene su pretensión principal, se le asigna el valor del TAE de su pretensión principal
-        if(!listaPretensionesPrincipales.isEmpty()){
-            for(Case reclamacion : listaReclamaciones){
-                if(mapaPretensiones.containsKey(reclamacion.SAC_PretensionPrincipal__c)){
-                    reclamacion.SAC_TAE__c = mapaPretensiones.get(reclamacion.SAC_PretensionPrincipal__c).SAC_TAE__c;
-                }else{
-                    reclamacion.SAC_TAE__c = null;
-                }
-            }
-
-        }
-    }*/
-
     /**************************************************************************
      * Proposito: Modificar los campos relativos a la direccion postal en su campo global
      *
@@ -190,6 +136,7 @@ public without sharing class SAC_Reclamacion {
     **************************************************************************/  
 
     public static void informarDireccionPostar(List<Case> listNewCase){
+        
         for(Case caso : listNewCase){
             String direccion;
             if (String.isNotBlank(caso.SAC_DireccionContacto__c)) {
@@ -198,10 +145,8 @@ public without sharing class SAC_Reclamacion {
             if (String.isNotBlank(caso.SAC_CodigoPostalContacto__c)) {
                 if (String.isNotBlank(direccion)) {
                     direccion = direccion + ', ' + caso.SAC_CodigoPostalContacto__c;
-
                 } else {
                     direccion = caso.SAC_CodigoPostalContacto__c;
-
                 }
             }
             if (String.isNotBlank(caso.SAC_PoblacionContacto__c)) {
@@ -594,6 +539,7 @@ public without sharing class SAC_Reclamacion {
     **************************************************************************/
 
     public static void bajaPretensionesRechazo(List<Case> listNewCase) {
+
         List<Id> idReclamaciones = new List<Id>();
         List<Case> pretensiones = new List<Case>();
 
@@ -606,6 +552,7 @@ public without sharing class SAC_Reclamacion {
         if(!pretensiones.isEmpty()){
 
             for(Case pretension: pretensiones){
+
                 pretension.Status = 'SAC_009';
                 pretension.SAC_StatusAuxiliar__c = 'SAC_009';
             }
@@ -736,150 +683,6 @@ public without sharing class SAC_Reclamacion {
             }
         }
     }
-
-
-    public static void actualizarPlantillaLateral(List<Case> listaCasosSelect, List<Case> listaCasosCambiaIdioma){
-        System.debug('Entra idioma');
-        Map<Id, Case> mapaReclamacionesCambiaIdioma = new Map<Id, Case>();
-        Set<Id> idsReclamaciones = new Set<Id>();
-        List<Case> listaReclamaciones = new List<Case>();
-
-        List<SAC_DocumentoEnvio__c> listaDocumentos = new List<SAC_DocumentoEnvio__c>();
-        Map<Id, SAC_DocumentoEnvio__c> mapaDocumentos = new Map<Id, SAC_DocumentoEnvio__c>();
-
-        List<SAC_DocumentoEnvio__c> listaDocumentosInsertar = new List<SAC_DocumentoEnvio__c>();
-        List<SAC_DocumentoEnvio__c> listaDocumentosUpdate = new List<SAC_DocumentoEnvio__c>();
-
-        List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
-        Map<String, EmailTemplate> mapaEmailTemplates = new Map<String, EmailTemplate>();
-
-
-        for (Case caso : listaCasosCambiaIdioma) {
-            mapaReclamacionesCambiaIdioma.put(caso.Id, caso);
-            idsReclamaciones.add(caso.Id);
-            listaReclamaciones.add(caso);
-        }
-
-        if(!idsReclamaciones.isEmpty()){
-            listaDocumentos = [SELECT Id, SAC_Caso__c, SAC_NombrePlantillaLateral__c, createdDate FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c IN :idsReclamaciones AND SAC_TipoDocumento__c = 'redaccion' ORDER by createdDate desc];
-            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName FROM EmailTemplate WHERE Developername IN ('SAC_Footer', 'SAC_Footer_ENG', 'SAC_FOOTER_CAT', 'SAC_FOOTER_Valenciano', 'SAC_FOOTER_Gallego', 'SAC_FOOTER_Euskera')];
-            System.debug('lista ' + lstPlantillas);
-
-            if(!listaDocumentos.isEmpty()){
-                for(SAC_DocumentoEnvio__c doc : listaDocumentos){
-                    if(!mapaDocumentos.containsKey(doc.SAC_Caso__c)){ 
-                        mapaDocumentos.put(doc.SAC_Caso__c, doc);       //Se añade solo el primero, ya que al estar ordenados por DESC, será el primero de la lista
-                    }
-                }
-            }
-
-            if(!lstPlantillas.isEmpty()){
-                for(EmailTemplate em : lstPlantillas){
-                    System.debug('plantilla ' + em.DeveloperName);
-                    if(!mapaEmailTemplates.containsKey(em.DeveloperName)){ 
-                        System.debug('plantilla a mapa' + em.DeveloperName);
-                        mapaEmailTemplates.put(em.DeveloperName, em);       
-                    }
-                }
-            }
-
-          
-
-            for(Case caso : listaReclamaciones){
-                if(mapaDocumentos.containsKey(caso.Id)){        //Si esta reclamación ya tiene documento, se cambia su plantilla lateral en función del nuevo idioma
-                    SAC_DocumentoEnvio__c documentoNuevo = new SAC_DocumentoEnvio__c();
-                    documentoNuevo.Id = mapaDocumentos.get(caso.Id).Id;
-                    if(caso.CC_Idioma__c == 'en'){              //Si el nuevo idioma es inglés
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = '';
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_ENG')){       //También se le asocia un footer según el idioma
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_ENG').HtmlValue;
-                        }
-
-                    }else if(caso.CC_Idioma__c == 'ca'){                                 //Si el nuevo idioma es catalán
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = '';
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_CAT')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_CAT').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'va'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';  //La lateral será castellano si el idioma es valenciano
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Valenciano')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Valenciano').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'ga'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';    //La lateral será castellano si el idioma es gallego
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Gallego')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Gallego').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'eu'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';    //La lateral será castellano si el idioma es euskera
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Euskera')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Euskera').HtmlValue;
-                        }
-                    }else{                                      //Si el nuevo idioma es castellano o cualquier otro
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';    
-                        if(mapaEmailTemplates.containsKey('SAC_Footer')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer').HtmlValue;
-                        }
-                    }
-                    listaDocumentosUpdate.add(documentoNuevo);
-                    
-                }else{                                      //Si esta reclamación aún no tiene documento, se crea
-                    SAC_DocumentoEnvio__c documentoNuevo = new SAC_DocumentoEnvio__c();
-                    documentoNuevo.SAC_Caso__c = caso.Id;
-                    documentoNuevo.SAC_TipoDocumento__c = 'redaccion';
-                    if(caso.CC_Idioma__c == 'en'){              //Si el nuevo idioma es inglés
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = '';
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_ENG')){       //También se le asocia un footer según el idioma
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_ENG').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'ca'){                                 //Si el nuevo idioma es catalán
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = '';
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_CAT')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_CAT').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'va'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';  //La lateral será castellano si el idioma es valenciano
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Valenciano')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Valenciano').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'ga'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';    //La lateral será castellano si el idioma es gallego
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Gallego')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Gallego').HtmlValue;
-                        }
-                    }else if(caso.CC_Idioma__c == 'eu'){
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';    //La lateral será castellano si el idioma es euskera
-                        if(mapaEmailTemplates.containsKey('SAC_Footer_Euskera')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer_Euskera').HtmlValue;
-                        }
-                    }else{                                      //Si el nuevo idioma es castellano o cualquier otro
-                        documentoNuevo.SAC_NombrePlantillaLateral__c = 'SAC_CartaPlantilla';
-                        if(mapaEmailTemplates.containsKey('SAC_Footer')){
-                            documentoNuevo.SAC_Footer__c = mapaEmailTemplates.get('SAC_Footer').HtmlValue;
-                        }
-                    }
-                    listaDocumentosInsertar.add(documentoNuevo);
-                }
-            }
-
-
-            //Insertar los documentos nuevos
-            if(!listaDocumentosInsertar.isEmpty()){
-                SAC_DatabaseDML.insertListDML(listaDocumentosInsertar, true);
-            }
-
-            //Actualizar los documentos existentes
-            if(!listaDocumentosUpdate.isEmpty()){
-                SAC_DatabaseDML.updateListDML(listaDocumentosUpdate, true);
-            }
-            
-
-        }
-
-
-    }
-
-
 
     /**************************************************************************
     * Proposito: Crear una task para el proyecto mis clientes. Se llama en el trigger AU de case

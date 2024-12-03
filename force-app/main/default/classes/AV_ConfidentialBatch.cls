@@ -15,19 +15,20 @@ Historial
     1.4         US245181        Daniel Rodriguez    02/12/2021          Added condition to check AV_Empleado__c
     1.5         AV_Query IT     Daniel Rodríguez    02/03/2022          Change AV_Query to SOQL for User, Account, Contact
     2.0         Fix Confidencial    Carolina Alonso 26/09/2022          Modify the logic to calculate the hierarchy 
+    2.1         FIX28080841     Oscar Moreno        03/09/2024          Fix error The Global modifier should be avoided.
 ***********************************************************************************************************************/
-global class AV_ConfidentialBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_ConfidentialBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 
-    global Integer recordsProcessed = 0;
-    global static final String BATCHNAME = 'AV_ConfidentialBatch';
-    global static final String TIPOMC  = 'MC';
+    public Integer recordsProcessed = 0;
+    public static final String BATCHNAME = 'AV_ConfidentialBatch';
+    public static final String TIPOMC  = 'MC';
     
     /**
      * Create a list of Clients that are Confidential or Employees.
      *
      * @param bc  Database.BatchableContext param that contains the batch job ID
      */ 
-    global Database.QueryLocator start(Database.BatchableContext bc) {
+    public Database.QueryLocator start(Database.BatchableContext bc) {
         String methodName = 'start';
         String avQuery = '';
         String limitBatch = AV_SchedulerBatches.getLimit(BATCHNAME);
@@ -47,7 +48,7 @@ global class AV_ConfidentialBatch implements Database.Batchable<sObject>, Databa
      * @param bc    Database.BatchableContext param that contains the batch job ID
      * @param listClients List<Account> param with the list of Confidential Clients.
      */
-    global void execute(Database.BatchableContext bc, List<Account> listClients){
+    public void execute(Database.BatchableContext bc, List<Account> listClients){
         // Procesar cada batch de registros
         String methodName = 'execute';
         try{
@@ -105,7 +106,7 @@ global class AV_ConfidentialBatch implements Database.Batchable<sObject>, Databa
      *
      * @param sc    SchedulableContext param that contains the job ID
      */
-    global void execute(SchedulableContext sc) {
+    public void execute(SchedulableContext sc) {
         Database.executeBatch(new AV_ConfidentialBatch());
     }
 
@@ -114,7 +115,7 @@ global class AV_ConfidentialBatch implements Database.Batchable<sObject>, Databa
      *
      * @param bc    Database.BatchableContext param that contains the batch job ID
      */
-    global void finish(Database.BatchableContext bc){
+    public void finish(Database.BatchableContext bc){
         String methodName='finish';
         CBK_Log.debug('Record Processes: ' + recordsProcessed, logginglevel.DEBUG);
     }

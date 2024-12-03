@@ -8,16 +8,13 @@ Historial
 ---------------------
    VERSION        USER_STORY       AUTHOR           DATE                Description
 1.0                US559793       Alexandre Perez  02/08/2023          Created
+2.0                               Borja Lavesiera   07/05/2024         Cambios Método updateObjectNullKO
 ***********************************************************************************************************************/
 @isTest
 public with sharing class CIBE_IntegrationUtilities_Test {
     @TestSetup
     static void makeData(){
-        //buenas tardes
-        user cIBUser;
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '1234', new List<String>{'CIBE_OperativaCIB', 'CIBE_OperativaEMP', 'CIBE_Integracion'});
-         }
+        User cIBUser = CIBE_TestHelper.createUser('CIBE_Gestor', '1234');
         System.runAs(cIBUser) {
             CIBE_TestHelper.createCustomer();
         }
@@ -61,7 +58,6 @@ public with sharing class CIBE_IntegrationUtilities_Test {
         System.runAs(usrTest) {
             accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123'];
             fieldsToUpdate.put('CIBE_FechaRefrescoCirbe__c', dateTime.now());
-            //fieldsToUpdate.put('Id', accTest.Id);
             test.startTest();
             sError = CIBE_IntegrationUtilities.updateObject(fieldsToUpdate, 'Account');
             test.stopTest();
@@ -86,7 +82,6 @@ public with sharing class CIBE_IntegrationUtilities_Test {
         }
         system.assert(string.isBlank(sError));
     }
-
     @isTest
     private static void updateObjectNullKO() {
         User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = '1234'];
@@ -96,11 +91,15 @@ public with sharing class CIBE_IntegrationUtilities_Test {
         System.runAs(usrTest) {
             accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123'];
             fieldsToUpdate.put('CIBE_FechaRefrescoCirbe__c', null);
-            //fieldsToUpdate.put('Id', accTest.Id);
-            test.startTest();
-            sError = CIBE_IntegrationUtilities.updateObjectNull(fieldsToUpdate, 'Account');
-            test.stopTest();
+            Test.startTest();
+            try {
+                sError = CIBE_IntegrationUtilities.updateObjectNull(fieldsToUpdate, 'Account');
+            } catch(DmlException e){
+                system.debug('Error' +e.getMessage());
+            System.assert(e.getMessage().contains('Id not specified in an update call'));
+            }
+            Test.stopTest();
         }
-        system.assert(string.isNotBlank(sError));
+        System.assertNotEquals('', sError, 'Se esperaba un mensaje de error.');
     }
 }

@@ -27,6 +27,6 @@ public without sharing class SAC_QueueableContadorAlertas implements Queueable{
             }
         }
 
-        SAC_DatabaseDML.updateListDML(listaReclamaciones, false);
+        update listaReclamaciones;
     }
 }

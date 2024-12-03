@@ -68,16 +68,11 @@ public  with sharing class CC_Borrado_Datos_Leads {
         // Blanquear accounts
         List<Account> accounts = [SELECT RecordTypeId, CC_Numero_Documento__c, CC_Email__c, Name, FirstName, LastName, CC_NumPerso__c, Phone, BillingAddress, BillingStreet, BillingPostalCode, BillingCity, BillingState,  BillingCountry FROM Account WHERE Id IN : accountsId];
         if(accounts.size() > 0){
-            Id recordTypeIdCentro = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_CentroCaixaBank');
-            Id recordTypeIdCliente = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
-            Id recordTypeIdGenerico = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Generico');
-            Id recordTypeIdPersonAccount = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'PersonAccount');
-            Id recordTypeIdPersonAccountPA = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
-            /*Id recordTypeIdCentro = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            Id recordTypeIdCentro = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
             Id recordTypeIdCliente = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
             Id recordTypeIdGenerico = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Generico').getRecordTypeId();
             Id recordTypeIdPersonAccount = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('PersonAccount').getRecordTypeId();
-            Id recordTypeIdPersonAccountPA = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();*/
+            Id recordTypeIdPersonAccountPA = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
              
            	List<Account> AccUpdate = new List<Account>();
             for(Account account : accounts){

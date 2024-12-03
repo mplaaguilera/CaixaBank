@@ -18,7 +18,7 @@ Historial
 	1.8			DE52465			Sandra Gómez		30/09/2021			insertOrUpdateCodigoGestorAsignado
 	1.9         USXXXXXX	    Daniel Rodríguez	10/03/2022          Add isBatch()
 	2.0			DE70392			Sandra Gómez		03/01/2023			Add AV_AvoidBulkApi in method updateCentro
-
+	2.1			US756725		Luis Fernández		17/11/2023			Added  new method validationTaskRules call
 ***********************************************************************************************************************/
 public class AV_Task_BI_TRHan extends CC_TriggerHandlerBase {
 	
@@ -30,8 +30,8 @@ public class AV_Task_BI_TRHan extends CC_TriggerHandlerBase {
 		//General check the Record type's for intouch project
 		List<Task> listData = AV_TaskTriggerHelper.checkGeneralRT(listNewObj);
 		
+		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if (listData!=null && !listData.isEmpty()){
-			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 			AV_TaskTriggerHelper.headerCustomActivity(listData);
 			/*if (!hasCustomPermission && AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c && !System.isbatch()) {
 				AV_TaskTriggerHelper.validateForbiddenWords(listData, mapOldObj);
@@ -43,6 +43,10 @@ public class AV_Task_BI_TRHan extends CC_TriggerHandlerBase {
 				AV_TaskTriggerHelper.updateCentro(listData, mapOldObj);
 			}
 			AV_TaskTriggerHelper.insertOrUpdateCenterAndRt(listData, mapOldObj);
+			if (!hasCustomPermission && !System.isbatch()) {
+				AV_TaskTriggerHelper.validationRulesTask(listData,null);
+				// mapToByPass = AV_OpportunityTriggerHelper.byPassOpp(listData,null);
+			}
 		}
 	}
 }

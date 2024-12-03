@@ -1,5 +1,5 @@
 /***************************************************************************
- * Name: SAC_ProrrogaAutomatica_Test.cls
+ * @description Name: SAC_ProrrogaAutomatica_Test.cls
  * Copyright © 2021  CaixaBank
  * =========================================================================
  * Proposito: Lanzar las notificaciones (campanita) de 
@@ -18,13 +18,13 @@ public with sharing class SAC_NotificacionProrrogaAutomatica_Test {
     static void makeData() {
         Account cuenta = new Account();
         cuenta.name = 'cuentaTest';
-        insert cuenta;
+        SAC_DatabaseDML.insertDML(cuenta, false);
 
         Entitlement entitle = new Entitlement();
         entitle.name = 'EntitleTest';
         entitle.AccountId = cuenta.Id;
         entitle.SlaProcessId = [SELECT id, name, IsActive, versionNumber FROM SlaProcess WHERE name = 'SAC_Process' ORDER BY versionNumber DESC LIMIT 1].id;
-        insert entitle;
+        SAC_DatabaseDML.insertDML(entitle, false);
 
         User usuario = new User();
         usuario.Username = 'Name12345@test.com';
@@ -38,12 +38,12 @@ public with sharing class SAC_NotificacionProrrogaAutomatica_Test {
         usuario.LanguageLocaleKey = 'en_US';
         usuario.isActive = true;
         usuario.userRole = [SELECT Id FROM userRole WHERE DeveloperName = 'SAC_General'];
-        insert usuario;
+        SAC_DatabaseDML.insertDML(usuario, false);
 
         CC_MCC__c mcc = new CC_MCC__c();
         mcc.Name = 'PSD2';
         mcc.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
-        insert mcc;
+        SAC_DatabaseDML.insertDML(mcc, false);
 
         Case casoReclamacion2 = new Case();
         casoReclamacion2.Subject = 'TestRec2';
@@ -54,7 +54,7 @@ public with sharing class SAC_NotificacionProrrogaAutomatica_Test {
         casoReclamacion2.OS_Alerta_Descripcion__c = 'Prorrogado';
         casoReclamacion2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
         casoReclamacion2.SAC_Prorrogado__c = FALSE;
-        insert casoReclamacion2;
+        SAC_DatabaseDML.insertDML(casoReclamacion2, false);
 
         List<Case> casos = new List<Case>();
         Case pretension1 = new Case();
@@ -76,7 +76,7 @@ public with sharing class SAC_NotificacionProrrogaAutomatica_Test {
         pretension2.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
         pretension2.SEG_Detalle__c = mcc.Id;
         casos.add(pretension2);
-        insert casos;
+        SAC_DatabaseDML.insertListDML(casos, false);
 
     }
     @isTest
@@ -86,17 +86,17 @@ public with sharing class SAC_NotificacionProrrogaAutomatica_Test {
         Test.startTest();
         system.runAs(usuario1){
             Id rec = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
-            List<Case> pretP = [SELECT Id, OS_Alerta_Descripcion__c,SAC_FechaRecepcion__c FROM case WHERE RecordTypeId =: rec];
+            List<Case> pretP = [SELECT Id, OS_Alerta_Descripcion__c,SAC_FechaRecepcion__c, OwnerId, SAC_Reclamacion__c FROM case WHERE RecordTypeId =: rec];
+            Map<Id, Case> mapaCasos = new Map<Id, Case>([SELECT Id, OS_Alerta_Descripcion__c,SAC_FechaRecepcion__c, OwnerId, SAC_Reclamacion__c FROM case WHERE RecordTypeId =: rec]);
             for (case pretensiones : pretP) {
                 pretensiones.OS_Alerta_Descripcion__c = 'Prorrogado';   
             }
-
-            update pretP;
+            SAC_NotificacionProrrogaAutomatica.notificacionProrrogaAutomatica(pretP, mapaCasos);
         }
 
         Test.stopTest();
         Id rec = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
-        List<Case> pretensiones = [SELECT Id, OS_Alerta_Descripcion__c FROM case WHERE RecordTypeId =: rec];
-        system.assertEquals(2, pretensiones.size(), 'Notificacion no mandada');
+        Integer count = [SELECT Count() FROM case WHERE RecordTypeId =: rec];
+        system.assertEquals(2, count, 'Notificacion no mandada');
     }
 }

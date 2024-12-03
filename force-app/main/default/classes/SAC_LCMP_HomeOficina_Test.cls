@@ -17,35 +17,35 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
     static void makeData(){
         
         User usuarioGeneral = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];      
-        Database.insert(usuarioGeneral);
+        SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
         PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
         PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
         permiSetAssi.AssigneeId = usuarioGeneral.Id;
         permiSetAssi.PermissionSetId = permiSet.Id;
-        Database.insert(permiSetAssi);
+        SAC_DatabaseDML.insertDML(permiSetAssi, false);
 
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];      
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         List<Account> cuentasOficina;
 
         System.runAs(usuarioAdmin){
             cuentasOficina = SAC_TestDataFactory.crearCuentasOficina(2);
-            Database.insert(cuentasOficina);
+            SAC_DatabaseDML.insertListDML(cuentasOficina, false);
             
             Contact contacto = SAC_TestDataFactory.crearContacto(1, cuentasOficina[1].Id )[0];
             contacto.av_usuarioasociado__c = usuarioGeneral.Id;
-            Database.insert(contacto);
+            SAC_DatabaseDML.insertDML(contacto, false);
 
             List<Account> cuentas = SAC_TestDataFactory.crearCuentas(3);
             for(integer i = 0; i<cuentas.size(); i++){
                 cuentas[i].recordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Generico').getRecordTypeId();
             }
-            Database.insert(cuentas);
+            SAC_DatabaseDML.insertListDML(cuentas, true);
             cuentas[0].CC_OficinaGestoraId__c = cuentas[1].Id;
             cuentas[0].CC_Numero_Documento__c = '82972082L';
-            Database.update(cuentas);
+            SAC_DatabaseDML.updateListDML(cuentas, false);
 
             Id idUsuario = UserInfo.getUserId();
             List <AccountShare> listaAccountShare = new List <AccountShare>(); 
@@ -56,7 +56,7 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
             acshare.OpportunityAccessLevel = 'None'; 
             acshare.CaseAccessLevel = 'Read'; 
             listaAccountShare.add(acshare); 
-            Database.insert(listaAccountShare, false);
+            SAC_DatabaseDML.insertListDML(listaAccountShare, false);
 
             
             Map<String, Object> camposRecl = new Map<String, Object>();
@@ -66,13 +66,13 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
             camposRecl.put('AccountId', cuentas[0].Id);
             camposRecl.put('SAC_StatusAuxiliar__c', 'SAC_005');
             Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-            Database.insert(casoReclamacion);
+            SAC_DatabaseDML.insertDML(casoReclamacion, false);
 
 
             List<SAC_Accion__c> tarea = SAC_TestDataFactory.crearTareas(1, casoReclamacion, false);
             tarea[0].SAC_Descripcion__c = 'Test'; 
             tarea[0].SAC_Oficina__c = cuentasOficina[1].id;
-            Database.insert(tarea);
+            SAC_DatabaseDML.insertListDML(tarea, false);
 
             Map<String, Object> camposInteraccion = new Map<String, Object>();
             camposInteraccion.put('SAC_Titulo__c', 'interaccion');
@@ -80,7 +80,7 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
             camposInteraccion.put('SAC_Estado__c', 'SAC_PendienteRespuesta');
             camposInteraccion.put('SAC_Reclamacion__c', casoReclamacion.Id);
             SAC_Interaccion__c interaccion = SAC_TestDataFactory.crearInteraccion('Consulta', camposInteraccion);
-            Database.insert(interaccion);
+            SAC_DatabaseDML.insertDML(interaccion, false);
         }       
     }
 
@@ -127,13 +127,11 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
     @isTest
     static void getCasesTest3(){
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
-        Case reclamacion = [SELECT Subject FROM Case WHERE Subject = 'TestRec' LIMIT 1];
         Account cuentaId = [SELECT Id, CC_OficinaGestoraId__c FROM Account WHERE Name = 'cuentaTest0' LIMIT 1];
         String oficina = cuentaId.CC_OficinaGestoraId__c;
 
         String tipoBusquedaOficina1 = 'ambas';
         String tipoBusquedaOficina2 = 'gestora';
-        String tipoBusquedaOficina3 = 'afectada';
         String tipoBusquedaRecepcion = 'fechaRecep';
         Date fechaDesde = system.now().addDays(-1).date();
         Date fechaHasta = system.now().addDays(1).date();
@@ -280,16 +278,15 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
         Case rec = [SELECT Id, Subject FROM Case WHERE Subject = 'TestRec' LIMIT 1];
 
         SAC_Accion__c accion = [SELECT Id FROM SAC_Accion__c WHERE SAC_Reclamacion__c =: rec.Id Limit 1];
-        List<SAC_Accion__Share> accionesShare = [SELECT Id FROM SAC_Accion__Share];
+        Integer accionShCount = [SELECT Count() FROM SAC_Accion__Share];
 
         System.runAs(usuarioGeneral){
             Test.startTest();
-                SAC_LCMP_HomeOficina.ShareAccion(accion.Id);
+                SAC_LCMP_HomeOficina.shareAccion(accion.Id);
             Test.stopTest();
         }
-        List<SAC_Accion__Share> accionesShare2 = [SELECT Id FROM SAC_Accion__Share];
 
-        System.assertNotEquals(accionesShare.size(), accionesShare2.size(), 'Anidar las acciones ha fallado.');
+        System.assertNotEquals(accionShCount, [SELECT Count() FROM SAC_Accion__Share], 'Anidar las acciones ha fallado.');
     }
 
     @isTest
@@ -297,12 +294,13 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
         Account acc = [SELECT Id, Name FROM Account WHERE Name = 'cuentaTest2' LIMIT 1];
         acc.CC_Numero_Documento__c = '82972082L';
-        Database.update(acc);
+        SAC_DatabaseDML.updateDML(acc, false);
         
         CBK_IntegrationSetting__c csAntecedentes = new CBK_IntegrationSetting__c();
         csAntecedentes.Name = 'SAC_Antecedentes';
         csAntecedentes.NamedCredential__c = 'callout:API_GWT_PRO/servicing/servicingIssue/claims/request';
-        Database.insert(csAntecedentes);
+        SAC_DatabaseDML.insertDML(csAntecedentes, false);
+
         
         Test.setMock(HttpCalloutMock.class, new SAC_MockHttpResponseGenerator(200, 'OK', null, null));
         
@@ -353,8 +351,6 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
         User usuarioAdmin = [SELECT id FROM User WHERE username = 'useradmintest0@test.com.testSetup' and IsActive = true limit 1];
         Account cuenta = [SELECT Id FROM Account WHERE Name = 'cuentaTest2' LIMIT 1];
 
-        List <AccountShare> listaAccountShare = [SELECT Id, AccountId, UserOrGroupId, CaseAccessLevel, Account.Name FROM AccountShare  WHERE AccountId = :cuenta.Id AND UserOrGroupId = :usuarioAdmin.id];
-
         System.runAs(usuarioAdmin){
             Test.startTest();
                 SAC_LCMP_HomeOficina.modificarPermisosReadAccount(cuenta.Id);
@@ -370,16 +366,15 @@ public with sharing class SAC_LCMP_HomeOficina_Test {
         SAC_Interaccion__c interaccion = [SELECT id FROM SAC_Interaccion__c WHERE  SAC_Titulo__c = 'interaccion' LIMIT 1];
         User usuarioGeneral = [SELECT id FROM User WHERE username = 'usertest0@test.com.testSetup' and IsActive = true limit 1];
 
-        List<SAC_Interaccion__Share> interaccionShare = [SELECT Id FROM SAC_Interaccion__Share];
+        Integer interaccionCounter = [SELECT Count() FROM SAC_Interaccion__Share];
 
         System.RunAs(usuarioGeneral){
             Test.startTest();
-                SAC_LCMP_HomeOficina.ShareInteraccion(interaccion.Id);
+                SAC_LCMP_HomeOficina.shareInteraccion(interaccion.Id);
             Test.stopTest();
         }
-        List<SAC_Interaccion__Share> interaccionShareNew = [SELECT Id FROM SAC_Interaccion__Share];
 
-        System.assertNotEquals(interaccionShare.size(), interaccionShareNew.size(), 'Anidar las interacciones ha fallado.');
+        System.assertNotEquals(interaccionCounter, [SELECT Count() FROM SAC_Interaccion__Share], 'Anidar las interacciones ha fallado.');
     }
 
     @isTest

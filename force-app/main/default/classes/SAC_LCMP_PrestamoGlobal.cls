@@ -446,7 +446,7 @@ public with sharing class SAC_LCMP_PrestamoGlobal {
                                   SAC_Naturaleza__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, Origin, SAC_MotivoInadmision__c, CC_Idioma__c, Account.CC_NumPerso__c, 
                                   SAC_DireccionPostalNotificacion__c, AccountId, Account.RecordTypeId, OS_Email__c, Account.CC_Email__c, SAC_DireccionPostal__c, RecordTypeId, 
                                   SuppliedEmail, CaseNumber, Subject, SAC_OrigenConsulta__c, CC_No_Identificado__c, recordType.Name, SAC_Reclamacion__r.OS_Email__c, 
-                                  CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name, SAC_Prestamo_seleccionado__c
+                                  CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name, SAC_Prestamo_seleccionado__c, SAC_TipoConsumidor__c
                                   FROM Case 
                                   WHERE Id =: id LIMIT 1];
         return reclamacion;

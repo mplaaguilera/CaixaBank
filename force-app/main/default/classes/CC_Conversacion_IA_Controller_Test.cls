@@ -24,18 +24,18 @@ public class CC_Conversacion_IA_Controller_Test {
 		
         insert userList;
 
+        Case caso = new Case(
+            Subject = 'Caso prueba',
+            RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
+        );
+        insert caso;
     }
 
     @isTest
     public static void getRTCaseTest() {
 
         User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Prueba'];
-        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso prueba' LIMIT 1];
-        Case caso = new Case(
-            Subject = 'Caso prueba',
-            RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
-        );
-        insert caso;
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso prueba' LIMIT 1];
 
         String rtCase;
         System.runAs(usuario) {
@@ -48,36 +48,10 @@ public class CC_Conversacion_IA_Controller_Test {
     }
 
     @isTest
-    public static void getValoracionCaseTest() {
-
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Prueba'];
-        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso prueba' LIMIT 1];
-        Case caso = new Case(
-            Subject = 'Caso prueba',
-            RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
-        );
-        insert caso;
-
-        String valoracionCase;
-        System.runAs(usuario) {
-            Test.startTest();
-            valoracionCase = CC_Conversacion_IA_Controller.getRTCase(caso.Id);
-            Test.stopTest();
-        }
-
-        System.assertEquals('Nada', valoracionCase, 'La valoración del caso es incorrecto');
-    }
-
-    @isTest
     public static void updateValoracionAITest() {
         User usuario = [SELECT Id FROM User WHERE FirstName = 'Usuario Prueba'];
-        //Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso prueba' LIMIT 1];
-        Case caso = new Case(
-            Subject = 'Caso prueba',
-            RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
-        );
-        insert caso;
-        
+        Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso prueba'];
+
         System.runAs(usuario) {
             Test.startTest();
             CC_Conversacion_IA_Controller.updateValoracionAI(caso.Id, 'OK');

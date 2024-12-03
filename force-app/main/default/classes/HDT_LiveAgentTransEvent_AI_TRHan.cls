@@ -13,6 +13,8 @@ public with sharing class HDT_LiveAgentTransEvent_AI_TRHan extends CC_TriggerHan
             ID sRTEmpleado = Schema.getGlobalDescribe().get('LiveChatTranscript').getDescribe().getRecordTypeInfosByDeveloperName().get('HDT_Empleados').getRecordTypeId();
             
             for (LiveChatTranscriptEvent eventoChat : listNewObj)  {
+                system.debug('sRTEmpleado: '+sRTEmpleado);
+                system.debug('eventoChat.LiveChatTranscript.RecordTypeId: '+eventoChat.LiveChatTranscript.RecordTypeId);
                 setIdsChat.add(eventoChat.LiveChatTranscriptId);
             }
             
@@ -128,8 +130,7 @@ public with sharing class HDT_LiveAgentTransEvent_AI_TRHan extends CC_TriggerHan
             }
             
         } catch (Exception e) {
-            CBK_Log.error(e, 'Error en el chat recibido');
-            throw e;
+            System.debug(e.getMessage());
         }
     }
 }

@@ -9,21 +9,23 @@ Historial
 	VERSION		USER_STORY			AUTHOR				DATE				Description
 	1.0			Init version        Sandra Gómez		04/04/2022			Init version
 	1.1			Fix					Gonzalo Ávila		27/09/2023			Fix CBK_Log Error
-	
+	1.2 		Fix					Gonzalo Ávila		16/07/2024			Change de position of i++ in execute
+    1.3         FIX28080841         Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.	
+
 ***********************************************************************************************************************/
-global with sharing class AV_GestorReassignmentTaskQueueable implements Queueable {
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_GestorReassignmentTaskQueueable';
+public with sharing class AV_GestorReassignmentTaskQueueable implements Queueable {
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_GestorReassignmentTaskQueueable';
 	@testVisible private static Boolean doChainJob = !Test.isRunningTest();
 	
-	global List<Task> listaTask = new List<Task>();
-	global List<Event> listaEvent= new List<Event>();
+	public List<Task> listaTask = new List<Task>();
+	public List<Event> listaEvent= new List<Event>();
 	public AV_GestorReassignmentTaskQueueable(List<Task> listTask, List<Event> listEvent) {
 		this.listaTask = listTask;
 		this.listaEvent = listEvent;
 	}
 
-	global void execute(System.QueueableContext qc){
+	public void execute(System.QueueableContext qc){
 		String methodName = 'executeTask';
 		Integer maxSize = (Integer) AV_LimitBook__c.getOrgDefaults().AV_LimitReassignment__c;
 		AV_LogDebug.printLogDebug(methodName, 'Tareas que se actualizan: '+maxSize+'/'+listaTask.size());
@@ -53,9 +55,9 @@ global with sharing class AV_GestorReassignmentTaskQueueable implements Queueabl
 					if (sr.getErrors()!=null) {
 						for(Database.Error err : sr.getErrors()) {
 							listErrorsReassignmentTask.add('methodName: ' + methodName + 'Error: ' + err.getMessage() +' -> Id: ' + aux.get(i).Id);
-							i++; 
 						}
 					}
+					i++; 
 				}
 
 				if(!listSuccessReassignmentTask.isEmpty()) {

@@ -25,47 +25,6 @@ private class CBK_EmailMessageBatch_Test {
 		caso3.CC_Tipo_Contacto__c = 'Consulta';
 		insert caso3;
 
-        CBK_EmailMessageResend__c emresend =  new CBK_EmailMessageResend__c();
-        emresend.CBK_EmailMessageId__c = 'XXXXXXX';
-        emresend.CBK_Status__c = 'Pendiente';
-        insert emresend;
-
-        CBK_EmailMessageResend__c emresend2 =  new CBK_EmailMessageResend__c();
-        emresend2.CBK_EmailMessageId__c = 'XXXXXX1';
-        emresend2.CBK_Status__c = 'Pendiente';
-        insert emresend2;
-
-        CBK_EmailMessageResend__c emresend3 =  new CBK_EmailMessageResend__c();
-        emresend3.CBK_EmailMessageId__c = 'XXXXXX2';
-        emresend3.CBK_Status__c = 'Pendiente';
-        insert emresend3;
-
-        CBK_EmailMessageResend__c emresend4 =  new CBK_EmailMessageResend__c();
-        emresend4.CBK_EmailMessageId__c = 'XXXXXX3';
-        emresend4.CBK_Status__c = 'Pendiente';
-        insert emresend4;
-
-        CBK_EmailMessageResend__c emresend5 =  new CBK_EmailMessageResend__c();
-        emresend5.CBK_EmailMessageId__c = 'XXXXXX4';
-        emresend5.CBK_Status__c = 'Pendiente';
-        insert emresend5;
-
-        List<String> idsCV = new List<String>();
-        Blob beforeblob=Blob.valueOf('Unit Test Attachment Body');
-        ContentVersion cnv = new ContentVersion();
-        cnv.title = 'test content pdf';
-        cnv.PathOnClient = 'Test_1';
-        cnv.VersionData = beforeblob;
-        insert cnv;
-        idsCV.add(cnv.Id);
-        
-        ContentVersion cnv22 = new ContentVersion();
-        cnv22.title = 'test content image';
-        cnv22.PathOnClient = 'Test_2';
-        cnv22.VersionData = beforeblob;
-        insert cnv22;
-        idsCV.add(cnv22.Id);
-
         List<EmailMessage> lst = new List<EmailMessage> ();
 		EmailMessage correo = new EmailMessage();
 		correo.ParentId = caso3.Id;
@@ -145,6 +104,47 @@ private class CBK_EmailMessageBatch_Test {
         correo5.BccAddress = strBCCAddress;
         correo5.MessageIdentifier = 'XXXXXX4';
         insert correo5;
+
+        CBK_EmailMessageResend__c emresend =  new CBK_EmailMessageResend__c();
+        emresend.CBK_EmailMessageId__c = correo.Id;
+        emresend.CBK_Status__c = 'Pendiente';
+        insert emresend;
+
+        CBK_EmailMessageResend__c emresend2 =  new CBK_EmailMessageResend__c();
+        emresend2.CBK_EmailMessageId__c = correo2.Id;
+        emresend2.CBK_Status__c = 'Pendiente';
+        insert emresend2;
+
+        CBK_EmailMessageResend__c emresend3 =  new CBK_EmailMessageResend__c();
+        emresend3.CBK_EmailMessageId__c = correo3.Id;
+        emresend3.CBK_Status__c = 'Pendiente';
+        insert emresend3;
+
+        CBK_EmailMessageResend__c emresend4 =  new CBK_EmailMessageResend__c();
+        emresend4.CBK_EmailMessageId__c = correo4.Id;
+        emresend4.CBK_Status__c = 'Pendiente';
+        insert emresend4;
+
+        CBK_EmailMessageResend__c emresend5 =  new CBK_EmailMessageResend__c();
+        emresend5.CBK_EmailMessageId__c = correo5.Id;
+        emresend5.CBK_Status__c = 'Pendiente';
+        insert emresend5;
+
+        List<String> idsCV = new List<String>();
+        Blob beforeblob=Blob.valueOf('Unit Test Attachment Body');
+        ContentVersion cnv = new ContentVersion();
+        cnv.title = 'test content pdf';
+        cnv.PathOnClient = 'Test_1';
+        cnv.VersionData = beforeblob;
+        insert cnv;
+        idsCV.add(cnv.Id);
+        
+        ContentVersion cnv22 = new ContentVersion();
+        cnv22.title = 'test content image';
+        cnv22.PathOnClient = 'Test_2';
+        cnv22.VersionData = beforeblob;
+        insert cnv22;
+        idsCV.add(cnv22.Id);
  
         ContentVersion cv=new Contentversion();
         cv.title='ABC';
@@ -187,5 +187,6 @@ private class CBK_EmailMessageBatch_Test {
             Id batchId = Database.executeBatch(batch);
         }
         Test.stopTest();
+        
     }
 }

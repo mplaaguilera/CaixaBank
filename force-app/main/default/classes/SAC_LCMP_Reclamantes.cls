@@ -64,23 +64,12 @@ public without sharing class SAC_LCMP_Reclamantes {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   02/02/22     Creación
     * 1.1            US826290         Raúl Santos    28/05/24     Modificación: actualizar el campo SAC_ReclamantesConDatosNoAlf__c del caso si es necesario
-    * 1.2            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
     public static void eliminarReclaSecu(String idCaso, String ownerId, String pretPrincipalownerId, String reclamanteId){
-
-        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :idCaso LIMIT 1];
-
-        if(caso.RecordTypeId == RECTYPECONSULTASAC){
-            String userName = UserInfo.getName();
-
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
-                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
-            }
-        }else{
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
-                throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
-            }
+        //Compruebo si el que ejecuta la acción es el owner
+        if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
+            throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
         }
 
         //Recupero los reclamantes del caso
@@ -116,25 +105,13 @@ public without sharing class SAC_LCMP_Reclamantes {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   03/02/22     Creación
-    * 1.1            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
-    public static Boolean comprobarMultiplesCasosCliente(String caseId, String ownerId, String pretPrincipalownerId, String reclamanteId){
-
-        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :caseId LIMIT 1];
-
-        if(caso.RecordTypeId == RECTYPECONSULTASAC){
-            String userName = UserInfo.getName();
-
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
-                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
-            }
-        }else{
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
-                throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
-            }
+    public static Boolean comprobarMultiplesCasosCliente(String ownerId, String pretPrincipalownerId, String reclamanteId){
+        //Compruebo si el que ejecuta la acción es el owner
+        if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
+            throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
         }
-        
         //Recupero el account y el contact del reclamante
         SAC_CaseReclamante__c reclamante = [SELECT Id, SAC_Account__c, SAC_Contact__c FROM SAC_CaseReclamante__c WHERE Id = :reclamanteId];
         //Compruebo si existen casos y lo devuelvo en forma de booleano
@@ -296,22 +273,12 @@ public without sharing class SAC_LCMP_Reclamantes {
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            NaN              Carlos Solis   03/02/22     Creación
-    * 1.1            US683740         Raúl Santos    04/11/24     Modificación: en consultas SAC, también puede realizar la operativa el letrado
     *****************************************************************/
     @AuraEnabled
     public static Boolean tieneReclamanteSecundario(String caseId, String ownerId, String pretPrincipalownerId){
-        Case caso = [SELECT Id, RecordTypeId, SAC_Letrado__c FROM Case WHERE Id = :caseId LIMIT 1];
-
-        if(caso.RecordTypeId == RECTYPECONSULTASAC){
-            String userName = UserInfo.getName();
-
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId) && !(caso.SAC_Letrado__c == userName)) {
-                throw new AuraHandledException('Debes ser el propietario del caso o propietario letrado para poder realizar la acción');
-            }
-        }else{
-            if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
-                throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
-            }
+        //Compruebo si el que ejecuta la acción es el owner
+        if (!esPropietarioCaso(ownerId, pretPrincipalownerId)) {
+            throw new AuraHandledException('Debes ser el propietario del caso para poder realizar la acción');
         }
 
         List<SAC_CaseReclamante__c> listaReclamantesSecundarios = [SELECT Id, SAC_Account__r.Name, SAC_ReclamantePrincipal__c, SAC_Pretension__c 

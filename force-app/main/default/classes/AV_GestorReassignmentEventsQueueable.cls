@@ -9,19 +9,20 @@ Historial
 	VERSION		USER_STORY			AUTHOR				DATE				Description
 	1.0			Init version        Sandra Gómez		04/04/2022			Init version
 	1.1			Fix					Gonzalo Ávila		27/09/2023			Fix CBK_Log Error
+    1.3         FIX28080841     Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.
 	
 ***********************************************************************************************************************/
-global with sharing class AV_GestorReassignmentEventsQueueable implements Queueable{
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_GestorReassignmentEventsQueueable';
+public with sharing class AV_GestorReassignmentEventsQueueable implements Queueable{
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_GestorReassignmentEventsQueueable';
     @testVisible private static Boolean doChainJob = !Test.isRunningTest();
 	
-	global List<Event> lista = new List<Event>();
+	public List<Event> lista = new List<Event>();
 	public AV_GestorReassignmentEventsQueueable(List<Event> objList) {
 		this.lista = objList;
 	}
 
-	global void execute(System.QueueableContext qc){
+	public void execute(System.QueueableContext qc){
 		String methodName = 'executeEvent';
 		Integer maxSize = (Integer) AV_LimitBook__c.getOrgDefaults().AV_LimitReassignment__c;
 		List<Event> aux = new List<Event>();

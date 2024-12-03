@@ -11,17 +11,6 @@
  * 1.1            US507573         Jose Carlos Blanco   19/01/23     Modificación
 *****************************************************************/
 
-
-/*
-Cosas a añadir:
-    Maestro temas:
-        nombre: Resolución SAC
-        record type: SAC_TipoAdjuntos
-        SAC_DeveloperName__c: RESOLUCION
-    Oficinas
-    grupos de trabajo en cada mcc
-*/
-
 public with sharing class SAC_SetupSandbox {
     //Nombre de la Org
     public static String nombreOrg = UserInfo.getUserName().substringAfterLast('.');
@@ -1196,9 +1185,15 @@ public with sharing class SAC_SetupSandbox {
         SlaProcess slaProceso = [SELECT id FROM SlaProcess WHERE Name = 'SAC_Process' ORDER BY VersionNumber DESC LIMIT 1];
         
         Account pA23 = new Account(
-            FirstName = 'Cuenta',
-            LastName = 'Entitlement',
-            RecordTypeId = recTypeClienteParticular//tiene que ser el record type generico
+            FirstName = 'Oliver',
+            LastName = 'Suárez Gómez',
+            RecordTypeId = recTypeClienteParticular,
+            CC_Numero_Documento__c = '7845856Z',
+            CC_Email__c = 'obartoli@caixabank.com',
+            Phone = '935004644',
+            PersonMobilePhone = '658965885',
+            BillingStreet = 'Avd. Diagonal 48 8C',
+            CC_Sexo__pc = 'V'
         );
         Database.insert(pA23);
 

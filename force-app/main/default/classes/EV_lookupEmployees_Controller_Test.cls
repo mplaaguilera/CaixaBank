@@ -7,6 +7,7 @@ Proposito: Clase test para controlador EV_lookupEmployees_Controller, se encarga
  * VERSION        USER_STORY         AUTHOR              DATE         Description
  * 1.0            US680535           Carolina Lopez      24/08/2023   Init Version   
  * 1.1            US704873           Carolina Lopez      13/09/2023   Add Method testGetCentrosHierarchy
+ * 1.2            ALTA_MASIVA        Carolina Lopez      17/01/2024   Modify TestSetup included CC_Matricula__c.
 ***********************************************************************************************************************/
 @IsTest
 public class EV_lookupEmployees_Controller_Test {
@@ -22,6 +23,7 @@ public class EV_lookupEmployees_Controller_Test {
             cuenta = EV_TestHelper.createCaixaCenterAltaMasiva(nombre);
             contacto = EV_TestHelper.createEmployee(cuenta);
             contacto.AV_JobLevels__c = '120';
+            contacto.CC_Matricula__c = 'U0686956';
             contacto.AV_UsuarioAsociado__c = newUser.Id;
             update contacto;            
         }

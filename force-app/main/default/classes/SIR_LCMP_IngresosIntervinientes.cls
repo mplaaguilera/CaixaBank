@@ -26,7 +26,7 @@ public with sharing class SIR_LCMP_IngresosIntervinientes {
     @AuraEnabled(Cacheable=true)
     public static List<SIR_FormularioRefinanciacion__c> getValoresForm(String idFormulario) {
         List<SIR_FormularioRefinanciacion__c> formulario = new  List<SIR_FormularioRefinanciacion__c>();
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             formulario = [SELECT SIR_TotalGastos__c, SIR_capActualRatioEndeudamiento__c, SIR_importeCuotaActual__c, SIR_capActualImporteFinanciacion__c,
                             SIR_capActualRatioTotal__c, SIR_capActualPagoCliente__c,  SIR_capacidadDevolucion__c, SIR_capActualTipoSolucion__c,
                             SIR_ingresosFuturo__c, SIR_ratioFuturo__c, SIR_ratioAdmision__c, SIR_solucionAplicar__c, SIR_tipoDificultad__c,
@@ -51,7 +51,7 @@ public with sharing class SIR_LCMP_IngresosIntervinientes {
     @AuraEnabled(Cacheable=true)
     public static List<SIR_IntervinienteFormulario__c> getIntervininientes(String idFormulario) {
         List<SIR_IntervinienteFormulario__c> intervinientes = new  List<SIR_IntervinienteFormulario__c>();
-        if(SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_IntervinienteFormulario__c.isAccessible()){
             intervinientes = [SELECT id, SIR_Cliente__c, SIR_Cliente__r.Name, SIR_Relacion__c, SIR_Profesion__c, SIR_IngresosTrabajo__c, SIR_Bienes__c, SIR_IngresosBienes__c
                                 FROM SIR_IntervinienteFormulario__c WHERE SIR_FormularioRefinanciacion__c =: idFormulario AND SIR_Relacion__c != 'B' order by SIR_Relacion__c desc];     
             for(SIR_IntervinienteFormulario__c inter: intervinientes){
@@ -80,7 +80,7 @@ public with sharing class SIR_LCMP_IngresosIntervinientes {
     @AuraEnabled(Cacheable=true)
     public static List<SIR_FormularioRefinanciacion__c> getFormulario(String idFormulario) {
         List<SIR_FormularioRefinanciacion__c> formulario = new List<SIR_FormularioRefinanciacion__c>();
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             formulario = [SELECT id, SIR_TotalIngresosTrabajo__c, SIR_TotalIngresosBienes__c, SIR_OtrosDatosInteres__c, SIR_IngresosAdicionalesUnidFam__c
                             FROM SIR_FormularioRefinanciacion__c WHERE id =: idFormulario]; 
             for(SIR_FormularioRefinanciacion__c formRefi: formulario){
@@ -113,7 +113,7 @@ public with sharing class SIR_LCMP_IngresosIntervinientes {
     @AuraEnabled(Cacheable=false)
     public static string updateIntervinientes(Object data) {
         List<SIR_IntervinienteFormulario__c> intervinientesForUpdate = new List<SIR_IntervinienteFormulario__c>();
-        if(SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isUpdateable()){
+        if(Schema.SObjectType.SIR_IntervinienteFormulario__c.isUpdateable()){
             intervinientesForUpdate = (List<SIR_IntervinienteFormulario__c>) JSON.deserialize(
                 JSON.serialize(data),
                 List<SIR_IntervinienteFormulario__c>.class
@@ -144,7 +144,7 @@ public with sharing class SIR_LCMP_IngresosIntervinientes {
     @AuraEnabled(Cacheable=false)
     public static string updateFormulario(String idFormulario, Decimal totalTrabajo, Decimal totalBienes, String otrosDatos, Decimal ingresosAdicionales) {  
         List<SIR_FormularioRefinanciacion__c> formulario = new List<SIR_FormularioRefinanciacion__c>(); 
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){    
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){    
             try {
                 formulario = [SELECT id, SIR_TotalIngresosTrabajo__c, SIR_TotalIngresosBienes__c, SIR_OtrosDatosInteres__c
                                 FROM SIR_FormularioRefinanciacion__c WHERE id =: idFormulario]; 

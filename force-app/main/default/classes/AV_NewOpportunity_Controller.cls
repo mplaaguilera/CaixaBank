@@ -6,39 +6,44 @@ Proposito: Controller for new oppoernunity and reporting LWCs
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-	VERSION		USER_STORY		AUTHOR				DATE			Description
-	1.0			US158542    	Jash 	            15/02/2021		Init version
-	1.1			US158542    	Álvaro López        05/03/2021		Added logic methods
-	1.2			FIX IOP Marzo  	Álvaro López        16/03/2021		Added field validations
-	1.3			FIX IOP Julio  	Sandra Gómez        21/06/2021		Change method saveOppRecords
-	1.4			Bug US196068  	Víctor Santiago     09/07/2021		Replaced dots with commas in decimal inputs
-	1.5			FIX				David Rufo			15/07/2021		Fix problems with check on/off priorizador
-	1.6			US212973		Víctor Santiago		20/07/2021		Added new VR on validateOppRecords
-	1.7			US200724		Víctor Santiago		18/08/2021		Added task-event filter to validatePFNewOpp, insertOpp
-	1.8			FIX-IOP Sept	Carolina Alonso		22/09/2021		Remove validation of Fecha de gestión for 'Potencial' Status
-	1.9			FIX-Performance	David Rufo			20/10/2021		Fix method "validateOppRecords" for empty list
-	2.0			FIX-Performance	Sandra Gómez		22/10/2021		Fix method "validateOppRecords" forbiddenWords
-	2.1			FIX-Performance	Daniel Rodriguez 	09/11/2021		Fix method "validateOppRecords" result errors
-	2.2			DE53751			Sandra Gómez		22/11/2021		Fix method "validateOppRecords" if empty forbiddenWords
-	2.3			US268502		Daniel Rodríguez	31/01/2022		Add createReportOppTaskTest and deleteReportOpp method
-	2.4			US322407 		Luis Fernández		23/02/2022      Add SearchProduct method
-	2.5			US325412 		Víctor Santiago		09/03/2022      Added origenapp in OppRecord and updateOppTasks
-	2.6			US365180 		Víctor Santiago		12/04/2022      Rewrote queries involved in saveOppRecords to SOQL
-	2.7			FIX-IOP Abril	Carolina Alonso		13/04/2022		Remove validation of Fecha de gestión for 'Potencial' Status 
-	2.8			US408074		Luis Fernández		08/07/2022		-Added "Potencial" attribute to OppRecord subclass.
-																	-Modified 'createOppTask' method.
-																	-Modified 'validateOppRecord' method.
-																	-Modified 'updateOppTask' method.
-	2.9			DE63839			Sandra Gómez		11/08/2022		Modify method validatePFNewOpp query task null
-    3.0 		US336957		Luis Fernández		01/09/2022		-Added "Resolucion" attribute to OppRecord subclass.
-																	-Modified 'createOppTask' method in order to retrieve the new field "AV_Resolucion"
-																	-Modified 'validateOppRecord' method in order to retrieve the new field "AV_Resolucion"
-																	-Modified 'updateOppTask' method in order to retrieve the new field "AV_Resolucion"
-	3.1			US457715		Eduardo González	19/10/2022		Modify without sharing class
-	3.2			US481572		Patricia Solano 	23/01/2023		Added method searchByProduct to add a new filter and modified methods validateOppRecords, 
-																	updateOppTasks class and OppRecord to add new values for opportunity report.
-	3.3			DE72302			Ángel Medina 		17/02/2023		Added new VR on validateOppRecords
-
+	VERSION		USER_STORY					AUTHOR				DATE			Description
+	1.0			US158542    				Jash 	            15/02/2021		Init version
+	1.1			US158542    				Álvaro López        05/03/2021		Added logic methods
+	1.2			FIX IOP Marzo  				Álvaro López        16/03/2021		Added field validations
+	1.3			FIX IOP Julio  				Sandra Gómez        21/06/2021		Change method saveOppRecords
+	1.4			Bug US196068  				Víctor Santiago     09/07/2021		Replaced dots with commas in decimal inputs
+	1.5			FIX							David Rufo			15/07/2021		Fix problems with check on/off priorizador
+	1.6			US212973					Víctor Santiago		20/07/2021		Added new VR on validateOppRecords
+	1.7			US200724					Víctor Santiago		18/08/2021		Added task-event filter to validatePFNewOpp, insertOpp
+	1.8			FIX-IOP Sept				Carolina Alonso		22/09/2021		Remove validation of Fecha de gestión for 'Potencial' Status
+	1.9			FIX-Performance				David Rufo			20/10/2021		Fix method "validateOppRecords" for empty list
+	2.0			FIX-Performance				Sandra Gómez		22/10/2021		Fix method "validateOppRecords" forbiddenWords
+	2.1			FIX-Performance				Daniel Rodriguez 	09/11/2021		Fix method "validateOppRecords" result errors
+	2.2			DE53751						Sandra Gómez		22/11/2021		Fix method "validateOppRecords" if empty forbiddenWords
+	2.3			US268502					Daniel Rodríguez	31/01/2022		Add createReportOppTaskTest and deleteReportOpp method
+	2.4			US322407 					Luis Fernández		23/02/2022      Add SearchProduct method
+	2.5			US325412 					Víctor Santiago		09/03/2022      Added origenapp in OppRecord and updateOppTasks
+	2.6			US365180 					Víctor Santiago		12/04/2022      Rewrote queries involved in saveOppRecords to SOQL
+	2.7			FIX-IOP Abril				Carolina Alonso		13/04/2022		Remove validation of Fecha de gestión for 'Potencial' Status 
+	2.8			US408074					Luis Fernández		08/07/2022		-Added "Potencial" attribute to OppRecord subclass.
+																				-Modified 'createOppTask' method.
+																				-Modified 'validateOppRecord' method.
+																				-Modified 'updateOppTask' method.
+	2.9			DE63839						Sandra Gómez		11/08/2022		Modify method validatePFNewOpp query task null
+    3.0 		US336957					Luis Fernández		01/09/2022		-Added "Resolucion" attribute to OppRecord subclass.
+																				-Modified 'createOppTask' method in order to retrieve the new field "AV_Resolucion"
+																				-Modified 'validateOppRecord' method in order to retrieve the new field "AV_Resolucion"
+																				-Modified 'updateOppTask' method in order to retrieve the new field "AV_Resolucion"
+	3.1			US457715					Eduardo González	19/10/2022		Modify without sharing class
+	3.2			US481572					Patricia Solano 	23/01/2023		Added method searchByProduct to add a new filter and modified methods validateOppRecords, 
+																				updateOppTasks class and OppRecord to add new values for opportunity report.
+	3.3			DE72302						Ángel Medina 		17/02/2023		Added new VR on validateOppRecords
+	3.4			Cambio lógica				Ángel Medina		22/01/2024		Modified method validateOppRecords, updateOppTasks 
+	3.5 		Ejecuciones Lentas 			Luis Fernández		23/02/2024		Changed SaveOppRecords, now it receive a list of opportunities. Deleted validateOpPRecords since validations run on the client side.Added validatePFAndForbbidenWords
+	3.6			US796361					Sandra Gómez		21/03/2024		Changed method saveOppRecords to Add AV_CommentsHistory__c
+	3.7			Fix empty opportunities 	Luis Fernández		16/04/2024		Delete else with 'NOK' from SaveOppRecords
+	3.8			PPM100205279				Luis Fernández		13/05/2024		Added new fields of search to product lookup method
+	3.9			FIX05090944					Ángel Medina		06/09/2024		Modify method saveOppRecords to fix the error Attempt to de-reference a null object
 ***********************************************************************************************************************/
 public without sharing class AV_NewOpportunity_Controller {
 	private final static Integer MAX_RESULTS 	= 10;
@@ -104,35 +109,35 @@ public without sharing class AV_NewOpportunity_Controller {
 				if(entityProd != null && !entityProd.isEmpty()) {
 					if(entityProd[0].AV_Expiration__c) {
 						ProdEntityField pef = new ProdEntityField();
-						pef.label = 'Fecha vencimiento';
+						pef.label = Label.AV_DueDate;
 						pef.type = 'date';
 						pef.fecha = true;
 						listProdEntityFields.add(pef);
 					}
 					if(entityProd[0].AV_Amount__c) {
 						ProdEntityField pef = new ProdEntityField();
-						pef.label = 'Importe';
+						pef.label = Label.AV_Importe;
 						pef.type = 'currency';
 						pef.moneda = true;
 						listProdEntityFields.add(pef);
 					}
 					if(entityProd[0].AV_Share__c) {
 						ProdEntityField pef = new ProdEntityField();
-						pef.label = 'Importe Cuota';
+						pef.label =  Label.AV_FeeAmount;
 						pef.type = 'currency';
 						pef.moneda = true;
 						listProdEntityFields.add(pef);
 					}
 					if(entityProd[0].AV_InterestRate__c) {
 						ProdEntityField pef = new ProdEntityField();
-						pef.label = 'Tipo de Interés';
+						pef.label = Label.AV_TypeOfInterest;
 						pef.type = 'number';
 						pef.num = true;
 						listProdEntityFields.add(pef);
 					}
 					if(entityProd[0].AV_Enrollment__c) {
 						ProdEntityField pef = new ProdEntityField();
-						pef.label = 'Matrícula';
+						pef.label = Label.AV_LicensePlate;
 						pef.type = 'text';
 						pef.text = true;
 						listProdEntityFields.add(pef);
@@ -143,170 +148,163 @@ public without sharing class AV_NewOpportunity_Controller {
 		return listProdEntityFields;
 	}
 
+
 	@AuraEnabled
-	public static String validateOppRecords(List<Map<String, Object>> listOppRecords, List<AV_NewOpportunity_Controller.OppRecord> listParseOppRecords){
-		String methodName = 'validateOppRecords';
+	public static String saveOppRecords(List<Opportunity> listOppRecords,String currentHcaId, String idTask) {
 		String result = 'OK';
-		List<String> listIdOpp= new List<String>();
-		List<List<String>> listPalabraProhibida= new List<List<String>>();
-		List<String> listComment= new List<String>();
-		List<String> listAsunto= new List<String>();
-		if (listOppRecords!=null && !listOppRecords.isEmpty()){
-			if (listParseOppRecords==null){
-				listParseOppRecords = new List<AV_NewOpportunity_Controller.OppRecord>();
-			}        
-			for(Map<String, Object> obj : listOppRecords) {
-				listIdOpp.add((String) obj.get('id'));
-			}
-			List<AV_CustomActivityOpportunity__c> listOppOld = [SELECT Id, AV_Stage__c, AV_IncludeInPrioritizingCustomers__c 
-																FROM AV_CustomActivityOpportunity__c
-																WHERE Id IN :listIdOpp];
-			Map<String, AV_CustomActivityOpportunity__c> mapOppOld= new Map<String, AV_CustomActivityOpportunity__c>();
-			for (AV_CustomActivityOpportunity__c opp: listOppOld) {
-				mapOppOld.put(opp.Id, opp);
-			}
-			for(Map<String, Object> obj : listOppRecords) {
-				String validateDecimal = '[0-9]+(,){0,1}[0-9]*$';
-				Pattern validatePattern =Pattern.compile(validateDecimal);
-				if (obj.get('interes') != null && obj.get('interes')!='') {
-					Matcher validateMatcher =validatePattern.matcher(String.valueOf(obj.get('interes')));
-					if (!validateMatcher.matches()) {
-						return 'El campo de Interes es de tipo decimal. El formato correcto es: 123,12';
-					}
-				}
-				if (obj.get('importe') != null && obj.get('importe')!='') {
-					Matcher validateMatcher =validatePattern.matcher(String.valueOf(obj.get('importe')));
-					if (!validateMatcher.matches()) {
-						return 'El campo de Importe es de tipo decimal. El formato correcto es: 123,12';
-					}
-				}
-				if (obj.get('cuota') != null && obj.get('cuota')!='') {
-					Matcher validateMatcher =validatePattern.matcher(String.valueOf(obj.get('cuota')));
-					if (!validateMatcher.matches()) {
-						return 'El campo de Importe Cuota es de tipo decimal. El formato correcto es: 123,12';
-					}
-				}
-				if (obj.get('amount') != null && obj.get('amount')!='') {
-					Matcher validateMatcher =validatePattern.matcher(String.valueOf(obj.get('amount')));
-					if (!validateMatcher.matches()) {
-						return 'El campo de Importe es de tipo decimal. El formato correcto es: 123,12';
-					}
-				} 
-				if (obj.get('margin') != null && obj.get('margin')!='') {
-					Matcher validateMatcher =validatePattern.matcher(String.valueOf(obj.get('margin')));
-					if (!validateMatcher.matches()) {
-						return 'El campo de Margen Previsto es de tipo decimal. El formato correcto es: 123,12';
-					}
-				} 
-				AV_NewOpportunity_Controller.OppRecord parseObj = new AV_NewOpportunity_Controller.OppRecord();
-				parseObj.id = (String) obj.get('id');
-				parseObj.taskid = (String) obj.get('taskid');
-				parseObj.path = (String) obj.get('path');
-				parseObj.fechagestion = obj.get('fechagestion') != null ? Date.valueOf(String.valueOf(obj.get('fechagestion'))) : null;
-				parseObj.incluir = (Boolean) obj.get('incluir');
-				parseObj.fechavencimiento = obj.get('fechavencimiento') != null ? Date.valueOf(String.valueOf(obj.get('fechavencimiento'))) : null;
-				parseObj.entidad = (String) obj.get('entidad');
-				parseObj.comentario = (String) obj.get('comentario');
-				parseObj.importe = obj.get('importe') != null && obj.get('importe') != '' ? Decimal.valueOf(String.valueOf(obj.get('importe')).replace(',', '.')) : null;
-				parseObj.interes = obj.get('interes') != null && obj.get('interes') != '' ? Decimal.valueOf(String.valueOf(obj.get('interes')).replace(',', '.')) : null;
-				parseObj.producto = (String) obj.get('producto');
-				parseObj.oportunidad = (String) obj.get('oportunidad');
-				parseObj.cuota = obj.get('cuota') != null && obj.get('cuota') != '' ? Decimal.valueOf(String.valueOf(obj.get('cuota')).replace(',', '.')) : null;
-				parseObj.matricula = (String) obj.get('matricula');
-				parseObj.otraentidadpick = (String) obj.get('otraentidadpick');
-				parseObj.origenapp = (String) obj.get('origenapp');
-				parseObj.potencial = (String) obj.get('potencial');
-				parseObj.resolucion = (String) obj.get('resolucion');
-				parseObj.amount = obj.get('amount') != null && obj.get('amount') != '' ? Decimal.valueOf(String.valueOf(obj.get('amount')).replace(',', '.')) : null;
-				parseObj.margin = obj.get('margin') != null && obj.get('margin') != '' ? Decimal.valueOf(String.valueOf(obj.get('margin')).replace(',', '.')) : null;
-				parseObj.byProduct = (String) obj.get('byProduct');
-				parseObj.oppRecordType = (String) obj.get('oppRecordType');			
-				listParseOppRecords.add(parseObj);
-
-				String oppRecordTypeDeveloperName;
-				if(parseObj.oppRecordType != null){
-					oppRecordTypeDeveloperName = Schema.SObjectType.Opportunity.getRecordTypeInfosById().get(parseObj.oppRecordType).getDeveloperName();
-				}
-
-				if(String.isBlank(parseObj.id)){
-					if(parseObj.incluir){
-						if(parseObj.fechagestion < System.today()) {
-							result = 'La fecha de próxima gestión no puede ser anterior a hoy.';
-						}else if(parseObj.path != AV_AppConstants.OPP_STATUS_ENGESTION && parseObj.path != AV_AppConstants.OPP_STATUS_POTENCIAL) {
-							result = 'El estado de la oportunidad no permite incluirla en "clientes priorizados".';
-						}
-					}
-					if (parseObj.comentario!=null && parseObj.comentario.length()>4000) {
-						result = 'El campo comentario no puede tener más de 4.000 caracteres.';
-					}
-					else if ((parseObj.path=='Con Venta' ) 
-								   || (parseObj.path=='Vencido' ) 
-								   || (parseObj.path=='Potencial')) {
-						result = 'No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.';
-					}
+		Savepoint sp = Database.setSavepoint();
+		if(listOppRecords != null && !listOppRecords.isEmpty()){
+			Set<String> opposToCleanCheckOnOff = new Set<String>();
+			String idOppNew;
+			Set<String> closedStatus = new Set<String>{
+				AV_AppConstants.OPP_STAGE_NOT_INTERESTED,
+				AV_AppConstants.OPP_STATUS_CERRNEG,
+				AV_AppConstants.OPP_STATUS_CERRPOST,
+				AV_AppConstants.OPP_STATUS_PROD_RECH,
+				AV_AppConstants.OPP_STATUS_PROD_CONTR
+			};
+			Opportunity newOpp;
+			List<Opportunity> opposToUpdt = new List<Opportunity>();
+			List<String> listIdsOpps = new List<String>();
+			List<Opportunity> listAllOpps = new List<Opportunity>();
+			for(Opportunity opp : listOppRecords){
+				if(opp.Id == null ||( (String) opp.Id).trim() == ''){
+					newOpp = opp;
+					newOpp.Id = null;
 				}else{
-					List<String> rtNames = new List<String>{'AV_CallMe', 'AV_AlertaComercial', 'AV_Sugerencia', 'AV_Propuesta'};
-					if(mapOppOld.get(parseObj.id).AV_Stage__c == 'Con Venta' && (parseObj.path == AV_AppConstants.OPP_STATUS_CERRPOST || parseObj.path == AV_AppConstants.OPP_STATUS_NOINTERE || parseObj.path == AV_AppConstants.OPP_STATUS_ENGESTION || parseObj.path == AV_AppConstants.OPP_STATUS_NOAPTO) && rtNames.contains(oppRecordTypeDeveloperName) ){
-						result = 'No se puede retroceder de etapa si está en estado Con Venta.';
+					opposToUpdt.add(opp);
+					listIdsOpps.add(opp.Id);
+					if(closedStatus.contains(opp.StageName) || !opp.AV_IncludeInPrioritizingCustomers__c ){
+						opposToCleanCheckOnOff.add(opp.Id);
 					}
-					if(parseObj.incluir && mapOppOld.get(parseObj.id).AV_IncludeInPrioritizingCustomers__c != true) {
-						if( parseObj.fechagestion < System.today()) {
-							result = 'La fecha de próxima gestión no puede ser anterior a hoy.';
-						} else if(parseObj.path != AV_AppConstants.OPP_STATUS_ENGESTION && parseObj.path != AV_AppConstants.OPP_STATUS_POTENCIAL)  {
-							result = 'El estado de la oportunidad no permite incluirla en "clientes priorizados".';
+				}
+				listAllOpps.add(opp);
+			}
+			Map<String,Opportunity> mapOldOpps = new Map<String,Opportunity>();
+			if (listIdsOpps != null && !listIdsOpps.isEmpty()) {
+				List<Opportunity> listOldOpps = [SELECT Id, StageName, AV_Comentarios__c FROM Opportunity WHERE Id IN :listIdsOpps];
+				if (listOldOpps != null && !listOldOpps.isEmpty()) {
+					for (Opportunity opp : listOldOpps) {
+						mapOldOpps.put(opp.Id,opp);
+					}
+				}
+			}
+			List<Task> COFTsk = new List<Task>();
+			List<AV_CustomActivityOpportunity__c> caoToDel = new List<AV_CustomActivityOpportunity__c>();
+			Set<String> tasksId = new Set<String>();
+			if(!opposToCleanCheckOnOff.isEmpty()){
+				COFTsk = [SELECT Id,AV_Task__c FROM Task WHERE AV_OrigenApp__c = :AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF AND RecordType.DeveloperName = :AV_AppConstants.TASKINICIATIVA_RT AND AV_Task__c IN (SELECT AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c In :opposToCleanCheckOnOff)];
+				for(Task t : COFTsk){
+					tasksId.add(t.AV_Task__c);
+				}
+				caoToDel = [SELECT Id FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c IN :tasksId];
+			}
+			if(!COFTsk.isEmpty() && !caoToDel.isEmpty()){
+				List<Database.DeleteResult> delCao = Database.delete(caoToDel,false);
+				for(Database.DeleteResult delR : delCao){
+					if(!delR.isSuccess()){	
+						for(Database.Error err : delR.getErrors()){
+							Database.rollback( sp );
+							return err.getMessage();
 						}
 					}
-					if (parseObj.comentario!=null && parseObj.comentario.length()>4000) {
-						result = 'El campo comentario no puede tener más de 4.000 caracteres.';
-					}else if((parseObj.comentario == null || parseObj.comentario.trim().length() == 0) && parseObj.resolucion == 'O'){
-						result = 'Para esta resolución, es necesario comentar el motivo del cierre negativo';
-
-					} 
-					else if ((parseObj.path=='Con Venta' && mapOppOld.get(parseObj.id).AV_Stage__c != 'Con Venta') 
-								   || (parseObj.path=='Vencido' && mapOppOld.get(parseObj.id).AV_Stage__c != 'Vencido') 
-								   || (parseObj.path=='Potencial' && mapOppOld.get(parseObj.id).AV_Stage__c != 'Potencial')) {
-						result = 'No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.';
-					}
 				}
-				if (parseObj.fechagestion == null &&
-					(parseObj.path == AV_AppConstants.OPP_STATUS_ENGESTION ||
-					parseObj.path == AV_AppConstants.OPP_STATUS_NOAPTO)) {
-						result = 'Para la etapa seleccionada es obligatorio informar fecha de próxima gestión.';
-				}
-				if (AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c) {
-					if (parseObj.comentario!=null) {
-						listComment.add(parseObj.comentario);
+				List<Database.DeleteResult> delTsk = Database.delete(COFTsk,false);
+				for(Database.DeleteResult delR : delTsk){
+					if(!delR.isSuccess()){	
+						for(Database.Error err : delR.getErrors()){
+							Database.rollback( sp );
+							return err.getMessage();
+						}
 					}
-					if (parseObj.oportunidad!=null) {
-						listAsunto.add(parseObj.oportunidad);
-					}
-				}
-				if( parseObj.fechagestion < System.today() && parseObj.path != AV_AppConstants.OPP_STATUS_CERRPOST && parseObj.path != AV_AppConstants.OPP_STATUS_NOINTERE && parseObj.path != AV_AppConstants.OPP_STATUS_POTENCIAL) {
-					result = 'La Fecha de próxima gestión tiene que ser mayor o igual a hoy.';
 				}
 			}
-			if (result.equalsIgnoreCase('OK')) {
-				AV_NewOpportunity_Controller.OppRecord newOpp;
-				for(AV_NewOpportunity_Controller.OppRecord rec : listParseOppRecords) {
-					if(String.isBlank(rec.id)) {
-						newOpp = rec;
-						break;
+			List<Database.SaveResult> srL = Database.update(opposToUpdt,false);
+			for(Database.SaveResult sr : srL){
+				if(!sr.isSuccess()){
+					for(Database.Error err : sr.getErrors()){
+						Database.rollback( sp );
+						return err.getMessage();
 					}
 				}
-				if(newOpp != null) {
-					result = validatePFNewOpp(newOpp);
+			}
+			if(newOpp != null && newOpp.AccountId != null){
+				String accountIdObject = newOpp.AccountId.getSobjectType().getDescribe().getName();
+				String hcaId;
+				if(!accountIdObject.equals(AV_AppConstants.OBJECT_NAME_ACCOUNT) && currentHcaId == null){//Si viene de task o event, en el lugar del accountId se envia el id del registro. Con esto se saca el AV_Task__c y el WhatId
+					if(accountIdObject.equals(AV_AppConstants.OBJECT_NAME_TASK)){
+						List<Task> tsk = [SELECT WhatId,AV_Task__c FROM Task WHERE Id = :newOpp.AccountId LIMIT 1];
+						if(!tsk.isEmpty()){
+							newOpp.AccountId = tsk[0].WhatId;
+							hcaId = tsk[0].AV_Task__c;
+						}
+					}
+					if(accountIdObject.equals(AV_AppConstants.OBJECT_NAME_EVENT)){
+						List<Event> evt = [SELECT WhatId,AV_Task__c FROM Event WHERE Id = :newOpp.AccountId LIMIT 1];
+						if(!evt.isEmpty()){
+							newOpp.AccountId = evt[0].WhatId;
+							hcaId = evt[0].AV_Task__c;
+						}
+					}
+				}else if(currentHcaId != null){//Si viene de oportunidad cogemos el taskId que llega por parámetro
+					hcaId = currentHcaId;
+				}
+				Database.SaveResult insRes = Database.insert(newOpp,false);
+				if(!insRes.isSuccess()){
+					Database.rollback(sp);
+					return insRes.getErrors()[0].getMessage();
+				} else {
+					idOppNew = insRes.getId();
+				}
+				if(hcaId != null){
+					AV_DetailOpp_Controller.linkOpp(hcaId, newOpp);
 				}
 			}
-			if (!listComment.isEmpty() || !listAsunto.isEmpty()) {
-				listPalabraProhibida.add(listComment);
-				listPalabraProhibida.add(listAsunto);
-				List<String> listErrorPP = AV_ForbiddenWords.validateMessages(listPalabraProhibida);
-				if (!listErrorPP.isEmpty()) {
-					if (listErrorPP[0].contains('Error')) {
-						result = listErrorPP[0];
-					} else if (!listErrorPP[0].contains('OK')) {
-						if (result.equalsIgnoreCase('OK')) {
-							result = 'Warning: '+listErrorPP[0];
+			if (idTask != null && listAllOpps != null && !listAllOpps.isEmpty()) {
+				List<AV_CommentsHistory__c> commHistList = new List<AV_CommentsHistory__c>();
+				List<Contact> contactList = [SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c =:UserInfo.getUserId() ];
+				for (Opportunity opp : listAllOpps) {
+					if (mapOldOpps != null && mapOldOpps.get(opp.Id) != null && (mapOldOpps.get(opp.Id).AV_Comentarios__c != opp.AV_Comentarios__c || mapOldOpps.get(opp.Id).StageName != opp.StageName)) {
+						AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+						ch.AV_Opportunity__c = opp.Id;
+						if (mapOldOpps.get(opp.Id).AV_Comentarios__c != opp.AV_Comentarios__c) {
+							ch.AV_NewComment__c = opp.AV_Comentarios__c;
+							ch.AV_OldComment__c = (String)mapOldOpps.get(opp.Id).AV_Comentarios__c;
+						}
+						ch.AV_OldStatus__c = mapOldOpps.get(opp.Id).StageName;
+						ch.AV_ModificationDate__c = System.today();
+						if(contactList != null && !contactList.isEmpty()){
+							ch.AV_AssignedEmployee__c = contactList[0].Id;
+						}
+						ch.AV_OpportunityStatus__c = opp.StageName;
+						if (idTask.startsWith('00U')) {
+							ch.AV_Event__c = idTask;
+						} else {
+							ch.AV_Task__c = idTask;
+						}
+						commHistList.add(ch);
+					} else if (idOppNew != null) {
+						AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+						ch.AV_NewComment__c = opp.AV_Comentarios__c;
+						ch.AV_Opportunity__c = idOppNew;
+						ch.AV_ModificationDate__c = System.today();
+						if(contactList != null && !contactList.isEmpty()){
+							ch.AV_AssignedEmployee__c = contactList[0].Id;
+						}
+						ch.AV_OpportunityStatus__c = opp.StageName;
+						if (idTask.startsWith('00U')) {
+							ch.AV_Event__c = idTask;
+						} else {
+							ch.AV_Task__c = idTask;
+						}
+						commHistList.add(ch);
+					}
+				}
+				if(commHistList!= null && !commHistList.isEmpty()){
+					List<Database.SaveResult> srCommHistList = Database.insert(commHistList,false);
+					for(Database.SaveResult ur : srCommHistList){
+						if(!ur.isSuccess()) {
+							result = ur.getErrors()[0].getMessage();
 						}
 					}
 				}
@@ -314,162 +312,59 @@ public without sharing class AV_NewOpportunity_Controller {
 		}
 		return result;
 	}
-	
+	/**
+	 * Validate the product and the words of the comment and the name of the opportunity
+	 * @param string prodId to validate
+	 * @param string tskId to validate
+	 * @param List<String> comments to validate
+	 * @param List<String> names to validate
+	 */
 	@AuraEnabled
-	public static String saveOppRecords(List<Map<String, Object>> listOppRecords) {
-		String result = 'OK';
-		List<AV_NewOpportunity_Controller.OppRecord> listParseOppRecords = new List<AV_NewOpportunity_Controller.OppRecord>();
-		result = validateOppRecords(listOppRecords, listParseOppRecords);
-	
-		if ('OK'.equalsIgnoreCase(result) || result.contains('Warning:')){
-			AV_NewOpportunity_Controller.OppRecord newOpp;
-			List<AV_NewOpportunity_Controller.OppRecord> listOppTasks = new List<AV_NewOpportunity_Controller.OppRecord>();
-			for(AV_NewOpportunity_Controller.OppRecord rec : listParseOppRecords) {
-				if(String.isBlank(rec.id)) {
-
-					newOpp = rec;
-				}else{
-					listOppTasks.add(rec);
-				}
-			}
-			
-			if(newOpp != null) {
-				result = insertOpp(newOpp);
-			}
-			if(!listOppTasks.isEmpty()) {
-				String resultUpdate = updateOppTasks(listOppTasks);
-				if (!'OK'.equalsIgnoreCase(resultUpdate) && !'OK'.equalsIgnoreCase(result)){
-					result = result + '\r\n' + resultUpdate;
-				}
-			}
-		}
-		return result;
-	}
-	
-	private static String validatePFNewOpp(AV_NewOpportunity_Controller.OppRecord opp) {
+	public static String validatePFNewOppAndForbiddenWords(String prodId, String tskId,List<String> comments,List<String> names) {
 		String result = 'OK';
 		String accId;
 		Set<String> openStatus = new Set<String>{
 			AV_AppConstants.OPP_STATUS_POTENCIAL, 
-			AV_AppConstants.OPP_STATUS_ENGESTION,
-			AV_AppConstants.OPP_STATUS_NOAPTO
+			AV_AppConstants.OPP_STATUS_ENGESTION
 		};
+		if(prodId != null){
 		AV_AppUtilities.SearchRT rtIniciativa = new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
 		Set<Id> setRtIniciativa	= AV_AppUtilities.getRecordTypeIdsInSet(new Set<AV_AppUtilities.SearchRT>{rtIniciativa});
-		List<Task> tsk = [SELECT AccountId, AV_Task__c FROM Task WHERE Id = :opp.taskid];
+		if(tskId != null){
 
-		if (tsk == null || tsk.isEmpty()) {
-			Event evt = [SELECT AccountId, AV_Task__c FROM Event WHERE Id = :opp.taskid LIMIT 1];
-			accId = evt.AccountId;
-		} else {
-			accId = tsk[0].AccountId;
+			List<Task> tsk = [SELECT AccountId, AV_Task__c FROM Task WHERE Id = :tskId];
+			
+			if (tsk == null || tsk.isEmpty()) {
+				Event evt = [SELECT AccountId, AV_Task__c FROM Event WHERE Id = :tskId LIMIT 1];
+				accId = evt.AccountId;
+			} else {
+				accId = tsk[0].AccountId;
+			}
 		}
-		List<Opportunity> listOpp =[SELECT Id, AV_PF__c, AccountId FROM Opportunity WHERE AV_PF__c =:opp.producto AND AccountId =:accId AND RecordTypeId = :setRtIniciativa and StageName in :openStatus];
-
-		if (listOpp!=null && !listOpp.isEmpty()){
-			// result = 'OK';
-			result = Label.AV_PFDuplicate;
+			List<Opportunity> listOpp =[SELECT Id, AV_PF__c, AccountId FROM Opportunity WHERE AV_PF__c =:prodId AND AccountId =:accId AND RecordTypeId = :setRtIniciativa and StageName in :openStatus];
+			
+			if (listOpp!=null && !listOpp.isEmpty()){
+				result = Label.AV_PFDuplicate;
+			}
+		}
+		if (AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c && (!comments.isEmpty() || !names.isEmpty())) {
+			List<List<String>> listPalabraProhibida = new List<List<String>>();
+			listPalabraProhibida.add(comments);
+			listPalabraProhibida.add(names);
+			List<String> listErrorPP = AV_ForbiddenWords.validateMessages(listPalabraProhibida);
+			if (!listErrorPP.isEmpty()) {
+				if (listErrorPP[0].contains('Error')) {
+					result = listErrorPP[0];
+				} else if (!listErrorPP[0].contains('OK')) {
+					if (result.equalsIgnoreCase('OK')) {
+						result = 'Warning: '+listErrorPP[0];
+					}
+				}
+			}
 		}
 		return result;
 	}
-
-	private static String insertOpp(AV_NewOpportunity_Controller.OppRecord opp) {
-		String accId;
-		String header;
-		List<Task> tsk = [SELECT AccountId, AV_Task__c FROM Task WHERE Id = :opp.taskid LIMIT 1];
-
-		if (tsk == null || tsk.isEmpty()) {
-			Event evt = [SELECT AccountId, AV_Task__c FROM Event WHERE Id = :opp.taskid LIMIT 1];
-
-			accId = evt.AccountId;
-			header = evt.AV_Task__c;
-		} else {
-			accId = tsk[0].AccountId;
-			header = tsk[0].AV_Task__c;
-		}
-
-		Id rtIniciativa = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(AV_AppConstants.OPPINICIATIVA_RT).getRecordTypeId();
-
-		Opportunity newOpty = new Opportunity();
-		newOpty.StageName = opp.path;
-		newOpty.AV_FechaProximoRecordatorio__c = opp.fechagestion;
-		newOpty.AV_IncludeInPrioritizingCustomers__c = opp.incluir;
-		newOpty.AV_FechaVencimiento__c = opp.fechavencimiento;
-		newOpty.AV_Entidad__c = opp.entidad;
-		newOpty.AV_Comentarios__c = opp.comentario;
-		newOpty.Amount = opp.importe;
-		newOpty.AV_TipoInteres__c = opp.interes;
-		newOpty.AV_PF__c = opp.producto;
-		newOpty.Name = opp.oportunidad;
-		newOpty.AV_Cuota__c = opp.cuota;
-		newOpty.AV_LicensePlate__c = opp.matricula;
-		newOpty.AV_Tenencia__c = opp.otraentidadpick;
-		newOpty.RecordTypeId = rtIniciativa;
-		newOpty.AccountId = accId;
-		newOpty.AV_AmountEuro__c = opp.amount;
-		newOpty.AV_MarginEuro__c = opp.margin;
-		newOpty.AV_ByProduct__c = opp.byProduct;
-
-		Database.SaveResult sr = Database.insert(newOpty, false);
-		if(!sr.isSuccess()) {
-			String errorMessage = 'KO';		    
-			for(Database.Error err : sr.getErrors()) {
-				AV_LogDebug.printLogDebug('insertOpp', 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
-				if(String.valueOf(err.getStatusCode()).contains('FIELD_CUSTOM_VALIDATION_EXCEPTION')) {
-					errorMessage = err.getMessage();
-				}
-			}
-			return errorMessage;
-		} else {
-			return AV_DetailOpp_Controller.linkOpp(header, newOpty);
-		}
-	}
-
-	private static String updateOppTasks(List<AV_NewOpportunity_Controller.OppRecord> listOppTasks) {
-		List<AV_CustomActivityOpportunity__c> listOppTaskToUpd = new List<AV_CustomActivityOpportunity__c>();
-
-		for(AV_NewOpportunity_Controller.OppRecord rec : listOppTasks) {
-			Opportunity opp = new Opportunity();
-			AV_CustomActivityOpportunity__c oppTask = new AV_CustomActivityOpportunity__c();
-			oppTask.Id = rec.id;
-			oppTask.Name = rec.oportunidad;
-			oppTask.AV_Product__c = rec.producto;
-			oppTask.AV_ReviewDate__c = rec.fechagestion;
-			oppTask.AV_Stage__c = rec.path;
-			oppTask.AV_HoldingAnotherEntity__c = rec.otraentidadpick;
-			oppTask.AV_Entity__c = rec.entidad;
-			oppTask.AV_FeeAmount__c = rec.cuota;
-			oppTask.AV_Amount__c = rec.importe;
-			oppTask.AV_TypeOfInterest__c = rec.interes;
-			oppTask.AV_Commentary__c = rec.comentario;
-			oppTask.AV_DueDate__c = rec.fechavencimiento;
-			oppTask.AV_LicensePlate__c = rec.matricula;
-			oppTask.AV_IncludeInPrioritizingCustomers__c = rec.incluir;
-			oppTask.AV_OrigenApp__c = rec.origenapp;
-			oppTask.AV_Priority__c= rec.potencial;
-			oppTask.AV_Resolucion__c = rec.resolucion;
-			oppTask.AV_MarginEuro__c = rec.margin;
-			oppTask.AV_AmountEuro__c = rec.amount;
-			oppTask.AV_ByProduct__c = rec.byProduct;
-			listOppTaskToUpd.add(oppTask);
-		}
-
-		if(!listOppTaskToUpd.isEmpty()) {
-			Database.SaveResult[] srList = Database.update(listOppTaskToUpd, false);
-			for (Database.SaveResult sr : srList) {
-				if(!sr.isSuccess()) {    
-					for(Database.Error err : sr.getErrors()) {
-						AV_LogDebug.printLogDebug('updateOppTasks', 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this siii error: ' + err.getFields());
-					}
-					return 'KO';
-				} else {
-					return 'OK';
-				}
-			}
-		}
-		return 'OK';
-	}
-
+	
 	public class ProdEntityField {
 		@AuraEnabled
 		public String type;
@@ -536,7 +431,7 @@ public without sharing class AV_NewOpportunity_Controller {
 		Database.SaveResult srTask = Database.insert(taskIni, false);
 		task tsk = new task();
 		if(srTask.isSuccess()){
-			tsk = [SELECT AV_ExternalID__c,Id,Subject,Status,WhatId,What.Name,Owner.Name,ActivityDate FROM Task WHERE Id = :taskIni.Id LIMIT 1];
+			tsk = [SELECT AV_ExternalID__c,Id,Subject,Status,WhatId,What.Name,Owner.Name,ActivityDate,AV_Task__c FROM Task WHERE Id = :taskIni.Id LIMIT 1];
 			idTask = tsk.id;
 			AV_HeaderCustomActivity__c  header =[SELECT AV_ExternalID__c, Id FROM AV_HeaderCustomActivity__c WHERE AV_ExternalID__c = :tsk.AV_ExternalID__c LIMIT 1];	
 
@@ -631,7 +526,7 @@ public without sharing class AV_NewOpportunity_Controller {
 				FIND :searchTerm
 				IN ALL FIELDS
 				RETURNING
-					Product2(Id, Name, AV_ExternalID__c WHERE Id NOT IN :selectedIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+					Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE Id NOT IN :selectedIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 				LIMIT :MAX_RESULTS
 			];
 		}
@@ -640,7 +535,7 @@ public without sharing class AV_NewOpportunity_Controller {
 				FIND :searchTerm
 				IN ALL FIELDS
 				RETURNING
-					Product2(Id, Name, AV_ExternalID__c WHERE RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+					Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 				LIMIT :MAX_RESULTS
 			];
 		}
@@ -652,7 +547,7 @@ public without sharing class AV_NewOpportunity_Controller {
 		for (Product2 p : listProduct) {
 			results.add(
 				new AV_LookupSearchResult(
-					p.Id,'Product2',productIcon,p.Name,'Codigo • ' + p.AV_ExternalID__c
+					p.Id,'Product2',productIcon,p.Name,'Codigo • ' + p.AV_ExternalID__c,p.AV_NewReportActions__c
 				)
 			);
 		}

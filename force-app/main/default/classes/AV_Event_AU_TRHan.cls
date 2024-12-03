@@ -14,8 +14,10 @@ Historial
 	1.4			DE63338			Sandra Gómez		18/08/2022			WhitOut Events Outlook
 	1.5			Fix GCF			Sandra Gómez		17/02/2023			hasCustomPermission add apigcf
 	1.6			US-0006226      David Ramos			23/10/2023			Add Kafka mathod syncEventsKafka
+	1.7                         Oscar Moreno        16/02/2024          Comment updateTareaOpp  method
+	1.8			PPM100538432	Sandra Gómez		17/09/2024			Add parameter mapToByPassEvent
 ***********************************************************************************************************************/
-public class AV_Event_AU_TRHan extends CC_TriggerHandlerBase{
+public class AV_Event_AU_TRHan extends AV_TriggerHandlerBase{
 	
 	public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Event>)tp.newList, (Map<Id, Event>)tp.newMap, (List<Event>) tp.oldList, (Map<Id, Event>) tp.oldMap);
@@ -28,29 +30,19 @@ public class AV_Event_AU_TRHan extends CC_TriggerHandlerBase{
 		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()){
 			if (!hasCustomPermission){
-				AV_EventTriggerHelper.syncEvents(listDataWhitoutOutlook, listOldObj);
-
+				AV_EventTriggerHelper.syncEvents(listDataWhitoutOutlook, listOldObj,mapToByPassEvent);
 				//POC Kafka configuration in AV_KafkaConfiguration__mdt
 				AV_KafkaEv_Integration.syncEventsKafka(listDataWhitoutOutlook);
 			}
-
 		}
-
 		if (listData!=null && !listData.isEmpty()){
 			AV_EventTriggerHelper.updateHeaderCustomActivityExtId(listData, mapOldObj);
+			AV_EventTriggerHelper.updateNextEventDateFieldOfOpp(listData, mapOldObj);
 		}
-
 		if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()){
 			if (!hasCustomPermission && !System.isbatch()){
 				AV_EventTriggerHelper.updateNextManagementDateOpp(listDataWhitoutOutlook, mapOldObj);
 			}
 		}
-
-		if (listData!=null && !listData.isEmpty()){
-			AV_EventTriggerHelper.recordChannel(listData, mapOldObj);
-		}
-
-
-
 	}
 }

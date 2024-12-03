@@ -600,9 +600,10 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 System.assertNotEquals('', respuesta.opportunityId, 'No se ha creado la oportunidad.' + respuesta.detalleError);
                 idOportunidadesCreadas.add(respuesta.opportunityId);
             }
-            for (Opportunity opp : [SELECT CSBD_SistemaOrigen__c, CSBD_Resumen__c FROM Opportunity WHERE Id IN :idOportunidadesCreadas]) {
+            for (Opportunity opp : [SELECT CSBD_SistemaOrigen__c, CSBD_Resumen__c, ContactId FROM Opportunity WHERE Id IN :idOportunidadesCreadas]) {
                 System.assertEquals('WS', opp.CSBD_SistemaOrigen__c, opp.Id + ': valor incorrecto en "Sistema origen" (' + opp.CSBD_SistemaOrigen__c + ')');
                 System.assert(String.isNotBlank(opp.CSBD_Resumen__c), opp.Id + ': campo "Resumen" vacío');
+                System.assert(String.isBlank(opp.ContactId), opp.Id + ': oportunidad con Contacto');
             }
         }
     }
@@ -748,8 +749,9 @@ public class CSBD_WS_AltaOportunidad_Test  {
                 System.assertNotEquals('', respuesta.opportunityId, 'No se ha creado la oportunidad. ' + respuesta.detalleError);
                 idOportunidadesCreadas.add(respuesta.opportunityId);
             }
-            for (Opportunity oportunidad : [SELECT CSBD_SistemaOrigen__c FROM Opportunity WHERE Id IN :idOportunidadesCreadas]) {
+            for (Opportunity oportunidad : [SELECT CSBD_SistemaOrigen__c, ContactId FROM Opportunity WHERE Id IN :idOportunidadesCreadas]) {
                 System.assertEquals('WS', oportunidad.CSBD_SistemaOrigen__c);
+                System.assert(String.isBlank(oportunidad.ContactId), oportunidad.Id + ': oportunidad con Contacto');
             }
         }
     }

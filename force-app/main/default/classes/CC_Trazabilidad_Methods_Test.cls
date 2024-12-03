@@ -1,6 +1,6 @@
 @IsTest
 public class CC_Trazabilidad_Methods_Test {
-  
+	
     @isTest
     static void altaPeticion() {
         Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
@@ -23,7 +23,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc1.CC_Tematica__c = tem.Id;
         mcc1.CC_Codigo_Externo__c = 'PR-000001';
         insert mcc1;
-    //'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
+		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
         CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
         CC_MCC__c mcc2 = new CC_MCC__c();
         mcc2.RecordTypeId = recordMot;
@@ -32,7 +32,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc2.CC_Producto_Servicio__c = prod.Id;
         mcc2.CC_Codigo_Externo__c = 'MO-000001';
         insert mcc2;  
-    CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
+		CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
              
         Case c1 = new Case();
         c1.Subject = 'Prueba';
@@ -41,10 +41,10 @@ public class CC_Trazabilidad_Methods_Test {
         c1.CC_Tipo_Cliente__c = 'Cliente';
         c1.Status = 'Activo';
         c1.Origin = 'Email';
-    c1.CC_Tipo_Contacto__c = 'Consulta';
+		c1.CC_Tipo_Contacto__c = 'Consulta';
         c1.CC_Canal_Procedencia__c = 'Atención al Cliente';
         c1.CC_MCC_Motivo__c = motiv.Id;
-    c1.CC_MCC_ProdServ__c = prod.Id;
+		c1.CC_MCC_ProdServ__c = prod.Id;
         c1.CC_MCC_Tematica__c = tem.Id;
         insert c1;
                 
@@ -56,7 +56,7 @@ public class CC_Trazabilidad_Methods_Test {
         insert TRZ;
         
         List<Id> ListCaseId = new List<Id>();
-    ListCaseId.add(c1.Id);
+		ListCaseId.add(c1.Id);
         CC_Trazabilidad_Methods.altaPeticion(ListCaseId);
     }
     
@@ -82,7 +82,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc1.CC_Tematica__c = tem.Id;
         mcc1.CC_Codigo_Externo__c = 'PR-000001';
         insert mcc1;
-    //'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
+		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
         CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
         CC_MCC__c mcc2 = new CC_MCC__c();
         mcc2.RecordTypeId = recordMot;
@@ -91,7 +91,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc2.CC_Producto_Servicio__c = prod.Id;
         mcc2.CC_Codigo_Externo__c = 'MO-000001';
         insert mcc2;  
-    CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
+		CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
              
         Case c1 = new Case();
         c1.Subject = 'Prueba';
@@ -100,10 +100,10 @@ public class CC_Trazabilidad_Methods_Test {
         c1.CC_Tipo_Cliente__c = 'Cliente';
         c1.Status = 'Activo';
         c1.Origin = 'Email';
-    c1.CC_Tipo_Contacto__c = 'Consulta';
+		c1.CC_Tipo_Contacto__c = 'Consulta';
         c1.CC_Canal_Procedencia__c = 'Atención al Cliente';
         c1.CC_MCC_Motivo__c = motiv.Id;
-    c1.CC_MCC_ProdServ__c = prod.Id;
+		c1.CC_MCC_ProdServ__c = prod.Id;
         c1.CC_MCC_Tematica__c = tem.Id;
         insert c1;
                 
@@ -115,7 +115,7 @@ public class CC_Trazabilidad_Methods_Test {
         insert TRZ;
         
         List<Id> ListCaseId = new List<Id>();
-    ListCaseId.add(c1.Id);
+		ListCaseId.add(c1.Id);
         CC_Trazabilidad_Methods.altaPeticion(ListCaseId);
     }
     
@@ -141,7 +141,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc1.CC_Tematica__c = tem.Id;
         mcc1.CC_Codigo_Externo__c = 'PR-000001';
         insert mcc1;
-    //'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
+		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
         CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
         CC_MCC__c mcc2 = new CC_MCC__c();
         mcc2.RecordTypeId = recordMot;
@@ -150,7 +150,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc2.CC_Producto_Servicio__c = prod.Id;
         mcc2.CC_Codigo_Externo__c = 'MO-000001';
         insert mcc2;  
-    CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
+		CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
              
         Case c1 = new Case();
         c1.Subject = 'Prueba';
@@ -159,10 +159,10 @@ public class CC_Trazabilidad_Methods_Test {
         c1.CC_Tipo_Cliente__c = 'Cliente';
         c1.Status = 'Cerrado';
         c1.Origin = 'Email';
-    c1.CC_Tipo_Contacto__c = 'Consulta';
+		c1.CC_Tipo_Contacto__c = 'Consulta';
         c1.CC_Canal_Procedencia__c = 'Atención al Cliente';
         c1.CC_MCC_Motivo__c = motiv.Id;
-    c1.CC_MCC_ProdServ__c = prod.Id;
+		c1.CC_MCC_ProdServ__c = prod.Id;
         c1.CC_MCC_Tematica__c = tem.Id;
         c1.CC_Detalles_Consulta__c = 'pruebas';
         c1.CC_Detalles_Solucion__c = 'pruebas';
@@ -207,7 +207,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc1.CC_Tematica__c = tem.Id;
         mcc1.CC_Codigo_Externo__c = 'PR-000001';
         insert mcc1;
-    //'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
+		//'APP BrokerNow','APP CaixaBank','APP CaixaBank Pay','APP CaixaBank Sign','App imaginBank'
         CC_MCC__c prod = [SELECT Id FROM CC_MCC__c WHERE Name='APP CaixaBank' LIMIT 1];
         CC_MCC__c mcc2 = new CC_MCC__c();
         mcc2.RecordTypeId = recordMot;
@@ -216,7 +216,7 @@ public class CC_Trazabilidad_Methods_Test {
         mcc2.CC_Producto_Servicio__c = prod.Id;
         mcc2.CC_Codigo_Externo__c = 'MO-000001';
         insert mcc2;  
-    CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
+		CC_MCC__c motiv = [SELECT Id FROM CC_MCC__c WHERE Name='Valoración positiva' LIMIT 1];
              
         Case c1 = new Case();
         c1.Subject = 'Prueba';
@@ -225,10 +225,10 @@ public class CC_Trazabilidad_Methods_Test {
         c1.CC_Tipo_Cliente__c = 'Cliente';
         c1.Status = 'Cerrado';
         c1.Origin = 'Email';
-    c1.CC_Tipo_Contacto__c = 'Consulta';
+		c1.CC_Tipo_Contacto__c = 'Consulta';
         c1.CC_Canal_Procedencia__c = 'Atención al Cliente';
         c1.CC_MCC_Motivo__c = motiv.Id;
-    c1.CC_MCC_ProdServ__c = prod.Id;
+		c1.CC_MCC_ProdServ__c = prod.Id;
         c1.CC_MCC_Tematica__c = tem.Id;
         c1.CC_Detalles_Consulta__c = 'pruebas';
         c1.CC_Detalles_Solucion__c = 'pruebas';
@@ -297,7 +297,7 @@ public class CC_Trazabilidad_Methods_Test {
         c1.CC_Tipo_Cliente__c = 'Cliente';
         c1.Status = 'Cerrado';
         c1.Origin = 'Email';
-    c1.CC_Tipo_Contacto__c = 'Consulta';
+		c1.CC_Tipo_Contacto__c = 'Consulta';
         c1.CC_Canal_Procedencia__c = 'Atención al Cliente';
         c1.CC_Detalles_Consulta__c = 'pruebas';
         c1.CC_Detalles_Solucion__c = 'pruebas';
@@ -310,7 +310,7 @@ public class CC_Trazabilidad_Methods_Test {
         TRZ.CC_Tipo_de_Registro__c = 'Alta';
         TRZ.CC_Control_Envio__c = 'Enviado';
         insert TRZ;
-    CC_Trazabilidad_Methods.bajaPeticion(c1.Id);
+		CC_Trazabilidad_Methods.bajaPeticion(c1.Id);
        
     }
     

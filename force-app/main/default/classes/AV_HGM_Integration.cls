@@ -14,6 +14,7 @@ VERSION		USER_STORY							    AUTHOR			  	DATE			Description
 1.4         FIX        								Patricia Solano  	22/02/2023 		Modify method getSurveyId_fw to add triggerId, namedCrName in the callHttpService
 1.5			US584558								Patricia Villacañas	09/05/2023		Added center parameter in method getHGMCustomer_fw
 1.6        US540119        							Alexandre Perez		18/07/2023		Adapted to new body returned in the new NPS endpoint
+1.7  	   Upgrade V2	   							Borja Lavesiera     15/12/2023		Modification to version V2 of NPS and Change to new CBK_HttpServiceIntegration.callHttpService Method
 ***********************************************************************************************************************/
 public with sharing class AV_HGM_Integration {
 
@@ -158,9 +159,9 @@ public with sharing class AV_HGM_Integration {
 			//Sacamos del CS el endpoint cuyo name credential es el de la integración
 			CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues(namedCrName);
 			//reemplazmos el employeeId
-			String endpoint = wsc?.NamedCredential__c.replace('{triggerId}', triggerId);
-			system.debug(methodName+ ' Endpoint: ' + endpoint);
+			String endpoint = wsc?.NamedCredential__c.replace('{triggerId}', triggerId);//Rollback versión inicial
 			if(endpoint !=null){frwReq.setEndpoint(endpoint);}
+			frwReq.setMethod('GET');
 			//Llamamos al callot del Framework con el endpoint corregido
 			HttpResponse respuesta = CBK_HttpServiceIntegration.callHttpService(frwReq, triggerId, namedCrName);
 			system.debug(methodName+ ' respuesta: ' + respuesta);
@@ -180,8 +181,8 @@ public with sharing class AV_HGM_Integration {
 				if(reqStatusOK){
 					//SurveyData bodyResponse = (SurveyData)resBody.get('Data');
 					SurveyData bodyResponse = new SurveyData();
-					bodyResponse.surveyId = (Integer)resBody.get('surveyId');
 					bodyResponse.name = (String)resBody.get('name');
+					bodyResponse.surveyId = (Integer)resBody.get('surveyId');
 					resultMethod.data = bodyResponse;	
 					system.debug(methodName+ 'bodyResponse: ' + bodyResponse);
 					system.debug(methodName+ 'resultMethod: ' + resultMethod);
@@ -238,6 +239,7 @@ public with sharing class AV_HGM_Integration {
             listAttr.addAll(datacliente.attributes);
             datacliente.attributes = listAttr;
         }
+		system.debug(System.JSON.serialize(datacliente));
 		HttpRequest frwReq = CBK_HttpServiceIntegration.getRequest(System.JSON.serialize(datacliente), namedCrName, CIBE_AppConstants.POST, mapHeader);
 		AV_LogDebug.printLogDebug(methodName,'frwReq: ' + frwReq);
 
@@ -251,8 +253,9 @@ public with sharing class AV_HGM_Integration {
 			String endpoint = wsc?.NamedCredential__c.replace('{surveyId}', String.valueOf(surveyId));
 			AV_LogDebug.printLogDebug(methodName,'Endpoint: ' + endpoint);
 			if(endpoint !=null){frwReq.setEndpoint(endpoint);}
+
 			//Llamamos al callot del Framework con el endpoint corregido
-			HttpResponse respuesta = CBK_HttpServiceIntegration.callHttpService(frwReq);
+			HttpResponse respuesta = CBK_HttpServiceIntegration.callHttpService(frwReq, 'CSurvey_Survey', namedCrName);//Rollback versión antigua
 			AV_LogDebug.printLogDebug(methodName,'respuesta: ' + respuesta);
 			if(respuesta!=null){
 				AV_LogDebug.printLogDebug(methodName,'respuesta body: ' + respuesta.getBody());

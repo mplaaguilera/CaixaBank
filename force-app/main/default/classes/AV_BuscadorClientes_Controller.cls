@@ -14,6 +14,10 @@ Historial
 	1.4         DE74258          	Patricia Solano		22/03/2022  Modified to pass quality clouds for fix of method getNumberOfCustomers
     1.5         DE79573             Oscar Moreno        07/07/2023  Change searchOffice method to show the assigned office and lower offices
 	1.6         US587408        	Ángel Medina        14/07/2023  Added AV_Group__c and AV_InterlocName__c to retrieved fields
+	1.7         DE85269             Oscar Moreno        14/11/2023  Modify mapCarteras method to display records of AV_BookMemeber based on AV_CarteraPrincipal__c field
+	1.8		    Fix PMD Errors 		Daniel Rodriguez	30/10/2023	Check if parameters isEmpty in queries
+	1.9         IN1180012          	Oscar Moreno        11/09/2024  Modify getCustomers method.Modify query if  carterafilter  is blank or not
+	2.0			PPM100492394		Ángel Medina		30/09/2024	Modify getCustomers and getEmployees methods for add multigestor
 ***********************************************************************************************************************/
 public without sharing class AV_BuscadorClientes_Controller {
     
@@ -93,97 +97,273 @@ public without sharing class AV_BuscadorClientes_Controller {
 	String preconMaxFilter, String targetAutoFilter, String page, String grupo, String interlocName) {
         String methodName = 'getCustomers';
         String query;
+		
+		
 		Integer totalSize;
         Set<String> fields = new Set<String>{
-            'Id', 'Name', 'CC_Numero_Documento__c', 'AV_Age__c', 'AV_Ingresos__c', 'AV_AhorroEInversion__c',
+			'Id', 'Name', 'CC_Numero_Documento__c', 'AV_Age__c', 'AV_Ingresos__c', 'AV_AhorroEInversion__c',
             'AV_Financiacion__c', 'AV_Rentabilidad__c', 'AV_Vinculacion__c', 'AV_Satisfaccion__c',
-            'AV_EAPGestor__c', 'AV_EAPGestor__r.Name', 'Owner.AV_NumeroOficinaEmpresa__c', 'AV_Preconceived__c', 'AV_Group__c', 'AV_InterlocName__c'
+            'AV_EAPGestor__c', 'AV_EAPGestor__r.Name', 'Owner.AV_NumeroOficinaEmpresa__c', 'AV_Preconceived__c', 'AV_Group__c', 'AV_InterlocName__c'	
+				
         };
+		
+		
+		Set<String> fields2 = new Set<String>{
+			
+			'AV_Cliente__r.Id', 'AV_Cliente__r.Name', 'AV_Cliente__r.CC_Numero_Documento__c', 'AV_Cliente__r.AV_Age__c', 'AV_Cliente__r.AV_Ingresos__c', 'AV_Cliente__r.AV_AhorroEInversion__c',
+			'AV_Cliente__r.AV_Financiacion__c', 'AV_Cliente__r.AV_Rentabilidad__c', 'AV_Cliente__r.AV_Vinculacion__c', 'AV_Cliente__r.AV_Satisfaccion__c',
+			'AV_Cliente__r.AV_EAPGestor__c', 'AV_Cliente__r.AV_EAPGestor__r.Name', 'AV_Cliente__r.Owner.AV_NumeroOficinaEmpresa__c', 'AV_Cliente__r.AV_Preconceived__c', 'AV_Cliente__r.AV_Group__c', 'AV_Cliente__r.AV_InterlocName__c',
+			'AV_Cliente__r.AV_AttentionModel__c','AV_Cliente__r.AV_Negocio__c','AV_Cliente__r.AV_MyBox__c','AV_Cliente__r.AV_TargetAuto__c','AV_Cartera__r.AV_ExternalID__c','AV_Cartera__r.name,AV_CarteraPrincipal__c'
+			
+		};
+		
+		
         String toLabelFields = 'TOLABEL(AV_AttentionModel__c), TOLABEL(AV_Negocio__c), TOLABEL(Account.AV_MyBox__c), TOLABEL(Account.AV_TargetAuto__c)';
 		Set<String> rtDevNames = new Set<String>{AV_AppConstants.ACCOUNT_ENT_RT, AV_AppConstants.ACCOUNT_PA_RT};
-        query = 'SELECT ' + String.join(new List<String>(fields), ',') + ', ' + toLabelFields + ' FROM Account WHERE RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames);
-        if (String.isNotBlank(negocioFilter)) {
-			if ('TODOS'.equals(negocioFilter)) {
-				query += ' AND AV_Negocio__c != null';
-			} else {
-				query += ' AND AV_Negocio__c INCLUDES (\'' + negocioFilter + '\')';
+
+		ObjectList objList; 
+		
+
+		if(String.isBlank(carteraFilter)){
+			query = 'SELECT ' + String.join(new List<String>(fields), ',') + ', ' + toLabelFields + ' FROM Account WHERE RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames);
+			if (String.isNotBlank(negocioFilter)) {
+				if ('TODOS'.equals(negocioFilter)) {
+					query += ' AND AV_Negocio__c != null';
+				} else {
+					query += ' AND AV_Negocio__c INCLUDES (\'' + negocioFilter + '\')';
+				}
 			}
-		}
-		if (String.isNotBlank(modeloFilter)) {
-            query += ' AND AV_AttentionModel__c = \'' + modeloFilter + '\'';
-        }
-        if (String.isNotBlank(edadMinFilter)) {
-            query += ' AND AV_Age__c >= ' + edadMinFilter;
-        }
-		if (String.isNotBlank(edadMaxFilter)) {
-			query += ' AND AV_Age__c <= ' + edadMaxFilter;
-		}
-        if (String.isNotBlank(ingresosMinFilter)) {
-            query += ' AND AV_Ingresos__c >= ' + ingresosMinFilter;
-        }
-		if (String.isNotBlank(ingresosMaxFilter)) {
-            query += ' AND AV_Ingresos__c <= ' + ingresosMaxFilter;
-        }
-        if (String.isNotBlank(ahorroMinFilter)) {
-            query += ' AND AV_AhorroEInversion__c >= ' + ahorroMinFilter;
-        }
-		if (String.isNotBlank(ahorroMaxFilter)) {
-            query += ' AND AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
-        }
-        if (String.isNotBlank(financiacionMinFilter)) {
-            query += ' AND AV_Financiacion__c >= ' + financiacionMinFilter;
-        }
-		if (String.isNotBlank(financiacionMaxFilter)) {
-            query += ' AND AV_Financiacion__c <= ' + financiacionMaxFilter;
-        }
-        if (String.isNotBlank(rentabilidadMinFilter)) {
-            query += ' AND AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
-        }
-		if (String.isNotBlank(rentabilidadMaxFilter)) {
-            query += ' AND AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
-        }
-        if (String.isNotBlank(experienciaFilter)) {
-            query += ' AND AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
-        }
-        if (String.isNotBlank(myBoxFilter)) {
-			if (myBoxFilter == AV_AppConstants.NOT_SELECTED) {
-				query += ' AND AV_MyBox__C = null';
-			} else {
-				query += ' AND AV_MyBox__C = \'' + myBoxFilter + '\'';
+			if (String.isNotBlank(modeloFilter)) {
+				query += ' AND AV_AttentionModel__c = \'' + modeloFilter + '\'';
 			}
-		}
-		if (String.isNotBlank(preconMinFilter)) {
-			query += ' AND AV_Preconceived__c >= ' + preconMinFilter;
-		}
-		if (String.isNotBlank(preconMaxFilter)) {
-			query += ' AND AV_Preconceived__c <= ' + preconMaxFilter;
-		}
-		if (String.isNotBlank(targetAutoFilter)) {
-			if (targetAutoFilter == AV_AppConstants.NOT_SELECTED) {
-				query += ' AND AV_TargetAuto__c = null';
-			} else {
-				query += ' AND AV_TargetAuto__c = \'' + targetAutoFilter + '\'';
+			if (String.isNotBlank(edadMinFilter)) {
+				query += ' AND AV_Age__c >= ' + edadMinFilter;
 			}
+			if (String.isNotBlank(edadMaxFilter)) {
+				query += ' AND AV_Age__c <= ' + edadMaxFilter;
+			}
+			if (String.isNotBlank(ingresosMinFilter)) {
+				query += ' AND AV_Ingresos__c >= ' + ingresosMinFilter;
+			}
+			if (String.isNotBlank(ingresosMaxFilter)) {
+				query += ' AND AV_Ingresos__c <= ' + ingresosMaxFilter;
+			}
+			if (String.isNotBlank(ahorroMinFilter)) {
+				query += ' AND AV_AhorroEInversion__c >= ' + ahorroMinFilter;
+			}
+			if (String.isNotBlank(ahorroMaxFilter)) {
+				query += ' AND AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
+			}
+			if (String.isNotBlank(financiacionMinFilter)) {
+				query += ' AND AV_Financiacion__c >= ' + financiacionMinFilter;
+			}
+			if (String.isNotBlank(financiacionMaxFilter)) {
+				query += ' AND AV_Financiacion__c <= ' + financiacionMaxFilter;
+			}
+			if (String.isNotBlank(rentabilidadMinFilter)) {
+				query += ' AND AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
+			}
+			if (String.isNotBlank(rentabilidadMaxFilter)) {
+				query += ' AND AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
+			}
+			if (String.isNotBlank(experienciaFilter)) {
+				query += ' AND AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
+			}
+			if (String.isNotBlank(myBoxFilter)) {
+				if (myBoxFilter == AV_AppConstants.NOT_SELECTED) {
+					query += ' AND AV_MyBox__C = null';
+				} else {
+					query += ' AND AV_MyBox__C = \'' + myBoxFilter + '\'';
+				}
+			}
+			if (String.isNotBlank(preconMinFilter)) {
+				query += ' AND AV_Preconceived__c >= ' + preconMinFilter;
+			}
+			if (String.isNotBlank(preconMaxFilter)) {
+				query += ' AND AV_Preconceived__c <= ' + preconMaxFilter;
+			}
+			if (String.isNotBlank(targetAutoFilter)) {
+				if (targetAutoFilter == AV_AppConstants.NOT_SELECTED) {
+					query += ' AND AV_TargetAuto__c = null';
+				} else {
+					query += ' AND AV_TargetAuto__c = \'' + targetAutoFilter + '\'';
+				}
+			}
+			if (employeeFilter!=null && !employeeFilter.isEmpty()) {
+
+				String multigeUser;
+				List<User> currentUser = [SELECT Id,AV_NumeroOficinaEmpresa__c,AV_Pool__c FROM User WHERE Id = :UserInfo.getUserId()];
+				if(currentUser != null){
+					multigeUser = AV_PoolEvents_Controller.getCurrentDT(currentUser[0].AV_NumeroOficinaEmpresa__c);
+				}
+				if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1 ) {
+					query += ' AND OwnerId = \''+ID_GCF+'\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \''+office+'\'';
+				} else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size() == 1) {
+					String employeeFilterWithoutGCF = employeeFilter[0].remove(ID_GCF+',');
+					List<String> employeeIds = employeeFilterWithoutGCF.split(',');
+					if (!employeeIds.contains(multigeUser)) {
+						employeeIds.add(multigeUser); 
+					}
+					query += ' AND (OwnerId IN ' + AV_AppUtilities.arrayToStringIn(employeeIds) + ' OR (OwnerId = \'' + ID_GCF + '\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \'' + office + '\'))';
+				}
+				else if (employeeFilter.contains(ID_GCF)) {				
+					query += ' AND Owner.AV_NumeroOficinaEmpresa__c = \'001-'+office+'\'';
+				} else if (employeeFilter.contains(multigeUser)) {				
+					query += ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter) + ' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \'' + office + '\'';
+				} else {		
+					query += ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
+				}
+			}
+
+			query += ' LIMIT ' + Integer.valueOf(page)*100 + ' OFFSET ' + (Integer.valueOf(page)-1)*100;
+			query = query.replaceAll('[{}]', '');
+			AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + query);
+			List<Account> queryResult = capsulateQuery(query);
+			List<AV_BookMember__c> carteras = getCarteras(queryResult, carteraFilter);
+			List<ClientData> data = mapClientData(queryResult, carteras, carteraFilter);
+			totalSize = '1'.equals(page) ? getNumberOfCustomers(office, negocioFilter, employeeFilter, carteraFilter, modeloFilter, edadMinFilter, edadMaxFilter, ingresosMinFilter, ingresosMaxFilter, ahorroMinFilter, ahorroMaxFilter, financiacionMinFilter, financiacionMaxFilter, rentabilidadMinFilter, rentabilidadMaxFilter, experienciaFilter, myBoxFilter, preconMinFilter, preconMaxFilter, targetAutoFilter, page) : -1;
+			return objList =  new ObjectList('Account', totalSize, data);
+
+		}else{
+			if (carteraFilter.contains(',')) { // varias carteras envolver con comillas
+				List<String> carterasList = carteraFilter.split(',');
+				for (Integer i = 0; i < carterasList.size(); i++) {
+					carterasList[i] = '\'' + carterasList[i] + '\'';
+				}
+				carteraFilter = String.join(carterasList, ',');
+			}else{   //unica cartera
+				 carteraFilter = '\'' + carteraFilter + '\'';
+			}
+			
+			
+			query = 'SELECT  '+ String.join(new List<String>(fields2), ',')+ ' FROM AV_BookMember__c WHERE AV_Cliente__r.RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames) + ' AND AV_Cartera__c IN ('+ carteraFilter+') ';
+			if (String.isNotBlank(negocioFilter)) {
+				if ('TODOS'.equals(negocioFilter)) {
+					query += ' AND AV_Cliente__r.AV_Negocio__c != null';
+				} else {
+					query += ' AND AV_Cliente__r.AV_Negocio__c INCLUDES (\'' + negocioFilter + '\')';
+				}
+			}
+			if (String.isNotBlank(modeloFilter)) {
+				query += ' AND AV_Cliente__r.AV_AttentionModel__c = \'' + modeloFilter + '\'';
+			}
+			if (String.isNotBlank(edadMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_Age__c >= ' + edadMinFilter;
+			}
+			if (String.isNotBlank(edadMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_Age__c <= ' + edadMaxFilter;
+			}
+			if (String.isNotBlank(ingresosMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_Ingresos__c >= ' + ingresosMinFilter;
+			}
+			if (String.isNotBlank(ingresosMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_Ingresos__c <= ' + ingresosMaxFilter;
+			}
+			if (String.isNotBlank(ahorroMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_AhorroEInversion__c >= ' + ahorroMinFilter;
+			}
+			if (String.isNotBlank(ahorroMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
+			}
+			if (String.isNotBlank(financiacionMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_Financiacion__c >= ' + financiacionMinFilter;
+			}
+			if (String.isNotBlank(financiacionMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_Financiacion__c <= ' + financiacionMaxFilter;
+			}
+			if (String.isNotBlank(rentabilidadMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
+			}
+			if (String.isNotBlank(rentabilidadMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
+			}
+			if (String.isNotBlank(experienciaFilter)) {
+				query += ' AND AV_Cliente__r.AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
+			}
+			if (String.isNotBlank(myBoxFilter)) {
+				if (myBoxFilter == AV_AppConstants.NOT_SELECTED) {
+					query += ' AND AV_Cliente__r.AV_MyBox__C = null';
+				} else {
+					query += ' AND AV_Cliente__r.AV_MyBox__C = \'' + myBoxFilter + '\'';
+				}
+			}
+			if (String.isNotBlank(preconMinFilter)) {
+				query += ' AND AV_Cliente__r.AV_Preconceived__c >= ' + preconMinFilter;
+			}
+			if (String.isNotBlank(preconMaxFilter)) {
+				query += ' AND AV_Cliente__r.AV_Preconceived__c <= ' + preconMaxFilter;
+			}
+			if (String.isNotBlank(targetAutoFilter)) {
+				if (targetAutoFilter == AV_AppConstants.NOT_SELECTED) {
+					query += ' AND AV_Cliente__r.AV_TargetAuto__c = null';
+				} else {
+					query += ' AND AV_Cliente__r.AV_TargetAuto__c = \'' + targetAutoFilter + '\'';
+				}
+			}
+			
+			query += ' LIMIT ' + Integer.valueOf(page)*100 + ' OFFSET ' + (Integer.valueOf(page)-1)*100;
+			query = query.replaceAll('[{}]', '');
+			List<AV_BookMember__c> carteras =  capsulateQuery2(query);
+			List<ClientData> data = new List<ClientData>();
+			if(carteras!= null && !carteras.isEmpty()){
+				for(AV_BookMember__c bm: carteras){
+					ClientData cd = new ClientData();
+					cd.cartera = bm;
+					cd.modelo = bm.AV_Cliente__r.AV_AttentionModel__c;
+					cd.id = bm.AV_Cliente__r.Id;
+					cd.name = bm.AV_Cliente__r.Name;
+					cd.nif = bm.AV_Cliente__r.CC_Numero_Documento__c;
+					cd.edad = (Integer) bm.AV_Cliente__r.AV_Age__c;
+					if(bm.AV_Cliente__r.AV_Ingresos__c != null){
+						cd.ingresos = bm.AV_Cliente__r.AV_Ingresos__c;
+					}else{
+						cd.ingresos = 0;
+					}
+					if(bm.AV_Cliente__r.AV_AhorroEInversion__c != null){
+						cd.ahorro = bm.AV_Cliente__r.AV_AhorroEInversion__c;
+
+					}else{
+						cd.ahorro = 0;
+					}
+					if(bm.AV_Cliente__r.AV_Financiacion__c != null){
+						cd.financiacion = bm.AV_Cliente__r.AV_Financiacion__c;
+
+					}else{
+						cd.financiacion = 0;
+					}if(bm.AV_Cliente__r.AV_Rentabilidad__c != null){
+						cd.rentabilidad = bm.AV_Cliente__r.AV_Rentabilidad__c;
+					}else{
+						cd.rentabilidad = 0;
+					}
+					cd.negocio = bm.AV_Cliente__r.AV_Negocio__c;
+					cd.vinculacion = bm.AV_Cliente__r.AV_Vinculacion__c;
+					if(bm.AV_Cliente__r.AV_Satisfaccion__c == AV_AppConstants.ZERO){
+						cd.experiencia = null;
+					}else{
+						cd.experiencia = bm.AV_Cliente__r.AV_Satisfaccion__c;
+					}
+
+					cd.gestorId = bm.AV_Cliente__r.AV_EAPGestor__c;
+					cd.gestorName = bm.AV_Cliente__r.AV_EAPGestor__r.Name;
+					cd.office = bm.AV_Cliente__r.Owner.AV_NumeroOficinaEmpresa__c;
+					cd.myBox = bm.AV_Cliente__r.AV_MyBox__c;
+					if(bm.AV_Cliente__r.AV_Preconceived__c != null){
+						cd.precon = bm.AV_Cliente__r.AV_Preconceived__c;
+					}else{
+						cd.precon = 0;
+					}
+					cd.targetAuto = bm.AV_Cliente__r.AV_TargetAuto__c;
+					cd.grupo = bm.AV_Cliente__r.AV_Group__c;
+					cd.interlocName = bm.AV_Cliente__r.AV_InterlocName__c;
+					data.add(cd);
+				}
+			}
+			
+			totalSize = '1'.equals(page) ? getNumberOfCustomersBookMember(office, negocioFilter, employeeFilter, carteraFilter, modeloFilter, edadMinFilter, edadMaxFilter, ingresosMinFilter, ingresosMaxFilter, ahorroMinFilter, ahorroMaxFilter, financiacionMinFilter, financiacionMaxFilter, rentabilidadMinFilter, rentabilidadMaxFilter, experienciaFilter, myBoxFilter, preconMinFilter, preconMaxFilter, targetAutoFilter, page) : -1;
+			return objList =  new ObjectList('Account', totalSize, data);	
 		}
-		if (employeeFilter!=null && !employeeFilter.isEmpty()) {
-			if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1) {
-				query += ' AND OwnerId = \''+ID_GCF+'\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \''+office+'\'';
-            } else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size()==1) {
-				query += ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \''+office+'\'))';
-            } else if (employeeFilter.contains(ID_GCF)) {
-				query += ' AND Owner.AV_NumeroOficinaEmpresa__c = \'001-'+office+'\'';
-            } else {
-				query += ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
-            }
-		}
-		query += ' LIMIT ' + Integer.valueOf(page)*100 + ' OFFSET ' + (Integer.valueOf(page)-1)*100;
-		query = query.replaceAll('[{}]', '');
-		AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + query);
-		List<Account> queryResult = capsulateQuery(query);
-		List<AV_BookMember__c> carteras = getCarteras(queryResult, carteraFilter);
-		List<ClientData> data = mapClientData(queryResult, carteras, carteraFilter);
-		totalSize = '1'.equals(page) ? getNumberOfCustomers(office, negocioFilter, employeeFilter, carteraFilter, modeloFilter, edadMinFilter, edadMaxFilter, ingresosMinFilter, ingresosMaxFilter, ahorroMinFilter, ahorroMaxFilter, financiacionMinFilter, financiacionMaxFilter, rentabilidadMinFilter, rentabilidadMaxFilter, experienciaFilter, myBoxFilter, preconMinFilter, preconMaxFilter, targetAutoFilter, page) : -1;
-		return new ObjectList('Account', totalSize, data);
+
+		
     }
 
 
@@ -221,8 +401,9 @@ public without sharing class AV_BuscadorClientes_Controller {
         String query;
 		Integer result;
 		Set<String> rtDevNames = new Set<String>{AV_AppConstants.ACCOUNT_ENT_RT, AV_AppConstants.ACCOUNT_PA_RT};
-        query = 'SELECT COUNT(Id) FROM Account WHERE RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames);
-        if (String.isNotBlank(negocioFilter)) {
+		
+		query = 'SELECT COUNT(Id) FROM Account WHERE RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames);
+		if (String.isNotBlank(negocioFilter)) {
 			if ('TODOS'.equals(negocioFilter)) {
 				query += ' AND AV_Negocio__c != null';
 			} else {
@@ -230,42 +411,42 @@ public without sharing class AV_BuscadorClientes_Controller {
 			}
 		}
 		if (String.isNotBlank(modeloFilter)) {
-            query += ' AND AV_AttentionModel__c = \'' + modeloFilter + '\'';
-        }
-        if (String.isNotBlank(edadMinFilter)) {
-            query += ' AND AV_Age__c >= ' + edadMinFilter;
-        }
+			query += ' AND AV_AttentionModel__c = \'' + modeloFilter + '\'';
+		}
+		if (String.isNotBlank(edadMinFilter)) {
+			query += ' AND AV_Age__c >= ' + edadMinFilter;
+		}
 		if (String.isNotBlank(edadMaxFilter)) {
 			query += ' AND AV_Age__c <= ' + edadMaxFilter;
 		}
-        if (String.isNotBlank(ingresosMinFilter)) {
-            query += ' AND AV_Ingresos__c >= ' + ingresosMinFilter;
-        }
+		if (String.isNotBlank(ingresosMinFilter)) {
+			query += ' AND AV_Ingresos__c >= ' + ingresosMinFilter;
+		}
 		if (String.isNotBlank(ingresosMaxFilter)) {
-            query += ' AND AV_Ingresos__c <= ' + ingresosMaxFilter;
-        }
-        if (String.isNotBlank(ahorroMinFilter)) {
-            query += ' AND AV_AhorroEInversion__c >= ' + ahorroMinFilter;
-        }
+			query += ' AND AV_Ingresos__c <= ' + ingresosMaxFilter;
+		}
+		if (String.isNotBlank(ahorroMinFilter)) {
+			query += ' AND AV_AhorroEInversion__c >= ' + ahorroMinFilter;
+		}
 		if (String.isNotBlank(ahorroMaxFilter)) {
-            query += ' AND AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
-        }
-        if (String.isNotBlank(financiacionMinFilter)) {
-            query += ' AND AV_Financiacion__c >= ' + financiacionMinFilter;
-        }
+			query += ' AND AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
+		}
+		if (String.isNotBlank(financiacionMinFilter)) {
+			query += ' AND AV_Financiacion__c >= ' + financiacionMinFilter;
+		}
 		if (String.isNotBlank(financiacionMaxFilter)) {
-            query += ' AND AV_Financiacion__c <= ' + financiacionMaxFilter;
-        }
-        if (String.isNotBlank(rentabilidadMinFilter)) {
-            query += ' AND AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
-        }
+			query += ' AND AV_Financiacion__c <= ' + financiacionMaxFilter;
+		}
+		if (String.isNotBlank(rentabilidadMinFilter)) {
+			query += ' AND AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
+		}
 		if (String.isNotBlank(rentabilidadMaxFilter)) {
-            query += ' AND AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
-        }
-        if (String.isNotBlank(experienciaFilter)) {
-            query += ' AND AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
-        }
-        if (String.isNotBlank(myBoxFilter)) {
+			query += ' AND AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
+		}
+		if (String.isNotBlank(experienciaFilter)) {
+			query += ' AND AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
+		}
+		if (String.isNotBlank(myBoxFilter)) {
 			if (myBoxFilter == AV_AppConstants.NOT_SELECTED) {
 				query += ' AND AV_MyBox__C = null';
 			} else {
@@ -286,21 +467,146 @@ public without sharing class AV_BuscadorClientes_Controller {
 			}
 		}
 		if (employeeFilter!=null && !employeeFilter.isEmpty()) {
+
+			String multigeUser;
+			List<User> currentUser = [SELECT Id,AV_NumeroOficinaEmpresa__c,AV_Pool__c FROM User WHERE Id = :UserInfo.getUserId()];
+			if(currentUser != null){
+				multigeUser = AV_PoolEvents_Controller.getCurrentDT(currentUser[0].AV_NumeroOficinaEmpresa__c);
+			}
 			if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1) {
 				query += ' AND OwnerId = \''+ID_GCF+'\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \''+office+'\'';
-            } else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size()==1) {
-				query += ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \''+office+'\'))';
-            } else if (employeeFilter.contains(ID_GCF)) {
+			} else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size() == 1) {
+				String employeeFilterWithoutGCF = employeeFilter[0].remove(ID_GCF+',');
+				List<String> employeeIds = employeeFilterWithoutGCF.split(',');
+				if (!employeeIds.contains(multigeUser)) {
+					employeeIds.add(multigeUser); 
+				}
+				query += ' AND (OwnerId IN ' + AV_AppUtilities.arrayToStringIn(employeeIds) + ' OR (OwnerId = \'' + ID_GCF + '\' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \'' + office + '\'))';
+			} else if (employeeFilter.contains(ID_GCF)) {
 				query += ' AND Owner.AV_NumeroOficinaEmpresa__c = \'001-'+office+'\'';
-            } else {
+			}else if (employeeFilter.contains(multigeUser)) {				
+				query += ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter) + ' AND AV_OficinaPrincipal__r.CC_Numero_Oficina__c = \'' + office + '\'';
+			}
+			else {
 				query += ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
-            }
+			}
 		}
+			
 		query = query.replaceAll('[{}]', '');
 		AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + query);
 		result = Integer.valueOf(capsulateQueryAggregateResult(query).get(0).get('expr0'));
+		
 		return result;
 	}
+
+	/**
+	 * @description		Get the total number of records of the query used in getCustomers (without 
+	 * OFFSET and LIMIT)
+	 * @param office	 for the customer's office
+	 * @param negocioFilter	Filter for the customer's business type
+	 * @param employeeFilter	Filter for employees related to the customer
+	 * @param carteraFilter	Filter for the customer's portfolio type
+	 * @param modeloFilter	Filter for the customer's model
+	 * @param edadMinFilter	Filter for the customer's minimum age
+	 * @param edadMaxFilter	Filter for the customer's maximum age
+	 * @param ingresosMinFilter	 Filter for the customer's minimum income
+	 * @param ingresosMaxFilter	Filter for the customer's maximum income
+	 * @param ahorroMinFilter	Filter for the customer's minimum savings
+	 * @param ahorroMaxFilter	Filter for the customer's maximum savings
+	 * @param financiacionMinFilter	Filter for the customer's minimum financing amount
+	 * @param financiacionMaxFilter	Filter for the customer's maximum financing amount
+	 * @param rentabilidadMinFilter	Filter for the customer's minimum profitability
+	 * @param rentabilidadMaxFilter	Filter for the customer's maximum profitability
+	 * @param experienciaFilter	Filter for the customer's experience
+	 * @param myBoxFilter	Filter for the customer's "myBox" status
+	 * @param preconMinFilter	Filter for the customer's minimum precon value
+	 * @param preconMaxFilter	Filter for the customer's maximum precon value
+	 * @param targetAutoFilter	Filter for the customer's car target
+	 * @param page	Page number for result pagination
+	 */
+	public static Integer getNumberOfCustomersBookMember(String office, String negocioFilter, String[] employeeFilter,
+	String carteraFilter, String modeloFilter, String edadMinFilter, String edadMaxFilter, String ingresosMinFilter,
+	String ingresosMaxFilter, String ahorroMinFilter, String ahorroMaxFilter, String financiacionMinFilter, String financiacionMaxFilter,
+	String rentabilidadMinFilter, String rentabilidadMaxFilter, String experienciaFilter, String myBoxFilter, String preconMinFilter,
+	String preconMaxFilter, String targetAutoFilter, String page) {
+		String methodName = 'getNumberOfCustomers';
+        String query;
+		Integer result;
+		Set<String> rtDevNames = new Set<String>{AV_AppConstants.ACCOUNT_ENT_RT, AV_AppConstants.ACCOUNT_PA_RT};
+
+		
+		query = 'SELECT  COUNT(Id) FROM AV_BookMember__c WHERE AV_Cliente__r.RecordType.DeveloperName IN ' + AV_AppUtilities.setToStringIn(rtDevNames) + ' AND AV_Cartera__c IN ('+carteraFilter+') ';
+		if (String.isNotBlank(negocioFilter)) {
+			if ('TODOS'.equals(negocioFilter)) {
+				query += ' AND AV_Cliente__r.AV_Negocio__c != null';
+			} else {
+				query += ' AND AV_Cliente__r.AV_Negocio__c INCLUDES (\'' + negocioFilter + '\')';
+			}
+		}
+		if (String.isNotBlank(modeloFilter)) {
+			query += ' AND AV_Cliente__r.AV_AttentionModel__c = \'' + modeloFilter + '\'';
+		}
+		if (String.isNotBlank(edadMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_Age__c >= ' + edadMinFilter;
+		}
+		if (String.isNotBlank(edadMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_Age__c <= ' + edadMaxFilter;
+		}
+		if (String.isNotBlank(ingresosMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_Ingresos__c >= ' + ingresosMinFilter;
+		}
+		if (String.isNotBlank(ingresosMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_Ingresos__c <= ' + ingresosMaxFilter;
+		}
+		if (String.isNotBlank(ahorroMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_AhorroEInversion__c >= ' + ahorroMinFilter;
+		}
+		if (String.isNotBlank(ahorroMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_AhorroEInversion__c <= ' + ahorroMaxFilter;
+		}
+		if (String.isNotBlank(financiacionMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_Financiacion__c >= ' + financiacionMinFilter;
+		}
+		if (String.isNotBlank(financiacionMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_Financiacion__c <= ' + financiacionMaxFilter;
+		}
+		if (String.isNotBlank(rentabilidadMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_Rentabilidad__c >= ' + rentabilidadMinFilter;
+		}
+		if (String.isNotBlank(rentabilidadMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_Rentabilidad__c <= ' + rentabilidadMaxFilter;
+		}
+		if (String.isNotBlank(experienciaFilter)) {
+			query += ' AND AV_Cliente__r.AV_Satisfaccion__c = \'' + experienciaFilter + '\'';
+		}
+		if (String.isNotBlank(myBoxFilter)) {
+			if (myBoxFilter == AV_AppConstants.NOT_SELECTED) {
+				query += ' AND AV_Cliente__r.AV_MyBox__C = null';
+			} else {
+				query += ' AND AV_Cliente__r.AV_MyBox__C = \'' + myBoxFilter + '\'';
+			}
+		}
+		if (String.isNotBlank(preconMinFilter)) {
+			query += ' AND AV_Cliente__r.AV_Preconceived__c >= ' + preconMinFilter;
+		}
+		if (String.isNotBlank(preconMaxFilter)) {
+			query += ' AND AV_Cliente__r.AV_Preconceived__c <= ' + preconMaxFilter;
+		}
+		if (String.isNotBlank(targetAutoFilter)) {
+			if (targetAutoFilter == AV_AppConstants.NOT_SELECTED) {
+				query += ' AND AV_Cliente__r.AV_TargetAuto__c = null';
+			} else {
+				query += ' AND AV_Cliente__r.AV_TargetAuto__c = \'' + targetAutoFilter + '\'';
+			}
+		}
+			
+		query = query.replaceAll('[{}]', '');
+		AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + query);
+		result = Integer.valueOf(capsulateQueryAggregateResult(query).get(0).get('expr0'));
+		
+		return result;
+	}
+
 
 	/**
 	 * @description		Method to pass quality clouds
@@ -316,6 +622,11 @@ public without sharing class AV_BuscadorClientes_Controller {
 		return (List<Account>) Database.query(q);
 	}
 
+
+	private static List<AV_BookMember__c> capsulateQuery2(String q){
+		return (List<AV_BookMember__c>) Database.query(q);
+	}
+
 	/**
 	 * @description		Get book info to populate lwc 'Cartera/cesta' field
 	 * @param	clients	 list of new account records
@@ -325,8 +636,11 @@ public without sharing class AV_BuscadorClientes_Controller {
 		if(carteraFilter != null){
 			if(carteraFilter.contains(',')){
 				booksList = carteraFilter.split(',');
+			}else if(carteraFilter != null){
+				booksList.add(carteraFilter);
 			}
 		}
+		
 		Map<Id, Account> clientMap = new Map<Id, Account>();
 		List<AV_BookMember__c> bmList = new List<AV_BookMember__c>();
 		if (!clients.isEmpty()) {
@@ -334,14 +648,14 @@ public without sharing class AV_BuscadorClientes_Controller {
 			if (String.isNotBlank(carteraFilter)) {
 				if(!booksList.isEmpty() && booksList != null){
 					bmList = [
-					SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c
+					SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c,AV_CarteraPrincipal__c
 					FROM AV_BookMember__c
 					WHERE AV_Cliente__c IN :clientMap.keySet() AND AV_Cartera__c IN :booksList
 				];
 
 				}else{
 					bmList = [
-						SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c
+						SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c,AV_CarteraPrincipal__c
 						FROM AV_BookMember__c
 						WHERE AV_Cliente__c IN :clientMap.keySet() AND AV_Cartera__c = :carteraFilter
 					];
@@ -349,15 +663,19 @@ public without sharing class AV_BuscadorClientes_Controller {
 				
 			} else {
 				bmList = [
-					SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c
+					SELECT AV_Cartera__c, AV_Cartera__r.AV_ExternalID__c, AV_Cliente__c,AV_CarteraPrincipal__c
 					FROM AV_BookMember__c
 					WHERE AV_Cliente__c IN :clientMap.keySet()
 				];
+				
+
 			}
 		}
+
+		
 		return bmList;
 	}
-
+ 
 	/**
 	 * @description		Get employees from the selected office
 	 * @param	oficina	for the customer's office		
@@ -370,7 +688,8 @@ public without sharing class AV_BuscadorClientes_Controller {
 		List<User> emps = new List<User>();
 		User emp = new User();
 		String offiNumber;
-		if (oficina.length() > 5) {
+		String filter = '%' + oficina;
+		if (!String.isBlank(oficina) && oficina.length() > 5) {
 			emps = [
 				SELECT Id, Name
 				FROM User
@@ -379,7 +698,6 @@ public without sharing class AV_BuscadorClientes_Controller {
 				AND AV_ProfileName__c = :AV_AppConstants.AV_PROFILE
 			];
 		} else {
-			String filter = '%' + oficina;
 			emps = [
 				SELECT Id, Name
 				FROM User
@@ -399,6 +717,17 @@ public without sharing class AV_BuscadorClientes_Controller {
 			employees.add(new optionsEmployee(ID_GCF + ',' + employeesAlls, AV_AppConstants.ALL_CENTER + oficina));
 		}
 		employees.add(new optionsEmployee(ID_GCF, AV_AppConstants.SINGESTOR_EAP_CENTRO + oficina));
+
+		List<User> currentUser = [SELECT Id,AV_NumeroOficinaEmpresa__c,AV_Pool__c FROM User WHERE Id = :UserInfo.getUserId()];
+		if(currentUser != null){
+			String multigeUser = AV_PoolEvents_Controller.getCurrentDT(currentUser[0].AV_NumeroOficinaEmpresa__c);
+			if(multigeUser != null){
+				employees.add(new optionsEmployee(multigeUser, AV_AppConstants.MULTIGENAME));
+			}
+		}
+	
+		
+		
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
@@ -410,18 +739,18 @@ public without sharing class AV_BuscadorClientes_Controller {
 	 */
 	@AuraEnabled
 	public static List<OptionsBook> getBooks(String employeeId){
-
 		List<OptionsBook> books = new List<OptionsBook>();
 		List<OptionsBook> booksSorted = new List<OptionsBook>();
 		List<Id> booksId = new List<Id>();
 
 		List<AV_BookManagementMember__c> bmm = new List<AV_BookManagementMember__c>();
-		bmm = [
-				SELECT Id, AV_Cartera__c, AV_ExternalID__c, AV_EmpleadoGestor__r.Name
-				FROM AV_BookManagementMember__c
-				WHERE AV_EmpleadoGestor__r.AV_UsuarioAsociado__c = :employeeId
-			];
-		
+		if(!String.isBlank(employeeId)){
+			bmm = [
+					SELECT Id, AV_Cartera__c, AV_ExternalID__c, AV_EmpleadoGestor__r.Name
+					FROM AV_BookManagementMember__c
+					WHERE AV_EmpleadoGestor__r.AV_UsuarioAsociado__c = :employeeId AND AV_CarteraActiva__c != 'N'
+				];
+		}
 		if(!bmm.isEmpty() && bmm != null){
 			for(AV_BookManagementMember__c b : bmm){
 				booksId.add(b.AV_Cartera__c);
@@ -453,25 +782,29 @@ public without sharing class AV_BuscadorClientes_Controller {
 		searchTerm +='*';
 		List<AV_LookupSearchResult> results = new List<AV_LookupSearchResult>();
 		List<List<SObject>> searchResults = new List<List<SObject>>();
+		Account centroUsuario = new Account();
 		User currentUser = [
 			SELECT AV_Funcion__c, AV_NumeroOficinaEmpresa__c, AV_OriginalOfficeNumber__c
 			FROM User
 			WHERE Id = :UserInfo.getUserId()
 		];
+		
 	
 		Set<Id> offices;
 		if (currentUser.AV_OriginalOfficeNumber__c != null) {
 			offices = AV_MassReassignOwner_Controller.getInferiorCenterIds(currentUser);
 		}else {
 			offices = AV_MassReassignOwner_Controller.getInferiorCenterIds();
+			
 		}
-		
-		Account centroUsuario = [
-            SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
-            FROM Account
-            WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c
-        ];
-
+		if(!String.isBlank(currentUser.AV_NumeroOficinaEmpresa__c)){
+			centroUsuario = [
+				SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
+				FROM Account
+				WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c
+			];
+			
+		}
 
 		if (String.isNotBlank(currentUser.AV_Funcion__c) && directores.contains(currentUser.AV_Funcion__c)) {
 			if(!selectedIds.isEmpty()){
@@ -602,6 +935,7 @@ public without sharing class AV_BuscadorClientes_Controller {
 		}	
 		
 		
+		
 		String productIcon = 'standard:account';
 		Account[] listAccount = (List<Account>) searchResults[0];
 		for (Account acc : listAccount) {
@@ -626,25 +960,22 @@ public without sharing class AV_BuscadorClientes_Controller {
      */
     public static List<Account> getInferiorCenters(List<Id> superiorCenters) {
 		List<Account> centrosInferioresTotales = new List<Account>();
-        List<Account> inferiorCenters = [
-            SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
-            FROM Account
-            WHERE AV_CentroSuperior__c IN :superiorCenters
-        ];
-		for(Account a: inferiorCenters){
-			centrosInferioresTotales.add(a);
-    }
+		if(!superiorCenters.isEmpty()){
+			List<Account> inferiorCenters = [
+				SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
+				FROM Account
+				WHERE AV_CentroSuperior__c IN :superiorCenters
+			];
 
+			centrosInferioresTotales.addAll(inferiorCenters);
 
-		List<Account> inferiorCenters2 =[
-			SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
-            FROM Account
-            WHERE AV_CentroSuperior__c IN : inferiorCenters
-		];
-		for(Account a: inferiorCenters2){
-			centrosInferioresTotales.add(a);
+			List<Account> inferiorCenters2 =[
+				SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
+				FROM Account
+				WHERE AV_CentroSuperior__c IN : inferiorCenters
+			];
+			centrosInferioresTotales.addAll(inferiorCenters2);
 		}
-        
 		return centrosInferioresTotales;
     }
 
@@ -669,6 +1000,7 @@ public without sharing class AV_BuscadorClientes_Controller {
 	 * @param carteraFilter Filter for the customer's portfolio type
 	 */
 	public static List<ClientData> mapClientData(List<Account> clients, List<AV_BookMember__c> carteras, String carteraFilter) {
+
 		List<ClientData> data = new List<ClientData>();
 		Map<Id, AV_BookMember__c> bookMap = new Map<Id, AV_BookMember__c>();
 		if (!clients.isEmpty()) {
@@ -676,6 +1008,7 @@ public without sharing class AV_BuscadorClientes_Controller {
 			for (Account cli : clients) {
 				// if filtered by cartera only show customers with specified cartera
 				if (String.isNotBlank(carteraFilter) && bookMap.get(cli.Id) == null) {
+					
 					continue;
 				}
 				ClientData cd = new ClientData();
@@ -724,11 +1057,12 @@ public without sharing class AV_BuscadorClientes_Controller {
 					cd.precon = 0;
 				}
 				cd.targetAuto = cli.AV_TargetAuto__c;
-				//cd.grupo = cli.AV_Group__c;
-				//cd.interlocName = cli.AV_InterlocName__c;
+				cd.grupo = cli.AV_Group__c;
+				cd.interlocName = cli.AV_InterlocName__c;
 				data.add(cd);
 			}
 		}
+		
 		return data;
 	}
 
@@ -737,14 +1071,44 @@ public without sharing class AV_BuscadorClientes_Controller {
 	 * @param carteras list of carteras records
 	 */
 	public static Map<Id, AV_BookMember__c> mapCarteras(List<AV_BookMember__c> carteras) {
-		Map<Id, AV_BookMember__c> bookMap = new Map<Id, AV_BookMember__c>();
+
+		Map<Id, List<AV_BookMember__c>> bookMap = new Map<Id, List<AV_BookMember__c>>();
+		
 		if (!carteras.isEmpty()) {
 			for (AV_BookMember__c cartera : carteras) {
-				bookMap.put(cartera.AV_Cliente__c, cartera);
+				//compruebo si ya existe el cliente de las carteras en las listas ya incializadas
+				if(bookMap.containsKey(cartera.AV_Cliente__c)){
+					List<AV_BookMember__c> bookMemberList = bookMap.get(cartera.AV_Cliente__c);
+					bookMemberList.add(cartera);
+
+				}else{
+					//inicializo nuevas listas si no existe el cliente
+					List<AV_BookMember__c> newBookMemberList = new List<AV_BookMember__c>{cartera};
+					bookMap.put(cartera.AV_Cliente__c,newBookMemberList);
+				}
+			}
+			
+		}
+
+		Map<Id, AV_BookMember__c> mapDef = new  Map<Id, AV_BookMember__c>();
+		if(bookMap!=null){
+			for(Id key: bookMap.keySet()){
+				List<AV_BookMember__c> bookMemberList = bookMap.get(key);
+				
+				for(AV_BookMember__c bm: bookMemberList){
+					if(bm.AV_CarteraPrincipal__c != true){				        
+						mapdef.put(bm.AV_Cliente__c,bm);						
+					}else{				        
+						mapdef.put(bm.AV_Cliente__c,bm);
+						break;
+					}
+				}
 			}
 		}
-		return bookMap;
+		return mapDef;	
 	}
+
+
 
 	/**
 	 * Type of object used to encapsulate the list of records and the total number of records
@@ -785,19 +1149,18 @@ public without sharing class AV_BuscadorClientes_Controller {
 			this.label = label;
 			this.value = value;		
 		}
-		 // Implement the compareTo() method
-		 public Integer compareTo(Object compareTo) {
-			OptionsEmployee compareToEmp = (OptionsEmployee)compareTo;
-			 if (this.label > compareToEmp.label) {
-                return 1;
-            }
-
-            if (this.label == compareToEmp.label) {
-                return 0;
-            }
-
-            return -1;        
+		public Integer compareTo(Object compareTo) {
+		OptionsEmployee compareToEmp = (OptionsEmployee)compareTo;
+			if (this.label > compareToEmp.label) {
+			return 1;
 		}
+
+		if (this.label == compareToEmp.label) {
+			return 0;
+		}
+
+		return -1;        
+	}
 	}
 
 	public class OptionsBook implements Comparable{

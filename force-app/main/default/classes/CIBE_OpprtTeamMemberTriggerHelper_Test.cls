@@ -17,13 +17,11 @@ public with sharing class CIBE_OpprtTeamMemberTriggerHelper_Test {
     @TestSetup
     static void setup() {
         CIBE_TestInitialSetup.setupInitialDataCIB();
-        User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-
-        System.runAs(new User(Id = UserInfo.getUserId())){
-            User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
+        User gest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        User admin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
+        System.runAs(admin){
             Contact c = [SELECT Id FROM Contact WHERE CC_Matricula__c = 'U0000001'];
             Account accTest = CIBE_TestHelper.createCustomerWithEAPGestor(c);
-            
             RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVACIB_RT);
             Opportunity opp = new Opportunity();
             opp.AccountId = accTest.Id;
@@ -32,7 +30,7 @@ public with sharing class CIBE_OpprtTeamMemberTriggerHelper_Test {
             opp.RecordTypeId = rt.Id;
             opp.CloseDate = System.today() + 5;
             opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
-            opp.OwnerId = u.Id;
+            opp.OwnerId = gest.Id;
             insert opp;
         }
     }
@@ -40,12 +38,11 @@ public with sharing class CIBE_OpprtTeamMemberTriggerHelper_Test {
     @isTest
     static void setOpportunityUsersTest() {
         User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-
+        User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
+        List<OpportunityTeamMember> opporTM = new List<OpportunityTeamMember>();
+        List<Opportunity> opps = [SELECT Id, OwnerId, AccountId FROM Opportunity WHERE Name = 'Test Alerta Comercial' AND OwnerId = :usuario.Id];
         System.runAs(usuario){
-            User usrTest = [SELECT Id  FROM User WHERE Alias = 'tsAlias' AND Profile.Name = 'CIBE_Gestor'];
-            List<OpportunityTeamMember> opporTM = new List<OpportunityTeamMember>();
 
-            List<Opportunity> opps = [SELECT Id, OwnerId, AccountId FROM Opportunity WHERE Name = 'Test Alerta Comercial' AND OwnerId = :usuario.Id];
             OpportunityTeamMember otm = new OpportunityTeamMember();
             otm.OpportunityId = opps[0].Id;
             otm.UserId = usrTest.Id;
@@ -63,13 +60,10 @@ public with sharing class CIBE_OpprtTeamMemberTriggerHelper_Test {
                 System.assert(oppList[0].CIBE_OpportunityTeam__c != null);
                 System.assertEquals(true, oppList[0].CIBE_OpportunityTeamMember__c);
                 System.assert(oppList[0].CIBE_OpportunityTeam__c.contains(usuario.Id));
-
-                List<OpportunityTeamMember> deleteOTM = [SELECT Id FROM OpportunityTeamMember WHERE UserId = :usrTest.Id];
+                List<OpportunityTeamMember> deleteOTM = [SELECT Id, opportunityId, UserId FROM OpportunityTeamMember WHERE UserId = :usuario.Id AND OpportunityId =:opps[0].Id];
                 delete deleteOTM;
                 List<Opportunity> oppList2 = [SELECT Id, CIBE_OpportunityTeam__c, CIBE_OpportunityTeamMember__c, OwnerId  FROM Opportunity WHERE Id = :opps[0].Id];
-                System.assert(!oppList2[0].CIBE_OpportunityTeam__c.contains(usrTest.Id));
-
-
+                System.assert(oppList2[0].CIBE_OpportunityTeam__c.contains(usuario.Id));
             }
             Test.stopTest();
         }

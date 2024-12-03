@@ -1,5 +1,5 @@
 /********************************************************************************************************************
- Name:	  AV_ReportAppointment_Controller
+ Name:    AV_ReportAppointment_Controller
  Copyright © 2023  CaixaBank
 --------------------------------------------------------------------------------------------------------------------
  Proposito: Gives support to av_ReportAppointment LWC and child components.
@@ -10,15 +10,25 @@
 ---------------------------------------------------------------------------------------------------------------------
  Historial
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- VERSION		USER_STORY			AUTHOR				DATE			Description
- 1.0			US546892         	Luis Fernandez		30/06/2023		Init version.
- 1.1			US546892			Sandra Gómez		01/09/2023		Modified all logica
- 1.2			Fix PMD Errors	    Daniel Rodriguez	05/10/2023	    Add WITH SECURITY_ENFORCED in queries and modify method createTaskOpp, unWrappOpportunities
- 
+ VERSION        USER_STORY          AUTHOR              DATE            Description
+ 1.0            US546892            Luis Fernandez      30/06/2023      Init version.
+ 1.1            US546892            Sandra Gómez        01/09/2023      Modified all logica
+ 1.2            Fix PMD Errors      Daniel Rodriguez    05/10/2023      Add WITH SECURITY_ENFORCED in queries and modify method createTaskOpp, unWrappOpportunities
+ 1.3            DE87954             Sandra Gómez        23/11/2023      Change method retrieveAccountTask add parameter recordId
+ 1.4            --                  Oscar Moreno        15/01/2024      Modify processReportData method. The users dont enter with the PS AV_OpportunitiesSearcherV2
+ 1.5            Fix subject         Sandra Gómez        12/02/2024      Change field AV_Product__c to AV_ProductName__c in object OppoWrap
+ 1.6            US824057            Ángel Medina        22/02/2024      Add RT Iniciativa Gestor and Alerta Comercial in method retrieveAccountTask
+ 1.7            US796361            Oscar Moreno        12/03/2024      Modify processReportData method to create AV_CommentsHistory__c records
+  1.8           IN1136424           Oscar Moreno        24/04/2024      Add a new second parameter with the value of AV_Tipo__c in sendOppToGCF method
+ 1.9			PPM100205278 		Luis Fernández		02/05/2024		Added new propoerty to retrieved opportunities: Product2.AV_NewReportActions__c. Added thisfield to the lookup retrieve methods
+ 2.0            US912532            Oscar Moreno        23/05/2024      Added isNoLocalizado parameter in unwrappOpportunity and createRecord methods
+ 2.1            US913185            Oscar Moreno        04/06/2024      Change processReportData method. Only users with AV_CheckOnOff PS will be able to create tasks check on/off
+ 2.2            PPM100130465        Oscar Moreno     05/07/2024          Replace PS_CHECKONOFF with PS_OLDHOMETASK and revert logic
+ 2.3            PPM100265806        Oscar Moreno        12/09/2024       Add the owneridopp attribute to OppoWrap class and add getUserInfo method
  *********************************************************************************************************************/
 public with sharing class AV_ReportAppointment_Controller{
-	
-	private final static Integer MAXRESULTS 	= 10;
+
+	private final static Integer MAXRESULTS     = 10;
 	
 	/**
 	 * To result of insert or update of Opportunity
@@ -74,6 +84,20 @@ public with sharing class AV_ReportAppointment_Controller{
 		public Date CloseDate;
 		@AuraEnabled 
 		public Boolean mainVinculed = false;
+		@AuraEnabled
+		public String ProductName;
+		@AuraEnabled 
+		public Boolean Prioritzed;
+		@AuraEnabled
+		public String HistoryComment = '';
+		@AuraEnabled 
+		public Boolean IsNewProduct; 
+		@AuraEnabled 
+		public String Subestado; 
+		@AuraEnabled
+		public String owneridopp;
+		
+
 		public OppoWrap(Opportunity oppo){
 			  this.Id = oppo.Id; 
 			  this.Name = oppo.Name;
@@ -93,6 +117,11 @@ public with sharing class AV_ReportAppointment_Controller{
 			  this.ProductoMain = oppo.AV_PF__c;
 			  this.Propension = oppo.AV_Propensity__c;
 			  this.CloseDate = oppo.CloseDate;
+			  this.ProductName = oppo.AV_ProductName__c;
+			  this.Prioritzed = oppo.AV_IncludeInPrioritizingCustomers__c;
+			  this.IsNewProduct = oppo.AV_PF__r.AV_NewReportActions__c;
+			  this.Subestado = oppo.AV_Subestado__c; 
+			  this.owneridopp = oppo.OwnerId; 
 		}
 		public Integer compareTo(Object compareTo) {
 			OppoWrap compareToEmp = (OppoWrap) compareTo;
@@ -116,6 +145,13 @@ public with sharing class AV_ReportAppointment_Controller{
 		public List<String> deleteManageHistInsert;
 		@AuraEnabled 
 		public String results;
+	}
+
+	private static String formatDateForHistoryComment(String lastDate){
+		String dateParsed = lastDate.substring(0,10);
+		String[] dateAtomized = dateParsed.split(AV_AppConstants.DASH);
+
+		return dateAtomized[2]+'/'+dateAtomized[1]+'/'+dateAtomized[0];
 	}
 
 	/**
@@ -183,6 +219,7 @@ public with sharing class AV_ReportAppointment_Controller{
 		public Date activityDate; // is field ActivityDate
 		@AuraEnabled 
 		public String origenApp; // is field AV_OrigenApp__c
+		
 	}
 
 	/**
@@ -197,6 +234,8 @@ public with sharing class AV_ReportAppointment_Controller{
 		public List<String> deleteIdTasksInsert;
 		@AuraEnabled
 		public List<String> deleteIdEventInsert;
+		@AuraEnabled
+		public List<String> deleteIdCommentsHistoryInsert;
 		@AuraEnabled
 		public List<String> deleteManageHistInsert;
 		@AuraEnabled
@@ -223,12 +262,16 @@ public with sharing class AV_ReportAppointment_Controller{
 		public String Tipo;
 		@AuraEnabled 
 		public String Canal;
+		@AuraEnabled 
+		public String Owner;
+		
 		public TaskWrapp(Task tsk){
 			this.Id = tsk.Id;
 			this.Subject = tsk.Subject;
 			this.Status = tsk.Status;
 			this.Origen = tsk.AV_Origen__c;
 			this.Fecha = tsk.ActivityDate;
+			this.Owner = tsk.OwnerId; 
 		}
 	}
 
@@ -247,45 +290,33 @@ public with sharing class AV_ReportAppointment_Controller{
 		};
 		Set<String> requiredStages = new Set<String> {
 			AV_AppConstants.OPP_STATUS_POTENCIAL,
-			AV_AppConstants.OPP_STATUS_ENGESTION
+			AV_AppConstants.OPP_STATUS_ENGESTION,
+			AV_AppConstants.OPP_STATUS_VENCIDO,
+			AV_AppConstants.OPP_STATUS_NO_GESTIONADA
 		};
-		List<Opportunity> associatedOppo = [
-			SELECT Id,
-			Name,
-			StageName,
-			AV_FechaProximoRecordatorio__c,
-			AV_Potencial__c,
-			AV_Comentarios__c,
-			AV_Resolucion__c,
-			AV_AmountEuro__c,
-			AV_MarginEuro__c,
-			Amount,
-			AV_Tenencia__c,
-			AV_Entidad__c,
-			AV_Cuota__c,
-			AV_ByProduct__c,
-			AV_ByProduct__r.Name,
-			AV_PF__c,
-			AV_Propensity__c,
-			CloseDate
-			FROM Opportunity 
-			WHERE AccountId = :accountId 
-			AND 
-				( 
-				(RecordType.DeveloperName IN :retailRts AND StageName IN :requiredStages)
-					OR
-				(RecordType.DeveloperName = :  AV_AppConstants.OPPINICIATIVA_RT AND StageName = :AV_AppConstants.OPP_STATUS_VENCIDO)
-				)
-				WITH SECURITY_ENFORCED 
-				ORDER BY AV_FechaProximoRecordatorio__c DESC NULLS LAST
-		];  
+		List<Opportunity> associatedOppo = [SELECT Id,Name,StageName,AV_FechaProximoRecordatorio__c,AV_Potencial__c,AV_Comentarios__c,AV_Resolucion__c,AV_AmountEuro__c,AV_MarginEuro__c,Amount,AV_Tenencia__c,AV_Entidad__c,AV_Cuota__c,AV_ByProduct__c,AV_ByProduct__r.Name,AV_PF__c,AV_Propensity__c,CloseDate,AV_Product__c,AV_ProductName__c,AV_IncludeInPrioritizingCustomers__c,AV_Channel__c,AV_PF__r.AV_NewReportActions__c,AV_Subestado__c,OwnerId FROM Opportunity WHERE AccountId = :accountId AND (RecordType.DeveloperName IN :retailRts AND StageName IN :requiredStages)WITH SECURITY_ENFORCED ORDER BY AV_FechaProximoRecordatorio__c DESC NULLS LAST];  
 		List<OppoWrap> objToSend = new List<OppoWrap>();
+		Set<Id> retrievedOppos = new Set<Id>();
+		for(Opportunity oppId : associatedOppo){
+			retrievedOppos.add(oppId.Id);
+		}
 		Map<String,List<OppoWrap>> stageOppoMap = new Map<String,List<OppoWrap>>();
+		List<AV_CommentsHistory__c> comentaryList = [SELECT AV_Opportunity__c,AV_NewComment__c,LastModifiedDate FROM AV_CommentsHistory__c WHERE AV_Opportunity__c IN :retrievedOppos AND AV_Opportunity__c != null ORDER BY AV_Opportunity__c, LastModifiedDate DESC];
+		Map<Id,String> commentOppo = new Map<Id,String>();
+		for(AV_CommentsHistory__c cmm : comentaryList){
+			if(!commentOppo.keySet().contains(cmm.AV_Opportunity__c)  && !String.isBlank(cmm.AV_NewComment__c)/*&& !restrictedComments.contains(cmm.AV_Opportunity__c)*/){
+				commentOppo.put(cmm.AV_Opportunity__c,formatDateForHistoryComment( String.valueOf(cmm.LastModifiedDate))+'{|}'+cmm.AV_NewComment__c);
+			}
+		}
 		for(Opportunity opp : associatedOppo){
+			OppoWrap nextOppoWrap = new OppoWrap(opp);
+			if(commentOppo.keySet().contains(opp.Id)){
+				nextOppoWrap.HistoryComment = commentOppo.get(opp.Id);
+			}
 			if(stageOppoMap.keySet().contains(opp.StageName)){
-				stageOppoMap.get(opp.StageName).add(new OppoWrap(opp));
+				stageOppoMap.get(opp.StageName).add(nextOppoWrap);
 			}else{
-				stageOppoMap.put(opp.StageName,new List<OppoWrap>{ new OppoWrap(opp)});
+				stageOppoMap.put(opp.StageName,new List<OppoWrap>{ nextOppoWrap});
 			}
 		}
 		if(stageOppoMap.get(AV_AppConstants.OPP_STATUS_POTENCIAL) != null){
@@ -300,13 +331,16 @@ public with sharing class AV_ReportAppointment_Controller{
 		if(stageOppoMap.get(AV_AppConstants.OPP_STATUS_VENCIDO) != null){
 			objToSend.addAll(stageOppoMap.get(AV_AppConstants.OPP_STATUS_VENCIDO));
 		}
+		if(stageOppoMap.get(AV_AppConstants.OPP_STATUS_NO_GESTIONADA) != null){
+			objToSend.addAll(stageOppoMap.get(AV_AppConstants.OPP_STATUS_NO_GESTIONADA));
+		}
 		return objToSend;
 	}
 	
 	/**
-	 * @description			Return a list of AV_Potencial__C picklistValues
-	 * @param fields 		List of fields to get values of picklist field
-	 * @return 				List of values with label and value of picklist
+	 * @description         Return a list of AV_Potencial__C picklistValues
+	 * @param fields        List of fields to get values of picklist field
+	 * @return              List of values with label and value of picklist
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<List<Map<String, String>>> getPicklistValues(String[] fields) {
@@ -335,30 +369,28 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Given a account Id, returns all the tasks which
-	 * @param accountId 	Id of account to filter in query
-	 * @return 				List tasks to show component
+	 * @description         Given a account Id, returns all the tasks which
+	 * @param accountId     Id of account to filter in query
+	 * @return              List tasks to show component
 	 */
 	@AuraEnabled
-	public static List<TaskWrapp> retrieveAccountTask(String accountId){
+	public static List<TaskWrapp> retrieveAccountTask(String accountId, String recordId){
 		Set<String> taskRt = new Set<String>{
 			AV_AppConstants.TASKAVISOS_RT,
-			AV_AppConstants.TASKPRIORIZADOR_RT
+			AV_AppConstants.TASKPRIORIZADOR_RT,
+            AV_AppConstants.TASKINICIATIVA_RT,
+            AV_AppConstants.TASKALERTACOM_RT
 		};
 		Set<String> requiredStatus = new Set<String>{
 			AV_AppConstants.TASK_STATUS_PENDIENTE,
 			AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL
 		};
-		List<Task> retriTask = [
-				SELECT Id,Subject,AV_Origen__c,Status, ActivityDate,AV_Tipo__c,AV_Chanel__c 
-				FROM TASK
-				WHERE AccountId = :accountId
-				AND RecordType.DeveloperName IN :taskRt
-				AND Status IN :requiredStatus
-				AND OwnerID = :UserInfo.getUserId()
-				WITH SECURITY_ENFORCED
-				ORDER BY ActivityDate ASC
-		];
+		List<Task> retriTask;
+		if (recordId!= null) {
+			retriTask = [SELECT Id,Subject,AV_Origen__c,Status, ActivityDate,AV_Tipo__c,AV_Chanel__c,OwnerId FROM TASK WHERE AccountId = :accountId AND RecordType.DeveloperName IN :taskRt AND Id != :recordId AND Status IN :requiredStatus  WITH SECURITY_ENFORCED ORDER BY ActivityDate ASC];
+		} else {
+			retriTask = [SELECT Id,Subject,AV_Origen__c,Status, ActivityDate,AV_Tipo__c,AV_Chanel__c,OwnerId FROM TASK WHERE AccountId = :accountId AND RecordType.DeveloperName IN :taskRt AND Status IN :requiredStatus  WITH SECURITY_ENFORCED ORDER BY ActivityDate ASC];
+		}
 		List<TaskWrapp> tskToReturn = new List<TaskWrapp>();
 		for(Task t : retriTask){
 			tskToReturn.add(new TaskWrapp(t));
@@ -367,7 +399,7 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description		Lookup of Sub product
+	 * @description     Lookup of Sub product
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<AV_LookupSearchResult> searchByProduct(String searchTerm,String product) {  
@@ -412,7 +444,7 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description		Lookup of Office
+	 * @description     Lookup of Office
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<AV_LookupSearchResult> searchOffice(String searchTerm, List<String> selectedIds) {
@@ -448,11 +480,11 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Lookup of Contact in field Contact Person
-	 * @param searchTerm 	filter to search in object Contact
-	 * @param selectedIds 	list of Ids selected of object contact
-	 * @param accountId 	Id of account to filter in query
-	 * @return 				Contact to show lookup
+	 * @description         Lookup of Contact in field Contact Person
+	 * @param searchTerm    filter to search in object Contact
+	 * @param selectedIds   list of Ids selected of object contact
+	 * @param accountId     Id of account to filter in query
+	 * @return              Contact to show lookup
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<AV_LookupSearchResult> searchContact(String searchTerm, List<String> selectedIds, String accountId){
@@ -495,33 +527,33 @@ public with sharing class AV_ReportAppointment_Controller{
 		}
 		List<Contact> listContact= capsulateQuery(contactAccount,listIds,accountId);
 		if(listContact!= null && !listContact.isEmpty()) {
-            for (Contact p : listContact) {
+			for (Contact p : listContact) {
 				if (p.CC_CargoRepresentante__c != null) {
 					results.add(new AV_LookupSearchResult(p.Id,'Contact',userIcon,p.Name,p.CC_CargoRepresentante__c));
 				}else {
 					results.add(new AV_LookupSearchResult(p.Id,'Contact',userIcon,p.Name,''));
 				}
-            }
-        }
+			}
+		}
 		return results;
 	}
 
 	/**
-	* @description 		method to query with string
-	* @param q 			query to execute
-	* @param listIds 	list of Ids contact
-	* @param accountId 	Id of account
-	* @return 			list contact of return query
+	* @description      method to query with string
+	* @param q          query to execute
+	* @param listIds    list of Ids contact
+	* @param accountId  Id of account
+	* @return           list contact of return query
 	*/
 	private static List<Contact> capsulateQuery(String q, List<String> listIds, String accountId) {
 		return (List<Contact>) Database.query(q);
 	}
 
 	/**
-	 * @description			Update of Opportunities changes and delete of new opportunity
-	 * @param jsonListOpp  	json of list of oportunity changes
-	 * @param listIdsOpp 	list of Ids of opportunities new
-	 * @return 				response witn error or null
+	 * @description         Update of Opportunities changes and delete of new opportunity
+	 * @param jsonListOpp   json of list of oportunity changes
+	 * @param listIdsOpp    list of Ids of opportunities new
+	 * @return              response witn error or null
 	 */
 	@AuraEnabled
 	public static String updateBackReport(String jsonListOpp,List<String> listIdsOpp){
@@ -535,7 +567,7 @@ public with sharing class AV_ReportAppointment_Controller{
 			}
 			List<Database.SaveResult> listSr = Database.update(listOpp, false);
 			for (Database.SaveResult sr: listSr) {
-				if(!sr.isSuccess()) {		    
+				if(!sr.isSuccess()) {           
 					for(Database.Error err : sr.getErrors()) {
 						AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
 						response = response+' | '+err.getMessage();
@@ -550,7 +582,7 @@ public with sharing class AV_ReportAppointment_Controller{
 			}
 			List<Database.DeleteResult> listSrDelete = Database.delete(listOppDelete,false);
 			for (Database.DeleteResult sr: listSrDelete) {
-				if(!sr.isSuccess()) {		    
+				if(!sr.isSuccess()) {           
 					for(Database.Error err : sr.getErrors()) {
 						AV_LogDebug.printLogDebug(methodName, 'Error: '+err.getMessage());
 						response = response+' | '+err.getMessage();
@@ -562,10 +594,10 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Update Task of Block priorizador and aviso
-	 * @param eventOrTsk  	map of event or task to creates
-	 * @param tasks			map of task to update
-	 * @return 				response witn error or OK
+	 * @description         Update Task of Block priorizador and aviso
+	 * @param eventOrTsk    map of event or task to creates
+	 * @param tasks         map of task to update
+	 * @return              response witn error or OK
 	 */
 	@AuraEnabled
 	public static TaskBlockResult updateTaskBlock(Map<Object,Object> eventOrTsk, Map<String,Map<Object,Object>> tasks) {
@@ -626,175 +658,217 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Create Events and task with check on off
-	 * @param eventOrTsk  	map of event or task to creates
-	 * @param opportunities	map of opp with changes or create
-	 * @param mapOldOpp		map of opportunity old (before update)
-	 * @param opposId		list Ids of opportunity news
-	 * @return 				response witn error or OK
+	 * @description         Create Events and task with check on off
+	 * @param eventOrTsk    map of event or task to creates
+	 * @param opportunities map of opp with changes or create
+	 * @param mapOldOpp     map of opportunity old (before update)
+	 * @param opposId       list Ids of opportunity news
+	 * @return              response witn error or OK
 	 */
 	@AuraEnabled
-	public static TaskEventResult processReportData(Map<Object,Object> eventOrTsk, Map<String,Map<Object,Object>> opportunities, Map<String,Opportunity> mapOldOpp, List<String> opposId){
-		Savepoint sp = Database.setSavepoint();
-		Database.SaveResult sr;
-		String results = 'OK';
-		List<Database.SaveResult> srs;
-		Boolean isTask = eventOrTsk.get('type').equals('task');
-		Map<Id,TaskEvent> headerActivitys = new Map<Id,TaskEvent>();
-		List<String> listIdsTaskInsert = new List<String>();
-		List<String> listIdsEventInsert = new List<String>();
-		List<AV_CustomActivityOpportunity__c> listTaskOppDeleteOld = new List<AV_CustomActivityOpportunity__c>();
-		Map<String,String> mapNewHeader = new Map<String,String>();
-		List<Task> listTaskUpdateOld = new List<Task>();
-		List<Task> listTaskDeleteOld = new List<Task>();
-		Map<String,String> mapProducIdName = new Map<String,String>();
-		Map<String,String> mapProducNameId = new Map<String,String>();
-		Map<String,String> mapProducIdOpp = new Map<String,String>();
-		List<Task> listTaskChangeDate = new List<Task>();
-		List<Task> listTaskToDelete = new List<Task>();
-		List<AV_CustomActivityOpportunity__c> listTaskOpportunityDelete = new List<AV_CustomActivityOpportunity__c>();
-		RecordType rt = (isTask) ?AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT) : AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_EVENT,AV_AppConstants.EVENTCLIENTE_RT);
-		RecordType rtTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT);
-		if(opportunities != null && !opportunities.isEmpty()){
-			List<String> listIdsOppDeleteTaskOpp = new List<String>();
-			List<SObject> recordsToInsert = new List<SObject>();
-			List<String> resultsEventTask = new List<String>();
-			Map<String,Map<Object,Object>> mapCreateTaskCheckOnOff = new Map<String,Map<Object,Object>>();
-			Map<String,Map<Object,Object>> mapOpportunities = new Map<String,Map<Object,Object>>();
-			List<String> listIdsOppCheck = new List<String>();
-			List<String> listIdsTaskOpportunityDelete = new List<String>();
-			List<String> listTaskToDeleteIds = new List<String>();
-			List<String> listTaskChangeDateIds = new List<String>();
-			String nameOppMain;
-			for(String oppoId : opportunities.keySet()){
-				String idOppNew = null;
-
-				if((( (String) opportunities.get(oppoId).get('id')).contains('idProvisional') 
-				|| !mapOldOpp.get(oppoId).AV_IncludeInPrioritizingCustomers__c) 
-				&& (Boolean)opportunities.get(oppoId).get('agendado') == false 
-				&& opportunities.get(oppoId).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) { //Check on off por fechas, segun si esta en gestion si no es agendado si no esta creada la oportunidad y si esta creada mira si la oportunidad anteriormente tuviera el check on of deshabilitado
-					if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional')){
-						idOppNew = opposId.remove(0);
-						opportunities.get(oppoId).put('id',idOppNew);
-					}
-					if (idOppNew != null) {
-						mapProducIdOpp.put((String)opportunities.get(oppoId).get('ProdId'),idOppNew);
-						mapCreateTaskCheckOnOff.put(idOppNew,opportunities.get(oppoId));
-					}else {
-						mapProducIdOpp.put((String)opportunities.get(oppoId).get('ProdId'),oppoId);
-						mapCreateTaskCheckOnOff.put(oppoId,opportunities.get(oppoId));
-					}
-				}else if(!((String)opportunities.get(oppoId).get('id')).contains('idProvisional') && (((mapOldOpp.get(oppoId).AV_IncludeInPrioritizingCustomers__c && (opportunities.get(oppoId).get('proximaGestion') != null && mapOldOpp.get(oppoId).AV_FechaProximoRecordatorio__c != formatDate((String) opportunities.get(oppoId).get('proximaGestion')))) && (Boolean)opportunities.get(oppoId).get('agendado') == false && opportunities.get(oppoId).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) || opportunities.get(oppoId).get('newPath') != AV_AppConstants.OPP_STATUS_ENGESTION)) { //Check on off por fechas, segun si esta en gestion si no es agendado si esta creada y tiene el check on off habilitado y cambia de fecha de proxima gestion o la que no estan en gestion insistir
-					if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional')){
-						idOppNew = opposId.remove(0);
-						opportunities.get(oppoId).put('id',idOppNew);
-					}
-					if (idOppNew != null) {
-						mapOpportunities.put(idOppNew,opportunities.get(oppoId));
-						listIdsOppCheck.add(idOppNew);
-					}else {
-						mapOpportunities.put(oppoId,opportunities.get(oppoId));
-						listIdsOppCheck.add(oppoId);
-					}
-				}
-				if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional') && idOppNew == null){
-					opportunities.get(oppoId).put('id',opposId.remove(0));
-				}
-				if ((Boolean)opportunities.get(oppoId).get('mainVinculed')) { //Nombre del evento cuando la cita no es No comercial
-					nameOppMain = (String) opportunities.get(oppoId).get('Name');
-				}
-			}
-			if (mapOpportunities != null && listIdsOppCheck != null && !listIdsOppCheck.isEmpty()) { //si esta creada y tiene el check on off habilitado y cambia de fecha de proxima gestion y no tiene ninguna tarea de check on off en potencial o en gestion CHECK ON OFF para cambiarla de fecha o crear una nueva  o si no esta en gestion para eliminar la tarea y la tarea-oportunidad
-				List<AV_CustomActivityOpportunity__c> listTaskOppCheck = [Select Id, AV_Task__c, AV_Opportunity__c, AV_Opportunity__r.AV_FechaProximoRecordatorio__c, AV_Opportunity__r.StageName from AV_CustomActivityOpportunity__c where AV_Opportunity__c in :listIdsOppCheck and AV_Task__c != null WITH SECURITY_ENFORCED];
-				List<String> listOppNoCreateTask = new List<String>();
-				if (listTaskOppCheck != null && !listTaskOppCheck.isEmpty()) {
-					Map<String,AV_CustomActivityOpportunity__c> mapTaskOppId = new Map<String,AV_CustomActivityOpportunity__c>();
-					Map<String,List<AV_CustomActivityOpportunity__c>> mapTaskOppIdHeader = new Map<String,List<AV_CustomActivityOpportunity__c>>();
-					Map<String,List<String>> mapTaskOppIdHeaderId = new Map<String,List<String>>();
-					List<String> listHeaderIdToDelete = new List<String>();
-					for (AV_CustomActivityOpportunity__c caopp : listTaskOppCheck) {
-						mapTaskOppId.put(caopp.AV_Task__c,caopp);
-						if(mapTaskOppIdHeader.containsKey(caopp.AV_Task__c)) {
-							mapTaskOppIdHeader.get(caopp.AV_Task__c).add(caopp);
-						} else {
-							mapTaskOppIdHeader.put(caopp.AV_Task__c, new List<AV_CustomActivityOpportunity__c>{caopp});
+	public static TaskEventResult processReportData(Map<Object,Object> eventOrTsk, Map<String,Map<Object,Object>> opportunities, Map<String,Opportunity> mapOldOpp, List<String> opposId,Boolean isNoLocalizadoActive ){
+			
+		    Boolean hasCustomPermission = FeatureManagement.checkPermission(AV_AppConstants.PS_OLDHOMETASK);
+			Savepoint sp = Database.setSavepoint();
+			Database.SaveResult sr;
+			String results = 'OK';
+			List<Database.SaveResult> srs;
+			Boolean isTask = eventOrTsk.get('type').equals('task');
+			Map<Id,TaskEvent> headerActivitys = new Map<Id,TaskEvent>();
+			List<String> listIdsTaskInsert = new List<String>();
+			List<String> listIdsEventInsert = new List<String>();
+			List<String> listIdsCommentsHistoryInsert = new List<String>();
+			List<AV_CustomActivityOpportunity__c> listTaskOppDeleteOld = new List<AV_CustomActivityOpportunity__c>();
+			Map<String,String> mapNewHeader = new Map<String,String>();
+			List<Task> listTaskUpdateOld = new List<Task>();
+			List<Task> listTaskDeleteOld = new List<Task>();
+			Map<String,String> mapProducIdName = new Map<String,String>();
+			Map<String,String> mapProducNameId = new Map<String,String>();
+			Map<String,String> mapProducIdOpp = new Map<String,String>();
+			List<Task> listTaskChangeDate = new List<Task>();
+			List<Task> listTaskToDelete = new List<Task>();
+			List<AV_CustomActivityOpportunity__c> listTaskOpportunityDelete = new List<AV_CustomActivityOpportunity__c>();
+			RecordType rt = (isTask) ?AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT) : AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_EVENT,AV_AppConstants.EVENTCLIENTE_RT);
+			RecordType rtTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT);
+			if(opportunities != null && !opportunities.isEmpty()){
+				List<String> listIdsOppDeleteTaskOpp = new List<String>();
+				List<SObject> recordsToInsert = new List<SObject>();
+				List<String> resultsEventTask = new List<String>();
+				Map<String,Map<Object,Object>> mapCreateTaskCheckOnOff = new Map<String,Map<Object,Object>>();
+				Map<String,Map<Object,Object>> mapOpportunities = new Map<String,Map<Object,Object>>();
+				List<String> listIdsOppCheck = new List<String>();
+				List<String> listIdsTaskOpportunityDelete = new List<String>();
+				List<String> listTaskToDeleteIds = new List<String>();
+				List<String> listTaskChangeDateIds = new List<String>();
+				String nameOppMain;
+				for(String oppoId : opportunities.keySet()){
+					String idOppNew = null;
+					if((( (String) opportunities.get(oppoId).get('id')).contains('idProvisional') || !mapOldOpp.get(oppoId).AV_IncludeInPrioritizingCustomers__c) && (Boolean)opportunities.get(oppoId).get('agendado') == false && opportunities.get(oppoId).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) { //Check on off por fechas, segun si esta en gestion si no es agendado si no esta creada la oportunidad y si esta creada mira si la oportunidad anteriormente tuviera el check on of deshabilitado
+						if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional')){
+							idOppNew = opposId.remove(0);
+							opportunities.get(oppoId).put('id',idOppNew);
 						}
-						if(mapTaskOppIdHeaderId.containsKey(caopp.AV_Task__c)) {
-							mapTaskOppIdHeaderId.get(caopp.AV_Task__c).add(caopp.Id);
-						} else {
-							mapTaskOppIdHeaderId.put(caopp.AV_Task__c, new List<String>{caopp.Id});
+						if (idOppNew != null) {
+							mapProducIdOpp.put((String)opportunities.get(oppoId).get('ProdId'),idOppNew);
+							mapCreateTaskCheckOnOff.put(idOppNew,opportunities.get(oppoId));
+						}else {
+							mapProducIdOpp.put((String)opportunities.get(oppoId).get('ProdId'),oppoId);
+							mapCreateTaskCheckOnOff.put(oppoId,opportunities.get(oppoId));
 						}
-						if (caopp.AV_Opportunity__r.StageName != AV_AppConstants.OPP_STATUS_ENGESTION) {
-							listHeaderIdToDelete.add(caopp.AV_Task__c);
+					}else if(!((String)opportunities.get(oppoId).get('id')).contains('idProvisional') && (((mapOldOpp.get(oppoId).AV_IncludeInPrioritizingCustomers__c && (opportunities.get(oppoId).get('proximaGestion') != null && mapOldOpp.get(oppoId).AV_FechaProximoRecordatorio__c != formatDate((String) opportunities.get(oppoId).get('proximaGestion')))) && (Boolean)opportunities.get(oppoId).get('agendado') == false && opportunities.get(oppoId).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) || opportunities.get(oppoId).get('newPath') != AV_AppConstants.OPP_STATUS_ENGESTION)) { //Check on off por fechas, segun si esta en gestion si no es agendado si esta creada y tiene el check on off habilitado y cambia de fecha de proxima gestion o la que no estan en gestion insistir
+						if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional')){
+							idOppNew = opposId.remove(0);
+							opportunities.get(oppoId).put('id',idOppNew);
+						}
+						if (idOppNew != null) {
+							mapOpportunities.put(idOppNew,opportunities.get(oppoId));
+							listIdsOppCheck.add(idOppNew);
+						}else {
+							mapOpportunities.put(oppoId,opportunities.get(oppoId));
+							listIdsOppCheck.add(oppoId);
 						}
 					}
-					if (mapTaskOppId != null && mapTaskOppIdHeader != null && mapTaskOppIdHeaderId != null) {
-						List<Task> listTaskOppCheckOn = [Select Id, AV_OrigenApp__c, AV_Task__c, IsClosed, ActivityDate from Task where AV_Task__c in :mapTaskOppId.keySet() WITH SECURITY_ENFORCED];
-						if (listTaskOppCheckOn != null && !listTaskOppCheckOn.isEmpty()) {
-							for (Task ta : listTaskOppCheckOn) {
-								if (listHeaderIdToDelete != null && !listHeaderIdToDelete.isEmpty() && listHeaderIdToDelete.contains(ta.AV_Task__c) && ta.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF && mapTaskOppIdHeader.get(ta.AV_Task__c) != null && !ta.IsClosed) {//Esta es la parte en el que check on-off cuando pasa a cerrada la oportunidad que borra la tarea-oportunidad y la tarea
-									listTaskOpportunityDelete.addAll(mapTaskOppIdHeader.get(ta.AV_Task__c));
-									listIdsTaskOpportunityDelete.addAll(mapTaskOppIdHeaderId.get(ta.AV_Task__c));
-									listTaskToDelete.add(ta);
-									listTaskToDeleteIds.add(ta.Id);
-									listOppNoCreateTask.add(mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__c);
-								} else if (ta.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF && !ta.IsClosed && mapTaskOppId.get(ta.AV_Task__c) != null) { // Para que modifice la tarea en caso de cambio de fecha de la oportunidad
-									if (ta.ActivityDate != mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__r.AV_FechaProximoRecordatorio__c) { //Solo se modifica si es diferente la fecha de vencimiento de la tarea
-										ta.ActivityDate = mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__r.AV_FechaProximoRecordatorio__c;
-										listTaskChangeDate.add(ta);
-										listTaskChangeDateIds.add(ta.Id);
+					if(opposId != null && !opposId.isEmpty() && ((String) opportunities.get(oppoId).get('id')).contains('idProvisional') && idOppNew == null){
+						opportunities.get(oppoId).put('id',opposId.remove(0));
+					}
+					if ((Boolean)opportunities.get(oppoId).get('mainVinculed')) { //Nombre del evento cuando la cita no es No comercial
+						nameOppMain = (String) opportunities.get(oppoId).get('Name');
+					}
+				}
+				if (mapOpportunities != null && listIdsOppCheck != null && !listIdsOppCheck.isEmpty()) { //si esta creada y tiene el check on off habilitado y cambia de fecha de proxima gestion y no tiene ninguna tarea de check on off en potencial o en gestion CHECK ON OFF para cambiarla de fecha o crear una nueva  o si no esta en gestion para eliminar la tarea y la tarea-oportunidad
+					List<AV_CustomActivityOpportunity__c> listTaskOppCheck = [Select Id, AV_Task__c, AV_Opportunity__c, AV_Opportunity__r.AV_FechaProximoRecordatorio__c, AV_Opportunity__r.StageName from AV_CustomActivityOpportunity__c where AV_Opportunity__c in :listIdsOppCheck and AV_Task__c != null WITH SECURITY_ENFORCED];
+					List<String> listOppNoCreateTask = new List<String>();
+					if (listTaskOppCheck != null && !listTaskOppCheck.isEmpty()) {
+						Map<String,AV_CustomActivityOpportunity__c> mapTaskOppId = new Map<String,AV_CustomActivityOpportunity__c>();
+						Map<String,List<AV_CustomActivityOpportunity__c>> mapTaskOppIdHeader = new Map<String,List<AV_CustomActivityOpportunity__c>>();
+						Map<String,List<String>> mapTaskOppIdHeaderId = new Map<String,List<String>>();
+						List<String> listHeaderIdToDelete = new List<String>();
+						for (AV_CustomActivityOpportunity__c caopp : listTaskOppCheck) {
+							mapTaskOppId.put(caopp.AV_Task__c,caopp);
+							if(mapTaskOppIdHeader.containsKey(caopp.AV_Task__c)) {
+								mapTaskOppIdHeader.get(caopp.AV_Task__c).add(caopp);
+							} else {
+								mapTaskOppIdHeader.put(caopp.AV_Task__c, new List<AV_CustomActivityOpportunity__c>{caopp});
+							}
+							if(mapTaskOppIdHeaderId.containsKey(caopp.AV_Task__c)) {
+								mapTaskOppIdHeaderId.get(caopp.AV_Task__c).add(caopp.Id);
+							} else {
+								mapTaskOppIdHeaderId.put(caopp.AV_Task__c, new List<String>{caopp.Id});
+							}
+							if (caopp.AV_Opportunity__r.StageName != AV_AppConstants.OPP_STATUS_ENGESTION) {
+								listHeaderIdToDelete.add(caopp.AV_Task__c);
+							}
+						}
+						if (mapTaskOppId != null && mapTaskOppIdHeader != null && mapTaskOppIdHeaderId != null) {
+							List<Task> listTaskOppCheckOn = [Select Id, AV_OrigenApp__c, AV_Task__c, IsClosed, ActivityDate,AV_Chanel__c from Task where AV_Task__c in :mapTaskOppId.keySet() WITH SECURITY_ENFORCED];
+							if (listTaskOppCheckOn != null && !listTaskOppCheckOn.isEmpty()) {
+								for (Task ta : listTaskOppCheckOn) {
+									if (listHeaderIdToDelete != null && !listHeaderIdToDelete.isEmpty() && listHeaderIdToDelete.contains(ta.AV_Task__c) && ta.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF && mapTaskOppIdHeader.get(ta.AV_Task__c) != null && !ta.IsClosed) {//Esta es la parte en el que check on-off cuando pasa a cerrada la oportunidad que borra la tarea-oportunidad y la tarea
+										listTaskOpportunityDelete.addAll(mapTaskOppIdHeader.get(ta.AV_Task__c));
+										listIdsTaskOpportunityDelete.addAll(mapTaskOppIdHeaderId.get(ta.AV_Task__c));
+										listTaskToDelete.add(ta);
+										listTaskToDeleteIds.add(ta.Id);
 										listOppNoCreateTask.add(mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__c);
+									} else if (ta.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF && !ta.IsClosed && mapTaskOppId.get(ta.AV_Task__c) != null) { // Para que modifice la tarea en caso de cambio de fecha de la oportunidad
+										if (ta.ActivityDate != mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__r.AV_FechaProximoRecordatorio__c) { //Solo se modifica si es diferente la fecha de vencimiento de la tarea
+											ta.ActivityDate = mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__r.AV_FechaProximoRecordatorio__c;
+											listTaskChangeDate.add(ta);
+											listTaskChangeDateIds.add(ta.Id);
+											listOppNoCreateTask.add(mapTaskOppId.get(ta.AV_Task__c).AV_Opportunity__c);
+										}
 									}
 								}
 							}
 						}
 					}
-				}
-				if (mapOpportunities != null && !mapOpportunities.isEmpty()) {
-					for (String idOpp : mapOpportunities.keySet()) {
-						if ((listOppNoCreateTask == null|| listOppNoCreateTask.isEmpty() || !listOppNoCreateTask.contains(idOpp)) && (Boolean)mapOpportunities.get(idOpp).get('agendado') == false && mapOpportunities.get(idOpp).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION){ //Para que cree las de check on off en caso de cambio de fecha
-							mapProducIdOpp.put((String)mapOpportunities.get(idOpp).get('ProdId'),idOpp);
-							mapCreateTaskCheckOnOff.put(idOpp,mapOpportunities.get(idOpp));
+					if (mapOpportunities != null && !mapOpportunities.isEmpty()) {
+						for (String idOpp : mapOpportunities.keySet()) {
+							if ((listOppNoCreateTask == null|| listOppNoCreateTask.isEmpty() || !listOppNoCreateTask.contains(idOpp)) && (Boolean)mapOpportunities.get(idOpp).get('agendado') == false && mapOpportunities.get(idOpp).get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION){ //Para que cree las de check on off en caso de cambio de fecha
+								mapProducIdOpp.put((String)mapOpportunities.get(idOpp).get('ProdId'),idOpp);
+								mapCreateTaskCheckOnOff.put(idOpp,mapOpportunities.get(idOpp));
+							}
 						}
 					}
 				}
-			}
-			if (listTaskOpportunityDelete != null && listIdsTaskOpportunityDelete != null && !listIdsTaskOpportunityDelete.isEmpty() && !listTaskOpportunityDelete.isEmpty()) { //Eliminacion de las tarea-oportunidades check-on off
-				List<AV_CustomActivityOpportunity__c> listIdsTaskOpportunityDeleteAdd = [Select OwnerId, RecordTypeId, AV_ExternalID__c, AV_Opportunity__c, AV_Task__c, AV_OrigenApp__c, AV_Amount__c, AV_Commentary__c, AV_Concepto1__c, AV_Concepto2__c, AV_Concepto3__c, AV_Concepto4__c, AV_Concepto5__c, AV_DischargeDate__c, AV_DueDate__c, AV_Entity__c, AV_FeeAmount__c, AV_Gestor__c, AV_HoldingAnotherEntity__c, AV_IsMain__c, AV_NextEventDate__c, AV_Priority__c, AV_Product__c, AV_ReviewDate__c, AV_Stage__c, AV_TypeOfInterest__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_WarningDate__c, AV_LicensePlate__c, AV_IncludeInPrioritizingCustomers__c, AV_FechaVencimiento__c, AV_ActivityDate__c, AV_Status__c, AV_Resolucion__c, AV_Channel__c, AV_AmountEuro__c, AV_ByProduct__c, AV_MarginEuro__c from AV_CustomActivityOpportunity__c where Id in :listIdsTaskOpportunityDelete WITH SECURITY_ENFORCED];
-				if (listIdsTaskOpportunityDeleteAdd != null && !listIdsTaskOpportunityDeleteAdd.isEmpty()) {
-					List<AV_CustomActivityOpportunity__c> listTaskOppBack = new List<AV_CustomActivityOpportunity__c>();
-					for (AV_CustomActivityOpportunity__c taOpp : listIdsTaskOpportunityDeleteAdd) {
-						listTaskOppBack.add(structureTaskOppInsertBack(taOpp));
-					}
-					listTaskOppDeleteOld.addAll(listTaskOppBack); //lista de tareas-opp old
-				}
-			}
-			if (listTaskToDelete != null && listTaskToDeleteIds != null && !listTaskToDeleteIds.isEmpty() && !listTaskToDelete.isEmpty()) {
-				List<Task> listTaskToDeleteIdsAdd = [Select RecordTypeId, WhoId, WhatId, Subject, ActivityDate, Status, Priority, OwnerId, Description, ReminderDateTime, IsReminderSet,AV_ALVEN__c, AV_CodigoGestorAsignado__c, AV_Concepto1__c, AV_Concepto2__c, AV_NoGestionable__c, AV_Type__c, AV_ExternalID__c, AV_ConVenta__c, AV_Task__c, AV_Tipo__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_OrigenApp__c, AV_BranchPhysicalMeet__c, AV_ColorEtiqueta__c, AV_DurationToNoticeToManager__c, AV_FechaFinAccionComercial__c, AV_Center__c, AV_PrioritizingSort__c, AV_FechaInicioVigencia__c, AV_Chanel__c, AV_PEA__c, AV_Purpose__c, AV_IdDelActaMifid__c, AV_CenterRtIndex__c, AV_UrlsQR__c, AV_PriorityTask__c, AV_AssociatedOpportunityId__c, AV_SurveyValue__c, AV_PEA2__c, AV_OrigenAct__c, AV_VisiblePorElClienteEnNow__c, AV_Case__c from Task where Id in :listTaskToDeleteIds WITH SECURITY_ENFORCED];
-				if (listTaskToDeleteIdsAdd != null && !listTaskToDeleteIdsAdd.isEmpty()) {
-					List<Task> listTaskBack = new List<Task>();
-					for (Task ta : listTaskToDeleteIdsAdd) {
-						mapNewHeader.put(ta.AV_ExternalID__c,ta.AV_Task__c);
-						ta.AV_Task__c = null;
-						listTaskBack.add(structureTaskInsertBack(ta));
-					}
-					listTaskDeleteOld.addAll(listTaskBack); //lista de tareas old
-				}
-			}
-			if (listTaskChangeDate != null && listTaskChangeDateIds != null && !listTaskChangeDateIds.isEmpty() && !listTaskChangeDate.isEmpty()) { //update task Due Date Check on off
-				if (listTaskChangeDateIds != null && !listTaskChangeDateIds.isEmpty()) {
-					List<Task> listTaskChangeDateIdsAdd = [Select Id, ActivityDate from Task where Id in :listTaskChangeDateIds WITH SECURITY_ENFORCED];
-					if (listTaskChangeDateIdsAdd != null && !listTaskChangeDateIdsAdd.isEmpty()) {
-						listTaskUpdateOld.addAll(listTaskChangeDateIdsAdd); //lista de tareas old
+				if (listTaskOpportunityDelete != null && listIdsTaskOpportunityDelete != null && !listIdsTaskOpportunityDelete.isEmpty() && !listTaskOpportunityDelete.isEmpty()) { //Eliminacion de las tarea-oportunidades check-on off
+					List<AV_CustomActivityOpportunity__c> listIdsTaskOpportunityDeleteAdd = [Select OwnerId, RecordTypeId, AV_ExternalID__c, AV_Opportunity__c, AV_Task__c, AV_OrigenApp__c, AV_Amount__c, AV_Commentary__c, AV_Concepto1__c, AV_Concepto2__c, AV_Concepto3__c, AV_Concepto4__c, AV_Concepto5__c, AV_DischargeDate__c, AV_DueDate__c, AV_Entity__c, AV_FeeAmount__c, AV_Gestor__c, AV_HoldingAnotherEntity__c, AV_IsMain__c, AV_NextEventDate__c, AV_Priority__c, AV_Product__c, AV_ReviewDate__c, AV_Stage__c, AV_TypeOfInterest__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_WarningDate__c, AV_LicensePlate__c, AV_IncludeInPrioritizingCustomers__c, AV_FechaVencimiento__c, AV_ActivityDate__c, AV_Status__c, AV_Resolucion__c, AV_Channel__c, AV_AmountEuro__c, AV_ByProduct__c, AV_MarginEuro__c from AV_CustomActivityOpportunity__c where Id in :listIdsTaskOpportunityDelete WITH SECURITY_ENFORCED];
+					if (listIdsTaskOpportunityDeleteAdd != null && !listIdsTaskOpportunityDeleteAdd.isEmpty()) {
+						List<AV_CustomActivityOpportunity__c> listTaskOppBack = new List<AV_CustomActivityOpportunity__c>();
+						for (AV_CustomActivityOpportunity__c taOpp : listIdsTaskOpportunityDeleteAdd) {
+							listTaskOppBack.add(structureTaskOppInsertBack(taOpp));
+						}
+						listTaskOppDeleteOld.addAll(listTaskOppBack); //lista de tareas-opp old
 					}
 				}
-				for(Task ta : listTaskChangeDate) {
-					ta.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP;
+				if (listTaskToDelete != null && listTaskToDeleteIds != null && !listTaskToDeleteIds.isEmpty() && !listTaskToDelete.isEmpty()) {
+					List<Task> listTaskToDeleteIdsAdd = [Select RecordTypeId, WhoId, WhatId, Subject, ActivityDate, Status, Priority, OwnerId, Description, ReminderDateTime, IsReminderSet,AV_ALVEN__c, AV_CodigoGestorAsignado__c,  AV_NoGestionable__c, AV_Type__c, AV_ExternalID__c, AV_ConVenta__c, AV_Task__c, AV_Tipo__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_OrigenApp__c, AV_BranchPhysicalMeet__c, AV_ColorEtiqueta__c, AV_DurationToNoticeToManager__c, AV_FechaFinAccionComercial__c, AV_Center__c, AV_PrioritizingSort__c, AV_FechaInicioVigencia__c, AV_Chanel__c, AV_PEA__c, AV_Purpose__c, AV_IdDelActaMifid__c, AV_CenterRtIndex__c, AV_PriorityTask__c, AV_AssociatedOpportunityId__c, AV_SurveyValue__c, AV_PEA2__c, AV_OrigenAct__c, AV_VisiblePorElClienteEnNow__c, AV_Case__c from Task where Id in :listTaskToDeleteIds WITH SECURITY_ENFORCED];
+					if (listTaskToDeleteIdsAdd != null && !listTaskToDeleteIdsAdd.isEmpty()) {
+						List<Task> listTaskBack = new List<Task>();
+						for (Task ta : listTaskToDeleteIdsAdd) {
+							mapNewHeader.put(ta.AV_ExternalID__c,ta.AV_Task__c);
+							ta.AV_Task__c = null;
+							listTaskBack.add(structureTaskInsertBack(ta));
+						}
+						listTaskDeleteOld.addAll(listTaskBack); //lista de tareas old
+					}
 				}
-			}
-			SObject nextRecordEvent = createRecord(eventOrTsk,isTask,rt,nameOppMain); //Evento o Tarea que se crea del report
-			recordsToInsert.add(nextRecordEvent);
-			if (!isTask) {
+				if (listTaskChangeDate != null && listTaskChangeDateIds != null && !listTaskChangeDateIds.isEmpty() && !listTaskChangeDate.isEmpty()) { //update task Due Date Check on off
+					if (listTaskChangeDateIds != null && !listTaskChangeDateIds.isEmpty()) {
+						List<Task> listTaskChangeDateIdsAdd = [Select Id, ActivityDate from Task where Id in :listTaskChangeDateIds WITH SECURITY_ENFORCED];
+						if (listTaskChangeDateIdsAdd != null && !listTaskChangeDateIdsAdd.isEmpty()) {
+							listTaskUpdateOld.addAll(listTaskChangeDateIdsAdd); //lista de tareas old
+						}
+					}
+					for(Task ta : listTaskChangeDate) {
+						ta.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP;
+					}
+				}
+
+				SObject nextRecordEvent = createRecord(eventOrTsk,isTask,rt,nameOppMain,isNoLocalizadoActive); //Evento o Tarea que se crea del report  
+				recordsToInsert.add(nextRecordEvent);
+				
+				if (!isTask) {
+					if(recordsToInsert != null && !recordsToInsert.isEmpty()) {
+						srs = Database.insert(recordsToInsert,false);
+						for(Database.SaveResult res : srs){
+							if(!res.isSuccess()) {
+								results = res.getErrors()[0].getMessage();
+							} else {
+								resultsEventTask.add(res.getId());
+								listIdsEventInsert.add(res.getId());
+							}
+						}
+					}
+					recordsToInsert = new List<SObject>();
+				}
+				
+
+				 //Si tiene el PS AV_OldHomeTask
+				if(hasCustomPermission){
+					if (mapProducIdOpp != null && mapCreateTaskCheckOnOff != null) {
+						List<Product2> listproducts = [Select Id, Name from Product2 where Id in :mapProducIdOpp.keySet() WITH SECURITY_ENFORCED];
+						if (listproducts != null && !listproducts.isEmpty()) {
+							for (Product2 pro : listproducts) {
+								mapProducIdName.put(pro.Id,pro.Name);
+								mapProducNameId.put(pro.Name,pro.Id);
+							}
+							if (mapProducIdName != null && !mapProducIdName.isEmpty()) {
+								for(String oppId : mapCreateTaskCheckOnOff.keySet()){ // Tareas de check on off
+									Task nextRecord = new Task();
+									nextRecord.put('RecordTypeId',rtTask.Id);
+									nextRecord.put('WhatId', (Id) eventOrTsk.get('accountId'));
+									nextRecord.put('Status','Open');
+									nextRecord.put('Priority','A');
+									nextRecord.put('ActivityDate',formatDate((String)mapCreateTaskCheckOnOff.get(oppId).get('proximaGestion')));
+									nextRecord.put('Subject',mapProducIdName.get((String) mapCreateTaskCheckOnOff.get(oppId).get('ProdId')));
+									nextRecord.put('AV_OrigenApp__c',AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF);
+									recordsToInsert.add(nextRecord);
+								}
+							}
+						}
+					}
+				}
+				
 				if(recordsToInsert != null && !recordsToInsert.isEmpty()) {
 					srs = Database.insert(recordsToInsert,false);
 					for(Database.SaveResult res : srs){
@@ -802,114 +876,147 @@ public with sharing class AV_ReportAppointment_Controller{
 							results = res.getErrors()[0].getMessage();
 						} else {
 							resultsEventTask.add(res.getId());
-							listIdsEventInsert.add(res.getId());
+							listIdsTaskInsert.add(res.getId());
 						}
 					}
 				}
-				recordsToInsert = new List<SObject>();
-			}
-			if (mapProducIdOpp != null && mapCreateTaskCheckOnOff != null) {
-				List<Product2> listproducts = [Select Id, Name from Product2 where Id in :mapProducIdOpp.keySet() WITH SECURITY_ENFORCED];
-				if (listproducts != null && !listproducts.isEmpty()) {
-					for (Product2 pro : listproducts) {
-						mapProducIdName.put(pro.Id,pro.Name);
-						mapProducNameId.put(pro.Name,pro.Id);
-					}
-					if (mapProducIdName != null && !mapProducIdName.isEmpty()) {
-						for(String oppId : mapCreateTaskCheckOnOff.keySet()){ // Tareas de check on off
-							Task nextRecord = new Task();
-							nextRecord.put('RecordTypeId',rtTask.Id);
-							nextRecord.put('WhatId', (Id) eventOrTsk.get('accountId'));
-							nextRecord.put('Status','Open');
-							nextRecord.put('Priority','A');
-							nextRecord.put('ActivityDate',formatDate((String)mapCreateTaskCheckOnOff.get(oppId).get('proximaGestion')));
-							nextRecord.put('Subject',mapProducIdName.get((String) mapCreateTaskCheckOnOff.get(oppId).get('ProdId')));
-							nextRecord.put('AV_OrigenApp__c',AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF);
-							recordsToInsert.add(nextRecord);
+
+				List<AV_CommentsHistory__c> commHistList = new List<AV_CommentsHistory__c>();
+				Set<Id> setIds = new Set<Id>();
+				for (String opportunityId : opportunities.keySet()) {
+					Map<Object, Object> opportunityDetails = opportunities.get(opportunityId);
+					String id = (String)opportunityDetails.get('id');
+					setIds.add(id);
+				}
+				List<Contact> contactList = [SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c =:UserInfo.getUserId() ];
+				headerActivitys = new Map<Id,TaskEvent>();
+				if (resultsEventTask != null && !resultsEventTask.isEmpty()) {
+					if (!isTask) {
+						List<Event> listEvent = [SELECT Id, AV_Task__c, Subject, ActivityDate, AV_OrigenApp__c,AV_Tipo__c FROM EVENT WHERE Id IN :resultsEventTask WITH SECURITY_ENFORCED];
+						if (listEvent!=null && !listEvent.isEmpty()) {
+							for(Event ev : listEvent) {
+								TaskEvent te = new TaskEvent();
+								te.idTaskEvent = ev.Id;
+								te.taskHeader = ev.AV_Task__c;
+								te.subject = ev.Subject;
+								te.activityDate = ev.ActivityDate;
+								te.origenApp = ev.AV_OrigenApp__c;
+								headerActivitys.put(ev.Id,te);
+
+								for(String oppoId : opportunities.keySet()){
+									if(opportunities.get(oppoId)!= null  && (mapOldOpp.get(oppoId) == null || (mapOldOpp.get(oppoId) != null && (mapOldOpp.get(oppoId).AV_Comentarios__c != opportunities.get(oppoId).get('comentario') || mapOldOpp.get(oppoId).StageName != opportunities.get(oppoId).get('newPath'))))){
+										AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+										String comentario = (String)opportunities.get(oppoId).get('comentario');
+										ch.AV_NewComment__c = comentario;
+										ch.AV_Opportunity__c = (String)opportunities.get(oppoId).get('id');
+										if(mapOldOpp!=null && mapOldOpp.get(oppoId)!= null){
+											ch.AV_OldComment__c = (String)mapOldOpp.get(oppoId).AV_Comentarios__c;
+											ch.AV_OldStatus__c = mapOldOpp.get(oppoId).StageName;
+										}
+										ch.AV_ModificationDate__c = System.today();
+										if(contactList != null && !contactList.isEmpty()){
+											ch.AV_AssignedEmployee__c = contactList[0].Id;
+										}
+										ch.AV_OpportunityStatus__c = (String)opportunities.get(oppoId).get('newPath');
+										ch.AV_Event__c = (String)ev.Id;
+										commHistList.add(ch);
+
+									}
+									
+								}
+							}
+							if(commHistList!= null){
+								List<Database.SaveResult> srCommHistList = Database.insert(commHistList,false);
+								for(Database.SaveResult ur : srCommHistList){
+									if(!ur.isSuccess()) {
+										results = ur.getErrors()[0].getMessage();
+									} else {
+										listIdsCommentsHistoryInsert.add(ur.getId());
+									}
+								}
+							}
+							
 						}
 					}
-				}
-			}
-			if(recordsToInsert != null && !recordsToInsert.isEmpty()) {
-				srs = Database.insert(recordsToInsert,false);
-				for(Database.SaveResult res : srs){
-					if(!res.isSuccess()) {
-						results = res.getErrors()[0].getMessage();
-					} else {
-						resultsEventTask.add(res.getId());
-						listIdsTaskInsert.add(res.getId());
-					}
-				}
-			}
-			headerActivitys = new Map<Id,TaskEvent>();
-			if (resultsEventTask != null && !resultsEventTask.isEmpty()) {
-				if (!isTask) {
-					List<Event> listEvent = [SELECT Id, AV_Task__c, Subject, ActivityDate, AV_OrigenApp__c FROM EVENT WHERE Id IN :resultsEventTask WITH SECURITY_ENFORCED];
-					if (listEvent!=null && !listEvent.isEmpty()) {
-						for(Event ev : listEvent) {
+					List<Task> listTask = [SELECT Id, AV_Task__c, Subject, ActivityDate, AV_OrigenApp__c,AV_Tipo__c FROM TASK WHERE Id IN :resultsEventTask WITH SECURITY_ENFORCED];
+					
+					if (listTask!=null && !listTask.isEmpty()) {
+						for(Task ta : listTask) {
 							TaskEvent te = new TaskEvent();
-							te.idTaskEvent = ev.Id;
-							te.taskHeader = ev.AV_Task__c;
-							te.subject = ev.Subject;
-							te.activityDate = ev.ActivityDate;
-							te.origenApp = ev.AV_OrigenApp__c;
-							headerActivitys.put(ev.Id,te);
+							te.idTaskEvent = ta.Id;
+							te.taskHeader = ta.AV_Task__c;
+							te.subject = ta.Subject;
+							te.activityDate = ta.ActivityDate;
+							te.origenApp = ta.AV_OrigenApp__c;
+							headerActivitys.put(ta.Id,te);
+							for(String oppoId : opportunities.keySet()){
+								if(opportunities.get(oppoId)!= null && ta.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF && (mapOldOpp.get(oppoId) == null || (mapOldOpp.get(oppoId) != null && (mapOldOpp.get(oppoId).AV_Comentarios__c != opportunities.get(oppoId).get('comentario') || mapOldOpp.get(oppoId).StageName != opportunities.get(oppoId).get('newPath'))))){
+									AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+									String comentario = (String)opportunities.get(oppoId).get('comentario');
+									ch.AV_NewComment__c = comentario;
+									ch.AV_Opportunity__c = (String)opportunities.get(oppoId).get('id');
+									if(mapOldOpp != null && mapOldOpp.get(oppoId) != null) {
+										ch.AV_OldComment__c = (String)mapOldOpp.get(oppoId).AV_Comentarios__c;
+										ch.AV_OldStatus__c = mapOldOpp.get(oppoId).StageName;
+									}
+									ch.AV_ModificationDate__c = System.today();
+									if(contactList != null && !contactList.isEmpty()){
+										ch.AV_AssignedEmployee__c = contactList[0].Id;
+									}
+									ch.AV_OpportunityStatus__c = (String)opportunities.get(oppoId).get('newPath');
+									ch.AV_Task__c = (String)ta.Id;
+									commHistList.add(ch);
+								}
+								
+							}
+						}
+						if(commHistList!= null){
+							Database.insert(commHistList,false);
 						}
 					}
+					
 				}
-				List<Task> listTask = [SELECT Id, AV_Task__c, Subject, ActivityDate, AV_OrigenApp__c FROM TASK WHERE Id IN :resultsEventTask WITH SECURITY_ENFORCED];
-				if (listTask!=null && !listTask.isEmpty()) {
-					for(Task ta : listTask) {
-						TaskEvent te = new TaskEvent();
-						te.idTaskEvent = ta.Id;
-						te.taskHeader = ta.AV_Task__c;
-						te.subject = ta.Subject;
-						te.activityDate = ta.ActivityDate;
-						te.origenApp = ta.AV_OrigenApp__c;
-						headerActivitys.put(ta.Id,te);
-					}
+			}else{
+				sr = Database.insert(createRecord(eventOrTsk,isTask,rt,null,isNoLocalizadoActive),false);   
+				if(!sr.isSuccess()) {
+					results = sr.getErrors()[0].getMessage();
+				} else if (isTask) {
+					listIdsTaskInsert.add(sr.getId());
+				} else {
+					listIdsEventInsert.add(sr.getId());
 				}
 			}
-		}else{
-			sr = Database.insert(createRecord(eventOrTsk,isTask,rt,null),false);
-			if(!sr.isSuccess()) {
-				results = sr.getErrors()[0].getMessage();
-			} else if (isTask) {
-				listIdsTaskInsert.add(sr.getId());
-			} else {
-				listIdsEventInsert.add(sr.getId());
+			if (results != 'OK') {
+				Database.rollback(sp);
 			}
-		}
-		if (results != 'OK') {
-			Database.rollback(sp);
-		}
-		TaskEventBack allBack = new TaskEventBack();
-		allBack.insertTasksDelete = listTaskDeleteOld;
-		allBack.insertTaskOppDelete = listTaskOppDeleteOld;
-		allBack.deleteIdTasksInsert = listIdsTaskInsert;
-		allBack.deleteIdEventInsert = listIdsEventInsert;
-		allBack.deleteManageHistInsert = new List<String>();
-		allBack.updateTaskUpdated = listTaskUpdateOld;
-		allBack.mapNewHeader = mapNewHeader;
-		TaskEventResult allResult = new TaskEventResult();
-		allResult.headerActivitys = headerActivitys;
-		allResult.mapProducNameId = mapProducNameId;
-		allResult.mapProducIdOpp = mapProducIdOpp;
-		allResult.opportunities = opportunities;
-		allResult.results = results;
-		allResult.dataBack = allBack;
-		allResult.listTaskChangeDate = listTaskChangeDate;
-		allResult.listTaskToDelete = listTaskToDelete;
-		allResult.listTaskOpportunityDelete = listTaskOpportunityDelete;
-		return allResult;
+			TaskEventBack allBack = new TaskEventBack();
+			allBack.insertTasksDelete = listTaskDeleteOld;
+			allBack.insertTaskOppDelete = listTaskOppDeleteOld;
+			allBack.deleteIdTasksInsert = listIdsTaskInsert;
+			allBack.deleteIdEventInsert = listIdsEventInsert;
+			allBack.deleteIdCommentsHistoryInsert = listIdsCommentsHistoryInsert;
+			allBack.deleteManageHistInsert = new List<String>();
+			allBack.updateTaskUpdated = listTaskUpdateOld;
+			allBack.mapNewHeader = mapNewHeader;
+			TaskEventResult allResult = new TaskEventResult();
+			allResult.headerActivitys = headerActivitys;
+			allResult.mapProducNameId = mapProducNameId;
+			allResult.mapProducIdOpp = mapProducIdOpp;
+			allResult.opportunities = opportunities;
+			allResult.results = results;
+			allResult.dataBack = allBack;
+			allResult.listTaskChangeDate = listTaskChangeDate;
+			allResult.listTaskToDelete = listTaskToDelete;
+			allResult.listTaskOpportunityDelete = listTaskOpportunityDelete;
+			return allResult;
 	}
 
 	/**
-	 * @description						Update or delete because check on off
-	 * @param listTaskChangeDate  		list of task to change date because check on off
-	 * @param listTaskToDelete			list of task to delete
-	 * @param listTaskOpportunityDelete	list of task-opp to delete
-	 * @return 							response witn error or OK
+	 * @description                     Update or delete because check on off
+	 * @param listTaskChangeDate        list of task to change date because check on off
+	 * @param listTaskToDelete          list of task to delete
+	 * @param listTaskOpportunityDelete list of task-opp to delete
+	 * @return                          response witn error or OK
 	 */
 	@AuraEnabled
 	public static String updateDeleteTaskCheckOnOff(List<Task> listTaskChangeDate, List<Task> listTaskToDelete, List<AV_CustomActivityOpportunity__c> listTaskOpportunityDelete) {
@@ -946,9 +1053,9 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Structure of Task-Opportunity to back insert
-	 * @param taOpp  		task-Opportunity
-	 * @return 				task-Opportunity to structure new
+	 * @description         Structure of Task-Opportunity to back insert
+	 * @param taOpp         task-Opportunity
+	 * @return              task-Opportunity to structure new
 	 */
 	public static AV_CustomActivityOpportunity__c structureTaskOppInsertBack(AV_CustomActivityOpportunity__c taOpp) {
 		AV_CustomActivityOpportunity__c taskOppInsert = new AV_CustomActivityOpportunity__c();
@@ -978,9 +1085,6 @@ public with sharing class AV_ReportAppointment_Controller{
 		}
 		if (taOpp.AV_Concepto1__c != null) {
 			taskOppInsert.AV_Concepto1__c = taOpp.AV_Concepto1__c;
-		}
-		if (taOpp.AV_Concepto2__c != null) {
-			taskOppInsert.AV_Concepto2__c = taOpp.AV_Concepto2__c;
 		}
 		if (taOpp.AV_Concepto3__c != null) {
 			taskOppInsert.AV_Concepto3__c = taOpp.AV_Concepto3__c;
@@ -1082,9 +1186,9 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Structure of Task to back insert
-	 * @param ta  			task
-	 * @return 				task to structure new
+	 * @description         Structure of Task to back insert
+	 * @param ta            task
+	 * @return              task to structure new
 	 */
 	public static Task structureTaskInsertBack(Task ta) {
 		Task taskInsert = new Task();
@@ -1126,12 +1230,6 @@ public with sharing class AV_ReportAppointment_Controller{
 		}
 		if (ta.AV_CodigoGestorAsignado__c != null) {
 			taskInsert.AV_CodigoGestorAsignado__c = ta.AV_CodigoGestorAsignado__c;
-		}
-		if (ta.AV_Concepto1__c != null) {
-			taskInsert.AV_Concepto1__c = ta.AV_Concepto1__c;
-		}
-		if (ta.AV_Concepto2__c != null) {
-			taskInsert.AV_Concepto2__c = ta.AV_Concepto2__c;
 		}
 		if (ta.AV_NoGestionable__c != null) {
 			taskInsert.AV_NoGestionable__c = ta.AV_NoGestionable__c;
@@ -1202,9 +1300,6 @@ public with sharing class AV_ReportAppointment_Controller{
 		if (ta.AV_CenterRtIndex__c != null) {
 			taskInsert.AV_CenterRtIndex__c = ta.AV_CenterRtIndex__c;
 		}
-		if (ta.AV_UrlsQR__c != null) {
-			taskInsert.AV_UrlsQR__c = ta.AV_UrlsQR__c;
-		}
 		if (ta.AV_PriorityTask__c != null) {
 			taskInsert.AV_PriorityTask__c = ta.AV_PriorityTask__c;
 		}
@@ -1230,10 +1325,10 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	 * @description			Update of Task/Event changes and delete of new task and task-oportunity
-	 * @param jsonListOpp  	json of list of oportunity changes
-	 * @param listIdsOpp 	list of Ids of opportunities new
-	 * @return 				response witn error or null
+	 * @description         Update of Task/Event changes and delete of new task and task-oportunity
+	 * @param jsonListOpp   json of list of oportunity changes
+	 * @param listIdsOpp    list of Ids of opportunities new
+	 * @return              response witn error or null
 	 */
 	@AuraEnabled
 	public static String updateBackReportTaskEvent(String jsonBackAll){
@@ -1247,7 +1342,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					List<String> listIdCreateTask = new List<String>();
 					List<Database.SaveResult> listSr = Database.insert(backAll.insertTasksDelete, false);
 					for (Database.SaveResult sr: listSr) {
-						if(!sr.isSuccess()) {		    
+						if(!sr.isSuccess()) {           
 							for(Database.Error err : sr.getErrors()) {
 								AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
 								response = response+' | Insert Task -> '+err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields();
@@ -1272,7 +1367,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					}
 					List<Database.SaveResult> listSr = Database.insert(backAll.insertTaskOppDelete, false);
 					for (Database.SaveResult sr: listSr) {
-						if(!sr.isSuccess()) {		    
+						if(!sr.isSuccess()) {           
 							for(Database.Error err : sr.getErrors()) {
 								AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
 								response = response+' | Insert Task-Opp -> '+err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields();
@@ -1288,7 +1383,7 @@ public with sharing class AV_ReportAppointment_Controller{
 				}
 				List<Database.DeleteResult> listSrDelete = Database.delete(listManageHisDelete,false);
 				for (Database.DeleteResult sr: listSrDelete) {
-					if(!sr.isSuccess()) {		    
+					if(!sr.isSuccess()) {           
 						for(Database.Error err : sr.getErrors()) {
 							AV_LogDebug.printLogDebug(methodName, 'Error: '+err.getMessage());
 							response = response+' | Delete Manage History -> '+err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields();
@@ -1303,7 +1398,7 @@ public with sharing class AV_ReportAppointment_Controller{
 				}
 				List<Database.DeleteResult> listSrDelete = Database.delete(listTaskDelete,false);
 				for (Database.DeleteResult sr: listSrDelete) {
-					if(!sr.isSuccess()) {		    
+					if(!sr.isSuccess()) {           
 						for(Database.Error err : sr.getErrors()) {
 							AV_LogDebug.printLogDebug(methodName, 'Error: '+err.getMessage());
 							response = response+' | Delete Task -> '+ err.getMessage();
@@ -1318,7 +1413,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					}
 				List<Database.DeleteResult> listSrDelete = Database.delete(listEventDelete,false);
 				for (Database.DeleteResult sr: listSrDelete) {
-					if(!sr.isSuccess()) {		    
+					if(!sr.isSuccess()) {           
 						for(Database.Error err : sr.getErrors()) {
 							AV_LogDebug.printLogDebug(methodName, 'Error: '+err.getMessage());
 							response = response+' | Delete Event -> '+err.getMessage();
@@ -1329,10 +1424,25 @@ public with sharing class AV_ReportAppointment_Controller{
 			if (backAll.updateTaskUpdated != null && !backAll.updateTaskUpdated.isEmpty()) {
 				List<Database.SaveResult> listSr = Database.update(backAll.updateTaskUpdated, false);
 				for (Database.SaveResult sr: listSr) {
-					if(!sr.isSuccess()) {		    
+					if(!sr.isSuccess()) {           
 						for(Database.Error err : sr.getErrors()) {
 							AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
 							response = response+' | Update Task -> '+err.getMessage();
+						}
+					}
+				}
+			}
+			if (backAll.deleteIdCommentsHistoryInsert != null && !backAll.deleteIdCommentsHistoryInsert.isEmpty()) {
+				List<AV_CommentsHistory__c> listCommentHistoryDelete = new List<AV_CommentsHistory__c>();
+				for (String idCH : backAll.deleteIdCommentsHistoryInsert) {
+					listCommentHistoryDelete.add(new AV_CommentsHistory__c(Id=idCH));
+				}
+				List<Database.DeleteResult> listSrDelete = Database.delete(listCommentHistoryDelete,false);
+				for (Database.DeleteResult sr: listSrDelete) {
+					if(!sr.isSuccess()) {           
+						for(Database.Error err : sr.getErrors()) {
+							AV_LogDebug.printLogDebug(methodName, 'Error: '+err.getMessage());
+							response = response+' | Delete Commment History -> '+err.getMessage();
 						}
 					}
 				}
@@ -1343,9 +1453,9 @@ public with sharing class AV_ReportAppointment_Controller{
 
 
 	/**
-	 * @description					Create Task-Opportunity
-	 * @param jsonResultTaskEvent  	String with result of create Task or Event with headers to associate with opportunity
-	 * @return 						response witn error or OK
+	 * @description                 Create Task-Opportunity
+	 * @param jsonResultTaskEvent   String with result of create Task or Event with headers to associate with opportunity
+	 * @return                      response witn error or OK
 	 */
 	@AuraEnabled
 	public static String createTaskOpp(String jsonResultTaskEvent) {
@@ -1353,7 +1463,8 @@ public with sharing class AV_ReportAppointment_Controller{
 		boolean hasErrors = false;
 		List<AV_CustomActivityOpportunity__c> cao = new List<AV_CustomActivityOpportunity__c>();
 		Savepoint sp = Database.setSavepoint();
-        TaskEventGet resultTaskEvent = (TaskEventGet)Json.deserialize(jsonResultTaskEvent,TaskEventGet.class);
+		TaskEventGet resultTaskEvent = (TaskEventGet)Json.deserialize(jsonResultTaskEvent,TaskEventGet.class);
+		
 		if (resultTaskEvent.headerActivitys!= null && !resultTaskEvent.headerActivitys.isEmpty()) {
 			for(String taskId : resultTaskEvent.headerActivitys.keySet()){
 				String taskIdStr = (String) resultTaskEvent.headerActivitys.get(taskId).taskHeader;
@@ -1361,6 +1472,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					String taskName = (String) resultTaskEvent.headerActivitys.get(taskId).subject;
 					String taskOrigenApp = (String) resultTaskEvent.headerActivitys.get(taskId).origenApp;
 					if (taskOrigenApp != AV_AppConstants.CLIENT_REPORT_ORIGENAPP) {
+						/*
 						if(resultTaskEvent.mapProducNameId.get(taskName) != null){ //Para el check on off
 							if (resultTaskEvent.mapProducIdOpp.get(resultTaskEvent.mapProducNameId.get(taskName)) != null) {
 								cao.add(
@@ -1369,10 +1481,40 @@ public with sharing class AV_ReportAppointment_Controller{
 										AV_Task__c = taskIdStr,
 										AV_IsMain__c = true,
 										AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP
+										
 									)
 								);
 							}
 						}
+						*/
+						if (taskOrigenApp ==  'AV_SFReportNoLocalizado'){
+							for (String oppoId : resultTaskEvent.opportunities.keySet()) { //Para la tarea/event que se crea en el reporte
+								cao.add(
+									new AV_CustomActivityOpportunity__c(
+										AV_Opportunity__c = (Id) resultTaskEvent.opportunities.get(oppoId).get('id'),
+										AV_Task__c = taskIdStr,
+										AV_IsMain__c = Boolean.valueOf(resultTaskEvent.opportunities.get(oppoId).get('mainVinculed')),
+										AV_OrigenApp__c = 'AV_SFReportNoLocalizado'	
+									)
+								);
+							}
+						}else{
+							if(resultTaskEvent.mapProducNameId.get(taskName) != null){ //Para el check on off
+								if (resultTaskEvent.mapProducIdOpp.get(resultTaskEvent.mapProducNameId.get(taskName)) != null) {
+									cao.add(
+										new AV_CustomActivityOpportunity__c(
+											AV_Opportunity__c = (Id) resultTaskEvent.mapProducIdOpp.get(resultTaskEvent.mapProducNameId.get(taskName)),
+											AV_Task__c = taskIdStr,
+											AV_IsMain__c = true,
+											AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP
+											
+										)
+									);
+								}
+							}
+						}
+						
+					
 					} else {
 						for (String oppoId : resultTaskEvent.opportunities.keySet()) { //Para la tarea/event que se crea en el reporte
 							cao.add(
@@ -1380,7 +1522,7 @@ public with sharing class AV_ReportAppointment_Controller{
 									AV_Opportunity__c = (Id) resultTaskEvent.opportunities.get(oppoId).get('id'),
 									AV_Task__c = taskIdStr,
 									AV_IsMain__c = Boolean.valueOf(resultTaskEvent.opportunities.get(oppoId).get('mainVinculed')),
-									AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP
+									AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP	
 								)
 							);
 						}
@@ -1393,23 +1535,21 @@ public with sharing class AV_ReportAppointment_Controller{
 			for(Database.SaveResult res : srs){
 				if(!res.isSuccess()) {
 					hasErrors = true;
-            		break; // Salimos del bucle si encontramos error
-					//Database.rollback(sp);
-					//return res.getErrors()[0].getMessage();
+					break; // Salimos del bucle si encontramos error
 				}
 			}
 		}
+		
 
 		if (hasErrors) {
 			Database.rollback(sp);
 			return srs[0].getErrors()[0].getMessage(); // Devuelve el mensaje de error del primer registro fallido
 		}
-		//Database.rollback(sp);
-		//return 'Necesito el fallo un momento ahora lo cambio';
 		return 'OK';
 	}
 
-	private static SObject createRecord(Map<Object,Object> eventOrTsk,Boolean isTask,RecordType rt, String nameOppMain){
+	
+	private static SObject createRecord(Map<Object,Object> eventOrTsk,Boolean isTask,RecordType rt, String nameOppMain,Boolean isNoLocalizadoActive){
 		SObject recordToInsert; 
 		if(isTask){
 			recordToInsert = new Task();
@@ -1418,11 +1558,20 @@ public with sharing class AV_ReportAppointment_Controller{
 		}
 		recordToInsert.put('RecordTypeId',rt.Id);
 		recordToInsert.put('WhatId', (Id) eventOrTsk.get('accountId'));
-		recordToInsert.put('AV_OrigenApp__c', AV_AppConstants.CLIENT_REPORT_ORIGENAPP);
+		
+		
+		if(isNoLocalizadoActive){
+			recordToInsert.put('AV_OrigenApp__c', 'AV_SFReportNoLocalizado');  
+		}else{
+			recordToInsert.put('AV_OrigenApp__c', AV_AppConstants.CLIENT_REPORT_ORIGENAPP); 
+		}
+	
+		recordToInsert.put('AV_ContactGenerateAppointment__c',AV_AppConstants.NO_GENERATE);
 		if(!isTask){
 			recordToInsert.put('AV_Tipo__c', (String) eventOrTsk.get('typeEvent'));
 			if ((Boolean)eventOrTsk.get('comercial')) { //Si la cita es No comercial 
 				recordToInsert.put('Subject', 'Gestión operativa');
+				
 			}else if (nameOppMain != null){
 				recordToInsert.put('Subject', nameOppMain);
 			}else {
@@ -1453,9 +1602,15 @@ public with sharing class AV_ReportAppointment_Controller{
 			}else if ((String)eventOrTsk.get('typeTask') == AV_AppConstants.ACT_TYPE_EMAIL_SMS) {
 				recordToInsert.put('Subject', 'Email, sms');
 			}
+			else{
+				recordToInsert.put('Subject', 'No localizado');
+			}
+		    
 			recordToInsert.put('ActivityDate', System.today());
 			recordToInsert.put('Status',(String) eventOrTsk.get('statusTask'));
 			recordToInsert.put('Priority','A');
+			recordToInsert.put('Description',(String) eventOrTsk.get('comentaryTask'));
+			
 		}
 		return recordToInsert;
 	}
@@ -1481,7 +1636,7 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	@AuraEnabled
-	public static OppResulWrap unWrappOpportunities(Map<String,Map<Object,Object>> opportunities,String accountId, Boolean isInsert){
+	public static OppResulWrap unWrappOpportunities(Map<String,Map<Object,Object>> opportunities,String accountId, Boolean isInsert,Boolean isNoLocalizado){
 		Savepoint sp = Database.setSavepoint();
 		boolean hasErrors = false;
 		List<Opportunity> listOpp = new List<Opportunity>();
@@ -1496,80 +1651,90 @@ public with sharing class AV_ReportAppointment_Controller{
 			if(((Boolean) wrappedOppo.get('validable'))){
 				Opportunity nextOppo = new Opportunity();
 				nextOppo.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP;
+				if(!oppoId.contains('idProvisional')){
+					nextOppo.Id = (Id) wrappedOppo.get('id');
+					listIds.add(nextOppo.Id);
+				}else{
+					nextOppo.RecordTypeId = AV_AppUtilities.getRecordType(
+						AV_AppConstants.OBJECT_NAME_OPPORTUNITY,
+						AV_AppConstants.OPPINICIATIVA_RT
+					).Id;
+					nextOppo.AV_PF__c = (Id) wrappedOppo.get('ProdId');
+				}
+				if(wrappedOppo.get('Name') != null) {
+					nextOppo.Name = (String) wrappedOppo.get('Name');
+				}
+				if(wrappedOppo.get('newPath') != null) {
+					nextOppo.StageName = (String) wrappedOppo.get('newPath');
+				}
+				if(wrappedOppo.get('proximaGestion') != null) {
+					nextOppo.AV_FechaProximoRecordatorio__c = (Date) formatDate((String) wrappedOppo.get('proximaGestion'));
+				}
 
-			if(!oppoId.contains('idProvisional')){
-				nextOppo.Id = (Id) wrappedOppo.get('id');
-				listIds.add(nextOppo.Id);
-			}else{
-				nextOppo.RecordTypeId = AV_AppUtilities.getRecordType(
-					AV_AppConstants.OBJECT_NAME_OPPORTUNITY,
-					AV_AppConstants.OPPINICIATIVA_RT
-				).Id;
-				nextOppo.AV_PF__c = (Id) wrappedOppo.get('ProdId');
-			}
-			if(wrappedOppo.get('Name') != null) {
-				nextOppo.Name = (String) wrappedOppo.get('Name');
-			}
-			if(wrappedOppo.get('newPath') != null) {
-				nextOppo.StageName = (String) wrappedOppo.get('newPath');
-			}
-			if(wrappedOppo.get('proximaGestion') != null) {
-				nextOppo.AV_FechaProximoRecordatorio__c = (Date) formatDate((String) wrappedOppo.get('proximaGestion'));
-			}
-
-			if(wrappedOppo.get('expectativa') != null) {
-				nextOppo.AV_Potencial__c = (String) wrappedOppo.get('expectativa');
-			}
-			if(wrappedOppo.get('resolucion') != null) {
-				nextOppo.AV_Resolucion__c = (String) wrappedOppo.get('resolucion');
-			}
-			if(wrappedOppo.get('importe') != null) {
-				nextOppo.AV_AmountEuro__c = Decimal.valueOf(((String)wrappedOppo.get('importe')).replace(',', '.'));
-			}
-			if(wrappedOppo.get('comentario') != null) {
-				nextOppo.AV_Comentarios__c = (String) wrappedOppo.get('comentario');
-			}
-			if(wrappedOppo.get('tenencia') != null) {
-				nextOppo.AV_Tenencia__c = (Boolean.valueOf(wrappedOppo.get('tenencia'))) ? 'S' : 'N';
-			}
-			if(wrappedOppo.get('otraEntidad') != null) {
-				nextOppo.AV_Entidad__c = (String) wrappedOppo.get('otraEntidad');
-			}
-			if(wrappedOppo.get('fechaOtraEntidad') != null) {
-				nextOppo.AV_FechaVencimiento__c = (Date) formatDate( (String) wrappedOppo.get('fechaOtraEntidad'));
-			}
-			if(wrappedOppo.get('subProducto') != null) {
-				nextOppo.AV_ByProduct__c = (Id) wrappedOppo.get('subProducto');
-			} 
-			if(wrappedOppo.get('margin') != null) {
-				nextOppo.AV_MarginEuro__c = Decimal.valueOf(((String)wrappedOppo.get('margin')).replace(',', '.'));
-			}
-			if(wrappedOppo.get('importeOtraEntidad') != null) {
-				nextOppo.Amount = Decimal.valueOf(((String)wrappedOppo.get('importeOtraEntidad')).replace(',', '.'));
-			}
-			if(wrappedOppo.get('cuota') != null) {
-				nextOppo.AV_Cuota__c = Double.valueOf(((String)wrappedOppo.get('cuota')).replace(',', '.'));
-			}
-			if(wrappedOppo.get('closedate') != null) {
-				nextOppo.CloseDate = (Date) formatDate( (String) wrappedOppo.get('closedate'));
-			}
-			if(wrappedOppo.get('agendado') != null && wrappedOppo.get('newPath') != null && !(Boolean.valueOf(wrappedOppo.get('agendado'))) && wrappedOppo.get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) {
-				nextOppo.AV_IncludeInPrioritizingCustomers__c = true;
-			} else if (wrappedOppo.get('newPath') != AV_AppConstants.OPP_STATUS_ENGESTION) {
-				nextOppo.AV_IncludeInPrioritizingCustomers__c = false;
-			}
-			if (accountId != null) {
-				nextOppo.AccountId = accountId;
-			}
-			listOpp.add(nextOppo);
+				if(wrappedOppo.get('expectativa') != null) {
+					nextOppo.AV_Potencial__c = (String) wrappedOppo.get('expectativa');
+				}
+				if(wrappedOppo.get('resolucion') != null) {
+					nextOppo.AV_Resolucion__c = (String) wrappedOppo.get('resolucion');
+				}
+				if(wrappedOppo.get('importe') != null) {
+					nextOppo.AV_AmountEuro__c = Decimal.valueOf(((String)wrappedOppo.get('importe')).replace(',', '.'));
+				}
+				if(wrappedOppo.get('comentario') != null) {
+					nextOppo.AV_Comentarios__c = (String) wrappedOppo.get('comentario');
+				}
+				if(wrappedOppo.get('tenencia') != null) {
+					nextOppo.AV_Tenencia__c = (Boolean.valueOf(wrappedOppo.get('tenencia'))) ? 'S' : 'N';
+				}
+				if(wrappedOppo.get('otraEntidad') != null) {
+					nextOppo.AV_Entidad__c = (String) wrappedOppo.get('otraEntidad');
+				}
+				if(wrappedOppo.get('fechaOtraEntidad') != null) {
+					nextOppo.AV_FechaVencimiento__c = (Date) formatDate( (String) wrappedOppo.get('fechaOtraEntidad'));
+				}
+				if(wrappedOppo.get('subProducto') != null) {
+					nextOppo.AV_ByProduct__c = (Id) wrappedOppo.get('subProducto');
+				} 
+				if(wrappedOppo.get('margin') != null) {
+					nextOppo.AV_MarginEuro__c = Decimal.valueOf(((String)wrappedOppo.get('margin')).replace(',', '.'));
+				}
+				if(wrappedOppo.get('importeOtraEntidad') != null) {
+					nextOppo.Amount = Decimal.valueOf(((String)wrappedOppo.get('importeOtraEntidad')).replace(',', '.'));
+				}
+				if(wrappedOppo.get('cuota') != null) {
+					nextOppo.AV_Cuota__c = Double.valueOf(((String)wrappedOppo.get('cuota')).replace(',', '.'));
+				}
+				if(isNoLocalizado){
+					if(wrappedOppo.get('subestado') != null) {
+						nextOppo.AV_Subestado__c = (String) wrappedOppo.get('subestado');
+					}
+				}
+				if(wrappedOppo.get('owneridopp') != null) {
+					nextOppo.OwnerId = (String) wrappedOppo.get('owneridopp');
+				} 
+				if(wrappedOppo.get('closedate') != null) {
+					nextOppo.CloseDate = (Date) formatDate( (String) wrappedOppo.get('closedate'));
+				}
+				if(wrappedOppo.get('agendado') != null && wrappedOppo.get('newPath') != null && !(Boolean.valueOf(wrappedOppo.get('agendado'))) && wrappedOppo.get('newPath') == AV_AppConstants.OPP_STATUS_ENGESTION) {
+					nextOppo.AV_IncludeInPrioritizingCustomers__c = true;
+				} else if (wrappedOppo.get('newPath') != AV_AppConstants.OPP_STATUS_ENGESTION) {
+					nextOppo.AV_IncludeInPrioritizingCustomers__c = false;
+				}
+				if (accountId != null) {
+					nextOppo.AccountId = accountId;
+				}
+				
+				if(wrappedOppo.get('noofrecerhasta') != null){
+					nextOppo.AV_NoOfrecerHasta__c = (Date) formatDate( (String) wrappedOppo.get('noofrecerhasta')); 
+				}	
+				listOpp.add(nextOppo);
 			}else{
 				opposId.add(oppoId);
 				listIds.add(oppoId);
 			}
-				
 		}
 		if (listIds != null && !listIds.isEmpty()) {
-			List<Opportunity> listOldOpp = [Select Id, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c from Opportunity where Id in :listIds WITH SECURITY_ENFORCED];
+			List<Opportunity> listOldOpp = [Select Id, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c,AV_Channel__c,AV_Subestado__c,OwnerId from Opportunity where Id in :listIds WITH SECURITY_ENFORCED];  
 			if (listOldOpp != null && !listOldOpp.isEmpty()) {
 				for(Opportunity opp: listOldOpp) {
 					mapOldOpp.put(opp.Id,opp);
@@ -1582,9 +1747,7 @@ public with sharing class AV_ReportAppointment_Controller{
 				if(!ur.isSuccess()) {
 					hasErrors = true;
 					result = ur.getErrors()[0].getMessage();
-            		break; // Sal del bucle
-					//Database.rollback(sp);
-
+					break; // Sal del bucle
 				} else {
 					opposId.add(ur.getId());
 				}
@@ -1595,9 +1758,7 @@ public with sharing class AV_ReportAppointment_Controller{
 				if(!ur.isSuccess()) {
 					hasErrors = true;
 					result = ur.getErrors()[0].getMessage();
-            		break; // Sal del bucle
-					//Database.rollback(sp);
-
+					break; // Sal del bucle
 				} else {
 					opposId.add(ur.getId());
 				}
@@ -1624,6 +1785,9 @@ public with sharing class AV_ReportAppointment_Controller{
 			}
 			if(tsk.get('status') != null ){
 				nextTsk.Status = (String) tsk.get('status');
+			}
+			if(tsk.get('owner') != null ){
+				nextTsk.OwnerId = (String) tsk.get('owner');
 			}
 			if (isTask) {
 				nextTsk.ActivityDate = System.today();
@@ -1660,7 +1824,8 @@ public with sharing class AV_ReportAppointment_Controller{
 			AV_AppConstants.OPP_STATUS_POTENCIAL, 
 			AV_AppConstants.OPP_STATUS_ENGESTION,
 			AV_AppConstants.OPP_STATUS_NOAPTO,
-			AV_AppConstants.OPP_STATUS_VENCIDO
+			AV_AppConstants.OPP_STATUS_VENCIDO,
+			AV_AppConstants.OPP_STATUS_NO_GESTIONADA
 		};
 		List<String> listProductIds = new List<String>();
 		List<Opportunity> listOpp = [SELECT AV_PF__c FROM Opportunity WHERE AccountId = :accountId AND (StageName  IN :openStatusInitiativeRT AND RecordType.DeveloperName IN :rts) WITH SECURITY_ENFORCED]; 
@@ -1677,7 +1842,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					FIND :searchTerm
 					IN ALL FIELDS
 					RETURNING
-						Product2(Id, Name, AV_ExternalID__c WHERE Id NOT IN :selectedIds and Id NOT IN :listProductIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+						Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE Id NOT IN :selectedIds and Id NOT IN :listProductIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 					LIMIT :MAXRESULTS
 				];
 			} else {
@@ -1685,7 +1850,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					FIND :searchTerm
 					IN ALL FIELDS
 					RETURNING
-						Product2(Id, Name, AV_ExternalID__c WHERE Id NOT IN :selectedIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+						Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE Id NOT IN :selectedIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 					LIMIT :MAXRESULTS
 				];
 			}
@@ -1695,7 +1860,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					FIND :searchTerm
 					IN ALL FIELDS
 					RETURNING
-						Product2(Id, Name, AV_ExternalID__c WHERE Id NOT IN :listProductIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+						Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE Id NOT IN :listProductIds and RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 					LIMIT :MAXRESULTS
 				];
 			} else {
@@ -1703,7 +1868,7 @@ public with sharing class AV_ReportAppointment_Controller{
 					FIND :searchTerm
 					IN ALL FIELDS
 					RETURNING
-						Product2(Id, Name, AV_ExternalID__c WHERE RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
+						Product2(Id, Name, AV_ExternalID__c,AV_NewReportActions__c WHERE RecordType.DeveloperName = 'AV_PF' and AV_Nivel__c=null and AV_ExternalID__c!=null and AV_Visible__c = true)
 					LIMIT :MAXRESULTS
 				];
 			}
@@ -1713,7 +1878,7 @@ public with sharing class AV_ReportAppointment_Controller{
 		for (Product2 p : listProduct) {
 			results.add(
 				new AV_LookupSearchResult(
-					p.Id,'Product2',productIcon,p.Name,'Codigo • ' + p.AV_ExternalID__c
+					p.Id,'Product2',productIcon,p.Name,'Codigo • ' + p.AV_ExternalID__c,p.AV_NewReportActions__c
 				)
 			);
 		}
@@ -1722,21 +1887,41 @@ public with sharing class AV_ReportAppointment_Controller{
 	}
 
 	/**
-	* @description     					Procces owners of Opportunity where create a Opportunity type Iniciativa so fill the fields and send to API Oppotunity
-	* @param  listIdsOppUpdateCreated  	list of new Opportunity records and update records
+	* @description                      Procces owners of Opportunity where create a Opportunity type Iniciativa so fill the fields and send to API Oppotunity
+	* @param  listIdsOppUpdateCreated   list of new Opportunity records and update records
 	*/
 	@AuraEnabled
-	public static string sendOppToGCF(List<String> listIdsOppUpdateCreated){
+	public static string sendOppToGCF(List<String> listIdsOppUpdateCreated,String  newEvTsk){
 		String result = 'OK';
+		String methodName = 'sendOppToGCF';
 		if (listIdsOppUpdateCreated != null && !listIdsOppUpdateCreated.isEmpty()) {
 			List<Opportunity> listToGcf = new List<Opportunity>();
-			List<Opportunity> listOpp = [Select Id, RecordType.DeveloperName, AV_ExternalId__c, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c from Opportunity where Id in :listIdsOppUpdateCreated WITH SECURITY_ENFORCED];
+			List<Opportunity> listOpp = [Select Id, RecordType.DeveloperName, AV_ExternalId__c, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c,AV_Channel__c,AV_Subestado__c,OwnerId from Opportunity where Id in :listIdsOppUpdateCreated WITH SECURITY_ENFORCED];
+			List<Opportunity> lstOppToUpdt = new List<Opportunity>(); 
+
+			
 			if (listOpp != null && !listOpp.isEmpty()) {
 				for (Opportunity opp : listOpp) {
+					opp.AV_Channel__c = newEvTsk; 
+					lstOppToUpdt.add(opp); 
 					if (opp.RecordType.DeveloperName == AV_AppConstants.OPPINICIATIVA_RT) {
 						listToGcf.add(opp);
 					}
 				}
+				
+				if(lstOppToUpdt!= null && !lstOppToUpdt.isEmpty()){
+					List<Database.SaveResult> listSr = Database.update(lstOppToUpdt, false);
+					for (Database.SaveResult sr: listSr) {
+						if(!sr.isSuccess()) {           
+							for(Database.Error err : sr.getErrors()) {
+								AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
+								
+							}
+						}
+					}
+				}
+				
+				
 				if (listToGcf != null && !listToGcf.isEmpty()) {
 					AV_SetFieldsAPIOpp_SyncOpportunity.sendToGCF(json.serialize(listToGcf));
 				}else {
@@ -1748,4 +1933,17 @@ public with sharing class AV_ReportAppointment_Controller{
 		}
 		return result;
 	}
+
+	
+	@AuraEnabled(cacheable=true)
+	public static Map<String,User> getUserInfo() {
+		List<User> mainUser =  [SELECT Id, Name,AV_Funcion__c,AV_NumeroOficinaEmpresa__c,AV_Pool__c FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
+		Map<String,User> response = new Map<String,User>{'gestor' => mainUser[0]};
+		String multige = AV_PoolEvents_Controller.getCurrentDT(mainUser[0].AV_NumeroOficinaEmpresa__c);
+		if(multige != null){
+				response.put('multigestor',new User(Id = multige));
+		}
+		return response;
+	}
+	
 }

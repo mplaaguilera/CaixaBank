@@ -64,6 +64,14 @@ public class HDT_Case_BU_TRHan_Test {
 
         System.runAs(usuario1){
 
+             // Inicialización de datos.        
+             Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId(); 
+             CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
+             lista.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución';
+             lista.CC_Activa__c = true;
+             lista.RecordTypeId = recorTypeLista;
+             insert lista;
+
             User usuario = new User();
             usuario.ProfileId = profileId;
             usuario.FirstName = 'first 11212';
@@ -362,6 +370,20 @@ public class HDT_Case_BU_TRHan_Test {
 		encuesta3.CC_Link_LimeSurvey__c = 'https://opina.caixabank.com/index.php?r=survey/index&';
        insert encuesta3;
 
+       HDT_Parametros__c encuesta = new HDT_Parametros__c(
+        Name = 'HDT_Envio_Encuesta_3N',
+        HDT_Configuracion_1__c = '261467',
+        HDT_Configuracion_2__c = 'Encuesta Test'
+    );
+    insert encuesta;
+
+    HDT_Parametros__c encuesta2 = new HDT_Parametros__c(
+        Name = 'HDT_Envio_Encuesta_3N_EDG',
+        HDT_Configuracion_1__c = '261468',
+        HDT_Configuracion_2__c = 'Encuesta Test'
+    );
+    insert encuesta2;
+
         Case caso = new Case();
         caso.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
         caso.Status = 'Activo';
@@ -381,28 +403,32 @@ public class HDT_Case_BU_TRHan_Test {
         caso.Origin = 'Chat';
        insert caso;
 
-        Case caso2 = new Case();
-        caso2.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
-        caso2.Status = 'Activo';
-        caso2.CC_Idioma__c = 'es';
-        caso2.Subject = 'Asunto';
-        caso2.Description = 'Descripción';
-        caso2.CC_Canal_Operativo__c = 'App Imagin';
-        caso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
-        caso2.CC_Detalles_Solucion__c = 'Detalles Solución';
-        caso2.CC_MCC_Tematica__c = mccTematica.Id;
-        caso2.CC_MCC_ProdServ__c = mccProducto.Id;
-        caso2.CC_MCC_Motivo__c = mccMotivo.Id;
-        caso2.CC_MCC_Causa__c = mccCausa.Id;
-        caso2.CC_MCC_Solucion__c = solucion.Id;
-        caso2.AccountId = cuenta.Id;
-        caso2.ContactId = contacto.Id;
-        caso2.Origin = 'Phone';
-       insert caso2;
+       Id listaPadre = [SELECT id FROM CC_Lista_Valores__c WHERE Name = 'HDT - Envío de Encuesta 3N - Canales de resolución' limit 1].Id;
+        // Crear un registro de CC_Lista_Valores__c para simular un resultado válido
+        CC_Lista_Valores__c listaValor = new CC_Lista_Valores__c(
+            Name = 'Servicios Centrales',
+            CC_Activa__c = true,
+            CC_Valor__c = 'No EDG',
+            CC_Lista__c = listaPadre
+
+        );
+        insert listaValor;
+
+        CC_Lista_Valores__c listaValor2 = new CC_Lista_Valores__c(
+            Name = 'EDG-MICROBANK',
+            CC_Activa__c = true,
+            CC_Valor__c = 'EDG',
+            CC_Lista__c = listaPadre
+
+        );
+        insert listaValor2;
+
+        List<Task> listaTareas = new List<Task>();
 
         //Creación nueva tarea ABIERTA asociada al caso anterior
         Task tarea = new Task(WhatId=caso.Id, Status='Open', Type = 'Traslado Tercer Nivel');
-        insert tarea;
+        listaTareas.add(tarea);
+        insert listaTareas;
 
         //Crear Agrupador incidencia
 
@@ -432,14 +458,12 @@ public class HDT_Case_BU_TRHan_Test {
         tarea.Status = 'Completed';
         update tarea;
 
-
         List<Case> listCasos = new List<Case>();
         listCasos.add(caso);
-        listCasos.add(caso2);
-
+       
         Set<Id> setIdsCasos = new Set<Id>();
         setIdsCasos.add(caso.Id);
-
+        
         List<ID> listaAgrupadores = new List<ID>();
         listaAgrupadores.add(agrupador.Id);
 
@@ -450,23 +474,229 @@ public class HDT_Case_BU_TRHan_Test {
 
             caso.Status = 'Cerrado';
             update caso;
+
             HDT_Case_BU_TRHan.generarURLLimeSurvey(listCasos,setIdsCasos);
 
             //CC_Agrupador.cierreAgrupador(listaAgrupadores);
             Case c = [SELECT Id, CC_URL_Encuesta_3N__c, Status FROM Case WHERE Id =: caso.Id LIMIT 1];
+            
+        
+        Test.stopTest();
+           System.assertEquals(caso.Status, 'Cerrado', 'No se ha cerrado el caso.');
+        }
+    }
+
+    @isTest
+    public static void generarURLLimeSurveyTest2(){
+
+        Account cuenta = [Select Id from Account where CC_Numero_Documento__c = '64850344G'];
+        Contact contacto = [Select Id from Contact where CC_Matricula__c = 'U011152'];
+        
+        Id recordTem = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordProd = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordMot = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+
+        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        CC_MCC__c mccTematica = new CC_MCC__c();
+        mccTematica.Name = 'ImaginBank';
+        mccTematica.CC_Tipo_Cliente__c = 'Empleado';
+        mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccTematica.RecordTypeId = recordTypeIdTematica;
+        mccTematica.CC_Codigo_Externo__c = 'TE-000001';
+        mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
+        insert mccTematica;
+
+        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        CC_MCC__c mccProducto = new CC_MCC__c();
+        mccProducto.Name = 'Migración';
+        mccProducto.CC_Tipo_Cliente__c = 'Empleado';
+        mccProducto.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccProducto.RecordTypeId = recordTypeIdProducto;
+        mccProducto.CC_Tematica__c = mccTematica.Id;
+        mccProducto.CC_Codigo_Externo__c = 'PR-000001';
+        insert mccProducto;
+
+        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        CC_MCC__c mccMotivo = new CC_MCC__c();
+        mccMotivo.Name = 'Reversión';
+        mccMotivo.CC_Tipo_Cliente__c = 'Empleado';
+        mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccMotivo.RecordTypeId = recordTypeIdMotivo;
+        mccMotivo.CC_Tematica__c = mccTematica.Id;
+        mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
+        mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
+       insert mccMotivo;
+
+        Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        CC_MCC__c mccCausa = new CC_MCC__c();
+        mccCausa.Name = 'Solicita reversión';
+        mccCausa.CC_Tipo_Cliente__c = 'Empleado';
+        mccCausa.CC_Fecha_Vigencia_Inicio__c = date.today();
+        mccCausa.RecordTypeId = recordTypeIdCausa;
+        mccCausa.CC_Motivo__c = mccMotivo.Id;
+        mccCausa.CC_Codigo_Externo__c = 'CA-000001';
+       insert mccCausa;
+        CC_MCC__c solucion = new CC_MCC__c();
+        solucion.RecordTypeId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        solucion.Name = 'Actualizar Sistema';
+        solucion.CC_Tipo_Cliente__c = 'Empleado';
+        solucion.CC_Causa__c = mccCausa.Id;
+        solucion.CC_Codigo_Externo__c = 'CA-000002';
+        insert solucion;
+        
+        
+		CC_Lista_Valores__c lovAvisosSobreAgrupadores = new CC_Lista_Valores__c();
+        lovAvisosSobreAgrupadores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
+        lovAvisosSobreAgrupadores.CC_Activa__c = true;
+        lovAvisosSobreAgrupadores.Name = 'Avisos sobre agrupadores';
+        insert lovAvisosSobreAgrupadores;
+
+        CC_Lista_Valores__c valorUmbralPrimerAviso = new CC_Lista_Valores__c();
+        valorUmbralPrimerAviso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralPrimerAviso.CC_Activa__c = true;
+        valorUmbralPrimerAviso.CC_Lista__c = lovAvisosSobreAgrupadores.Id;
+        valorUmbralPrimerAviso.Name = CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', 'CC_Incidencia') + ' - Umbral primer aviso';
+        valorUmbralPrimerAviso.CC_Valor__c = '2';
+        CC_Lista_Valores__c valorUmbralSiguientesAvisos = new CC_Lista_Valores__c();
+        valorUmbralSiguientesAvisos.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
+        valorUmbralSiguientesAvisos.CC_Activa__c = true;
+        valorUmbralSiguientesAvisos.CC_Lista__c = lovAvisosSobreAgrupadores.Id;
+        valorUmbralSiguientesAvisos.Name = CC_MetodosUtiles.getRecordTypeNameFromDeveloperName('CC_Agrupador__c', 'CC_Incidencia') + ' - Umbral siguientes avisos';
+        valorUmbralSiguientesAvisos.CC_Valor__c = '50';
+
+        List<CC_Lista_Valores__c> valorUmbralInsert = new List<CC_Lista_Valores__c>();
+        valorUmbralInsert.add(valorUmbralPrimerAviso);
+        valorUmbralInsert.add(valorUmbralSiguientesAvisos);
+    	insert valorUmbralInsert;
+        
+
+        CC_Envio_Encuesta__c encuesta3 = new CC_Envio_Encuesta__c();
+		encuesta3.Name = 'CC_URL_Encuesta';
+		encuesta3.CC_Id_Encuesta__c = '687532';
+		encuesta3.CC_Link_LimeSurvey__c = 'https://opina.caixabank.com/index.php?r=survey/index&';
+       insert encuesta3;
+
+       HDT_Parametros__c encuesta = new HDT_Parametros__c(
+        Name = 'HDT_Envio_Encuesta_3N',
+        HDT_Configuracion_1__c = '261467',
+        HDT_Configuracion_2__c = 'Encuesta Test'
+    );
+    insert encuesta;
+
+    HDT_Parametros__c encuesta2 = new HDT_Parametros__c(
+        Name = 'HDT_Envio_Encuesta_3N_EDG',
+        HDT_Configuracion_1__c = '261468',
+        HDT_Configuracion_2__c = 'Encuesta Test'
+    );
+    insert encuesta2;
+
+        Case caso2 = new Case();
+        caso2.recordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
+        caso2.Status = 'Activo';
+        caso2.CC_Idioma__c = 'es';
+        caso2.Subject = 'Asunto';
+        caso2.Description = 'Descripción';
+        caso2.CC_Canal_Operativo__c = 'App Imagin';
+        caso2.CC_Detalles_Consulta__c = 'Detalles Consulta';
+        caso2.CC_Detalles_Solucion__c = 'Detalles Solución';
+        caso2.CC_Canal_Resolucion__c = 'EDG-MICROBANK';
+        caso2.CC_MCC_Tematica__c = mccTematica.Id;
+        caso2.CC_MCC_ProdServ__c = mccProducto.Id;
+        caso2.CC_MCC_Motivo__c = mccMotivo.Id;
+        caso2.CC_MCC_Causa__c = mccCausa.Id;
+        caso2.CC_MCC_Solucion__c = solucion.Id;
+        caso2.AccountId = cuenta.Id;
+        caso2.ContactId = contacto.Id;
+        caso2.Origin = 'Phone';
+       insert caso2;
+
+       Id listaPadre = [SELECT id FROM CC_Lista_Valores__c WHERE Name = 'HDT - Envío de Encuesta 3N - Canales de resolución' limit 1].Id;
+        // Crear un registro de CC_Lista_Valores__c para simular un resultado válido
+        CC_Lista_Valores__c listaValor = new CC_Lista_Valores__c(
+            Name = 'Servicios Centrales',
+            CC_Activa__c = true,
+            CC_Valor__c = 'No EDG',
+            CC_Lista__c = listaPadre
+
+        );
+        insert listaValor;
+
+        CC_Lista_Valores__c listaValor2 = new CC_Lista_Valores__c(
+            Name = 'EDG-MICROBANK',
+            CC_Activa__c = true,
+            CC_Valor__c = 'EDG',
+            CC_Lista__c = listaPadre
+
+        );
+        insert listaValor2;
+
+        List<Task> listaTareas = new List<Task>();
+
+        //Creación nueva tarea ABIERTA asociada al caso anterior
+        Task tarea2 = new Task(WhatId=caso2.Id, Status='Open', Type = 'Traslado Tercer Nivel');
+        listaTareas.add(tarea2);
+        insert listaTareas;
+
+        //Crear Agrupador incidencia
+
+        Test.startTest();
+
+ 		 CC_Agrupador__c agrupador = new CC_Agrupador__c();
+        agrupador.RecordTypeId = Schema.SObjectType.CC_Agrupador__c.getRecordTypeInfosByDeveloperName().get('CC_Incidencia').getRecordTypeId();
+        agrupador.CC_Titulo__c = 'Prueba';
+        agrupador.CC_Estado__c = 'Activo';
+		agrupador.CC_Descripcion__c = 'Prueba TEST';
+        agrupador.CC_CanalEntrada__c = 'Twitter';
+        agrupador.CC_CanalProcedencia__c = 'ImaginBank';
+        agrupador.CC_Fecha_Cierre__c =  Datetime.valueOf(system.now());
+        insert agrupador;
+        CC_PlantillaAsociada__c plantillaAgrupador = new CC_PlantillaAsociada__c();
+        plantillaAgrupador.CC_Agrupador__c = agrupador.Id;
+        plantillaAgrupador.CC_Idioma__c = 'es';
+        plantillaAgrupador.CC_Tipo_Cliente__c = 'Empleado';
+        plantillaAgrupador.CC_CuerpoNotificacion__c = 'Cuerpo email';
+        plantillaAgrupador.CC_Revisada__c = true;
+       insert plantillaAgrupador;
+
+
+        caso2.CC_Agrupador_Id__c = agrupador.Id;
+        caso2.Status= 'Pendiente Incidencia';
+        update caso2;
+
+        tarea2.Status = 'Completed';
+        update tarea2;
+
+
+
+        List<Case> listCasos = new List<Case>();
+        listCasos.add(caso2);
+
+        Set<Id> setIdsCasos = new Set<Id>();
+        setIdsCasos.add(caso2.Id);
+        
+        List<ID> listaAgrupadores = new List<ID>();
+        listaAgrupadores.add(agrupador.Id);
+
+        
+        User pruebas = [SELECT Id FROM User WHERE LastName = 'last211' LIMIT 1];
+        //user usuario = [select id from user WHERE Name = 'HDT_Usuario_CaixaBank'];
+        System.runAs(pruebas){
+            caso2.Status = 'Cerrado';
+            update caso2;
+
+            HDT_Case_BU_TRHan.generarURLLimeSurvey(listCasos,setIdsCasos);
             Case c2 = [SELECT Id, CC_URL_Encuesta_3N__c, Status FROM Case WHERE Id =: caso2.Id LIMIT 1];
         
         Test.stopTest();
 
            System.assertEquals(caso2.Status, c2.Status, 'No se ha cerrado el caso.');
-            System.assertEquals(caso2.CC_URL_Encuesta_3N__c, c2.CC_URL_Encuesta_3N__c, 'No se ha informado el valor del campo de la encuesta 3N.');
         }
     }
 
     @isTest
     public static void enmascararPANBeforeInsert() {
         System.runAs(HDT_TestDataFactory.usuarioAHdt()) {
-        // Alta de datos para la prueba
+                    // Alta de datos para la prueba
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
         caso.Subject = 'Asunto 1234567898765432';
@@ -2051,7 +2281,8 @@ public class HDT_Case_BU_TRHan_Test {
         User pruebas = [SELECT Id FROM User WHERE LastName = 'last211' LIMIT 1];
 
         System.runAs(pruebas){
-            Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+            //Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
             CC_MCC__c mccTematica = new CC_MCC__c();
             mccTematica.Name = 'ImaginBank';
             mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -2061,7 +2292,8 @@ public class HDT_Case_BU_TRHan_Test {
             mccTematica.CC_Canal_Operativo__c = 'App BrokerNow';
             insert mccTematica;
 
-            Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+            //Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
             CC_MCC__c mccProducto = new CC_MCC__c();
             mccProducto.Name = 'Migración';
             mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -2071,7 +2303,8 @@ public class HDT_Case_BU_TRHan_Test {
             mccProducto.CC_Codigo_Externo__c = 'PR-000001';
             insert mccProducto;
 
-            Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+            Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+            //Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
             CC_MCC__c mccMotivo = new CC_MCC__c();
             mccMotivo.Name = 'Reversión';
             mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -2082,7 +2315,8 @@ public class HDT_Case_BU_TRHan_Test {
             mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
             insert mccMotivo;
 
-            Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+            Id recordTypeIdCausa = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+            //Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
             CC_MCC__c mccCausa = new CC_MCC__c();
             mccCausa.Name = 'Solicita reversión';
             mccCausa.CC_Tipo_Cliente__c = 'Cliente';

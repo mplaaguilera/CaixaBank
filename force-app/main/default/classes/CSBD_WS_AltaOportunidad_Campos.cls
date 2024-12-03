@@ -529,11 +529,11 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 				if (String.isNotBlank(solicitud?.numperso)) {
 					condiciones.add(' CC_NumPerso__c = \'' + (solicitud?.buzonCajeros == true ? solicitud?.numperso : formatearNumperso(solicitud?.numperso))+ '\'');
 				}
-
+				
 				if (String.isNotBlank(solicitud?.nif)) {
 					condiciones.add(' CC_Numero_Documento__c = \'' + solicitud.nif + '\'');
 				}
-
+				
 				if (String.isNotBlank(solicitud?.telefono)) {
 					condiciones.add(' Phone = \'' + solicitud.telefono + '\' OR MobilePhone = \'' + solicitud.telefono + '\'');
 				}
@@ -570,12 +570,43 @@ public with sharing class CSBD_WS_AltaOportunidad_Campos {
 		if (!String.isEmpty(tipoIdentificacion.get('valorBusqueda')) || !String.isEmpty(tipoIdentificacion.get('tipoBusqueda'))) {
 			List<Account> cuentas = new List<Account>();
 			List<Contact> contactos = new List<Contact>();
+			Boolean identificacionALF = identificacionAlfActiva();
 
-			if (cuentas.isEmpty()) {
+			if (identificacionALF) {
+				//Identificación contra ALF (ignora resultados con más de una cuenta)
+				Map<String, Object> mapaCuentasContactos = CC_IdentCliente_Future.getIdentificacionALF(tipoIdentificacion.get('tipoBusqueda'), tipoIdentificacion.get('valorBusqueda'));
+				cuentas = (List<Account>)mapaCuentasContactos.get('CUENTAS');
+				if (cuentas.size() == 1) {
+					if (mapaCuentasContactos.containsKey('CONTACTOS')) {
+						contactos = (List<Contact>)mapaCuentasContactos.get('CONTACTOS');
+						if (contactos.size() == 1) {
+							campos.put('AccountId', cuentas[0].Id);
+							campos.put('CSBD_Contact__c', contactos[0].Id);
+						}
+					} else {
+						//Buscar la cuenta retornada por ALF solo tiene un contacto en Salesforce
+						List<Contact> contactosCuenta = [SELECT Id, Phone, MobilePhone FROM Contact WHERE AccountId = :cuentas[0].Id];
+						if (contactosCuenta.size() == 1) {
+							campos.put('AccountId', cuentas[0].Id);
+							campos.put('CSBD_Contact__c', contactosCuenta[0].Id);
+						}
+					}
+				}
+			}
+
+			if (!identificacionALF || cuentas.isEmpty()) {
 				//Identificación contra BD (también cuando identificación ALF sin resultados)
-				if (String.isNotBlank(tipoIdentificacion.get('valorBusqueda'))) {
-					contactos = Database.query('SELECT AccountId FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND ('
-													+ tipoIdentificacion.get('valorBusqueda')  + ')',
+				if (tipoIdentificacion.get('tipoBusqueda') == 'NP') {
+					contactos = [SELECT AccountId FROM Contact
+							WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA')
+							AND CC_NumPerso__c = :tipoIdentificacion.get('valorBusqueda')];
+				} else if (tipoIdentificacion.get('tipoBusqueda') == 'DOC') {
+					contactos = [SELECT AccountId FROM Contact
+							WHERE (RecordType.DeveloperName = 'CC_Cliente' OR Account.RecordType.DeveloperName = 'CC_ClientePA')
+							AND CC_Numero_Documento__c = :tipoIdentificacion.get('valorBusqueda')];
+				} else{
+					contactos = Database.query('SELECT AccountId FROM Contact WHERE (RecordType.DeveloperName = \'CC_Cliente\' OR Account.RecordType.DeveloperName = \'CC_ClientePA\') AND (' 
+													+ tipoIdentificacion.get('valorBusqueda')  + ')', 
 												AccessLevel.USER_MODE);
 				}
 

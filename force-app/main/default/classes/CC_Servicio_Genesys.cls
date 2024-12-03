@@ -66,6 +66,11 @@ public with sharing class CC_Servicio_Genesys {
 						WHERE CSBD_Now_Codigo_Producto__c = :oportunidad.CSBD_Now_Codigo_Producto__c
 						LIMIT 1]?.KIN_Cola_Id_GC__c ?? queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
 
+			} else if(oportunidad.RecordType.DeveloperName == 'CSBD_MAC'){
+				return [SELECT KIN_Cola_Id_GC__c FROM CC_Servicio_Genesys__c
+						WHERE CSBD_Tipos_de_Oportunidad__c = :oportunidad.RecordType.Name
+						LIMIT 1]?.KIN_Cola_Id_GC__c ?? queueIdServicioGenesysCsbd('NIS_GenesysCloudOutboundDefault');
+
 			} else if (String.isNotBlank(oportunidad.CSBD_Producto__c)) {
 				//Se determina el servicio de salida según se define en la lista de valores "CSBD: Productos con grabación de llamadas salientes"
 				if ([SELECT Id FROM CC_Lista_Valores__c WHERE CC_Activa__c = TRUE

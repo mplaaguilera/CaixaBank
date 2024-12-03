@@ -736,7 +736,7 @@ public with sharing class CC_OTP {
         }
         return resultado;
     }
-    //Desglce de métodos
+//Desglce de métodos
     public static List<Task> comprobarSiHayLlamada(Id casoId){
        return [SELECT Id, CC_Llamada_Id__r.CC_Tipo__c, CC_Llamada_Id__r.CC_DNIS__c FROM Task WHERE WhatId = :casoId AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task') AND CreatedDate = TODAY AND (Status = 'Open' OR Type = 'Llamada transferida' OR Type = 'Consulta') AND CC_Llamada_Id__c != null ORDER BY  CreatedDate DESC LIMIT 1];
       
@@ -1026,5 +1026,13 @@ public with sharing class CC_OTP {
     public static Boolean getPSAutenticacion() {
         List<PermissionSetAssignment> permisoAutenticacion = [SELECT Id FROM PermissionSetAssignment WHERE Assignee.Id = :UserInfo.getUserId() AND PermissionSet.Name = 'CC_Autenticacion' LIMIT 1];
         return (!permisoAutenticacion.isEmpty()) ? true : false;
+    }
+
+    @AuraEnabled
+    public static void testAut() {
+        System.debug('::: dentro testAut');
+        Map<Boolean, String> retornoAutenticacion = CC_WS_Autenticacion_SAU.CC_WS_Envio_Autenticacion(false, '100');
+        System.debug('::: retornoAutenticacion: ' + retornoAutenticacion);
+        System.debug('::: despues testAut');
     }
 }

@@ -21,7 +21,7 @@ public with sharing class CC_MCC_TRDisp extends CC_TriggerDispatcherBase {
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
     }
-    */
+    
     public virtual override void beforeUpdate(CC_TriggerParameters tp) {
         
         if (!isBeforeUpdateProcessing) {           
@@ -34,7 +34,7 @@ public with sharing class CC_MCC_TRDisp extends CC_TriggerDispatcherBase {
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
-   /* 
+    
     public virtual override void beforeDelete(CC_TriggerParameters tp) {
         
         if (!isBeforeDeleteProcessing) {           

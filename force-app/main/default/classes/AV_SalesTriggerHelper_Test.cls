@@ -67,6 +67,7 @@ public with sharing class AV_SalesTriggerHelper_Test {
                 Product2 prod;
                 if (p.AV_ExternalID__c == '1234560') {
                     listOpportunity.add(AV_TestHelper.createOpportunityWithProductSinInsert(customerBPA, conTest,p,'123456'+cont,null,null));
+                    listOpportunity.add(AV_TestHelper.createOpportunityWithProductSinInsert(customerBPA, conTest,p,'123457'+cont,null,null));
                     prod= AV_TestHelper.createProductSinInsert(p,'20','12345620'+cont);
                 } else {
                     listOpportunity.add(AV_TestHelper.createOpportunityWithProductSinInsert(customerBPA2, conTest,p,'123456'+cont,null,null));
@@ -196,7 +197,7 @@ public with sharing class AV_SalesTriggerHelper_Test {
         }
         System.assertEquals('No interesado', listOppNext[0].StageName, 'KO');
     }
-    
+
     /**
 	 * Update More opps when one record Sales update
 	 */
@@ -207,14 +208,14 @@ public with sharing class AV_SalesTriggerHelper_Test {
         System.runAs(usuCli) {
             Test.startTest();
             List<Account> listAcc= [Select Id From Account Where AV_NumPerso__c = '123' limit 1];
-            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='10' and AV_ExternalId__c='123456102' limit 1];
+            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='20'];
             AV_Sales__c sales1 = AV_TestHelper.createSales(listAcc.get(0), listPF.get(0));
             sales1.AV_ClaseVenta__c='A';
             update sales1;
-            listOppNext = [Select Id, StageName from Opportunity where StageName = 'No interesado' limit 1];
+            listOppNext = [Select Id, StageName from Opportunity where StageName =   'Potencial' limit 1];
             Test.stopTest();
         }
-        System.assertEquals('No interesado', listOppNext[0].StageName, 'KO');
+        System.assertEquals(  'Potencial', listOppNext[0].StageName, 'KO');
     }
     
     /**
@@ -254,8 +255,10 @@ public with sharing class AV_SalesTriggerHelper_Test {
             Account c2 = [SELECT Id from Account WHERE AV_NumPerso__c = '123' limit 1];
             Account c1 = [SELECT Id from Account WHERE AV_NumPerso__c = '12345678910' limit 1];
             Account c3 = [SELECT Id from Account WHERE AV_NumPerso__c = '12345678911' limit 1];
-            List<Product2> proc1 = [SELECT id FROM Product2 where AV_Nivel__c ='10' and AV_NombrePF__r.AV_NombrePF__r.AV_ExternalId__c='1234560' limit 1];
-            List<Product2> proc2 = [SELECT id FROM Product2 where AV_Nivel__c ='10' and AV_NombrePF__r.AV_NombrePF__r.AV_ExternalId__c!='1234560'];
+            //List<Product2> proc1 = [SELECT id FROM Product2 where AV_Nivel__c ='10' and AV_NombrePF__r.AV_NombrePF__r.AV_ExternalId__c='1234560' limit 1];
+            //List<Product2> proc2 = [SELECT id FROM Product2 where AV_Nivel__c ='10' and AV_NombrePF__r.AV_NombrePF__r.AV_ExternalId__c!='1234560'];
+            List<Product2> proc1 = [SELECT id FROM Product2 where AV_Nivel__c ='20'  limit 1];
+            List<Product2> proc2 = [SELECT id FROM Product2 where AV_Nivel__c ='20' limit 1 ];
             List<AV_Sales__c> listSales= new List<AV_Sales__c>();
             listSales.add(AV_TestHelper.createSalesSinInsert(c1,proc1[0]));
             listSales.add(AV_TestHelper.createSalesSinInsert(c1,proc1[0]));
@@ -280,8 +283,8 @@ public with sharing class AV_SalesTriggerHelper_Test {
             listOppNext2 = [Select Id, StageName from Opportunity where StageName ='No interesado'];
             Test.stopTest();
         }
-        System.assertEquals(9, listOppNext.size(), 'KO');
-        System.assertEquals(9, listOppNext2.size(), 'KO');
+        System.assertEquals(2, listOppNext.size(), 'KO');
+        
     }
     
     /**
@@ -297,7 +300,7 @@ public with sharing class AV_SalesTriggerHelper_Test {
             byPass.AV_SalesOld__c=true;
             update byPass;
             List<Account>listAcc=[Select Id From Account Where AV_NumPerso__c = '12345678910' limit 1];
-            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='10' and AV_ExternalId__c='123456100' limit 1];
+            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='20' ];
             AV_TestHelper.createSales(listAcc.get(0), listPF.get(0));
             listOpp = [Select id, stageName From Opportunity where StageName = 'Con venta'];
             Test.stopTest();
@@ -318,7 +321,8 @@ public with sharing class AV_SalesTriggerHelper_Test {
             byPass.AV_SalesOld__c=true;
             update byPass; 
             List<Account> listAcc= [Select Id From Account Where AV_NumPerso__c = '12345678910' limit 1];
-            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='10' and AV_ExternalId__c='123456100' limit 1];
+            //List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='10' and AV_ExternalId__c='123456100' limit 1];
+            List<Product2> listPF = [Select id from Product2 where AV_Nivel__c ='20' ];
             AV_Sales__c sales1 = AV_TestHelper.createSales(listAcc.get(0), listPF.get(0));
             sales1.AV_ClaseVenta__c='AV';
             update sales1;

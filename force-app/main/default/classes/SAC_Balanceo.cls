@@ -29,6 +29,7 @@ public without sharing class SAC_Balanceo {
      * 1.0            US213183         Carlos Solis   6/05/21      Creación
     *****************************************************************/
     public static void asignarCasosAlOwner (List<Case> listaCasos /**Query */, List<Case> listNewCaseAsignarCasosAlOwner, List<Id> listaIdsCuentas, Map<Id,Case> mapaDatosCasosActualizar) {
+       
         Map<Id,List<Case>> mapaListCasos = new Map<Id,List<Case>>(); 
         List<case> listaCasos2 = new List<case>();
 
@@ -48,7 +49,6 @@ public without sharing class SAC_Balanceo {
                 mapaListConsultas.get(caso.AccountId).add(caso);
             }  
         }
-
         for( ID ide : mapaListCasos.keySet()){ 
             listaCasos2.addAll(mapaListCasos.get(ide) );        
         } 
@@ -70,7 +70,7 @@ public without sharing class SAC_Balanceo {
                 casosParaUpdatear.add(caso);
             }
         }
-
+        
         for(Case caso : casosParaUpdatear){
             if(mapaDatosCasosActualizar.containsKey(caso.id)){
                 mapaDatosCasosActualizar.get(caso.id).OwnerId = caso.OwnerId;
@@ -91,10 +91,6 @@ public without sharing class SAC_Balanceo {
      * 1.0            US213183         Carlos Solis   6/05/21      Creación
     *****************************************************************/
     public static List<Case> asignarOwnerCaso (List<Case> listaCasos, List<Case> listNewCase, list<Id> listaIdsCuentas) {
-
-        System.debug('Entro en el asignarOwnerCaso 1 -> ' + listaCasos);
-        System.debug('Entro en el asignarOwnerCaso 1 -> ' + listNewCase);
-
         
         Map<Id,List<Case>> mapaCasos = new Map<Id,List<Case>>(); 
         List<case> listaCasos2 = new List<case>();
@@ -154,9 +150,6 @@ public without sharing class SAC_Balanceo {
         if (!listaWrapperAlerta.isEmpty()) {
             SAC_Alertas.generarAlertas(listaWrapperAlerta);
         }
-
-        System.debug('Entro en el asignarOwnerCaso 2 -> ' + listNewCase);
-
 
         return listaCasosNoTratados;
     }

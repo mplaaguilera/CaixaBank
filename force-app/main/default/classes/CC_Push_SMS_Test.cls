@@ -73,7 +73,7 @@ public class CC_Push_SMS_Test {
         insert oCaso;
         CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
         customSetting.Name = 'CC_Envio_SMS';
-        customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/distribution/messages/applicationAlerts/send';
+        customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/distribution/messages/applicationAlerts/send';
         customSetting.RegistroTrazaIntegracion__c = true;
         insert customSetting;
     }

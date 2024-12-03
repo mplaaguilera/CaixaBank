@@ -43,7 +43,7 @@ public with sharing class CIBE_TasksFromGroupsController {
                             Owner.Name,
                             RecordType.Name
                         FROM Task
-                        WHERE RecordTypeId IN :recordTypes AND WhatId = :recordIds AND Status = :stages
+                        WHERE RecordTypeId IN :recordTypes AND WhatId = :recordIds AND Status = :stages AND AV_ToDelete__c = FALSE
                         ORDER BY ActivityDate ASC LIMIT 10 OFFSET :offSet];
         }
 

@@ -79,7 +79,7 @@ global with sharing class SEG_WS_Cognitive_FFEE extends CBK_HttpServiceIntegrati
         if(listCasos.isEmpty()){
             output.resultado='KO';
             output.mensaje='No se encuentra el Caso indicado en Salesforce';
-        } else if(listCasos[0].SEG_ClasificacionRapida__c == null && listCasos[0].SEG_Case_Owner__c == 'SEG_BO'){          
+         } else if(listCasos[0].SEG_ClasificacionRapida__c == null && listCasos[0].SEG_Case_Owner__c == 'SEG_BO'){          
             Case casoSeg = listCasos[0];
 
             if(String.isNotBlank(input.category)) {

@@ -186,8 +186,8 @@ public with sharing class CC_WS_Methods_CLI {
             }
             
             oAccount.CC_NumPerso__c = sNumPer;
-            oAccount.AV_Segmento__c = Segmento;
-            oAccount.AV_Subsegmento__c = SubSegmento;
+            oAccount.CC_Segmento__c = Segmento;
+            oAccount.CC_Subsegmento__c = SubSegmento;
 
             // Recuperar segmento y subsegmento de la lista de valores.
             if (oParamAux != null && oParamAux.size() > 0) {

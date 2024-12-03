@@ -11,13 +11,13 @@ Historial
 	1.1		 US405453			Vladislav Lityagin		08/08/2022  Add searchNoAccount, getOriginValues
 	1.2		 US450961			Oscar Moreno Rodriguez	27/09/2022	Add getProducto
 	1.3		 US461262			Oscar Moreno Rodriguez	28/10/2022	Add getStageValues, getPendingReasonValues, getStatusValues, getResolutionValues
-
+	1.4		 Fix PMD Errors		Daniel Rodriguez		30/10/2023	Add queries WITH SECURITY_ENFORCED 
 ***********************************************************************************************************************/
 public with sharing class AV_BuscadorLeadOpp_Controller {
 
     private final static Integer MAX_RESULTS 	= 10;
     private final static Integer MAX_LIMIT 		= 49900;
-    private final static String  ID_GCF			= [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1].Id;
+    private final static String  ID_GCF			= [SELECT Id FROM User WHERE AV_ProfileName__c = 'API Only' AND Alias = 'AV-TF9' WITH SECURITY_ENFORCED  LIMIT 1].Id;
 	public static Integer numberOfRecords;
 
     @AuraEnabled
@@ -76,7 +76,7 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
     private static ObjectList getLeadOppsFilter(Date creationDateFilterFrom, Date creationDateFilterUntil, String[] originMultiFilter, String[] empresaMultiFilter,String[] productoMultiFilter, Boolean altaClienteFilter, String[] statusMultiFilter, String[] stageMultiFilter, String clientFilter, String noClientFilter, String[] employeMultiFilter, String[] pendingReasonMultiFilter, String[] resolutionMultiFilter, Date dueDateFilterFrom, Date dueDateFilterUntil, Date closeDateFilterFrom, Date closeDateFilterUntil,double incomeAmountFilterFrom,double incomeAmountFilterUntil,String page, String office) {
 		String methodName = 'getLeadOppsFilter';
 		Integer totalSize;
-		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
+		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
 		
 		Set<String> stageNull = new Set<String>{AV_AppConstants.LEADOPP_STAGE_POTENCIAL, AV_AppConstants.LEADOPP_STAGE_GESTION,AV_AppConstants.LEADOPP_STAGE_NEGATIVA,AV_AppConstants.LEADOPP_STAGE_POSITIVA,AV_AppConstants.LEADOPP_STAGE_NO_APTO,AV_AppConstants.LEADOPP_STAGE_VENCIDA,AV_AppConstants.LEADOPP_STAGE_VENTA,''};
 		String avQuery = 'SELECT Id, Name, AV_Lead__r.Name, AV_Lead__r.AV_NumPerso__r.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, AV_CreationDate__c, AV_Lead__r.AV_numperso__r.Name, AV_Lead__r.AV_numperso__c, AV_Lead__c, AV_PrescriberId__c,AV_Empresa__c, AV_Producto__c,AV_Producto__r.Name,AV_Lead__r.AV_IsClient__c,tolabel(AV_Status__c), AV_StatusLeadOpp__c, Owner.Name, AV_PendingReason__c, AV_Resolution__c, AV_DueDate__c, AV_FechaCierreGestion__c, AV_IncomeAmount__c  FROM AV_LeadOpportunity__c';
@@ -225,7 +225,7 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
 
 	@AuraEnabled
 	public static String getOffice(){
-		return [select AV_NumeroOficinaEmpresa__c from User WHERE Id = :UserInfo.getUserId() LIMIT 1].AV_NumeroOficinaEmpresa__c;
+		return [select AV_NumeroOficinaEmpresa__c from User WHERE Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED LIMIT 1].AV_NumeroOficinaEmpresa__c;
 	}
 
 	
@@ -341,7 +341,7 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
 
 	@AuraEnabled
 	public static String nameContactAssign(String contactId){
-		List<User> us  = [Select Id, Name From User Where Id = :contactId];
+		List<User> us  = [Select Id, Name From User Where Id = :contactId WITH SECURITY_ENFORCED];
 		if (us.isEmpty()) {
 			return null;
 		}else{
@@ -452,8 +452,8 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
 		List<OptionsPicklist> employees = new List<OptionsPicklist>();
 		List<OptionsPicklist> employeesSorted = new List<OptionsPicklist>();
 		List<Id> employeesId = new List<Id>();
-		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
-		List<User> emps  = [Select Id, Name, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where AV_NumeroOficinaEmpresa__c = :emp.AV_NumeroOficinaEmpresa__c];								
+		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
+		List<User> emps  = [Select Id, Name, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where AV_NumeroOficinaEmpresa__c = :emp.AV_NumeroOficinaEmpresa__c WITH SECURITY_ENFORCED];								
 		if(!emps.isEmpty() && emps != null){
 			for(User u : emps){
 				employeesId.add(u.Id);
@@ -464,7 +464,7 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
 		if(employeesId.size()>1) {
 			employees.add(new OptionsPicklist(ID_GCF+','+employeesAlls,'TODOS - CENTRO '+emp.AV_NumeroOficinaEmpresa__c));
 		}
-		employees.add(new OptionsPicklist(ID_GCF,'Sin Gestor / Eap - CENTRO '+emp.AV_NumeroOficinaEmpresa__c));
+		employees.add(new OptionsPicklist(ID_GCF, AV_AppConstants.SINGESTOR_EAP_CENTRO +emp.AV_NumeroOficinaEmpresa__c));
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
@@ -475,7 +475,7 @@ public with sharing class AV_BuscadorLeadOpp_Controller {
 	public static List<OptionsPicklist> getProducto(){
 		List<OptionsPicklist> productos=new List<OptionsPicklist>();
 		List<Product2> product2=new List<Product2>();
-		product2=[select id,Name from Product2 where AV_PFNowIn__c=true];
+		product2=[select id,Name from Product2 where AV_PFNowIn__c=true WITH SECURITY_ENFORCED];
 
 		if(!product2.isEmpty() && product2 !=null){
 			for(Product2 a:product2){

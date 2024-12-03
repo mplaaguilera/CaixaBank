@@ -7,75 +7,98 @@ public with sharing class SIRE_LCMP_Comunicaciones_Test {
         insert rol;
         User usuario = SIR_TestDataFactory.createTestUser('usuarioTestSireLcmp',rol,'System Administrator','U0111111','09999');
         System.runAs(usuario) {  
-            ID recordTypeCentro = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+            Id recordTypeCentro = mapRTsObjectsAccount.get('CC_CentroCaixaBank').getRecordTypeId();
+            Map<String,Account> centros = New Map<String,Account>();
+                
             Account centro7 = new Account();
             centro7.RecordTypeId = recordTypeCentro;
             centro7.Name = 'test centro7';
             centro7.CC_Numero_Empresa__c = '007';
             centro7.CC_Numero_Oficina__c = '09997';
             centro7.CC_Numero_Oficina_Empresa__c = '001-09997';
-            insert centro7;
+            centros.put('001-09997',centro7);
             
             Account centro6 = new Account();
             centro6.RecordTypeId = recordTypeCentro;
             centro6.Name = 'test centro6';
             centro6.CC_Numero_Empresa__c = '006';
             centro6.CC_Numero_Oficina__c = '09996';
-            centro6.CC_Numero_Oficina_Empresa__c = '001-09996';
-            centro6.AV_CentroSuperior__c = centro7.id;
-            insert centro6;
+            centro6.CC_Numero_Oficina_Empresa__c = '001-09996';            
+            centro6.AV_CentroSuperior__c = null;
+            centros.put('001-09996',centro6);
             
             Account centro5 = new Account();
             centro5.RecordTypeId = recordTypeCentro;
             centro5.Name = 'test centro5';
             centro5.CC_Numero_Empresa__c = '005';
             centro5.CC_Numero_Oficina__c = '09995';
-            centro5.CC_Numero_Oficina_Empresa__c = '001-09995';
-            centro5.AV_CentroSuperior__c = centro6.id;
-            insert centro5;
+            centro5.CC_Numero_Oficina_Empresa__c = '001-09995';       
+            centro5.AV_CentroSuperior__c = null;
+            centros.put('001-09995',centro5);
             
             Account centro4 = new Account();
             centro4.RecordTypeId = recordTypeCentro;
             centro4.Name = 'test centro4';
             centro4.CC_Numero_Empresa__c = '004';
             centro4.CC_Numero_Oficina__c = '09994';
-            centro4.CC_Numero_Oficina_Empresa__c = '001-09994';
-            centro4.AV_CentroSuperior__c = centro5.id;
-            insert centro4;
+            centro4.CC_Numero_Oficina_Empresa__c = '001-09994';                        
+            centro4.AV_CentroSuperior__c = null;
+            centros.put('001-09994',centro4);
             
             Account centro3 = new Account();
             centro3.RecordTypeId = recordTypeCentro;
             centro3.Name = 'test centro3';
             centro3.CC_Numero_Empresa__c = '003';
             centro3.CC_Numero_Oficina__c = '09993';
-            centro3.CC_Numero_Oficina_Empresa__c = '001-09993';
-            centro3.AV_CentroSuperior__c = centro4.id;
-            insert centro3;
+            centro3.CC_Numero_Oficina_Empresa__c = '001-09993';            
+            centro3.AV_CentroSuperior__c = null;
+            centros.put('001-09993',centro3);
             
             Account centro2 = new Account();
             centro2.RecordTypeId = recordTypeCentro;
             centro2.Name = 'test centro2';
             centro2.CC_Numero_Empresa__c = '002';
             centro2.CC_Numero_Oficina__c = '09992';
-            centro2.CC_Numero_Oficina_Empresa__c = '001-09992';
-            centro2.AV_CentroSuperior__c = centro3.id;
-            insert centro2;
+            centro2.CC_Numero_Oficina_Empresa__c = '001-09992';                        
+            centro2.AV_CentroSuperior__c = null;
+            centros.put('001-09992',centro2);
             
             Account centro1 = new Account();
             centro1.RecordTypeId = recordTypeCentro;
             centro1.Name = 'test centro1';
             centro1.CC_Numero_Empresa__c = '001';
             centro1.CC_Numero_Oficina__c = '09991';
-            centro1.CC_Numero_Oficina_Empresa__c = '001-09991';
-            centro1.AV_CentroSuperior__c = centro2.id;
-            insert centro1;
-                        
+            centro1.CC_Numero_Oficina_Empresa__c = '001-09991';     
+            centro1.AV_CentroSuperior__c = null;
+            centros.put('001-09991',centro1);
+            
+            //crear oficinas Caixabank
+            insert centros.values();
+            
+            //actualizar jerarquias oficinas
+            centro1.AV_CentroSuperior__c = centros.get('001-09992').id;
+            centro2.AV_CentroSuperior__c = centros.get('001-09993').id;
+            centro3.AV_CentroSuperior__c = centros.get('001-09994').id;
+            centro4.AV_CentroSuperior__c = centros.get('001-09995').id;
+            centro5.AV_CentroSuperior__c = centros.get('001-09996').id;
+            centro6.AV_CentroSuperior__c = centros.get('001-09997').id;
+            
+            centros.put('001-09991',centro1);
+            centros.put('001-09992',centro2);
+            centros.put('001-09993',centro3);
+            centros.put('001-09994',centro4);
+            centros.put('001-09995',centro5);
+            centros.put('001-09996',centro6);            
+            update centros.values();
+            
             Contact contacto = new Contact(LastName='Test01',CC_NumPerso__c = '99999991', CC_Matricula__c='U0111111', AccountId= centro1.Id, AV_UsuarioAsociado__c= usuario.Id);
             insert contacto;
 
             Account cuenta = SIR_TestDataFactory.crearCuenta();
 
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsProceso = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
+            Id recordtypeProceso = mapRTsObjectsProceso.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_EMP_FLUJO).getRecordTypeId();
             SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(
                     Name = SIR_Constantes.tipoProceso_PRESOL,
                     SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_PRESOL_E1,	
@@ -84,7 +107,7 @@ public with sharing class SIRE_LCMP_Comunicaciones_Test {
                     SIREC__SIREC_fld_fechaLimite__c  = date.today(),
                     SIREC__SIREC_fld_fechaSituacion__c = date.today(),
                     SIREC__SIREC_fld_masterRecordId__c = String.valueof((Math.random() * 100000)),
-                    recordtypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_FLUJO).getRecordTypeId()
+                    recordtypeId = recordtypeProceso
                 );
             insert proceso;
             
@@ -99,6 +122,8 @@ public with sharing class SIRE_LCMP_Comunicaciones_Test {
             );
             insert tareaAcc;
 
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccion = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByDeveloperName();
+            Id recordtypeAccion = mapRTsObjectsAccion.get(SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_AMISTOSO_EMPRESA).getRecordTypeId();
             SIREC__SIREC_obj_acciones__c accion = new SIREC__SIREC_obj_acciones__c(
             SIREC__SIREC_fld_proceso__c = proceso.Id,
             SIREC__SIREC_fld_tarea__c = tareaAcc.Id,
@@ -108,7 +133,7 @@ public with sharing class SIRE_LCMP_Comunicaciones_Test {
             SIREC__SIREC_fld_interviniente__c = cuenta.Id,
             SIR_accionEnviada__c = false,
             SIREC__SIREC_fld_estado__c = 'En curso',
-            RecordTypeId = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByName().get(SIR_Constantes.ACCION_RECORDTYPE_NAME_AMISTOSO_EMPRESA).getRecordTypeId(),
+            RecordTypeId = recordtypeAccion,
             SIREC__SIREC_fld_responsable__c = usuario.Id
             );
             insert accion;

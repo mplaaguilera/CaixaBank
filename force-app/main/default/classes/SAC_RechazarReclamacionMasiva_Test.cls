@@ -45,7 +45,7 @@ public with sharing class SAC_RechazarReclamacionMasiva_Test {
 	@isTest 
 	private static void testRechazarReclamacionMasivaController() {
 		User usuario = [SELECT id FROM User WHERE LastName = 'Administrator' AND IsActive = true LIMIT 1];
-		list<Case> lstCases = [SELECT id,Status,SAC_StatusAuxiliar__c,Subject FROM Case WHERE Subject LIKE 'testrec%'];
+		list<Case> lstCases = [SELECT id,Status,SAC_StatusAuxiliar__c,Subject, RecordTypeId FROM Case WHERE Subject LIKE 'testrec%'];
 	
 		System.runAs(usuario){
 			PageReference testPage = Page.SAC_RechazarReclamacionMasiva;

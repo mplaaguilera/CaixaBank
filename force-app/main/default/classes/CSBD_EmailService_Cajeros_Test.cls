@@ -219,7 +219,7 @@ public with sharing class CSBD_EmailService_Cajeros_Test {
         adjuntoTexto.fileName = 'textfiletwo3.txt';
         adjuntoTexto.mimeTypeSubType = 'text/plain';
         correoCmnExternalizarCorreo.textAttachments = new List<Messaging.inboundEmail.TextAttachment>{adjuntoTexto};
-
+    
         //Preparación de respuestas de prueba de los servicios web guardadas como static resources
         MultiStaticResourceCalloutMock multiMock = new MultiStaticResourceCalloutMock();
         String endpointSirCalcLimites = obtenerParametrosIntegracion('CSBD_SIR_CalcLimites')?.CC_EndPoint__c;
@@ -233,7 +233,7 @@ public with sharing class CSBD_EmailService_Cajeros_Test {
         multiMock.setStatusCode(200);
         multiMock.setHeader('Content-Type', 'text/xml');
         Test.setMock(HttpCalloutMock.class, multiMock);
-
+        
         //Ejecución de la prueba
         System.runAs (usuarioGestor) {
             Test.startTest();
@@ -298,7 +298,7 @@ public with sharing class CSBD_EmailService_Cajeros_Test {
         multiMock.setStatusCode(200);
         multiMock.setHeader('Content-Type', 'text/xml');
         Test.setMock(HttpCalloutMock.class, multiMock);
-
+        
         Messaging.InboundEmail correoCmnAltaOportunidad2 = new Messaging.InboundEmail();
         correoCmnAltaOportunidad2.fromAddress = 'correo@prueba';
         correoCmnAltaOportunidad2.toAddresses = new List<String>{'correo@prueba'};
@@ -321,8 +321,8 @@ public with sharing class CSBD_EmailService_Cajeros_Test {
         adjuntoTexto2.fileName = 'textfiletwo3.txt';
         adjuntoTexto2.mimeTypeSubType = 'text/plain';
         correoCmnAltaOportunidad2.textAttachments = new List<Messaging.inboundEmail.TextAttachment>{adjuntoTexto2};
-
-
+   
+        
         //Ejecución de la prueba
         System.runAs (usuarioGestor) {
             Test.startTest();
@@ -337,16 +337,16 @@ public with sharing class CSBD_EmailService_Cajeros_Test {
             List<Opportunity> oportunidades = [SELECT StageName, CSBD_Estado__c, CSBD_Resolucion__c FROM Opportunity WHERE RecordType.DeveloperName = 'CSBD_CMN'];
             System.assert(oportunidades.size() > 0, 'No se ha creado la oportunidad de CMN recibida');
             EmailMessage mailCreado = [SELECT Id FROM EmailMessage WHERE CSBD_Oportunidad_Id__c = :oportunidades[0].Id];
-
+            
             System.assertEquals(null, resultado2, 'Comprobamos que no se crea el mensaje de salida.');
-
+            
             CBK_Log__c respuestaLogBuena = [SELECT Log_Level__c, CBK_sfdcType__c, CBK_sfdcCaseId__c, CBK_sfdcEmailMessageId__c, CBK_sfdcResultDetail__c from CBK_Log__c WHERE CBK_sfdcResultStatus__c = 'OK' AND OwnerId = :usuarioGestor.Id];
             System.assertEquals(oportunidades[0].Id, respuestaLogBuena.CBK_sfdcCaseId__c, 'Comprobamos que la oportunidad esta relacionada con la creada.');
             System.assertEquals(mailCreado.Id, respuestaLogBuena.CBK_sfdcEmailMessageId__c, 'Comprobamos que el emailmessage id no es null.');
             System.assertEquals('Resultado', respuestaLogBuena.CBK_sfdcType__c, 'Comprobamos que el tipo es resultado.');
             System.assertEquals('Envio correcto', respuestaLogBuena.CBK_sfdcResultDetail__c, 'Comprobamos que el detail es envio correcto.');
             System.assertEquals('INFO', respuestaLogBuena.Log_Level__c, 'Comprobamos que el nivel es info.');
-
+            
             //CBK_Log__c respuestaLogMala = [SELECT CBK_sfdcResultDetail__c from CBK_Log__c WHERE CBK_sfdcResultStatus__c = 'KO' AND OwnerId = :usuarioGestor.Id];
             //System.assertNotEquals('Envio correcto', respuestaLogMala.CBK_sfdcResultDetail__c, 'Comprobamos que el detail no es envio correcto.');
         }

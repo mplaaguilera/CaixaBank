@@ -241,7 +241,7 @@ public with sharing class CC_Push_Notificacion_App {
     // Se valida el enrollment PUSH del cliente
     //public static List<String> validarEnrollmentPUSH(List<CC_Push_Notificacion_App.CC_Push_Notificacion_App_Mssg> mensajes) {
     public static Map<String, Boolean> validarEnrollmentPUSH(String numPer) {
-        // system.debug('Luis dentro validar enrollment PUSH ' + numPer);
+        system.debug('Luis dentro validar enrollment PUSH ' + numPer);
         Http http = new Http();
         Map<String, Boolean> resMap = new Map<String, Boolean>();
         List<String> res = new List<String>();
@@ -250,7 +250,7 @@ public with sharing class CC_Push_Notificacion_App {
             Decimal numPersDec = Decimal.valueOf(numPer);
             persMayusHex = CC_MetodosUtiles.decimalToHex(numPersDec).toUpperCase();
         }
-        // system.debug('perso to HEX ' + persMayusHex);
+        system.debug('perso to HEX ' + persMayusHex);
 
         // Framework de integración CBK
         Map<String, String> mHeaders = new Map<String, String>();
@@ -278,9 +278,9 @@ public with sharing class CC_Push_Notificacion_App {
         String httpRequestEndpointlaCaixa = httpRequestEndpoint + appIdCaixa;
         String httpRequestEndpointImagin = httpRequestEndpoint + appIdImagin;
 
-        // system.debug('test endpoint caixa' + httpRequestEndpointlaCaixa);
+        system.debug('test endpoint caixa' + httpRequestEndpointlaCaixa);
         request.setEndpoint(httpRequestEndpointlaCaixa);
-        // system.debug('request caixa' + request);
+        system.debug('request caixa' + request);
         List<CC_TrazaInt__c> registroTrazas = new List<CC_TrazaInt__c>();
         Boolean errorHttpSend = false;
         try {
@@ -292,7 +292,7 @@ public with sharing class CC_Push_Notificacion_App {
             
             CC_TrazaInt__c registroIntegracion = new CC_TrazaInt__c ();
 			registroIntegracion.Name = 'CC_MCD_Gestion_PUSH_uuIds';
-			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_TST_CC/distribution/messagePush/applicationAlerts/uuids';
+			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_PRO_CC/distribution/messagePush/applicationAlerts/uuids';
 			registroIntegracion.CC_FechaInicio__c = dtStart;
 			registroIntegracion.CC_FechaFin__c = dtStop;
 			registroIntegracion.CC_MensajeEntrada__c = request.toString();
@@ -307,10 +307,10 @@ public with sharing class CC_Push_Notificacion_App {
 
 
 
-            // system.debug('response body ' + respuesta.getBody());
-			// system.debug('response ' + respuesta);
-			// system.debug('response status ' + respuesta.getStatus());
-			// system.debug('response status code ' + respuesta.getStatusCode());
+            system.debug('response body ' + respuesta.getBody());
+			system.debug('response ' + respuesta);
+			system.debug('response status ' + respuesta.getStatus());
+			system.debug('response status code ' + respuesta.getStatusCode());
             
             if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
                 res.add(respuesta.getBody());
@@ -319,9 +319,9 @@ public with sharing class CC_Push_Notificacion_App {
             else {
                 resMap.put('CaixaBank', false);
             }
-            // system.debug('cantidad de elementos ' + res.size());
-            // system.debug('lista ' + res);
-            // system.debug('mapaRes ' + resMap);
+            system.debug('cantidad de elementos ' + res.size());
+            system.debug('lista ' + res);
+            system.debug('mapaRes ' + resMap);
             /*List<String> errores = obtenerErrores(respuesta.getBody());
             system.debug('errores ' + errores.size());
             if (errores.isEmpty()) {
@@ -332,15 +332,15 @@ public with sharing class CC_Push_Notificacion_App {
             
         } catch (Exception e) {
             errorHttpSend = true;
-            // system.debug('error catch ' + e.getMessage());
+            system.debug('error catch ' + e.getMessage());
             CBK_Log.error(e);
             res.add('KO: ' + e.getMessage());
             resMap.put('CaixaBank', false);
-            // system.debug('mapaRes ' + resMap);
+            system.debug('mapaRes ' + resMap);
         }
 
         request.setEndpoint(httpRequestEndpointImagin);
-        // system.debug('request Imagin' + request);
+        system.debug('request Imagin' + request);
 
         try {
             Datetime dtStart = Datetime.now();
@@ -350,7 +350,7 @@ public with sharing class CC_Push_Notificacion_App {
 
             CC_TrazaInt__c registroIntegracion = new CC_TrazaInt__c ();
 			registroIntegracion.Name = 'CC_MCD_Gestion_PUSH_uuIds';
-			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_TST_CC/distribution/messagePush/applicationAlerts/uuids';
+			registroIntegracion.CC_Identificador__c = 'callout:API_GWT_PRO_CC/distribution/messagePush/applicationAlerts/uuids';
 			registroIntegracion.CC_FechaInicio__c = dtStart;
 			registroIntegracion.CC_FechaFin__c = dtStop;
 			registroIntegracion.CC_MensajeEntrada__c = request.toString();
@@ -363,10 +363,10 @@ public with sharing class CC_Push_Notificacion_App {
 			}
             registroTrazas.add(registroIntegracion);
 
-            // system.debug('response body ' + respuesta2.getBody());
-			// system.debug('response ' + respuesta2);
-			// system.debug('response status ' + respuesta2.getStatus());
-			// system.debug('response status code ' + respuesta2.getStatusCode());
+            system.debug('response body ' + respuesta2.getBody());
+			system.debug('response ' + respuesta2);
+			system.debug('response status ' + respuesta2.getStatus());
+			system.debug('response status code ' + respuesta2.getStatusCode());
             
             if(String.isNotBlank(respuesta2.getBody()) && respuesta2.getStatusCode() == 200){
                 res.add(respuesta2.getBody());
@@ -375,16 +375,16 @@ public with sharing class CC_Push_Notificacion_App {
             else {
                 resMap.put('IMAGIN', false);
             }
-            // system.debug('cantidad de elementos ' + res.size());
-            // system.debug('lista ' + res);
-            // system.debug('mapaRes ' + resMap);
+            system.debug('cantidad de elementos ' + res.size());
+            system.debug('lista ' + res);
+            system.debug('mapaRes ' + resMap);
         } catch (Exception e) {
             errorHttpSend = true;
-            // system.debug('error catch ' + e.getMessage());
+            system.debug('error catch ' + e.getMessage());
             CBK_Log.error(e);
             res.add('KO: ' + e.getMessage());
             resMap.put('IMAGIN', false);
-            // system.debug('mapaRes ' + resMap);
+            system.debug('mapaRes ' + resMap);
         }
 
         if(!registroTrazas.isEmpty()){

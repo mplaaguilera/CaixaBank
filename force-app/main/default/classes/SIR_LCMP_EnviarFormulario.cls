@@ -26,7 +26,7 @@ public with sharing class SIR_LCMP_EnviarFormulario {
 	*****************************************************************/
     @AuraEnabled(Cacheable=true)
     public static String comprobarCampos(String idFormulario){
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             List<SIR_FormularioRefinanciacion__c> formulario = [SELECT id, SIR_TotalIngresosTrabajo__c, SIR_TotalIngresosBienes__c, SIR_OtrosDatosInteres__c,
                                                                 SIR_MiembrosUnidadFamiliar__c, SIR_IngresosAdicionalesUnidFam__c, SIR_ImporteMinSubsistencia__c, 
                                                                 SIR_AlquilerViviendaHabitual__c, SIR_PensionAlimenticia__c, SIR_Otros__c, SIR_TotalGastos__c, 
@@ -94,9 +94,7 @@ public with sharing class SIR_LCMP_EnviarFormulario {
     public static String[] enviarProceso(String idFormulario){
         // Estan todos los campos obligatorios bien informados, se puede llamar al WS
         String[] resultado = new String[]{''}; 
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible() 
-            && SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isAccessible()
-            && SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() ){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible() && Schema.SObjectType.SIR_IntervinienteFormulario__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() ){
             // Comprobamos si disponemos de ID_PROCESO_SIREC (SIREC__SIREC_fld_masterRecordId__c) para determinar si enviamos o no el Proceso primero antes que el Formulario
             SIR_FormularioRefinanciacion__c formulario = [SELECT SIR_Proceso__c, SIR_Proceso__r.SIREC__SIREC_fld_masterRecordId__c
                                                           FROM SIR_FormularioRefinanciacion__c WHERE id=:idFormulario LIMIT 1];
@@ -143,8 +141,7 @@ public with sharing class SIR_LCMP_EnviarFormulario {
     public static String[] enviarForm(String idFormulario){
         // Ya se ha enviado el WS de Proceso, por lo que podemos enviar el WS de Formulario
         String[] resultado = new String[]{''}; 
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible() 
-            && SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isAccessible()){            
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible() && Schema.SObjectType.SIR_IntervinienteFormulario__c.isAccessible()){            
             String[] resultadoWS;
             // Enviamos el Formulario
             resultadoWS = SIR_SendFormulario_WS.sendFormulario(idFormulario);
@@ -203,7 +200,7 @@ public with sharing class SIR_LCMP_EnviarFormulario {
 	*****************************************************************/
     public static String updateFormulario(String idFormulario, String resultadoWS){
         try {
-            if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){
+            if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){
                 SIR_FormularioRefinanciacion__c formUpdate = [SELECT SIR_Estado__c FROM SIR_FormularioRefinanciacion__c WHERE id=:idFormulario LIMIT 1];                
                 if(resultadoWS == 'OK'){
                     formUpdate.SIR_Estado__c = SIR_Constantes.FORMULARIOREFINANCIACION_ESTADO_ENVIADO; 
@@ -235,7 +232,7 @@ public with sharing class SIR_LCMP_EnviarFormulario {
 	*****************************************************************/
     public static String updateProceso(String idProceso, String idProcesoSirec){
         try {
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){
                 SIREC__SIREC_obj_proceso__c procesoUpdate = [SELECT SIREC__SIREC_fld_situacion__c, SIR_fld_Situacion_SF__c FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso LIMIT 1];                
                 procesoUpdate.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_REFINANCIACION;
                 procesoUpdate.SIR_fld_Situacion_SF__c = SIR_Constantes.PROCESO_SITUACION_REFINANCIACION;

@@ -463,17 +463,9 @@ public without sharing class SAC_LCMP_BusquedaCliente {
         Id usuarioActual = UserInfo.getUserId();
         String tipoRegistro = getTipoRegistro(recordId);
         if (tipoRegistro == 'Caso') {
-            caso = [SELECT OwnerId, SAC_PretensionPrincipal__r.OwnerId, SAC_Letrado__c, RecordTypeId FROM Case WHERE RecordTypeId IN (:RECORDTYPERECLAMACION, :RECORDTYPECONSULTA, :RECORDTYPECONSULTASAC, :RECORDTYPEPRETENSION) AND Id = :recordId];
+            caso = [SELECT OwnerId, SAC_PretensionPrincipal__r.OwnerId FROM Case WHERE RecordTypeId IN (:RECORDTYPERECLAMACION, :RECORDTYPECONSULTA, :RECORDTYPECONSULTASAC, :RECORDTYPEPRETENSION) AND Id = :recordId];
         }
-
-        if(caso.RecordTypeId == RECORDTYPECONSULTASAC){
-
-            String userName = UserInfo.getName();
-
-            return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual || caso.SAC_Letrado__c == userName) ? true : false;
-        }else{
-            return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual) ? true : false;
-        }
+        return (caso.OwnerId == usuarioActual || caso.SAC_PretensionPrincipal__r.OwnerId == usuarioActual) ? true : false;
 	}
     
     @AuraEnabled

@@ -9,6 +9,8 @@ Historial
 	VERSION  USER_STORY				AUTHOR				DATE            Description
 	1.0      Initial				Alicia		    	09/02/2023      Init version
 	1.1      US379981				Lucía		    	24/04/2023      Add method getAccountTeamMember
+	1.2      PPM100455545			Lucía		    	19/09/2024      Add method getContact
+	1.3      FIX20241386			Lucía		    	30/10/2024      Update method getContact
 
 ***********************************************************************************************************************/
 public with sharing class CIBE_CXBTeamNewOpportunityController {
@@ -106,6 +108,56 @@ public with sharing class CIBE_CXBTeamNewOpportunityController {
 		return mapContact;
 
 	}
+
+
+
+	@AuraEnabled(cacheable=true)
+	public static Map<Id,Contact> getContact(String pais){
+		Map<Id, Contact> mapContact = new Map<Id, Contact>();
+		Set<Id> contacto = new Set<Id>();
+		Map<String, String> values = new Map<String, String>();
+		List<String> record = new List<String>();
+		
+		List<String> lstString = pais.split(';');
+		if(!lstString.isEmpty()){
+			List<CIBE_PaisJerarquia__mdt> paisJerarquia = [SELECT Id, CIBE_Country__c, CIBE_Value__c  from CIBE_PaisJerarquia__mdt WHERE CIBE_Country__c IN :lstString];
+			if(!paisJerarquia.isEmpty()){
+				for (CIBE_PaisJerarquia__mdt valuePJ : paisJerarquia) {
+					values.put(valuePJ.CIBE_Country__c, valuePJ.CIBE_Value__c);
+				}			
+			}
+
+
+			if(values != null){
+				for (String paisV : lstString) {
+					for (String mapPaisV : values.keySet()){
+						if(paisV == mapPaisV){
+							record.add(values.get(mapPaisV));
+						}
+					}
+				}
+			}
+		}
+
+
+
+		if(record != null){
+			List<CIBE_Hierarchy__c> jerarquia = [SELECT Id, CIBE_Contact__c FROM CIBE_Hierarchy__c WHERE CIBE_SectoresPaises__r.Name = :record OR CIBE_CentrosCarteras__r.Name = :record];
+
+			if(!jerarquia.isEmpty()){
+				for (CIBE_Hierarchy__c cont : jerarquia) {
+					contacto.add(cont.CIBE_Contact__c);
+				}
+
+				mapContact = new Map<Id, Contact>([SELECT Id, Name, AV_UsuarioAsociado__c, CC_Numero_Oficina__c, AV_DescFuncion__c, AV_Responsabilidad__c FROM Contact WHERE Id IN :contacto]);
+			}
+
+		}
+
+		return mapContact;
+
+	}
+
 
 	public class ContactoWrapper {
 		@AuraEnabled 

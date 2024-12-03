@@ -18,7 +18,7 @@ public with sharing class SEG_TaskConnect {
         Case casoSeg = [SELECT Id,SEG_Numero_centro__c, CaseNumber, SEG_NIF_peticionario__c, Account.Name, Subject, SEG_ClasificacionRapida__r.Name, 
         CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.Name, SEG_Detalle__r.Name, Status, ClosedDate, SEG_Case_Owner__c, SEG_PropAnteriorGrupo__c, 
         SEG_Fechayhoracreacion__c, LastModifiedDate, SEG_Observaciones__c, SEG_Zona__c, SEG_Organizacion__c, SEG_N_operaciones_CSO__c, CC_Owner_Anterior__r.Name, 
-        SEG_Subestado__c, SEG_Grupo__r.Name, Priority FROM Case WHERE Id=: casoid LIMIT 1];
+        SEG_Subestado__c, SEG_Grupo__r.Name, Priority, OwnerId FROM Case WHERE Id=: casoid LIMIT 1];
 
         List<CaseMilestone> milestone = [SELECT id, TargetDate FROM CaseMilestone WHERE CaseId = :casoSeg.Id];
 
@@ -88,6 +88,13 @@ public with sharing class SEG_TaskConnect {
         datosCaso.subestado = casoSeg.SEG_Subestado__c != null ? casoSeg.SEG_Subestado__c : '';
         datosCaso.grupo = casoSeg.SEG_Grupo__r?.Name != null ? casoSeg.SEG_Grupo__r?.Name : '';
         datosCaso.prioridad = casoSeg.Priority != null ? casoSeg.Priority : '';
+        datosCaso.numeroEmpleado = '';
+
+        if (String.valueOf(casoSeg.ownerId).startsWith('005')) {
+            List<User> propietario = [SELECT id, EmployeeNumber FROM User WHERE Id = :casoSeg.OwnerId LIMIT 1];
+            datosCaso.numeroEmpleado = propietario[0].EmployeeNumber != null ? propietario[0].EmployeeNumber : '';
+        }
+        
         if(!milestone.isEmpty()){
             datosCaso.fechaLimiteSla = milestone[0].TargetDate?.format('dd-MM-yyyy HH:mm:ss');
         }
@@ -194,5 +201,6 @@ public with sharing class SEG_TaskConnect {
         public String grupo = ''; //MCC 0029
         public String prioridad = ''; //Media
         public String fechaLimiteSla = ''; //2023-08-08 11:36:50
+        public String numeroEmpleado = ''; //U01A3F65
     }
 }

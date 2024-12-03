@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR			DATE			Description
 	1.0			US461563    	Lucía	  	    16/03/2023		Init version 
+    1.1			US850814    	Lucía	  	    05/06/2024		Errores QC
 
 ***********************************************************************************************************************/
 
@@ -16,16 +17,16 @@ public with sharing class CIBE_TabListOpportunityCIB_Test {
     
     @TestSetup
     public static void setup() {
-        string rtIdPickVal = Schema.getGlobalDescribe().get('CBK_PicklistValues__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CBK_PicklistValue').getRecordTypeId();
-        string rtIdPick = Schema.getGlobalDescribe().get('CBK_PicklistValues__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CBK_Picklist').getRecordTypeId();
-        string rtContact = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        string rtJerarquia = Schema.getGlobalDescribe().get('CIBE_Hierarchy__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CIBE_Employee').getRecordTypeId();
+        string rtIdPickVal = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_PicklistValue').getRecordTypeId();
+        string rtIdPick = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_Picklist').getRecordTypeId();
+        string rtContact = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId(); 
+        string rtJerarquia = Schema.SObjectType.CIBE_Hierarchy__c.getRecordTypeInfosByDeveloperName().get('CIBE_Employee').getRecordTypeId();
 
         CIBE_TestInitialSetup.setupInitialDataCIB();
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-        Contact contacto = [SELECT Id FROM Contact WHERE CC_Matricula__c = 'U0000001'];
+        User admin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
+        Contact contacto = [SELECT Id, av_usuarioAsociado__c FROM Contact WHERE CC_Matricula__c = 'U0000001'];
         
-        System.runAs(new User(Id = UserInfo.getUserId())) {
+        System.runAs(admin) {
             Account cliente = CIBE_TestHelper.createCustomer();
     
             CBK_PicklistValues__c pick = new CBK_PicklistValues__c();
@@ -141,12 +142,12 @@ public with sharing class CIBE_TabListOpportunityCIB_Test {
             opp.CIBE_ECAs__c = true;
             opp.CIBE_AlgunaOperRAR__c = true;
             opp.CIBE_DictamenALM__c = false;
-            opp.CIBE_Visto__c = 'IG';
+            opp.CIBE_Visto__c = 'NO';
             opp.CIBE_Nivel__c = '';
             opp.CIBE_Sindicaciones__c = false;
             opp.CIBE_Observaciones__c = '';
             opp.CIBE_VigenciaOferta__c = null;
-            opp.OwnerId = usuario.Id;
+            opp.OwnerId = contacto.av_usuarioAsociado__c;
             opp.AV_FechaAlta__c = System.today() - 5;
             insert opp;
         }

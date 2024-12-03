@@ -16,24 +16,34 @@ Historial
     2.4         US686939        Oscar Moreno        24/08/2023          Added updateCommentsHistory method
     2.5			US546892		Sandra Gómez		18/09/2023			add mapToByPass in method updateTaskWithOpp and sendDataToGCF
     2.6	        Fix		        Sandra Gómez		07/10/2023		    Change method setFieldsFromOppTask add parameter mapByPass
+    2.7	        New Scoring     Luis Fernández	    20/12/2023		    Added new method calculateScoreOpp call
+    2.8                         Oscar Moreno        12/01/2024          PS AV_OpportunitiesSearcherV2 control the access to updateTaskWithOpp method
+    2.9			DT08			Luis Fernández		23/04/2024			Added calculateScoreOpp called from AV_OpportunityTriggerHelperAux
+    3.0         US913185        Oscar Moreno        12/01/2024          PS AV_OpportunitiesSearcherV2 control the access to updateTaskWithOpp method
+    3.1         PPM100130465    Oscar Moreno        05/07/2024          Replace PS_CHECKONOFF with PS_OLDHOMETASK
+    3.2         PPM100130465    Sandra Gómez        30/07/2024          Add new parameter mapToByPassOld in method updateCommentsHistory
 ***********************************************************************************************************************/
-public with sharing class AV_Opportunity_AU_TRHan extends CC_TriggerHandlerBase {
+public with sharing class AV_Opportunity_AU_TRHan extends AV_TriggerHandlerBase {
 	
     public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Opportunity>)tp.newList, (Map<Id, Opportunity>)tp.newMap, (List<Opportunity>) tp.oldList, (Map<Id, Opportunity>) tp.oldMap);
 	}
 	
 	private void process(List<Opportunity> listNewObj, Map<Id, Opportunity> mapNewObj, List<Opportunity> listOldObj, Map<Id, Opportunity> mapOldObj) {
+		Boolean hasCustomPermission = FeatureManagement.checkPermission(AV_AppConstants.PS_OLDHOMETASK);
 		//General check the Record type's for intouch project
         List<Opportunity> listData = AV_OpportunityTriggerHelper.checkGeneralRT(listNewObj);
         List<Opportunity> listDataCM = AV_OpportunityTriggerHelper.checkCallMeRT(listNewObj);
         // Lógica de negocio a ejecutar
         if (listData!=null && !listData.isEmpty()){
-            AV_OpportunityTriggerHelper.setFieldsFromOppTask(listData, mapOldObj, mapToByPass);
+            // AV_OpportunityTriggerHelper.setFieldsFromOppTask(listData, mapOldObj, mapToByPass);
             AV_OpportunityTriggerHelper.telephoneContracting(listData, mapOldObj);
-            AV_OpportunityTriggerHelper.updateTaskWithOpp(listData, mapOldObj, mapToByPass);
+            if(hasCustomPermission){
+                AV_OpportunityTriggerHelper.updateTaskWithOpp(listData, mapOldObj, mapToByPass);
+			}
             AV_OpportunityTriggerHelper.sendDataToGCF(listData, 'AU', mapToByPass);
-            AV_OpportunityTriggerHelper.updateCommentsHistory(listData,mapOldObj);
+            AV_OpportunityTriggerHelper.updateCommentsHistory(listData,mapOldObj,mapToByPass,mapToByPassOld);
+            AV_OpportunityTriggerHelperAux.calculateScoreOpp(listData,mapOldObj,null,'AU');
         }
 	}
 }

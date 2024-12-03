@@ -12,6 +12,7 @@ Historial
 	1.2			App FSC			David Rufo			24/08/2020			Add new function for update the user with the number of CAIXA office
 	1.3			US170549		Sandra Gómez		09/02/2021			Add permissionUser
 	1.4			Fix				Sandra Gómez		23/12/2021			Add userExternalId
+	1.5         FIX040724844    Oscar Moreno        04/07/2024          Replace updateUsuarioAsociado to be called from WithoutSharing class
 
 ***********************************************************************************************************************/
 public class AV_User_AU_TRHan extends CC_TriggerHandlerBase {
@@ -26,7 +27,7 @@ public class AV_User_AU_TRHan extends CC_TriggerHandlerBase {
 		
 		if (listData!=null && !listData.isEmpty()){
             // Lógica de negocio a ejecutar
-            AV_UserTriggerHelper.updateUsuarioAsociado(false, listData, mapOldObj);
+			AV_UserHandlerWithoutSharingMethods.updateUsuarioAsociado(false, listData, mapOldObj); 
             AV_UserTriggerHelper.permissionUser(listData);
             AV_UserTriggerHelper.automiticProcessOwner(listData,mapOldObj);
 			AV_UserTriggerHelper.reassignmentInactiveUser(listData,mapOldObj);

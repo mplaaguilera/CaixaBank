@@ -6,6 +6,8 @@ public with sharing class CC_LiveChatTranscript_AU_TRHan extends CC_TriggerHandl
 	
     private void process(List<LiveChatTranscript> listNewObj, Map<Id, LiveChatTranscript> mapNewObj) {
         
+
+
         //Informa Origen a partir de la Procedencia antes de guardar el registro
         //Descartar los que vengan de CSBD
         List<LiveChatTranscript> listNewTranscript = new List<LiveChatTranscript>();

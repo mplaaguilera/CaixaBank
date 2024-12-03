@@ -4,7 +4,6 @@ public class CC_SkillRequirementsTest {
     private static String idskillahorro = '';
     private static String idskillagente = '';
     private static String idskillidioma = '';
-
     private static String idservicechannel = '';
 	private static String idskillAplicacion = '';
 

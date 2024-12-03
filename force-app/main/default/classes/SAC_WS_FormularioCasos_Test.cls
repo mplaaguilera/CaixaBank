@@ -28,17 +28,17 @@ public class SAC_WS_FormularioCasos_Test {
             //Usuario SAC General
             usuarioGeneral = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0]; 
             usuarioGeneral.Username = 'usertest0@test.com.testSetup';     
-            Database.insert(usuarioGeneral);
+            SAC_DatabaseDML.insertDML(usuarioGeneral, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuarioGeneral.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
     }
 	@isTest
-    static void crearFormularioGGH_01() {
+    static void crearFormularioGGH01() {
         
         // Crear cliente.
         Account a = new Account();
@@ -48,7 +48,7 @@ public class SAC_WS_FormularioCasos_Test {
         insert a;
         
         List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.isEmpty(), false);
+        System.assertEquals(o1.isEmpty(), false, 'No se ha recuperado la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -59,7 +59,7 @@ public class SAC_WS_FormularioCasos_Test {
         insert b;
         
         List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.isEmpty(), false);
+        System.assertEquals(o2.isEmpty(), false, 'No se ha recuperado el contacto');
         
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -111,16 +111,14 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            List<SPV_Formulario__c> formularios = [SELECT Id, Name, SPV_Caso__c
-                                                   FROM SPV_Formulario__c];
             
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }
 	
     @isTest
-    static void crearFormularioFraude_01() {
+    static void crearFormularioFraude01() {
         
         // Crear cliente.
         Account a = new Account();
@@ -130,7 +128,7 @@ public class SAC_WS_FormularioCasos_Test {
         insert a;
         
         List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.isEmpty(), false);
+        System.assertEquals(o1.isEmpty(), false, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -141,7 +139,7 @@ public class SAC_WS_FormularioCasos_Test {
         insert b;
         
         List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.isEmpty(), false);
+        System.assertEquals(o2.isEmpty(), false, 'Error al recuperar el contacto');
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -191,15 +189,15 @@ public class SAC_WS_FormularioCasos_Test {
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
            
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }
 
     @isTest
-    static void crearFormularioWeb_01() {
+    static void crearFormularioWeb01() {
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -207,9 +205,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccTematica.RecordTypeId = recordTypeIdTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccTematica);
+        SAC_DatabaseDML.insertDML(mccTematica, false);
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -218,9 +216,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         mccProducto.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccProducto); 
+        SAC_DatabaseDML.insertDML(mccProducto, false);
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -230,9 +228,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         mccMotivo.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccMotivo);
+        SAC_DatabaseDML.insertDML(mccMotivo, false);
         
-        Id recordTypeIdWeb = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
+        Id recordTypeIdWeb = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
        	CC_MCC__c mccConvWeb = new CC_MCC__c();
         mccConvWeb.Name = 'Test';
         mccConvWeb.CC_Tipo_Cliente__c = 'SAC';
@@ -247,17 +245,16 @@ public class SAC_WS_FormularioCasos_Test {
         mccConvWeb.CC_MCCWeb_Producto__c = '001';
         mccConvWeb.CC_MCCWeb_Ambito__c = '001';
         mccConvWeb.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccConvWeb);
+        SAC_DatabaseDML.insertDML(mccConvWeb, false);
         
         // Crear cliente.
         Account a = new Account();
         a.Name = 'Cliente prueba 1';
         a.CC_NumPerso__c = '999910559714';
         a.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a);
+        SAC_DatabaseDML.insertDML(a, false);
         
-        List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = 'Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -265,10 +262,9 @@ public class SAC_WS_FormularioCasos_Test {
         b.CC_NumPerso__c = '999910559714';
         b.CC_Numero_Documento__c = '23663942R';
         b.AccountId = a.Id;
-        Database.insert(b);
+        SAC_DatabaseDML.insertDML(b, false);
         
-        List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.size(), 1);
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = 'Contacto prueba 1'], 1, 'Error al recuperar el contacto');
 
         
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
@@ -352,13 +348,13 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }
     
     @isTest
-    static void crearFormularioWeb_02() {
+    static void crearFormularioWeb02() {
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -399,23 +395,22 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }    
     }
     
     @isTest
-    static void crearFormularioWeb_03() {
+    static void crearFormularioWeb03() {
         
         // Crear cliente.
         Account a = new Account();
         a.Name = 'Cliente prueba 1';
         a.CC_NumPerso__c = '999910559714';
         a.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a);
+        SAC_DatabaseDML.insertDML(a, false);
         
-        List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = 'Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -423,20 +418,18 @@ public class SAC_WS_FormularioCasos_Test {
         b.CC_NumPerso__c = '999910559714';
         b.CC_Numero_Documento__c = '23663942R';
         b.AccountId = a.Id;
-        Database.insert(b);
+        SAC_DatabaseDML.insertDML(b, false);
         
-        List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.size(), 1);
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = 'Contacto prueba 1'], 1, 'Error al recuperar el contacto');
         
         // Crear cliente.
         Account a1 = new Account();
         a1.Name = '1Cliente prueba 1';
         a1.CC_NumPerso__c = '899910559714';
         a1.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a1);
+        SAC_DatabaseDML.insertDML(a1, false);
         
-        List<Account> o11 = [SELECT Id FROM Account WHERE Name = '1Cliente prueba 1'];
-        System.assertEquals(o11.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = '1Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b1 = new Contact();
@@ -444,20 +437,18 @@ public class SAC_WS_FormularioCasos_Test {
         b1.CC_NumPerso__c = '899910559714';
         b1.CC_Numero_Documento__c = '23663942R';
         b1.AccountId = a1.Id;
-        Database.insert(b1);
+        SAC_DatabaseDML.insertDML(b1, false);
         
-        List<Contact> o21 = [SELECT Id FROM Contact WHERE LastName = '1Contacto prueba 1'];
-        System.assertEquals(o21.size(), 1);
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = '1Contacto prueba 1'], 1, 'Error al recuperar el contacto');
         
         // Crear cliente.
         Account a11 = new Account();
         a11.Name = '11Cliente prueba 1';
         a11.CC_NumPerso__c = '';
         a11.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a11);
+        SAC_DatabaseDML.insertDML(a11, false);
         
-        List<Account> o111 = [SELECT Id FROM Account WHERE Name = '11Cliente prueba 1'];
-        System.assertEquals(o111.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = '11Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
 
         
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
@@ -531,13 +522,13 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }    
     }
     
     @isTest
-    static void crearFormularioWeb_error01() {
+    static void crearFormularioWebError01() {
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -577,7 +568,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }
@@ -623,7 +614,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest(); 
         }  
     }
@@ -669,13 +660,13 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }  
     }
     
     @isTest
-    static void crearFormularioWeb_error04() {
+    static void crearFormularioWebError04() {
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -715,7 +706,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }  
     }
@@ -761,7 +752,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest(); 
         }   
     }
@@ -807,7 +798,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }    
     }
@@ -902,9 +893,9 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
-            System.assertEquals(oRes[0].sCodError, '4');
-            System.assertEquals(oRes[0].sDetalleError, 'NIF incluido en la lista CC_MailCenter_Blacklist_NIF. Petición proveniente del robot de comprobación.');
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
+            System.assertEquals(oRes[0].sCodError, '4', 'Error al crear el caso desde SAC_WS_FormularioCasos');
+            System.assertEquals(oRes[0].sDetalleError, 'NIF incluido en la lista CC_MailCenter_Blacklist_NIF. Petición proveniente del robot de comprobación.', 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }
     }
@@ -912,7 +903,7 @@ public class SAC_WS_FormularioCasos_Test {
     @isTest
     static void crearMicrobank01() {
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -920,9 +911,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccTematica.RecordTypeId = recordTypeIdTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccTematica);
+        SAC_DatabaseDML.insertDML(mccTematica, false);
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -931,9 +922,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         mccProducto.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccProducto); 
+        SAC_DatabaseDML.insertDML(mccProducto, false);
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo =  Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -943,9 +934,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         mccMotivo.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccMotivo);
+        SAC_DatabaseDML.insertDML(mccMotivo, false);
         
-        Id recordTypeIdWeb = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
+        Id recordTypeIdWeb = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
        	CC_MCC__c mccConvWeb = new CC_MCC__c();
         mccConvWeb.Name = 'Test';
         mccConvWeb.CC_Tipo_Cliente__c = 'SAC';
@@ -960,17 +951,16 @@ public class SAC_WS_FormularioCasos_Test {
         mccConvWeb.CC_MCCWeb_Producto__c = '001';
         mccConvWeb.CC_MCCWeb_Ambito__c = '001';
         mccConvWeb.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccConvWeb);
+        SAC_DatabaseDML.insertDML(mccConvWeb, false);
         
         // Crear cliente.
         Account a = new Account();
         a.Name = 'Cliente prueba 1';
         a.CC_NumPerso__c = '999910559714';
         a.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a);
+        SAC_DatabaseDML.insertDML(a, false);
         
-        List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = 'Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -978,10 +968,9 @@ public class SAC_WS_FormularioCasos_Test {
         b.CC_NumPerso__c = '999910559714';
         b.CC_Numero_Documento__c = '23663942R';
         b.AccountId = a.Id;
-        Database.insert(b);
+        SAC_DatabaseDML.insertDML(b, false);
         
-        List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.size(), 1);
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = 'Contacto prueba 1'], 1, 'Error al recuperar el contacto');
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -1021,13 +1010,13 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }  
     }
     
     @isTest
-    static void crearFormularioWeb_CIF() {
+    static void crearFormularioWebCIF() {
 
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
         
@@ -1068,7 +1057,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }
@@ -1141,13 +1130,15 @@ public class SAC_WS_FormularioCasos_Test {
         oEntrada.add(oData2);
        
 
+        List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output>();
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         System.runAs(usuario){
             Test.startTest();
-            List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
+            oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
             //System.assertNotEquals(oRes, null);
             Test.stopTest();
         }   
+        Assert.areNotEqual(oRes.size(), 0, 'No se ha obtenido el resultado esperado');
     }
 
     @isTest
@@ -1159,9 +1150,9 @@ public class SAC_WS_FormularioCasos_Test {
         settings.SAC_Shadow__c = false;
         settings.SAC_Porcentaje__c = 100;
             
-        Database.insert(settings);
+        SAC_DatabaseDML.insertDML(settings, false);
         
-        Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
+        Id recordTypeIdTematica = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
 		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
@@ -1169,9 +1160,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccTematica.RecordTypeId = recordTypeIdTematica;
         mccTematica.CC_Codigo_Externo__c = 'TE-000001';
         mccTematica.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccTematica);
+        SAC_DatabaseDML.insertDML(mccTematica, false);
         
-        Id recordTypeIdProducto = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
+        Id recordTypeIdProducto = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
         CC_MCC__c mccProducto = new CC_MCC__c();
         mccProducto.Name = 'Cuenta corriente';
         mccProducto.CC_Tipo_Cliente__c = 'Cliente';
@@ -1180,9 +1171,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccProducto.CC_Tematica__c = mccTematica.Id;
         mccProducto.CC_Codigo_Externo__c = 'PR-000001';
         mccProducto.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccProducto); 
+        SAC_DatabaseDML.insertDML(mccProducto, false);
         
-        Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id recordTypeIdMotivo = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
        	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
@@ -1192,9 +1183,9 @@ public class SAC_WS_FormularioCasos_Test {
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         mccMotivo.CC_Codigo_Externo__c = 'MO-000001';
         mccMotivo.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccMotivo);
+        SAC_DatabaseDML.insertDML(mccMotivo, false);
         
-        Id recordTypeIdWeb = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
+        Id recordTypeIdWeb = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('SAC_Detalle').getRecordTypeId();
        	CC_MCC__c mccConvWeb = new CC_MCC__c();
         mccConvWeb.Name = 'Test';
         mccConvWeb.CC_Tipo_Cliente__c = 'SAC';
@@ -1209,17 +1200,16 @@ public class SAC_WS_FormularioCasos_Test {
         mccConvWeb.CC_MCCWeb_Producto__c = '001';
         mccConvWeb.CC_MCCWeb_Ambito__c = '001';
         mccConvWeb.CC_Canal_Operativo__c = 'Oficina';
-        Database.insert(mccConvWeb);
+        SAC_DatabaseDML.insertDML(mccConvWeb, false);
         
         // Crear cliente.
         Account a = new Account();
         a.Name = 'Cliente prueba 1';
         a.CC_NumPerso__c = '999910559714';
         a.CC_Numero_Documento__c = '23663942R';
-        Database.insert(a);
+        SAC_DatabaseDML.insertDML(a, false);
         
-        List<Account> o1 = [SELECT Id FROM Account WHERE Name = 'Cliente prueba 1'];
-        System.assertEquals(o1.size(), 1);
+        System.assertEquals([SELECT Count() FROM Account WHERE Name = 'Cliente prueba 1'], 1, 'Error al recuperar la cuenta');
         
         // Crear contacto.
         Contact b = new Contact();
@@ -1227,10 +1217,9 @@ public class SAC_WS_FormularioCasos_Test {
         b.CC_NumPerso__c = '999910559714';
         b.CC_Numero_Documento__c = '23663942R';
         b.AccountId = a.Id;
-        Database.insert(b);
+        SAC_DatabaseDML.insertDML(b, false);
         
-        List<Contact> o2 = [SELECT Id FROM Contact WHERE LastName = 'Contacto prueba 1'];
-        System.assertEquals(o2.size(), 1);
+        System.assertEquals([SELECT Count() FROM Contact WHERE LastName = 'Contacto prueba 1'], 1, 'Error al recuperar el contacto');
 
         
         List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input> oEntrada = new List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Input>();
@@ -1314,7 +1303,7 @@ public class SAC_WS_FormularioCasos_Test {
         System.runAs(usuario){
             Test.startTest();
             List<SAC_WS_FormularioCasos.SAC_WS_FormularioCasos_Output> oRes = SAC_WS_FormularioCasos.createCase(oEntrada);
-            System.assertNotEquals(oRes, null);
+            System.assertNotEquals(oRes, null, 'Error al crear el caso desde SAC_WS_FormularioCasos');
             Test.stopTest();
         }   
     }

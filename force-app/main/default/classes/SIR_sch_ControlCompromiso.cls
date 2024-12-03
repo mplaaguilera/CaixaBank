@@ -11,8 +11,8 @@ Proposito:   Clase Schedulable para lanzar el batch de control de compromiso
 
 *****************************************************************/
 
-global with sharing class SIR_sch_ControlCompromiso implements Schedulable{
-    global void execute(SchedulableContext sc)
+public with sharing class SIR_sch_ControlCompromiso implements Schedulable{
+    public void execute(SchedulableContext sc)
 
     {
         SIR_Batch_ControlCompromiso myBatchObject = new SIR_Batch_ControlCompromiso();

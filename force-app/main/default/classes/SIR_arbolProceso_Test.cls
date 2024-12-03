@@ -19,7 +19,8 @@ public with sharing class SIR_arbolProceso_Test {
         Account cuenta = SIR_TestDataFactory.crearCuenta();
         SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProcesoFechaConcreta(cuenta);
         proceso.Name = 'testArbolEstrategias';
-        proceso.SIREC__SIREC_fld_estrategia__c = 'E.6 – Sin prioridad';
+        proceso.SIREC__SIREC_fld_estrategia__c = '10001';
+        proceso.SIREC__SIREC_fld_estrategiaCatalogo__c = SIR_TestDataFactory.crearCatalogoEstrategia(proceso.SIREC__SIREC_fld_estrategia__c).Id;
         proceso.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_PENDIENTE_INICIO_GESTION;
         update proceso; 
         SIR_TestDataFactory.crearHistoricoProceso(1, proceso);

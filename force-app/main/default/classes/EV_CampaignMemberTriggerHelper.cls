@@ -14,6 +14,8 @@ Historial
 																			Modify method fillFormatoAsistenciaByRT, linkUniqueSurveyGeneration, eventSurvey
 	2.3			US657362			Mamen Arias			31/08/2023			Add Status 'Pendiente' and 'Invitacion enviada' for chage Status to 'Asistió' in linkUniqueSurveyGeneration
 	2.4			US674053			Mamen Arias			02/10/2023			Modify method linkUniqueSurveyGeneration > check if EV_ContadorCheckInVirtual__c >= 1, instead == 1
+	2.5			DE83772				Mamen Arias			15/11/2023			Modify method linkUniqueSurveyGeneration to check if there is a survey in the campaign or is active.
+	2.6			US764367            Carolina Lopez      22/11/2023          Add methods crearHistoricoDelete, validateBankTeller.
 ***********************************************************************************************************************/
 public with sharing class EV_CampaignMemberTriggerHelper {
 
@@ -32,11 +34,11 @@ public with sharing class EV_CampaignMemberTriggerHelper {
 		Id rtEventoVirtual = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoVirtual').getRecordTypeId();
 		Id rtEventoFisico = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoFisico').getRecordTypeId();
 		for(CampaignMember cm : listNews){
-				if(cm.EV_RTCampaign__c == rtEventoVirtual){
-					cm.EV_FormatoDeAsistencias__c = '002';
-				}else if(cm.EV_RTCampaign__c == rtEventoFisico){
-					cm.EV_FormatoDeAsistencias__c = '001';
-				}
+			if(cm.EV_RTCampaign__c == rtEventoVirtual){
+				cm.EV_FormatoDeAsistencias__c = '002';
+			}else if(cm.EV_RTCampaign__c == rtEventoFisico){
+				cm.EV_FormatoDeAsistencias__c = '001';
+			}
 		} 
 	}
 
@@ -70,16 +72,16 @@ public with sharing class EV_CampaignMemberTriggerHelper {
 			listLead = [SELECT Id, Name, EV_Account__c FROM Lead WHERE Id in : mapLeadCampaign.keySet() and EV_Account__c != null];
 			if(listLead!=null){
 				for(Lead l : listLead){
-						if(!mapCampaignAccount.containsKey(mapLeadCampaign.get(l.Id))){
-							Set<Id> ids= new Set<Id>();
-							ids.add(l.EV_Account__c);
-							mapCampaignAccount.put(mapLeadCampaign.get(l.Id),ids);
-						}else{
-							Set<Id> ids= new Set<Id>();
-							ids.add(l.EV_Account__c);
-							ids.addAll(mapCampaignAccount.get(mapLeadCampaign.get(l.Id)));
-							mapCampaignAccount.put(mapLeadCampaign.get(l.Id),ids);
-						}
+					if(!mapCampaignAccount.containsKey(mapLeadCampaign.get(l.Id))){
+						Set<Id> ids= new Set<Id>();
+						ids.add(l.EV_Account__c);
+						mapCampaignAccount.put(mapLeadCampaign.get(l.Id),ids);
+					}else{
+						Set<Id> ids= new Set<Id>();
+						ids.add(l.EV_Account__c);
+						ids.addAll(mapCampaignAccount.get(mapLeadCampaign.get(l.Id)));
+						mapCampaignAccount.put(mapLeadCampaign.get(l.Id),ids);
+					}
 				}
 			}
 			for(set<id> i : mapCampaignAccount.values()){
@@ -125,7 +127,7 @@ public with sharing class EV_CampaignMemberTriggerHelper {
 		}
 		EV_LogDebug.printLogDebug('setCampaignIds linkUniqueSurveyGeneration',String.valueof(setCampaignIds));
 		if(setCampaignIds != null){
-			listCampaign = [SELECT Id, EV_Encuesta__c FROM Campaign WHERE Id in:setCampaignIds];
+			listCampaign = [SELECT Id, EV_Encuesta__c, EV_Encuesta__r.ActiveVersionId FROM Campaign WHERE Id in:setCampaignIds];
 			if(listCampaign!=null){
 				for(Campaign camp: listCampaign){
 					mapCampaign.put(camp.Id, camp);
@@ -135,81 +137,93 @@ public with sharing class EV_CampaignMemberTriggerHelper {
 			for(CampaignMember campMember : listNews){
 				SurveyInvitation survey = new SurveyInvitation();
 				if(campMemberStatus.contains(campMember.Status) && campMember.EV_ContadorCheckInVirtual__c >= 1 && campMember.RecordtypeId == rtEvento){
-					campMember.Status = 'Asistió';
-					survey.CommunityId = network.Id;
-					survey.EV_Campaign__c = campMember.CampaignId;
-					if(campMember.LastName != null || campMember.FirstName != null){
-						survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
-					}else{
-						survey.Name = '_Survey_Invitation_'+Datetime.now();
-					}
-					if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.LeadId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.ContactId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
-						survey.ParticipantId = campMember.LastModifiedById;
-						survey.OptionsAllowGuestUserResponse = false;
-					}
-					survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
-
-					if(survey!=null){
-						Database.insert(survey);
-						campMember.EV_InvitacionEncuesta__c = survey.Id;
+					if (mapCampaign.get(campMember.CampaignId).EV_Encuesta__r.ActiveVersionId != null){
+						campMember.Status = 'Asistió';
+						survey.CommunityId = network.Id;
+						survey.EV_Campaign__c = campMember.CampaignId;
+						if(campMember.LastName != null || campMember.FirstName != null){
+							survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
+						}else{
+							survey.Name = '_Survey_Invitation_'+Datetime.now();
+						}
+						if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.LeadId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.ContactId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
+							survey.ParticipantId = campMember.LastModifiedById;
+							survey.OptionsAllowGuestUserResponse = false;
+						}
+						survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
+	
+						if(survey!=null){
+							Database.insert(survey);
+							campMember.EV_InvitacionEncuesta__c = survey.Id;
+						}
+					} else {
+						campMember.addError(Label.EV_ErrorEncuesta);
 					}
 
 				// Comparamos que haya cambiado sólo el campo Status, para que no entre en este if cada vez que se modifique un cambio en el CM
 				}else if(mapOld != null && mapOld.get(campMember.Id).Status != campMember.Status && campMemberStatusConfirmed.contains(campMember.Status) && campMember.RecordtypeId == rtEvento){
-					survey.CommunityId = network.Id;
-					survey.EV_Campaign__c = campMember.CampaignId;
-					if(campMember.LastName != null || campMember.FirstName != null){
-						survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
-					}else{
-						survey.Name = '_Survey_Invitation_'+Datetime.now();
+					if (mapCampaign.get(campMember.CampaignId).EV_Encuesta__r.ActiveVersionId != null){
+						survey.CommunityId = network.Id;
+						survey.EV_Campaign__c = campMember.CampaignId;
+						if(campMember.LastName != null || campMember.FirstName != null){
+							survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
+						}else{
+							survey.Name = '_Survey_Invitation_'+Datetime.now();
+						}
+						if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.LeadId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.ContactId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
+							survey.ParticipantId = campMember.LastModifiedById;
+							survey.OptionsAllowGuestUserResponse = false;
+						}
+						survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
+	
+						if(survey!=null){
+							Database.insert(survey);
+							campMember.EV_InvitacionEncuesta__c = survey.Id;
+						}
+					} else {
+						campMember.addError(Label.EV_ErrorEncuesta);
 					}
-					if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.LeadId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.ContactId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
-						survey.ParticipantId = campMember.LastModifiedById;
-						survey.OptionsAllowGuestUserResponse = false;
-					}
-					survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
-
-					if(survey!=null){
-						Database.insert(survey);
-						campMember.EV_InvitacionEncuesta__c = survey.Id;
-					}
-				
+					
 				// Esta casuística es sólo por si se inserta un CM directamente con el estado Asistió.
-				}else if (mapOld == null && campMemberStatusConfirmed.contains(campMember.Status) && campMember.RecordtypeId == rtEvento){             
-					survey.CommunityId = network.Id;
-					survey.EV_Campaign__c = campMember.CampaignId;
-					if(campMember.LastName != null || campMember.FirstName != null){
-						survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
-					}else{
-						survey.Name = '_Survey_Invitation_'+Datetime.now();
-					}
-					if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.LeadId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
-						survey.ParticipantId = campMember.ContactId;
-						survey.OptionsAllowGuestUserResponse = true;
-					}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
-						survey.ParticipantId = campMember.LastModifiedById;
-						survey.OptionsAllowGuestUserResponse = false;
-					}
-					survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
-
-					if(survey!=null){
-						Database.insert(survey);
-						campMember.EV_InvitacionEncuesta__c = survey.Id;
+				}else if (mapOld == null && campMemberStatusConfirmed.contains(campMember.Status) && campMember.RecordtypeId == rtEvento){
+					if (mapCampaign.get(campMember.CampaignId).EV_Encuesta__r.ActiveVersionId != null){
+						survey.CommunityId = network.Id;
+						survey.EV_Campaign__c = campMember.CampaignId;
+						if(campMember.LastName != null || campMember.FirstName != null){
+							survey.Name = campMember.LastName+'_'+campMember.FirstName+'_Survey_Invitation_'+Datetime.now();
+						}else{
+							survey.Name = '_Survey_Invitation_'+Datetime.now();
+						}
+						if(campMember.LeadId!=null && campMember.ContactId==null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.LeadId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if(campMember.LeadId==null && campMember.ContactId!=null && campMember.AccountId == null){
+							survey.ParticipantId = campMember.ContactId;
+							survey.OptionsAllowGuestUserResponse = true;
+						}else if (campMember.LeadId==null && campMember.ContactId==null && campMember.AccountId != null){
+							survey.ParticipantId = campMember.LastModifiedById;
+							survey.OptionsAllowGuestUserResponse = false;
+						}
+						survey.SurveyId = mapCampaign.get(campMember.CampaignId).EV_Encuesta__c;
+	
+						if(survey!=null){
+							Database.insert(survey);
+							campMember.EV_InvitacionEncuesta__c = survey.Id;
+						}
+					} else {
+						campMember.addError(Label.EV_ErrorEncuesta);
 					}
 				}
 			}
@@ -358,30 +372,34 @@ public with sharing class EV_CampaignMemberTriggerHelper {
 	}
 
 	//Metodo BD
-	/*public static void crearHistoricoDelete(List<CampaignMember> listOldObj, Map<Id, String> mapNameForLeads) {
-		EV_LogDebug.printLogDebug('crearHistoricoDelete ',String.valueof(listOldObj) + ' ' + String.valueof(mapNameForLeads));
+	public static void crearHistoricoDelete(List<CampaignMember> listOldObj) {
+		EV_LogDebug.printLogDebug('crearHistoricoDelete ',String.valueof(listOldObj));
         
-        List<EV_CampaignMemberHistory__c> ch = new List<EV_CampaignMemberHistory__c>(); 
-        
-        for(CampaignMember cmOld : listOldObj)
-        {           
-            EV_CampaignMemberHistory__c cmHistorial = new EV_CampaignMemberHistory__c();               
-            cmHistorial.EV_Campaign_Id__c = cmOld.CampaignId;            
-            cmHistorial.EV_CampaignMember_Id__c = cmOld.Id;    
-            cmHistorial.EV_Nombre_Miembro__c = mapNameForLeads.get(cmOld.LeadId);
-            cmHistorial.EV_Lead__c = cmOld.LeadId;     
-            cmHistorial.EV_Usuario__c = userinfo.getUserId();
-            cmHistorial.EV_Accion_Trigger__c = 'Delete';
-            cmHistorial.EV_Detalles_del_historial__c = DateTime.now() + ' - Se ha eliminado al Campaign Member Id: ' 
-                + cmOld.id + ' perteneciente a la Campaign Id: '+ cmOld.campaignId + ' por el usuario: '+ userinfo.getUserName();
-            
-            ch.add(cmHistorial);
-        }
-        
-        if(!ch.isEmpty())
-        {
-            insert ch;
-        }*
-    }*/
+		List<EV_CampaignMemberHistory__c> ch = new List<EV_CampaignMemberHistory__c>(); 
+		for(CampaignMember cmOld : listOldObj){           
+			EV_CampaignMemberHistory__c cmHistorial = new EV_CampaignMemberHistory__c();               
+			cmHistorial.EV_Campaign_Id__c = cmOld.CampaignId;            
+			cmHistorial.EV_CampaignMember_Id__c = cmOld.Id;    
+			cmHistorial.EV_Nombre_Miembro__c = cmOld.Lead.Name;
+			cmHistorial.EV_Lead__c = cmOld.LeadId;     
+			cmHistorial.EV_Usuario__c = userinfo.getUserId();
+			cmHistorial.EV_Accion_Trigger__c = 'Delete';
+			cmHistorial.EV_Detalles_del_historial__c = DateTime.now() + ' - Se ha eliminado al Campaign Member Id: ' 
+				+ cmOld.id + ' perteneciente a la Campaign Id: '+ cmOld.campaignId + ' por el usuario: '+ userinfo.getUserName();
+			
+			ch.add(cmHistorial);
+		}
+		if(!ch.isEmpty()){
+			insert ch;
+		}
+    }
 
+	//Metodo BD
+	public static void validateBankTeller(List<CampaignMember> listOlds){
+		for (CampaignMember cm : listOlds){
+			if (cm.Id!=null){
+				cm.addError(Label.AV_ErrorDeleteCampaignMember);
+			}
+		}
+	}
 }

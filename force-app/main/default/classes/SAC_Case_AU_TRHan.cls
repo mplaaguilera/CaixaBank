@@ -108,6 +108,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         }
     }
     private void processSAC(List<Case> listNewObj, Map<Id, Case> mapNewObj, List<Case> listOldObj, Map<Id, Case> mapOldObj) {
+
         List<SObject> objetos =new list<SObject>();
         List<Case> listaPretensiones = new List<Case>();
         List<Case> listaReclamaciones = new List<Case>();
@@ -162,8 +163,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         Set<Id> setIdPreCambioNegociacion = new Set<Id>();
         Set<Id> setReclaSubsanacion = new Set<Id>();
         List<Id> listaIdsCambioOwnerReclamacion = new List<Id>();
-        List<Id> listaIdsCambiaIdioma = new List<Id>();
-        List<Case> listaCasosCambiaIdioma = new List<Case>();
         Map<Id, Case> mapaDatosCasosActualizar = new Map<Id, Case>();
         Map<Id, Case> mapaReclamacionesNotificar = new Map<Id, Case>();
         Map<Id, Case> mapaReclamacionesCerradas = new Map<Id, Case>();
@@ -199,7 +198,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
         for (case caso : listNewObj) { 
             //Pretensiones 
             if (caso.RecordTypeId == RECTYPEPRETENSION) {
-           
                 if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && caso.AccountId != null 
                     && mapOldObj.get(caso.Id).OwnerId != colaSupervisores.Id
                     && caso.OwnerId != cola.Id && caso.OwnerId != colaSupervisores.Id ) {
@@ -331,7 +329,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 listaCasos.add(caso);
             //Reclamaciones
             }else if(caso.RecordTypeId == RECTYPERECLAMACION){
-                
                 if (mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.Status == 'SAC_008') { //Derivación
                     idesReclaGlobal.add(caso.Id);
                     mapaReclamacionesNotificar.put(caso.Id, caso);
@@ -344,12 +341,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                         listaReclamacionesConsultasAFinalizar.add(caso);
                     }
                 }
-
-                if(mapOldObj.containsKey(caso.Id) && caso.CC_Idioma__c != mapOldObj.get(caso.Id).CC_Idioma__c){
-                    listaIdsCambiaIdioma.add(caso.Id);
-                    listaCasosCambiaIdioma.add(caso);
-                }
-
                 if(mapOldObj.containsKey(caso.Id) && caso.CC_Canal_Procedencia__c != mapOldObj.get(caso.Id).CC_Canal_Procedencia__c){           
                     listaReclaPadreCanalProcedencia.add(caso);  
                     idesReclaGlobal.add(caso.Id);                  
@@ -438,7 +429,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 listaReclamaciones.add(caso);
                 listaCasos.add(caso);
             }else if(caso.RecordTypeId == RECTYPECONSULTA){
-               
                 listaConsultas.add(caso);
                 listaCasos.add(caso);
                 if (caso.OwnerId != mapOldObj.get(caso.Id).OwnerId && caso.AccountId != null && caso.OwnerId != cola.Id) {
@@ -457,7 +447,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     idesReclaGlobal.add(mapOldObj.get(caso.Id).CC_CasoRelacionado__c);
                 }
             }else if(caso.RecordTypeId == RECTYPECONSULTASAC){
-           
                 listaCasos.add(caso);
                 if(mapOldObj.containsKey(caso.Id) && caso.Status != mapOldObj.get(caso.Id).Status && caso.CC_CasoRelacionado__c != Null){
                     setIdesRecCheck.add(caso.CC_CasoRelacionado__c);
@@ -468,10 +457,8 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                     idesReclaGlobal.add(mapOldObj.get(caso.Id).CC_CasoRelacionado__c);
                 }
 
-
                 if(mapOldObj.get(caso.Id).SAC_Naturaleza__c != caso.SAC_Naturaleza__c && caso.SAC_Naturaleza__c == 'SAC_005'){
                     listaRecCambioNaturaleza.add(caso);
-                   
                 }
             }
         }
@@ -488,7 +475,7 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                                       SAC_Reclamacion__r.CC_CasoRelacionado__r.Status, SAC_Reclamacion__r.CC_CasoRelacionado__r.RecordTypeId, SAC_MotivoInadmision__c, Origin, SEG_Detalle__r.SAC_GenerarTaskMisClientes__c, SAC_FechaUltimaAsignacionLetrado__c,
                                       CC_Oficina_Afectada_Lookup__r.CC_Numero_Oficina__c, CC_Oficina_Afectada_Lookup__r.AV_MatriculaResponsable1__r.CC_Matricula__c, CC_MCC_ProdServ__r.Name, SEG_Detalle__r.Name, SAC_MotivoSentidoResolucion__c,
                                       SAC_RedaccionFinal__c, SAC_FamiliaMotivoBdE__c, SAC_ResultadoNegociacion__c, SEG_Detalle__r.SAC_ImporteDesdeMCC__c, SEG_Detalle__r.SAC_ImporteHastaMCC__c, SEG_Detalle__r.SAC_GrupoLetradoMCC__c,
-                                      CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c, CC_Idioma__c, CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c, CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c, CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c, CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c,
+                                      CC_MCC_Motivo__r.SAC_ImporteDesdeMCC__c, CC_MCC_Motivo__r.SAC_ImporteHastaMCC__c, CC_MCC_Motivo__r.SAC_GrupoLetradoMCC__c, CC_MCC_ProdServ__r.SAC_ImporteDesdeMCC__c, CC_MCC_ProdServ__r.SAC_ImporteHastaMCC__c,
                                       CC_MCC_ProdServ__r.SAC_GrupoLetradoMCC__c, CC_MCC_Tematica__r.SAC_ImporteDesdeMCC__c, CC_MCC_Tematica__r.SAC_ImporteHastaMCC__c, CC_MCC_Tematica__r.SAC_GrupoLetradoMCC__c, SAC_ValidacionMCC__c,
                                       SAC_TipoSubsanacion__c, SAC_EsPrincipal__c, SAC_M2P__c, SAC_Reclamacion__r.SAC_M2P__c
                                   FROM Case
@@ -502,7 +489,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                                             AND (Status != 'SAC_008' OR Status != 'SAC_012' OR Status != 'SAC_013')) 
                                       OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: listaReclamacionEspecial)
                                       OR (RecordTypeId = :RECTYPERECLAMACION AND (Id IN: setIdRecPadre OR Id IN: idesReclaGlobal))
-                                      OR (RecordTypeId = :RECTYPERECLAMACION AND  Id IN: listaIdsCambiaIdioma)
                                       )];
         
         if (procesado && !segundoProcesado) {
@@ -526,7 +512,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 //SAC_NotificacionProrrogaAutomatica.notificacionProrrogaAutomatica(listaPretensiones, mapOldObj);
                 compruebaPretensiones = true;
                 if (!listaPretensionControlarMilestone.isEmpty()) {
-                  
                     SAC_ComportamientoSLAs.cerrarMilestoneLetradoAltaBaja(listaPretensionControlarMilestone);
                 }
                 if (!listaCambioEntidadPrincipal.isEmpty()) {SAC_Reclamacion.entidadAfectadaPrincipal(listaCasosSelect, listaCambioEntidadPrincipal, mapaDatosCasosActualizar);}
@@ -595,10 +580,6 @@ public without sharing class SAC_Case_AU_TRHan extends CC_TriggerHandlerBase {
                 }
 
                 if (!mapaReclamacionesNotificar.isEmpty()) { SAC_Notificacion.derivacion(mapaReclamacionesNotificar, listaCasosSelect, mapaDatosCasosActualizar); }
-
-                if(!listaIdsCambiaIdioma.isEmpty()){
-                    SAC_Reclamacion.actualizarPlantillaLateral(listaCasosSelect, listaCasosCambiaIdioma);
-                }
 
                 //US458927 Se elimina la alerta notificarCambioOwner
                 //if (!mapaReclamacionOwnerCambiado.isEmpty()) { SAC_Notificacion.notificarCambioOwner(mapaReclamacionOwnerCambiado, listaCasosSelect, mapaDatosCasosActualizar); }

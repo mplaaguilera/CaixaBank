@@ -9,15 +9,15 @@ Historial
    VERSION		USER_STORY		AUTHOR				DATE				Description
    1.0			App FSC			Sandra Gómez		01/02/2021			Init version
    1.1			USXXXXXX		Sandra Gómez		22/11/2021			add FWK Batches
-
+   1.2		    FIX11070844	    Oscar Moreno		19/07/2024			Fix error The Global modifier should be avoided.
 ***********************************************************************************************************************/
-global class AV_DeleteRecordsCarteraBatchQueueable implements Queueable{
+public class AV_DeleteRecordsCarteraBatchQueueable implements Queueable{
 	 /**
 	 * Executes the Queueable job
 	 *
 	 * @param qc	QueueableContext param that contains the context of the queueable
 	 */
-	global void execute(QueueableContext qc) {
+	public void execute(QueueableContext qc) {
 		Set<String> listUser = new Set<String>();
 		listUser.add(UserInfo.getUserId());
 		AV_ScheduleBatch__mdt proccessBatch = [SELECT AV_Limit__c FROM AV_ScheduleBatch__mdt WHERE DeveloperName = 'AV_DeleteCartera' LIMIT 1];

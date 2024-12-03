@@ -6,41 +6,41 @@ public class SEG_Email_Launcher_Controller {
     	@AuraEnabled
     	public List<EmailMessage> vCargarEmails { get; set; }
     	@AuraEnabled
-    	public boolean vGetPropietario { get; set; }
+    	public boolean vGetPropietario { get; set; }   
     	@AuraEnabled
-    	public List<String> vCargarFechaEmails { get; set; }
+    	public List<String> vCargarFechaEmails { get; set; }   
         @AuraEnabled
-    	public String vGetDynamicUrlToApex { get; set; }
-        @AuraEnabled
-        public emailMessage vMostrarEmailReciente { get; set; }
-        @AuraEnabled
-        public Contact vMostrarContact { get; set; }
+    	public String vGetDynamicUrlToApex { get; set; }   
+        @AuraEnabled        
+        public emailMessage vMostrarEmailReciente { get; set; }   
+        @AuraEnabled        
+        public Contact vMostrarContact { get; set; }   
     }
-
+    
 	@AuraEnabled
 	static public wrapperInit initComponent(String caseId){
         wrapperInit result = new wrapperInit();
-
+        
         //getCaso
-		result.vGetCaso=recuperarCaso(caseId);
+		result.vGetCaso=recuperarCaso(caseId);        
         //cargarEmails
-      	result.vCargarEmails=recuperarEmails(caseId);
+      	result.vCargarEmails=recuperarEmails(caseId);    
         //esPropietario
-      	result.vGetPropietario=esPropietario(caseId);
+      	result.vGetPropietario=esPropietario(caseId);    
         //recuperarFechaEmails
-      	result.vCargarFechaEmails=recuperarFechaEmails(caseId);
+      	result.vCargarFechaEmails=recuperarFechaEmails(caseId);    
         //getDynamicUrlToApex
-      	result.vGetDynamicUrlToApex=getDynamicUrl();
+      	result.vGetDynamicUrlToApex=getDynamicUrl();   
         //mostrarEmailReciente
-      	result.vMostrarEmailReciente=mostrarEmailReciente(caseId);
+      	result.vMostrarEmailReciente=mostrarEmailReciente(caseId);    
         //mostrarContact
-      	result.vMostrarContact=mostrarContact(result.vMostrarEmailReciente);
-
-        return result;
+      	result.vMostrarContact=mostrarContact(result.vMostrarEmailReciente);    
+        
+        return result;   
 	}
 
-
-
+    
+    
     @AuraEnabled(cacheable=true)
 	static public String defaultIdioma(String caseId){
 
@@ -95,7 +95,7 @@ public class SEG_Email_Launcher_Controller {
 		EmailMessage newMessage = new EmailMessage();
 		String subject ;
 		if (!mensaje.isEmpty()){
-			if(string.isNotBlank(mensaje[0].Subject) && !mensaje[0].subject.contains(casoVinculado.caseNumber)){
+			if(string.isNotBlank(mensaje[0].Subject) && !mensaje[0].subject.contains(casoVinculado.caseNumber)){   
 				subject = mensaje[0].Subject;
 				subject = (casoVinculado.caseNumber +' - ' + subject);
 				newMessage = mensaje[0];
@@ -110,17 +110,17 @@ public class SEG_Email_Launcher_Controller {
 			return null;
 		}
 	}
-
+    
     @AuraEnabled
 	static public EmailMessage mostrarEmailReciente(String caseId) {
 		List<EmailMessage> correos = [SELECT FromName, CcAddress, FromAddress, ToAddress, HtmlBody, LastModifiedById, MessageDate, CreatedDate, Subject, incoming FROM EmailMessage WHERE ParentId = :caseId AND incoming = true ORDER BY MessageDate DESC LIMIT 1];
 		Case casoVinculado = [SELECT id, caseNumber FROM Case WHERE id =: caseId];
 		EmailMessage newMessage = new EmailMessage();
 		String subject ;
-
-
+		
+		
 		if (!correos.isEmpty()){
-			if(string.isNotBlank(correos[0].Subject) && !correos[0].subject.contains(casoVinculado.caseNumber)){
+			if(string.isNotBlank(correos[0].Subject) && !correos[0].subject.contains(casoVinculado.caseNumber)){   
 				subject = correos[0].Subject;
 				subject = (casoVinculado.caseNumber +' - ' + subject);
 				newMessage = correos[0];
@@ -134,7 +134,7 @@ public class SEG_Email_Launcher_Controller {
 		else{
 			return null;
 		}
-
+		
 	}
 
 	@AuraEnabled(cacheable=true)
@@ -150,12 +150,12 @@ public class SEG_Email_Launcher_Controller {
 					for (Contact c : contactos){
 						if(c.SEG_Estado__c != 'Inactivo'){
 							selectedContact = c;
-						}
+						} 
 					}
 				}
 			}
 		}
-
+		
 		return selectedContact;
 	}
 
@@ -181,7 +181,7 @@ public class SEG_Email_Launcher_Controller {
 		List<ContentVersion> listaFicheros = new List<ContentVersion>();
 		//List<EmailMessage> email = [SELECT FromName, CcAddress, FromAddress, ToAddress, HtmlBody, LastModifiedById, MessageDate FROM EmailMessage WHERE ParentId = :caseId ORDER BY MessageDate DESC LIMIT 1];
 		List<EmailMessage> email = [SELECT Id FROM EmailMessage WHERE ParentId = :caseId ORDER BY MessageDate DESC LIMIT 1];
-
+		
 		// Id idemailid = [SELECT Id FROM EmailMessage where id = :emailid];
 		if (!email.isEmpty()){
 			List<ContentDocumentLink> contentDocLinkList = [SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: email[0].id AND LinkedEntity.Type='EmailMessage'];
@@ -197,7 +197,7 @@ public class SEG_Email_Launcher_Controller {
 				}
 			}
 		}
-
+		
 		return listaFicheros;
 
 	}
@@ -336,11 +336,11 @@ public class SEG_Email_Launcher_Controller {
 		emailsComPara = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComPara, caso[0].SEG_Buz_n_de_la_zona__c );
 		emailsComCc = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComCc, caso[0].SEG_Buz_n_de_la_zona__c );
 		emailsComCco = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComCco, caso[0].SEG_Buz_n_de_la_zona__c );
-
+		
 		/*emailsComPara = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComPara);
 		emailsComCc = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComCc);
 		emailsComCco = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(emailsComCco);*/
-
+		
 		ListadoEmailsWrapper listadoAuxiliar = new ListadoEmailsWrapper(emailsComPara,emailsComCc,emailsComCco);
 
 		return listadoAuxiliar;
@@ -383,21 +383,21 @@ public class SEG_Email_Launcher_Controller {
 		{
 			if(contactosRelacionados.size() > 1)
 			{
-				for (Contact contacto : contactosRelacionados)
+				for (Contact contacto : contactosRelacionados) 
 				{
 					if(contacto.SEG_Estado__c != 'Inactivo')
 					{
-						setContactosFiltrados.add(contacto.Id);
+						setContactosFiltrados.add(contacto.Id); 
 					}
 				}
 			}
-
+			
 			if(setContactosFiltrados.isEmpty())
 			{
-				for (Contact contacto : contactosRelacionados)
+				for (Contact contacto : contactosRelacionados) 
 				{
 					setContactosFiltrados.add(contacto.Id);
-				}
+				}                
 			}
 		}
 		/*
@@ -475,22 +475,22 @@ public class SEG_Email_Launcher_Controller {
 		{
 			if(contactosRelacionados.size() > 1)
 			{
-				for (Contact contacto : contactosRelacionados)
+				for (Contact contacto : contactosRelacionados) 
 				{
 					if(contacto.SEG_Estado__c != 'Inactivo')
 					{
-						setContactosFiltrados.add(contacto.Id);
+						setContactosFiltrados.add(contacto.Id); 
 					}
 				}
-			}
+			}			
 			if(setContactosFiltrados.isEmpty())
 			{
-				for (Contact contacto : contactosRelacionados)
+				for (Contact contacto : contactosRelacionados) 
 				{
 					setContactosFiltrados.add(contacto.Id);
-				}
+				}                
 			}
-		}
+		}		
 
 		List<CC_Canal_Com__c> canalComunicacion = [SELECT id, CC_ContactoId__c,CC_Email__c, CC_CuentaId__c FROM CC_Canal_Com__c WHERE CC_ContactoId__c IN :setContactosFiltrados];
 		if (!emailsListado.isEmpty()) {
@@ -531,7 +531,15 @@ public class SEG_Email_Launcher_Controller {
 	}
 
 	@AuraEnabled
-	public static Boolean controlarContactyOrgZona(Id caseId) {
-		return ![SELECT Id FROM Case WHERE Id = :caseId AND (ContactId = NULL OR SEG_Organizacion__c = NULL OR SEG_Zona__c = NULL)].isEmpty();
+	public static Boolean controlarContactyOrgZona (Id caseId) {
+		Boolean isDisabled = false;
+
+		List<Case> caso = [SELECT id, ContactId , SEG_Organizacion__c, SEG_Zona__c FROM Case WHERE id =:caseId LIMIT 1];
+		if (caso[0].ContactId == null || caso[0].SEG_Organizacion__c == null|| caso[0].SEG_Zona__c == null){
+			isDisabled = true;
+		}
+
+	return isDisabled;	 
+
 	}
 }

@@ -215,7 +215,7 @@ public class CC_Llamada_Test {
 
         Account oficinaGestora = new Account(RecordTypeId = recordTypeOficina, Name = 'Cuenta oficina gestora', CC_Tipo_Centro__c = 'OF',  CC_Email__c = 'test@test.com',  CC_Numero_Oficina__c = '222', CC_Numero_Oficina_Empresa__c = '222-22222');
         insert oficinaGestora;
-        Account cuenta = new Account(RecordTypeId = recordTypeCuenta, Name = 'Cuenta', AV_NumPerso__c = '666', CC_OficinaGestoraId__c = oficinaGestora.Id, AV_OficinaPrincipal__c = oficinaGestora.Id);
+        Account cuenta = new Account(RecordTypeId = recordTypeCuenta, Name = 'Cuenta', CC_NumPerso__c = '666', CC_OficinaGestoraId__c = oficinaGestora.Id, AV_OficinaPrincipal__c = oficinaGestora.Id);
         insert cuenta;
 
         Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();

@@ -6,11 +6,11 @@ Proposito: Clase para Trigger de Campaign AfterUpdate
 ----------------------------------------------------------------------------------------------------------------------
 Historial
 ----------------------------------------------------------------------------------------------------------------------
-  VERSION    USER_STORY        AUTHOR        DATE        Description
-  1.0                        Daniel Rodriguez                  Init version
-   1.1      US586998      Daniel Rodriguez      15/06/2023      Insert method updateRollUpEventChangeStatus 
-  1.2         DE75856           Daniel Rodriguez      04/10/2023        Change method creationSchedule for new class EV_CreateScheduleChangeStatus
-
+  VERSION    USER_STORY        AUTHOR               DATE            Description
+  1.0                        Daniel Rodriguez                       Init version
+  1.1        US586998        Daniel Rodriguez      15/06/2023       Insert method updateRollUpEventChangeStatus 
+  1.2        DE75856         Daniel Rodriguez      04/10/2023       Change method creationSchedule for new class EV_CreateScheduleChangeStatus
+  1.3        US854993        Carolina Lopez        09/04/2024       Add method visiblePortalInformation.
 ***********************************************************************************************************************/
 
 public  class EV_Campaign_AU_TRHan extends CC_TriggerHandlerBase {
@@ -24,5 +24,6 @@ public  class EV_Campaign_AU_TRHan extends CC_TriggerHandlerBase {
         EV_CreateScheduleChangeStatus.creationSchedule(listNewObj,mapOldObj);
         EV_CampaignTriggerHelper.updateCarteraPO(listNewObj, mapOldObj);
         EV_CampaignTriggerHelper.updateRollUpEventChangeStatus(listNewObj, mapOldObj);
+        EV_CampaignTriggerHelper.visiblePortalInformation(listNewObj,mapOldObj);
     }
 }

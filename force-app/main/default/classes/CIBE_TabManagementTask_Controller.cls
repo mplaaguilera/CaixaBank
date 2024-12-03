@@ -12,8 +12,11 @@ Historial
 	1.2			DE77150 		Lucia				29/06/2023		MOdificado el metodo validateHGM
 	1.3         US540119        Alexandre Perez		18/07/2023		Adapted to new NPS endPoint using fw
 	1.4			US585878		Bea					28/09/2023		Added  getNoGestionable method
+	1.5 		US776107    	Alicia				08/01/2024		Move 'getContact()' and 'reLinkOppToEvent()' to CIBE_UtilitiesWOS
+	1.6 		IN1179773    	Lucia				12/07/2024		Modify getPickListValuesByRecordTypeId2
+
 ***********************************************************************************************************************/
-public without sharing class CIBE_TabManagementTask_Controller {
+public with sharing class CIBE_TabManagementTask_Controller {
     
 
     @AuraEnabled
@@ -62,7 +65,6 @@ public without sharing class CIBE_TabManagementTask_Controller {
 			return true;
 		}
 	}
-
 
 	private class DataTableWrapper {
         @AuraEnabled
@@ -178,6 +180,8 @@ public without sharing class CIBE_TabManagementTask_Controller {
 	@AuraEnabled
 	public static String updateTaskReminder(String id, Datetime reminderDateTime, String comentario) {
 
+		List<AV_ManagementHistory__c> historicoTareaUpdate = new List<AV_ManagementHistory__c>();
+
 		if(reminderDateTime > Datetime.now()){
 			Task tarea = [SELECT Id, Status, AV_Tipo__c, ActivityDate, Description, IsReminderSet, ReminderDateTime,RecordType.DeveloperName FROM Task WHERE Id = :id];
 			tarea.Id=id;
@@ -197,7 +201,20 @@ public without sharing class CIBE_TabManagementTask_Controller {
 					AV_LogDebug.printLogDebug('updateTask', 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
 					return err.getMessage();
 				}
+			}else{
+				List<AV_ManagementHistory__c> historicoTarea = [SELECT Id FROM AV_ManagementHistory__c WHERE AV_ActivityId__c = :tarea.Id ORDER BY CreatedDate DESC LIMIT 1];
+				if(!historicoTarea.isEmpty()){
+					for (AV_ManagementHistory__c histTsk : historicoTarea) {
+						histTsk.AV_Status__c = 'Posponer-Llamar más tarde';
+						historicoTareaUpdate.add(histTsk);
+					}
+				}
 			}
+
+			if(!historicoTareaUpdate.isEmpty()){
+				update historicoTareaUpdate;
+			}
+
 			return 'OK';
 		}else{
 			return Label.AV_ErrorLTTodaysTime;
@@ -206,6 +223,7 @@ public without sharing class CIBE_TabManagementTask_Controller {
 
 	@AuraEnabled
 	public static String updateTask(String id, String estado, String tipo, Date fecha, String comentario, String acciones, String motivo, String valoracion,String contacto , Datetime activityDateTime, Boolean dontCreateEvent) {
+
 		String methodName = 'updateTask';
 		User sinGestorEAP = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' LIMIT 1];
         List<String> eventRelatedTypes = new List<String>{
@@ -219,8 +237,8 @@ public without sharing class CIBE_TabManagementTask_Controller {
 		Task tarea = [SELECT Id, AccountId,Subject,Status, AV_Tipo__c, AV_Center__c,Description, ActivityDate, RecordType.DeveloperName, AV_ExternalID__c, LastModifiedDate,OwnerId,AV_Task__c FROM Task WHERE Id = :id LIMIT 1 ];
 
 		if( tarea.id != null){			
-		 if( tarea.ownerId != UserInfo.getUserId() && tarea.ownerId != sinGestorEAP.Id){
-			return Label.AV_CMP_DiffUserOwner;
+			if( tarea.ownerId != UserInfo.getUserId() && tarea.ownerId != sinGestorEAP.Id){
+				return Label.AV_CMP_DiffUserOwner;
 			}		
 		}
 		if('CIBE_OtrosCIB'.equals(tarea.RecordType.DeveloperName) && (CIBE_AppConstants.GESTIONADO_POSITIVO_ESTADO.equals(estado) || CIBE_AppConstants.GESTIONADO_NEGATIVA_ESTADO.equals(estado))){
@@ -288,65 +306,24 @@ public without sharing class CIBE_TabManagementTask_Controller {
         else{
 			return Label.AV_ErrorGTDueDate;
 		}
-        
         //Save the data
-        Database.SaveResult sr = Database.update(tarea, false);
-        if(!sr.isSuccess()) {	    
-            for(Database.Error err : sr.getErrors()) {
-                AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
-                return err.getMessage();
-            }
-        }
+		update tarea;
+        // Database.SaveResult sr = Database.update(tarea, false);
+        // if(!sr.isSuccess()) {	    
+        //     for(Database.Error err : sr.getErrors()) {
+        //         AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
+                
+		// 		return err.getMessage();
+        //     }
+        // }
 
 		if(dontCreateEvent!=null && !dontCreateEvent){
-
 			if(eventRelatedTypes.contains(tipo)){
 				return insertEventRelated(tarea, activityDateTime);
 			}
 		}
 	
         return 'OK';
-	}
-
-	@AuraEnabled
-	public static List<AV_LookupSearchResult> getContact(String searchTerm, List<String> selectedIds, String accountId){
-		String methodName = 'getContact';
-		searchTerm += '*';
-		List<AV_LookupSearchResult> results = new List<AV_LookupSearchResult>();
-		List<List<SObject>> searchResults = new List<List<SObject>>();
-		if(!selectedIds.isEmpty()){
-			searchResults = [
-				FIND :searchTerm
-				IN ALL FIELDS
-				RETURNING
-				Contact(Id, Name, CC_CargoRepresentante__c WHERE Id NOT IN :selectedIds AND RecordType.DeveloperName='CC_Representante' and AccountId = :AccountId)
-				LIMIT 10];
-			}
-			else{
-			searchResults = [
-			FIND :searchTerm
-			IN ALL FIELDS
-			RETURNING
-				Contact(Id, Name, CC_CargoRepresentante__c WHERE RecordType.DeveloperName='CC_Representante' and AccountId = :accountId)
-			LIMIT 10];
-		}
-		String userIcon = 'standard:contact';
-		Contact otros =[SELECT Id, Name FROM Contact WHERE CC_Matricula__c = '000000000' LIMIT 1];
-		Contact[] listUsers = (List<Contact>) searchResults[0];
-		for (Contact u : listUsers) {
-			results.add(new AV_LookupSearchResult(u.Id,'Contact',userIcon,u.Name,u.CC_CargoRepresentante__c));
-		}
-		results.sort();
-		results.add(
-				new AV_LookupSearchResult(
-					otros.Id,
-					'Contact',
-					userIcon,
-					otros.Name,
-					''
-				)
-			);
-		return results;
 	}
 
 	@AuraEnabled
@@ -372,12 +349,10 @@ public without sharing class CIBE_TabManagementTask_Controller {
 		String result = 'OK';
 		String methodName = 'insertOrUpdateActivityExt';
 		Database.SaveResult sr;
-
 		CBK_Activity_Extension__c actExt;
-		List<CBK_Activity_Extension__c> actExtList = [SELECT AV_ActivityId__c,
-		 AV_AccionesARealizar__c, AV_MotivoCierreExperienciaCliente__c, AV_ValoracionGestion__c
-		 FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c = :taskId LIMIT 1];
-		 
+		List<CBK_Activity_Extension__c> actExtList = [SELECT AV_ActivityId__c, AV_AccionesARealizar__c, AV_MotivoCierreExperienciaCliente__c, AV_ValoracionGestion__c
+														FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c = :taskId LIMIT 1];
+		
 		if(!actExtList.isEmpty()){
 			actExt = actExtList[0];
 		}	
@@ -387,19 +362,18 @@ public without sharing class CIBE_TabManagementTask_Controller {
 				actExt.AV_AccionesARealizar__c = String.isNotEmpty(acciones) ? acciones : null;
 				actExt.AV_MotivoCierreExperienciaCliente__c = String.isNotEmpty(motivo) ? motivo : null;
 				actExt.AV_ValoracionGestion__c = String.isNotEmpty(valoracion) ? valoracion : null;
-				sr = Database.insert(actExt, false);
+				sr = Database.insert(actExt);
 			} else {
 				actExt.AV_AccionesARealizar__c = String.isNotEmpty(acciones) ? acciones : null;
 				actExt.AV_MotivoCierreExperienciaCliente__c = String.isNotEmpty(motivo) ? motivo : null;
 				actExt.AV_ValoracionGestion__c = String.isNotEmpty(valoracion) ? valoracion : null;
-				sr = Database.update(actExt, false);
+				sr = Database.update(actExt);
 			}
-		
 
 		if (!sr.isSuccess()) {
 			for(Database.Error err : sr.getErrors()) {
                 AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getStatusCode() + ' - ' + err.getMessage() + '. ' + 'Fields that affected this error: ' + err.getFields());
-                result = err.getMessage();
+				result = err.getMessage();
             }
 		}
 		
@@ -432,8 +406,6 @@ public without sharing class CIBE_TabManagementTask_Controller {
 			wrapper.acciones = String.isNotEmpty(actExt[0].AV_AccionesARealizar__c) ? actExt[0].AV_AccionesARealizar__c : null;
 			wrapper.valoracion = String.isNotEmpty(actExt[0].AV_ValoracionGestion__c) ? actExt[0].AV_ValoracionGestion__c : null;
 		}
-		System.debug('@@ wrapper');
-		System.debug(wrapper);
 		return wrapper;
 	}
 
@@ -475,14 +447,14 @@ public without sharing class CIBE_TabManagementTask_Controller {
 			eventRelated.EndDateTime = eventRelated.StartDateTime.addMinutes(5);
 			
 		}else if(eventRelated.AV_Tipo__c ==  CIBE_AppConstants.CITA_TELEFONICA_TIPO
-		|| eventRelated.AV_Tipo__c ==  CIBE_AppConstants.VIDEOLLAMADA_TIPO  ){
-			eventRelated.EndDateTime = eventRelated.StartDateTime.addMinutes(15);
+				|| eventRelated.AV_Tipo__c ==  CIBE_AppConstants.VIDEOLLAMADA_TIPO  ){
+					eventRelated.EndDateTime = eventRelated.StartDateTime.addMinutes(15);
 		}else if(eventRelated.AV_Tipo__c == CIBE_AppConstants.CITA_OFICINA_TIPO 
-				 || eventRelated.AV_Tipo__c == CIBE_AppConstants.VISITA_TIPO){
+				|| eventRelated.AV_Tipo__c == CIBE_AppConstants.VISITA_TIPO){
 					eventRelated.EndDateTime = eventRelated.StartDateTime.addMinutes(30);
 					eventRelated.AV_BranchPhysicalMeet__c = tarea.AV_Center__c;
 					eventRelated.Location = tarea.AV_Center__c;
-				 }
+		}
 
         eventRelated.AV_OrigenApp__c = CIBE_AppConstants.SALESFORCE_ORIGENAPP;
 
@@ -492,35 +464,8 @@ public without sharing class CIBE_TabManagementTask_Controller {
 			return 'WARNEVENT';
 		} 
 			
-		return reLinkOppToEvent(sr.getId(),tarea.AV_Task__c) ;
+		return CIBE_UtilitiesWOS.reLinkOppToEvent(sr.getId(),tarea.AV_Task__c) ;
 		// return activityDateTime;
-	}
-
-		/**
-	 * Get all the Oppos linked to the reported task and re-link them to the related Event
-	 * @param eventRelatedId The Id of the recently inserted Event
-	 * @param taskHeader Id of the AV_HeaderCustomActivity__c object stored in AV_Task__C field from reported task
-	 */
-	private static String reLinkOppToEvent(Id eventRelatedId, String taskHeader){
-		Event headerField = [SELECT AV_Task__c FROM Event WHERE Id =: eventRelatedId LIMIT 1];
-		List<AV_CustomActivityOpportunity__c> linkedOpps =[SELECT AV_Opportunity__c,AV_IsMain__C FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :taskHeader];
-		List<AV_CustomActivityOpportunity__c> relatedOpp = new List<AV_CustomActivityOpportunity__c>();
-		for(AV_CustomActivityOpportunity__c oppRelated : linkedOpps){
-			
-			relatedOpp.add( new AV_CustomActivityOpportunity__c(
-				AV_Opportunity__c = oppRelated.AV_Opportunity__c,
-				AV_Task__c = headerField.AV_Task__C,
-				AV_IsMain__c = oppRelated.AV_IsMain__C
-			));
-		}
-
-		List<Database.SaveResult> sr = Database.insert(relatedOpp,true);
-		for(Database.SaveResult result : sr){
-			if(!result.isSuccess()){
-				return 'WARNEVENT';
-			}
-		}
-		return 'OK';
 	}
 
 	/**
@@ -540,7 +485,6 @@ public without sharing class CIBE_TabManagementTask_Controller {
 		String avNumper = null;
 		String tokenValue = null;
 		List<Task> tarea = new List<Task>();
-		system.debug('HGM ' + id + ' ' + managementDateTask);
 		if (String.isNotBlank(id) && managementDateTask != null) { 
 					tarea =	[SELECT Id,CC_Empleado_Gestor__c, AccountId,CreatedDate, AV_SurveyValue__c, AV_Valor5__c, Account.RecordType.Developername, Account.AV_NumPerso__c,
 							Account.FirstName, Account.LastName, Account.PersonEmail, Account.PersonMobilePhone, Account.AV_Idioma__c,CC_Empleado_Gestor__r.CIBE_NumPerso__c,
@@ -560,7 +504,6 @@ public without sharing class CIBE_TabManagementTask_Controller {
 					// revome content before the characters ': '
 					if (!String.isBlank(tokenValue) && tokenValue.contains('Token: ')) {
 						tokenValue = tokenValue.remove('Token: ');
-						system.debug('tokenValue: '+tokenValue);
 					}
 					if(tarea[0].Account.RecordType.DeveloperName.equalsIgnoreCase(CIBE_AppConstants.ACCOUNT_CLIENTE_PA_RT)){
 						List <Account> cuenta =	[SELECT Id,AV_NumPerso__c,FirstName, LastName, PersonEmail, PersonMobilePhone, AV_Idioma__c, Name FROM Account WHERE Id=:tarea[0].AccountId];
@@ -639,4 +582,66 @@ public without sharing class CIBE_TabManagementTask_Controller {
 		}		
 		return isNoGestionable;
 	}
+
+	@AuraEnabled
+	public static List<Map<String, String>> getPickListValuesByRecordTypeId2(string objectName, string recordId,string fieldApiName) {
+		// query to custom metada type --> Picklist List Value By Record Type
+		// api name de picklist in List
+		String recordTypeName = getRecordType(recordId);
+
+		Set<String> setLabelsRts = new Set<String>{CIBE_AppConstants.TASK_ALERTACOMERCIAL_EMP_RT, CIBE_AppConstants.TASK_OTROS_EMP_RT, CIBE_AppConstants.TASK_ONBOARDING_EMP_RT, CIBE_AppConstants.TASK_PRIORIZADOS_EMP_RT, CIBE_AppConstants.TASK_AVISOS_EMP_RT, CIBE_AppConstants.TASK_EXPERIENCIACLIENTE_EMP_RT};
+		List<AV_PicklistListValuesByRecordType__mdt> picklistValues = new List<AV_PicklistListValuesByRecordType__mdt>();
+
+
+		if(setLabelsRts.contains(recordTypeName)){
+			picklistValues = [SELECT id, AV_ListSalesProcess__c, DeveloperName, AV_ObjectLabel__c
+			FROM AV_PicklistListValuesByRecordType__mdt 
+			WHERE DeveloperName= 'CIBE_TaskTipoEMP' AND AV_ObjectLabel__c =:objectName];
+		}else{
+			picklistValues = [SELECT id, AV_ListSalesProcess__c, DeveloperName, AV_ObjectLabel__c
+			FROM AV_PicklistListValuesByRecordType__mdt 
+			WHERE DeveloperName= 'CIBE_TaskTipo' AND AV_ObjectLabel__c =:objectName];
+		}
+
+	
+		List<String> pickValues = new List<String>();
+		pickValues = picklistValues[0].AV_ListSalesProcess__c.split(';');
+		
+		if(pickValues.isEmpty()) {
+			throw new IllegalArgumentException('No se ha encontrado ningun valor en el picklist.');
+		}
+
+        // Get the describe for the object
+        DescribeSObjectResult objResult = Schema.getGlobalDescribe().get(objectName).getDescribe();
+		
+        // Get the field dynamically
+        DescribeFieldResult fieldResult = objResult.fields.getMap().get(fieldApiName).getDescribe();
+		List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+		
+		// loop to Schema picklist 
+		List<Map<String, String>> listPicklist = new List<Map<String, String>>();
+        for(Schema.PicklistEntry pickListVal : ple){
+			for(String val : pickValues){
+				if (val == String.valueOf(pickListVal.getValue())) {
+					listPicklist.add(
+						new Map<String, String>{
+							'label' => String.valueOf(pickListVal.getLabel()), 
+							'value' => String.valueOf(pickListVal.getValue())});
+				}
+			}
+        }
+        return listPicklist;
+	}
+
+
+	@AuraEnabled(cacheable=true)
+	public static List<Task> getRecord(String recordId){
+		try {
+			List<Task> data = [SELECT Id, Status, AV_Tipo__c, RecordType.DeveloperName FROM Task WHERE Id = :recordId];
+			return data;
+		} catch (Exception e) {
+			throw new AuraHandledException(e.getMessage());
+		}
+	}
+
 }

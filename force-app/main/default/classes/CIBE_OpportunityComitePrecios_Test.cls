@@ -14,7 +14,17 @@ Historial
 public with sharing class CIBE_OpportunityComitePrecios_Test {
     @isTest
 	private static void getUrlTest(){
-        String url = CIBE_OpportunityComitePrecios.getUrl('SC123');
-        System.assert(String.isNotBlank(url));
-    }  
+        CIBE_TestInitialSetup.setupInitialDataCIB();
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        
+        Test.startTest();
+        System.runAs(usuario) {
+            String url = CIBE_OpportunityComitePrecios.getUrl('SC123');
+            System.assert(String.isNotBlank(url));
+            String url2 = CIBE_OpportunityComitePrecios.getUrl(null);
+            System.assert(String.isBlank(url2));
+        }
+        Test.stopTest();
+
+    }
 }

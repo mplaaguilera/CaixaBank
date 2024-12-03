@@ -25,7 +25,6 @@ public class SIR_ReassignOwner_Test {
         
 	*****************************************************************/    
     @Istest static void test1(){
-        SIR_Constantes constantes = new SIR_Constantes();
         
         UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
         insert rol;
@@ -34,7 +33,8 @@ public class SIR_ReassignOwner_Test {
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);  
             SIR_FormularioRefinanciacion__c formulario = SIR_TestDataFactory.crearFormulario(proceso);
-            ID recordTypeCentro = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+            Id recordTypeCentro = mapRTsObjectsAccount.get('CC_CentroCaixaBank').getRecordTypeId(); 
             Account centro2 = new Account();
             centro2.RecordTypeId = recordTypeCentro;
             centro2.Name = 'Centro INTOUCH';
@@ -58,10 +58,10 @@ public class SIR_ReassignOwner_Test {
             SIR_LCMP_ReassignOwner.getOficinaGestorActual();
             SIR_LCMP_ReassignOwner.getOficinaString(cuenta.Id);
             SIR_LCMP_ReassignOwner.getOficinas('Oficina', 'siIntouch', 'noDan', cuenta.AV_CentroSuperior__c, cuenta.Id);
-            SIR_LCMP_ReassignOwner.getEmployees(cuenta.Id, false);
-            SIR_LCMP_ReassignOwner.getEmployees(cuenta.Id, true);
+            SIR_LCMP_ReassignOwner.getEmployees(cuenta.Id, false, centro1.CC_Numero_Oficina_Empresa__c);
+            SIR_LCMP_ReassignOwner.getEmployees(cuenta.Id, true, centro1.CC_Numero_Oficina_Empresa__c);
             SIR_LCMP_ReassignOwner.getQueryRecordTypeProceso();
-            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, UserInfo.getUserId(), cuenta.Id, true);
+            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, usuario.Id, cuenta.Id, true);
             SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'UserIntegracion', cuenta.Id, true);
             SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'Todos', cuenta.Id, true);
             SIR_LCMP_ReassignOwner.findRecords('mar', '001-03358');
@@ -70,10 +70,10 @@ public class SIR_ReassignOwner_Test {
             listaIds.add(proceso.Id);
             String response;
             
-            response = SIR_LCMP_ReassignOwner.changeGestor(UserInfo.getUserId(), listaIds);  
+            response = SIR_LCMP_ReassignOwner.changeGestor(usuario.Id, listaIds);  
             test.stopTest();
             System.assertEquals('OK', response, 'SIR_ReassignOwner_Test.test1 No se ha obtenido la respuesta OK');
-            System.assertEquals(UserInfo.getUserId(), [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId, 'SIR_ReassignOwner_Test.test1 no se ha asignado el usuario correctamente');
+            System.assertEquals(usuario.Id, [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId, 'SIR_ReassignOwner_Test.test1 no se ha asignado el usuario correctamente');
         }
            
    }
@@ -90,8 +90,7 @@ public class SIR_ReassignOwner_Test {
         
 	*****************************************************************/    
    @Istest static void test2(){
-       SIR_Constantes constantes = new SIR_Constantes();           
-       
+             
        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
        insert rol;
        User usuario = SIR_TestDataFactory.createTestUser('usuarioTest',rol,'System Administrator', 'U0111111', '001-09999', 'Gestor');        
@@ -123,17 +122,17 @@ public class SIR_ReassignOwner_Test {
            SIR_LCMP_ReassignOwner.getOficinaGestorActual();
            SIR_LCMP_ReassignOwner.getOficinaString(cuenta.Id);
            SIR_LCMP_ReassignOwner.getOficinas('Oficina', 'noIntouch', 'noDan', centro1.AV_CentroSuperior__c, centro1.Id);
-           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, false); 
-           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, true); 
-           SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, UserInfo.getUserId(), centro1.Id, true ); 
+           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, false, centro1.CC_Numero_Oficina_Empresa__c); 
+           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, true, centro1.CC_Numero_Oficina_Empresa__c); 
+           SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, usuario.Id, centro1.Id, true ); 
            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'UserIntegracion', centro1.Id, false );
            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'Todos', centro1.Id,false );
             List<String> listaIds = new List<String>();
             listaIds.add(proceso.Id);
-            response = SIR_LCMP_ReassignOwner.changeGestor(UserInfo.getUserId(), listaIds);       
+            response = SIR_LCMP_ReassignOwner.changeGestor(usuario.Id, listaIds);       
             test.stopTest(); 
             System.assertEquals('OK', response, 'SIR_ReassignOwner_Test.test2 No se ha obtenido la respuesta OK');
-            System.assertEquals(UserInfo.getUserId(), [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId,'SIR_ReassignOwner_Test.test2 No se ha asignado el usuario correctamente');
+            System.assertEquals(usuario.Id, [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId,'SIR_ReassignOwner_Test.test2 No se ha asignado el usuario correctamente');
         }   
    }
  
@@ -150,8 +149,7 @@ public class SIR_ReassignOwner_Test {
         1.0            US372106         Atmira         05/07/2022     	  Created    
         
 	*****************************************************************/    
-   @Istest static void test3(){
-       SIR_Constantes constantes = new SIR_Constantes();           
+   @Istest static void test3(){        
        
        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
        insert rol;
@@ -184,17 +182,17 @@ public class SIR_ReassignOwner_Test {
            SIR_LCMP_ReassignOwner.getOficinaGestorActual();
            SIR_LCMP_ReassignOwner.getOficinaString(cuenta.Id);
            SIR_LCMP_ReassignOwner.getOficinas('Oficina', 'noIntouch', 'siDan', centro1.AV_CentroSuperior__c, centro1.Id);
-           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, false); 
-           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, true); 
-           SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, UserInfo.getUserId(), centro1.Id, false ); 
+           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, false, centro1.CC_Numero_Oficina_Empresa__c); 
+           SIR_LCMP_ReassignOwner.getEmployees(centro1.Id, true, centro1.CC_Numero_Oficina_Empresa__c); 
+           SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, usuario.Id, centro1.Id, false ); 
            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'UserIntegracion', centro1.Id, false );
            SIR_LCMP_ReassignOwner.buscarProcesos(cuenta.Id, null , '1', '12', proceso.RecordTypeId, 'Todos', centro1.Id, false );
             List<String> listaIds = new List<String>();
             listaIds.add(proceso.Id);
-            response = SIR_LCMP_ReassignOwner.changeGestor(UserInfo.getUserId(), listaIds);       
+            response = SIR_LCMP_ReassignOwner.changeGestor(usuario.Id, listaIds);       
             test.stopTest(); 
             System.assertEquals('OK', response, 'SIR_ReassignOwner_Test.test2 No se ha obtenido la respuesta OK');
-            System.assertEquals(UserInfo.getUserId(), [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId,'SIR_ReassignOwner_Test.test2 No se ha asignado el usuario correctamente');
+            System.assertEquals(usuario.Id, [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId,'SIR_ReassignOwner_Test.test2 No se ha asignado el usuario correctamente');
         }   
    }     
   

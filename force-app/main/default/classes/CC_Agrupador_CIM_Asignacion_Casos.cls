@@ -41,8 +41,9 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
 
         Set<Id> idsMarcasNuevosAgrupadores = new Set<Id>();
         Set<Id> idsCasosMarca = new Set<Id>();
-        List<Case> casosActualizar = new List<Case>();
+        Map<Id, Case> casosActualizar = new  Map<Id, Case> ();
         List<CC_Marca_Case__c> lstCaseMarca = new List<CC_Marca_Case__c>();
+        Set<Id> lstCaseMarca2 = new Set<Id>();
         List<CC_Agrupador__c> comunicacionesInformativasExistentes = new List<CC_Agrupador__c>();
         List<CC_Agrupador__c> comunicacionesInformativasInsertar = new List<CC_Agrupador__c>();
         Map<String, String> mapAgrupadorMarca = new Map<String, String>();
@@ -57,7 +58,7 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
         if(lstCaseMarca.isEmpty()){
             return;
         } 
-
+      
         for (CC_Marca_Case__c marcaCaso : lstCaseMarca) {      
             if(!mapMarca.containsKey(marcaCaso.CC_Marca__c)){
                  CC_Caracteristica__c marca = new CC_Caracteristica__c();
@@ -66,7 +67,25 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
                  mapMarca.put(marcaCaso.CC_Marca__c, marca);
             }                   
              
-        }   
+        } 
+
+        //Tomar todos los casos bajo la misma marca de los que se estan procesando
+        //Esto es necesario porque si no se habia superado el umbral de casos para la marca
+        //cuando esos casos se cerraron, entonces habría que procesarlos ahora.
+        for(AggregateResult caseAgg : [
+            SELECT CC_Case__c 
+            FROM CC_Marca_Case__c 
+            WHERE CC_Marca__c IN :mapMarca.keySet() 
+                AND CC_Case__r.CreatedDate = TODAY 
+                AND CC_Case__r.Status = 'Cerrado'
+                AND (
+                        CC_Case__r.CC_Comunicacion_Informativa__c = null
+                        OR CC_Case__c IN: idsCasos
+                    )
+            GROUP BY CC_Case__c
+            ]){
+            lstCaseMarca2.add((Id)caseAgg.get('CC_Case__c')); 
+        }     
         
         comunicacionesInformativasExistentes = [SELECT Id, CC_Marca__c FROM CC_Agrupador__c WHERE RecordTypeId = :recordTypeDeveloperName AND CC_Estado__c = 'Activo' AND CC_Marca__c IN :mapMarca.keySet() AND CreatedDate = TODAY WITH SECURITY_ENFORCED];
 
@@ -77,51 +96,53 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
         }
 
         List<Case> casosConMismaMarca = new List<Case>();
-        casosConMismaMarca =  [SELECT CC_Comunicacion_Informativa__c, CC_Admin__c FROM Case WHERE Id = :idsCasos
+        casosConMismaMarca =  [ SELECT CC_Comunicacion_Informativa__c, CC_Admin__c, 
+                                    (
+                                       SELECT CC_Marca__c FROM Marcas_de_un_Caso__r  ORDER BY LastModifiedDate DESC LIMIT 1
+                                    ) 
+                                FROM Case WHERE Id IN :lstCaseMarca2
                                         AND CC_MCC_Tematica__r.CC_Activo__c = true
                                         AND CC_MCC_ProdServ__R.CC_Activo__c = TRUE
                                         AND CC_MCC_Motivo__R.CC_Activo__c = TRUE
                                         AND CC_MCC_Causa__R.CC_Activo__c = TRUE
                                         WITH SECURITY_ENFORCED];
 
-        for (Case caso : casosConMismaMarca) {
-            for (CC_Marca_Case__c marca : lstCaseMarca) {
-                    if(mapCasosMarca.containsKey(marca.CC_Marca__c)) {
-                        List<Case> lstCasosAgrupados = mapCasosMarca.get(marca.CC_Marca__c);
-                        lstCasosAgrupados.add(caso);
-                        mapCasosMarca.put(marca.CC_Marca__c,lstCasosAgrupados);
-                    } else {
-                        mapCasosMarca.put(marca.CC_Marca__c, new List<Case> {caso});
-                    }
+        for (Case caso : casosConMismaMarca) { 
+            //solo procesar la marca mas reciente del caso, si el mismo caso tiene mas de una marca. 
+            Id marcaMasRecienteCaso = caso.Marcas_de_un_Caso__r[0].CC_Marca__c;
+            if(!mapCasosMarca.containsKey(marcaMasRecienteCaso)) {
+                mapCasosMarca.put(marcaMasRecienteCaso, new List<Case> {caso});               
+            } else {
+                mapCasosMarca.get(marcaMasRecienteCaso).add(caso);
             }
         }
         
         for(Id marcaId: mapCasosMarca.keySet()){
             List<Case> casosMismaMarca = mapCasosMarca.get(marcaId);
             Integer totalCasos = casosMismaMarca.size();
-            for (Case caso : casosMismaMarca) {
-                if (mapAgrupadorMarca.containsKey(marcaId) && caso.CC_Comunicacion_Informativa__c == null) {
-                    caso.CC_Comunicacion_Informativa__c = mapAgrupadorMarca.get(marcaId);
-                    caso.CC_Admin__c = true;
-                    casosActualizar.add(caso);
-                } else {
-                    CC_Caracteristica__c marca = mapMarca.get(marcaId);
-                    if (totalCasos >= marca.CC_Casos_requeridos_CIM__c) {
-                        CC_Agrupador__c comunicacionInformativaNueva = new CC_Agrupador__c();
-                        Id comunicacionInformativaMarcaRecordTypeId = recordTypeDeveloperName;
-                        comunicacionInformativaNueva.RecordTypeId = comunicacionInformativaMarcaRecordTypeId;
-                        comunicacionInformativaNueva.CC_Estado__c = 'Activo';
-                        comunicacionInformativaNueva.CC_Titulo__c = marca.Name;
-                        comunicacionInformativaNueva.CC_Marca__c = marcaId;
-                        if(!comunicacionesInformativasInsertar.contains(comunicacionInformativaNueva)){
-                            comunicacionesInformativasInsertar.add(comunicacionInformativaNueva);
-                        }
-                    } else {
-                        caso.CC_Comunicacion_Informativa__c = null;
+            for (Case caso : casosMismaMarca) {   
+                    if (mapAgrupadorMarca.containsKey(marcaId) && caso.CC_Comunicacion_Informativa__c == null) {
+                        caso.CC_Comunicacion_Informativa__c = mapAgrupadorMarca.get(marcaId);
                         caso.CC_Admin__c = true;
-                        casosActualizar.add(caso);
+                        casosActualizar.put(caso.Id, caso);
+                    } else {
+                        CC_Caracteristica__c marca = mapMarca.get(marcaId);
+                        if (marca != null && marca.CC_Casos_requeridos_CIM__c !=null && totalCasos >= marca.CC_Casos_requeridos_CIM__c) {
+                            CC_Agrupador__c comunicacionInformativaNueva = new CC_Agrupador__c();
+                            Id comunicacionInformativaMarcaRecordTypeId = recordTypeDeveloperName;
+                            comunicacionInformativaNueva.RecordTypeId = comunicacionInformativaMarcaRecordTypeId;
+                            comunicacionInformativaNueva.CC_Estado__c = 'Activo';
+                            comunicacionInformativaNueva.CC_Titulo__c = marca.Name;
+                            comunicacionInformativaNueva.CC_Marca__c = marcaId;
+                            if(!comunicacionesInformativasInsertar.contains(comunicacionInformativaNueva)){
+                                comunicacionesInformativasInsertar.add(comunicacionInformativaNueva);
+                            }
+                        } else {
+                            caso.CC_Comunicacion_Informativa__c = null;
+                            caso.CC_Admin__c = true;
+                            casosActualizar.put(caso.Id, caso);
+                        }
                     }
-                }
             }
         }
         
@@ -147,7 +168,7 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
                         	if (casoAgrupado.CC_Comunicacion_Informativa__c != agrupadorInsertado.Id) { 
                             	casoAgrupado.CC_Comunicacion_Informativa__c = agrupadorInsertado.Id;
                             	casoAgrupado.CC_Admin__c = true;
-                            	casosActualizar.add(casoAgrupado);
+                                casosActualizar.put(casoAgrupado.Id, casoAgrupado);
                         	}
                     	}
                     }
@@ -156,13 +177,13 @@ public with sharing class CC_Agrupador_CIM_Asignacion_Casos {
         }
         
         if(!casosActualizar.isEmpty() && Schema.sObjectType.Case.fields.CC_Comunicacion_Informativa__c.isUpdateable() &&  Schema.sObjectType.Case.fields.CC_Admin__c.isUpdateable()){
-            update casosActualizar;
+            update casosActualizar.values();
         }
 
-        for (Case casoActualizar : casosActualizar) {
+        for (Case casoActualizar : casosActualizar.values()) {
             casoActualizar.CC_Admin__c = false;
         }
 
-        update casosActualizar;
+        update casosActualizar.values();
     }
 }

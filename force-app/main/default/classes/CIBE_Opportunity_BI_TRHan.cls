@@ -25,15 +25,15 @@ public class CIBE_Opportunity_BI_TRHan extends CC_TriggerHandlerBase {
         
         if (listData!=null && !listData.isEmpty()){
 			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
-			/*if (!hasCustomPermission && !System.isbatch()) {
-				if(AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c){
-					CIBE_OpportunityTriggerHelper.validateForbiddenWords(listData, mapOldObj);
-				}
-			}*/
+			if (!hasCustomPermission && !System.isbatch()) {
+				// if(AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c){
+				// 	CIBE_OpportunityTriggerHelper.validateForbiddenWords(listData, mapOldObj);
+				// }
+				CIBE_OpportunityTriggerHelper.saveFieldsFromOpp(listData, mapOldObj, false);
+			}
 			
 			CIBE_OpportunityTriggerHelper.calculateCurrency(listData, mapOldObj);
 			CIBE_OpportunityTriggerHelper.fillFieldsFromOpp(listData, mapOldObj);
-			CIBE_OpportunityTriggerHelper.saveFieldsFromOpp(listData, mapOldObj, false);
 			CIBE_OpportunityTriggerHelper.retrieveComercialGroup(listData, mapOldObj);
 			CIBE_OpportunityTriggerHelper.processOwnerEAPGestor(listData, mapOldObj);
 			CIBE_OpportunityTriggerHelper.changeOwner(listData, mapOldObj);

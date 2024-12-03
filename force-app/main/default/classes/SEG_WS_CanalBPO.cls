@@ -344,7 +344,7 @@ global with sharing class SEG_WS_CanalBPO {
         update currentCase; 
     }
     @TestVisible
-    public class Input {
+    private class Input {
         public String tipoProceso {get;set;}
         public String origen {get;set;}
         public String caseId {get;set;}
@@ -364,12 +364,12 @@ global with sharing class SEG_WS_CanalBPO {
 
     }
     @TestVisible
-    public class ContenidoAdicional{
+    private class ContenidoAdicional{
         public String key {get;set;}
         public String value {get;set;}
     }
     @TestVisible
-    public class Documentsid{
+    private class Documentsid{
         public String key {get;set;}
         public String value {get;set;}
     }

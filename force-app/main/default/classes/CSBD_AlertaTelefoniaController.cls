@@ -1,5 +1,5 @@
 public with sharing class CSBD_AlertaTelefoniaController {
-    /*
+    
     @AuraEnabled
     public static Opportunity obtenerOpp(String recId){
         if (Schema.sObjectType.Opportunity.isAccessible()) {
@@ -11,5 +11,4 @@ public with sharing class CSBD_AlertaTelefoniaController {
             return null;
         }
     }
-        */
 }

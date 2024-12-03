@@ -11,8 +11,7 @@ public with sharing class SAC_LCMP_PretensionesRelacionController {
         }
 
         @AuraEnabled
-        public static void validarPretension(Id recordId, boolean checkValidar){ 
-            
+        public static void validarPretension(Id recordId, boolean checkValidar){
             Case prete = [SELECT Id, SAC_ValidacionMCC__c FROM Case WHERE RecordTypeId =: RECORDTYPEPRETENSION AND Id =: recordId];
 
             if(prete.SAC_ValidacionMCC__c == false && checkValidar == true){

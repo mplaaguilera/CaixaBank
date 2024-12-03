@@ -13,15 +13,15 @@ public with sharing class FRA_Genesys_Cloud_Eventos_Controller {
     }
 
     @AuraEnabled
-    public static Map<String, Object> registrarConsulta(String consultaJson) {
+    public static Map<String, Object> registrarConsulta(String consultaJson, String servicioGen) {
         CC_Llamada_Input input = parseJson(consultaJson);
-        return FRA_Llamada_GC.registrarConsulta(input);
+        return FRA_Llamada_GC.registrarConsulta(input, servicioGen);
     }
 
     @AuraEnabled
-    public static Map<String, Object> registrarblindTransfer(String consultaJson) {
+    public static Map<String, Object> registrarblindTransfer(String consultaJson, String servicioGen) {
         CC_Llamada_Input input = parseJson(consultaJson);
-        return FRA_Llamada_GC.registrarblindTransfer(input);
+        return FRA_Llamada_GC.registrarblindTransfer(input, servicioGen);
     }
 
     @AuraEnabled

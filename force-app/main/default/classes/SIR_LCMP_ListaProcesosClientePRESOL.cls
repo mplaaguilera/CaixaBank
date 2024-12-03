@@ -30,9 +30,9 @@ public with sharing class SIR_LCMP_ListaProcesosClientePRESOL {
         Id recordTypeIdPRESOL = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId();
         List<SIREC__SIREC_obj_proceso__c> procesos = new List<SIREC__SIREC_obj_proceso__c>();
         
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             // 02/01/2023 Modificacion -- P2253-997  --  Se retrocede el cambio realizado en las cajitas. Se muestran solo los procesos Pendientes
-            procesos = [SELECT id, name, toLabel(SIREC__SIREC_fld_estrategia__c), toLabel(SIREC__SIREC_fld_situacion__c), SIREC__SIREC_fld_fechaSituacion__c,
+            procesos = [SELECT id, name, SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIREC__SIREC_fld_situacion__c), SIREC__SIREC_fld_fechaSituacion__c,
                         SIREC__SIREC_fld_fechaInicio__c, Owner.Name, RecordTypeId
                         FROM SIREC__SIREC_obj_proceso__c 
                         WHERE SIREC__SIREC_fld_cliente__c =: idCliente 

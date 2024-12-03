@@ -39,7 +39,7 @@ public  class CBK_FilterCriteriaHandlers_Dispacher {
         for (SObject so : sObjectIn){
             string obj = string.valueOf(so.getSObjectType());
             Id recTypeId = string.valueOf(so.get('RecordTypeId'));
-            string rt = recTypeId != null ? Schema.getGlobalDescribe().get(obj).getDescribe().getRecordTypeInfosById().get(recTypeId).getDeveloperName() : 'Otros';
+            string rt = Schema.getGlobalDescribe().get(obj).getDescribe().getRecordTypeInfosById().get(recTypeId).getDeveloperName();
             rt = checkInMetadata(rt) ? rt : 'Otros';
             if(Test.isRunningTest() && hasCustomPermission){ 
                 rt = 'CC_Colaborador';

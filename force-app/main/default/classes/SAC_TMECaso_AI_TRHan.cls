@@ -7,6 +7,7 @@ public without sharing class SAC_TMECaso_AI_TRHan extends CC_TriggerHandlerBase 
 		process((List<SAC_TMECaso__c>)tp.newList, (Map<Id, SAC_TMECaso__c>)tp.newMap);
 	}    
     private void process(List<SAC_TMECaso__c> listNewObj, Map<Id, SAC_TMECaso__c> mapNewObj){
+
         List<SAC_TiempoEstados__c> listaTPEs = new List<SAC_TiempoEstados__c>();
         SAC_Accion__c tarea = new SAC_Accion__c();
 

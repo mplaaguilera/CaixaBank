@@ -47,7 +47,7 @@ private class CBK_MonitorJobs_Test {
         job.createdBy__c=usr.Id;
         job.createdDate__c=datetime.now();
         job.systemModstamp__c=datetime.now();
-        job.state__c='Closed';
+        job.state__c='JobComplete';
         job.concurrencyMode__c='Parallel';
         job.contentType__c='CSV';
         job.apiVersion__c='49.0';
@@ -61,8 +61,6 @@ private class CBK_MonitorJobs_Test {
         Test.stopTest();
         job = [Select Entidad__c from CBK_log__c where Id=:job.Id];
         System.assertnotEquals('Test', job.Entidad__c);
-
-
     }
     @isTest
     static void detalle2() {
@@ -76,7 +74,7 @@ private class CBK_MonitorJobs_Test {
         job.createdBy__c=usr.Id;
         job.createdDate__c=datetime.now();
         job.systemModstamp__c=datetime.now();
-        job.state__c='Closed';
+        job.state__c='JobComplete';
         job.concurrencyMode__c='Parallel';
         job.contentType__c='CSV';
         job.apiVersion__c='49.0';
@@ -219,8 +217,44 @@ private class CBK_MonitorJobs_Test {
         Test.stopTest();
         job = [Select Entidad__c from CBK_log__c where Id=:job.Id];
         System.assertnotEquals('Test', job.Entidad__c);
+    }
 
-
+    @isTest
+    static void errorNotFoundjob() {
+        User usr = [SELECT id FROM User WHERE LastName = 'LastNameTest' LIMIT 1];
+        CBK_log__c job = New CBK_log__c();
+        job.RecordTypeId=Schema.SObjectType.CBK_Log__c.getRecordTypeInfosByDeveloperName().get('Data_Load_Log').getRecordTypeId();
+        job.Job_Id__c='7503Y00000TGeNyQAL';
+        job.operation__c='upsert';
+        job.object__c='Case';
+        job.Entidad__c ='Test';
+        job.createdBy__c=usr.Id;
+        job.createdDate__c=datetime.now();
+        job.systemModstamp__c=datetime.now();
+        job.state__c='JobComplete';
+        job.concurrencyMode__c='Parallel';
+        job.contentType__c='CSV';
+        job.apiVersion__c='49.0';
+        job.jobType__c='Classic';  
+        job.Error_Type__c = ''; 
+        insert job;
+        
+        string vJsonres = '[{"errorCode":"NOT_FOUND","message":"The requested resource does not exist"}]';
+		HttpResponse resp = new HttpResponse();
+		resp.setBody(vJsonres);		
+		resp.setStatusCode(404);
+		resp.setStatus('KO');
+		CBK_HttpService_Mock_TEST vMock = new CBK_HttpService_Mock_TEST(resp);
+		Test.setMock(HttpCalloutMock.class, vMock);
+        
+        Test.startTest();
+        System.runAs (usr) {
+            CBK_MonitorJobs.CBK_JobDetail(job.Job_Id__c);
+        }
+        Test.stopTest();
+        job = [Select Entidad__c, Error_Type__c, Log_Message__c from CBK_log__c where Id=:job.Id];
+        System.assertEquals('completado. Job no existe', job.Error_Type__c);
+        System.assertEquals(true, job.Log_Message__c.contains('NOT_FOUND'));
     }
 
     @isTest

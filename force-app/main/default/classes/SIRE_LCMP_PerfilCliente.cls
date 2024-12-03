@@ -24,34 +24,44 @@ public with sharing class SIRE_LCMP_PerfilCliente {
         1.0                             Atmira         28/05/2023     	  Created    
     *****************************************************************/
 	@AuraEnabled(cacheable=true)
-	public static List<PerfilClienteWrapper> wrapperCabecera(String recordId){
+	public static Map<String,List<PerfilClienteWrapper>> wrapperCabecera(String recordId){
 
+        //List<PerfilClienteWrapper> wrapper = new List<PerfilClienteWrapper>();
+        Map<String,List<PerfilClienteWrapper>> wrapperMap = new Map<String,List<PerfilClienteWrapper>>();
         List<PerfilClienteWrapper> wrapper = new List<PerfilClienteWrapper>();
+        PerfilClienteWrapper wrapperCabecera = new PerfilClienteWrapper();
         try{        
             if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()
-                && SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible()){
+                && SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible()){               
                 String clienteId = null;
                 if(!recordId.startsWith('001')){
                     List<SIREC__SIREC_obj_proceso__c> proceso = [SELECT SIREC__SIREC_fld_cliente__c FROM SIREC__SIREC_obj_proceso__c WHERE Id =: recordId LIMIT 1];
                     if(!proceso.isEmpty()){ 
                         clienteId = proceso[0].SIREC__SIREC_fld_cliente__c;
-                    }
+                    } 
                 } else {
-                    clienteId = recordId;
+                    List<SIREC__SIREC_obj_proceso__c> proceso = [SELECT SIREC__SIREC_fld_cliente__c FROM SIREC__SIREC_obj_proceso__c WHERE SIREC__SIREC_fld_cliente__c =: recordId AND 
+                                                                SIREC__SIREC_fld_situacion__c !=: SIR_Constantes.PROCESO_SITUACION_FINALIZADO LIMIT 1];
+                    if(!proceso.isEmpty()){ 
+                        clienteId = recordId;
+                    } else {
+                        // No hay procesos Activos
+                        wrapper.add(wrapperCabecera);
+                        wrapperMap.put('NoProcesoActivo', wrapper);
+                        return wrapperMap;
+                    }                    
                 }
                 List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = [
                     SELECT SIR_saldActivo__c, SIREC__SIREC_fld_saldPasivo__c, SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_deudaPendienteTotal__c, 
                     SIREC__SIREC_fld_deudaVencidaTotal__c, SIREC__SIREC_fld_diasImpago__c, SIREC__SIREC_fld_numCiclosImpago__c, SIREC__SIREC_fld_ciclosImpago__c,
-                    SIREC__SIREC_fld_cliente__r.AV_CNAE__c 
+                    SIREC__SIREC_fld_cliente__r.AV_CNAE__c, SIR_ImportePP__c, SIR_DeudaRefinanciada__c, tolabel(SIR_IndicadorProbationPeriod__c) 
                     FROM SIREC__SIREC_obj_informacionCliente__c WHERE SIREC__SIREC_fld_cliente__c =: clienteId LIMIT 1];
-                if(!infoCliente.isEmpty()){ 
-                    
+                if(!infoCliente.isEmpty()){                    
                     List<SIR_CatalogoSirec__c> catalogo = [SELECT SIR_Descripcion__c FROM SIR_CatalogoSirec__c WHERE SIR_Codigo__c =: infoCliente[0].SIREC__SIREC_fld_cliente__r.AV_CNAE__c];
                     String sectorCnae = '';
                     if(!catalogo.isEmpty()){
                         sectorCnae = string.valueOf(catalogo[0].SIR_Descripcion__c);
-                    } 
-                    PerfilClienteWrapper wrapperCabecera = new PerfilClienteWrapper();
+                    }                     
                     wrapperCabecera.saldosActivos        = valorConvert(infoCliente[0].SIR_saldActivo__c);
                     wrapperCabecera.sector               = sectorCnae;
                     wrapperCabecera.saldosPasivos        = valorConvert(infoCliente[0].SIREC__SIREC_fld_saldPasivo__c);
@@ -70,13 +80,17 @@ public with sharing class SIRE_LCMP_PerfilCliente {
                     wrapperCabecera.ciclosImpago12m      = string.valueOf(infoCliente[0].SIREC__SIREC_fld_numCiclosImpago__c);
                     wrapperCabecera.ebitda               = '';
                     wrapperCabecera.ciclosImpagoTotal    = string.valueOf(infoCliente[0].SIREC__SIREC_fld_ciclosImpago__c);
+                    wrapperCabecera.importePP 			 = valorConvert(infoCliente[0].SIR_ImportePP__c);
+                    wrapperCabecera.deudaRefinanciada 	 = valorConvert(infoCliente[0].SIR_DeudaRefinanciada__c);
+                    wrapperCabecera.indicadorPP 		 = infoCliente[0].SIR_IndicadorProbationPeriod__c;   
                     wrapper.add(wrapperCabecera);
+                    wrapperMap.put('EMP', wrapper);
                 }
             }
         }catch(exception e){
             CBK_log.error(e, 'Error : SIRE_LCMP_PerfilCliente - ' + e.getTypeName() + ': ' + e.getMessage());
         }
-        return wrapper;
+        return wrapperMap;
     }
 
     /****************************************
@@ -126,6 +140,12 @@ public with sharing class SIRE_LCMP_PerfilCliente {
         public String ebitda {get;set;}
         @AuraEnabled
         public String ciclosImpagoTotal {get;set;} 
+        @AuraEnabled
+        public String importePP {get;set;} 
+        @AuraEnabled
+        public String deudaRefinanciada {get;set;} 
+        @AuraEnabled
+        public String indicadorPP {get;set;} 
     }
 
     /*****************************************************************

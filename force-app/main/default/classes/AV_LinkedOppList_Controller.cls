@@ -58,7 +58,7 @@ public with sharing class AV_LinkedOppList_Controller {
 			ORDER BY sortablegrid__FieldOrder__c];
 		}
 
-		String targetObjectName = listFields.get(0).sortablegrid__sdg__r.sortablegrid__sObjectName__c;				
+		String targetObjectName = listFields.get(0).sortablegrid__sdg__r.sortablegrid__sObjectName__c;			
 		
 		response.labelObject = targetObjectName.equalsIgnoreCase(OBJECT_TASK) ? SObjectType.Task.getLabelPlural() : SObjectType.Event.getLabelPlural();				
 		if(targetObjectName.equalsIgnoreCase(OBJECT_TASK)){
@@ -74,8 +74,10 @@ public with sharing class AV_LinkedOppList_Controller {
 		for(sortablegrid__SDG_Field__c sdgf : listFields) {
 			Column col = new Column();
 			Schema.DisplayType fldType;
+			System.debug('Api Name: ' + sdgf.sortablegrid__APIName__c);
 			if (!sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Owner.Name')
 				&& !sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistroAsunto__c)')){
+					
 					Map<String, Schema.SObjectField> mapa;
 					if(targetObjectName.equalsIgnoreCase(OBJECT_TASK)){
 						mapa = Schema.SObjectType.Task.fields.getMap();
@@ -118,10 +120,14 @@ public with sharing class AV_LinkedOppList_Controller {
 					col.type = 'url';
 					CLS_TypeAttributes attributes = new CLS_TypeAttributes();
 					CLS_Label label = new CLS_Label();
+					Tooltip tooltip = new Tooltip();
+					tooltip.fieldName = 'ownerLabel';
 					label.fieldName = 'ownerLabel';
 					attributes.label = label;
+					attributes.tooltip = tooltip;
 					col.sortBy = 'ownerLabel';
 					col.typeAttributes = attributes;
+					
 				}
 
 			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistroAsunto__c')) {
@@ -129,8 +135,11 @@ public with sharing class AV_LinkedOppList_Controller {
 				col.type = 'url';
 				CLS_TypeAttributes attributes = new CLS_TypeAttributes();
 				CLS_Label label = new CLS_Label();
+				Tooltip tooltip = new Tooltip();
+				tooltip.fieldName = 'subjectLabel';
 				label.fieldName = 'subjectLabel';
 				attributes.label = label;
+				attributes.tooltip = tooltip;
 				col.sortBy = 'subjectLabel';
 				col.typeAttributes = attributes;
 			}
@@ -194,6 +203,7 @@ public with sharing class AV_LinkedOppList_Controller {
 				querysoql += ' ,TOLABEL (' + fieldpick + ')';
 			}
 		}
+		System.debug('Target Object Name: ' + targetObjectName);
 		querysoql += ' FROM  ' + targetObjectName;
 		String formatSetTaskHeaderIds = ' (\'\')';
 		if(!setTaskHeaderIds.isEmpty()){
@@ -229,7 +239,7 @@ public with sharing class AV_LinkedOppList_Controller {
 		String eventStatus = AV_AppConstants.EVENT_STATUS_PENDIENTE;
 		String eventClientRT = AV_AppConstants.EVENTCLIENTE_RT;
 		String tareaOppRT = AV_AppConstants.OPPTASK_RT;
-
+		System.debug('RecordId: ' + recordId);
 		if(recordId.startsWith('001')){
 			//Task object
 			if(OBJECT_TASK.equalsIgnoreCase(targetObjectName)){
@@ -424,7 +434,7 @@ public with sharing class AV_LinkedOppList_Controller {
 		@AuraEnabled
 		public String minute;
 		@AuraEnabled
-		public String tooltip;	//Subject
+		public Tooltip tooltip;	//Subject
 	}
 
 	public class CLS_Label {
@@ -433,6 +443,10 @@ public with sharing class AV_LinkedOppList_Controller {
 	}
 
 	public class CLS_Class {
+		@AuraEnabled
+		public String fieldName;
+	}
+	public class Tooltip {
 		@AuraEnabled
 		public String fieldName;
 	}

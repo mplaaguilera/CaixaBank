@@ -145,7 +145,8 @@ public with sharing class OS_OpenCTI_Test {
         OS_OpenCTI.finalizarLlamada(inputJson);
         Test.stopTest();
 
-        system.assertEquals(0, [SELECT COUNT() FROM CC_Llamada__c WHERE CC_DNIS__C = :entrada.dnis LIMIT 1], 'Comprobamos no se crea la llamada.');
+        List<CC_Llamada__c> lstLlamada = [SELECT Id FROM CC_Llamada__c WHERE CC_DNIS__C = :entrada.dnis LIMIT 1];
+        system.assertEquals(0, lstLlamada.size(), 'Comprobamos no se crea la llamada.');
 
     }
 
@@ -280,6 +281,7 @@ public with sharing class OS_OpenCTI_Test {
         OS_OpenCTI.transferirLlamada(inputJson);
         Test.stopTest();
 
-        system.assertEquals(0, [SELECT COUNT() FROM CC_Llamada__c WHERE CC_DNIS__C =:entrada.dnis], 'Comprobamos no se crea la llamada.');
+        List<CC_Llamada__c> lstLlamada = [SELECT Id FROM CC_Llamada__c WHERE CC_DNIS__C =:entrada.dnis];
+        system.assertEquals(0, lstLlamada.size(), 'Comprobamos no se crea la llamada.');
     }
 }

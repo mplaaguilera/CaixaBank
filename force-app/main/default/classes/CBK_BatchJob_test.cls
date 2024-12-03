@@ -105,6 +105,7 @@ private class CBK_BatchJob_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
+        jobDef.UsuarioContexto__c = 'OT';
         insert jobDef; 
         CBK_BatchJob.statusBatch();
         System.assertNotEquals(jobDef.Id, null);
@@ -124,6 +125,7 @@ private class CBK_BatchJob_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
+        jobDef.UsuarioContexto__c = 'OT';
         insert jobDef; 
         CBK_BatchJob.reschedulledJobs();
         System.assertNotEquals(jobDef.Id, null);
@@ -164,6 +166,7 @@ private class CBK_BatchJob_test {
         jobDef.LastExec_Sched__c=system.now()-1;
         jobDef.NextExec__c=system.now()-1;
         jobDef.Calc_NextExec__c='INI';
+        jobDef.UsuarioContexto__c = 'OT';
         insert jobDef; 
         CBK_BatchJob.runBatches();
         System.assertNotEquals(jobDef.Id, null);
@@ -209,6 +212,7 @@ private class CBK_BatchJob_test {
         jobDef.Activo__c=true;
         jobDef.LastExec_Sched__c=DateTime.now()-1;
         jobDef.Calc_NextExec__c='INI';
+        jobDef.UsuarioContexto__c = 'OT';
         insert jobDef; 
         CBK_BatchJob.reschedulledJobs();
         CBK_BatchJob.statusBatch();

@@ -20,12 +20,14 @@ Historial
 	2.6			DE71732			Sandra Gómez		07/02/2023			Add iniciativa + 3 days
 	2.7			US542315		Ángel Medina		23/05/2023			Add condition RT = TASKEXPCLIENT_RT AND AV_OrigenApp__c = AV_SAC in query
 	2.8         US349042        Oscar Moreno        16/06/2023          Add condition ActivityDate < TODAY AND ActivityDate < LAST_N_DAYS:7
+    2.9		    FIX11070844	    Oscar Moreno		   22/07/2024			Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
-global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 	
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_TaskStatusBatch';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_TaskStatusBatch';
 	private static final String STATUS_PENDING_NOT_LOCATE 	= 'Pendiente no localizado';
 	private static final String STATUS_OPEN_ENGLISH 		= 'Open';
 	private static final String STATUS_OPEN_SPANISH 		= 'Pendiente';
@@ -57,13 +59,12 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
         if(avQuery==null){
             avQuery = setQuery();
         }
         AV_LogDebug.printLogDebug(methodName, 'Query to execute: ' + avQuery);
-		
 		return Database.getQueryLocator(avQuery);
 	}
 
@@ -73,7 +74,7 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 	 * @param bc		Database.BatchableContext param that contains the batch job ID
 	 * @param listTask 	List<Task> param with the list of Task to update.
 	 */
-	global void execute(Database.BatchableContext bc, List<Task> listTask){
+	public void execute(Database.BatchableContext bc, List<Task> listTask){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
        
@@ -86,7 +87,6 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 					updateTaskStatus(task,listTaskToUpdate);
 				}							
 			}
-			
 			//Update Tasks
 			if(listTaskToUpdate!=null && !listTaskToUpdate.isEmpty()){
 				AV_LogDebug.printLogDebug(methodName,'Records updated: ' + listTaskToUpdate.size());
@@ -106,9 +106,6 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 
 	 
     private void updateTaskStatus(Task task, List<Task> listTaskToUpdate){
-		System.debug('TASK1---->'+task);
-		System.debug('listTaskToUpdate---->'+ listTaskToUpdate);
-		
         if(STATUS_PENDING_NOT_LOCATE.equalsIgnoreCase(task.Status) ){
             task.Status = STATUS_MANAGE_NOT_LOCATE;
             listTaskToUpdate.add(task);
@@ -125,7 +122,7 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 	 * 
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_TaskStatusBatch());
 	}
 
@@ -134,7 +131,7 @@ global class AV_TaskStatusBatch implements Database.Batchable<sObject>, Database
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}

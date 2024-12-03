@@ -8,6 +8,10 @@ Historial
 ---------------------
 VERSION		USER_STORY	        AUTHOR		   		DATE				Description
 1.0			Fix		            Patricia Solano	    07/08/2022		    Init version
+1.2			Fix					Sandra Gómez		21/11/2023			Change method scoreTaskAftDelete and scoreTaskAftInsert to control null
+1.3			Fix error		    Daniel Rodriguez    15/01/2024			Fix method scoreTaskAftUpdate check map != null
+1.4         Fix                 Oscar Moreno        12/02/2024          Fix method  scoreTaskAftUpdate check mapAccToUpdate != null
+1.5         Fix                 Oscar Moreno        02/07/2024          Fix method  scoreTaskAftDelete check mapActExt != null
 ***********************************************************************************************************************/
 public without sharing class AV_TaskTriggerHelperSharing {
 	
@@ -18,19 +22,16 @@ public without sharing class AV_TaskTriggerHelperSharing {
 	*/
 	public static void calculateScoreTask(List<Task> listData, String origen){
 		List<AV_Score__c> listScoresMetadata =[select id,AV_Active__c, AV_Object__c, Name,AV_RecordType__c, AV_Score__c from AV_Score__c where AV_Active__c = true ];
-				
 		Map<String, Decimal> mapListScoresMDT=new Map<String, Decimal>();
 		List<String> listIdRT=new List<String>();
 		for(AV_Score__c mdtScores:listScoresMetadata){
 			mapListScoresMDT.put(mdtScores.AV_RecordType__c, mdtScores.AV_Score__c);
 			listIdRT.add(mdtScores.AV_RecordType__c);
 		}
-		
 		List<RecordType> listRT= [Select Id, developername from RecordType where developername IN  :listIdRT];
 		Map<Id,RecordType> mapRT = new  Map<Id,RecordType>(listRT);
 		List<ID> listIdAccounts=new List<Id>();
 		List<Task> newListData=new List<Task>();
-		
 		for(Task dataTask:listData){
 			if(mapRT.get(dataTask.RecordTypeId)!=null){
 				newListData.add(dataTask);
@@ -39,12 +40,9 @@ public without sharing class AV_TaskTriggerHelperSharing {
 				}
 			}
 		}  
-		
-		
 		List<Account> listAccounts= [Select id,AV_Priority__c from Account where id IN :listIdAccounts];
 		Map<Id,Account> mapAccount = new  Map<Id,Account>(listAccounts);
 	   	Map<Id,Account> mapAccToUpdate=new Map<Id,Account>();
-		
 		switch on origen {
 			when 'insert' {
 				scoreTaskAftInsert(newListData,mapAccToUpdate,mapAccount,mapRT,mapListScoresMDT);
@@ -55,7 +53,6 @@ public without sharing class AV_TaskTriggerHelperSharing {
 			when 'delete' {
 				scoreTaskAftDelete(newListData,mapAccToUpdate,mapAccount,mapRT,mapListScoresMDT);
 			}
-			
 		}
 	}
 
@@ -71,16 +68,14 @@ public without sharing class AV_TaskTriggerHelperSharing {
 		for(CBK_Activity_Extension__c ae:listActExt){
 			mapTaskActivityEx.put(ae.AV_ActivityId__c,ae);
 		}
-		
 		for(Task dataTask:listData){ 
 			if(dataTask.Status!=AV_AppConstants.GESTIONADO_POSITIVO_ESTADO && dataTask.Status!=AV_AppConstants.GESTIONADO_NEGATIVA_ESTADO && dataTask.Status!=AV_AppConstants.GESTIONADO_NO_LOCALIZADO && dataTask.Status!=AV_AppConstants.NO_GESTIONADA ){
-				if(!mapAccToUpdate.containsKey(dataTask.AccountId) && !mapAccount.isEmpty()){
+				if(!mapAccToUpdate.containsKey(dataTask.AccountId) && !mapAccount.isEmpty() && mapAccount.get(dataTask.AccountId) != null){
 					Account acc=new Account();
 					acc.Id=dataTask.AccountId;
 					acc.AV_Priority__c=mapAccount.get(dataTask.AccountId).AV_Priority__c!=null?mapAccount.get(dataTask.AccountId).AV_Priority__c:0;
 					mapAccToUpdate.put(acc.Id,acc);
 				}
-				
 				CBK_Activity_Extension__c actExt=new CBK_Activity_Extension__c(); 
 				if(mapTaskActivityEx.get(dataTask.Id)!=null){
 					actExt.Id=mapTaskActivityEx.get(dataTask.Id).Id;
@@ -88,12 +83,10 @@ public without sharing class AV_TaskTriggerHelperSharing {
 					actExt.AV_ActivityId__c=String.valueOf(dataTask.Id);
                     actExt.OwnerId=dataTask.OwnerId;
 				}
-				
 				actExt.AV_Scoring__c=mapListScoresMDT.get(mapRT.get(dataTask.RecordtypeId).developername); 
 				if(mapRT.get(dataTask.RecordtypeId).DeveloperName.equals('AV_Priorizador') && dataTask.AV_PrioritizingSort__c != null ){
 					actExt.AV_Scoring__c+=dataTask.AV_PrioritizingSort__c;                  
 				}
- 
 				listActExtToUpdate.add(actExt);
 				if(mapAccount!=null && !mapAccount.isEmpty()){
 					mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c+=actExt.AV_Scoring__c;
@@ -103,7 +96,6 @@ public without sharing class AV_TaskTriggerHelperSharing {
 		if(!mapAccToUpdate.isEmpty()){
 			Database.update(mapAccToUpdate.values(), false);
 		}
-
 		if(!listActExtToUpdate.isEmpty()){
 			Database.upsert(listActExtToUpdate, false);
 		}
@@ -139,7 +131,8 @@ public without sharing class AV_TaskTriggerHelperSharing {
 						listActExtToUpdate.add(actExt);
 					}
 				}
-				if(mapAccount!=null && !mapAccount.isEmpty() && mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c!=0 && mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c!=null && actExt.AV_Scoring__c != null){
+				
+				if(mapAccount!=null && !mapAccount.isEmpty() && mapAccToUpdate!= null && !mapAccToUpdate.isEmpty() && dataTask.AccountId != null && mapAccToUpdate.get(dataTask.AccountId) != null && mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c!=0 && mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c!=null && actExt.AV_Scoring__c != null){
 					mapAccToUpdate.get(dataTask.AccountId).AV_Priority__c-=actExt.AV_Scoring__c;
 				}
 			}
@@ -164,16 +157,17 @@ public without sharing class AV_TaskTriggerHelperSharing {
 				mapActExt.put(actExt.AV_ActivityId__c,actExt);            
 			}
 		}
+		
 		CBK_Activity_Extension__c actExt=new CBK_Activity_Extension__c();
 		for(Task dataTask:listData){
 			if(!AV_AppConstants.GESTIONADO_POSITIVO_ESTADO.equals(dataTask.Status) && !AV_AppConstants.GESTIONADO_NEGATIVA_ESTADO.equals(dataTask.Status) && !AV_AppConstants.GESTIONADO_NO_LOCALIZADO.equals(dataTask.Status) && !AV_AppConstants.NO_GESTIONADA.equals(dataTask.Status)){	           
-				if(!mapAccToUpdate.containsKey(dataTask.AccountId) && mapAccount!=null && !mapAccount.isEmpty()){
+				if(!mapAccToUpdate.containsKey(dataTask.AccountId) && mapAccount!=null && !mapAccount.isEmpty() && mapAccount.get(dataTask.AccountId) != null){
 					Account acc=new Account();
 					acc.Id=dataTask.AccountId;
 					acc.AV_Priority__c=mapAccount.get(dataTask.AccountId).AV_Priority__c!=null?mapAccount.get(dataTask.AccountId).AV_Priority__c:0;
 					mapAccToUpdate.put(acc.Id,acc);
 				}
-				if(!mapActExt.isEmpty() && mapActExt.get(dataTask.id) != null){
+				if(mapActExt != null && !mapActExt.isEmpty() && mapActExt.get(dataTask.id) != null){
 					actExt.Id=mapActExt.get(dataTask.id).id;
 					actExt.AV_Scoring__c=(mapActExt.get(dataTask.id).AV_Scoring__c!=null?mapActExt.get(dataTask.id).AV_Scoring__c:0);
 				}
@@ -182,6 +176,7 @@ public without sharing class AV_TaskTriggerHelperSharing {
 				}
 			}
 		}
+		
 		if(!mapAccToUpdate.isEmpty()){
 			Database.update(mapAccToUpdate.values(), false);
 		}

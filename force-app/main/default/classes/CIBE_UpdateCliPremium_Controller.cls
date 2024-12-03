@@ -22,6 +22,7 @@ Historial
 	2.1			Fix - US329551										Sandra Gómez		24/03/2022		Add field AV_Interlocutor__c
 	2.2 		Ampliación campos CIBE								Alejandro Campos	10/06/2022		Added fields which start with CIBE_
 	2.3         eliminacion adobe campaign							Alex Perez			20/06/2023
+	2.4         US841839       Borja Lavesiera     12/03/2024       Eliminar Http, HttpRequest y HttpResponse Constructor
 ***********************************************************************************************************************/
 
 
@@ -46,10 +47,6 @@ public with sharing class CIBE_UpdateCliPremium_Controller {
 	private static final String PARAM_CUSTOMERINTERNALID  = 'x-absis-customerInternalId';
 	private static final String PARAM_PROFILEIDSAP = 'x-absis-profile-from-idsap';
 	private static final String PARAM_USERID   = 'X-ABSIS-HEADER-SESSION-numperso';
-
-	//public static final Map<String, List<Products>> MAPEXPERIENCELISTPRODUCT = new Map<String, List<Products>>();
-	//public static final Map<String, Boolean> MAPEXPERIENCEMYBOX = new Map<String, Boolean>();
-
 
 	public class CustomerResponse {
 		@AuraEnabled
@@ -300,9 +297,7 @@ public with sharing class CIBE_UpdateCliPremium_Controller {
 	public static WrapperResponse retrieveCustomerData(String numPerson, DateTime fechaRefresco, String jsonBody){
 		WrapperResponse wrapper = new WrapperResponse();
 
-		if(numPerson != null){
-			Http http = new Http();
-
+		if(numPerson != null) {
 			if(jsonBody == null || (fechaRefresco != null && AV_APPUtilities.calculateTimeDifferences(fechaRefresco, System.now()) >= 24)){
 
 				Map<String,string> mHeaders =  new  Map<String,string>();
@@ -311,8 +306,17 @@ public with sharing class CIBE_UpdateCliPremium_Controller {
 				String hexDigest = AV_IntegrationUtilities.convertToHexadecimal(longUser);
 				mHeaders.put('x-absis-customerInternalId',hexDigest);
 
-				HttpRequest req = CBK_HttpServiceIntegration.getRequest('', 'getCustomers', 'GET', mHeaders);
-				HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+				CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+						reqWrapper.body = '';
+                        reqWrapper.intSetting = 'getCustomers';
+                        reqWrapper.method = 'GET';
+                        reqWrapper.mHeaders =  mHeaders;
+                        reqWrapper.mUriParams = new  Map<String,string>();
+                        reqWrapper.mQueryParams = new  Map<String,string>();
+
+				HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper);
+				//HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+				HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req, numPerson, reqWrapper.intSetting);
 				System.debug('Response: ' + res.getBody());
 				if(res.getStatusCode() == 200){
 					CustomerData resp = (CustomerData)JSON.deserialize(res.getBody(),CustomerData.class);     

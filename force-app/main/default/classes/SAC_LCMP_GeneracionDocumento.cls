@@ -14,7 +14,9 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
                                                     FROM SAC_DocumentoEnvio__c
                                                     WHERE SAC_Caso__c = :id
                                                     AND SAC_TipoDocumento__c = 'redaccion' ORDER by createdDate desc limit 1];
+            
             return docGuardado;
+            
         } else {
             return null;
         }
@@ -43,16 +45,22 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
 
     @AuraEnabled
     public static void adjuntarPDFaCaso(String url, Id parentId, String procedencia){
-        Case caso = [SELECT CaseNumber, CC_Idioma__c FROM Case WHERE id =: parentId LIMIT 1];
+        Case caso = [SELECT CaseNumber, CC_Idioma__c, recordType.DeveloperName FROM Case WHERE id =: parentId LIMIT 1];
         String numCaso = caso.CaseNumber;
         String nombreDocumento;
-        if(caso.CC_Idioma__c == 'es') { nombreDocumento = ' carta respuesta SAC'; }
-        else if(caso.CC_Idioma__c == 'ca') { nombreDocumento = ' carta resposta SAC'; }
-        else if(caso.CC_Idioma__c == 'en') { nombreDocumento = ' SAC response letter'; }
-        else if(caso.CC_Idioma__c == 'va') { nombreDocumento = ' carta resposta SAC'; }
-        else if(caso.CC_Idioma__c == 'ga') { nombreDocumento = ' carta de resposta SAC'; }
-        else if(caso.CC_Idioma__c == 'eu') { nombreDocumento = ' SAC erantzun gutuna'; }
-        else { nombreDocumento = ' carta respuesta SAC'; }
+        String proyecto;
+        if(caso.recordType.DeveloperName == 'SPV_Reclamacion') {
+            proyecto = ' SPV';
+        } else {
+            proyecto = ' SAC';
+        }
+        if(caso.CC_Idioma__c == 'es') { nombreDocumento = ' carta respuesta' + proyecto; }
+        else if(caso.CC_Idioma__c == 'ca') { nombreDocumento = ' carta resposta' + proyecto; }
+        else if(caso.CC_Idioma__c == 'en') { nombreDocumento = proyecto + ' response letter'; }
+        else if(caso.CC_Idioma__c == 'va') { nombreDocumento = ' carta resposta' + proyecto; }
+        else if(caso.CC_Idioma__c == 'ga') { nombreDocumento = ' carta de resposta' + proyecto; }
+        else if(caso.CC_Idioma__c == 'eu') { nombreDocumento = proyecto + ' erantzun gutuna'; }
+        else { nombreDocumento = ' carta respuesta' + proyecto; }
 
         PageReference pageRef = new PageReference('https://' + url);          
         Blob body;
@@ -65,8 +73,12 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
 
         List<ContentVersion> cvs = new List<ContentVersion>();
         cvs = [SELECT Id, Title, ContentDocumentId FROM ContentVersion WHERE FirstPublishLocationId =: parentId AND SAC_StringRedaccion_fileupload__c =: 'ResolucionRedaccion'];
-        SAC_MaestroTemas__c maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCION' LIMIT 1];
-
+        SAC_MaestroTemas__c maestro = new SAC_MaestroTemas__c();
+        if(caso.recordType.DeveloperName == 'SPV_Reclamacion') {
+            maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCIONSPV' LIMIT 1];
+        } else {
+            maestro = [SELECT Id FROM SAC_MaestroTemas__c WHERE RecordTypeId = :RECTYPETIPOADJUNTOS AND SAC_DeveloperName__c = 'RESOLUCION' LIMIT 1];
+        }
         
         Set<Id> idsCD = new Set<Id>(); 
         if(!cvs.isEmpty()){
@@ -181,13 +193,13 @@ public with sharing class SAC_LCMP_GeneracionDocumento {
         Case caso = [SELECT CaseNumber, CC_Idioma__c FROM Case WHERE id =: parentId LIMIT 1];
         String numCaso = caso.CaseNumber;
         String nombreDocumento;
-        if(caso.CC_Idioma__c == 'es') { nombreDocumento = ' Carta Inadmisión'; }
-        else if(caso.CC_Idioma__c == 'ca') { nombreDocumento = ' Carta Inadmissió'; }
-        else if(caso.CC_Idioma__c == 'en') { nombreDocumento = ' Inadmissibility Letter'; }
-        else if(caso.CC_Idioma__c == 'va') { nombreDocumento = ' Carta Inadmissió'; }
-        else if(caso.CC_Idioma__c == 'ga') { nombreDocumento = ' Carta de inadmisión'; }
-        else if(caso.CC_Idioma__c == 'eu') { nombreDocumento = ' Onartezintasun Gutuna'; }
-        else { nombreDocumento = ' Carta Inadmisión'; }
+        if(caso.CC_Idioma__c == 'es') { nombreDocumento = ' carta respuesta SAC'; }
+        else if(caso.CC_Idioma__c == 'ca') { nombreDocumento = ' carta resposta SAC'; }
+        else if(caso.CC_Idioma__c == 'en') { nombreDocumento = ' SAC response letter'; }
+        else if(caso.CC_Idioma__c == 'va') { nombreDocumento = ' carta resposta SAC'; }
+        else if(caso.CC_Idioma__c == 'ga') { nombreDocumento = ' carta de resposta SAC'; }
+        else if(caso.CC_Idioma__c == 'eu') { nombreDocumento = ' SAC erantzun gutuna'; }
+        else { nombreDocumento = ' carta respuesta SAC'; }
         PageReference pageRef = new PageReference('https://' + url);  
         Blob body;
         if(Test.isRunningTest()){

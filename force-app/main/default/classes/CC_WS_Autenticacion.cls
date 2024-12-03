@@ -319,6 +319,7 @@ public with sharing class CC_WS_Autenticacion {
 				headers.put(lov.Name, lov.CC_Valor__c);
 			}
 		}
+        system.debug('DPK headers' + headers);
 		return headers;
 	}
 }

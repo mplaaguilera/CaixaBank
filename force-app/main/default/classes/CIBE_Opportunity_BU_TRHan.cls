@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY			AUTHOR				DATE				Description
 	1.0								Jose Maria 			07/06/2022			Init version
+	2.0			US717936			Bea					07/12/2023			Added the call to method of updateStageName
 	
 ***********************************************************************************************************************/
 public class CIBE_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
@@ -22,15 +23,16 @@ public class CIBE_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
         
         if (listData!=null && !listData.isEmpty()){
 			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
-			/*if (!hasCustomPermission && !System.isbatch()) {
-				if(AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c){
-					CIBE_OpportunityTriggerHelper.validateForbiddenWords(listData, mapOldObj);
-				}
-			}*/
+			if (!hasCustomPermission && !System.isbatch()) {
+				// if(AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c){
+				// 	CIBE_OpportunityTriggerHelper.validateForbiddenWords(listData, mapOldObj);
+				// }
+				CIBE_OpportunityTriggerHelper.saveFieldsFromOpp(listData, mapOldObj, true);
+
+			}
 			
 			CIBE_OpportunityTriggerHelper.calculateCurrency(listData, mapOldObj);
 			CIBE_OpportunityTriggerHelper.fillFieldsFromOpp(listData, mapOldObj);
-			CIBE_OpportunityTriggerHelper.saveFieldsFromOpp(listData, mapOldObj, true);
 			CIBE_OpportunityTriggerHelper.retrieveComercialGroup(listData, mapOldObj);
             CIBE_OpportunityTriggerHelper.asignAltaValues(listData, mapOldObj);
 			CIBE_OpportunityTriggerHelper.processOwnerEAPGestor(listData, mapOldObj);
@@ -45,6 +47,8 @@ public class CIBE_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
 			CIBE_OpportunityTriggerHelper.updateCentro(listData,mapOldObj);
 			CIBE_OpportunityTriggerHelper.checkCloseDate(listData,mapOldObj);
 			CIBE_OpportunityTriggerHelper.stateOpportunity(listData,mapOldObj);
+			CIBE_OpportunityTriggerHelper.updateStageName(listData,mapOldObj);
+            CIBE_OpportunityTriggerHelper.insertOppTM(listData, mapOldObj);
         }
 	}
 }

@@ -716,18 +716,15 @@ public with sharing class CC_WS_Methods_ALF {
                 //{
                     Account oConversionUpdate = new Account();
                     oConversionUpdate.CC_NumPerso__c = sNumPer;
-                    oConversionUpdate.AV_NumPerso__c = sNumPer;
                     oConversionUpdate.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
                     oNewRes.put('ConvAccountRT##0##'+sNumPer,oConversionUpdate);
 
                     Account oActualizarPAName = new Account();
                     oActualizarPAName.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
                 	oActualizarPAName.CC_NumPerso__c = sNumPer;
-                    oActualizarPAName.AV_NumPerso__c = sNumPer;
                     oActualizarPAName.FirstName = sNombre;
                     oActualizarPAName.LastName = sApellido1 + ' ' + sApellido2;
                     oActualizarPAName.CC_NumPerso__pc = sNumPer;
-                    oActualizarPAName.AV_NumPerso__pc = sNumPer;
                     oNewRes.put('ConvPANameAccount##0##'+sNumPer,oActualizarPAName);
 
                     Account oActualizarName = new Account();
@@ -1277,10 +1274,6 @@ public with sharing class CC_WS_Methods_ALF {
                 {
                     sInterfaz = 'SAC_Int_ALF';
                 }
-                when 'Supervisores'
-                {
-                    sInterfaz = 'SPV_Int_ALF';
-                }
                 when else {
                     sInterfaz = 'CC_Int_ALF';
                 }
@@ -1613,10 +1606,6 @@ public with sharing class CC_WS_Methods_ALF {
                 {
                     sInterfaz = 'SAC_Int_ALF_DOC';
                 }
-                when 'Supervisores'
-                {
-                    sInterfaz = 'SPV_Int_ALF_DOC';
-                }
                 when else {
                     sInterfaz = 'CC_Int_ALF_DOC';
                 }
@@ -1931,10 +1920,6 @@ public with sharing class CC_WS_Methods_ALF {
                 when 'SAC'
                 {
                     sInterfaz = 'SAC_Int_ALF_REP_JUR';
-                }
-                when 'Supervisores'
-                {
-                    sInterfaz = 'SPV_Int_ALF_REP_JUR';
                 }
                 when else {
                     sInterfaz = 'CC_Int_ALF_REP_JUR';

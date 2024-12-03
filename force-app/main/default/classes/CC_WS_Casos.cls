@@ -177,7 +177,7 @@ global with sharing class CC_WS_Casos {
         Recuperar datos configurados en los Metadatos para la cuenta origen.
             Estado del caso duplicado.
     */
-    private static CC_Config_FormWeb_Duplicado__mdt  getConfigAppDuplicado (String sApp)
+    private static CC_Config_FormWeb_Duplicado__mdt	getConfigAppDuplicado (String sApp)
     {
         CC_Config_FormWeb_Duplicado__mdt oAppCfg;
 
@@ -240,7 +240,7 @@ global with sharing class CC_WS_Casos {
                         String ambitoMicrobank = [SELECT Valor_Texto__c FROM CC_Parametros__mdt WHERE Nombre__c = 'Producto_Aplicacion_Microbank'].Valor_Texto__c;
                         if (oForm.Ambito == ambitoMicrobank)
                         {
-                          aplicacionReal = 'MICROBANK';
+                        	aplicacionReal = 'MICROBANK';
                         }
                     }
 
@@ -993,7 +993,7 @@ global with sharing class CC_WS_Casos {
         for (String sClave : oForms.keySet())
         {
             Boolean bCrear = false;
-      //Validacion CIF/NIF y logica de creación Acc, Cont, Pers Acc.
+			//Validacion CIF/NIF y logica de creación Acc, Cont, Pers Acc.
             if (oForms.get(sClave).NIF.trim().unescapeHtml4()!=''){
                 sTipoNif = CC_MetodosUtiles.validarCIFNIF(oForms.get(sClave).NIF.trim().unescapeHtml4());
             }
@@ -1034,8 +1034,8 @@ global with sharing class CC_WS_Casos {
                 {
                     // Nuevo tratamiento PersonAccount y BusinessAccount.
                     if (sTipoNif == 'CIF') {
-                      oNew.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-                      oNew.Name = sNom;
+                    	oNew.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+                    	oNew.Name = sNom;
                     } else {
                         oNew.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
                         if (oForms.get(sClave).Nombre != null)
@@ -1133,7 +1133,7 @@ global with sharing class CC_WS_Casos {
         for (String sClave : oForms.keySet())
         {
             Boolean bCrear = false;
-      //Validacion CIF/NIF y logica de creación Acc, Cont, Pers Acc.
+			//Validacion CIF/NIF y logica de creación Acc, Cont, Pers Acc.
             if (oForms.get(sClave).NIF.trim().unescapeHtml4()!=''){
                 sTipoNif = CC_MetodosUtiles.validarCIFNIF(oForms.get(sClave).NIF.trim().unescapeHtml4());
             }
@@ -1588,10 +1588,10 @@ global with sharing class CC_WS_Casos {
         Map<String, Object> oParamAux;
 
         // Lista de NIFs de los formularios.
-    List<String> nifList = new List<String>();
+		List<String> nifList = new List<String>();
 
-    // Casos potencialmente duplicados.
-    Map<String, Case> casosDuplicadosMap = new Map<String, Case>();
+		// Casos potencialmente duplicados.
+		Map<String, Case> casosDuplicadosMap = new Map<String, Case>();
 
         try {
             // Preparar objeto traza.
@@ -1697,7 +1697,7 @@ global with sharing class CC_WS_Casos {
                         oAux.sRefUser = oForm.REFUSUARIO;
                         oAux.sNIF = oForm.NIF;
                         oAux.sTexto = oForm.Texto;
-            oAux.sAccountId = '';
+						oAux.sAccountId = '';
                         oAux.sContactId = '';
                         oRes.add(oAux);
 
@@ -1791,12 +1791,12 @@ global with sharing class CC_WS_Casos {
                 }
                 oContForm = null;
 
-        // Búsqueda de casos potencialmente duplicados.
+				// Búsqueda de casos potencialmente duplicados.
                 Decimal tiempoDuplicidadDecimal = [SELECT CC_Tiempo_Duplicidad__c FROM CC_Config_FormWeb_Duplicado__mdt WHERE CC_Aplicacion__c = 'FORMWEB' LIMIT 1].CC_Tiempo_Duplicidad__c;
                 Integer tiempoDuplicidad = tiempoDuplicidadDecimal != null ? tiempoDuplicidadDecimal.intValue() : 0;
-        for (Case oCasoDuplicado : [SELECT Id, CC_Numero_Documento__c, CC_MailTelfNotif__c, CC_SuppliedProducto__c, CC_RefExterna__c, CreatedDate FROM Case WHERE CC_Numero_Documento__c in :nifList AND CreatedDate >= :Datetime.now().addMinutes(-tiempoDuplicidad) ORDER BY CreatedDate ASC]) {
-          casosDuplicadosMap.put(oCasoDuplicado.CC_Numero_Documento__c, oCasoDuplicado);
-        }
+				for (Case oCasoDuplicado : [SELECT Id, CC_Numero_Documento__c, CC_MailTelfNotif__c, CC_SuppliedProducto__c, CC_RefExterna__c, CreatedDate FROM Case WHERE CC_Numero_Documento__c in :nifList AND CreatedDate >= :Datetime.now().addMinutes(-tiempoDuplicidad) ORDER BY CreatedDate ASC]) {
+					casosDuplicadosMap.put(oCasoDuplicado.CC_Numero_Documento__c, oCasoDuplicado);
+				}
 
                 // Procesar los formularios.
                 for (String sForm : oMapForm.keySet())

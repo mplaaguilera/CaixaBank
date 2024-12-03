@@ -26,13 +26,15 @@ Historial
 	2.5             DE79573             Oscar Moreno        07/07/2023      Change searchOffice method to show the assigned office and lower offices
 	2.6         	US587408        	Ángel Medina        14/07/2023  	Added AV_Group__c and AV_InterlocName__c to retrieved fields
 	2.7		        US692335			Elisabeth R.		16/10/2023	    Added hasCustomPermission method
-
+	2.8		        PMD Errors			Humberto Vilchez	28/11/2023	    Add SECURITY_ENFORCED to Querys
+	2.9		 		Revisar queries 	Ángel Medina		12/02/2024		Modify query from sosl to soql
+    3.0             PPM100211786        Gonzalo Avila       29/05/2024      Modify getTasksFilter method to search by Recordtype.Developername instead of Recordtype.name
 ***********************************************************************************************************************/
 public with sharing class AV_MassReassignOwner_Controller {
 
 	private final static Integer MAX_RESULTS 	= 10;
 	private final static Integer MAX_LIMIT 		= 49900;
-    private final static String  ID_GCF			= (String)[SELECT ID FROM USER WHERE ALIAS = :AV_AppConstants.AV_ALIAS_AVTF9 LIMIT 1].Id;
+    private final static String  ID_GCF			= (String)[SELECT ID FROM USER WHERE ALIAS = :AV_AppConstants.AV_ALIAS_AVTF9 WITH SECURITY_ENFORCED LIMIT 1].Id;
 	public static Integer numberOfRecords;
 
 	/**
@@ -103,7 +105,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 		List<OptionsEmployee> employees = new List<OptionsEmployee>();
 		List<OptionsEmployee> employeesSorted = new List<OptionsEmployee>();
 		List<Id> employeesId = new List<Id>();
-		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
+		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
 
 		if (String.isBlank(oficina)) {
 			return null;
@@ -118,24 +120,25 @@ public with sharing class AV_MassReassignOwner_Controller {
 				String profileId = [
 					SELECT Id
 					FROM Profile
-					WHERE Name = :AV_AppConstants.AV_PROFILE
+					WHERE Name = :AV_AppConstants.AV_PROFILE 
+					WITH SECURITY_ENFORCED
 				].Id;
 				List<RecordType> listRT = [
 					SELECT Id, DeveloperName
 					FROM RecordType
 					WHERE Name = :data[2]
-					
+					WITH SECURITY_ENFORCED
 				];
 				Set<Id> setIdsRts = (new Map<Id,RecordType>(listRT)).keySet().clone();				
 				AggregateResult[] tasksWithCenter = [
 					SELECT OwnerId, Owner.Name
 					FROM Task
 					WHERE AV_CenterRtIndex__c = :centerRt AND Owner.ProfileId = :profileId AND Status = :data[1] AND RecordTypeId IN :setIdsRts
-					
+					WITH SECURITY_ENFORCED
 					GROUP BY OwnerId, Owner.Name
 				];
-		
-				if (!tasksWithCenter.isEmpty()) {
+	
+				if (!tasksWithCenter.isEmpty()&& tasksWithCenter!=null) {
 					for (AggregateResult t : tasksWithCenter) {
 							employeesId.add((Id)t.get('OwnerId'));
 							employeesSorted.add(new OptionsEmployee((Id)t.get('OwnerId'),(String)t.get('Name')));
@@ -143,16 +146,12 @@ public with sharing class AV_MassReassignOwner_Controller {
 				}
 
 			}else if(data.size() == 1){
-
-				List<List<SObject>> searchResults = [
-					FIND :oficina
-					IN ALL FIELDS
-					RETURNING User(Id, Name, AV_NumeroOficinaEmpresa__c WHERE IsActive = true)
-					LIMIT :MAX_LIMIT
+				List<User> searchResults = [
+					SELECT Id, Name, AV_NumeroOficinaEmpresa__c FROM User WHERE IsActive = true AND AV_NumeroOficinaEmpresa__c = :emp.AV_NumeroOficinaEmpresa__c
+					AND AV_NumeroOficinaEmpresa__c LIKE :('%' + oficina + '%') LIMIT :MAX_LIMIT
 				];
-				List<User> emps = (List<User>) searchResults[0];
-				if(!emps.isEmpty() && emps != null){
-					for(User u : emps){
+				if(!searchResults.isEmpty() && searchResults != null){
+					for(User u : searchResults){
 						employeesId.add(u.Id);
 						employeesSorted.add(new OptionsEmployee(u.Id,u.Name));
 					}
@@ -165,7 +164,16 @@ public with sharing class AV_MassReassignOwner_Controller {
 		if(employeesId.size()>1) {
 			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO '+oficina.split('\\{\\|}')[0]));
 		}
-		employees.add(new OptionsEmployee(ID_GCF,'Sin Gestor / Eap - CENTRO '+oficina.split('\\{\\|}')[0]));
+		employees.add(new OptionsEmployee(ID_GCF, AV_AppConstants.SINGESTOR_EAP_CENTRO + oficina.split('\\{\\|}')[0]));
+
+		List<User> currentUser = [SELECT Id,AV_NumeroOficinaEmpresa__c,AV_Pool__c FROM User WHERE Id = :UserInfo.getUserId()];
+		if(currentUser != null){
+			String multigeUser = AV_PoolEvents_Controller.getCurrentDT(currentUser[0].AV_NumeroOficinaEmpresa__c);
+			if(multigeUser != null){
+				employees.add(new optionsEmployee(multigeUser, AV_AppConstants.MULTIGENAME));
+			}
+		}
+
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
@@ -193,7 +201,7 @@ public with sharing class AV_MassReassignOwner_Controller {
      */
     public static Id getOfficePermission(List<Id> superiorCenters,Account acc) {
 		Id officeId;
-		List<Account> inferiorCenters = [SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__r.AV_CentroSuperior__r.AV_CentroSuperior__c,AV_CentroSuperior__r.AV_CentroSuperior__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c FROM Account WHERE (AV_CentroSuperior__r.AV_CentroSuperior__r.AV_CentroSuperior__c IN :superiorCenters OR AV_CentroSuperior__r.AV_CentroSuperior__c IN :superiorCenters OR AV_CentroSuperior__c IN :superiorCenters) AND Id = :acc.Id LIMIT 1];
+		List<Account> inferiorCenters = [SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__r.AV_CentroSuperior__r.AV_CentroSuperior__c,AV_CentroSuperior__r.AV_CentroSuperior__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c FROM Account WHERE (AV_CentroSuperior__r.AV_CentroSuperior__r.AV_CentroSuperior__c IN :superiorCenters OR AV_CentroSuperior__r.AV_CentroSuperior__c IN :superiorCenters OR AV_CentroSuperior__c IN :superiorCenters) AND Id = :acc.Id WITH SECURITY_ENFORCED LIMIT 1];
 		if (inferiorCenters!= null && !inferiorCenters.isEmpty()) {
 			for (Id off : superiorCenters) {
 				if (off == inferiorCenters[0].AV_CentroSuperior__c) {
@@ -226,10 +234,11 @@ public with sharing class AV_MassReassignOwner_Controller {
 		Account userCenter = [
             SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
             FROM Account
-            WHERE CC_Numero_Oficina_Empresa__c = :us.AV_NumeroOficinaEmpresa__c
+            WHERE CC_Numero_Oficina_Empresa__c = :us.AV_NumeroOficinaEmpresa__c 
+			WITH SECURITY_ENFORCED 
         ];
 		Map<String,String> mapOfficeUsCedido = new Map<String,String>();
-		List<AV_OfficePermission__c> officePermList = [SELECT Id , name,AV_OficinaCedida__c,AV_Assigner__c,AV_Assigner__r.AV_Funcion__c,AV_UsuarioCedido__c FROM AV_OfficePermission__c  WHERE AV_UsuarioCedido__c =: UserInfo.getUserId() AND AV_FinalPermiso__c >=: Date.Today()];
+		List<AV_OfficePermission__c> officePermList = [SELECT Id , name,AV_OficinaCedida__c,AV_Assigner__c,AV_Assigner__r.AV_Funcion__c,AV_UsuarioCedido__c FROM AV_OfficePermission__c  WHERE AV_UsuarioCedido__c =: UserInfo.getUserId() AND AV_FinalPermiso__c >=: Date.Today() WITH SECURITY_ENFORCED];
 		List<Id> listOffice = new List<Id>();
 		String funcion;
 		if(officePermList!= null){
@@ -285,16 +294,17 @@ public with sharing class AV_MassReassignOwner_Controller {
 		List<Account> inferiorOffices = new List<Account>();
 		List<Id> ids = new List<Id>();
 		Set<Id> result = new Set<Id>();
-
 		User currentUser = [
 			SELECT AV_Funcion__c, AV_NumeroOficinaEmpresa__c
 			FROM User
-			WHERE Id = :UserInfo.getUserId()
+			WHERE Id = :UserInfo.getUserId() 
+			WITH SECURITY_ENFORCED
 		];
 		Account userCenter = [
             SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
             FROM Account
-            WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c
+            WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c 
+			WITH SECURITY_ENFORCED
         ];
 		String funcion = String.isNotBlank(currentUser.AV_Funcion__c) ? currentUser.AV_Funcion__c : '';
 		ids.add(userCenter.Id);
@@ -337,6 +347,7 @@ public with sharing class AV_MassReassignOwner_Controller {
             SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
             FROM Account
             WHERE AV_CentroSuperior__c IN :superiorCenters
+			WITH SECURITY_ENFORCED
         ];
 		for(Account a: inferiorCenters){
 			centrosInferioresTotales.add(a);
@@ -346,7 +357,8 @@ public with sharing class AV_MassReassignOwner_Controller {
 		List<Account> inferiorCenters2 =[
 			SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
             FROM Account
-            WHERE AV_CentroSuperior__c IN : inferiorCenters
+            WHERE AV_CentroSuperior__c IN : inferiorCenters 
+			WITH SECURITY_ENFORCED
 		];
 		for(Account a: inferiorCenters2){
 			centrosInferioresTotales.add(a);
@@ -427,8 +439,8 @@ public with sharing class AV_MassReassignOwner_Controller {
 			avQuery = avQuery + ' AND RecordType.Name = \''+origenFilter+'\'';
 
 		}else if(origenFilter != null && origenFilter == 'notAssigned'){
-
-			avQuery = avQuery + ' AND RecordType.Name IN '+AV_AppUtilities.arrayToStringIn(origenFilterAll);		
+			
+			avQuery = avQuery + ' AND RecordType.DeveloperName IN (\'AV_AlertaComercial\', \'AV_ExperienciaCliente\', \'AV_Otros\', \'AV_Onboarding\', \'AV_Priorizador\')';
 		}
 		if(clientFilter != null) {
 			avQuery = avQuery + ' AND AccountId = \''+clientFilter+'\'';
@@ -454,6 +466,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 			if (office != null) {
 				avQuery = avQuery + ' AND AV_CenterRtIndex__c IN '+ centerRTList ;
 			}
+
 			if(employeeFilter != null) {
 				if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1) {
 					avQuery = avQuery + ' AND OwnerId = \''+ID_GCF+'\' AND AV_CenterRtIndex__c IN '+centerRTList;
@@ -485,6 +498,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 			avQuery = avQuery + ' AND AV_CodigoGestorAsignado__c = null';
 		}
 		}
+
 
 		avQuery= avQuery+' AND AV_ToDelete__C = FALSE ORDER BY ActivityDate ASC NULLS FIRST LIMIT 100 OFFSET '+((Integer.valueOf(page)-1)*100);
         AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + avQuery);
@@ -556,7 +570,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 	public static List<AV_LookupSearchResult> search(String searchTerm, List<String> selectedIds, Boolean myOffice) {
 		Profile p = [SELECT Id FROM Profile WHERE Name = :AV_AppConstants.AV_PROFILE];
 		
-		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
+		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
 		
 		searchTerm += '*';
 		List<AV_LookupSearchResult> results = new List<AV_LookupSearchResult>();
@@ -693,7 +707,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 			AV_OriginalOfficeNumber__c
 			FROM User
 			WHERE Id = :UserInfo.getUserId()
-			
+			WITH SECURITY_ENFORCED
 		];
 		Set<Id> offices;
 		if (currentUser.AV_OriginalOfficeNumber__c != null) {
@@ -704,8 +718,8 @@ public with sharing class AV_MassReassignOwner_Controller {
 		Account centroUsuario = [
             SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
             FROM Account
-            WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c
-			
+            WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c 
+			WITH SECURITY_ENFORCED
         ];
 		if (String.isNotBlank(currentUser.AV_Funcion__c) && directores.contains(currentUser.AV_Funcion__c)) {
 			if(!selectedIds.isEmpty()){
@@ -892,7 +906,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 	*/
 	@AuraEnabled
 	public static String nameContactAssign(String contactId){
-		List<User> us  = [Select Id, Name From User Where Id = :contactId];
+		List<User> us  = [Select Id, Name From User Where Id = :contactId WITH SECURITY_ENFORCED];
 		if (us.isEmpty()) {
 			return null;
 		}else{
@@ -941,8 +955,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 			avQuery = avQuery + ' AND RecordType.Name = \''+origenFilter+'\'';
 
 		}else if(origenFilter != null && origenFilter == 'notAssigned'){
-
-			avQuery = avQuery + ' AND RecordType.Name IN '+AV_AppUtilities.arrayToStringIn(origenFilterAll);		
+			avQuery = avQuery + ' AND RecordType.DeveloperName IN (\'AV_AlertaComercial\', \'AV_ExperienciaCliente\', \'AV_Otros\', \'AV_Onboarding\', \'AV_Priorizador\')';	
 		}
 		if(clientFilter != null) {
 			avQuery = avQuery + ' AND AccountId = \''+clientFilter+'\'';
@@ -1038,7 +1051,7 @@ public with sharing class AV_MassReassignOwner_Controller {
 			return this.totalSize == 0;
 		}
 	}
-    
+
 	@AuraEnabled
 	public static Boolean hasCustomPermission(){
 		return FeatureManagement.checkPermission('AV_PrivateBanking');

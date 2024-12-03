@@ -10,7 +10,7 @@
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US204755         Carlos Solis   31/05/21      Creación
 *****************************************************************/
-public with sharing class SAC_LCMP_EnvioReclamante {
+public without sharing class SAC_LCMP_EnvioReclamante {
     /*****************************************************************
      * Proposito: Comprueba si existen acciones asociadas a la reclamación
      * y devuelve la lista de acciones para ser tratada en el .js

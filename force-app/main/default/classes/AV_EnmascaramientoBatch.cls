@@ -12,26 +12,27 @@ VERSION		USER_STORY		AUTHOR				DATE				Description
 2.1			App FSC			Carolina Alonso		26/10/2020			Delete OrderBy in the query
 2.2			PMD			    Víctor Santiago	    15/04/2021			AV_limit changed to avLimit
 2.3			USXXXXXX		Sandra Gómez		22/11/2021			add FWK
+2.4         FIX28080841     Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.
 
 ***********************************************************************************************************************/
-global class AV_EnmascaramientoBatch implements Database.Batchable<sObject>, Database.Stateful {
+public class AV_EnmascaramientoBatch implements Database.Batchable<sObject>, Database.Stateful {
 	
-	global Integer recordsProcessed = 0;
-	global static final String AV_PARTICULAR = 'CC_ClientePA';
+	public Integer recordsProcessed = 0;
+	public static final String AV_PARTICULAR = 'CC_ClientePA';
 	
-	global String avLimit;
+	public String avLimit;
 	
-	global AV_EnmascaramientoBatch(String limitQuery) {
+	public AV_EnmascaramientoBatch(String limitQuery) {
 		avLimit = limitQuery;
 	}
 
-	global AV_EnmascaramientoBatch() {}
+	public AV_EnmascaramientoBatch(){}
 	
 	/**
 * Create a list of Account that the recordtype is CC_ClientePA
 * @param bc  Database.BatchableContext param that contains the batch job ID
 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String query = 'SELECT Id, RecordtypeId, AV_FechaEnmascaramiento__c, Description, FirstName, '+
 			+'LastName, PersonEmail, PersonMobilePhone, PersonBirthdate, CC_Numero_Documento__pc, '+
 			+'Phone, lastModifiedDate FROM Account WHERE RecordType.DeveloperName = \'CC_CLientePA\' '+
@@ -49,7 +50,7 @@ global class AV_EnmascaramientoBatch implements Database.Batchable<sObject>, Dat
      * @param bc	Database.BatchableContext param that contains the batch job ID
      * @param listAccounts List<Account> param with the list of Accounts.
      */
-	global void execute(Database.BatchableContext bc, List<Account> listAccounts){
+	public void execute(Database.BatchableContext bc, List<Account> listAccounts){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -60,11 +61,13 @@ global class AV_EnmascaramientoBatch implements Database.Batchable<sObject>, Dat
 			//Recorremos la lista y calculamos sus valores enmascarados
 			for(Account cliente : listAccounts){
 				//FirstName, LastName, PersonEmail
+				
 				AV_MaskUtils.maskPersonInformation(cliente, AV_PARTICULAR);
 				AV_MaskUtils.maskBirthDate(cliente); 
 				AV_MaskUtils.maskTelephone(cliente, AV_PARTICULAR); 
 				AV_MaskUtils.maskIdenNumber(cliente);
 				AV_MaskUtils.maskDescription(cliente); 
+
 				cliente.AV_FechaEnmascaramiento__c = DATE.TODAY();
 				
 				listAccountsToUpdate.add(cliente);
@@ -86,7 +89,7 @@ global class AV_EnmascaramientoBatch implements Database.Batchable<sObject>, Dat
      *
      * @param bc	Database.BatchableContext param that contains the batch job ID
      */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}

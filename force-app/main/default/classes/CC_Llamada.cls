@@ -730,7 +730,7 @@ public with sharing class CC_Llamada {
 
         String asunto = 'Traslado a ' + grupo + ' de Tercer Nivel';
         String tipo = 'Traslado Tercer Nivel';
-        CC_EmailSendController.createActivityTraslados(caso.Id, null, asunto, tipo, grupo, null, llamadaId);
+        CC_EmailSendController.createActivityTraslados(caso.Id, null, asunto, tipo, grupo, llamadaId);
     }
 
     private static boolean hayCasosAbiertosCuenta(Id cuentaId) {

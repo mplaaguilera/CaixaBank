@@ -115,10 +115,6 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			output.codigo = e.getTypeName(); //'0000'
 			output.descripcion = 'ExceptionMessage: ' + e.getMessage() + ' - Line: ' + e.getStackTraceString().substringBetween('Class.', '\nClass.');
 			CBK_Log.error(e);
-
-			//Registramos las trazas adecuadamente.
-			//resultado = '{"Result":"KO","Description":"Datos obligatorios no informados."}';
-			//String outputString = 'Resultado: ' + output.resultado + ', Descripción: ' + output.descripcion + ', Código: ' + output.codigo;
 			handleWebServiceResponse(req, res, dtStart, output, 412);
 		} finally {
 			
@@ -215,11 +211,6 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			}
 		}
 		
-
-		//Validaciones con caso existente
-		//Comprobaciones para casos existentes
-		//contactoIdentificado = SACH_Identificacion_Auto.identificarNUMPERSOsinCodificar(input.numperso);
-
 		if (contactoIdentificado == null) {
 			throw new CustomException('NUMPERSO no existe o es incorrecto. Por favor revise el numpero enviado.');
 		}
@@ -255,9 +246,6 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			casoExistente = null;
 		}
 
-		//Id idOficinaGestora;
-		//List<Account> oficinasGestoras = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = :input.oficinagestora AND RecordType.DeveloperName = 'CC_CentroCaixaBank' LIMIT 1];
-
 		if (idOficinaGestora == null) {
 				throw new CustomException('La Oficina Gestora que ha indicado no existe o es incorrecta.');	
 		}
@@ -272,20 +260,6 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
      */
 	public static void gestionPeticionPromor(Input input, Output output,String jsonString,Case casoExistente, Contact contactoIdentificado,Id idOficinaGestora) {
 		
-		/*
-        //Case casoAntiguo;
-		//Contact contactoIdentificado = SACH_Identificacion_Auto.identificarNUMPERSOsinCodificar(input.numperso);
-
-		if (contactoIdentificado == null) {
-			throw new CustomException('NUMPERSO no existe o es incorrecto. Por favor revise el numpero enviado.');
-		}
-		
-        try {
-            casoAntiguo = [SELECT Status, CC_MCC_Solucion__c FROM Case WHERE RecordType.DeveloperName = 'SACH_Cliente' AND ContactId = :contactoIdentificado.Id LIMIT 1];
-        } catch (QueryException e) {
-            casoAntiguo = null;
-        }*/
-
         if (casoExistente != null) {
 
                 // Para cada caso vamos a buscar que Solucion tiene el caso
@@ -333,18 +307,6 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
                 // Si el caso esta con codigo 715 y pendientes de colaborador --> reactivar el caso
                 if (casoExistente.Status == 'Pendiente Colaborador' && nombreSolucion == 'Suspensión actuaciones por instrucción del SACH (715)') {
 					
-					/*
-					if (String.isBlank(input.pacto)) {
-						throw new CustomException('Error! - El campo pacto no está informado y es obligatorio. Al estar en Pendiente Colaborador y en solución 715.');
-					}
-
-					//Comprobamos el pacto
-					if (String.isnotBlank(input.pacto)) {
-						if (!new Set<String>{'226', '224', '301', '327', '299'}.contains(input.pacto)) {
-							throw new CustomException('El pacto que ha informado es incorrecto. Por favor revise el código del Pacto');   
-						}
-					} */
-
                     casoExistente.Status = 'Activo';
                     casoExistente.OwnerId = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'SACH_Promor'].Id;
                     casoExistente.SACH_Pacto__c = input.pacto;
@@ -377,27 +339,7 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 		} else {
 			SACH_Parametros__c rutaRelativa = SACH_Parametros__c.getInstance('SACH_Promor');
 			String rutaDefinitiva = '';
-			//Recogida del Custom Setting para formar el Link del archivo
-			//Recogemos el Custom Setting para obtener las direcciones de correo de respuesta
 			
-			/*
-			Id idOficinaGestora;
-			List<Account> oficinasGestoras = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = :input.oficinagestora AND RecordType.DeveloperName = 'CC_CentroCaixaBank' LIMIT 1];
-
-			if (!oficinasGestoras.isEmpty()) {
-				idOficinaGestora = oficinasGestoras[0].Id;
-			} 
-			else {
-				throw new CustomException('La Oficina Gestora que ha indicado no existe o es incorrecta.');	
-			}
-
-			/*
-			if (String.isnotBlank(input.pacto)) {
-				if (!new Set<String>{'226', '224', '301', '327', '299'}.contains(input.pacto)) {
-					throw new CustomException('El pacto que ha informado es incorrecto. Por favor revise el código del Pacto');   
-				}
-			} */
-
 			//NUEVO CASO DE ENTRADA
 			//Creación de un caso nuevo porque no hay antes nada relacionado con ninguún caso anterior.
 			Case caso = new Case();
@@ -452,7 +394,16 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			'165' => 'Requerimiento de pago/notificación por Tablón Edictal Judicial Único (TEJU)',
 			'736' => 'Resolución Admº vulnerabilidad Ley 12/2023',
 			'739' => 'Resolución Admº Intermediación/Conciliación ley 12/2023',
-			'700' => 'Petición autorización solicitud subasta al SACH'
+			'700' => 'Petición autorización solicitud subasta al SACH',
+			'38.0' => 'Requerimiento de pago/notificación fiadores por edicto',
+			'39.0' => 'Requerimiento de pago/notificación fiadores a través de Procurador',
+			'58.0' => 'Requerimiento de pago/notificación fiadores por SCNE',
+			'158.0' => 'Requerimiento de pago/notificación fiadores por exhorto',
+			'164.0' => 'Requerimiento de pago/notificación por medios electrónicos',
+			'165.0' => 'Requerimiento de pago/notificación por Tablón Edictal Judicial Único (TEJU)',
+			'736.0' => 'Resolución Admº vulnerabilidad Ley 12/2023',
+			'739.0' => 'Resolución Admº Intermediación/Conciliación ley 12/2023',
+			'700.0' => 'Petición autorización solicitud subasta al SACH'
 		};
 		
 
@@ -467,26 +418,17 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			horarioLaboral = [SELECT Id, Name FROM BusinessHours WHERE Name = 'SACH_Calendario_Invierno'];
 		}
 
+		Integer uniqueActivityIndex = 0;
+
 		for (Actividad actividad : input.actividades) {
-
-			/*
-			//Manejo de los errores de la llegada de datos
-			if (String.isBlank(actividad.codactividad)) {
-				throw new CustomException('Error! - codactividad no informado. Este campo es OBLIGATORIO.');
-			}*/
-
+			uniqueActivityIndex++;
 			//Recogemos las actividades segun la codificacion especificada
 			String actividadDesc = '';
 			if (codigodeactividades.containsKey(actividad.codactividad)) {
 				actividadDesc = codigodeactividades.get(actividad.codactividad);
 			}	
 
-			//Verificamos que el caso no tenga ya esta actividad creada y por lo tanto no le adjuntamos los ficheros.
-			//Verificamos si ya existe alguna tarea de traslado Colaborador abierta para el Caso y si existe se cierra.
-			//List<Task> tareasActividades = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type = 'Automática' AND Subject = :actividadDesc WITH SECURITY_ENFORCED LIMIT 1];
-
 			List<Task> tareasActividades = comprobarTareasExistentes(caso,actividadDesc);
-			
 			
 			if (tareasActividades.isEmpty()) {
 				
@@ -500,7 +442,8 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 				tareacomentario.Description = actividad.comentarios;
 				tareacomentario.Subject = actividadDesc;
 				tareacomentario.Status = 'Completed';
-				//insert tareacomentario;
+				tareacomentario.CallDisposition = actividad.codactividad + '-' + String.valueOf(uniqueActivityIndex);
+				
 				//Comprobamos si la actividad es la 700
 				if (actividad.codactividad == '700'){        
 					DateTime dia = CBK_UtilsDate.nowDT();
@@ -518,32 +461,18 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 			
 				//Manejo de los archivos adjuntos
 				if (actividad.adjuntos != null) {
-					//Insertar registros Content Version
-			
+					// Generar un identificador único
+    				String actividadIdUnica = actividad.codactividad + '-' + uniqueActivityIndex;
 					for (Adjunto adjunto : actividad.adjuntos) {
 
-					/*	
-					//Manejo de los errores de la llegada de datos sobre los ficheros adjuntos
-					if (String.isBlank(adjunto.iddocumento)) {
-						throw new CustomException('Error! - iddocumento no está informado. Este campo es OBLIGATORIO.');
+						rutaDefinitiva = rutaRelativa.SACH_Parametro_1__c + '&idDocumento='+adjunto.iddocumento+'&referenciaExterna='+input.iddemanda; 
+						ContentVersion contentVersion = new ContentVersion();
+						contentVersion.contentUrl = rutaDefinitiva;
+						contentVersion.Description = actividadIdUnica + ' - ' + adjunto.nombreadjunto + ' - ' + adjunto.tipodocumento + ' - ' + actividad.comentarios + ' - ' + actividadDesc;
+						contentVersion.contentLocation = 'L';
+						listaContentVersion.add(contentVersion);
 					}
-
-					if (String.isBlank(adjunto.nombreadjunto)) {
-						throw new CustomException('Error! - nombreadjunto no está informado. Este campo es OBLIGATORIO.');
-					}
-
-					if (String.isBlank(adjunto.tipodocumento)) {
-						throw new CustomException('Error! - tipodocumento no está informado. Este campo es OBLIGATORIO.');
-					}*/
-
-					rutaDefinitiva = rutaRelativa.SACH_Parametro_1__c + '&idDocumento='+adjunto.iddocumento+'&referenciaExterna='+input.iddemanda; 		//emailrespuesta.HDT_Configuracion_1__c
-					ContentVersion contentVersion = new ContentVersion();
-					contentVersion.contentUrl = rutaDefinitiva;
-					contentVersion.Description = adjunto.nombreadjunto + ' - ' + adjunto.tipodocumento + ' - ' + actividad.comentarios + ' - ' + actividadDesc;
-					contentVersion.contentLocation = 'L';
-					listaContentVersion.add(contentVersion);
-				}
-			}	
+				}	
 			}
 		}
 
@@ -563,13 +492,8 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 	public static List<Task> comprobarTareasExistentes(Case caso, String actividadDesc){
 
 			List<Task> tareasActividades = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type = 'Automática' AND Subject = :actividadDesc WITH SECURITY_ENFORCED LIMIT 1];
-
-			return tareasActividades;
-	
-                
-            }
-
-            
+			return tareasActividades;     
+    }    
 	private class CustomException extends Exception {}
 
 	public static void generarContentLinkVersionTarea(List<ContentVersion> listaContentVersion,List<Task> listaTareas) {
@@ -585,13 +509,9 @@ global with sharing class SACH_WS_AltaCasoPromor extends CBK_HttpServiceIntegrat
 					listaContentVersion = [SELECT ContentDocumentId,Description FROM ContentVersion WHERE Id IN :listaContentVersionId];
                     
 					for (Task tarea : listaTareas) {
-
-						 //Insertar registros ContentDocumentLink
-						// List<ContentDocumentLink> listaContentDocumentLink = new List<ContentDocumentLink>();
-						for (ContentVersion cv : listaContentVersion) {
-
+						for (ContentVersion cv : listaContentVersion) {					
 							//adjunto.nombreadjunto + ' - ' + adjunto.tipodocumento;
-							if (cv.Description.contains(tarea.Description) && cv.Description.contains(tarea.Subject)) {
+							if (cv.Description.contains(tarea.CallDisposition)) {
 								ContentDocumentLink cdLink2 = new ContentDocumentLink();
 								cdLink2.LinkedEntityId = tarea.Id;	
 								cdLink2.ContentDocumentId = cv.ContentDocumentId;

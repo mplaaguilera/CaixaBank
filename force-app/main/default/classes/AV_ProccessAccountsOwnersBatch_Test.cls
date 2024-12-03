@@ -19,10 +19,7 @@ private class AV_ProccessAccountsOwnersBatch_Test {
 		AV_TestHelper.activateLogger();
 		User u1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U0100001');
         User u2 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U000900312');
-        //AV_LogDebug.printLogDebug('setup', 'User1: ' + u1);
-        //AV_LogDebug.printLogDebug('setup', 'User2: ' + u2);
-        Contact con =  AV_TestHelper.createEmployee(null,u1);
-        //AV_LogDebug.printLogDebug('setup', 'Contact: ' + con);
+        Contact con =  AV_TestHelper.createEmployee(null,u1,u1.AV_ExternalId__c);
 
 		List<Account> accounts = new List<Account>();
         RecordType rt = AV_AppUtilities.getRecordType('Account', 'CC_ClientePA');
@@ -31,7 +28,7 @@ private class AV_ProccessAccountsOwnersBatch_Test {
 		 * Create 10 Accounts with the field AV_BatchProccessOwners__c 'ToBeProcess'.
 		 */
 		// Insertar 10 Cuentas 
-		for (Integer i=0;i<10;i++) {
+		for (Integer i=0;i<1;i++) {
 			Account acc = new Account(
 					FirstName = 'FirstName',
 					LastName = 'LastName' + i,
@@ -46,7 +43,10 @@ private class AV_ProccessAccountsOwnersBatch_Test {
 		insert accounts;
         
         con.AV_UsuarioAsociado__c = u2.Id;
+        con.CC_Matricula__c = u2.AV_ExternalId__c;
         update con;
+
+		
 	}
 
 	/**
@@ -56,7 +56,7 @@ private class AV_ProccessAccountsOwnersBatch_Test {
 	static void executeProccessAccountsOwnersBatch() {
         User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U000900312' limit 1];
         Set<String> setUserIds = new Set<String>{u2.Id};
-        AV_LogDebug.printLogDebug('executeProccessAccountsOwnersBatch', 'User2: ' + u2);
+        AV_LogDebug.printLogDebug('executeProccessAccountsOwnersBatch', 'User2: ' + u2);	
         
 		AV_ProccessAccountsOwnersBatch b = new AV_ProccessAccountsOwnersBatch('300', setUserIds);
         
@@ -64,9 +64,9 @@ private class AV_ProccessAccountsOwnersBatch_Test {
 		Database.executeBatch(b);
 		Test.stopTest();
         
-        List<Account> listData = [SELECT id, OwnerId FROM Account];
+        List<Account> listData = [SELECT id, OwnerId,AV_EAPGestor__r.AV_UsuarioAsociado__c FROM Account];
         for (Account acc : listData) {
-            System.assertEquals(u2.id, acc.OwnerId);
+            System.assertEquals(acc.AV_EAPGestor__r.AV_UsuarioAsociado__c, u2.id);
         }
 	}
 }

@@ -46,7 +46,7 @@ public with sharing class OS_Case_AU_TRHan extends CC_TriggerHandlerBase {
         }
         
         if ((mapOldObjCops.size() != 0) ||(listNewObjCops.size() != 0)){
-            revisarCambioEstado(mapOldObjCops, listNewObjCops);
+            //revisarCambioEstado(mapOldObjCops, listNewObjCops);
             crearActividadCierreCOPS(mapOldObjCops, listNewObjCops);
             crearActividadReasignacionCOPS(mapOldObjCops, listNewObjCops);
             crearActividadReasignacionGruposTrabajoCOPS(mapOldObjCops, listNewObjCops);
@@ -233,54 +233,59 @@ public with sharing class OS_Case_AU_TRHan extends CC_TriggerHandlerBase {
 
     /**
     * Revisa si ha habido un cambio de estado en un caso y, si es así, actualiza el estado del caso relacionado en Segmentos
-    */
+    
     private void revisarCambioEstado(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
+        List<Case> casosCerradoCOPS = new List<Case>();
         List<Case> casosRelacionadosSegmentos = new List<Case>();
         Set<Id> casosSegmentosRevisar = new Set<Id>();
         Map<Id, Case> mapCasosSeg;
         for (Case caso : listNewObj) {
             // Comprobar si ha habido un cambio de estado en el caso
             if (mapOldObj.get(caso.Id).Status != caso.Status && (caso.Status == 'Cerrado' || caso.Status == 'Rechazado') && caso.SEG_Id_Related_Mail__c != null && caso.CC_CasoRelacionado__c != null) {
-                Case caseSeg = new Case(Id = caso.CC_CasoRelacionado__c);
-                if (caso.Status == 'Cerrado') {
-                    caseSeg.Status = 'Cerrado';
-                    caseSeg.SEG_Subestado__c = 'Gestionado por UAFE';
-                } else {
-                    caseSeg.Status = 'Activo';
-                }
-                casosRelacionadosSegmentos.add(caseSeg);
+                casosCerradoCOPS.add(caso);
                 casosSegmentosRevisar.add(caso.CC_CasoRelacionado__c);
             }
         }
 
-        if (!casosSegmentosRevisar.isEmpty() && !casosRelacionadosSegmentos.isEmpty()) {
+        if (!casosCerradoCOPS.isEmpty() && !casosSegmentosRevisar.isEmpty()) {
             
-            mapCasosSeg = new Map<Id, Case>([SELECT Id, AccountId, Account.Name, ContactId, CC_MCC_Motivo__c, SEG_N_operaciones_del_caso__c FROM Case WHERE Id IN :casosSegmentosRevisar]); //Añadir los campos de MCC
+            mapCasosSeg = new Map<Id, Case>([SELECT Id, Status, SEG_Subestado__c, AccountId, Account.Name, ContactId, CC_MCC_Motivo__c, SEG_N_operaciones_del_caso__c FROM Case WHERE Id IN :casosSegmentosRevisar]); //Añadir los campos de MCC
             List<Contact> listContact = [SELECT Id, AccountId FROM Contact WHERE Email = 'buzon.uafe@uafe.caixabank.com' AND RecordType.DeveloperName = 'CC_Colaborador'];
             List<CC_MCC__c> mccUAFE = SEG_MetodosWithoutSharing.devolverMCCSEG();
 
-            for (Case casoRelacionado : casosRelacionadosSegmentos) {
-                if (mapCasosSeg != null && mapCasosSeg.containsKey(casoRelacionado.Id)) {
-                    if (mapCasosSeg.get(casoRelacionado.Id).CC_MCC_Motivo__c == null && !mccUAFE.isEmpty()) {
-                        casoRelacionado.CC_MCC_Tematica__c = mccUAFE[0]?.CC_Producto_Servicio__r?.CC_Tematica__c;
-                        casoRelacionado.CC_MCC_ProdServ__c = mccUAFE[0]?.CC_Producto_Servicio__c;
-                        casoRelacionado.CC_MCC_Motivo__c = mccUAFE[0]?.Id;
-                    }
+            if (mapCasosSeg != null) {
+                for (Case casoCOPS : casosCerradoCOPS) {
+                    if (mapCasosSeg.containsKey(casoCOPS.CC_CasoRelacionado__c) && mapCasosSeg.get(casoCOPS.CC_CasoRelacionado__c).Status != 'Cerrado' && mapCasosSeg.get(casoCOPS.CC_CasoRelacionado__c).Status != 'Rechazado') {
+                        Case caseSeg = mapCasosSeg.get(casoCOPS.CC_CasoRelacionado__c);
+                        if (casoCOPS.Status == 'Cerrado') {
+                            caseSeg.Status = 'Cerrado';
+                            caseSeg.SEG_Subestado__c = 'Gestionado por UAFE';
+                        } else {
+                            caseSeg.Status = 'Activo';
+                        }
 
-                    if ((casoRelacionado.AccountId == null || casoRelacionado.Account?.Name == 'CUENTA PENDIENTE ASOCIAR') && !listContact.isEmpty()) {
-                        casoRelacionado.ContactId = listContact[0].Id;
-                        casoRelacionado.AccountId = listContact[0].AccountId;
+                        if (caseSeg.CC_MCC_Motivo__c == null && !mccUAFE.isEmpty()) {
+                            caseSeg.CC_MCC_Tematica__c = mccUAFE[0]?.CC_Producto_Servicio__r?.CC_Tematica__c;
+                            caseSeg.CC_MCC_ProdServ__c = mccUAFE[0]?.CC_Producto_Servicio__c;
+                            caseSeg.CC_MCC_Motivo__c = mccUAFE[0]?.Id;
+                        }
+    
+                        if ((caseSeg.AccountId == null || caseSeg.Account?.Name == 'CUENTA PENDIENTE ASOCIAR') && !listContact.isEmpty()) {
+                            caseSeg.ContactId = listContact[0].Id;
+                            caseSeg.AccountId = listContact[0].AccountId;
+                        }
+    
+                        if (caseSeg.SEG_N_operaciones_del_caso__c == null) {
+                            caseSeg.SEG_N_operaciones_del_caso__c = 1;
+                        }
+                        casosRelacionadosSegmentos.add(caseSeg);
                     }
+                }
 
-                    if (mapCasosSeg.get(casoRelacionado.Id).SEG_N_operaciones_del_caso__c == null) {
-                        casoRelacionado.SEG_N_operaciones_del_caso__c = 1;
-                    }
+                if (!casosRelacionadosSegmentos.isEmpty()) {
+                    CBK_DMLUtility.updateRecords(casosRelacionadosSegmentos);
                 }
             }
         }
-
-        if (!casosRelacionadosSegmentos.isEmpty()) {
-            CBK_DMLUtility.updateRecords(casosRelacionadosSegmentos);
-        }
-    }
+    }*/
 }

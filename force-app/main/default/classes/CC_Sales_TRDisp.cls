@@ -48,4 +48,17 @@ public with sharing class CC_Sales_TRDisp extends CC_TriggerDispatcherBase{
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
+    
+    public virtual override void beforeInsert(CC_TriggerParameters tp) {
+        
+        if (!isBeforeInsertProcessing) {           
+            isBeforeInsertProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'beforeInsert')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
+            }
+            isBeforeInsertProcessing = false;
+        }
+        else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
+    }
 }

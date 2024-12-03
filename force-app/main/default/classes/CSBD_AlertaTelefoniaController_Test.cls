@@ -1,7 +1,6 @@
 @isTest
 public with sharing class CSBD_AlertaTelefoniaController_Test {
-
-    /*
+    
     @TestSetup
     static void makeData(){
         User usGestor = CSBD_Usuarios.usuarioGestor();
@@ -10,7 +9,7 @@ public with sharing class CSBD_AlertaTelefoniaController_Test {
         cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
         cuenta.Name = 'test@test.com';
         insert cuenta;
-
+        
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'test@test.com';
@@ -78,6 +77,5 @@ public with sharing class CSBD_AlertaTelefoniaController_Test {
 
 
     }
-        */
 
 }

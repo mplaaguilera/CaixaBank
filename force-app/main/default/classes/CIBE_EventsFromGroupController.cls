@@ -11,11 +11,12 @@ Historial
 */
 public with sharing class CIBE_EventsFromGroupController {
 
-    private static List<String> stages = new List<String>{'Pendiente'};
+    private static List<String> stages = new List<String>{'Pendiente','Planificada'};
     
     private static Set<Id> recordTypes = CIBE_AppUtilities.getRecordTypeIdsInSet(
         new Set<CIBE_AppUtilities.SearchRT>{
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT),
+            new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_CIB_RT),
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT)
         });
 
@@ -33,7 +34,7 @@ public with sharing class CIBE_EventsFromGroupController {
                                 toLabel(AV_Tipo__c),
                                 Owner.Name
                         FROM Event
-                        WHERE RecordTypeId IN :recordTypes AND WhatId = :recordIds AND CSBD_Evento_Estado__c = :stages 
+                        WHERE RecordTypeId IN :recordTypes AND WhatId = :recordIds AND CSBD_Evento_Estado__c IN :stages AND AV_ToDelete__c = FALSE  
                         ORDER BY StartDateTime ASC LIMIT 10 OFFSET :offSet];
         }
 

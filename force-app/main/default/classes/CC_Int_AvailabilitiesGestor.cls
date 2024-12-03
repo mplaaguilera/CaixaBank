@@ -130,10 +130,12 @@ public with sharing class CC_Int_AvailabilitiesGestor {
         respuestaDisponibilidades.put('fechasHorasMap', fechasHorasMap);
         respuestaDisponibilidades.put('employeeIdGestorBackup', employeeIdGestorBackup);
 
-        CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_Int_ObtInfCarterizaCliente', endpoint, statusCode, entrada, error, salida, finOK);
+        CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_Int_AvailabilitiesGestor', endpoint, statusCode, entrada, error, salida, finOK);
         if(traza != null){
             insert traza;
         }
+        system.debug('VMLS mapa respuestaDisponibilidades ' + respuestaDisponibilidades);
+        system.debug('VMLS mapa respuestaDisponibilidades ' + respuestaDisponibilidades.tostring());
         return respuestaDisponibilidades;
     }
     public static List<OT_Picklist.Item> obtenerGestoresBackup(String recordId, String employeeId, String gestorElegidoId, String eventType) {
@@ -184,6 +186,8 @@ public with sharing class CC_Int_AvailabilitiesGestor {
 
         List<OT_Picklist.Item> horasDisponibilidadGestor = new List<OT_Picklist.Item>();
         Set<Time> horasSet = new Set<Time>();
+        system.debug('VMLS fechasHorasMap ' + fechasHorasMap);
+        system.debug('VMLS fechasHorasMap ' + fechasHorasMap.tostring());
 
         for(Date fechaDisponibilidad: fechasHorasMap.keySet()){
             Date fechaDisponibilidadElegida = Date.valueOf(fechaElegida);

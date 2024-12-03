@@ -6,11 +6,15 @@ Proposito: Tareas y eventos de la Homa page
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-	VERSION		USER_STORY	  	AUTHOR		   	DATE					Description
+	VERSION		USER_STORY	  	AUTHOR		   		DATE				Description
 	1.1			DE56793	      	Patricia Solano  	11/15/2022		  	Init version
 	1.2         Fix           	Elisabeth R.       	18/01/2022         	Added hour and minute attributes to CLS_TypeAttributes
 	1.3         Fix SortBy    	Elisabeth Rodríguez 09/02/2022        	Added sortBy attribute
 	1.4			Fix PMD Errors	Daniel Rodriguez	05/10/2023			Add WITH SECURITY_ENFORCED and isAccessible() fields
+	1.5         US769112        Oscar Moreno        27/12/2023          The query of getRecords method is filtered based on the AV_OpportunitiesSearcherV2 PS 
+	1.6 		Deuda Técnica	Gonzalo Ávila		21/03/2024			Replace the use of Sortable Data Grid 
+	1.7			PPM100211786	Ángel Medina		02/05/2024			Change query for custom setting
+	1.8			PPM100492394	Ángel Medina		17/10/2024			Add events multige in YesterdayEvents	
 ***********************************************************************************************************************/
 public with sharing class AV_TaskAndEventSDGHome_Controller {
 	
@@ -18,202 +22,212 @@ public with sharing class AV_TaskAndEventSDGHome_Controller {
 	public static final String OBJECT_EVENT = 'Event';
 
 	@AuraEnabled(cacheable=true)
-	public static DataResponse getRecords(String sdgApiName){
+	public static DataResponse getRecords(String objectType){
 		String methodName = 'getRecords';
 		
 		DataResponse response = new DataResponse();
-		List<SObject> listRecords = new List<SObject>();
 		Set<String> setFieldApiNames = new Set<String>();
 		Set<String> picklistField = new Set<String>();
 		List<Column> listCols = new List<Column>();
 		List<Column> listColsToShow = new List<Column>();
 		String fieldStatusFilter;
 		Set<Id> setTaskHeaderIds = new Set<Id>();
-		
-		
-		//Build columns
-		List<sortablegrid__SDG_Field__c> listFields = new List<sortablegrid__SDG_Field__c>();
-		if(Schema.sObjectType.sortablegrid__SDG_Field__c.isAccessible() && Schema.SObjectType.sortablegrid__SDG_Field__c.fields.sortablegrid__APIName__c.isAccessible()
-		&& Schema.SObjectType.sortablegrid__SDG_Field__c.fields.sortablegrid__FieldOrder__c.isAccessible()){
-			 listFields = [SELECT sortablegrid__APIName__c, 
-			sortablegrid__FieldOrder__c, sortablegrid__Override_Label__c,
-			sortablegrid__sdg__r.sortablegrid__sObjectName__c 
-			FROM sortablegrid__SDG_Field__c 
-			WHERE sortablegrid__is_valid_field__c = true
-			AND sortablegrid__sdg__r.sortablegrid__SDG_Tag__c = :sdgApiName WITH SECURITY_ENFORCED
-			ORDER BY sortablegrid__FieldOrder__c];
-		}
 
-		String targetObjectName = listFields.get(0).sortablegrid__sdg__r.sortablegrid__sObjectName__c;				
+		List<String> labelTask = new List<String>{'PRIORIDAD', 'ORIGEN', 'CLIENTE', 'ASUNTO', 'ESTADO', 'FECHA VENCIMIENTO'};
+		List<String> labelEvent = new List<String>{'CLIENTE','ASUNTO','FECHA EVENTO','TIPO','ESTADO'};
+
+						
 		
-		response.labelObject = targetObjectName.equalsIgnoreCase(OBJECT_TASK) ? SObjectType.Task.getLabelPlural() : SObjectType.Event.getLabelPlural();				
-		if(targetObjectName.equalsIgnoreCase(OBJECT_TASK)){
+		response.labelObject = objectType.equalsIgnoreCase('TodayTask') || objectType.equalsIgnoreCase('PendingTask') ? SObjectType.Task.getLabelPlural() : SObjectType.Event.getLabelPlural();				
+		if(objectType.equalsIgnoreCase('TodayTask') || objectType.equalsIgnoreCase('PendingTask')){
 			response.icono = 'standard:task';
 			fieldStatusFilter = 'Status';
-		}else if(targetObjectName.equalsIgnoreCase(OBJECT_EVENT)){
+		}else if(objectType.equalsIgnoreCase('TodayEvents') || objectType.equalsIgnoreCase('YesterdayEvents')){
 			response.icono=  'standard:event';
 			fieldStatusFilter = 'CSBD_Evento_Estado__c';
 		}
 
-		if(sdgApiName.equals(AV_AppConstants.TODAYS_TASKS)){
-
+		if(objectType.equals('TodayTask')){
 			response.title = AV_AppConstants.TODAYS_TASKS_TITLE;
-
-		}else if(sdgApiName.equals(AV_AppConstants.PENDING_TASKS)){
-
+		}else if(objectType.equals('PendingTask')){
 			response.title = AV_AppConstants.PENDING_TASKS_TITLE;
-
-		}else if(sdgApiName.equals(AV_AppConstants.TODAYS_APPOINTMENTS)){
-
+		}else if(objectType.equals('TodayEvents')){
 			response.title = AV_AppConstants.TODAYS_APPOINTMENTS_TITLE;
-
-		}else if(sdgApiName.equals(AV_AppConstants.YESTERDAYS_APPOINTMENTS)){
-
+		}else if(objectType.equals('YesterdayEvents')){
 			response.title = AV_AppConstants.YESTERDAYS_APPOINTMENTS_TITLE;
-
 		}
 
-		for(sortablegrid__SDG_Field__c sdgf : listFields) {
-			Column col = new Column();
-			Schema.DisplayType fldType;
-			if (!sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Owner.Name')
-				&& !sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistroAsunto__c') && !sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Account.Name') 
-				&& !sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistro__c')){
-					Map<String, Schema.SObjectField> mapa;
-					if(targetObjectName.equalsIgnoreCase(OBJECT_TASK)){
-						mapa = Schema.SObjectType.Task.fields.getMap();
-					}else if(targetObjectName.equalsIgnoreCase(OBJECT_EVENT)){
-						mapa = Schema.SObjectType.Event.fields.getMap();	
-					}	
-					Schema.SObjectField field = mapa.get(sdgf.sortablegrid__APIName__c);
-					fldType = field.getDescribe().getType();
-			} 
+		
+		if(objectType.equals('TodayTask') || objectType.equals('PendingTask')){
+				for(String label : labelTask){
+					Column col = new Column();
+					col.sortable = true;
+					col.label = label;
+					col.hideDefaultActions = true;
 
-			col.sortable = true;
-			if(!sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Account.Name') || !sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistro__c')){
-				col.sortBy = sdgf.sortablegrid__APIName__c;
-			}
-			col.label = sdgf.sortablegrid__Override_Label__c;
-			col.fieldName = sdgf.sortablegrid__APIName__c;
-			col.hideDefaultActions = true;
-			if(fldType != Null && fldType == Schema.DisplayType.Picklist){
-				picklistField.add(col.fieldName); 
-			}else{
-				setFieldApiNames.add(col.fieldName);
-			}
-			
-			if(fldType != Null && (fldType == Schema.DisplayType.DateTime || fldType == Schema.DisplayType.Date)) {
-				col.type = 'date';
-				CLS_TypeAttributes attributes = new CLS_TypeAttributes();
-				attributes.day = '2-digit';
-				attributes.month = 'short';
-				attributes.year = 'numeric';
-				col.typeAttributes = attributes;
-				if(fldType == Schema.DisplayType.DateTime){
-					attributes.hour = '2-digit';
-            		attributes.minute = '2-digit';
+					if(label.equalsIgnoreCase('PRIORIDAD')){
+						col.fieldName = 'Priority';
+						col.type = 'text';
+					}
+					if(label.equalsIgnoreCase('ORIGEN')){
+						col.fieldName = 'AV_Origen__c';
+						col.sortBy = 'AV_Origen__c';
+					}
+					else if(label.equalsIgnoreCase('CLIENTE')){
+						col.fieldName = 'clientLink';
+						col.type = 'url';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						CLS_Label labelscs = new CLS_Label();
+						Tooltip tooltip = new Tooltip();
+						tooltip.fieldName = 'clientLabel';
+						labelscs.fieldName = 'clientLabel';
+						col.sortBy = 'clientLabel';
+						attributes.label = labelscs;
+						attributes.tooltip = tooltip;
+						col.typeAttributes = attributes;
+					}
+					else if(label.equalsIgnoreCase('ASUNTO')){
+						col.fieldName = 'subjectLink';
+						col.type = 'url';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						CLS_Label labelscs = new CLS_Label();
+						Tooltip tooltip = new Tooltip();
+						tooltip.fieldName = 'subjectLabel';
+						labelscs.fieldName = 'subjectLabel';
+						col.sortBy = 'subjectLabel';
+						attributes.label = labelscs;
+						attributes.tooltip = tooltip;
+						col.typeAttributes = attributes;
+					}
+					else if(label.equalsIgnoreCase('ESTADO')){
+						col.fieldName = 'Status';
+						col.type = 'text';
+					}
+					else if(label.equalsIgnoreCase('FECHA VENCIMIENTO')){
+						col.fieldName = 'ActivityDate';
+						col.sortBy = 'ActivityDate';
+						col.type = 'date';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						attributes.day = '2-digit';
+						attributes.month = 'short';
+						attributes.year = 'numeric';
+						attributes.hour = '2-digit'; 
+						attributes.minute = '2-digit'; 
+						col.typeAttributes = attributes;
+					}
+					listCols.add(col);
 				}
+				if(objectType.equals('TodayTask')){
+					response.cols = listCols;
+        			List<Task> queryTask = new List<Task>();
+        			queryTask = [SELECT AV_Origen__c, Account.Name, AV_VerRegistro__c, ActivityDate, Id, OwnerId, Subject, What.Name,TOLABEL (Priority),TOLABEL (Status) FROM Task WHERE ( Status IN ( 'Open','Pendiente no localizado') AND AV_ToDelete__c = FALSE AND ActivityDate = TODAY AND AV_VisibleByLoggedUser__c = true AND ((RecordType.DeveloperName IN ( 'AV_Otros') AND AV_OrigenApp__c != 'AV_SalesforceTaskOpp') OR (RecordType.DeveloperName in ('AV_AlertaComercial') AND AV_OrigenApp__c = 'AV_CallMe' )))];
+			        response.data = queryTask;
+				}else if(objectType.equals('PendingTask')){
+					response.cols = listCols;
+        			List<Task> queryTask = new List<Task>();
+        			queryTask = [SELECT AV_Origen__c, Account.Name, AV_VerRegistro__c, ActivityDate, Id, OwnerId, Subject, What.Name,TOLABEL (Priority),TOLABEL (Status) FROM Task WHERE ActivityDate >= LAST_N_DAYS:3 and ActivityDate < TODAY and RecordType.DeveloperName = 'AV_Otros' and Status in ('Open','Pendiente no localizado') and AV_OrigenApp__c != 'AV_SalesforceTaskOpp' and AV_VisibleByLoggedUser__c = true and AV_ToDelete__c = false ORDER BY ActivityDate ASC];
+			        response.data = queryTask;
+				}
+		}
+		if(objectType.equals('TodayEvents') || objectType.equals('YesterdayEvents')){
+			for(String label : labelEvent){
+				Column col = new Column();
+					col.sortable = true;
+					col.label = label;
+					col.hideDefaultActions = true;
+
+					if(label.equalsIgnoreCase('CLIENTE')){
+						col.fieldName = 'clientLink';
+						col.type = 'url';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						CLS_Label labelscs = new CLS_Label();
+						Tooltip tooltip = new Tooltip();
+						tooltip.fieldName = 'clientLabel';
+						labelscs.fieldName = 'clientLabel';
+						col.sortBy = 'clientLabel';
+						attributes.label = labelscs;
+						attributes.tooltip = tooltip;
+						col.typeAttributes = attributes;
+					}
+					else if(label.equalsIgnoreCase('ASUNTO')){
+						col.fieldName = 'subjectLink';
+						col.type = 'url';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						CLS_Label labelscs = new CLS_Label();
+						Tooltip tooltip = new Tooltip();
+						tooltip.fieldName = 'subjectLabel';
+						labelscs.fieldName = 'subjectLabel';
+						col.sortBy = 'subjectLabel';
+						attributes.label = labelscs;
+						attributes.tooltip = tooltip;
+						col.typeAttributes = attributes;
+					}
+					else if(label.equalsIgnoreCase('FECHA EVENTO')){
+						col.fieldName = 'StartDateTime';
+						col.sortBy = 'StartDateTime';
+						col.type = 'date';
+						CLS_TypeAttributes attributes = new CLS_TypeAttributes();
+						attributes.day = '2-digit';
+						attributes.month = 'short';
+						attributes.year = 'numeric';
+						attributes.hour = '2-digit'; 
+						attributes.minute = '2-digit'; 
+						col.typeAttributes = attributes;
+
+					}
+					else if(label.equalsIgnoreCase('TIPO')){
+						col.fieldName = 'AV_Tipo__c';
+						col.type = 'text';
+					}
+					else if(label.equalsIgnoreCase('ESTADO')){
+						col.fieldName = 'CSBD_Evento_Estado__c';
+						col.type = 'text';
+					}
+					
+					listCols.add(col);
+			}
+			if(objectType.equals('TodayEvents')){
+				response.cols = listCols;
+
 				
-			}
-			
-			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Owner.name')) {
-					col.fieldName = 'ownerLink';
-					col.type = 'url';
-					CLS_TypeAttributes attributes = new CLS_TypeAttributes();
-					CLS_Label label = new CLS_Label();
-					label.fieldName = 'ownerLabel';
-					attributes.label = label;
-					attributes.tooltip = 'Owner.name';
-					col.typeAttributes = attributes;
-			}
+				List<AV_RecordConfiguration__c> recordConfigurationCS = [SELECT AV_RecordType__c, AV_Status__c, AV_Type__c FROM AV_RecordConfiguration__c LIMIT 1];
+				if(!recordConfigurationCS.isEmpty()){
+					AV_RecordConfiguration__c record = recordConfigurationCS[0];
+					String recordType = record.AV_RecordType__c;
+					String status = record.AV_Status__c;
+					String type = record.AV_Type__c;
 
-			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Account.Name')) {
-				col.fieldName = 'clientLink';
-				col.type = 'url';
-				CLS_TypeAttributes attributes = new CLS_TypeAttributes();
-				CLS_Label label = new CLS_Label();
-				label.fieldName = 'clientLabel';
-				col.sortBy = 'clientLabel';
-				attributes.label = label;
-				col.typeAttributes = attributes;
+					List<String> statusList = status.split(',');
+					List<String> typeList = type.split(',');
+					List<Event> queryEvent = new List<Event>();
+					queryEvent = [SELECT Account.Name, AV_VerRegistro__c, StartDateTime, Id, OwnerId, Subject, What.Name,TOLABEL (AV_Tipo__c),TOLABEL (CSBD_Evento_Estado__c) FROM Event 
+					WHERE RecordType.DeveloperName = :recordType 
+					AND TOLABEL(CSBD_Evento_Estado__c) IN :statusList 
+					AND TOLABEL(AV_Tipo__c) IN :typeList
+					AND ActivityDate = TODAY AND AV_VisibleByLoggedUser__c = true 
+					ORDER BY StartDateTime ASC];
+					response.data = queryEvent;
+				}
 			}
+			if(objectType.equals('YesterdayEvents')){
+				response.cols = listCols;
+				List<User> currentUser = [SELECT Id, AV_NumeroOficinaEmpresa__c FROM User WHERE Id = :UserInfo.getUserId()];
+				String multiGestId = AV_PoolEvents_Controller.getCurrentDT(currentUser[0].AV_NumeroOficinaEmpresa__c);
+				String center = (currentUser[0].AV_NumeroOficinaEmpresa__c.contains(AV_AppConstants.DASH)) ? currentUser[0].AV_NumeroOficinaEmpresa__c.split(AV_AppConstants.DASH)[1] : currentUser[0].AV_NumeroOficinaEmpresa__c;
 
-			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('AV_VerRegistro__c')) {
-				col.fieldName = 'subjectLink';
-				col.type = 'url';
-				CLS_TypeAttributes attributes = new CLS_TypeAttributes();
-				CLS_Label label = new CLS_Label();
-				label.fieldName = 'subjectLabel';
-				col.sortBy = 'subjectLabel';
-				attributes.label = label;
-				attributes.tooltip = 'Subject';
-				col.typeAttributes = attributes;
+				List<Event> unifiedResults = [
+					SELECT What.Name, Account.Name, Id, AccountId, Account.AV_Numperso__c, Subject, ActivityDateTime, StartDateTime, TOLABEL(AV_Tipo__c), TOLABEL(CSBD_Evento_Estado__c), RecordType.DeveloperName, AV_VerRegistro__c, OwnerId, AV_Center__c
+					FROM Event 
+					WHERE RecordType.DeveloperName IN ('AV_EventosConCliente', :AV_AppConstants.EVENTCLIENTE_RT) 
+					AND ActivityDate = YESTERDAY 
+					AND CSBD_Evento_Estado__c = 'Pendiente'
+					AND ((AV_VisibleByLoggedUser__c = true AND OwnerId = :UserInfo.getUserId()) OR (OwnerId = :multiGestId AND AV_Center__c = :center))
+					ORDER BY StartDateTime ASC
+				];
+				response.data = unifiedResults;
 			}
-
-			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('Status')) {
-				col.fieldName = 'Status';
-				col.type = 'text';
-			}
-
-			if(sdgf.sortablegrid__APIName__c.equalsIgnoreCase('CSBD_Evento_Estado__c')) {
-				col.fieldName = 'CSBD_Evento_Estado__c';
-				col.type = 'text';
-			}
-			listCols.add(col);
- 
 		}
-
-		listRecords = getRecordsByDynamicQuery(sdgApiName, setFieldApiNames, picklistField, targetObjectName, fieldStatusFilter);
-		AV_LogDebug.printLogDebug(methodName, 'Registro recuperados: ' + listRecords.size());
-		AV_LogDebug.printLogDebug(methodName, 'Columnas total: ' +listCols);
-		
-		response.cols = listCols;
-		response.data = listRecords;
 		return response;
-	}
-	
-	private static List<SObject> getRecordsByDynamicQuery(String sdgApiName, Set<String> setFieldApiNames, Set<String> picklistField, String targetObjectName, String fieldStatusFilter){
-		String methodName = 'getRecordsByDynamicQuery';
-
-		if (setFieldApiNames==null){
-			setFieldApiNames = new Set<String>();
-		}
-		setFieldApiNames.add('Id');
-		setFieldApiNames.add('OwnerId');
-		setFieldApiNames.add('Subject');
-		setFieldApiNames.add('What.Name');
-
-
-		
-		//Create query to execute at the end of the method
-		String querysoql = 'SELECT';
-		integer i=0;
-		for(String field : setFieldApiNames){
-			querysoql += ' '+field;
-			i++;
-			if(i!= setFieldApiNames.size()) {
-                querysoql += ',';
-            }
-		
-		}
-		if(!picklistField.isEmpty()){
-			for(String fieldPick : picklistField){
-				querysoql += ',TOLABEL (' + fieldpick + ')';
-			}
-		}
-		querysoql += ' FROM '+targetObjectName ;
-		
-		if(sdgApiName.equals(AV_AppConstants.TODAYS_TASKS)){
-			querysoql += ' WHERE ( Status IN ( \'Open\',\'Pendiente no localizado\') AND AV_ToDelete__c = FALSE AND ActivityDate = TODAY AND AV_VisibleByLoggedUser__c = true AND ((RecordType.DeveloperName IN ( \'AV_Otros\') AND AV_OrigenApp__c != \'AV_SalesforceTaskOpp\') OR (RecordType.DeveloperName in (\'AV_AlertaComercial\') AND AV_OrigenApp__c = \'AV_CallMe\' )))';
-		}else if(sdgApiName.equals(AV_AppConstants.PENDING_TASKS)){
-			querysoql += ' WHERE ActivityDate >= LAST_N_DAYS:3 and ActivityDate < TODAY and RecordType.DeveloperName = \'AV_Otros\' and Status in (\'Open\',\'Pendiente no localizado\') and AV_OrigenApp__c != \'AV_SalesforceTaskOpp\' and AV_VisibleByLoggedUser__c = true and AV_ToDelete__c = false ORDER BY ActivityDate ASC';
-		}else if(sdgApiName.equals(AV_AppConstants.TODAYS_APPOINTMENTS)){
-			querysoql += ' WHERE RecordType.DeveloperName in (\'AV_EventosConCliente\') and ActivityDate = TODAY and AV_VisibleByLoggedUser__c = true ORDER BY StartDateTime ASC';
-		}else if(sdgApiName.equals(AV_AppConstants.YESTERDAYS_APPOINTMENTS)){
-			querysoql += ' WHERE RecordType.DeveloperName in (\'AV_EventosConCliente\') and ActivityDate = YESTERDAY and AV_VisibleByLoggedUser__c = true and CSBD_Evento_Estado__c = \'Pendiente\' ORDER BY StartDateTime ASC';
-		}
-
-		return Database.query(querysoql);
 	}
 	
 	public class DataResponse {
@@ -266,7 +280,7 @@ public with sharing class AV_TaskAndEventSDGHome_Controller {
 		@AuraEnabled
 		public String minute;
 		@AuraEnabled
-		public String tooltip;	//Subject
+		public Tooltip tooltip;	//Subject
 	}
 
 	public class CLS_Label {
@@ -275,6 +289,10 @@ public with sharing class AV_TaskAndEventSDGHome_Controller {
 	}
 
 	public class CLS_Class {
+		@AuraEnabled
+		public String fieldName;
+	}
+	public class Tooltip {
 		@AuraEnabled
 		public String fieldName;
 	}

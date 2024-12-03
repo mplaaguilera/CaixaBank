@@ -26,6 +26,26 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     final static String RECORDTYPEACCION = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     final static string CLASSNAME = 'SAC_EmailServiceNew';
     
+
+
+    public static Map<String, String> obtenerValoresPicklist(String nombreObjeto, String nombreCampo){
+        Map<String, String> mapaValoresPicklist = new Map<String, String>();
+        List<Schema.DescribeSobjectResult> resultados = Schema.describeSObjects(new List<String>{nombreObjeto});
+        for(Schema.DescribeSobjectResult result: resultados){
+            for(Schema.PicklistEntry unValor: result.fields.getMap().get(nombreCampo).getDescribe().getPicklistValues()){
+                if(unValor.isActive()){
+                    if(!mapaValoresPicklist.containsKey(unValor.getValue())){
+                        mapaValoresPicklist.put(unValor.getValue(), unValor.getLabel());
+                    }
+                }
+            }
+        }
+
+        return mapaValoresPicklist;
+
+
+    }
+
     /*****************************************************************
     * Proposito: Procesa el email para asociarlo a un caso existente o crear uno nuevo
     * 
@@ -36,6 +56,8 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     *****************************************************************/
     public Messaging.InboundEmailResult handleInboundEmail(Messaging.InboundEmail email, Messaging.InboundEnvelope envelope) {        
         
+
+
         // Trazabilidad para registrar la entrada del correo.
         try{
             CBK_Log.auditemail(email,envelope);
@@ -255,7 +277,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                         //caso.CC_AcuseRecibo__c = '1'; esta linea se ha comentado para que no se quede el acuse de recibo en 1. Al no introducir un valor, manda el acuse de recibo y se updatea a 2 (dia 7/11/22)
                         resultado = Database.insert(reclamacionNueva);
                         
-                        wrapEmRes = emailTask(reclamacionNueva.Id, email, RECORDTYPETAREA);
+                        wrapEmRes = emailTask(reclamacionNueva.Id, email, RECORDTYPETAREA, '', reclamacionNueva.RecordTypeId);
                         Map<String,Boolean> mapaResultadoEmailTask = wrapEmRes.mapaResultado;
                         emailMess = wrapEmRes.eMessage;
                         
@@ -274,12 +296,15 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 } else if(linkarEmailACasoExistente) {
                     //Preparar alerta de email entrante
                     List<SAC_WrapperAlerta> listaAlertas = prepararAlertas(casoConThreadId);
-                    
+                    String statusLlegadaMail = casoConThreadId.Status; //Almacena el estado del caso al momento de llegada del mail
+           
+
                     if(casoConThreadId.RecordTypeId == RECORDTYPECONSULTA && (casoConThreadId.Status == 'SAC_008' || casoConThreadId.Status == 'SAC_012' || casoConThreadId.Status == 'SAC_013')){
                         casoConThreadId.Status='SAC_011';
                         casoConThreadId.SAC_StatusAuxiliar__c = casoConThreadId.Status;
                     }
                     
+
                     if (!listaAlertas.isEmpty()) {
                         SAC_EmailServiceNew.generarAlertasFuturo(JSON.serialize(listaAlertas));
                     }
@@ -289,7 +314,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                     Database.SaveResult resultado = null;
                     resultado = Database.update(casoConThreadId);
                     
-                    wrapEmRes = emailTask(casoConThreadId.Id, email, RECORDTYPETAREA);
+                    wrapEmRes = emailTask(casoConThreadId.Id, email, RECORDTYPETAREA, statusLlegadaMail, casoConThreadId.RecordTypeId);
                     result.success = wrapEmRes.mapaResultado.get('resultado');
                     emailMess = wrapEmRes.eMessage;
                 }
@@ -353,6 +378,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         
         EmailMessage contentEmMes = new EmailMessage();
         
+        
         contentEmMes.RelatedToId    = idConsulta;
         //contentEmMes.ParentId       = idConsulta;
         contentEmMes.ToAddress      = (email.toAddresses != null)?String.join(email.toAddresses, ','):null;
@@ -370,22 +396,27 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         contentEmMes.CBK_sfdcMessageId__c = email.messageId?.left(255);
         contentEmMes.ThreadIdentifier = email.inReplyTo;
         
-        if(email.ccAddresses != null){
-            contentEmMes.CcAddress=String.join(email.ccAddresses,',');
+        //Try
+        try{
+            if(email.ccAddresses != null){
+                contentEmMes.CcAddress=String.join(email.ccAddresses,',');
+            }
+            
+            SAC_DatabaseDML.insertDML(contentEmMes, false);
+            resultado = true; 
+            
+            // Add Email Message Relation for id of the sender
+            EmailMessageRelation emr = new EmailMessageRelation();
+            emr.EmailMessageId = contentEmMes.id;
+            emr.RelationAddress = email.FromAddress;
+            emr.RelationType = 'FromAddress';
+            if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
+                SAC_DatabaseDML.insertDML(emr, false);
+            }
+        }catch(Exception e){
+            CBK_Log.error(e,'Error procesando el correo entrante',email);
         }
-        
-        SAC_DatabaseDML.insertDML(contentEmMes, false);
-        resultado = true; 
-        
-        // Add Email Message Relation for id of the sender
-        EmailMessageRelation emr = new EmailMessageRelation();
-        emr.EmailMessageId = contentEmMes.id;
-        emr.RelationAddress = email.FromAddress;
-        emr.RelationType = 'FromAddress';
-        if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            SAC_DatabaseDML.insertDML(emr, false);
-        }
-        
+
         //Guardamos los attachments si hubiese alguno
         if(resultado=true){
             Map<String, ContentVersion> attachmentsMap= handleAttachments(email);
@@ -438,9 +469,14 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 }
                 
             }
-            if(Schema.sObjectType.EmailMessage.isUpdateAble()){
-                SAC_DatabaseDML.updateDML(contentEmMes, false);
-                resultado = true; 
+            //Try
+            try{
+                if(Schema.sObjectType.EmailMessage.isUpdateAble()){
+                    SAC_DatabaseDML.updateDML(contentEmMes, false);
+                    resultado = true; 
+                }
+            }catch(Exception e){
+                CBK_Log.error(e,'Error procesando el correo entrante',email);
             }
         }  
         wrappEmResult.result = resultado;
@@ -454,20 +490,27 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
     * Historial
     * -------
     * VERSION        USER_STORY       AUTHOR         DATE         Description
-    * 1.0            US219261         Nicolás G.   15/06/21     Creación
+    * 1.0            US219261         Nicolás G.   15/06/21         Creación
+    * 1.1           US751370          Álex          11/11/2024      Añadido recoger el estado de la reclamación
     *****************************************************************/
-    public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR){
+    //public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR)
+    public static WrapperEmailResult emailTask(ID casoid, Messaging.InboundEmail email, Id taskTR, String estadoCaso, Id casoRecordType){
         Boolean resultado = false;
         Boolean tieneAttachments = false;
         Map<String,Boolean> mapaResultado = new Map<String,Boolean>();
         WrapperEmailResult wrapEmailRes = new WrapperEmailResult();
         
+
         Integer maxLengthSubject = EmailMessage.Subject.getDescribe().getLength()-1;
         
         String plainTextBody;
         String htmlBody;
         String subject;
         
+        //Obtener valores picklist de status
+        Map<String, String> mapaValoresPicklistStatus = new Map<String, String>();
+        mapaValoresPicklistStatus = obtenerValoresPicklist('Case', 'Status');
+
         if(String.isNotBlank(email.plainTextBody)){
             plainTextBody = email.plainTextBody.left(130000);
         }
@@ -477,9 +520,10 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         if(String.isNotBlank(email.subject)){
             subject = email.subject.left( maxLengthSubject );
         } 
-        
+
         EmailMessage conEmailMessage = new EmailMessage();
         
+
         conEmailMessage.ParentId    = casoid;
         conEmailMessage.ToAddress   = (email.toAddresses != null)?String.join(email.toAddresses, ','):null;
         conEmailMessage.FromAddress = email.FromAddress;
@@ -497,22 +541,38 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         conEmailMessage.MessageIdentifier = email.messageId;
         conEmailMessage.CBK_sfdcMessageId__c = email.messageId?.left(255);
         conEmailMessage.ThreadIdentifier = email.inReplyTo;
-        
+
+        //Añadido US751370-> No se recoge el estado si es un estado que cierra la reclamación
+        if(mapaValoresPicklistStatus.containsKey(estadoCaso) && casoRecordType == RECORDTYPERECLAMACION && estadoCaso != 'Closed' && estadoCaso != 'SAC_008' && estadoCaso != 'SAC_014' && estadoCaso != 'Cerrado' && estadoCaso != 'Rechazado'){
+            conEmailMessage.SAC_CaseStatus__c = mapaValoresPicklistStatus.get(estadoCaso);
+        }
+
+        //Try
+        try{
         SAC_DatabaseDML.insertDML(conEmailMessage, false);
+
         resultado = true; 
-        
+        }catch(Exception e){
+            CBK_Log.error(e,'Error procesando el correo entrante',email);
+        }
+
         // Add Email Message Relation for id of the sender
         EmailMessageRelation emr = new EmailMessageRelation();
         emr.EmailMessageId = conEmailMessage.id;
         emr.RelationAddress = email.FromAddress;
         emr.RelationType = 'FromAddress';
-        if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
-            SAC_DatabaseDML.insertDML(emr, false);
+        //Try
+        try{
+            if(Schema.sObjectType.EmailMessageRelation.isCreateable()){
+                SAC_DatabaseDML.insertDML(emr, false);
+            }
+            if(resultado=true){
+                createTask(casoid, email.Subject, TaskTR);
+            }
+        }catch(Exception e){
+            CBK_Log.error(e,'Error procesando el correo entrante',email);
         }
-        
-        if(resultado=true){
-            createTask(casoid, email.Subject, TaskTR);
-        }
+
         //Guardamos los attachments si hubiese alguno
         if(resultado=true){	
             Map<String, ContentVersion> attachmentsMap= handleAttachments(email);
@@ -564,9 +624,13 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
                 }
             }
             
-            if(Schema.sObjectType.EmailMessage.isUpdateAble()){
-                SAC_DatabaseDML.updateDML(conEmailMessage, false);
-                resultado = true; 
+            try{
+                if(Schema.sObjectType.EmailMessage.isUpdateAble()){
+                    SAC_DatabaseDML.updateDML(conEmailMessage, false);
+                    resultado = true; 
+                }
+            }catch(Exception e){
+                CBK_Log.error(e,'Error procesando el correo entrante',email);
             }
         } 
         
@@ -596,7 +660,7 @@ public without sharing class SAC_EmailServiceNew implements Messaging.InboundEma
         
         //Si existe ya un caso se añade el mail al hilo
         if(caseID != null){
-            wrapEmRes = emailTask(caseID, email, RECORDTYPETAREA);
+            wrapEmRes = emailTask(caseID, email, RECORDTYPETAREA, '', '');
             return wrapEmRes;
         }else{
             return wrapEmRes;

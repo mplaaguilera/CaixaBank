@@ -11,6 +11,7 @@ Historial
 	1.2			US635282			Daniel Rodriguez 	13/06/2023			Insert method updateRollup
 	1.3 		US635293			Carolina Lopez		21/06/2023			Insert method SendSingleEmail
 	1.4							  	Daniel Rodriguez 	17/10/2023			Call to AC if you have custom permission EV_CallTooAC
+	1.5			CStatistics			Mamen Arias			12/03/2024			Insert method updateRollupLeadsContacts
 ***********************************************************************************************************************/
 public with sharing class EV_CampaignMemberC_AI_TRHan extends CC_TriggerHandlerBase {
     public override void mainEntry(CC_TriggerParameters tp) {
@@ -24,7 +25,7 @@ public with sharing class EV_CampaignMemberC_AI_TRHan extends CC_TriggerHandlerB
 			EV_CampaignMemberCTriggerHelper.inscripcionNRT(mapNewObj);
         }
         EV_CampaignMemberCTriggerHelper.updateRollup(mapNewObj,null);
+        EV_CampaignMemberCTriggerHelper.updateRollupLeadsContacts(mapNewObj,null);
         EV_CampaignMemberCTriggerHelper.sendSingleEmail(listNewObj);
-        
 	}
 }

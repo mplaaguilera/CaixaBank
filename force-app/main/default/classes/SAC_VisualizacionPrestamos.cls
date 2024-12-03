@@ -86,7 +86,7 @@ public with sharing class SAC_VisualizacionPrestamos {
                                                ORDER BY RecordType.Name ASC];
         allPrestamoList.addAll(prestamoList);
         allPrestamoList.addAll(titularesList);
-        // Check MCCs
+        //Check MCCs
         Boolean appliesMCC = checkMCCs(reclamacion);
         // Map Record Type and Préstamos
         for(SAC_Prestamo__c prestamo: allPrestamoList) {

@@ -23,7 +23,6 @@ public without sharing class SAC_LCMP_UpdateStatus {
     private static final String MSG_ERROR_PERMISSIONS = 'No tienes permisos para realizar la acción.';
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
     private static final Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
-    private static final Id RECTYPECONSULTASAC = mapRTsObjects.get('Case').get('SAC_ConsultaSAC').getRecordTypeId();
     private static final String RECTYPEMAESTROACCIONES = mapRTsObjects.get('SAC_MaestroAccionesReclamacion__c').get('SAC_MaestroAcciones').getRecordTypeId();
     private static final String RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     private static final String RECTYPEMAESTROTEMASFT = mapRTsObjects.get('SAC_MaestroTemas__c').get('SAC_FastTrack').getRecordTypeId();
@@ -396,7 +395,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
                     }
                     listaCasosActualizar.add(casoPorActualizar);
                     // Hay más de una pretensión en subsanación por lo que la reclamación no debe salir de ese estado, por lo que solo se informa el campo en la pretensión que se actualiza
-                    if(listaPretensionesSubsanacion.size() == 1) {       
+                    if(listaPretensionesSubsanacion.size() == 1) {
                         if(reclamacion.SAC_TiempoParadaSubsanacion__c != null) {
                             reclamacion.SAC_TiempoParadaSubsanacion__c = reclamacion.SAC_TiempoParadaSubsanacion__c + dias;
                             reclamacion.SAC_FechaUltimaSubsanacion__c = Date.today();
@@ -517,13 +516,12 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * -------
          * VERSION        USER_STORY       AUTHOR         DATE         Description
          * 1.0            US219267         Luis Mesa    31/05/21       Creación Método
-         * 1.1            US683740         Raúl Santos  04/11/24       Modificación: en consultas SAC, también puede realizar la operativa el letrado
         *****************************************************************/
         if(!Case.SObjectType.getDescribe().isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
 
         Id usuarioActual = UserInfo.getUserId();
 
-        Case casoActual = [SELECT Id, Status, OwnerId, RecordTypeId, SAC_Reclamacion__r.OwnerId, SAC_PretensionPrincipal__c, SAC_Letrado__c
+        Case casoActual = [SELECT Id, Status, OwnerId, RecordTypeId, SAC_Reclamacion__r.OwnerId, SAC_PretensionPrincipal__c
                             FROM Case
                             WHERE RecordType.DeveloperName LIKE 'SAC_%' AND Id =: record
                             LIMIT 1];
@@ -533,13 +531,9 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         }
 
         else{
-            //Si es letrado de la consulta SAC, habilitar
-            if(casoActual.recordTypeId == RECTYPECONSULTASAC && casoActual.SAC_Letrado__c == UserInfo.getName()){
-                return true;
-            }
             //comprobar el recordType del registro actual para ver si el usuario actual es propietario de otro caso relacionado
             //si es Reclamacion comprobar que el usuario es el propietario de sus pretensiones -> return true;
-            else if(casoActual.recordTypeId == RECTYPERECLAMACION){
+            if(casoActual.recordTypeId == RECTYPERECLAMACION){
                 //es reclamación, hay que garantizar acceso a las pretensiones hijas también
                 //en teoria todas las pretensiones las trata el mismo letrado, por tanto con tener en cuenta cual es la pretension principal.ownerId basta
                 List<Case> pretension = [SELECT Id, OwnerId
@@ -998,7 +992,7 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
          * Historial
          * -------
          * VERSION        USER_STORY       AUTHOR         DATE         Description
-         * 1.0            US337252      Daniel Benito   28/02/22     Creación Método
+         * 1.0             US337252     Daniel Benito    28/02/22       Creación Método
         *****************************************************************/
         if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'Fallo al acutalizar.' ); }
         Case casoPorActualizar = [SELECT Id, recordTypeId, Status, SAC_MotivoInadmision__c, CC_Rechazar_Reabrir_Caso__c
@@ -1026,14 +1020,14 @@ Cuando esto ocurre, se manda a actualizar también la reclamación padre quitand
         if(casoPorActualizar.CC_Rechazar_Reabrir_Caso__c){
 
             casoPorActualizar.CC_Rechazar_Reabrir_Caso__c = false;
-        }
+        }     
         
         
         listaFamiliaCasos.add(casoPorActualizar);
 
         if(Case.SObjectType.getDescribe().isUpdateable()){
             try {
-                SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true);
+                SAC_DatabaseDML.updateListDML(listaFamiliaCasos, true);   
             } catch (Exception e) { 
                 String errorMsg = e.getMessage();
                 String pureErrorMsg = errorMsg.substringAfter('_EXCEPTION,');

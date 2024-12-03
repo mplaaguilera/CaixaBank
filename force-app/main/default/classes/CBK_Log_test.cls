@@ -1,5 +1,65 @@
 @isTest
 public class CBK_Log_test {
+	@testSetup
+	static void initialData() {
+        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+            Profile perfil = [SELECT Id FROM Profile WHERE Name='System Administrator'];
+            UserRole rol = [SELECT Id FROM UserRole WHERE Name='Sistemática Comercial'];
+            String orgId = UserInfo.getOrganizationId();
+            String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+            Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+            String uniqueName = orgId + dateString + randomInt;
+            User thisUser = new User(alias = 'user2', email='testSEGBI2@acme.com',
+                emailencodingkey='UTF-8', lastname='Smith',
+                languagelocalekey='en_US',
+                localesidkey='en_US', profileid = perfil.Id, userroleid = rol.Id,
+                timezonesidkey='America/Los_Angeles',
+                Username = uniqueName + '@test' + orgId + '.org');
+            insert thisUser;
+            List<PermissionSetAssignment> listPermissionSetAssignment = new List<PermissionSetAssignment>();
+            for (PermissionSetGroupComponent permisoUnitario : [SELECT Id, PermissionSetGroupId, PermissionSetId, PermissionSet.Name FROM PermissionSetGroupComponent WHERE PermissionSetGroup.DeveloperName IN ('CBK_Framework_Login','CBK_Framework_Admin')]){
+                PermissionSetAssignment nuevoPermiso = new PermissionSetAssignment();
+                nuevoPermiso.PermissionSetId = permisoUnitario.PermissionSetId;
+                nuevoPermiso.AssigneeId = thisUser.id;
+                listPermissionSetAssignment.add(nuevoPermiso);
+            }
+            if (listPermissionSetAssignment.isEmpty()){
+                insert listPermissionSetAssignment;
+            }
+        }
+    }
+
+    @isTest
+    public static void testNuevaFuncionalidad() {
+        List<Object> detalle = new List<Object> {'Error 1', 'Error 2', 'Error 3'};
+        
+
+        User testUser = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+
+       System.runAs (testUser) {
+            try{
+                User lst = [Select Id from User LIMIT 2];
+            } catch (Exception e) {
+                Map<String, String> mapOptFields = new Map<String, String>();
+                mapOptFields.put('state__c','Complete');
+                mapOptFields.put('FromAddress__c','pruebas@gmail.com');
+                mapOptFields.put('inexistente','Complete');
+                CBK_Log.addError('Contexto',e,'error',detalle, mapOptFields);
+                CBK_Log.addError('Contexto2',e,'error2',detalle, mapOptFields);
+                CBK_Log.insertDML();
+            }
+        }
+
+        //Query del registro insertado
+        CBK_Log__c listadoLogs = [SELECT Id,Transaction_ID__c FROM CBK_Log__c WHERE Transaction_ID__c = 'Contexto'];
+        
+        
+        //Comprobar los campos incluidos
+        System.assertEquals('Contexto', listadoLogs.Transaction_ID__c,'No coincide el valor con el esperado');
+       
+    }
+
+
     @isTest
     public static void Test01() {
 		List<Object> detalle = new List<Object> {'Error 1', DateTime.newInstance(2020, 10, 26) };
@@ -9,7 +69,7 @@ public class CBK_Log_test {
 		CBK_Log.debug(txtError,logginglevel.INFO);
 		txtError = 'Test Debug';
         
-        
+        // Métodos de test DEBUG.
         CBK_Log.debug('Contexto',txtError);
         CBK_Log.debug(txtError, detalle);
 		CBK_Log.debug('Contexto',txtError, detalle);
@@ -18,6 +78,7 @@ public class CBK_Log_test {
         CBK_Log.debug(txtError, detalle,logginglevel.INFO);
 		CBK_Log.debug('Contexto',txtError, detalle,logginglevel.INFO);
         
+        // Métodos de test ERROR.
         CBK_Log.error('Test');
         CBK_Log.error(txtError, detalle);
         CBK_Log.error('Contexto','Test');
@@ -186,4 +247,42 @@ public class CBK_Log_test {
         EvtLog.Error_Code__c='';
 		CBK_Log.deserializeMsg(EvtLog);
     } 
+    
+    @isTest
+    public static void Test_createLogWithoutevent() { 
+        List<Object> detalle = new List<Object> {'Error 1', 'Error 2', 'Error 3'};
+        try{
+            User lst = [Select Id from User LIMIT 2];
+        } catch (Exception e) {
+            
+            CBK_Log.saveError('Contexto',e,'error',detalle);
+            CBK_Log.saveError('Contexto2',null,'error2',detalle);
+        }
+    }
+
+    @isTest
+    public static void Test_createLogWithouteventOptParams() { 
+        List<Object> detalle = new List<Object> {'Error 1', 'Error 2', 'Error 3'};
+        User testUser = [SELECT Id, Profile.Name, UserRole.Name FROM User WHERE Email = 'testSEGBI2@acme.com' LIMIT 1];
+
+        System.runAs (testUser) {
+            try{
+                User lst = [Select Id from User LIMIT 2];
+            } catch (Exception e) {
+                Map<String, String> mapOptFields = new Map<String, String>();
+                mapOptFields.put('state__c','Complete');
+                mapOptFields.put('FromAddress__c','pruebas@gmail.com');
+                mapOptFields.put('inexistente','Complete');
+                CBK_Log.saveError('Contexto',e,'error',detalle, mapOptFields);
+                CBK_Log.saveError('Contexto2',e,'error2',detalle, mapOptFields,'Prueba Contexto2');
+            }
+
+        //Query del registro insertado
+        CBK_Log__c listadoLogs = [SELECT Id,Transaction_ID__c FROM CBK_Log__c WHERE Transaction_ID__c = 'Contexto'];
+        
+        //Comprobar los campos incluidos
+        System.assertEquals('Contexto', listadoLogs.Transaction_ID__c,'No coincide el valor con el esperado');
+
+        }
+    }
 }

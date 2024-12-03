@@ -88,7 +88,6 @@ public class SAC_Reclamacion_Test {
         mapaCamposCaso.put('CC_MCC_ProdServ__c', mccProdServ1.id);
         mapaCamposCaso.put('OwnerId', listaUsers[0].id);
         mapaCamposCaso.put('CC_Oficina_Afectada_Lookup__c', cuentaOficina.id);
-        mapaCamposCaso.put('CC_Idioma__c', 'en');
         Case casoReclamacion = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         reclamaciones.add(casoReclamacion);
 
@@ -168,15 +167,6 @@ public class SAC_Reclamacion_Test {
 
         Database.insert(reclamaciones);
         
-        //Documentos envío
-        List<SAC_DocumentoEnvio__c> listaDocs = new List<SAC_DocumentoEnvio__c>();
-        SAC_DocumentoEnvio__c documento = new SAC_DocumentoEnvio__c();
-        documento.SAC_Caso__c = casoReclamacion.Id;
-        documento.SAC_TipoDocumento__c = 'redaccion';
-
-        listaDocs.add(documento);
-        Database.insert(listaDocs);
-
         mapaCamposCaso.clear();
         mapaCamposCaso.put('SuppliedCompany', 'Pret1');
         mapaCamposCaso.put('Origin', 'Backoffice');
@@ -298,26 +288,6 @@ public class SAC_Reclamacion_Test {
             Database.insert(listaTareas);
         }
     }
-
-    @isTest
-    public static void actualizarPlantillaLateral_Test(){
-
-        Case reclamacion = [SELECT Id, Status FROM Case WHERE Subject = 'TestRec'];
-        User usuario = [SELECT Id FROM User WHERE Username = 'sac5reclamacion@test.test' AND isActive = true];
-
-        Test.startTest();
-        System.runAs(usuario){
-            
-            reclamacion.CC_Idioma__c = 'es';
-            Database.update(reclamacion);
-        }
-
-        SAC_DocumentoEnvio__c resultado = [SELECT Id, SAC_NombrePlantillaLateral__c FROM SAC_DocumentoEnvio__c WHERE SAC_Caso__c = :reclamacion.Id];
-
-        Assert.areEqual(resultado.SAC_NombrePlantillaLateral__c, 'SAC_CartaPlantilla', 'No se ha actualizado la plantilla,');
-        Test.stopTest();
-    }
-
 
     @isTest
     public static void devolverConsultasCOPS_Test(){

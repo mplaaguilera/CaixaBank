@@ -21,11 +21,11 @@ Historial
 	3.0		    AV_Query IT	        Daniel Rodríguez    03/03/2022	        Change AV_Query to SOQL for User, Account, Contact
 	3.1			Fix					Sandra Gómez		02/02/2022			Change Queueable Next AV_DeleteRecordsCartCliBatchQueueable and deleted Retos of chain
 	3.2         US671736            Oscar Moreno        17/10/2023          Delete the content of the class
-
+	3.3         QC                  Oscar Moreno        05/06/2024          Return a String of deleteRecord method
 ***********************************************************************************************************************/
 public class AV_DeleteRecordsVentasBatch  {
 
-    public static void deleteRecord(){
-        
+    public static String deleteRecord(){
+        return 'entra en deleteRecord';
     }
 }

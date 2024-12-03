@@ -56,6 +56,7 @@ public with sharing class FRA_Llamada_GC {
 				CC_Fecha_Inicio__c = System.now(),
 				CC_Servicio_Llamada_Saliente__c  = caso.CC_Canal_Resolucion__c,
 				RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'FRA_Cliente'),
+				KIN_Genesys_Cloud_URL_Grabacion__c = inputLlamada.urlGrabacion,
 				CC_IdentCliente__c = '0' // Sin datos ALF);
             );
 
@@ -104,7 +105,7 @@ public with sharing class FRA_Llamada_GC {
 		return new Map<String, Object>{'llamada' => llamada};
 	}
 
-	public static Map<String, Object> registrarConsulta(CC_Llamada_Input inputConsulta) {
+	public static Map<String, Object> registrarConsulta(CC_Llamada_Input inputConsulta, String servicioGen) {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c 
 												  FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :identificarCodigoCola(inputConsulta.servicio) LIMIT 1];
@@ -112,8 +113,14 @@ public with sharing class FRA_Llamada_GC {
 								 FROM CC_Llamada__c WHERE Id = :inputConsulta.salesforceParentId];
 		Case caso = [SELECT Subject, CC_Idioma__c, AccountId, ContactId FROM Case WHERE Id = :inputConsulta.casoId];
 	
+        if(String.isNotBlank(servicioGen)){
+            caso.FRA_Servicio_Contact_Center__c = servicioGen;
+			caso.CC_Canal_Contacto__c='FRA_Call Center';
+        	update caso;
+        }
+	
 		CC_Llamada__c consulta = new CC_Llamada__c (
-			RecordTypeId = llamada.RecordTypeId,
+			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'FRA_Cliente'),
 			KIN_Genesys_Cloud__c = true,
 			KIN_Consulta__c = true,
 			CC_Tipo__c = 'Entrante',
@@ -135,11 +142,12 @@ public with sharing class FRA_Llamada_GC {
 		);
 		
 		insert consulta;
+
 		crearActividad(consulta.Id, caso.Id, 'Consulta', servicioGenesys.Name, null);
 		return new Map<String, Object>{'llamada' => consulta, 'caso' => caso};
 	}
 
-	public static Map<String, Object> registrarblindTransfer(CC_Llamada_Input inputConsulta) {
+	public static Map<String, Object> registrarblindTransfer(CC_Llamada_Input inputConsulta, String servicioGen) {
 		finalizarLlamadasActividadesAbiertas(UserInfo.getUserId());
 		CC_Servicio_Genesys__c servicioGenesys = [SELECT Name, CC_Activo_Salesforce__c, CC_Tipo__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c 
 												  FROM CC_Servicio_Genesys__c WHERE CC_Codigo__c = :identificarCodigoCola(inputConsulta.servicio) LIMIT 1];
@@ -147,8 +155,14 @@ public with sharing class FRA_Llamada_GC {
 								 FROM CC_Llamada__c WHERE Id = :inputConsulta.salesforceParentId];
 		Case caso = [SELECT Subject, CC_Idioma__c, AccountId, ContactId FROM Case WHERE Id = :inputConsulta.casoId];
 	
+        if(String.isNotBlank(servicioGen)){
+            caso.FRA_Servicio_Contact_Center__c = servicioGen;
+			caso.CC_Canal_Contacto__c='FRA_Call Center'; 
+        	update caso;
+        }
+	
 		CC_Llamada__c consulta = new CC_Llamada__c (
-			RecordTypeId = llamada.RecordTypeId,
+			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Llamada__c', 'FRA_Cliente'),
 			KIN_Genesys_Cloud__c = true,
 			KIN_Consulta__c = true,
 			CC_Tipo__c = 'Entrante',
@@ -223,7 +237,6 @@ public with sharing class FRA_Llamada_GC {
 		if (String.isNotBlank(llamadaId)) {
 			finalizarLlamadaActividades(new CC_Llamada__c(Id = llamadaId), 'Llamada%', 'Llamada finalizada');
 		}
-
 	}
 
 	public static void iniciarTransferenciaCiega(CC_Llamada_Input inputConsulta, String tipoCierre) {
@@ -261,7 +274,8 @@ public with sharing class FRA_Llamada_GC {
 		Case caso = new Case(
 			RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'),
 			Subject = llamada.CC_Asunto__c,
-			Origin = servicioGenesys.CC_Canal_de_Entrada__c == 'Telefono' ? 'Phone' : String.isBlank(servicioGenesys.CC_Canal_de_Entrada__c) ? 'Phone' : servicioGenesys.CC_Canal_de_Entrada__c,
+            Origin = servicioGenesys.CC_Canal_de_Entrada__c == 'Telefono' ? 'Phone' : String.isBlank(servicioGenesys.CC_Canal_de_Entrada__c) ? 'Phone' : servicioGenesys.CC_Canal_de_Entrada__c,
+			FRA_Origen_Creacion__c = 'Llamada',
 			CC_Canal_Respuesta__c = 'Phone',
 			CC_Telefono_Contacto__c = llamada.CC_ANI__c,
 			CC_No_Identificado__c = llamada.CC_No_Identificado__c,
@@ -279,12 +293,17 @@ public with sharing class FRA_Llamada_GC {
 			if (llamada.CC_Cuenta__c != null) {
 				caso.CC_Oficina__c = llamada.CC_Cuenta__c;
 			}
+			caso.CC_Canal_Contacto__c='FRA_Oficina';
 		} else {
 			if (llamada.CC_Contacto__c != null) {
 				caso.ContactId = llamada.CC_Contacto__c;
 			}
 			if (llamada.CC_Cuenta__c != null) {
 				caso.AccountId = llamada.CC_Cuenta__c;
+				if(String.isNotBlank(caso.CC_Canal_Procedencia__c)){
+					caso.CC_Canal_Contacto__c=caso.CC_Canal_Procedencia__c =='Teléfono FRAUDE Tarjetas Consumer'?'FRA_Cliente Consumer':'FRA_Cliente cbk';
+				}
+				
 			}
 		}
 	
@@ -312,11 +331,14 @@ public with sharing class FRA_Llamada_GC {
 	// Devuelve true si es empleado
 	public static Boolean identificarPorTelefono(CC_Llamada__c llamada, String telefono) {
 		Boolean empleado = false;
-		telefono = telefono.replace('+34', '');
+		List<String> telefonos = new List<String>();
+		telefonos.add(telefono.replace('+34', ''));
+		telefonos.add(telefono.replace('+34', '34 '));
+
 		if (!String.isEmpty(telefono)) {
 			//Busca los canales de comunicación por el teléfono
 			List<CC_Canal_Com__c> oCanales = [SELECT CC_ContactoId__c, CC_CuentaId__c, CC_ContactoId__r.RecordType.DeveloperName FROM CC_Canal_Com__c 
-												 WHERE CC_TelefonoIDX__c = :telefono AND RecordType.DeveloperName = 'CC_Telefono'];
+												 WHERE CC_Telefono__c IN :telefonos AND RecordType.DeveloperName = 'CC_Telefono'];
 			Set<String> oIDs = new Set<String>();
         	for (CC_Canal_Com__c oCanal : oCanales) {
             	if (oCanal.CC_CuentaId__c != null) {
@@ -329,7 +351,7 @@ public with sharing class FRA_Llamada_GC {
 			//Busca las cuentas de RT CC_Cliente y CC_ClientePA que se encuentra en la consulta anterior
 			List<Account> oCuentas = [SELECT Id, Name, RecordType.DeveloperName FROM Account 
 									  WHERE Id = :oIDs AND (RecordType.DeveloperName = 'CC_Cliente' OR RecordType.DeveloperName = 'CC_ClientePA' OR RecordType.DeveloperName = 'CC_CentroCaixaBank')];
-			if (oCuentas.size() == 1) {
+			if (!oCuentas.isEmpty()) {
 				Id accountCuenta = oCuentas[0].Id;
 				llamada.CC_Cuenta__c = accountCuenta;
 				String cuentaRT = oCuentas[0].RecordType.DeveloperName;

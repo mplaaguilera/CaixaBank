@@ -9,6 +9,8 @@ Historial
    VERSION        USER_STORY       AUTHOR           DATE                Description
    1.0            App FSC          Maria Telleria   23/04/2020          Init version
    1.1			  App FSC		   Sandra Gómez		04/11/2020			Refactor
+   1.3		    FIX11070844	    Oscar Moreno		22/07/2024	        Insert System.enqueueJob(new AV_DeleteRecordsCartCliBatchQueueable()); 
+
 
 ***********************************************************************************************************************/
 @isTest
@@ -42,6 +44,7 @@ private class AV_DeleteRecordsCartCliBatch_Test {
 		Test.startTest();
 		AV_DeleteRecordsCartCliBatch obj = new AV_DeleteRecordsCartCliBatch();
 		DataBase.executeBatch(obj);
+		System.enqueueJob(new AV_DeleteRecordsCartCliBatchQueueable()); 
 		Test.stopTest();
 		// Check if the inserted Book members are deleted correctly
 		System.assertEquals(0, [select count() from AV_BookMember__c where AV_ToDelete__c = true]);

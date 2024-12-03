@@ -110,7 +110,6 @@ public with sharing class AV_AccountTriggerHelper_Test {
 	@isTest
 	public static void executeAccountTriggerUpdatingEAPGestor() {
 		User usrTest = [select Id from User limit 1];
-        Test.startTest();
         AV_GestorReassignmentQueueable.doChainJob = false;
         Account cienteCreadoOld = [select Id, AV_EAPGestor__c from Account Limit 1];
         Contact c = [Select id from Contact Where AV_UsuarioAsociado__c != null];
@@ -118,6 +117,7 @@ public with sharing class AV_AccountTriggerHelper_Test {
 		update cienteCreadoOld;
         Account cienteUpdated = [select AV_EAPGestor__c from Account where Id = :cienteCreadoOld.Id];
         String externalId = '12345';
+        Test.startTest();
         Task tskTest = AV_TestHelper.createTareaExternalId(usrTest, externalId);
         tskTest.WhatId = cienteCreadoOld.Id;
         update tskTest;

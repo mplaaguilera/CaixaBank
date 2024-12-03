@@ -27,24 +27,28 @@ public with sharing class AV_SObjectRelatedInfoCController_Test {
 		userGestor.IsActive = true;
         insert userGestor;
 
-        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+        User userGcf = [SELECT Id, AV_ExternalID__c FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true];
 
+		
 		System.runAs(userCli){
+			
 			Account account = AV_TestHelper.createCustomerSinInsert();
 			account.OwnerId = userGestor.Id;
 			insert account;
-		}
+			
 
+		}
+		
 		System.runAs(userGcf){
 			Account account =  [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
-
+			
 			Case myCase =  new Case();
 			myCase.Subject = 'Test Case';
 			myCase.OwnerId = userGestor.Id;
 			insert myCase;
 
-			RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKEXPCLIENT_RT);
+
 			Task task = AV_TestHelper.createTareaExternalIdWithCustomerSinInsert(userGestor, 'ID-0001', account);
 			Task taskWithCase = AV_TestHelper.createTareaExternalIdWithCustomerSinInsert(userGestor, 'ID-0002', account);
 			taskWithCase.AV_Case__c = myCase.Id;
@@ -65,10 +69,7 @@ public with sharing class AV_SObjectRelatedInfoCController_Test {
 		String filterId; 
 
 		Account account =  [SELECT Id FROM Account WHERE CC_Numero_Documento__c = '9446386T' LIMIT 1];
-		Case myCase =  [SELECT Id FROM Case WHERE Subject = 'Test Case' LIMIT 1];
-		myCase.AccountId = account.Id;
-		update myCase;
-
+		
 		String filterType = 'Account';
 		String filterName = 'Id';
 		String typeName = 'Account';
@@ -252,5 +253,58 @@ public with sharing class AV_SObjectRelatedInfoCController_Test {
 			
 		System.assertEquals(listFSMember.size(), listFieldSet.size());
 		System.assertEquals(task.Id, recordId);
+	}
+
+	
+
+	@isTest
+    public static void testGetGestoresMultigestor() {
+		
+		User userGcf = [SELECT Id, AV_ExternalID__c FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		Test.startTest();
+		
+		Account caixcenter = AV_TestHelper.createCaixaCenter();
+		Contact ct =AV_TestHelper.createEmployeeSinInsert(caixcenter,userGcf, userGcf.AV_ExternalID__c);
+		ct.FirstName = 'Banca de Particulares test';
+		ct.AV_Pool__c = true;
+		
+		Account acc = AV_TestHelper.createCustomerSinInsert();
+		Account center = AV_TestHelper.createCaixaCenterSinInsert();
+		center.CC_Numero_Oficina__c = '93124';
+		center.Name = 'centro test';
+		center.CC_Numero_Oficina_Empresa__c = '001-93124';
+		center.AV_EAPGestor__c = ct.Id;
+		insert center;
+		
+		ct.Account = center;
+		insert ct;
+		
+		acc.AV_MyBox__c = 'S';
+		acc.AV_IsPreconceived__c = false;
+		acc.AV_TargetAuto__c = 'S';
+		RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_PA_RT);
+		acc.FirstName = 'FirstName3';
+		acc.LastName = 'LastName3';
+		acc.RecordTypeId = rt.Id;
+		acc.AV_NumPerso__c = '121';
+		acc.AV_Negocio__c = 'BPA';
+		acc.CC_Numero_Documento__c = '1446382T';
+		acc.AV_OficinaPrincipal__c= center.id;
+		acc.AV_EAPGestor__c = ct.id;
+		insert acc;
+		
+		
+		System.runAs(userGcf){
+			String result = AV_SObjectRelatedInfoCController.getGestoresMultigestor(acc.Id);
+			Boolean result2 = AV_SObjectRelatedInfoCController.isBancaParticularesEAPGestor(acc.Id);
+			System.assertEquals(result2,true);
+			System.assertEquals(ct.AV_Pool__c,true);
+			System.assertEquals(acc.AV_OficinaPrincipal__c,center.Id);
+			System.assertEquals(ct.FirstName.contains(AV_AppConstants.MULTIGENAME),true);
+			Test.stopTest();
+		}
+		
+
 	}
 }

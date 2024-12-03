@@ -29,7 +29,7 @@ public with sharing class SIR_LCMP_interlocutor {
         String idInfoCliente;
         List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = new List<SIREC__SIREC_obj_informacionCliente__c>();
         
-        if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
             infoCliente = [SELECT id FROM SIREC__SIREC_obj_informacionCliente__c WHERE SIREC__SIREC_fld_cliente__c =: idCliente ];
             if(!infoCliente.isEmpty()){
                 idInfoCliente = infoCliente[0].id;

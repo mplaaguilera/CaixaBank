@@ -31,7 +31,7 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
         
         // Recuperar los EmailMessage.
         List<EmailMessage> listadoEmails = [SELECT Id,MessageIdentifier, ToAddress, CcAddress, BccAddress, Subject, HtmlBody,TextBody, ParentId, RelatedToId, ValidatedFromAddress, contentDocumentIds 
-                                            FROM EmailMessage WHERE MessageIdentifier IN :mapidentifierReen.keyset()];
+                                            FROM EmailMessage WHERE Id IN :mapidentifierReen.keyset() AND Incoming = false];
 
         for (EmailMessage em : listadoEmails){
             valFromAddress.add(em.ValidatedFromAddress);
@@ -74,16 +74,16 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
                 List<String> lsttBccAddress = emailReprocesar.BccAddress != null ? emailReprocesar.BccAddress.split(';') : new List<String>();
                 if(lstToAddress != null && lstToAddress.size() > 100){
                     allRecordsProcessedKO++;
-                    errorLimites.put(emailReprocesar.MessageIdentifier, 'Más de 100 destinatarios en el ToAddress');
-                    CBK_Log.error(emailReprocesar.Id + ' Más de 100 destinatarios en el ToAddress: ' + lstToAddress);
+                    errorLimites.put(emailReprocesar.Id, 'Más de 100 destinatarios en el ToAddress');
+                    CBK_Log.addError(emailReprocesar.Id, null ,'Más de 100 destinatarios en el ToAddress', lstToAddress, null);
                 }else if(lstCcAddress != null && lstCcAddress.size() > 25){
                     allRecordsProcessedKO++;
-                    errorLimites.put(emailReprocesar.MessageIdentifier, 'Más de 25 destinatarios en el CcAddress');
-                    CBK_Log.error(emailReprocesar.Id + ' - Más de 25 destinatarios en el CcAddress: ' + lstCcAddress);
+                    errorLimites.put(emailReprocesar.Id, 'Más de 25 destinatarios en el CcAddress');
+                    CBK_Log.addError(emailReprocesar.Id, null ,'Más de 25 destinatarios en el CcAddress', lstCcAddress, null);
                 }else if(lsttBccAddress != null && lsttBccAddress.size() > 25){
                     allRecordsProcessedKO++;
-                    errorLimites.put(emailReprocesar.MessageIdentifier, 'Más de 25 destinatarios en el BccAddress');
-                    CBK_Log.error(emailReprocesar.Id + ' - Más de 25 destinatarios en el BccAddress: ' + lsttBccAddress);
+                    errorLimites.put(emailReprocesar.Id, 'Más de 25 destinatarios en el BccAddress');
+                    CBK_Log.addError(emailReprocesar.Id, null, 'Más de 25 destinatarios en el BccAddress', lsttBccAddress, null);
                 }else{
                     Messaging.SingleEmailMessage mensajeEnviar = new Messaging.SingleEmailMessage();
                     mensajeEnviar.setToAddresses(lstToAddress); 
@@ -102,14 +102,14 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
                     }
                     
                     if (config.CBK_Active__c){
-                        mensajeEnviar.setWhatId(mapidentifierReen.get(emailReprocesar.MessageIdentifier).Id);
+                        mensajeEnviar.setWhatId(mapidentifierReen.get(emailReprocesar.Id).Id);
                     }else{
                         mensajeEnviar.setWhatId(emailReprocesar.RelatedToId);
                     } 
 
                     mensajeEnviar.setEntityAttachments(mapEmailLstDocId.get(emailReprocesar.Id)); 
                     listadoCorreosEnviar.add(mensajeEnviar);
-                    mensajeReenviado.add(emailReprocesar.MessageIdentifier);
+                    mensajeReenviado.add(emailReprocesar.Id);
                 }
             }
             Set<String> udpIdsOK = new Set<String>();
@@ -125,7 +125,6 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
                 }
             }
 
-            CBK_Log.debug('listadoCorreosEnviar.size(): ' + listadoCorreosEnviar.size());
             if (listadoCorreosEnviar.size() > 0){
                 List<Messaging.SendEmailResult> envioCorreos = Messaging.sendEmail(listadoCorreosEnviar, false);
                 Integer i = 0;
@@ -135,9 +134,9 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
 
                     if (!correoEnviado.isSuccess()){
                         newResult.CBK_Status__c = 'Error';
-                        newResult.CBK_ErrorDescription__c = 'Error en el Reenvio';
+                        newResult.CBK_ErrorDescription__c = 'Error en el Reenvio ' + correoEnviado.getErrors();
                         allRecordsProcessedKO++;
-                        CBK_Log.error('Send Email result: ' + correoEnviado.isSuccess() + ' - ' + correoEnviado.getErrors());
+                        CBK_Log.addError(newResult.Id, null, 'Send Email result: ' + correoEnviado.getErrors(), envioCorreos,null);
                     }else{
                         newResult.CBK_Status__c = 'Procesado';
                         allRecordsProcessedOK++;
@@ -147,13 +146,14 @@ global class CBK_EmailMessageBatch implements Database.Batchable<sObject>, Datab
                 }
             }
             if (listaUpdateReprocess.size() > 0){
-                CBK_Log.debug('Lista update: ' + listaUpdateReprocess);
                 update listaUpdateReprocess;
             }
-
         }catch(Exception ex){
-            CBK_Log.error(ex, 'Catch Error Reproceso correos: ' + ex.getMessage());
+            CBK_Log.addError(null, ex, 'Catch Error Reproceso correos: ' + ex.getMessage(), null, null);
         }
+
+        //Se insertan los CBK_Logs
+        CBK_Log.insertDML();
     }    
     global void finish(Database.BatchableContext bc){
         CBK_Log.debug('Email a Reprocesar: ' + allRecordsProcessed + ' / Reprocesados: ' + allRecordsProcessedOK + ' / Error Reproceso: ' + allRecordsProcessedKO);

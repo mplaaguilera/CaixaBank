@@ -19,8 +19,9 @@ public with sharing class SIRE_LCMP_HomeSolutions {
     @AuraEnabled(Cacheable=true)
     public static Map<String,Integer> getData(String tiposProcesos) {
 		Set<String> setSituaciones = new Set<String>{SIR_Constantes.PROCESO_SITUACION_SIRE_PENDIENTE_INICIO_GESTION};
-        Id recordTypeIdFlujo = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_FLUJO).getRecordTypeId();
-        Id recordTypeIdPreventivo = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_PREVENTIVO).getRecordTypeId();
+        Map<String,Schema.RecordTypeInfo> mapRTsObjectsProcesos = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
+        Id recordTypeIdFlujo = mapRTsObjectsProcesos.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_EMP_FLUJO).getRecordTypeId();            
+        Id recordTypeIdPreventivo = mapRTsObjectsProcesos.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId();            
         
         List<SIREC__SIREC_obj_proceso__c> lstProcesosFlujo = new List<SIREC__SIREC_obj_proceso__c>();
         List<SIREC__SIREC_obj_proceso__c> lstProcesosPreventivo = new List<SIREC__SIREC_obj_proceso__c>();

@@ -6,7 +6,7 @@ public class CC_WS_Casos_Test {
         
         Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
-    mccTematica.Name = 'Ahorro a la vista';
+		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
         mccTematica.RecordTypeId = recordTypeIdTematica;
@@ -25,7 +25,7 @@ public class CC_WS_Casos_Test {
         insert mccProducto; 
         
         Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-         CC_MCC__c mccMotivo = new CC_MCC__c();
+       	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
@@ -36,7 +36,7 @@ public class CC_WS_Casos_Test {
         insert mccMotivo;
         
         Id recordTypeIdWeb = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_ConvMCCWeb').getRecordTypeId();
-         CC_MCC__c mccConvWeb = new CC_MCC__c();
+       	CC_MCC__c mccConvWeb = new CC_MCC__c();
         mccConvWeb.Name = 'Test';
         mccConvWeb.CC_Tipo_Cliente__c = 'Cliente';
         mccConvWeb.CC_Equivalencia_Formulario__c = 'MC-001-001-001';
@@ -715,7 +715,7 @@ public class CC_WS_Casos_Test {
         
         Id recordTypeIdTematica = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
         CC_MCC__c mccTematica = new CC_MCC__c();
-    mccTematica.Name = 'Ahorro a la vista';
+		mccTematica.Name = 'Ahorro a la vista';
         mccTematica.CC_Tipo_Cliente__c = 'Cliente';
         mccTematica.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
         mccTematica.RecordTypeId = recordTypeIdTematica;
@@ -734,7 +734,7 @@ public class CC_WS_Casos_Test {
         insert mccProducto; 
         
         Id recordTypeIdMotivo = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
-         CC_MCC__c mccMotivo = new CC_MCC__c();
+       	CC_MCC__c mccMotivo = new CC_MCC__c();
         mccMotivo.Name = 'Apertura sin autorización';
         mccMotivo.CC_Tipo_Cliente__c = 'Cliente';
         mccMotivo.CC_Fecha_Vigencia_Inicio__c = date.today()-1;
@@ -745,7 +745,7 @@ public class CC_WS_Casos_Test {
         insert mccMotivo;
         
         Id recordTypeIdWeb = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_ConvMCCWeb').getRecordTypeId();
-         CC_MCC__c mccConvWeb = new CC_MCC__c();
+       	CC_MCC__c mccConvWeb = new CC_MCC__c();
         mccConvWeb.Name = 'Test';
         mccConvWeb.CC_Tipo_Cliente__c = 'Cliente';
         mccConvWeb.CC_Equivalencia_Formulario__c = 'MC-001-001-001';

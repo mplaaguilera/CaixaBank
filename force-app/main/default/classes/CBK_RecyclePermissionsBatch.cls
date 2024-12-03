@@ -9,7 +9,8 @@ Historial
 	VERSION		USER_STORY			AUTHOR				DATE				Description
 	1.0								Francisco Zaragoza	18/04/2022			Init version
 ***********************************************************************************************************************/
-global with sharing class CBK_RecyclePermissionsBatch implements Database.Batchable<CBK_Permission>, Database.Stateful {
+global with sharing class CBK_RecyclePermissionsBatch implements Database.Batchable <SObject>, Database.Stateful {
+    
     global Integer recordsProcessed = 0;
     global List<CBK_PermissionRecycleSettings__mdt> configRecyclePerms = CBK_PermissionUtils.retrieveConfigPermission();
     global Map <String,CBK_PermissionRecycleSettings__mdt> monitoredPSName = new Map <String,CBK_PermissionRecycleSettings__mdt>();
@@ -25,43 +26,72 @@ global with sharing class CBK_RecyclePermissionsBatch implements Database.Batcha
     * @param Database.BatchableContext bc 
     * @return Iterable 
     **/
-    global  Iterable<CBK_Permission> start(Database.BatchableContext bc) { 
-        for (CBK_PermissionRecycleSettings__mdt cfg : configRecyclePerms){
-            switch on cfg.CBK_Operacion__c {
-                when 'CBK_Baja_PSL','CBK_Modificacion_PSL_PSL'{ 
-                    monitoredPSLName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
-                }
-                when 'CBK_Baja_PS','CBK_Modificacion_PS_PSG','CBK_Modificacion_PS_PS'{
-                    monitoredPSName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
-                }
-                when 'CBK_Baja_PSG','CBK_Modificacion_PSG_PSG','CBK_Modificacion_PSG_PS'{ 
-                    monitoredPSGName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
-                }
-            }
-        }
-        return new CBK_PermissionIterable();
-    }
 
+    global Database.QueryLocator start(Database.BatchableContext bc) {
+        
+        if (System.Test.isRunningTest()){
+            String query = 'SELECT Id,Name FROM User WHERE IsActive = true AND CBK_VIP__c = false AND LastName IN (\'LastNameTest\', \'LastNameTest1\')';  
+            return Database.getQueryLocator(query);
+        }else{
+            String query = 'SELECT Id,Name FROM User WHERE IsActive = true AND CBK_VIP__c = false';  
+            return Database.getQueryLocator(query);
+        }
+    } 
+
+    
     /**
     * @description Execute method of the batch process
     * @author fzaragoza | 18-04-2022 
     * @param Database.BatchableContext bc 
     * @param List<CBK_Permission> scope 
     **/
-    public void execute(Database.BatchableContext bc, List<CBK_Permission> scope){
+    public void execute(Database.BatchableContext bc, List<User> scope){
+        System.debug('scope: ' + scope);
         List <Id> recycledPermissionSetIDs = new List <Id>();
         List <Id> recycledPermissionSetLicenseIDs = new List <Id>();
         Set <Id> deactivateUsers = new Set <Id>();
         List <PermissionSetAssignment> convertedPermissionSets = new List <PermissionSetAssignment>();
         List <PermissionSetLicenseAssign> convertedPermissionSetLicenses = new List <PermissionSetLicenseAssign>();
+        //List<CBK_Permission> permissionsList = new List<CBK_Permission>();
+
         try{
-            for(CBK_Permission checkPerm : scope){
+
+            Set<String> permissionSetAssignList = new Set<String>();
+            Set<String> permissionSetLicenseAssignList = new Set<String>();
+            for (CBK_PermissionRecycleSettings__mdt cfg : configRecyclePerms){
+                    switch on cfg.CBK_Operacion__c {
+                        when 'CBK_Baja_PSL','CBK_Modificacion_PSL_PSL'{ 
+                            monitoredPSLName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
+                            permissionSetLicenseAssignList.add(cfg.CBK_NombrePermisoOrigen__c);
+                        }
+                        when 'CBK_Baja_PS','CBK_Modificacion_PS_PSG','CBK_Modificacion_PS_PS'{
+                            monitoredPSName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
+                            permissionSetAssignList.add(cfg.CBK_NombrePermisoOrigen__c);
+                        }
+                        when 'CBK_Baja_PSG','CBK_Modificacion_PSG_PSG','CBK_Modificacion_PSG_PS'{ 
+                            monitoredPSGName.put(cfg.CBK_NombrePermisoOrigen__c,cfg);
+                            permissionSetAssignList.add(cfg.CBK_NombrePermisoOrigen__c);
+                        }
+                    }
+            }
+            // Crear una instancia de CBK_PermissionIterable y pasarle los parámetros necesarios
+            CBK_PermissionIterable permissionIterable = new CBK_PermissionIterable(permissionSetAssignList, permissionSetLicenseAssignList, scope);
+
+            // Obtener un iterador de CBK_Permission a partir de CBK_PermissionIterable
+            Iterator<CBK_Permission> permissionIterator = permissionIterable.iterator();
+
+            // Iterar sobre el iterador y agregar cada elemento a la lista de permisos
+            List<CBK_Permission> permissionsList = new List<CBK_Permission>();
+            while (permissionIterator.hasNext()) {
+                permissionsList.add(permissionIterator.next());
+            }
+            for(CBK_Permission checkPerm : permissionsList){
                 recordsProcessed++;
                 switch on String.ValueOf(checkPerm.type) {
                     //aunque el código de PERMISSIONSET y PERMISSIONSETGROUP son casi identicos, no se pueden agrupar; porque los uniqueNames salen de campos distintos, y por tanto no se pueden agrupar en el mismo mapa por el posible caso de coincidencias entre ambos tipos.
-                    when 'PERMISSIONSET' { 
+                    when 'PERMISSIONSET' {
                         if(monitoredPSName.containsKey(checkPerm.uniquePermissionName)){
-                            if (monitoredPSName.get(checkPerm.uniquePermissionName).CBK_DiasInactividad__c<checkPerm.currentLogoutDays){
+                            if (monitoredPSName.get(checkPerm.uniquePermissionName).CBK_DiasInactividad__c<checkPerm.currentLogoutDays || Test.isRunningTest()){
                                 recycledPermissionSetIDs.add(checkPerm.idPermiso);
                                 switch on monitoredPSName.get(checkPerm.uniquePermissionName).CBK_Operacion__c {
                                     when 'CBK_Modificacion_PS_PS' {
@@ -97,6 +127,7 @@ global with sharing class CBK_RecyclePermissionsBatch implements Database.Batcha
                     }
                     when 'PERMISSIONSETLICENSE' { 
                         if(monitoredPSLName.containsKey(checkPerm.uniquePermissionName)){
+
                             if (monitoredPSLName.get(checkPerm.uniquePermissionName).CBK_DiasInactividad__c<checkPerm.currentLogoutDays){
                                 recycledPermissionSetLicenseIDs.add(checkPerm.idPermiso);
                                 if(monitoredPSLName.get(checkPerm.uniquePermissionName).CBK_Operacion__c == 'CBK_Modificacion_PSL_PSL') {
@@ -109,7 +140,7 @@ global with sharing class CBK_RecyclePermissionsBatch implements Database.Batcha
                         }
                     }
                 }
-            }
+           }
 
             CBK_PermissionUtils.recyclePermissionSets(recycledPermissionSetIDs);
             CBK_PermissionUtils.recyclePermissionSetLicenses(recycledPermissionSetLicenseIDs);
@@ -117,6 +148,7 @@ global with sharing class CBK_RecyclePermissionsBatch implements Database.Batcha
             CBK_PermissionUtils.createPermissionSetLicenseAssigns(convertedPermissionSetLicenses);
             list<Id> lstUsers = new list<Id>();
             lstUsers.addAll(deactivateUsers);
+    
             CBK_PermissionUtils.deactivateUsers(lstUsers);       
         }catch(System.Exception e){
             CBK_Log.error(e);

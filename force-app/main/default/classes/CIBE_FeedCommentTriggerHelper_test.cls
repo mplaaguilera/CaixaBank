@@ -13,37 +13,42 @@ VERSION		USER_STORY			AUTHOR				DATE				Description
 public with sharing class CIBE_FeedCommentTriggerHelper_test {
     @TestSetup
     static void setup(){
-        User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
-        Account accTest = CIBE_TestHelper.createConfidencialCustomer();
-        Account cenTest = CIBE_TestHelper.createCaixaCenter();
-        Contact conTest = CIBE_TestHelper.createEmployee(cenTest, usrTest);
-        CIBE_TestHelper.createOpportunityTeam(accTest);
+        List<String> lstPSet = new list<String>{CIBE_AppConstants.CIBE_OPERATIVAEMP,CIBE_AppConstants.CIBE_CUSTOMMETADATA};
+        CIBE_TestInitialSetup.setupInitialData('','','', '','',lstPSet);
+        User usrTest = [SELECT Id FROM User WHERE Profile.name =:CIBE_AppConstants.CIBE_GESTOR AND AV_ExternalID__c ='U0000001' ];
+
+        system.runAs(usrTest){
+            Account accTest = CIBE_TestHelper.createConfidencialCustomer();
+            CIBE_TestHelper.createOpportunityTeam(accTest);
+        }
     
     }
 
     @isTest
     private static void createNotificationNewChat_test() {
-        List<Opportunity> opps = [SELECT Id, OwnerId, AccountId FROM Opportunity];
+        User usrTest = [SELECT Id FROM User WHERE Profile.name =:CIBE_AppConstants.CIBE_GESTOR AND AV_ExternalID__c ='U0000001' ];
         List<FeedItem> lstFi = new List<FeedItem>();
         FeedItem fi = new FeedItem();
-        fi.parentId = opps[0].Id;
-        fi.body = 'Prueba123';
-        lstFi.add(fi);
-        insert lstFi;
-        List<FeedComment> lstFc = new List<FeedComment>();
-        FeedComment fc = new FeedComment();
-        fc.FeedItemId = fi.id;
-        fc.CommentBody	 = 'Prueba123';
-        lstFc.add(fc);
-        insert lstFc;
+        system.runAs(usrTest){
+            List<Opportunity> opps = [SELECT Id, OwnerId, AccountId FROM Opportunity];
+            fi.parentId = opps[0].Id;
+            fi.body = 'Prueba123';
+            lstFi.add(fi);
+            insert lstFi;
+            List<FeedComment> lstFc = new List<FeedComment>();
+            FeedComment fc = new FeedComment();
+            fc.FeedItemId = fi.id;
+            fc.CommentBody	 = 'Prueba123';
+            lstFc.add(fc);
+            insert lstFc;
 
-
-        Test.startTest();
-        if(!opps.isEmpty()){
-            CIBE_FeedItemTriggerHelper.createNotificationNewChat(lstFi);
-            List<FeedComment> lstFcFin =[SELECT Id FROM FeedComment WHERE FeedItemId = :fi.id];
-            System.assert(lstFcFin.size()>0);
+            Test.startTest();
+            if(!opps.isEmpty()){
+                CIBE_FeedItemTriggerHelper.createNotificationNewChat(lstFi);
+            }
+            Test.stopTest();
         }
-        Test.stopTest();
+        List<FeedComment> lstFcFin =[SELECT Id FROM FeedComment WHERE FeedItemId = :fi.id];
+        System.assert(lstFcFin.size()>0);
     }
 }

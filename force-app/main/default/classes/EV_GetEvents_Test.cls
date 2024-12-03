@@ -8,6 +8,8 @@ Historial
 ---------------------
 	VERSION		USER_STORY		    AUTHOR				DATE				Description
 	1.0		  	US587006			Mamen Arias         07/06/2023          Init Version
+    1.1         US306439            Carolina Lopez      20/11/2023          Add methods attendeddeferredbasisEmptyList, attendeddeferredbasisEventCustom.
+  	1.2			US511092       		Daniel Rodriguez 	09/01/2024			Remove system.debug
 ***********************************************************************************************************************/
 @isTest
 public class EV_GetEvents_Test {
@@ -541,6 +543,55 @@ public class EV_GetEvents_Test {
         Test.stopTest();
         System.assertEquals(HTTP_STATUS_400, RestContext.response.statusCode, 'La llamada no ha sido correcta');
     }
+
+    @isTest
+    public static void attendeddeferredbasisEmptyList() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');     
+        
+        System.runAs(newUser){
+            EV_WS_GetEvents.RequestServicesGCFBody wrapper = EV_TestHelper.createWrapperJSONServicesGCF('attended-deferred-basis', null, null, null, null, '1234567890', null);
+
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEvents.getResults();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_400, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
+
+    @isTest
+    public static void attendeddeferredbasisEventCustom() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');     
+        
+        System.runAs(newUser){
+            EV_CampaignMemberC__c cm = [SELECT Id, EV_ExternalID__c, EV_Status__c, EV_ContactId__r.CC_Numperso__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_Numero_Documento__c = '48133877Y'];
+            EV_WS_GetEvents.RequestServicesGCFBody wrapper = EV_TestHelper.createWrapperJSONServicesGCF('attended-deferred-basis', null, null, null, null, cm.EV_ExternalID__c, null);
+
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEvents.getResults();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_200, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
     
     @isTest
     public static void wrongParametersTest() {
@@ -567,7 +618,6 @@ public class EV_GetEvents_Test {
         Test.startTest();
         System.runAs(newUser){
         	EV_WS_GetEvents.getResults();
-            system.debug('@@results ' + RestContext.response.responsebody);
         }
         Test.stopTest();
         System.assertEquals(HTTP_STATUS_400, RestContext.response.statusCode, 'La llamada no ha sido correcta');

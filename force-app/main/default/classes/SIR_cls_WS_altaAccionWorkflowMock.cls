@@ -11,8 +11,8 @@
 
     *****************************************************************/
     @isTest
-    global with sharing class SIR_cls_WS_altaAccionWorkflowMock implements HttpCalloutMock{
-        global HTTPResponse respond(HTTPRequest req) {
+    public with sharing class SIR_cls_WS_altaAccionWorkflowMock implements HttpCalloutMock{
+        public HTTPResponse respond(HTTPRequest req) {
            
             SIR_cls_WS_altaAccionWorkflow.WrapperclassAction request = (SIR_cls_WS_altaAccionWorkflow.WrapperclassAction)JSon.deserialize(req.getBody(), SIR_cls_WS_altaAccionWorkflow.WrapperclassAction.class);
                    

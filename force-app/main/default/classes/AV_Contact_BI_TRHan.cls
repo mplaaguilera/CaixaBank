@@ -30,7 +30,13 @@ public with sharing class AV_Contact_BI_TRHan extends CC_TriggerHandlerBase{
         if (listCibeData!=null && !listCibeData.isEmpty()){
         	AV_ContactTriggerHelper.migrateApoderados(listCibeData);
         }
-		
+
+		if(listNewObj != null && !listNewObj.isEmpty()){
+			AV_ContactTriggerHelper.employeeExists(listNewObj);
+		}
+		if (listNewObj != null && !listNewObj.isEmpty()) {
+			AV_ContactTriggerHelper.isPoolContact(listNewObj, mapOldObj);
+		}
 	}
 
 }

@@ -11,6 +11,8 @@ VERSION		USER_STORY		AUTHOR				DATE				Description
 2.0			US481662		Jose Maria 			29/11/2022			Funcionalidad Cartera y Sector añadido al metodo ChangeOwner
 3.0			US507827		Jose Maria			26/01/2023			Copy callApiTeams method from retail
 3.1			US619652		Lucia				02/06/2023			Add method deleteRecordsRelatedWithEvent
+3.2			US850518		Lucia				11/04/2024			Add method updateNextMeetingDate
+3.3.		PPM100376561	Luis				23/10/2024			Add method updateRelacionadoGC, upsert Relacionado Cita with GC list in Field FinServ__NextSteps__c.
 
 ------------------------------------------------------------------------------------------------
 ***********************************************************************************************************************/
@@ -19,9 +21,19 @@ public with sharing class CIBE_EventTriggerHelper {
     public static final String SUFFIX_EXTERNALID 	= 'Evt-';
     private static CIBE_AppUtilities.SearchRT rtCliente 	= new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
     private static CIBE_AppUtilities.SearchRT rtGestor	    = new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
-    private static Set<Id> setRtAll 		= getAllRT();
+	private static CIBE_AppUtilities.SearchRT rtClienteCIB = new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT,CIBE_AppConstants.EVENT_CLIENTE_CIB_RT);
+	private static CIBE_AppUtilities.SearchRT rtGestorCIB = new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT,CIBE_AppConstants.EVENT_GESTOR_CIB_RT);
+    
+	private static Set<Id> setRtAll 		= getAllRT();
     private static Set<Id> setRtCliente		= getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtCliente});
     private static Set<Id> setRtGestor		= getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtGestor});
+	private static Set<Id> setRtGestorAll 	= getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtGestor, rtGestorCIB});
+	private static Set<Id> setRtClienteAll 	= getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtClienteCIB, rtCliente});
+
+
+
+	private static User userGCF 				= CIBE_AppUtilities.getUserGCF();
+
 
 
     /**
@@ -62,7 +74,7 @@ public with sharing class CIBE_EventTriggerHelper {
     */
     public static Set<Id> getAllRT(){
 		
-        Set<CIBE_AppUtilities.SearchRT> setLabelsRt = new Set<CIBE_AppUtilities.SearchRT>{rtCliente, rtGestor};
+        Set<CIBE_AppUtilities.SearchRT> setLabelsRt = new Set<CIBE_AppUtilities.SearchRT>{rtCliente, rtGestor, rtClienteCIB, rtGestorCIB};
 		return CIBE_AppUtilities.getRecordTypeIdsInSet(setLabelsRt);
     }
     /* Metodo para obtener todos los RT de un objeto
@@ -119,9 +131,7 @@ public with sharing class CIBE_EventTriggerHelper {
 		
         Set<Id> setIdsRt = getAllRT();
         List<AV_HeaderCustomActivity__c> listHeaderTask = new List<AV_HeaderCustomActivity__c>();
-        
-        AV_LogDebug.printLogDebug('process', 'listNewObj: ' + listNews.size());
-        
+                
         Id evGestorRT = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.EVENT_GESTOR_RT).getRecordTypeId();
         
         for(Event auxEvt : listNews){
@@ -152,8 +162,7 @@ public with sharing class CIBE_EventTriggerHelper {
         //Insert data && update the field "AV_Task__c"
         if (listHeaderTask!=null && !listHeaderTask.isEmpty()){
             try{
-                AV_LogDebug.printLogDebug('process', 'insert listHeaderTask: ' + listHeaderTask.size());
-                if(AV_HeaderCustomActivity__c.SObjectType.getDescribe().isCreateable()) {
+                if(Schema.sObjectType.AV_HeaderCustomActivity__c.isCreateable()) {
                     Database.insert(listHeaderTask, false);
                 }
             }catch(Exception e){
@@ -184,21 +193,24 @@ public with sharing class CIBE_EventTriggerHelper {
 	 * @param  mapOlds 	map of old Event records
 	 */
 	public static void createCRMTask(List<Event> listNews, Map<Id, Event> mapOlds) {
-		
 		if(!System.isFuture() && !System.isBatch()){
-			List<Event> lstToProcess = new List<Event>();
+            Id evGestorCIBRT = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.EVENT_GESTOR_CIB_RT).getRecordTypeId();
+            Id evClienteCIBRT = Schema.SObjectType.Event.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.EVENT_CLIENTE_CIB_RT).getRecordTypeId();
+            
+            List<Id> rtIds = new List<Id>{evGestorCIBRT, evClienteCIBRT};
+            List<Event> lstToProcess = new List<Event>();
 			Set<String> setEvtIds = new Set<String>();
 	
 			if(mapOlds == null) {
 				for(Event ev : listNews) {
-					if(String.isNotBlank(ev.Description)) {
+					if(rtIds.contains(ev.RecordtypeId) || String.isNotBlank(ev.Description)) {
 						lstToProcess.add(ev);
 						setEvtIds.add(ev.Id);
 					}
 				}
 			} else {
 				for(Event ev : listNews) {
-					if(String.isNotBlank(ev.Description) && ev.Description != mapOlds.get(ev.Id).Description) {
+					if(rtIds.contains(ev.RecordtypeId) || (String.isNotBlank(ev.Description) && ev.Description != mapOlds.get(ev.Id).Description)) {
 						lstToProcess.add(ev);
 						setEvtIds.add(ev.Id);
 					}
@@ -210,7 +222,6 @@ public with sharing class CIBE_EventTriggerHelper {
 				List<CBK_Activity_Extension__c> lstCRMTasksToInsert = new List<CBK_Activity_Extension__c>();
 				User currentUser = new User();
 				if(	
-					User.SObjectType.getDescribe().isAccessible() &&
 					Schema.SObjectType.User.fields.AV_NumeroOficinaEmpresa__c.isAccessible()
 				) {
 					currentUser = [SELECT Name, AV_NumeroOficinaEmpresa__c FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
@@ -230,7 +241,6 @@ public with sharing class CIBE_EventTriggerHelper {
 					List<CBK_Activity_Extension__c> lstCRMTasks= new List<CBK_Activity_Extension__c>();
 
 					if(
-						CBK_Activity_Extension__c.SObjectType.getDescribe().isAccessible() &&
 						Schema.SObjectType.CBK_Activity_Extension__c.fields.AV_ActivityId__c.isAccessible() &&
 						Schema.SObjectType.CBK_Activity_Extension__c.fields.AV_CommentLastModifiedBy__c.isAccessible()&&
 						Schema.SObjectType.CBK_Activity_Extension__c.fields.AV_CommentLastModifiedDate__c.isAccessible()
@@ -247,19 +257,19 @@ public with sharing class CIBE_EventTriggerHelper {
 						if(!mapCRMTask.containsKey(auxEv.Id)) {
 							crmTask = new CBK_Activity_Extension__c(AV_ActivityId__c = auxEv.Id, AV_CommentLastModifiedBy__c = employeeInfo, AV_CommentLastModifiedDate__c = System.now());
 							lstCRMTasksToInsert.add(crmTask);
-						} else {
+						} else if(auxEv.Description != mapOlds.get(auxEv.Id).Description){
 							crmTask = new CBK_Activity_Extension__c(Id = mapCRMTask.get(auxEv.Id).Id, AV_CommentLastModifiedBy__c = employeeInfo, AV_CommentLastModifiedDate__c = System.now());
 							lstCRMTasksToUpdate.add(crmTask);
 						}
 					}
 				}
 				if(!lstCRMTasksToInsert.isEmpty()) {
-					if(CBK_Activity_Extension__c.sObjectType.getDescribe().isCreateable()){ 
+					if(Schema.sObjectType.CBK_Activity_Extension__c.isCreateable()){ 
 						Database.insert(lstCRMTasksToInsert, false);
 					}
 				}
 				if(!lstCRMTasksToUpdate.isEmpty()) {
-					if(CBK_Activity_Extension__c.sObjectType.getDescribe().isUpdateable()){
+					if(Schema.sObjectType.CBK_Activity_Extension__c.isUpdateable()){
 						Database.update(lstCRMTasksToUpdate, false);
 					}
 				}
@@ -283,18 +293,16 @@ public with sharing class CIBE_EventTriggerHelper {
 			//Check the new data
 			if(mapOlds == null || mapOlds.isEmpty()){
 				for(Event e : listNews){
-					boolean isRtGestorNoOutlook = (setRtGestor).contains(e.RecordTypeId) 
+					boolean isRtGestorNoOutlook = (setRtGestorAll).contains(e.RecordTypeId) 
 															&& (!e.IsRecurrence && !e.IsRecurrence2);
 												
 					
-					boolean isRtClienteNoOutlook = (setRtCliente).contains(e.RecordTypeId) 
+					boolean isRtClienteNoOutlook = (setRtClienteAll).contains(e.RecordTypeId) 
 														&& String.isNotBlank(e.AV_ExternalID__c) 
 														&&  (!e.IsRecurrence && !e.IsRecurrence2)
-														&& e.AV_Tipo__c != CIBE_AppConstants.VIDEOLLAMADA_TIPO;
-								
-					
-					AV_LogDebug.printLogDebug(methodName, 'isRtGestorNoOutlook: ' + isRtGestorNoOutlook);
-					AV_LogDebug.printLogDebug(methodName, 'isRtClienteNoOutlook: ' + isRtClienteNoOutlook);
+														&& e.AV_Tipo__c != CIBE_AppConstants.VIDEOLLAMADA_TIPO
+														&& (e.FinServ__NextSteps__c == null);
+
 					if(isRtGestorNoOutlook || isRtClienteNoOutlook){
 						eventsToProcess.add(e);
 					}
@@ -305,20 +313,18 @@ public with sharing class CIBE_EventTriggerHelper {
 			//Check existing data
 			else{
 				for(Event e : listNews){
-					boolean isRtGestorNoOutlook = (setRtGestor).contains(e.RecordTypeId) 
+					boolean isRtGestorNoOutlook = (setRtGestorAll).contains(e.RecordTypeId) 
 													&&  (!e.IsRecurrence && !e.IsRecurrence2);
 												
 					
-					boolean isRtClienteNoOutlook = (setRtCliente).contains(e.RecordTypeId) 
+					boolean isRtClienteNoOutlook = (setRtClienteAll).contains(e.RecordTypeId) 
 														&& String.isNotBlank(e.AV_ExternalID__c)
 														&&  (!e.IsRecurrence && !e.IsRecurrence2);
 					boolean cambioConf = false;
 					if(e.CIBE_Confidential__c!= mapOlds.get(e.id).CIBE_Confidential__c){
 						cambioConf= true;
 					}
-					
-					AV_LogDebug.printLogDebug(methodName, 'isRtGestorNoOutlook: ' + isRtGestorNoOutlook);
-					AV_LogDebug.printLogDebug(methodName, 'isRtClienteNoOutlook: ' + isRtClienteNoOutlook);
+
 					if((isRtGestorNoOutlook || isRtClienteNoOutlook) && !cambioConf ){
 						eventsToProcess.add(e);
 					}
@@ -358,7 +364,7 @@ public with sharing class CIBE_EventTriggerHelper {
 			List<AV_HeaderCustomActivity__c> lstHeaderTaskToUpd = new List<AV_HeaderCustomActivity__c>();
 			List<AV_HeaderCustomActivity__c> lstHeaderTask= new List<AV_HeaderCustomActivity__c>();
 			if(
-				AV_HeaderCustomActivity__c.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.AV_HeaderCustomActivity__c.isAccessible() &&
 				Schema.SObjectType.AV_HeaderCustomActivity__c.fields.AV_ExternalID__c.isAccessible()
 			) {
 				lstHeaderTask = [SELECT AV_ExternalID__c, Id FROM AV_HeaderCustomActivity__c WHERE Id IN :mapToProcess.keySet()];
@@ -372,170 +378,170 @@ public with sharing class CIBE_EventTriggerHelper {
 			}
 
 			if(!lstHeaderTaskToUpd.isEmpty()) {
-				if(AV_HeaderCustomActivity__c.sObjectType.getDescribe().isUpdateable()){
+				if(Schema.SObjectType.AV_HeaderCustomActivity__c.isUpdateable()){
 					Database.update(lstHeaderTaskToUpd, false);
 				}
 			}
 		}
 	}
 
-    /**
-	* @description		Update updateNextManagementDateOpp of opportunity
-	* @param  listNews  list of new Task records
-	* @param  mapOlds   map of old records
-	*/
-	public static void updateNextManagementDateOpp(List<Event> listNews, Map<Id, Event> mapOlds){
+    // /**
+	// * @description		Update updateNextManagementDateOpp of opportunity
+	// * @param  listNews  list of new Task records
+	// * @param  mapOlds   map of old records
+	// */
+	// public static void updateNextManagementDateOpp(List<Event> listNews, Map<Id, Event> mapOlds){
 		
-		String methodName = 'updateNextManagementDateOpp';
-		Set<String> setLabelsRtsTask = new Set<String>{CIBE_AppConstants.TASK_OTROS_CIB_RT, CIBE_AppConstants.TASK_OTROS_EMP_RT};
-        Set<String> setLabelsRtsEvent = new Set<String>{CIBE_AppConstants.EVENT_CLIENTE_RT};
-        Set<Id> setIdsRtsTask = getIdsRT(setLabelsRtsTask);
-		Set<Id> setIdsRtsEvent = getIdsRT(setLabelsRtsEvent);
-		List<Task> lstTasks = new List<Task>();
-		Set<Id> setIdsHeaderEvent = new Set<Id>();
-		Set<String> setIdsEvent = new Set<String>();
-		Set<Id> setOpp = new Set<Id>();
-		Set<Id> setTaskEventExId = new Set<Id>();
-		Map<Id,List<String>> mapOppEvent = new Map<Id,List<String>>();
-		List<Opportunity> listOppUpdate = new List<Opportunity>();
-		Map<String,List<String>> mapTaskOpp = new Map<String,List<String>>();
-		List<String> ids= new List<String>();
-		Date dateOppNew = null;
+	// 	String methodName = 'updateNextManagementDateOpp';
+	// 	Set<String> setLabelsRtsTask = new Set<String>{CIBE_AppConstants.TASK_OTROS_CIB_RT, CIBE_AppConstants.TASK_OTROS_EMP_RT};
+    //     Set<String> setLabelsRtsEvent = new Set<String>{CIBE_AppConstants.EVENT_CLIENTE_RT};
+    //     Set<Id> setIdsRtsTask = getIdsRT(setLabelsRtsTask);
+	// 	Set<Id> setIdsRtsEvent = getIdsRT(setLabelsRtsEvent);
+	// 	List<Task> lstTasks = new List<Task>();
+	// 	Set<Id> setIdsHeaderEvent = new Set<Id>();
+	// 	Set<String> setIdsEvent = new Set<String>();
+	// 	Set<Id> setOpp = new Set<Id>();
+	// 	Set<Id> setTaskEventExId = new Set<Id>();
+	// 	Map<Id,List<String>> mapOppEvent = new Map<Id,List<String>>();
+	// 	List<Opportunity> listOppUpdate = new List<Opportunity>();
+	// 	Map<String,List<String>> mapTaskOpp = new Map<String,List<String>>();
+	// 	List<String> ids= new List<String>();
+	// 	Date dateOppNew = null;
 		
-		if(mapOlds != null && !mapOlds.isEmpty() ) {
-			for(Event tNew : listNews){
-				Event eventOld = mapOlds.get(tNew.id);
+	// 	if(mapOlds != null && !mapOlds.isEmpty() ) {
+	// 		for(Event tNew : listNews){
+	// 			Event eventOld = mapOlds.get(tNew.id);
 				
-				if((setIdsRtsEvent).contains(tNew.RecordTypeId) && (eventOld.ActivityDate != tNew.ActivityDate) && tNew.AV_ExternalID__c != null && (tNew.CSBD_Evento_Estado__c == CIBE_AppConstants.EVENT_STATUS_PENDIENTE)){
-					setIdsEvent.add(tNew.AV_ExternalID__c);
-				} 
-			}
-			if(!setIdsEvent.isEmpty()){
-				List<AV_HeaderCustomActivity__c> listHeaderTask= new List<AV_HeaderCustomActivity__c>();
-				if(
-					AV_HeaderCustomActivity__c.SObjectType.getDescribe().isAccessible() &&
-					Schema.SObjectType.AV_HeaderCustomActivity__c.fields.AV_ExternalID__c.isAccessible()
-				) {
-					listHeaderTask = [SELECT id, AV_ExternalID__c FROM AV_HeaderCustomActivity__c WHERE AV_ExternalID__c in :setIdsEvent];
-				}
+	// 			if((setIdsRtsEvent).contains(tNew.RecordTypeId) && (eventOld.ActivityDate != tNew.ActivityDate) && tNew.AV_ExternalID__c != null && (tNew.CSBD_Evento_Estado__c == CIBE_AppConstants.EVENT_STATUS_PENDIENTE)){
+	// 				setIdsEvent.add(tNew.AV_ExternalID__c);
+	// 			} 
+	// 		}
+	// 		if(!setIdsEvent.isEmpty()){
+	// 			List<AV_HeaderCustomActivity__c> listHeaderTask= new List<AV_HeaderCustomActivity__c>();
+	// 			if(
+	// 				AV_HeaderCustomActivity__c.SObjectType.getDescribe().isAccessible() &&
+	// 				Schema.SObjectType.AV_HeaderCustomActivity__c.fields.AV_ExternalID__c.isAccessible()
+	// 			) {
+	// 				listHeaderTask = [SELECT id, AV_ExternalID__c FROM AV_HeaderCustomActivity__c WHERE AV_ExternalID__c in :setIdsEvent];
+	// 			}
 				
-				if(!listHeaderTask.isEmpty()){
-					for(AV_HeaderCustomActivity__c htask : listHeaderTask){
+	// 			if(!listHeaderTask.isEmpty()){
+	// 				for(AV_HeaderCustomActivity__c htask : listHeaderTask){
 						
-						setIdsHeaderEvent.add(htask.Id);
-					}
-				}
-                List<AV_CustomActivityOpportunity__c> listTaskAndOpp = new List<AV_CustomActivityOpportunity__c>();
-				if(
-					AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
-					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Task__c.isAccessible() &&
-					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_ExternalID__c.isAccessible()&&
-					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible()
-				) {
-					listTaskAndOpp = [SELECT Id, AV_Task__r.AV_ExternalID__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c != null AND AV_Task__c in :setIdsHeaderEvent];
-				}
+	// 					setIdsHeaderEvent.add(htask.Id);
+	// 				}
+	// 			}
+    //             List<AV_CustomActivityOpportunity__c> listTaskAndOpp = new List<AV_CustomActivityOpportunity__c>();
+	// 			if(
+	// 				AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
+	// 				Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Task__c.isAccessible() &&
+	// 				Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_ExternalID__c.isAccessible()&&
+	// 				Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible()
+	// 			) {
+	// 				listTaskAndOpp = [SELECT Id, AV_Task__r.AV_ExternalID__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c != null AND AV_Task__c in :setIdsHeaderEvent];
+	// 			}
 				
-				if(!listTaskAndOpp.isEmpty()){ 
-					for(AV_CustomActivityOpportunity__c taskOpp : listTaskAndOpp){
-						setOpp.add(taskOpp.AV_Opportunity__c);
-					}
-				}
-				if(!setOpp.isEmpty()){  
-					List<AV_CustomActivityOpportunity__c> listTaskAndOppRelated= new List<AV_CustomActivityOpportunity__c>();
-					if(
-						AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
-						Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_ExternalID__c.isAccessible() &&
-						Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible()&&
-						Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Task__c.isAccessible()
-					) {
-						listTaskAndOppRelated = [SELECT Id, AV_Task__r.AV_ExternalID__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c in :setOpp];
-					}
+	// 			if(!listTaskAndOpp.isEmpty()){ 
+	// 				for(AV_CustomActivityOpportunity__c taskOpp : listTaskAndOpp){
+	// 					setOpp.add(taskOpp.AV_Opportunity__c);
+	// 				}
+	// 			}
+	// 			if(!setOpp.isEmpty()){  
+	// 				List<AV_CustomActivityOpportunity__c> listTaskAndOppRelated= new List<AV_CustomActivityOpportunity__c>();
+	// 				if(
+	// 					AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
+	// 					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_ExternalID__c.isAccessible() &&
+	// 					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible()&&
+	// 					Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Task__c.isAccessible()
+	// 				) {
+	// 					listTaskAndOppRelated = [SELECT Id, AV_Task__r.AV_ExternalID__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c in :setOpp];
+	// 				}
 					
 					
-					if(!listTaskAndOppRelated.isEmpty()){ 
-						for(AV_CustomActivityOpportunity__c eventkOppRelated : listTaskAndOppRelated){
-							if(mapOppEvent.containsKey(eventkOppRelated.AV_Opportunity__c)) {
-								mapOppEvent.get(eventkOppRelated.AV_Opportunity__c).add(eventkOppRelated.AV_Task__r.AV_ExternalID__c);
-							} else {
-								mapOppEvent.put(eventkOppRelated.AV_Opportunity__c, new List<String> { eventkOppRelated.AV_Task__r.AV_ExternalID__c });
-							}
-							if(mapTaskOpp.containsKey(eventkOppRelated.AV_Task__r.AV_ExternalID__c)) {
-								mapTaskOpp.get(eventkOppRelated.AV_Task__r.AV_ExternalID__c).add(eventkOppRelated.AV_Opportunity__c);
-							} else {
-								mapTaskOpp.put(eventkOppRelated.AV_Task__r.AV_ExternalID__c, new List<String> {eventkOppRelated.AV_Opportunity__c});
-							}
-							ids.add(eventkOppRelated.AV_Task__r.AV_ExternalID__c);
-						}
-					}
-				}
+	// 				if(!listTaskAndOppRelated.isEmpty()){ 
+	// 					for(AV_CustomActivityOpportunity__c eventkOppRelated : listTaskAndOppRelated){
+	// 						if(mapOppEvent.containsKey(eventkOppRelated.AV_Opportunity__c)) {
+	// 							mapOppEvent.get(eventkOppRelated.AV_Opportunity__c).add(eventkOppRelated.AV_Task__r.AV_ExternalID__c);
+	// 						} else {
+	// 							mapOppEvent.put(eventkOppRelated.AV_Opportunity__c, new List<String> { eventkOppRelated.AV_Task__r.AV_ExternalID__c });
+	// 						}
+	// 						if(mapTaskOpp.containsKey(eventkOppRelated.AV_Task__r.AV_ExternalID__c)) {
+	// 							mapTaskOpp.get(eventkOppRelated.AV_Task__r.AV_ExternalID__c).add(eventkOppRelated.AV_Opportunity__c);
+	// 						} else {
+	// 							mapTaskOpp.put(eventkOppRelated.AV_Task__r.AV_ExternalID__c, new List<String> {eventkOppRelated.AV_Opportunity__c});
+	// 						}
+	// 						ids.add(eventkOppRelated.AV_Task__r.AV_ExternalID__c);
+	// 					}
+	// 				}
+	// 			}
                 
-				if(!mapOppEvent.isEmpty()){
-					Set<String> statusTask = new Set<String>{CIBE_AppConstants.TASK_STATUS_PENDIENTE, CIBE_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL};
-					Set<String> statusEvent = new Set<String>{CIBE_AppConstants.EVENT_STATUS_PENDIENTE};
-					Map<String,Date> mapOppFecha = new Map<String,Date>();
+	// 			if(!mapOppEvent.isEmpty()){
+	// 				Set<String> statusTask = new Set<String>{CIBE_AppConstants.TASK_STATUS_PENDIENTE, CIBE_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL};
+	// 				Set<String> statusEvent = new Set<String>{CIBE_AppConstants.EVENT_STATUS_PENDIENTE};
+	// 				Map<String,Date> mapOppFecha = new Map<String,Date>();
 
-					List<Task> listTaskAndOppRelated= new List<Task>();
-					if(
-						Task.SObjectType.getDescribe().isAccessible() &&
-						Schema.SObjectType.Task.fields.AV_ExternalID__c.isAccessible() &&
-						Schema.SObjectType.Task.fields.ActivityDate.isAccessible()
-					) {
-						listTaskAndOppRelated = [SELECT Id, AV_ExternalID__c, ActivityDate FROM Task WHERE Status IN :statusTask AND RecordtypeId IN :setIdsRtsTask AND AV_ExternalID__c IN :ids AND ActivityDate >= TODAY order by ActivityDate ASC];
-					}
+	// 				List<Task> listTaskAndOppRelated= new List<Task>();
+	// 				if(
+	// 					Task.SObjectType.getDescribe().isAccessible() &&
+	// 					Schema.SObjectType.Task.fields.AV_ExternalID__c.isAccessible() &&
+	// 					Schema.SObjectType.Task.fields.ActivityDate.isAccessible()
+	// 				) {
+	// 					listTaskAndOppRelated = [SELECT Id, AV_ExternalID__c, ActivityDate FROM Task WHERE Status IN :statusTask AND RecordtypeId IN :setIdsRtsTask AND AV_ExternalID__c IN :ids AND ActivityDate >= TODAY order by ActivityDate ASC];
+	// 				}
 					
 					
-					AV_LogDebug.printLogDebug(methodName, 'listTaskAndOppRelated: '+listTaskAndOppRelated.size());
-					for(Task ta:listTaskAndOppRelated) {
-						if (mapTaskOpp.get(ta.AV_ExternalID__c)!=null) {
-							for(String oppId:mapTaskOpp.get(ta.AV_ExternalID__c)) {
-								if (mapOppFecha.get(oppId) == null){
-									mapOppFecha.put(oppId,ta.ActivityDate);
-								}else if (mapOppFecha.get(oppId) > ta.ActivityDate) {
-									mapOppFecha.put(oppId,ta.ActivityDate);
-								}
-							}
-						}
-					}
+	// 				AV_LogDebug.printLogDebug(methodName, 'listTaskAndOppRelated: '+listTaskAndOppRelated.size());
+	// 				for(Task ta:listTaskAndOppRelated) {
+	// 					if (mapTaskOpp.get(ta.AV_ExternalID__c)!=null) {
+	// 						for(String oppId:mapTaskOpp.get(ta.AV_ExternalID__c)) {
+	// 							if (mapOppFecha.get(oppId) == null){
+	// 								mapOppFecha.put(oppId,ta.ActivityDate);
+	// 							}else if (mapOppFecha.get(oppId) > ta.ActivityDate) {
+	// 								mapOppFecha.put(oppId,ta.ActivityDate);
+	// 							}
+	// 						}
+	// 					}
+	// 				}
 					
-					List<Event> listEventAndOppRelated= new List<Event>();
-					if(
-						Event.SObjectType.getDescribe().isAccessible() &&
-						Schema.SObjectType.Event.fields.AV_ExternalID__c.isAccessible() &&
-						Schema.SObjectType.Event.fields.ActivityDate.isAccessible()
-					) {
-						listEventAndOppRelated = [SELECT Id, AV_ExternalID__c, ActivityDate FROM Event WHERE CSBD_Evento_Estado__c IN :statusEvent AND RecordtypeId IN :setIdsRtsEvent AND AV_ExternalID__c IN :ids AND ActivityDate >= TODAY order by ActivityDate ASC limit 1];
-					}
+	// 				List<Event> listEventAndOppRelated= new List<Event>();
+	// 				if(
+	// 					Event.SObjectType.getDescribe().isAccessible() &&
+	// 					Schema.SObjectType.Event.fields.AV_ExternalID__c.isAccessible() &&
+	// 					Schema.SObjectType.Event.fields.ActivityDate.isAccessible()
+	// 				) {
+	// 					listEventAndOppRelated = [SELECT Id, AV_ExternalID__c, ActivityDate FROM Event WHERE CSBD_Evento_Estado__c IN :statusEvent AND RecordtypeId IN :setIdsRtsEvent AND AV_ExternalID__c IN :ids AND ActivityDate >= TODAY order by ActivityDate ASC limit 1];
+	// 				}
 					
 			
-					AV_LogDebug.printLogDebug(methodName, 'listEventAndOppRelated: '+listEventAndOppRelated.size());
-					for(Event e:listEventAndOppRelated) {
-						if (mapTaskOpp.get(e.AV_ExternalID__c)!=null) {
-							for(String oppId:mapTaskOpp.get(e.AV_ExternalID__c)) {
-								if (mapOppFecha.get(oppId) == null) {
-									mapOppFecha.put(oppId,e.ActivityDate);
-								}else if (mapOppFecha.get(oppId) > e.ActivityDate) {
-									mapOppFecha.put(oppId,e.ActivityDate);
-								}
-							}
-						}
-					}
-					if(mapOppFecha != null) {
-						for (Id idOpp : mapOppEvent.keySet()){
-							if (mapOppFecha.get(idOpp) != null) {
-								Opportunity oppUpdate = new Opportunity(Id= idOpp, AV_FechaProximoRecordatorio__c = mapOppFecha.get(idOpp));
-								listOppUpdate.add(oppUpdate);
-							}	
-						}
-					}
-				}
-				if(!listOppUpdate.isEmpty()){
-					AV_LogDebug.printLogDebug(methodName, 'Oportunidades: ' + listOppUpdate.size());
-					List<Database.SaveResult> listUpdateResult = database.update(listOppUpdate,false);
-					CIBE_AppUtilities.displayErrors(methodName,listUpdateResult);
-				}
-			}
-		}
-    }   
+	// 				AV_LogDebug.printLogDebug(methodName, 'listEventAndOppRelated: '+listEventAndOppRelated.size());
+	// 				for(Event e:listEventAndOppRelated) {
+	// 					if (mapTaskOpp.get(e.AV_ExternalID__c)!=null) {
+	// 						for(String oppId:mapTaskOpp.get(e.AV_ExternalID__c)) {
+	// 							if (mapOppFecha.get(oppId) == null) {
+	// 								mapOppFecha.put(oppId,e.ActivityDate);
+	// 							}else if (mapOppFecha.get(oppId) > e.ActivityDate) {
+	// 								mapOppFecha.put(oppId,e.ActivityDate);
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 				if(mapOppFecha != null) {
+	// 					for (Id idOpp : mapOppEvent.keySet()){
+	// 						if (mapOppFecha.get(idOpp) != null) {
+	// 							Opportunity oppUpdate = new Opportunity(Id= idOpp, AV_FechaProximoRecordatorio__c = mapOppFecha.get(idOpp));
+	// 							listOppUpdate.add(oppUpdate);
+	// 						}	
+	// 					}
+	// 				}
+	// 			}
+	// 			if(!listOppUpdate.isEmpty()){
+	// 				AV_LogDebug.printLogDebug(methodName, 'Oportunidades: ' + listOppUpdate.size());
+	// 				List<Database.SaveResult> listUpdateResult = database.update(listOppUpdate,false);
+	// 				CIBE_AppUtilities.displayErrors(methodName,listUpdateResult);
+	// 			}
+	// 		}
+	// 	}
+    // }   
 
 	/**
 	 * @description		 Check if the event is created by Outlook or by User
@@ -633,7 +639,7 @@ public with sharing class CIBE_EventTriggerHelper {
 		if(!evtToProcess.isEmpty() && !evtOwners.isEmpty()) {
             List<Contact> listCont = new List<Contact>();
             if(
-				Contact.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.Contact.isAccessible() &&
 				Schema.SObjectType.Contact.fields.lastmodifieddate.isAccessible() &&
 				Schema.SObjectType.Contact.fields.CIBE_Sector__c.isAccessible()&&
 				Schema.SObjectType.Contact.fields.CIBE_Cartera__c.isAccessible()&&
@@ -644,7 +650,7 @@ public with sharing class CIBE_EventTriggerHelper {
            
 
 			List<CBK_Activity_Extension__c> listTaskExtension = new List<CBK_Activity_Extension__c>();
-			if(CBK_Activity_Extension__c.SObjectType.getDescribe().isAccessible() &&
+			if(Schema.SObjectType.CBK_Activity_Extension__c.isAccessible() &&
 			Schema.SObjectType.CBK_Activity_Extension__c.fields.CIBE_Sector__c.isAccessible()&&
 			Schema.SObjectType.CBK_Activity_Extension__c.fields.CIBE_Cartera__c.isAccessible()&&
 			Schema.SObjectType.CBK_Activity_Extension__c.fields.AV_ActivityId__c.isAccessible()
@@ -682,11 +688,11 @@ public with sharing class CIBE_EventTriggerHelper {
 			}
 
 			
-			List<User> userGcf = new List<User>();
+			// List<User> userGcf = new List<User>();
 			List<User> ownerWithNoEap = new List<User>();
-			if(	User.SObjectType.getDescribe().isAccessible() ) {
+			if(Schema.SObjectType.User.isAccessible() ) {
 				//Invocamos al usuario para owners sin EAP
-				userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
+				// userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
 				//Retrieve users who are not in contact table 
 				ownerWithNoEap = [SELECT ID FROM USER WHERE id NOT IN: idsContact AND id IN :evtOwners];
 			}
@@ -700,7 +706,7 @@ public with sharing class CIBE_EventTriggerHelper {
 
 			for(Event evt : evtToProcess){			  
 				if(idOwnerWithNoEap.contains(evt.OwnerId)){
-					evt.OwnerId= userGcf[0].Id;
+					evt.OwnerId = userGCF.Id;
 					if(mapActExt.containsKey(evt.id)){
 						mapActExt.get(evt.id).CIBE_Cartera__c = null;
 						mapActExt.get(evt.id).CIBE_Sector__c = null;
@@ -710,7 +716,7 @@ public with sharing class CIBE_EventTriggerHelper {
 			}
 
 			if(!listActExtUpdt.isEmpty()) {
-				if(CBK_Activity_Extension__c.sObjectType.getDescribe().isUpdateable() ){
+				if(Schema.SObjectType.CBK_Activity_Extension__c.isUpdateable() ){
 					Database.update(listActExtUpdt, false);
 				}
 			}
@@ -746,14 +752,7 @@ public with sharing class CIBE_EventTriggerHelper {
 		}
 		
 		if (lstEvents != null) {
-			List<Contact> listEmployees= new List<Contact>();
-			if(
-				Contact.SObjectType.getDescribe().isAccessible() &&
-				Schema.SObjectType.Contact.fields.AV_UsuarioAsociado__c.isAccessible() &&
-				Schema.SObjectType.Contact.fields.CC_Matricula__c.isAccessible()
-			) {
-				listEmployees= [SELECT Id, CC_Matricula__c, AV_UsuarioAsociado__c FROM Contact WHERE AV_UsuarioAsociado__c IN :listIdOwner];
-			}
+			List<Contact> listEmployees= [SELECT Id, CC_Matricula__c, AV_UsuarioAsociado__c FROM Contact WHERE AV_UsuarioAsociado__c IN :listIdOwner];
 
 			if(listEmployees != null && !listEmployees.isEmpty()){
 				for(Contact c : listEmployees){
@@ -831,6 +830,7 @@ public with sharing class CIBE_EventTriggerHelper {
 		Map<Id,String> mapEventUser = new Map<Id,String>();
 		Map<String,String> mapExternalIdUser = new Map<String,String>();
 		List<String> listExternalId = new List<String>();
+		Map<String, Id> mapGestoresUsers = new Map<String, Id>();
 		if(mapOlds != null && !mapOlds.isEmpty()) {
 			for(Event eNew : lstEvents){
 				if((setIdsRt).contains(eNew.RecordTypeId) && String.isNotBlank(eNew.AV_CodigoGestorAsignado__c)
@@ -850,44 +850,41 @@ public with sharing class CIBE_EventTriggerHelper {
 				}
 			}
 		}
-		User userGcf= new User();
-		if(	User.SObjectType.getDescribe().isAccessible() ) {
-			userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
-		}
+		// User userGcf= new User();
+		// if(	User.SObjectType.getDescribe().isAccessible() ) {
+		// 	userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
+		// }
 
 		if(lstEventsCodigoGestoresSinEap!=null && !lstEventsCodigoGestoresSinEap.isEmpty()) {
 	
 			for(Event a : lstEventsCodigoGestoresSinEap){
-				a.OwnerId = userGcf.Id;
+				a.OwnerId = userGCF.Id;
 			}
 		}
 
 		if(codigosGestores!=null && !codigosGestores.isEmpty()) {
-			Map<String, Id> mapGestoresUsers = new Map<String, Id>();
-			List<User> listGestoresUsers= new List<User>();
-
 			if(
-				User.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.User.isAccessible() &&
 				Schema.SObjectType.User.fields.AV_ExternalID__c.isAccessible()
 			) {
-				listGestoresUsers = [SELECT Id,AV_ExternalID__c FROM User WHERE AV_ExternalID__c IN :codigosGestores AND IsActive = true];
-			}
+				List<User> listGestoresUsers = [SELECT Id,AV_ExternalID__c FROM User WHERE AV_ExternalID__c IN :codigosGestores AND IsActive = true];
 			
-			if(listGestoresUsers.size() > 0 && listGestoresUsers != null){
-				for(User u : listGestoresUsers){
-					if(String.isNotBlank(u.AV_ExternalID__c)){
-						mapGestoresUsers.put(u.AV_ExternalID__c, u.Id);
+				if(listGestoresUsers != null && !listGestoresUsers.isEmpty()){
+					for(User u : listGestoresUsers){
+						if(String.isNotBlank(u.AV_ExternalID__c)){
+							mapGestoresUsers.put(u.AV_ExternalID__c, u.Id);
+						}
+					}
+				
+					for(Event a : lstEventsCodigoGestores){
+						if(mapGestoresUsers.get(a.AV_CodigoGestorAsignado__c) != null){
+							a.OwnerId = mapGestoresUsers.get(a.AV_CodigoGestorAsignado__c);
+						}else{
+							a.OwnerId = userGCF.Id;
+						}
 					}
 				}
 			}
-			for(Event a : lstEventsCodigoGestores){
-				if(mapGestoresUsers.get(a.AV_CodigoGestorAsignado__c) != null){
-					a.OwnerId = mapGestoresUsers.get(a.AV_CodigoGestorAsignado__c);
-				}else{
-					a.OwnerId = userGcf.Id;
-				}
-			}
-			
 		}	
 	}
 
@@ -910,7 +907,7 @@ public with sharing class CIBE_EventTriggerHelper {
 			}
 
 			if(	
-				User.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.User.isAccessible() &&
 				Schema.SObjectType.User.fields.AV_NumeroOficinaEmpresa__c.isAccessible()) {
 				ownersInfo = [SELECT Id, AV_NumeroOficinaEmpresa__c FROM User WHERE Id IN :ownersIds];
 			}
@@ -963,21 +960,17 @@ public with sharing class CIBE_EventTriggerHelper {
 
 		List<User> ownerOffice = new List<User>();
 		if(
-			USER.SObjectType.getDescribe().isAccessible() &&
+			Schema.SObjectType.User.isAccessible() &&
 			Schema.SObjectType.USER.fields.AV_NumeroOficinaEmpresa__c.isAccessible()
 		) {
 			ownerOffice = [SELECT ID,AV_NumeroOficinaEmpresa__c FROM USER WHERE ID IN :owners];
-		}
-		List<User> userGFC= new List<User>();
-		if(	User.SObjectType.getDescribe().isAccessible() ) {
-			userGFC = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' and IsActive = TRUE LIMIT 1];
 		}
 
 		for(User owner : ownerOffice){
 			mapOwnerOffice.put(owner.Id,owner.AV_NumeroOficinaEmpresa__c);
 		}
 		for(Event e : eventsToProcess){	
-			if(e.OwnerId != userGFC[0].id) {
+			if(e.OwnerId != userGCF.Id) {
 				offiNumber= mapOwnerOffice.get(e.OwnerId);
 				e.AV_Center__C = (offiNumber != null)?offiNumber.substring(offiNumber.length()-5):null;
 			}	
@@ -1010,18 +1003,12 @@ public with sharing class CIBE_EventTriggerHelper {
 		Map<Id, Boolean> cliConfidentiality = new Map<Id, Boolean>();
 		Map<Id, Boolean> cliEmployee = new Map<Id, Boolean>();
 		for (Event evt : listNew) {
-			/*if(evt.AccountId!=null){
-				cliIds.add(evt.AccountId);
-			}else{
-				cliIds.add(evt.whatId);
-			}*/
 			cliIds.add(evt.whatId);
-
 		}
 		List<Account> clients= new List<Account>();
 
 		if(
-			Account.SObjectType.getDescribe().isAccessible() &&
+			Schema.SObjectType.Account.isAccessible() &&
 			Schema.SObjectType.Account.fields.AV_Confidencial__c.isAccessible() &&
 			Schema.SObjectType.Account.fields.AV_Empleado__c.isAccessible()
 		) {
@@ -1080,7 +1067,7 @@ public with sharing class CIBE_EventTriggerHelper {
 		if (listToProcess != null && !listToProcess.isEmpty()) {
 			List<User> listEmp  = new List<User>();
 			if(
-				User.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.User.isAccessible()  &&
 				Schema.SObjectType.User.fields.AV_ExternalID__c.isAccessible() &&
 				Schema.SObjectType.User.fields.AV_AzureId__c.isAccessible() &&
 				Schema.SObjectType.User.fields.FederationIdentifier.isAccessible()
@@ -1126,7 +1113,7 @@ public with sharing class CIBE_EventTriggerHelper {
         }
 		List<AV_CustomActivityOpportunity__c> eventOppList = [SELECT Id FROM AV_CustomActivityOpportunity__c WHERE (AV_Task__c IN :listIdsHeaderEvent OR AV_Task__r.AV_ExternalID__c IN :listExternalIdsHeaderEvent) OR (AV_Task__c IN :listIdsHeaderEvent AND AV_Task__r.AV_ExternalID__c IN :listExternalIdsHeaderEvent)];
 		List<AV_HeaderCustomActivity__c> listHeaderEvent = [SELECT Id FROM AV_HeaderCustomActivity__c WHERE (Id IN :listIdsHeaderEvent OR AV_ExternalID__c IN :listExternalIdsHeaderEvent) OR (Id IN :listIdsHeaderEvent AND AV_ExternalID__c IN :listExternalIdsHeaderEvent)];
-        if(managementHistoryList.size() > 0 || eventExtensionList.size() > 0 || eventOppList.size() > 0 || listHeaderEvent.size() > 0) {
+        if(!managementHistoryList.IsEmpty()|| !eventExtensionList.IsEmpty() || !eventOppList.IsEmpty() || !listHeaderEvent.IsEmpty()) {
             System.enqueueJob(new CIBE_DeleteRelatedEventQueueable(managementHistoryList,eventExtensionList,eventOppList,listHeaderEvent));
 		}
 	}
@@ -1144,15 +1131,13 @@ public with sharing class CIBE_EventTriggerHelper {
 					mapEventHCAOld.put(e.AV_Task__c,mapEventOld.get(e.Id));
 				}
 			}
-			System.debug(mapEventHCA);
-			System.debug(mapEventHCAOld);
 
 
 			if(mapEventHCA != null && mapEventHCAOld != null){
-
 				List<AV_HeaderCustomActivity__c> header = new List<AV_HeaderCustomActivity__c>();
 				List<AV_HeaderCustomActivity__c> headerUp = new List<AV_HeaderCustomActivity__c>();
-				if(AV_HeaderCustomActivity__c.SObjectType.getDescribe().isAccessible()) {
+				if(Schema.SObjectType.AV_HeaderCustomActivity__c.isAccessible() &&
+				Schema.SObjectType.AV_HeaderCustomActivity__c.isUpdateable()) {
 					header = [SELECT Id, CIBE_ConfidentialEvent__c FROM AV_HeaderCustomActivity__c WHERE Id IN :mapEventHCA.keySet()];
 				}
 
@@ -1171,4 +1156,257 @@ public with sharing class CIBE_EventTriggerHelper {
 			}
 		}
 	}
+
+	public static void updateNextMeetingDate(List<Event> listNews, Map<Id, Event> mapOlds, String oppId){
+		String methodName = 'updateNextMeetingDate';
+		Set<String> setStage = new Set<String>{CIBE_AppConstants.OPPORTUNITY_STATUS_POTENCIAL, CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO, CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA};
+        Set<String> setLabelsRtsEvent = new Set<String>{CIBE_AppConstants.EVENT_CLIENTE_RT};
+		Set<Id> setIdsRtsEventEMP = getIdsRT(setLabelsRtsEvent);
+		Set<String> setOpp = new Set<String>();
+		Date fecha;
+		Date hoy = System.today();
+		List<Opportunity> listOppUpdate = new List<Opportunity>();
+		Set<String> setOppNeg = new Set<String>();
+		Set<String> setRtEMP = new Set<String>{CIBE_AppConstants.OPP_INICIATIVAEMP_RT, CIBE_AppConstants.OPP_ACCIONEMP_RT, CIBE_AppConstants.OPP_ALERTAEMP_RT, CIBE_AppConstants.OPP_SUGERENCIAEMP_RT};
+		List<Event> lstToProcess = new List<Event>();
+		Map<Id,Event> mapaEventRelacionadoOpp = new Map<Id,Event>();
+		Set<String> setEvtIds = new Set<String>();
+		Map<String, AV_CustomActivityOpportunity__c> mapOpp = new Map<String, AV_CustomActivityOpportunity__c>();
+		Map<String, Event> mapEvent = new Map<String, Event>();
+		List<Event> eventosRelacionadosOpp = new List<Event>();
+		
+		if(!listNews.isEmpty()){
+			for(Event ev : listNews) {
+				if(setIdsRtsEventEMP.contains(ev.RecordtypeId) && ev.AccountId != null && ev.AV_Task__c != null) {
+					setOppNeg.add(ev.Id);
+				}
+			}
+
+			if(setOppNeg != null){
+				for(Event ev : [SELECT Id, AccountId, Account.AV_Negocio__c, AV_Task__c, ActivityDate,CSBD_Evento_Estado__c FROM Event WHERE Id IN :setOppNeg]) {
+					if(ev.Account.AV_Negocio__c != null && (ev.Account.AV_Negocio__c.contains('EMP') || ev.Account.AV_Negocio__c.contains('PRO')))  {
+						mapEvent.put(ev.AV_Task__c, ev);
+					}
+					if(ev.CSBD_Evento_Estado__c == CIBE_AppConstants.EVENT_STATUS_PENDIENTE && ev.ActivityDate >= hoy){
+						mapaEventRelacionadoOpp.put(ev.AV_Task__c, ev);
+					}
+				}
+			}
+		}
+		
+		if(mapEvent != null && oppId == null){
+			Map<String, AV_CustomActivityOpportunity__c> oppMap = new Map<String, AV_CustomActivityOpportunity__c>();
+			//Sacamos las Oportunidades de la cita
+			
+			for(AV_CustomActivityOpportunity__c customActivity :[SELECT AV_Opportunity__c, AV_Opportunity__r.Name, AV_Opportunity__r.StageName, AV_Opportunity__r.AV_FechaProximoRecordatorio__c, 
+																AV_Opportunity__r.CIBE_NextMeetingDate__c, AV_Opportunity__r.CloseDate, AV_Task__c, AV_Task__r.Name  
+																from AV_CustomActivityOpportunity__c 
+																where AV_Task__c = :mapEvent.keySet() AND AV_Opportunity__r.StageName IN :setStage 
+																AND AV_Opportunity__r.RecordType.DeveloperName IN :setRtEMP AND CreatedDate >= LAST_N_MONTHS:12]){
+				oppMap.put(customActivity.AV_Opportunity__c, customActivity);
+			}
+
+			
+			if(oppMap != null && oppMap.size() > 0){
+				List<AV_CustomActivityOpportunity__c> citasVinculadas = [SELECT Id, AV_Opportunity__c, AV_Task__c, AV_Task__r.Name  
+				from AV_CustomActivityOpportunity__c where AV_Opportunity__c = :oppMap.keySet() AND CreatedDate >= LAST_N_MONTHS:12]; // de las oportunidades vinculadas a la cita sacamos todas las demás citas que tenga
+
+					for (AV_CustomActivityOpportunity__c citasOpp : citasVinculadas) {
+						//setOpp.add(citasOpp.AV_Task__c);
+						if(mapaEventRelacionadoOpp !=null && mapaEventRelacionadoOpp.containsKey(citasOpp.AV_Task__c)){
+							eventosRelacionadosOpp.add(mapaEventRelacionadoOpp.get(citasOpp.AV_Task__c));
+						}
+					}
+
+					if(!eventosRelacionadosOpp.isEmpty()){
+						fecha = eventosRelacionadosOpp[0].ActivityDate;
+						for (Integer i = 0; i < eventosRelacionadosOpp.size(); i++) {
+							if(eventosRelacionadosOpp[i].ActivityDate < fecha){
+								fecha = eventosRelacionadosOpp[i].ActivityDate;
+							}
+						}
+						
+						for (String variable1 : oppMap.keySet()) {
+							for (AV_CustomActivityOpportunity__c variable2 : citasVinculadas) {
+								if(variable1.equals(variable2.AV_Opportunity__c)){
+									setEvtIds.add(variable2.AV_Task__c);
+								}
+							}
+		
+							if(setEvtIds != null && (fecha < oppMap.get(variable1).AV_Opportunity__r.CloseDate && fecha >= hoy)){
+								if(setEvtIds.size() == 1){
+									Opportunity oppUpdate = new Opportunity(Id= oppMap.get(variable1).AV_Opportunity__c, Name = oppMap.get(variable1).AV_Opportunity__r.Name, AV_FechaProximoRecordatorio__c = mapEvent.get(oppMap.get(variable1).AV_Task__c).ActivityDate, CIBE_NextMeetingDate__c = mapEvent.get(oppMap.get(variable1).AV_Task__c).ActivityDate);
+									listOppUpdate.add(oppUpdate);
+								}else{
+									Opportunity oppUpdate = new Opportunity(Id= oppMap.get(variable1).AV_Opportunity__c, Name = oppMap.get(variable1).AV_Opportunity__r.Name, AV_FechaProximoRecordatorio__c = fecha, CIBE_NextMeetingDate__c = fecha);
+									listOppUpdate.add(oppUpdate);
+								}
+							}else if((fecha > oppMap.get(variable1).AV_Opportunity__r.CloseDate || fecha < hoy)){
+								Opportunity oppUpdate = new Opportunity(Id= oppMap.get(variable1).AV_Opportunity__c, Name = oppMap.get(variable1).AV_Opportunity__r.Name, AV_FechaProximoRecordatorio__c = fecha, CIBE_NextMeetingDate__c = fecha, CloseDate = fecha);
+								listOppUpdate.add(oppUpdate);
+							}
+						}
+					}
+				// }
+			}
+		}else if (oppId != null){
+			//Se rellena desde los componentes de vinculación/desvinculas Opps
+			List<AV_CustomActivityOpportunity__c> citasVinculadas = [SELECT Id, AV_Opportunity__c, AV_Task__c, AV_Task__r.Name  
+																	from AV_CustomActivityOpportunity__c 
+																	where AV_Opportunity__c = :oppId];
+
+			if(citasVinculadas.isEmpty()){
+				Opportunity opp = [SELECT Id, CloseDate, name FROM Opportunity WHERE Id = :oppId];
+                opp.Id = oppId;
+                opp.CIBE_NextMeetingDate__c = null;
+				listOppUpdate.add(opp);
+
+			}else{
+				for (AV_CustomActivityOpportunity__c citasOpp : citasVinculadas) {
+					if(mapaEventRelacionadoOpp !=null && mapaEventRelacionadoOpp.containsKey(citasOpp.AV_Task__c)){
+						eventosRelacionadosOpp.add(mapaEventRelacionadoOpp.get(citasOpp.AV_Task__c));
+					}
+				}
+
+				if(!eventosRelacionadosOpp.isEmpty()){
+					fecha = eventosRelacionadosOpp[0].ActivityDate;
+					for (Integer i = 0; i < eventosRelacionadosOpp.size(); i++) {
+						if(eventosRelacionadosOpp[i].ActivityDate < fecha){
+							fecha = eventosRelacionadosOpp[i].ActivityDate;
+						}
+					}
+
+					Opportunity oppUpdate = new Opportunity(Id=  oppId,  CIBE_NextMeetingDate__c = fecha);
+					listOppUpdate.add(oppUpdate);
+				}
+			}
+		}
+
+		if(!listOppUpdate.isEmpty()) {
+			if(Schema.SObjectType.Opportunity.isUpdateable()){
+				Database.SaveResult[] srList = Database.update(listOppUpdate, false);
+				boolean hasError = false;
+				List<Object> objs = new List<Object>();
+				Map<String, String> msjs = new Map<String, String>();
+				for (Integer i = 0; i < listOppUpdate.size(); i++) {
+					Database.SaveResult sr = srList[i];
+					if(!sr.isSuccess() && !sr.getErrors().isEmpty()) {
+						msjs.put(listOppUpdate[i].Id + '_' + listOppUpdate[i].Name, ((String)sr.getErrors()[0].getMessage()));
+						objs.add(listOppUpdate[i]);
+						hasError = true;
+					}
+				}
+				if(hasError) {
+					CBK_Log.error(msjs, objs);
+				}
+			}
+		}
+
+	} 
+
+	/**
+    * @description      Delete deleteRelations objects related With Event
+    * @param  deletedEventList  list of delete Event records
+    */
+    public static void deleteRelations(List<Event> deletedEventList){
+
+        Map<String, Event> mapEvent = new Map<String, Event>();
+        List<Event> lstEvEmp = new List<Event>();
+        Set<String> setEvTask = new Set<String>();
+        Set<String> setLabelsRtsEvent = new Set<String>{CIBE_AppConstants.EVENT_CLIENTE_RT, CIBE_AppConstants.EVENT_GESTOR_RT};
+        Set<Id> setIdsRtsEventEMP = getIdsRT(setLabelsRtsEvent);
+
+        if(!deletedEventList.isEmpty() ){/*&& profileCu == 'CIBE_Gestor'*/
+            for(Event ev : deletedEventList) {
+                if(setIdsRtsEventEMP.contains(ev.RecordtypeId) && ev.AV_Task__c != null) {
+                    lstEvEmp.add(ev);
+					setEvTask.add(ev.AV_Task__c);
+                }
+            }
+        }
+
+        if(!lstEvEmp.isEmpty()){
+
+            List<AV_CustomActivityOpportunity__c> customActi = [SELECT Id, AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c IN : setEvTask];
+            List<CIBE_RelaccionadoCita__c> citaRel = [SELECT Id , CIBE_CitaRelaccionada__c FROM CIBE_RelaccionadoCita__c  WHERE CIBE_CitaRelaccionada__c IN : setEvTask];
+
+            if(!customActi.isEmpty()){
+                if(Schema.sObjectType.AV_CommentsHistory__c.isDeletable()){
+                    List<Database.DeleteResult> srList = Database.delete(customActi,false);
+                    for(Database.deleteResult res : srList) {
+                        if(!res.isSuccess()) {
+                            for(Database.Error err : res.getErrors()) {
+                                CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!citaRel.isEmpty()){
+                if(Schema.sObjectType.AV_CommentsHistory__c.isDeletable()){
+                    List<Database.DeleteResult> srList2 = Database.delete(citaRel,false);
+                    for(Database.deleteResult res1 : srList2) {
+                        if(!res1.isSuccess()) {
+                            for(Database.Error err : res1.getErrors()) {
+                                CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+	/**
+    * @description      Delete deleteRelations objects related With Event
+    * @param  deletedEventList  list of delete Event records
+    */
+    public static void updateRelacionadoGC(List<Event> newEvent){
+
+        Map<String, Event> mapEvent = new Map<String, Event>();
+        List<CIBE_RelaccionadoCita__c> lstRelacionado = new List<CIBE_RelaccionadoCita__c>();
+        Set<String> setLabelsRtsEvent = new Set<String>{CIBE_AppConstants.EVENT_CLIENTE_RT, CIBE_AppConstants.EVENT_GESTOR_RT};
+        Set<Id> setIdsRtsEventEMP = getIdsRT(setLabelsRtsEvent);
+
+        if(!newEvent.isEmpty() ){
+            for(Event ev : newEvent) {
+                if(setIdsRtsEventEMP.contains(ev.RecordtypeId)) {
+					mapEvent.put(ev.AV_Task__c,ev);
+                }
+            }
+        }
+
+        if(mapEvent!=null && !mapEvent.isEmpty()){
+            List<CIBE_RelaccionadoCita__c> citaRel = [SELECT Id, CIBE_Account__c, CIBE_GrupoComercial__c, CIBE_CitaRelaccionada__c FROM CIBE_RelaccionadoCita__c  WHERE CIBE_CitaRelaccionada__c IN : mapEvent.KeySet()];
+
+            if(!citaRel.isEmpty()){
+				for(CIBE_RelaccionadoCita__c rel : citaRel) {
+					rel.CIBE_Account__c = mapEvent.get(rel.CIBE_CitaRelaccionada__c).whatId;
+					rel.CIBE_GrupoComercial__c = mapEvent.get(rel.CIBE_CitaRelaccionada__c).FinServ__NextSteps__c;
+					lstRelacionado.add(rel);
+				}
+            }else{
+				for(Event ev : mapEvent.Values()) {
+					CIBE_RelaccionadoCita__c relCita = new CIBE_RelaccionadoCita__c();
+					relCita.CIBE_Account__c = ev.whatId;
+					relCita.CIBE_GrupoComercial__c = ev.FinServ__NextSteps__c;
+					relCita.CIBE_CitaRelaccionada__c = ev.AV_Task__c;
+					lstRelacionado.add(relCita);
+				}
+			}
+			if(!lstRelacionado.isEmpty()){
+                if(Schema.sObjectType.CIBE_RelaccionadoCita__c.isCreateable()){
+                    List<Database.UpsertResult> srList = Database.upsert(lstRelacionado,false);
+                    for(Database.UpsertResult res1 : srList) {
+                        if(!res1.isSuccess()) {
+                            for(Database.Error err : res1.getErrors()) {
+                                CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                            }
+                        }
+                    }
+                }
+			}
+        }
+    }
 }

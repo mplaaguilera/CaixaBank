@@ -168,7 +168,7 @@ public inherited sharing class CSBD_Opportunity {
 
 		for (Opportunity oportunidad : oportunidades) {
 			if (oportunidad.RecordType.DeveloperName == 'CSBD_MAC' && String.isBlank(oportunidad.CSBD_Motivo_MAC__c)) {
-				throw new DefaultException('No es posible cerrar una oportunidad MAC si el campo "Motivo MAC" no está informado.');
+				throw new DefaultException('No es posible cerrar una oportunidad AC si el campo "Motivo AC" no está informado.');
 			}
 
 			if (oportunidad.CSBD_Estado__c == 'Pendiente Cliente') {
@@ -272,52 +272,49 @@ public inherited sharing class CSBD_Opportunity {
 	}
 
 	public static Opportunity reactivarOportunidad(Id idOportunidad, String nombreEtapaVentas) {
-		return reactivarOportunidad(idOportunidad, nombreEtapaVentas, false);
+		return reactivarOportunidad(idOportunidad, nombreEtapaVentas, true);
 	}
 
 	public static Opportunity reactivarOportunidad(Id idOportunidad, String nombreEtapaVentas, Boolean tomarPropiedad) {
 		//No quitar campos de esta consulta, los usa el modal de reactivación al leer la oportunidad devuelta
-		Opportunity oportunidad = [SELECT CSBD_Identificador__c, CSBD_Estado__c, CSBD_Ultima_Etapa_Ventas__c, RecordType.Name
-									FROM Opportunity WHERE Id = :idOportunidad];
-		oportunidad.CSBD_Estado__c = 'Activa';
+		List<Opportunity> oportunidades = [SELECT CSBD_Identificador__c, CSBD_Estado__c, CSBD_Ultima_Etapa_Ventas__c, (SELECT StageName, CSBD_Ultima_Etapa_Ventas__c FROM CSBD_Oportunidades_Hijas__r WHERE StageName = 'Rechazada')
+												FROM Opportunity WHERE Id = :idOportunidad];
 
+		List<Opportunity> actualizarOportunidades = new List<Opportunity>();
+
+        for(Opportunity oportunidad : oportunidades) {
+			actualizarOportunidades.add(reactivarOportunidad(oportunidad, nombreEtapaVentas, tomarPropiedad, true));
+
+			for(Opportunity oportunidadHija: oportunidad.CSBD_Oportunidades_Hijas__r){
+				actualizarOportunidades.add(reactivarOportunidad(oportunidadHija, nombreEtapaVentas, tomarPropiedad, false));
+			}
+        }
+
+		if(!actualizarOportunidades.isEmpty()){
+			update actualizarOportunidades;
+		}
+
+		CSBD_Activity.crearActividad(idOportunidad, 'Reactivación', 'Completed', 'Reactivación', '', null);
+		return actualizarOportunidades[0];
+	}
+
+	public static Opportunity reactivarOportunidad(Opportunity oportunidad, String nombreEtapaVentas, Boolean tomarPropiedad, Boolean padre){
 		if (tomarPropiedad) {
 			oportunidad.OwnerId = UserInfo.getUserId();
 		}
 
-		if (nombreEtapaVentas != null) {
+		if (nombreEtapaVentas != null && padre) {
 			oportunidad.StageName = nombreEtapaVentas;
-		} else if (oportunidad.CSBD_Ultima_Etapa_Ventas__c != null) {
+		} else if (oportunidad.CSBD_Ultima_Etapa_Ventas__c != null && oportunidad.CSBD_Ultima_Etapa_Ventas__c != 'Rechazada') {
 			oportunidad.StageName = oportunidad.CSBD_Ultima_Etapa_Ventas__c;
 		} else {
 			oportunidad.StageName = 'Solicitud';
 		}
+
+		oportunidad.CSBD_Estado__c = 'Activa';
 		oportunidad.CSBD_Resolucion__c = '';
 		oportunidad.Loss_Reason__c = '';
-
-        List<Opportunity> oportunidades = [SELECT CSBD_Resolucion__c, CSBD_Ultima_Etapa_Ventas__c FROM Opportunity WHERE CSBD_Parent_Id__c = :idOportunidad];
-		List<Opportunity> oportunidadesHijas = new List<Opportunity>();
-
-        for(Opportunity opp : oportunidades) {
-            if(opp.CSBD_Resolucion__c == 'Oportunidad ' + oportunidad.RecordType.Name +' asociada perdida'){
-                if (opp.CSBD_Ultima_Etapa_Ventas__c != null) {
-					opp.StageName = opp.CSBD_Ultima_Etapa_Ventas__c;
-				} else {
-					opp.StageName = 'Solicitud';
-				}
-				opp.CSBD_Resolucion__c = '';
-				opp.Loss_Reason__c = '';
-				oportunidadesHijas.add(opp);
-            }
-        }
-
-		if(!oportunidadesHijas.isEmpty()){
-			update oportunidadesHijas;
-		}
-
-		update oportunidad;
-
-		CSBD_Activity.crearActividad(idOportunidad, 'Reactivación', 'Completed', 'Reactivación', '', null);
+		
 		return oportunidad;
 	}
 

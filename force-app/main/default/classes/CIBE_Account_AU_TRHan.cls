@@ -13,20 +13,23 @@ Historial
 public with sharing class CIBE_Account_AU_TRHan  extends CC_TriggerHandlerBase{
 
 	public override void mainEntry(CC_TriggerParameters tp) {
-    	process((List<Account>)tp.newList, (Map<Id, Account>)tp.newMap, (List<Account>) tp.oldList, (Map<Id, Account>) tp.oldMap);
-  	}
-  
-  	private void process(List<Account> listNewObj, Map<Id, Account> mapNewObj, List<Account> listOldObj, Map<Id, Account> mapOldObj) {
-    	//General check the Record type's for intouch project
-    	List<Account> listData = CIBE_AccountTriggerHelper.checkGeneralRT(listNewObj);
+		process((List<Account>)tp.newList, (Map<Id, Account>)tp.newMap, (List<Account>) tp.oldList, (Map<Id, Account>) tp.oldMap);
+	}
+
+	private void process(List<Account> listNewObj, Map<Id, Account> mapNewObj, List<Account> listOldObj, Map<Id, Account> mapOldObj) {
+		//General check the Record type's for intouch project
+		List<Account> listData = CIBE_AccountTriggerHelper.checkGeneralRT(listNewObj);
 
 		if (listData != null && !listData.isEmpty()) {
-			CIBE_AccountTriggerHelper.updateOppConfidentiality(listData, mapOldObj);
-			CIBE_AccountTriggerHelper.updateTaskConfidentiality(listData, mapOldObj);
-			CIBE_AccountTriggerHelper.updateEvntConfidentiality(listData, mapOldObj);
+			List<Account> lstAccN = CIBE_AccountTriggerHelper.getNegocio(listData);
+
+			if (lstAccN != null && !lstAccN.isEmpty()) {
+				CIBE_AccountTriggerHelper.updateOppConfidentiality(lstAccN, mapOldObj);
+				CIBE_AccountTriggerHelper.updateTaskConfidentiality(lstAccN, mapOldObj);
+				CIBE_AccountTriggerHelper.updateEvntConfidentiality(lstAccN, mapOldObj);
+			}
 			CIBE_AccountTriggerHelperWS.commitTeamMembers(listData, mapOldObj);
 			CIBE_AccountTriggerHelper.processEAPGestorUser(listData, mapOldObj);
 		}
-  	}
-
+	}
 }

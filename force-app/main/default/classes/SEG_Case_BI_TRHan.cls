@@ -587,7 +587,7 @@ public with sharing class SEG_Case_BI_TRHan extends CC_TriggerHandlerBase{
 		
 	}
 
-    /**
+    		/**
 	 * @description US697153 - Comprobación y marcado de casos para el envío a taskconnect SEG_sincronizado_con_TaskConnect__c
 	 * @param lstNewObj
 	 */

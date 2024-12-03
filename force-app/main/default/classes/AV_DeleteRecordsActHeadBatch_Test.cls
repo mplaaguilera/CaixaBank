@@ -11,7 +11,8 @@ Historial
    2.0			App FSC			Maria Telleria		02/09/2020		Coverage for the new logic
    2.1			App FSC			Sandra Gómez		04/11/2020		Refactor
    2.2         US671736         Oscar Moreno        17/10/2023       Delete the content of the class
-
+   2.3          QC              Oscar Moreno        05/06/2024      Insert AssertEquals on deleteRecordTest method
+  
 ***********************************************************************************************************************/
 @isTest
 private class AV_DeleteRecordsActHeadBatch_Test {
@@ -20,5 +21,6 @@ private class AV_DeleteRecordsActHeadBatch_Test {
     public static void deleteRecordTest(){
 
 		        AV_DeleteRecordsActHeadBatch.deleteRecord();
+                System.assertEquals(AV_DeleteRecordsActHeadBatch.deleteRecord(),'entra en deleteRecords');
     }
 }

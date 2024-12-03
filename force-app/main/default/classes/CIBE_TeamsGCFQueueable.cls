@@ -14,11 +14,14 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
     
     String jsonString;
     String subject;
+    String eventId;
     Datetime endDateTime;
     Datetime startDateTime;
     String headerId;
     String userName;
     String azureId;
+    List<String> attendes;
+    String contactoPrincipal;
 
     public CIBE_TeamsGCFQueueable(String serializedEvent, String subject, Datetime endDateTime, Datetime startDateTime, String headerId, String userName, String azureId) {
         this.jsonString=serializedEvent;
@@ -29,13 +32,27 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
         this.userName=userName;
         this.azureId=azureId;
     }
+    
+    public CIBE_TeamsGCFQueueable(String serializedEvent, Event evt, String userName, String azureId, List<String> attendes, String contactoPrincipal) {
+        
+        this.jsonString=serializedEvent;
+        this.eventId = evt.Id;
+        this.subject=evt.Subject;
+        this.endDateTime=evt.EndDateTime;
+        this.startDateTime=evt.StartDateTime;
+        this.headerId=evt.AV_Task__c;
+        this.userName=userName;
+        this.azureId=azureId;
+        this.attendes=attendes;
+        this.contactoPrincipal = contactoPrincipal;
+    }
 
     /**
 	 * Executes the Queueable job
 	 * @param qc	QueueableContext param that contains the context of the queueable
 	 */
 	public void execute(QueueableContext qc) {
-        futureCreateMeeting(subject, endDateTime, startDateTime, headerId, userName, azureId, jsonString);
+        futureCreateMeeting(eventId, subject, endDateTime, startDateTime, headerId, userName, azureId, jsonString, attendes, contactoPrincipal);
         if (!Test.isRunningTest()) {
             insertEventGCFFuture(jsonString);
         }
@@ -46,7 +63,8 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 		String methodName = 'insertEventGCF';
         
 		CIBE_AppUtilities.SearchRT rtGestor = new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
-        Set<Id> setRtGestor	= CIBE_EventTriggerHelper.getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtGestor});
+        CIBE_AppUtilities.SearchRT rtGestorCIB = new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
+        Set<Id> setRtGestor	= CIBE_EventTriggerHelper.getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtGestor,rtGestorCIB});
 		
 		List<Event> eventList = new List<Event>();
         try {
@@ -174,8 +192,7 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 					eUpt.AV_origenApp__c = CIBE_AppConstants.SALESFORCE_ORIGENAPP;
                         }
 					eventToUpdate.add(eUpt);
-						
-						if (setRtGestor.contains(evento.RecordTypeId) && (evento.IsRecurrence || evento.IsRecurrence2)) {
+						if (setRtGestor.contains(evento.RecordTypeId) && (evento.IsRecurrence || evento.IsRecurrence2)) {							
 						AV_HeaderCustomActivity__c headerCustomAct = CIBE_CitaPrevia_SyncEvents.createRecurrentEventHeader(evento, res.eventPremiumId);
 						if (headerCustomAct != null) {
 								customHeaders.add(headerCustomAct);
@@ -274,9 +291,11 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 		}
 	}
 
-    private static void futureCreateMeeting(String subject, Datetime endDateTime, Datetime startDateTime, String headerId, String userName, String azureId, String jsonString){
+    private static void futureCreateMeeting(String eventId, String subject, Datetime endDateTime, Datetime startDateTime, String headerId, String userName, String azureId, String jsonString, List<String> attendes, String contactoPrincipal){
 		String methodName = 'futureCreateMeeting';
-		
+		system.debug('### futureCreateMeeting');
+        system.debug('### attendes ' + attendes);
+        system.debug('### contactoPrincipal ' + contactoPrincipal);
         AV_AzureTeamsToken__c tok = AV_AzureTeamsToken__c.getValues('AzureTeamToken');
 		CIBE_Teams_Integration.Response res = new CIBE_Teams_Integration.Response();
 		Boolean firstToken = false;
@@ -292,9 +311,11 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 			Datetime exp = tok.CreatedDate.addSeconds( Integer.valueOf(tok.AV_ExpiresIn__c));
 			if(System.now() >= exp){
 				delToken = tok.Id;
+                system.debug('### 1er if ');
 				res = CIBE_Teams_Integration.getToken();
 				accessToken = res.data.access_token;
 			}else{
+                system.debug('### 2do if ');
 				accessToken = CIBE_Teams_Integration.getTokenString(new String[]{
 					tok.AV_Token1__c,
 					tok.AV_Token2__c,
@@ -308,11 +329,13 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 				});
 			}
 		}else{
+            system.debug('### 3er if ');
 			firstToken = true;
 			res = CIBE_Teams_Integration.getToken();
 			accessToken = res.data.access_token;
 		}
-        
+        system.debug('### accessToken '+ accessToken);
+        system.debug('### azureId '+ azureId);
 		if(!String.isBlank(azureId)){
 			userId = azureId;
 		}else{
@@ -320,12 +343,16 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 				userId = CIBE_Teams_Integration.getUserId(accessToken,userName);
 			}
 		}
+        system.debug('### userId '+ userId);
 		if(accessToken != null && userId != null){
+            system.debug('### futureCreateMeeting');
 			String joinUrl = CIBE_Teams_Integration.createMeeting(accessToken, meet,userId);
+			system.debug('### joinUrl ' + joinUrl);
 
 			if(String.isNotBlank(headerId)) {
 				List<AV_HeaderCustomActivity__c> headers = new List<AV_HeaderCustomActivity__c>{new AV_HeaderCustomActivity__c(Id = headerId, AV_UrlTeams__c = joinUrl)};
 				Database.SaveResult [] headerUpdate = Database.update(headers, false);
+                
 	
 				boolean hasError = false;
 				Map<String, String> msjs = new Map<String, String>();
@@ -338,10 +365,14 @@ public class CIBE_TeamsGCFQueueable implements Queueable, Database.AllowsCallout
 						hasError = true;
 					}
 				}
+                
+                
 	
 				if(hasError) {
 					CBK_Log.error(msjs, objs);
-				}
+                }else if((attendes != null && !attendes.isEmpty()) || contactoPrincipal != null){
+                        CIBE_NewEventController.updateEventWithURL(eventId, attendes, contactoPrincipal,joinUrl);
+                }
 			}
 			
 			try{

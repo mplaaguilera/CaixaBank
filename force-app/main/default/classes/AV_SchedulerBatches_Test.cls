@@ -6,13 +6,14 @@ Proposito: Test de la clase AV_ScheduleDeleteBatch
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-   VERSION        USER_STORY       AUTHOR           DATE                Description
-   1.0            App FSC          Maria Telleria   29/04/2020          Init version
-   1.1            App FSC          David Rufo   	29/11/2020          Improve coverage + Fix
-   1.2			  USXXXXXX		   Daniel Rodriguez	22/11/2021			add FWK Batches
-   1.3            US448873         Luis Fernández   08/03/2023          Added few methods in order to improve cobertry (testDeactivateSingleBatch,
+   VERSION        USER_STORY       AUTHOR               DATE                Description
+   1.0            App FSC          Maria Telleria       29/04/2020          Init version
+   1.1            App FSC          David Rufo   	    29/11/2020          Improve coverage + Fix
+   1.2			  USXXXXXX		   Daniel Rodriguez	    22/11/2021			add FWK Batches
+   1.3            US448873         Luis Fernández       08/03/2023          Added few methods in order to improve cobertry (testDeactivateSingleBatch,
                                                                                                                         testDeactivadedBatches)
    1.4            Fix              Patricia Villacañas  18/05/2023          Modified to set run as
+   1.5            US592909         Gonzalo Ávila Bravo  28/11/2023          Error message added in the catch of the testDeactivatedBatches method
 
 ***********************************************************************************************************************/
 @isTest
@@ -25,11 +26,11 @@ private class AV_SchedulerBatches_Test {
     static void setup() {
 
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-
+        
 
         System.runAs(userGcf){
         AV_TestHelper.activateLogger();
-    }
+        }
     }
 
     /**
@@ -53,21 +54,20 @@ private class AV_SchedulerBatches_Test {
     
         System.assertEquals(listData.size(), [SELECT count() FROM AV_ScheduleBatch__mdt WHERE DeveloperName LIKE 'AV_%' AND AV_Active__C = TRUE]);
 
-        if (listData != null && !listData.isEmpty()) {
+            if (listData != null && !listData.isEmpty()) {
 
-            List<String> activationlist =new List<String>();
+                List<String> activationlist =new List<String>();
 
-            for (AV_ScheduleBatch__mdt sm : listData) {
+                for (AV_ScheduleBatch__mdt sm : listData) {
 
-               
-                 activationlist.add(sm.DeveloperName);
-               
-            }
+                
+                    activationlist.add(sm.DeveloperName);
+                
+                }
 
-            List<CronTrigger> ct = [SELECT State FROM CronTrigger WHERE CronJobDetail.Name IN :activationlist ];
+                List<CronTrigger> ct = [SELECT State FROM CronTrigger WHERE CronJobDetail.Name IN :activationlist ];
                 
             }
-
         }
         Test.stopTest();
     }
@@ -123,8 +123,8 @@ private class AV_SchedulerBatches_Test {
         List<CBK_Framework_Batch__c> jobList = [SELECT Id FROM CBK_Framework_Batch__c];
         System.assertEquals(2, jobList.size());
     }
-    
-    @isTest
+            
+    @isTest 
     static void testDeactivateSingleBatch(){
         List<AV_ScheduleBatch__mdt> listData = AV_SchedulerBatches.getMetadata('true');       
 
@@ -137,7 +137,7 @@ private class AV_SchedulerBatches_Test {
                 AV_SchedulerBatches.activate(listData[1].DeveloperName);
             }
             AV_SchedulerBatches.deactivate(listData[1].DeveloperName);
-		}
+    }
         Test.stopTest();
         List<CronTrigger> result = [SELECT Id FROM CronTrigger where CronJobDetail.Name = :listData[1].DeveloperName LIMIT 1];
         System.assert(result.isEmpty());
@@ -156,7 +156,7 @@ private class AV_SchedulerBatches_Test {
        
         Test.startTest();
         System.runAs(userGcf){
-		String methodName = 'testDeactivadedBatches';
+        String methodName = 'testDeactivadedBatches';
         for(String str : dvNames){
             try{
                 AV_SchedulerBatches.activate(str);

@@ -1,0 +1,53 @@
+@isTest
+public with sharing class GRR_TestDataFactory_Test {
+    
+    @TestSetup
+    static void makeData(){
+        String orgId = UserInfo.getOrganizationId();
+        String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+        Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+        String uniqueName = orgId + dateString + randomInt;
+        User usuario = new User();
+        usuario.IsActive = true;
+        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'GRR_Usuario_CaixaBank'].Id;
+        usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'GRR'].Id;
+        usuario.FirstName = 'GRR Prueba Clases Test';
+        usuario.LastName = 'GRR Prueba Clases Test';
+        usuario.Alias = uniqueName.substring(18, 23);
+        usuario.Email = uniqueName + '@test' + orgId + '.org';
+        usuario.Username = uniqueName + '@test' + orgId + '.org';
+        usuario.EmailEncodingKey = 'UTF-8';
+        usuario.LanguageLocaleKey = 'es';
+        usuario.LocaleSidKey = 'es_ES';
+        usuario.TimezonesIdKey = 'Europe/Madrid';
+        insert usuario;
+        List<PermissionSetAssignment> psAssignments = new List<PermissionSetAssignment>();
+        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN ('GRR_Agente','GRR_Supervisor')]) {
+            PermissionSetAssignment psAssignment = new PermissionSetAssignment();
+            psAssignment.AssigneeId = usuario.Id;
+            psAssignment.PermissionSetId = ps.Id;
+            psAssignments.add(psAssignment);
+        }
+        insert psAssignments;
+    }
+    
+    @isTest 
+    public static void testUsuarioPruebasGRR() {
+        User usuario = [SELECT Id FROM User WHERE FirstName = 'GRR Prueba Clases Test' LIMIT 1];
+        User testUser = GRR_TestDataFactory.usuarioPruebasGRR();
+
+        System.runAs(usuario) {
+        User insertedUser = [SELECT Id, Alias, Email, EmailEncodingKey, LastName, LanguageLocaleKey, LocaleSidKey, UserRoleId, ProfileId, TimeZoneSidKey, UserName FROM User WHERE Id = :testUser.Id];
+                
+        System.assertEquals('UTF-8', insertedUser.EmailEncodingKey);
+        System.assertEquals('Prueba', insertedUser.LastName);
+        System.assertEquals('es', insertedUser.LanguageLocaleKey);
+        System.assertEquals('es_ES', insertedUser.LocaleSidKey);
+        System.assertEquals([SELECT Id FROM UserRole WHERE Name = 'GRR'].Id, insertedUser.UserRoleId);
+        System.assertEquals([SELECT Id FROM Profile WHERE Name = 'GRR_Usuario_CaixaBank'].Id, insertedUser.ProfileId);
+        System.assertEquals('Europe/Madrid', insertedUser.TimeZoneSidKey);
+        
+        }
+    }
+
+}

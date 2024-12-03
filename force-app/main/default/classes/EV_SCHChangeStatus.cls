@@ -17,7 +17,7 @@ Historial
 public without sharing class EV_SCHChangeStatus implements Schedulable {
 
     public void execute(SchedulableContext sc) {
-        EV_LogDebug.printLogDebug('EV_SCHChangeStatus', String.valueof(sc));
+        EV_LogDebug.printLogDebug('@@@EV_SCHChangeStatus ENTRA', String.valueof(sc));
         
         List<Campaign> cmp = new List<Campaign>();
         
@@ -26,7 +26,7 @@ public without sharing class EV_SCHChangeStatus implements Schedulable {
                                     WHERE Status = :Label.EV_Invitaciones_Enviadas AND EV_DiaHora_eventoAE__c <= :Datetime.now()
                                 ] ) {
 
-            EV_LogDebug.printLogDebug('Invitaciones Enviadas', String.valueof(campaign));
+            EV_LogDebug.printLogDebug('@@@Invitaciones Enviadas', String.valueof(campaign));
             
             if(campaign.EV_FechaHoraFin__c <= Datetime.now()) {
                 campaign.Status = Label.EV_Finalizado;
@@ -41,7 +41,7 @@ public without sharing class EV_SCHChangeStatus implements Schedulable {
                                     WHERE Status = :Label.EV_Apunto_Empezar AND EV_DiaHora_evento__c <= :Datetime.now()
                                 ] ) {
 
-            EV_LogDebug.printLogDebug('A punto de empezar', String.valueof(campaign));
+            EV_LogDebug.printLogDebug('@@@A punto de empezar', String.valueof(campaign));
 
             if(campaign.EV_FechaHoraFin__c <= Datetime.now()) {
                 campaign.Status = Label.EV_Finalizado;
@@ -56,7 +56,7 @@ public without sharing class EV_SCHChangeStatus implements Schedulable {
                                     WHERE Status = :Label.EV_En_Curso AND EV_FechaHoraFin__c <= :Datetime.now()
                                 ] ) {
 
-            EV_LogDebug.printLogDebug('En Curso', String.valueof(campaign));
+            EV_LogDebug.printLogDebug('@@@En Curso', String.valueof(campaign));
 
             campaign.Status = Label.EV_Finalizado;
             cmp.add(campaign);
@@ -66,13 +66,13 @@ public without sharing class EV_SCHChangeStatus implements Schedulable {
                                     WHERE Status = :Label.EV_Publico_Validado AND EV_FechaHoraFin__c <= :Datetime.now()
                                     ] ) {
 
-            EV_LogDebug.printLogDebug('Publico Validado', String.valueof(campaign));
+            EV_LogDebug.printLogDebug('@@@Publico Validado', String.valueof(campaign));
 
             campaign.Status = Label.EV_Finalizado;
             cmp.add(campaign);
         }   
 
-        EV_LogDebug.printLogDebug('cmp',String.valueof(cmp));
+        EV_LogDebug.printLogDebug('@@@cmp',String.valueof(cmp));
         Database.SaveResult [] updateResult = Database.update(cmp, false);
 
         boolean hasError = false;
@@ -84,13 +84,13 @@ public without sharing class EV_SCHChangeStatus implements Schedulable {
                 msjs.put(cmp[i].Id, ((String)sr.getErrors()[0].getMessage()));
                 objs.add(cmp[i]);
                 hasError = true;
+                EV_LogDebug.printLogDebug('EV_SCHChangeStatus ERROR', String.valueof(msjs));
             }
         }
-
         if(hasError) {
             CBK_Log.error(msjs, objs);
+            EV_LogDebug.printLogDebug('EV_SCHChangeStatus ERROR', String.valueof(msjs));
             EV_CreateScheduleChangeStatus.evaluateJob();
         }
     }
-
 }

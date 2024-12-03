@@ -79,6 +79,7 @@ public without sharing class SAC_HandlerMethods {
 		for (SAC_CaseReclamante__c reclamante : reclamantesAModificar) {
 			reclamante.SAC_ReclamantePrincipal__c = false;
 		}
+
 		reclamantes.addAll(reclamantesAModificar);
 		reclamantes.addAll(reclamantesAInsertar);
 		

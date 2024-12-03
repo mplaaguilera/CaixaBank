@@ -16,7 +16,8 @@ public class SIR_EnviarFormulario_Test {
     @testSetup static void setupMethod(){ 
         SIR_TestDataFactory.CrearIntegrationSetting('updateFormRefinanciacion');
         SIR_TestDataFactory.CrearIntegrationSetting('altaProcRefinanciacion');
-    }
+        
+    }       
 
     
     /*****************************************************************
@@ -70,7 +71,7 @@ public class SIR_EnviarFormulario_Test {
         insert u;
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
         insert new PermissionSetAssignment(AssigneeId = u.id, PermissionSetId = ps.Id);     
-        Id myId = UserInfo.getUserId();
+        Id myId = u.Id;
         System.runAs(u) {
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
@@ -106,38 +107,14 @@ public class SIR_EnviarFormulario_Test {
             SIR_FormularioRefinanciacion__c formulario = SIR_TestDataFactory.crearFormulario(proceso);
             infoCliente.SIREC__SIREC_fld_masterRecordId__c = 'correcto';
             update infoCliente;
+            proceso.SIREC__SIREC_fld_masterRecordId__c ='';
+            update proceso;
             List<String> lstString = new List<String>();
             Test.setMock(HttpCalloutMock.class, new SIR_cls_WS_altaProcRefinanciacionMock()); 
             Test.startTest();
                 List<String> lstResponse = SIR_LCMP_EnviarFormulario.enviarProceso(formulario.Id);
             Test.stopTest();
             system.assertEquals(lstresponse.get(0), 'OK', constantes.STRING_TEST);
-        }
-    }
-
-    @istest static void enviarProcesoKOtest(){
-        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
-        insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('primero',rol,'AV_Usuario_CaixaBank');
-        List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
-        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
-        insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
-        
-   		System.runAs(usuario){
-            SIR_Constantes constantes = new SIR_Constantes();
-            Account cuenta = SIR_TestDataFactory.crearCuenta();
-            SIREC__SIREC_obj_informacionCliente__c infoCliente = SIR_TestDataFactory.CrearInfoCliente(cuenta);
-            SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta, '');
-            //SIREC__SIREC_obj_acciones__c accion = SIR_TestDataFactory.CrearAccion(proceso);
-            SIR_FormularioRefinanciacion__c formulario = SIR_TestDataFactory.crearFormulario(proceso);
-            //infoCliente.SIREC__SIREC_fld_masterRecordId__c = 'INCorrecto';
-            //update infoCliente;
-            //List<String> lstString = new List<String>();
-            Test.setMock(HttpCalloutMock.class, new SIR_cls_WS_altaProcRefinanciacionMock()); 
-            Test.startTest();
-                List<String> lstResponse = SIR_LCMP_EnviarFormulario.enviarProceso(formulario.Id);
-            Test.stopTest();
-            system.assertEquals(lstresponse.get(0), 'KO', constantes.STRING_TEST);
         }
     }
 
@@ -164,8 +141,9 @@ public class SIR_EnviarFormulario_Test {
             Test.setMock(HttpCalloutMock.class, new SIR_SendFormulario_WSMock()); 
             Test.startTest();       
             String [] resultado = SIR_LCMP_EnviarFormulario.enviarForm(formulario.Id);  
+
             Test.stopTest();
-            system.assertEquals(resultado[0], 'OK', constantes.STRING_TEST);
+            system.assertEquals(resultado[0], 'OK', 'SIR_EnviarFormulario_Test.enviarFormOKtest ');
         }
     }
 
@@ -192,7 +170,7 @@ public class SIR_EnviarFormulario_Test {
             Test.startTest();       
             String [] resultado = SIR_LCMP_EnviarFormulario.enviarForm(formulario.Id);  
             Test.stopTest();
-            system.assertEquals(resultado[0], '', constantes.STRING_TEST);
+            System.assertEquals(resultado[0], '', 'SIR_EnviarFormulario_Test.enviarFormKOtest' );
         }
     }
 

@@ -16,6 +16,10 @@ public with sharing class CIBE_Path_Opportunity_Controller {
     public static final  String INICIATIVACIB = 'CIBE_IniciativaEmpleadoCIB';
     public static final  String SUGERENCIACIB = 'CIBE_SugerenciaCIB';
     public static final  String ALERTACOMERCIALCIB = 'CIBE_AlertaComercialCIB';
+    private static List<String> listRTs = new List<String>{CIBE_AppConstants.OPP_INICIATIVAEMP_RT,
+        CIBE_AppConstants.OPP_ACCIONEMP_RT,
+        CIBE_AppConstants.OPP_ALERTAEMP_RT,
+        CIBE_AppConstants.OPP_SUGERENCIAEMP_RT};
 
     /**
      * 
@@ -40,6 +44,23 @@ public with sharing class CIBE_Path_Opportunity_Controller {
            
         } catch (Exception e) {
 
+            System.debug('Error getRecordTypeVerification: ' + e);
+            return null;
+        }
+
+    }
+
+    @AuraEnabled(cacheable = true)
+    public static Boolean oppEmp(String recordId) { 
+        try {
+            Opportunity currentOpportunity = [SELECT Id, RecordType.DeveloperName FROM Opportunity WHERE Id = :recordId];
+            if(listRTs.contains(currentOpportunity.RecordType.DeveloperName)) {
+                return true;
+            } else {
+                return false;
+            }
+           
+        } catch (Exception e) {
             System.debug('Error getRecordTypeVerification: ' + e);
             return null;
         }

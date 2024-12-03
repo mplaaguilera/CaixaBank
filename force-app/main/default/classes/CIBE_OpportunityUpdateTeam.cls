@@ -16,7 +16,7 @@ public static Map<Id, Contact> getAccountTeamMember(String recordId){
 
     Set<Id> acc = new Set<Id>();
     Set<Id> eapGestor = new Set<Id>();
-    if(Opportunity.SObjectType.getDescribe().isAccessible()
+    if(Schema.SObjectType.Opportunity.isAccessible()
     && Schema.SObjectType.Opportunity.fields.Id.isAccessible() 
     && Schema.SObjectType.Opportunity.fields.AccountId.isAccessible()) {
 
@@ -28,7 +28,7 @@ public static Map<Id, Contact> getAccountTeamMember(String recordId){
     }
 
     List<AccountTeamMember> listAccMembers = new List<AccountTeamMember>();
-    if(AccountTeamMember.SObjectType.getDescribe().isAccessible()
+    if(Schema.SObjectType.AccountTeamMember.isAccessible()
         && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible() 
         && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
         && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
@@ -43,7 +43,7 @@ public static Map<Id, Contact> getAccountTeamMember(String recordId){
             listUserId.add(accMember.UserId);
         }
     
-        if(!listUserId.isEmpty() && Contact.SObjectType.getDescribe().isAccessible() 
+        if(!listUserId.isEmpty() && Schema.SObjectType.Contact.isAccessible() 
             && Schema.SObjectType.Contact.fields.Id.isAccessible() 
             && Schema.SObjectType.Contact.fields.Name.isAccessible()
             && Schema.SObjectType.Contact.fields.AV_UsuarioAsociado__c.isAccessible()
@@ -64,7 +64,7 @@ public static Map<Id, Contact> getAccountTeamMember(String recordId){
 public static List<OpportunityTeamMember> updateOpportunityTeamMember (String recordId, List<OpportunityTeamMember> lista){
 
     List<Id> userIdList = new List<Id>();
-    if(OpportunityTeamMember.SObjectType.getDescribe().isCreateable()
+    if(Schema.SObjectType.OpportunityTeamMember.isCreateable()
         && Schema.SObjectType.OpportunityTeamMember.fields.Id.isAccessible()
         && Schema.SObjectType.OpportunityTeamMember.fields.OpportunityId.isAccessible()
         && Schema.SObjectType.OpportunityTeamMember.fields.OpportunityId.isAccessible()
@@ -92,20 +92,19 @@ public static List<OpportunityTeamMember> updateOpportunityTeamMember (String re
 @AuraEnabled(cacheable=true)
     public static List<Wrapper> getOpportunityTeamMembers(String recordId){
         
-
         String aux = null;
         String auxName = null;
+        String auxFuncion = null;
+        String auxCentro = null;
 
     List<OpportunityTeamMember> oppList = new  List<OpportunityTeamMember>();
         List<Wrapper> listReturn = new List<Wrapper>();
         Map<Id, Contact> mapGrupoComercial = new Map<Id, Contact>();
-    if(OpportunityTeamMember.SObjectType.getDescribe().isAccessible() 
+    if(Schema.SObjectType.OpportunityTeamMember.isAccessible() 
         && Schema.SObjectType.OpportunityTeamMember.fields.Id.isAccessible()
         && Schema.SObjectType.OpportunityTeamMember.fields.UserId.isAccessible()
-        && Schema.SObjectType.OpportunityTeamMember.fields.CIBE_Funcion__c.isAccessible()
-        && Schema.SObjectType.OpportunityTeamMember.fields.CIBE_Centro__c.isAccessible()
         ) {
-            oppList = [SELECT Id, UserId, User.Name, CIBE_Funcion__c, CIBE_Centro__c, OpportunityAccessLevel, Opportunity.CloseDate, Opportunity.RecordType.DeveloperName FROM OpportunityTeamMember WHERE OpportunityId  =: recordId];
+                oppList = [SELECT Id, UserId, User.Name, OpportunityAccessLevel, Opportunity.CloseDate, Opportunity.RecordType.DeveloperName FROM OpportunityTeamMember WHERE OpportunityId  =: recordId AND User.IsActive = :true ];
         }
 
         List<Contact> contactList = new  List<Contact>();
@@ -116,29 +115,30 @@ public static List<OpportunityTeamMember> updateOpportunityTeamMember (String re
             for (OpportunityTeamMember oppMember : oppList) {
                 userIds.add(oppMember.UserId);
             }
-            contactList = [SELECT Id, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.Name FROM Contact WHERE AV_UsuarioAsociado__c  IN :userIds];
+                contactList = [SELECT Id, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.Name, AV_DescFuncion__c,AV_UsuarioAsociado__r.CIBE_Centro__c FROM Contact WHERE AV_UsuarioAsociado__c  IN :userIds ];
         }
 
+        if(!contactList.isEmpty()){
         for(Contact fs :contactList){
             mapGrupoComercial.put(fs.AV_UsuarioAsociado__c, fs);
         }
 
-    
         for(OpportunityTeamMember oTM : oppList){
-
             if(mapGrupoComercial.containsKey(oTM.UserId) ){
                 aux = mapGrupoComercial.get(oTM.UserId).Id;
                 auxName = mapGrupoComercial.get(oTM.UserId).AV_UsuarioAsociado__r.Name;
-            }
-
-             aux = aux != null ? aux : '';
+                auxFuncion = mapGrupoComercial.get(oTM.UserId).AV_DescFuncion__c;
+                    auxCentro = mapGrupoComercial.get(oTM.UserId).AV_UsuarioAsociado__r.CIBE_Centro__c;
+            aux = aux != null ? aux : '';
+                    auxFuncion = auxFuncion != null ?auxFuncion : '';
+                    auxCentro = auxCentro != null ?auxCentro : '';
 
             listReturn.add(
                 new Wrapper(
                     auxName,
                     aux,
-                    oTM.CIBE_Funcion__c,
-                    oTM.CIBE_Centro__c,
+                    auxFuncion,
+                            auxCentro,
                     oTM.Opportunity.RecordType.DeveloperName,
                     oTM.Opportunity.CloseDate,
                     oTM.Id,
@@ -147,7 +147,8 @@ public static List<OpportunityTeamMember> updateOpportunityTeamMember (String re
                 aux = null;
                 auxName = null;
         }
-
+            }
+        }
         return  listReturn;
 }
 
@@ -160,21 +161,22 @@ public static List<OpportunityTeamMember> updateOpportunityTeamMember (String re
             && Schema.SObjectType.OpportunityTeamMember.fields.Id.isAccessible()
             && Schema.SObjectType.OpportunityTeamMember.fields.OpportunityId.isAccessible()
             && Schema.SObjectType.OpportunityTeamMember.fields.UserId.isAccessible()) {
-
-            opp = [SELECT id FROM Opportunity WHERE Id =: recordId AND OwnerId =: UserInfo.getUserId()];
+            //Se podria recuperar en el lwc el user y pasarlo por parametro como el recordId y asi no se usa el UserInfo.getUserId();
+            Id userLogId = UserInfo.getUserId();
+            opp = [SELECT id FROM Opportunity WHERE Id =: recordId AND OwnerId =: userLogId];
             if(!opp.isEmpty()){
                 //eres el owner de la oportunidad
                 prueba = true;
             }else{
-                teamMembers = [SELECT Id, UserId, Opportunity.OwnerId FROM OpportunityTeamMember WHERE OpportunityId = :recordId AND (UserId = :UserInfo.getUserId() OR Opportunity.OwnerId = :UserInfo.getUserId() ) ];
+                teamMembers = [SELECT Id, UserId, Opportunity.OwnerId FROM OpportunityTeamMember WHERE OpportunityId = :recordId AND (UserId = :userLogId OR Opportunity.OwnerId = :userLogId ) ];
                 if(!teamMembers.isEmpty()){
                     //eres participante
                     prueba = true;
+                }
+            }
                 }else{
                     throw new IllegalArgumentException('showAddMemberButton - El usuario no tiene permisos para acceder a los miembros.');
                 }
-            }
-    }
     return prueba;
 }
 
@@ -237,17 +239,19 @@ public static void deleteTeamMember(String memberId) {
             CIBE_AppConstants.OPP_INICIATIVACIB_RT,
             CIBE_AppConstants.OPP_ACCIONEMP_RT
             };
+
                 List<String> oppRTSug = new List<String>{   CIBE_AppConstants.OPP_SUGERENCIACIB_RT,
                     CIBE_AppConstants.OPP_SUGERENCIAEMP_RT
                     };
+
                         if(Opportunity.SObjectType.getDescribe().isAccessible()) {
                             
                             oppList = [SELECT Id, CloseDate, RecordType.DeveloperName FROM Opportunity WHERE Id =: recordId];
                             
                             Date today = System.today();
                             Date fechaLimite = today.addDays(547);
-                            if(!oppList.isEmpty()){
                                 
+            if(!oppList.isEmpty()){
                                 for(Opportunity opp : oppList){
                                     if((oppRTList.contains(opp.RecordType.DeveloperName) && (opp.CloseDate >= today && opp.CloseDate <= fechaLimite) ) || 
                                        oppRTSug.contains(opp.RecordType.DeveloperName)){

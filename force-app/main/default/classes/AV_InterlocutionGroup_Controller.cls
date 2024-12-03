@@ -6,9 +6,11 @@ Proposito: Tareas y eventos asociados a la oportunidad
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-	VERSION		USER_STORY	  AUTHOR		   	DATE				Description
-	1.0			US352009	  Luis Fernández  	16/01/2023		  	Init version
+	VERSION		USER_STORY	    AUTHOR		   	    DATE				Description
+	1.0			US352009	    Luis Fernández  	16/01/2023		  	Init version
                 US517372
+    1.1		    Fix PMD Errors	Daniel Rodriguez	25/10/2023	        Add WITH SECURITY_ENFORCED in queries
+    1.2         PPM100205278    Luis Fernández      28/05/2024          Added No Gestionada opp status
 ***********************************************************************************************************************/
 public with sharing class AV_InterlocutionGroup_Controller {
 
@@ -21,11 +23,11 @@ public with sharing class AV_InterlocutionGroup_Controller {
     @AuraEnabled
     public static List<AV_GrupoInterlocucion__c>  retrieveGroupsList(String clientId){
     
-    List<AV_GrupoInterlocucion__c> grp = [SELECT Id,Name FROM AV_GrupoInterlocucion__c WHERE AV_Numper__c = :clientId AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT];
+    List<AV_GrupoInterlocucion__c> grp = [SELECT Id,Name FROM AV_GrupoInterlocucion__c WHERE AV_Numper__c = :clientId AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT WITH SECURITY_ENFORCED];
     if(grp.isEmpty()){
         return new List<AV_GrupoInterlocucion__c>();
     }
-    return [SELECT AV_Numper__c,AV_Numper__r.Name,AV_IsInterlocutor__C,Name FROM AV_GrupoInterlocucion__C Where Name = :grp[0].Name AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT];
+    return [SELECT AV_Numper__c,AV_Numper__r.Name,AV_IsInterlocutor__C,Name FROM AV_GrupoInterlocucion__C Where Name = :grp[0].Name AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT WITH SECURITY_ENFORCED];
 
     }
 
@@ -43,23 +45,23 @@ public with sharing class AV_InterlocutionGroup_Controller {
         AggregateResult oppNumberRecords = [SELECT COUNT(Id) 
             FROM Opportunity 
             WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT) 
-            AND StageName IN (:AV_AppConstants.OPP_STATUS_POTENCIAL, :AV_AppConstants.OPP_STATUS_ENGESTION,:AV_AppConstants.OPP_STATUS_NOAPTO) 
+            AND StageName IN (:AV_AppConstants.OPP_STATUS_POTENCIAL, :AV_AppConstants.OPP_STATUS_ENGESTION) 
             AND SystemModstamp = LAST_N_DAYS:730 and AV_ToDelete__c = false
-            AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT)];
+            AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT) WITH SECURITY_ENFORCED];
 
         AggregateResult evNumberRecords = [SELECT COUNT(Id)
             FROM Event 
             WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT)
             AND StartDateTime >= TODAY 
             AND CSBD_Evento_Estado__c =:AV_AppConstants.EVENT_STATUS_PENDIENTE
-            AND RecordType.DeveloperName in (:AV_AppConstants.EVENTCLIENTE_RT) AND IsChild = false ];
+            AND RecordType.DeveloperName in (:AV_AppConstants.EVENTCLIENTE_RT) AND IsChild = false WITH SECURITY_ENFORCED];
 
         AggregateResult tskNumberRecords = [SELECT COUNT(Id) 
             FROM Task
             WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT) 
             AND RecordType.DeveloperName IN (:AV_AppConstants.TASKINICIATIVA_RT,:AV_AppConstants.TASKALERTACOM_RT, :AV_AppConstants.TASKAVISOS_RT,:AV_AppConstants.TASKEXPCLIENT_RT, :AV_AppConstants.TASKONBOARDING_RT,:AV_AppConstants.TASKPRIORIZADOR_RT) 
             AND (ActivityDate=LAST_N_DAYS:3 OR ActivityDate>=TODAY) 
-            AND Status in (:AV_AppConstants.TASK_STATUS_PENDIENTE,:AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL) AND AV_ToDelete__c = false];
+            AND Status in (:AV_AppConstants.TASK_STATUS_PENDIENTE,:AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL) AND AV_ToDelete__c = false WITH SECURITY_ENFORCED];
 
         countRecords.put('oppos',Integer.valueOf(oppNumberRecords.get('expr0')));
         countRecords.put('events',Integer.valueOf(evNumberRecords.get('expr0')));
@@ -107,7 +109,7 @@ public with sharing class AV_InterlocutionGroup_Controller {
      */
     private static String getGrpInterlocutorId(String grpName){
     String interlocutorId;
-    List<AV_GrupoInterlocucion__c> grpList = [SELECT AV_Numper__c, AV_IsInterlocutor__c FROM AV_GrupoInterlocucion__C WHERE Name = :grpName AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT];
+    List<AV_GrupoInterlocucion__c> grpList = [SELECT AV_Numper__c, AV_IsInterlocutor__c FROM AV_GrupoInterlocucion__C WHERE Name = :grpName AND RecordType.DeveloperName =: AV_AppConstants.INTERLOC_GROUP_RT WITH SECURITY_ENFORCED];
     for(AV_GrupoInterlocucion__c grp : grpList){
         if(grp.AV_IsInterlocutor__c ){
             interlocutorId = grp.AV_Numper__c;
@@ -133,7 +135,7 @@ public with sharing class AV_InterlocutionGroup_Controller {
         WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT) 
         AND RecordType.DeveloperName IN (:AV_AppConstants.TASKINICIATIVA_RT,:AV_AppConstants.TASKALERTACOM_RT, :AV_AppConstants.TASKAVISOS_RT,:AV_AppConstants.TASKEXPCLIENT_RT, :AV_AppConstants.TASKONBOARDING_RT,:AV_AppConstants.TASKPRIORIZADOR_RT)  
         AND (ActivityDate=LAST_N_DAYS:3 OR ActivityDate>=TODAY) 
-        AND Status in (:AV_AppConstants.TASK_STATUS_PENDIENTE,:AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL) AND AV_ToDelete__c = false ORDER BY ActivityDate ASC];
+        AND Status in (:AV_AppConstants.TASK_STATUS_PENDIENTE,:AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL) AND AV_ToDelete__c = false WITH SECURITY_ENFORCED ORDER BY ActivityDate ASC];
         
         for(Task tsk : tsks){
             ActivityData input = new ActivityData();
@@ -167,7 +169,7 @@ public with sharing class AV_InterlocutionGroup_Controller {
             WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT)
             AND StartDateTime >= TODAY 
             AND CSBD_Evento_Estado__c =:AV_AppConstants.EVENT_STATUS_PENDIENTE
-            AND RecordType.DeveloperName in (:AV_AppConstants.EVENTCLIENTE_RT) AND IsChild = false ORDER BY StartDateTime ASC];
+            AND RecordType.DeveloperName in (:AV_AppConstants.EVENTCLIENTE_RT) AND IsChild = false WITH SECURITY_ENFORCED ORDER BY StartDateTime ASC];
             for(Event evt :evts){
                 ActivityData input = new ActivityData();
                 input.origin = typeLabels.get(evt.AV_Tipo__c);
@@ -197,9 +199,9 @@ public with sharing class AV_InterlocutionGroup_Controller {
             AV_FechaProximoRecordatorio__c,AV_CentroOrigen__c,AV_Gestor__c,AV_Gestor__r.Name,CloseDate
             FROM Opportunity 
             WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT)
-            AND StageName in (:AV_AppConstants.OPP_STATUS_POTENCIAL, :AV_AppConstants.OPP_STATUS_ENGESTION, :AV_AppConstants.OPP_STATUS_NOAPTO) 
+            AND StageName in (:AV_AppConstants.OPP_STATUS_POTENCIAL, :AV_AppConstants.OPP_STATUS_ENGESTION) 
             AND SystemModstamp = LAST_N_DAYS:730 and AV_ToDelete__c = false
-            AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT) ORDER BY StageName ASC, CloseDate ASC];
+            AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT) WITH SECURITY_ENFORCED ORDER BY StageName ASC, CloseDate ASC];
 
             return fillOppoDataList(oppos,grpName);
     }
@@ -214,10 +216,10 @@ public with sharing class AV_InterlocutionGroup_Controller {
         List<Opportunity> oppos = [SELECT Id,CloseDate,Name,Account.Name,AV_PF__c,AV_PF__r.Name,StageName,AV_Tenencia__c,AV_FechaModificacion__c,AV_FechaProximoRecordatorio__c,AV_CentroOrigen__c,AV_Gestor__c,AV_Gestor__r.Name
         FROM Opportunity 
         WHERE AccountId IN (SELECT AV_Numper__c FROM AV_GrupoInterlocucion__c WHERE Name = :grpName AND RecordType.DeveloperName = :AV_AppConstants.INTERLOC_GROUP_RT) AND
-        ((StageName in (:AV_AppConstants.OPP_STATUS_VENCIDO, :AV_AppConstants.OPP_STATUS_CERRPOST,:AV_AppConstants.OPP_STAGE_NOT_INTERESTED,:AV_AppConstants.OPP_STAGE_SALES) 
+        ((StageName in (:AV_AppConstants.OPP_STATUS_VENCIDO, :AV_AppConstants.OPP_STATUS_NO_GESTIONADA,:AV_AppConstants.OPP_STATUS_CERRPOST,:AV_AppConstants.OPP_STAGE_NOT_INTERESTED,:AV_AppConstants.OPP_STAGE_SALES,:AV_AppConstants.OPP_STATUS_PROD_RECH,:AV_AppConstants.OPP_STATUS_PROD_CONTR) 
         AND AV_ToDelete__c = false) 
         OR (StageName in ('Formalizada','Perdida') and RecordType.DeveloperName like 'CSBD_%')) and SystemModstamp = LAST_N_DAYS:730
-        AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT) ORDER BY StageName ASC, CloseDate ASC];
+        AND RecordType.DeveloperName IN (:AV_AppConstants.OPPINICIATIVA_RT, :AV_AppConstants.OPPALERTACOM_RT,:AV_AppConstants.OPPPROPUESTA_RT, :AV_AppConstants.OPPSUGERENCIA_RT,:AV_AppConstants.OPPLLAMADA_RT) WITH SECURITY_ENFORCED ORDER BY StageName ASC, CloseDate ASC];
         
         return fillOppoDataList(oppos,grpName);
     }

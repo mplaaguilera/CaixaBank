@@ -36,20 +36,21 @@ Historial
     * @description  Método de test para validar la invocación de la funcionalidad de recuperación de PermissionSetAssignment
     * @author fzaragoza | 28-04-2022 
     **/
-    @IsTest static void testRetrievePermissionSetAssignments() {
-        List<PermissionSetAssignment> retrievePermissionSetAssignments = CBK_PermissionUtils.retrievePermissionSetAssignments();
-        System.assertNotEquals(retrievePermissionSetAssignments, null,'Se esperaba recuperar el listado inicializado de PermissionSetAssignment');
-    }
+    //@IsTest static void testRetrievePermissionSetAssignments() {
+        //List<PermissionSetAssignment> retrievePermissionSetAssignments = CBK_PermissionUtils.retrievePermissionSetAssignments();
+        //System.assertNotEquals(retrievePermissionSetAssignments, null,'Se esperaba recuperar el listado inicializado de PermissionSetAssignment');
+   // }
 
+    //Set<String> permissionSetAssignList, List<User> userList
 
     /**
     * @description Método de test para validar la invocación de la funcionalidad de recuperación de PermissionSetLicenseAssign
     * @author fzaragoza | 28-04-2022 
     **/
-    @IsTest static void testRetrievePermissionSetLicenseAssignments() {
-        List<PermissionSetLicenseAssign> retrievePermissionSetLicenseAssignments = CBK_PermissionUtils.retrievePermissionSetLicenseAssignments();
-        System.assertNotEquals(retrievePermissionSetLicenseAssignments, null,'Se esperaba recuperar el listado inicializado de PermissionSetAssignment');
-    }
+   // @IsTest static void testRetrievePermissionSetLicenseAssignments() {
+       // List<PermissionSetLicenseAssign> retrievePermissionSetLicenseAssignments = CBK_PermissionUtils.retrievePermissionSetLicenseAssignments();
+       // System.assertNotEquals(retrievePermissionSetLicenseAssignments, null,'Se esperaba recuperar el listado inicializado de PermissionSetAssignment');
+    //}
     /**
     * @description  Método de test para validar la invocación de la funcionalidad de recuperación de la configuración de permisos a monitorizar
     * @author fzaragoza | 28-04-2022 

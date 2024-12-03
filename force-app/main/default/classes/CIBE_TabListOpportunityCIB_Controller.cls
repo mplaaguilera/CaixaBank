@@ -11,6 +11,8 @@ Historial
 	1.1			US461563        Alex Campos		13/03/2023	    Init version
     1.2         US506957        Ali             03/08/2023      Añadir campo confidencial
     1.3         US682142        ALi             25/07/2023      Añadido el campo Linea
+    1.4			US850814    	Lucía	  	    05/06/2024		Añadir los campos CIBE_AbsoluteClientProfSeg__c, CIBE_AbsoluteGroupProfSeg__c, CIBE_RelativeClientProfSeg__c y CIBE_RelativeGroupProfSeg__c
+
 */
 public with sharing class CIBE_TabListOpportunityCIB_Controller {
 
@@ -34,7 +36,8 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
                 'CIBE_ComisionesDivisa__c, CIBE_Balance__c, CIBE_Comisiones__c, TOLABEL(CIBE_TipoOperacion__c), TOLABEL(CIBE_ProbabilidadExito__c), TOLABEL(StageName), TOLABEL(CIBE_CerradoNegativo__c), ' +
                 'CloseDate, CIBE_DiasUltimaGestion__c, OwnerId, Owner.Name, AV_EmpleadoAlta__c, AV_EmpleadoAlta__r.Name, CIBE_ESG__c, CIBE_ECAs__c, CIBE_AlgunaOperRAR__c, CIBE_DictamenALM__c, CIBE_Visto__c, ' +
                 'CIBE_Nivel__c, CIBE_Sindicaciones__c, CIBE_Observaciones__c, CIBE_VigenciaOferta__c, CIBE_Fechaaprobacionprecio__c, ' +
-                'AV_Gestor__c, AV_Gestor__r.Name, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CIBE_ApproveDate__c, AV_ClienteConfidencial__c, CIBE_Linea__c ' +
+                'AV_Gestor__c, AV_Gestor__r.Name, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CIBE_ApproveDate__c, AV_ClienteConfidencial__c, CIBE_Linea__c, TOLABEL(Account.CIBE_AbsoluteClientProfSeg__c), TOLABEL(Account.CIBE_AbsoluteGroupProfSeg__c), ' +
+                'TOLABEL(Account.CIBE_RelativeClientProfSeg__c), TOLABEL(Account.CIBE_RelativeGroupProfSeg__c)' + 
                 'FROM Opportunity ' +
                 'WHERE RecordTypeId IN :recordTypes ' + 
                 'AND StageName IN :stages ' +
@@ -78,17 +81,17 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
             oppWrapp.centrosCarteras = String.isNotBlank(oppWrapp.centrosCarteras) ? oppWrapp.centrosCarteras: '';
             oppWrapp.redesSegmentos = String.isNotBlank(oppWrapp.redesSegmentos) ? oppWrapp.redesSegmentos: '';
             oppWrapp.sectoresPaises = String.isNotBlank(oppWrapp.sectoresPaises) ? oppWrapp.sectoresPaises: '';
-            oppWrapp.iden = String.isNotBlank(op.Id) ? op.Id : '';
+            oppWrapp.iden = String.isNotBlank(op.Id) ? '/' +  op.Id : '';
             oppWrapp.name = String.isNotBlank(op.name) ? op.name : '';
-            oppWrapp.accountId = String.isNotBlank(op.AccountId) ? op.AccountId : null;
+            oppWrapp.accountId = String.isNotBlank(op.AccountId) ? '/' +  op.AccountId : null;
             oppWrapp.accountName = String.isNotBlank(op.Account.Name) ? op.Account.Name : '';
             oppWrapp.accountCif = String.isNotBlank(op.Account.CC_Numero_Documento__c) ? op.Account.CC_Numero_Documento__c : '';
-            oppWrapp.grupoComercialId = String.isNotBlank(op.CIBE_GrupoComercial__c) ? op.CIBE_GrupoComercial__c : null;
+            oppWrapp.grupoComercialId = String.isNotBlank(op.CIBE_GrupoComercial__c) ? '/' +  op.CIBE_GrupoComercial__c : null;
             oppWrapp.grupoComercialName = String.isNotBlank(op.CIBE_GrupoComercial__r.Name) ? op.CIBE_GrupoComercial__r.Name : '';
             oppWrapp.grupoEconomico = String.isNotBlank(op.Account.CIBE_GrupoEconomico__c) ? op.Account.CIBE_GrupoEconomico__c : '';
-            oppWrapp.familiaId = String.isNotBlank(op.CIBE_Familia__c) ? op.CIBE_Familia__c : null;
+            oppWrapp.familiaId = String.isNotBlank(op.CIBE_Familia__c) ? '/' +  op.CIBE_Familia__c : null;
             oppWrapp.familiaName = String.isNotBlank(op.CIBE_Familia__r.Name) ? op.CIBE_Familia__r.Name : '';
-            oppWrapp.pFId = String.isNotBlank(op.AV_PF__c) ? op.AV_PF__c : null;
+            oppWrapp.pFId = String.isNotBlank(op.AV_PF__c) ? '/' + op.AV_PF__c : null;
             oppWrapp.pFName = String.isNotBlank(op.AV_PF__r.Name) ? op.AV_PF__r.Name : '';
             oppWrapp.amountDivisa = op.CIBE_AmountDivisa__c != null ? Integer.valueOf(op.CIBE_AmountDivisa__c.round(RoundingMode.HALF_UP)).format() : '';
             oppWrapp.divisa = String.isNotBlank(op.CIBE_Divisa__c) ? op.CIBE_Divisa__c : '';
@@ -103,9 +106,9 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
             oppWrapp.cerradoNegativo = String.isNotBlank(op.CIBE_CerradoNegativo__c) ? op.CIBE_CerradoNegativo__c : '';
             oppWrapp.closeDate = op.CloseDate;
             oppWrapp.diasUltimaGestion = op.CIBE_DiasUltimaGestion__c != null ? String.valueOf(op.CIBE_DiasUltimaGestion__c) : '';
-            oppWrapp.ownerId = String.isNotBlank(op.OwnerId) ? op.OwnerId : null;
+            oppWrapp.ownerId = String.isNotBlank(op.OwnerId) ? '/' + op.OwnerId : null;
             oppWrapp.ownerName = String.isNotBlank(op.Owner.Name) ? op.Owner.Name : '';
-            oppWrapp.firstOwnerId = String.isNotBlank(op.AV_EmpleadoAlta__c) ? op.AV_EmpleadoAlta__c : null;
+            oppWrapp.firstOwnerId = String.isNotBlank(op.AV_EmpleadoAlta__c) ? '/' +  op.AV_EmpleadoAlta__c : null;
             oppWrapp.firstOwnerName = String.isNotBlank(op.AV_EmpleadoAlta__r.Name) ? op.AV_EmpleadoAlta__r.Name : '';
             oppWrapp.esg = op.CIBE_ESG__c;
             oppWrapp.ecas = op.CIBE_ECAs__c;
@@ -125,6 +128,10 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
             oppWrapp.fechaAlta = op.AV_FechaAlta__c;
             oppWrapp.confidencial = op.AV_ClienteConfidencial__c; 
             oppWrapp.linea = op.CIBE_Linea__c; 
+            oppWrapp.empresaAbsoluta = op.Account.CIBE_AbsoluteClientProfSeg__c;
+            oppWrapp.empresaRelativa = op.Account.CIBE_RelativeClientProfSeg__c;
+            oppWrapp.grupoAbsoluta = op.Account.CIBE_AbsoluteGroupProfSeg__c;
+            oppWrapp.grupoRelativa = op.Account.CIBE_RelativeGroupProfSeg__c;
             listOppWrapp.add(oppWrapp);
         }
         
@@ -140,7 +147,8 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
                 'CIBE_ComisionesDivisa__c, CIBE_Balance__c, CIBE_Comisiones__c, TOLABEL(CIBE_TipoOperacion__c), TOLABEL(CIBE_ProbabilidadExito__c), TOLABEL(StageName), TOLABEL(CIBE_CerradoNegativo__c), ' +
                 'CloseDate, CIBE_DiasUltimaGestion__c, OwnerId, Owner.Name, AV_EmpleadoAlta__c, AV_EmpleadoAlta__r.Name, CIBE_ESG__c, CIBE_ECAs__c, CIBE_AlgunaOperRAR__c, CIBE_DictamenALM__c, CIBE_Visto__c, ' +
                 'CIBE_Nivel__c, CIBE_Sindicaciones__c, CIBE_Observaciones__c, CIBE_VigenciaOferta__c, CIBE_Fechaaprobacionprecio__c, ' +
-                'AV_Gestor__c, AV_Gestor__r.Name, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CIBE_ApproveDate__c, AV_ClienteConfidencial__c, CIBE_Linea__c ' +
+                'AV_Gestor__c, AV_Gestor__r.Name, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CIBE_ApproveDate__c, AV_ClienteConfidencial__c, CIBE_Linea__c, TOLABEL(Account.CIBE_AbsoluteClientProfSeg__c), TOLABEL(Account.CIBE_AbsoluteGroupProfSeg__c), ' +
+                'TOLABEL(Account.CIBE_RelativeClientProfSeg__c), TOLABEL(Account.CIBE_RelativeGroupProfSeg__c)' +  
                 'FROM Opportunity ' +
                 'WHERE RecordTypeId IN :recordTypes ' + 
                 'AND ((StageName IN :stages )' +
@@ -212,6 +220,10 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
             opp += (String.isNotBlank(op.CIBE_VigenciaOferta__c) ? op.CIBE_VigenciaOferta__c : '') + ';';
             opp += (op.AV_ClienteConfidencial__c ? 'true' : '') + ';';  
             opp += (op.CIBE_Linea__c ? 'true' : '') + ';';  
+            opp += (String.isNotBlank(op.Account.CIBE_AbsoluteClientProfSeg__c) ? op.Account.CIBE_AbsoluteClientProfSeg__c : '') + ';';
+            opp += (String.isNotBlank(op.Account.CIBE_RelativeClientProfSeg__c) ? op.Account.CIBE_RelativeClientProfSeg__c : '') + ';';
+            opp += (String.isNotBlank(op.Account.CIBE_AbsoluteGroupProfSeg__c) ? op.Account.CIBE_AbsoluteGroupProfSeg__c : '') + ';';
+            opp += (String.isNotBlank(op.Account.CIBE_RelativeGroupProfSeg__c) ? op.Account.CIBE_RelativeGroupProfSeg__c : '') + ';';
             opp += '\n';
             opportunities.add(opp);
         }
@@ -381,6 +393,10 @@ public with sharing class CIBE_TabListOpportunityCIB_Controller {
         @AuraEnabled public Date fechaAlta {get;set;}
         @AuraEnabled public boolean confidencial {get;set;}
         @AuraEnabled public boolean linea {get;set;}
+        @AuraEnabled public String empresaAbsoluta {get;set;}
+        @AuraEnabled public String empresaRelativa {get;set;}
+        @AuraEnabled public String grupoAbsoluta {get;set;}
+        @AuraEnabled public String grupoRelativa {get;set;}
 	}
 
     public class HierarchyWrapper {

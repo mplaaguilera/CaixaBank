@@ -158,11 +158,11 @@ public with sharing class CIBE_RAR_Integration {
     --------    
     VERSION        USER_STORY       AUTHOR                         DATE           Description   
     1.0            US372933         Alexandre Perez                23/08/2023     Created
+    1.1            IN1183650        Luis Martínez                  05/07/2024     Cambio body para llamar a la nueva version de la API.
     *****************************************************************/
 	@AuraEnabled
 	public static SimulationResponse getSimulation(string simulationId, string simulationType, Id recordId) {
 
-        Account acc = new Account();
         map<string, object> fieldsToUpdate = new map<string, object>();
         SimulationResponse simulationResponse = new SimulationResponse();
 
@@ -178,29 +178,42 @@ public with sharing class CIBE_RAR_Integration {
             string.valueOf(opp.CIBE_Numero_de_Simulador__c) != simulationId) {
                 Map<String,string> mHeaders =  new  Map<String,string>();
 
+                if (simulationType == 'refrescar' && opp.CIBE_Tipo_de_simulacion__c == 'Empresa'){
+                        simulationType = 'CIBE_GetRARSimulation';
+                    } else if (simulationType == 'refrescar' && opp.CIBE_Tipo_de_simulacion__c == 'Grupo'){
+                        simulationType = 'CIBE_getRARSimuGroup';
+                    }
                 CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues(simulationType);
                 //si detecta que usamos la name credential del camaleon le metemos su cabecera
                 if(wsc?.NamedCredential__c.contains('CAMALEON')){
                     mHeaders.put('x-api-actor-simulated','ABSIS_GENERICO');
                 }
                 mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-                if(simulationType == 'CIBE_GetRARSimulation') {
-                    body = '{"showPriceNote":true,"showOperations":true,"operationFilters":{"state":"ACTIVE"}}';
+                if(simulationType == 'CIBE_GetRARSimulation') {//Empresa
+                    // body = '{"showPriceNote":true,"showOperations":true,"operationFilters":{"state":"ACTIVE"}}';
+                    //cambio IN1183650 error calculadoras grupo
+                    body = '{"showPriceNote":true,"showOperations":true,"operationFilters": {"isAssociate": true,"showStructuredOperations": true }}';
+
                 } else {
-                    body = '{"showPriceNote":true,"showSimulations":true,"simulationFilters":{"showPriceNote":true,"showOperations":true}}';
+                    // body = '{"showPriceNote":true,"showSimulations":true,"simulationFilters":{"showPriceNote":true,"showOperations":true}}';
+                    //cambio IN1183650 error calculadoras grupo
+                    body = '{"showPriceNote":true,"showSimulations":true,"simulationFilters":{"showPriceNote":true,"showOperations":true,"operationFilters": {"isAssociate": true,"showStructuredOperations": true }}}';
                 }
-    
-                system.debug(body);
-                HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, simulationType, 'POST', mHeaders);
-                system.debug(req);
-                system.debug(req.getEndpoint());
+
+                CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+                        reqWrapper.body = body;
+                        reqWrapper.intSetting = simulationType;
+                        reqWrapper.method = 'POST';
+                        reqWrapper.mHeaders =  mHeaders;
+                        reqWrapper.mUriParams = new  Map<String,string>();
+                        reqWrapper.mQueryParams = new  Map<String,string>();
+
+                HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper);
                 url = req.getEndpoint().replace('{simulationId}', simulationId);
                 req.setEndpoint(url);
-                //HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
                 HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req, simulationId, simulationType);
-                system.debug(res.getBody());
+
                 if(res.getStatusCode() == 200) {
-                    
                     //limpiamos en caso de que hubiesen cambiado de simulacion
                     fieldsToUpdate.put('Id',recordId);
                     fieldsToUpdate.put('CIBE_Numero_de_Simulador__c', integer.valueOf(simulationId));
@@ -218,19 +231,20 @@ public with sharing class CIBE_RAR_Integration {
                     fieldsToUpdate.put('CIBE_RARGarantias__c', null);
                     fieldsToUpdate.put('CIBE_VAOperacion__c', null);
                     fieldsToUpdate.put('CIBE_RARNomOperacion__c', null);
+                    //INC RAR
+                    fieldsToUpdate.put('CIBE_RARConjunto__c', null);
+                    fieldsToUpdate.put('CIBE_RARPost__c', null);
+
+
                     //simulación empresa
                     if(simulationType == 'CIBE_GetRARSimulation'){
                         RARResponse respData = new RARResponse();
                         PriceNote pn = new PriceNote();
                         pn.commissions = null;
                         respData.priceNote = pn;
-                        system.debug(res.getBody());
-                        system.debug(res.getBody().length());
-                        system.debug(res.getBody().right(3));
                         respData = (RARResponse)JSON.deserialize(res.getBody(),RARResponse.class);
-                        //system.debug(respData.priceNote.commissions);
                         list<RARResponse> rarlist = new list<RARResponse>();
-                        
+
                         rarlist.add(respData);
                         updateRatingPD(rarlist);
                         fieldsToUpdate.put('CIBE_Tipo_de_simulacion__c', 'Empresa');
@@ -267,12 +281,10 @@ public with sharing class CIBE_RAR_Integration {
                         }
                         
                         simulationResponse.empresaResponse = respData;
-                    //simulacion grupo
-                    } else {
+                    
+                    } else {//simulacion grupo
                         RARGroupResponse respData = new RARGroupResponse();
                         respData = (RARGroupResponse)JSON.deserialize(res.getBody(),RARGroupResponse.class);
-                        system.debug('respData');
-                        system.debug(respData);
                         updateRatingPD(respData.simulations);
                         fieldsToUpdate.put('CIBE_Tipo_de_simulacion__c', 'Grupo');
                         if(respData.groupSimulationOperationsProfitabilities != null){
@@ -285,7 +297,9 @@ public with sharing class CIBE_RAR_Integration {
                         } else {
                             fieldsToUpdate.put('CIBE_RARPost__c',null); 
                         }
-                        string sResp = JSON.serialize(respData.simulations);
+                        string sRespSimu = JSON.serialize(respData.simulations);
+                        string sResp = JSON.serialize(respData);
+
                         if(sResp.length() <= 131072){
                             fieldsToUpdate.put('CIBE_JSONRAROperations__c', sResp);
                         } else {
@@ -309,15 +323,11 @@ public with sharing class CIBE_RAR_Integration {
                     sError = res.getStatusCode() + ' ' + respErr.detail;
                     //quitar el cbk log cuando el tratamiento de errores por status code funcione correctamente a nivel de fwk
                     cbk_log.error('SimulationId: ' + simulationId + '. Error: ' + sError);
-                    //sError = 'Fallo conexión RAR';
                 }
             //si la simulación ya fue cargada, se consulta el campo con el json que contiene las simulaciones/operaciones que se muestran en las tablas
             } else if(simulationType == 'CIBE_GetRARSimulation') {
                 //empresa
                 RARResponse empResponse = new RARResponse();
-                //simulationResponse.empresaResponse = empResponse;
-                list<Operations> operationData = new list<Operations>();//RARResponse respData = new RARResponse();
-                //RARResponse respData = new RARResponse();
                 empResponse = (RARResponse)JSON.deserialize(opp.CIBE_JSONRAROperations__c,RARResponse.class);
                 list<RARResponse> paraRating = new list<RARResponse>();
                 paraRating.add(empResponse);
@@ -325,34 +335,35 @@ public with sharing class CIBE_RAR_Integration {
                 updateRatingPD(paraRating);
                 simulationResponse.empresaResponse = empResponse;
                 simulationResponse.empresaResponse.operationNumber = opp.CIBE_RAROperationNumber__c;
-                //simulationResponse.empresaResponse.operations = operationData;
 
             } else {
                 //grupo
                 RARGroupResponse grupResponse = new RARGroupResponse();
+                
                 simulationResponse.grupoResponse = grupResponse;
+                //Hacemos el cambio para pasar en el updateRatingPD solo la lista RARResponse
                 list<RARResponse> simulationsList = new list<RARResponse>();
+                RARGroupResponse respData = (RARGroupResponse)JSON.deserialize(opp.CIBE_JSONRAROperations__c,RARGroupResponse.class);
 
-                simulationsList = (list<RARResponse>)JSON.deserialize(opp.CIBE_JSONRAROperations__c,list<RARResponse>.class);
-
-                updateRatingPD(simulationsList);
-                for(RARResponse simulation : simulationsList){
-                    for(operations operation : simulation.operations){
-                        if(operation.operationNumber == opp.CIBE_RAROperationNumber__c){
-                            simulationResponse.grupoResponse.operationNumber = opp.CIBE_RAROperationNumber__c;
+                simulationsList = respData.simulations;
+                if(simulationsList!=null){
+                    updateRatingPD(simulationsList);
+                    for(RARResponse simulation : simulationsList){
+                        for(operations operation : simulation.operations){
+                            if(operation.operationNumber == opp.CIBE_RAROperationNumber__c){
+                                simulationResponse.grupoResponse.operationNumber = opp.CIBE_RAROperationNumber__c;
+                                break;
+                            }
+                        }
+                        if(simulationResponse.grupoResponse.operationNumber != null){
+                            simulationResponse.grupoResponse.simulationId = simulation.simulationId;
                             break;
                         }
                     }
-                    if(simulationResponse.grupoResponse.operationNumber != null){
-                        simulationResponse.grupoResponse.simulationId = simulation.simulationId;
-                        break;
-                    }
                 }
-                //SimulationResponse.grupoResponse.operationNumber = opp.CIBE_RAROperationNumber__c;
-                simulationResponse.grupoResponse.simulations = simulationsList;
-                system.debug('rating');
-                system.debug(simulationResponse.grupoResponse.simulations[0].ratingInt);
-               
+                if(simulationResponse!=null){
+                    simulationResponse.grupoResponse.simulations = simulationsList;
+                }               
             }
             
 
@@ -361,9 +372,7 @@ public with sharing class CIBE_RAR_Integration {
             cbk_log.error(e);
             system.debug(e.getMessage() + ' ' + e.getLineNumber());
         }
-        system.debug('sError ' + string.isBlank(sError) );
         if(!string.isBlank(sError)){
-            system.debug('sError ' + sError);
             throw new AuraHandledException(sError);
         }
         return SimulationResponse;
@@ -374,7 +383,6 @@ public with sharing class CIBE_RAR_Integration {
         try{
         map<string, object> fieldsToUpdate = new map<string, object>();
         string sError;
-        system.debug(jSONop);
         RARResponse operationData = new RARResponse();
         operationData = (RARResponse)JSON.deserialize(jSONop,RARResponse.class);
         fieldsToUpdate.put('CIBE_RAROperationNumber__c', operationData.operations[0].operationNumber);
@@ -400,10 +408,8 @@ public with sharing class CIBE_RAR_Integration {
             fieldsToUpdate.put('CIBE_RARComision12meses__c',operationData.priceNote.commissions);
         }
         sError = CIBE_IntegrationUtilities.updateObjectNull(fieldsToUpdate, 'Opportunity');
-        system.debug(sError);
-        system.debug(operationData);
         return 'OK';
-        }catch(Exception e) {
+        }catch(DmlException e) {
             cbk_log.error(e);
             throw new AuraHandledException(e.getMessage());
         }
@@ -411,12 +417,8 @@ public with sharing class CIBE_RAR_Integration {
 
     @AuraEnabled(cacheable=true)
     public static opportunity getSimulationId(Id recordId){
-        try {
             Opportunity opp = [SELECT CIBE_Numero_de_Simulador__c, CIBE_RAROperationNumber__c, CIBE_Tipo_de_simulacion__c FROM Opportunity WHERE Id = : recordId];
             return opp;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
     }
 
     /**
@@ -438,27 +440,20 @@ public static String getUrl(String simulationId, string simulationType){
     String urlVacia = resultadoCMDT.CIBE_URL__c;
     String url = '';
     // Creamos un try catch para capturar los errores
-    
-       try{
-
-        System.debug('URL a devolver: ' + resultadoCMDT.CIBE_URL__C);
-        System.debug('CIBE_Parameters__c a devolver: ' + resultadoCMDT.CIBE_Parameters__c);
-
-        url = resultadoCMDT.CIBE_URL__C.replace('{simulationId}',simulationId );
-    
-        }
-         catch(Exception e){
-            System.debug('Error al intentar obtener los datos para generar la url' + e.getMessage());
-            url = urlVacia;
-         }
-        
-
-        System.debug('URL a devolver: ' + url);
+    if(simulationId!=null){
+        try{
+            url = resultadoCMDT.CIBE_URL__C.replace('{simulationId}',simulationId );
+            }
+            catch(Exception e){
+                System.debug('Error al intentar obtener los datos para generar la url' + e.getMessage());
+                url = urlVacia;
+            }
+    }
 
         return url;
     }
 
-   /**
+/**
  * @param: List<RARResponse>
  * fucionalidad: devuelve la clasificación S&P según PD
  * 
@@ -466,12 +461,8 @@ public static String getUrl(String simulationId, string simulationType){
 */
     public static void updateRatingPD(List<RARResponse> listNews) {
 		//comprobar acceso a query
-		map<string, RARResponse> mapOperations = new map<string, RARResponse>();
-        map<decimal, string> mapPDs = new map<decimal, string>();
         decimal maxvalue = 0;
         decimal minvalue = 999.999;
-        list<decimal> values = new list<decimal>();
-        system.debug(listNews);
 		for(RARResponse ope : listNews){
             if(ope.pd != null){
                 if(ope.pd < minvalue) {
@@ -482,8 +473,6 @@ public static String getUrl(String simulationId, string simulationType){
                 }
             }
 		}
-        system.debug('max ' + maxvalue);
-        system.debug('min ' + minvalue);
         List<CIBE_PD__c> listPD = new List<CIBE_PD__c>();
         if(
             CIBE_PD__c.SObjectType.getDescribe().isAccessible()&&
@@ -495,15 +484,12 @@ public static String getUrl(String simulationId, string simulationType){
             
             listPD = [select id, CIBE_PDRating__c,CIBE_FechaCarga__c, CIBE_PDMin__c, CIBE_PDMax__c from CIBE_PD__c where CIBE_PDMin__c <= :maxvalue and CIBE_PDMax__c>= :minvalue order by CIBE_PDMax__c desc];
         }
-        system.debug('listPD ' + listPD);
         if(!listPD.isEmpty()){
             for(RARResponse ope : listNews){
                 if(ope.pd != null){
                     for(CIBE_PD__c pd : listPD){
-                        system.debug('ope.pd ' + ope.pd);
                         if(ope.pd>=pd.CIBE_PDMin__c && ope.pd<=pd.CIBE_PDMax__c){
                             ope.ratingInt = '('+ pd.CIBE_PDRating__c + ')';
-                            system.debug('pd.CIBE_PDRating__c' + pd.CIBE_PDRating__c);
                             break;
                         }
                     }

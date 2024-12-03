@@ -125,7 +125,7 @@ public with sharing class SEG_TaskConnect_Test implements HttpCalloutMock{
 
         CBK_IntegrationSetting__c csTaskConnect = new CBK_IntegrationSetting__c();
         csTaskConnect.Name = 'SEG_Task_Connect';
-        csTaskConnect.NamedCredential__c = 'callout:API_SEG_PRE/tech/orqcor/predict';
+        csTaskConnect.NamedCredential__c = 'callout:API_SEG_PRO/tech/orqcor/predict';
         insert csTaskConnect;
     }
 

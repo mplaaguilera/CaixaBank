@@ -27,7 +27,7 @@ public with sharing class SIR_LCMP_CancelarProcesoRefi {
 	*****************************************************************/
     @AuraEnabled(Cacheable=true)
     public static String comprobarPropietario(String idProceso){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             SIREC__SIREC_obj_proceso__c proceso = [SELECT Id, OwnerId FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso LIMIT 1];
             if(proceso.OwnerId == UserInfo.getUserId()){
                 return 'OK';
@@ -53,7 +53,7 @@ public with sharing class SIR_LCMP_CancelarProcesoRefi {
     @AuraEnabled(Cacheable=true)
     public static String[] cancelarProceso(String idProceso){
         String[] resultado = new String[]{''};
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             SIREC__SIREC_obj_proceso__c proceso = [SELECT Id, SIREC__SIREC_fld_masterRecordId__c, SIREC__SIREC_fld_situacion__c FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso LIMIT 1];
             if(proceso.SIREC__SIREC_fld_masterRecordId__c == null){
                 resultado[0] = 'OK';                  
@@ -81,7 +81,7 @@ public with sharing class SIR_LCMP_CancelarProcesoRefi {
 	*****************************************************************/
     @AuraEnabled(Cacheable=false)
     public static String updateRegistros(String idProceso){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable() && SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable() && Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){
             try {
                 SIREC__SIREC_obj_proceso__c procesoUpdate = [SELECT id, SIREC__SIREC_fld_situacion__c, SIR_fld_Situacion_SF__c, SIREC__SIREC_fld_motivosBaja__c FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso LIMIT 1];
                 procesoUpdate.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_FINALIZADO;

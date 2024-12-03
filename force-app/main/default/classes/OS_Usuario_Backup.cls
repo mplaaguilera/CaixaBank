@@ -2,7 +2,6 @@ public with sharing class OS_Usuario_Backup {
 
     @InvocableMethod
     public static void cambioPropietario(List<Id> idUsuarios) {
-        System.debug('KEVIN DEBUG entrada metodo');
         cambioPropietarioFuture(idUsuarios);
     }
     

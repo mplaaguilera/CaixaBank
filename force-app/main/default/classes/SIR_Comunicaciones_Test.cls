@@ -6,8 +6,9 @@ public with sharing class SIR_Comunicaciones_Test {
         insert rol;
         User usuario = SIR_TestDataFactory.createTestUser('usuarioTestSirLcmp',rol,'System Administrator','U0111111','09999');
         System.runAs(usuario) {  
-            ID recordTypeCentro = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+            Id recordTypeCentro = mapRTsObjectsAccount.get('CC_CentroCaixaBank').getRecordTypeId();            
+        
             Account centro7 = new Account();
             centro7.RecordTypeId = recordTypeCentro;
             centro7.Name = 'test centro7';
@@ -99,6 +100,9 @@ public with sharing class SIR_Comunicaciones_Test {
         System.runAs(usuario){
             Account cuenta = SIR_TestDataFactory.crearCuenta();
 
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsProcesos = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeIdPresol = mapRTsObjectsProcesos.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL).getRecordTypeId();            
+        
             SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(
                     Name = SIR_Constantes.tipoProceso_PRESOL,
                     SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_PRESOL_E1,	
@@ -107,7 +111,7 @@ public with sharing class SIR_Comunicaciones_Test {
                     SIREC__SIREC_fld_fechaLimite__c  = date.today(),
                     SIREC__SIREC_fld_fechaSituacion__c = date.today(),
                     SIREC__SIREC_fld_masterRecordId__c = String.valueof((Math.random() * 100000)),
-                    recordtypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId()
+                    recordtypeId = recordTypeIdPresol
                 );
             insert proceso;
 
@@ -122,6 +126,9 @@ public with sharing class SIR_Comunicaciones_Test {
             );
             insert tareaAcc;
 
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccion = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeIdAccion = mapRTsObjectsAccion.get(SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_PRESOL).getRecordTypeId();            
+        
             SIREC__SIREC_obj_acciones__c accion = new SIREC__SIREC_obj_acciones__c(
             SIREC__SIREC_fld_proceso__c = proceso.Id,
             SIREC__SIREC_fld_tarea__c = tareaAcc.Id,
@@ -131,8 +138,8 @@ public with sharing class SIR_Comunicaciones_Test {
             SIREC__SIREC_fld_interviniente__c = cuenta.Id,
             SIR_accionEnviada__c = false,
             SIREC__SIREC_fld_estado__c = 'En curso',
-            RecordTypeId = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByName().get(SIR_Constantes.ACCION_RECORDTYPE_NAME_PRESOL).getRecordTypeId(),
-            SIREC__SIREC_fld_responsable__c = UserInfo.getUserId()
+            RecordTypeId = recordTypeIdAccion,
+            SIREC__SIREC_fld_responsable__c = usuario.Id
             );
             insert accion;
 
@@ -147,7 +154,9 @@ public with sharing class SIR_Comunicaciones_Test {
         User usuario = [SELECT Id FROM User WHERE Username = 'usuarioTestSirLcmp@usertestsirec.com' LIMIT 1];
         System.runAs(usuario){
             Account cuenta = SIR_TestDataFactory.crearCuenta();
-
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsProcesos = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeIdAmistoso = mapRTsObjectsProcesos.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_IMPA).getRecordTypeId();            
+        
             SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(
                     Name = SIR_Constantes.tipoProceso_PRESOL,
                     SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_PRESOL_E1,	
@@ -156,7 +165,7 @@ public with sharing class SIR_Comunicaciones_Test {
                     SIREC__SIREC_fld_fechaLimite__c  = date.today(),
                     SIREC__SIREC_fld_fechaSituacion__c = date.today(),
                     SIREC__SIREC_fld_masterRecordId__c = String.valueof((Math.random() * 100000)),
-                    recordtypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId()
+                    recordtypeId = recordTypeIdAmistoso
                 );
             insert proceso;
 
@@ -171,6 +180,9 @@ public with sharing class SIR_Comunicaciones_Test {
             );
             insert tareaAcc;
 
+            Map<String,Schema.RecordTypeInfo> mapRTsObjectsAccion = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByDeveloperName();
+            Id recordTypeIdAccion = mapRTsObjectsAccion.get(SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_AMISTOSO).getRecordTypeId();            
+        
             SIREC__SIREC_obj_acciones__c accion = new SIREC__SIREC_obj_acciones__c(
             SIREC__SIREC_fld_proceso__c = proceso.Id,
             SIREC__SIREC_fld_tarea__c = tareaAcc.Id,
@@ -180,8 +192,8 @@ public with sharing class SIR_Comunicaciones_Test {
             SIREC__SIREC_fld_interviniente__c = cuenta.Id,
             SIR_accionEnviada__c = false,
             SIREC__SIREC_fld_estado__c = 'En curso',
-            RecordTypeId = Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByName().get(SIR_Constantes.ACCION_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId(),
-            SIREC__SIREC_fld_responsable__c = UserInfo.getUserId()
+            RecordTypeId = recordTypeIdAccion,
+            SIREC__SIREC_fld_responsable__c = usuario.Id
             );
             insert accion;
             

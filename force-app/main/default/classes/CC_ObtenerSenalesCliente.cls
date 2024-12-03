@@ -18,11 +18,11 @@ public with sharing class CC_ObtenerSenalesCliente {
 
         //CC_InterfaceSettings__mdt configPartyReferenceMdt = CC_MetodosUtiles.getInterfazConfigBody('CC_Int_ObtenerSenalesCliente');
 
-       // System.debug('numperso '+numperso); 
+        System.debug('numperso '+numperso); 
 
         Decimal numpersoDecimal = Decimal.valueOf(numperso);
 
-       // System.debug('numpersoDecimal '+CC_MetodosUtiles.decimalToHex(numpersoDecimal)); 
+        System.debug('numpersoDecimal '+CC_MetodosUtiles.decimalToHex(numpersoDecimal)); 
 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(configPartyReferenceMdt.CC_EndPoint__c);
@@ -33,8 +33,8 @@ public with sharing class CC_ObtenerSenalesCliente {
         try {
             Http http = new Http();
             HTTPResponse respuesta = http.send(req);
-           // System.debug( 'respuesta' +respuesta );
-           // System.debug( 'respuesta.getBody()' +respuesta.getBody() );
+            System.debug( 'respuesta' +respuesta );
+            System.debug( 'respuesta.getBody()' +respuesta.getBody() );
             
             if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
                 RespuestaSenalesCliente senalesClienteList = (RespuestaSenalesCliente) System.JSON.deserialize(respuesta.getBody(), RespuestaSenalesCliente.class);
@@ -44,11 +44,11 @@ public with sharing class CC_ObtenerSenalesCliente {
                 }
             }
             else{
-               // System.debug('respuesta vacía o <>200');
+                System.debug('respuesta vacía o <>200');
             }
         } 
         catch (Exception e) {
-           // System.debug('Excepction error ' + e.getMessage());
+            System.debug('Excepction error ' + e.getMessage());
             CBK_Log.error(e);
         }        
         //Si hay señales para el numperso actualizamos el cliente

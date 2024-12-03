@@ -164,7 +164,7 @@ global without sharing class CBK_MonitorJobs implements Schedulable {
      * @param jobId  : Id del Builk API Job
      */ 
     global static void CBK_JobDetail(Id jobId) {
-        CBK_Log__c job = [SELECT Id, Job_Id__c, operation__c, Project__c, object__c,Rec_Loaded__c,Rec_Success__c, Rec_Error__c, createdBy__r.Name , createdDate__c, systemModstamp__c, state__c, concurrencyMode__c, contentType__c, apiVersion__c, jobType__c, Completado__c ,
+        CBK_Log__c job = [SELECT Id, Job_Id__c,Error_Type__c,Log_Message__c, CBK_Duration__c, operation__c, Project__c, object__c,Rec_Loaded__c,Rec_Success__c, Rec_Error__c, createdBy__r.Name , createdDate__c, systemModstamp__c, state__c, concurrencyMode__c, contentType__c, apiVersion__c, jobType__c, Completado__c ,
                              totalProcessingTime__c, apiActiveProcessingTime__c,retries__c
                              FROM CBK_Log__c where Job_Id__c=:JobId]; 
 
@@ -209,7 +209,9 @@ global without sharing class CBK_MonitorJobs implements Schedulable {
                     job.Rec_Success__c = job.Rec_Loaded__c - job.Rec_Error__c;       
                     if ((job.state__c=='Failed')||(job.state__c=='JobComplete')||(job.state__c=='Aborted')){
                         job.Completado__c=true;
-                    }else if(job.state__c=='Closed' && job.operation__c == 'query'){
+                        Decimal minutes = (decimal.valueOf(job.systemModstamp__c.getTime()) - decimal.valueOf(job.createdDate__c.getTime()))/(1000*60);
+                        job.CBK_Duration__c = String.valueOf(minutes);
+                    }else{
                         callbatchesbyJobId = true;
                     }
                 }
@@ -236,10 +238,20 @@ global without sharing class CBK_MonitorJobs implements Schedulable {
                     }
                 }
                 if (allcompleted){
-                    finish.sort();
+                    if (finish.size() > 0){
+                        finish.sort();
+                        job.systemModstamp__c = finish.get(finish.size()-1);
+                    } 
                     job.Completado__c=true;
-                    job.systemModstamp__c = finish.get(finish.size()-1);
+                    Decimal minutes = (decimal.valueOf(job.systemModstamp__c.getTime()) - decimal.valueOf(job.createdDate__c.getTime()))/(1000*60);
+                    job.CBK_Duration__c = String.valueOf(minutes);
                 }
+            }
+        }else{
+            job.Log_Message__c = String.valueOf(response.getBody())?.left((2000));
+            if(response.getStatusCode() == 404){
+                job.Completado__c=true;
+                job.Error_Type__c = 'completado. Job no existe';
             }
         }
         upsert job Job_Id__c;             

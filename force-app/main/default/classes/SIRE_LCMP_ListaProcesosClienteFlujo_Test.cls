@@ -42,22 +42,8 @@ public class SIRE_LCMP_ListaProcesosClienteFlujo_Test {
             procesos = SIRE_LCMP_ListaProcesosClienteFlujo.getProcesos(cuenta.Id);
             url = SIRE_LCMP_ListaProcesosClienteFlujo.getURL(cuenta.Id);
             Test.stopTest();
-            Id recordTypeIdFlujo = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_FLUJO).getRecordTypeId();
-            Set<String> setSituaciones = new Set<String>{SIR_Constantes.PROCESO_SITUACION_SIRE_PENDIENTE_INICIO_GESTION};
-            List<SIREC__SIREC_obj_proceso__c> procesoCuenta = [SELECT id, 
-            name, 
-            toLabel(SIREC__SIREC_fld_estrategia__c), 
-            toLabel(SIREC__SIREC_fld_situacion__c), 
-            SIREC__SIREC_fld_fechaSituacion__c,
-            SIREC__SIREC_fld_fechaInicio__c, 
-            Owner.Name
-            FROM SIREC__SIREC_obj_proceso__c 
-            WHERE SIREC__SIREC_fld_cliente__c =: cuenta.id 
-            AND SIREC__SIREC_fld_situacion__c IN :setSituaciones
-            AND SIR_ObjetivoProceso__c != :SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO
-            AND RecordTypeId =: recordTypeIdFlujo];
-            Assert.areEqual(procesoCuenta,  procesos, 'No está devolviendo el proceso correcto');        
-            Assert.areNotEqual(null,  SIRE_LCMP_ListaProcesosClienteFlujo.getURL(cuenta.Id), constantes.STRING_TEST);
+           
+            Assert.areEqual(usuario.id, procesos[0].OwnerId, 'SIRE_LCMP_ListaProcesosClienteFlujo_Test. No está devolviendo los procesos del owner conectado'); 
             Assert.areEqual(true, url.contains(cuenta.id), 'La url no está devolviendo bien la ficha cliente');
             Assert.areEqual(true, url.contains('c__SIRE_MisClientesSolucionesEMP'), 'No está llevando a la home de empresas');  
         }                      

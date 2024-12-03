@@ -31,6 +31,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US200298         Luis Mesa    16/04/21       Creación Método
 *****************************************************************/
+
         if(!Case.SObjectType.getDescribe().isAccessible()){
             throw new AuraHandledException(MSG_ERROR_PERMISSIONS);        }
 
@@ -181,8 +182,6 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
      * 1.3            US330921       Marcela Neira  12/11/21       Modificacion (En caso que la reclamación con la que se vincula la Consulta esté 
      *                                                             en estado Cerrada/Ejecución" Y el GESTOR sea diferente del que trata la consulta, 
      *                                                             se mande una notificación al gestor. )
-     * 1.4            US683740       Raúl Santos    31/10/24       Modificación:  Si desde una consulta SAC vinculamos una reclamación con grupo letrado informado, 
-     *                                                             la consulta SAC debe heredar ese grupo letrado
     *****************************************************************/
     
     @AuraEnabled
@@ -192,7 +191,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
         if(!Case.SObjectType.getDescribe().isAccessible()){
             throw new AuraHandledException(MSG_ERROR_PERMISSIONS);
         }
-        List<Case> casoAnteriorAVincular = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, OwnerId, SEG_Grupo__c, CaseNumber, SAC_PretensionPrincipal__r.OwnerId, SAC_GrupoLetrado__c From Case Where Id =: idCasoVinculado Limit 1];
+        List<Case> casoAnteriorAVincular = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, OwnerId, SEG_Grupo__c, CaseNumber, SAC_PretensionPrincipal__r.OwnerId From Case Where Id =: idCasoVinculado Limit 1];
         List<Case> casoActual = [Select Id, CC_CasoRelacionado__c, Status, RecordTypeId, RecordType.DeveloperName, CaseNumber, OwnerId, SEG_Grupo__c From Case Where Id =: idCasoActual Limit 1];
         //List<Case> pretensiones = [SELECT Id, SAC_Reclamacion__c, Status, SEG_Grupo__c  FROM Case WHERE SAC_Reclamacion__c =: idCasoActual AND Status != 'SAC_009'];
         String tipoCaso = casoActual[0].RecordType.DeveloperName + ';' + casoAnteriorAVincular[0].CaseNumber;
@@ -255,12 +254,7 @@ private static final Id RECORTYPECONSULTASAC = Schema.SObjectType.Case.getRecord
                                 //Añadirla a la lista para posteriormente llamar al método
                                 listaWrapperAlerta.add(wrapAlerta);
                             }                           
-                        } 
-
-                        //Si desde una consulta SAC vinculamos una reclamación con grupo letrado informado, la consulta SAC debe heredar ese grupo letrado
-                        if(casoActual[0].RecordTypeId == RECORTYPECONSULTASAC && casoAnteriorAVincular[0].SAC_GrupoLetrado__c != null){
-                            casoActual[0].SAC_GrupoLetrado__c =  casoAnteriorAVincular[0].SAC_GrupoLetrado__c;
-                        }                  
+                        }                        
                 }
 
                 listaCasosUpdatear.add(casoActual[0]);

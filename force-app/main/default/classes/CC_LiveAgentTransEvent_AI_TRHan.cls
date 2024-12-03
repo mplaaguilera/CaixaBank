@@ -11,8 +11,7 @@ public with sharing class CC_LiveAgentTransEvent_AI_TRHan extends CC_TriggerHand
             Map<String, List<Task>> mapIdChatTask = new Map<String, List<Task>>();
             Map<String, LiveChatTranscript> mapIdChatTrans = new Map<String, LiveChatTranscript>();
             //List<LiveChatTranscript> ChatUpd = new List<LiveChatTranscript>();
-            
-            Id rtEmpleadosId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('LiveChatTranscript', 'CC_Empleados');
+            ID sRTEmpleado = Schema.getGlobalDescribe().get('LiveChatTranscript').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleados').getRecordTypeId();
             
             for (LiveChatTranscriptEvent eventoChat : listNewObj)  {
                 setIdsChat.add(eventoChat.LiveChatTranscriptId);
@@ -21,7 +20,7 @@ public with sharing class CC_LiveAgentTransEvent_AI_TRHan extends CC_TriggerHand
             if(setIdsChat !=null){
                 
                 List<LiveChatTranscript> listChat = [SELECT Id,Case.Owner.Name, Status, CaseId, CC_Tipo__c, OwnerId, CC_Categoria__c, CC_Espacio__c, CC_Id_Cognitive__c, RecordTypeId, CC_Tiempo_Pausado__c 
-                                                     FROM LiveChatTranscript WHERE Id IN : setIdsChat AND RecordTypeId = :rtEmpleadosId ];
+                                                     FROM LiveChatTranscript WHERE Id IN : setIdsChat AND RecordTypeId = :sRTEmpleado ];
                 
                 if(!listChat.isEmpty()){
                     List<Task> tareasChatQuery = [SELECT Id,CreatedDate,Status,Type, CC_LiveChatTranscript_Id__c FROM Task WHERE CC_LiveChatTranscript_Id__c IN :setIdsChat 
@@ -98,7 +97,7 @@ public with sharing class CC_LiveAgentTransEvent_AI_TRHan extends CC_TriggerHand
                                         nuevaActividad.Subject = 'Chat finalizado por agente';    
                                     }
                                 } else {
-                                    if (chat.RecordTypeId == rtEmpleadosId)
+                                    if (chat.RecordTypeId == sRTEmpleado)
                                     {
                                         nuevaActividad.Subject = 'Chat finalizado por empleado';
                                     }else{

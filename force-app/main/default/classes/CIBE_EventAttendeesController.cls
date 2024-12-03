@@ -79,14 +79,17 @@ public with sharing class CIBE_EventAttendeesController {
             }
 
             AttendeeWrapper owner = new AttendeeWrapper();
-            owner.id = contactos.get(ev.OwnerId).Id;
-            owner.name = contactos.get(ev.OwnerId).Name;
-            owner.isOwner = true;
-            owner.accepted = true;
-            owner.undecided = false;
-            owner.declined = false;
-            owner.contactId = '/' + contactos.get(ev.OwnerId).Id;
-            result.add(owner);
+            if(contactos.containsKey(ev.OwnerId)){
+                owner.id = contactos.get(ev.OwnerId).Id;
+                owner.name = contactos.get(ev.OwnerId).Name;
+                owner.isOwner = true;
+                owner.accepted = true;
+                owner.undecided = false;
+                owner.declined = false;
+                owner.contactId = '/' + contactos.get(ev.OwnerId).Id;
+                result.add(owner);
+            }
+
 
             for(EventRelation attendee : attendees) {
                 if(contactos.containsKey(attendee.RelationId)) {

@@ -25,7 +25,7 @@ public with sharing class SIR_LCMP_EditarContratosFormulario {
     @AuraEnabled(Cacheable=true)
     public static String queryContratos (Id idFormulario) {        
         String idAccountMasIdProceso = '';
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){         
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){         
             List<SIR_FormularioRefinanciacion__c> formulario = [ SELECT id, SIR_Persona__c, SIR_Proceso__c  FROM SIR_FormularioRefinanciacion__c 
                                                                  WHERE Id =: idFormulario LIMIT 1];  
             if(!formulario.isEmpty()){
@@ -48,7 +48,7 @@ public with sharing class SIR_LCMP_EditarContratosFormulario {
     @AuraEnabled(Cacheable=true)
     public static List<SIREC__SIREC_obj_procesoContrato__c> queryContratatosFormulario (Id idProceso) {
         List<SIREC__SIREC_obj_procesoContrato__c> procesoContrato = new List<SIREC__SIREC_obj_procesoContrato__c>();        
-        if(SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isAccessible()){         
+        if(Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isAccessible()){         
             procesoContrato = [SELECT SIREC__SIREC_fld_contract__c FROM SIREC__SIREC_obj_procesoContrato__c WHERE SIREC__SIREC_fld_proceso__c =: idProceso AND SIR_estadoCarga__c != 'B'];                                                                                              
         }  
         return procesoContrato;
@@ -69,12 +69,12 @@ public with sharing class SIR_LCMP_EditarContratosFormulario {
         String resultado = '';
         String titular = Label.SIR_TIT;
         String avalista = Label.SIR_AVA;  
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isCreateable()
-            && SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable() && SIREC__SIREC_obj_personaAsociada__c.SObjectType.getDescribe().isCreateable() 
-            && SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isCreateable() && SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible() 
-            && SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible() && SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isUpdateable()
-            && SIREC__SIREC_obj_personaAsociada__c.SObjectType.getDescribe().isUpdateable() && SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isUpdateable()
-            && Contract.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_intervinientesContrato__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isCreateable()
+            && Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable() && Schema.SObjectType.SIREC__SIREC_obj_personaAsociada__c.isCreateable() 
+            && Schema.SObjectType.SIR_IntervinienteFormulario__c.isCreateable() && Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible() 
+            && Schema.SObjectType.SIREC__SIREC_obj_Catalogo__c .isAccessible() && Schema.SObjectType.SIR_IntervinienteFormulario__c.isUpdateable()
+            && Schema.SObjectType.SIREC__SIREC_obj_personaAsociada__c.isUpdateable() && Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isUpdateable()
+            && Schema.SObjectType.Contract.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_intervinientesContrato__c.isAccessible()){
             try {  
                 List<Id> idContractsAntiguos = contractsAntiguos.split(',');
                 List<Id> idContractsNuevos = contractsNuevos.split(',');                 
@@ -258,28 +258,17 @@ public with sharing class SIR_LCMP_EditarContratosFormulario {
                     }
                     insert listNewPersonaAsociada;
                                             
-                    List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = [SELECT id, SIREC__SIREC_fld_CNAETexto__c, SIREC__SIREC_fld_CNOTexto__c, SIREC__SIREC_fld_cliente__c, 
+                    List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = [SELECT id, SIREC__SIREC_fld_CNAECatalogo__r.SIREC__SIREC_fld_Descripcion__c, SIREC__SIREC_fld_cliente__c, 
                                                                                 SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c, SIREC__SIREC_fld_ingresosTotal__c 
                                                                                 FROM SIREC__SIREC_obj_informacionCliente__c WHERE SIREC__SIREC_fld_cliente__c=: idCliente];                                  
                     if(!infoCliente.isEmpty()){
-                        // Realizamos query para recoger catalogo de CNAE y CNO     
-                        List<SIR_CatalogoSirec__c> catalogos = [SELECT id, SIR_Codigo__c, SIR_Descripcion__c, Name FROM SIR_CatalogoSirec__c WHERE Name='CNAE' OR Name='CNO']; 
                         Map<Id, SIREC__SIREC_obj_informacionCliente__c> mapInfoCliente = new Map<Id, SIREC__SIREC_obj_informacionCliente__c>();
                         for(SIREC__SIREC_obj_informacionCliente__c info: infoCliente){
                             mapInfoCliente.put(info.SIREC__SIREC_fld_cliente__c, info);
                         }
                         for(SIR_IntervinienteFormulario__c intervinienteForm: listNewIntervinienteForm){                 
                             if(mapInfoCliente.containsKey(intervinienteForm.SIR_Cliente__c)){
-                                if(!catalogos.isEmpty()){                                   
-                                    for(SIR_CatalogoSirec__c cat: catalogos){ 
-                                        if(mapInfoCliente.get(intervinienteForm.SIR_Cliente__c).SIREC__SIREC_fld_CNOTexto__c == cat.SIR_Codigo__c && cat.Name == 'CNO'){
-                                            intervinienteForm.SIR_Profesion__c = cat.SIR_Descripcion__c;
-                                        }
-                                        if(mapInfoCliente.get(intervinienteForm.SIR_Cliente__c).SIREC__SIREC_fld_CNAETexto__c == cat.SIR_Codigo__c && cat.Name == 'CNAE'){
-                                            intervinienteForm.SIR_Profesion__c = cat.SIR_Descripcion__c;
-                                        }
-                                    }                                 
-                                }
+                                intervinienteForm.SIR_Profesion__c = mapInfoCliente.get(intervinienteForm.SIR_Cliente__c).SIREC__SIREC_fld_CNAECatalogo__r.SIREC__SIREC_fld_Descripcion__c;
                                 intervinienteForm.SIR_IngresosTrabajo__c = mapInfoCliente.get(intervinienteForm.SIR_Cliente__c).SIREC__SIREC_fld_ingresosTotal__c;
                                 if(intervinienteForm.SIR_IngresosTrabajo__c == null){
                                     intervinienteForm.SIR_IngresosTrabajo__c = 0;
@@ -302,7 +291,8 @@ public with sharing class SIR_LCMP_EditarContratosFormulario {
                                                                                             SIREC__SIREC_fld_relacionContract__c, SIR_estadoCarga__c
                                                                                             FROM SIREC__SIREC_obj_intervinientesContrato__c
                                                                                             WHERE SIREC__SIREC_fld_persona__c =: idAccount  AND SIREC__SIREC_fld_relacionContract__c =: titular 
-                                                                                            AND SIR_estadoCarga__c !='B'];
+                                                                                            AND SIR_estadoCarga__c !='B'
+                                                                                            AND SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_fechaActualizacionSIREC__c >=  LAST_N_DAYS:2];
                 SIR_Constantes constantes = new SIR_Constantes();
                 Decimal deudaTotal             = 0;
                 Decimal deudaGarantiaReal      = 0; // SIR_deudaTotalGarantiaReal__c

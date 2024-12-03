@@ -29,7 +29,7 @@ public with sharing class CC_Activity {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'AM_Task');
 				} else if (tarea.RecordTypeId != CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'HDT_Task')) {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
-				}else {
+				} else {
 					tarea.RecordtypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
 				}
 				actividades.add(tarea);

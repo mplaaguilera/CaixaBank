@@ -6,10 +6,11 @@ Historial
 VERSION		USER_STORY		AUTHOR				DATE			Description
 1.0			Test Class		Mikel Lezama		28/09/2022		Init version
 1.1			App FSC			Alex Campos			24/10/2022	    Corrección getParents recursividad 
+1.2			US850814    	Lucía	  	        05/06/2024		Añadir los campos CIBE_AbsoluteClientProfSeg__c, CIBE_AbsoluteGroupProfSeg__c, CIBE_RelativeClientProfSeg__c y CIBE_RelativeGroupProfSeg__c
 
 -----------------------------------------------------------------------------------------------------------------------
 **********************************************************************************************************************/
-public class CIBE_GruposEconomicos_Controller {
+public with sharing class CIBE_GruposEconomicos_Controller {
     
     @AuraEnabled(cacheable=true)
     public static List<Entry> getData(String recordId, String tipoGrupo) {
@@ -33,16 +34,23 @@ public class CIBE_GruposEconomicos_Controller {
                                 FinServ__RelatedAccount__r.CIBE_LEXAprobado__c,
                                 FinServ__RelatedAccount__r.AV_Financiacion__c,
                                 FinServ__RelatedAccount__r.CIBE_Source__c,
+                                TOLABEL( FinServ__RelatedAccount__r.CIBE_AbsoluteClientProfSeg__c),
+                                TOLABEL(FinServ__RelatedAccount__r.CIBE_AbsoluteGroupProfSeg__c),
+                                TOLABEL(FinServ__RelatedAccount__r.CIBE_RelativeClientProfSeg__c),
+                                TOLABEL(FinServ__RelatedAccount__r.CIBE_RelativeGroupProfSeg__c),
                                 FinServ__Role__r.Name
                         FROM FinServ__AccountAccountRelation__c WHERE RecordType.DeveloperName = 'CIBE_GrupoEconomico' AND FinServ__Account__r.RecordType.DeveloperName = 'CIBE_GrupoEconomico' AND FinServ__Account__c = :recordId AND FinServ__Role__r.Name = 'Parent' AND CIBE_TipoGrupo__c =: tipoGrupo ORDER BY FinServ__RelatedAccount__r.RecordType.DeveloperName ASC];
         }
-
         List<Entry> entries = new List<Entry>();
         for(FinServ__AccountAccountRelation__c relation : relations) {
             Entry e = new Entry();
             e.id = relation.FinServ__RelatedAccount__r.Id;
             e.accountName = relation.FinServ__RelatedAccount__r.Name;
             e.showRecord = '/' + relation.FinServ__RelatedAccount__r.Id;
+            e.empresaAbsoluta = relation.FinServ__RelatedAccount__r.CIBE_AbsoluteClientProfSeg__c;
+            e.empresaRelativa = relation.FinServ__RelatedAccount__r.CIBE_RelativeClientProfSeg__c;
+            e.grupoAbsoluta = relation.FinServ__RelatedAccount__r.CIBE_AbsoluteGroupProfSeg__c;
+            e.grupoRelativa = relation.FinServ__RelatedAccount__r.CIBE_RelativeGroupProfSeg__c;
             if(relation.FinServ__RelatedAccount__r.RecordType.DeveloperName == 'CC_Cliente') {
                 e.pasivo =relation.FinServ__RelatedAccount__r.AV_AhorroEInversion__c != null ? Integer.valueOf(relation.FinServ__RelatedAccount__r.AV_AhorroEInversion__c.round(RoundingMode.HALF_UP)).format() : '';
                 e.activo = relation.FinServ__RelatedAccount__r.AV_Financiacion__c != null ? Integer.valueOf(relation.FinServ__RelatedAccount__r.AV_Financiacion__c.round(RoundingMode.HALF_UP)).format() : '';
@@ -79,7 +87,6 @@ public class CIBE_GruposEconomicos_Controller {
             parents = new List<List<Breadcrumb>>();
             getParentsRecursively(recordId, tipoGrupo, new List<Breadcrumb>(), true);
         }
-        System.debug(parents);
         return parents;
     }
     
@@ -155,6 +162,10 @@ public class CIBE_GruposEconomicos_Controller {
         @AuraEnabled public List<Entry> children {get;set;}
         @AuraEnabled public String showRecord {get;set;}
         @AuraEnabled public String source {get;set;}
+        @AuraEnabled public String empresaAbsoluta {get;set;}
+        @AuraEnabled public String grupoAbsoluta {get;set;}
+        @AuraEnabled public String empresaRelativa {get;set;}
+        @AuraEnabled public String grupoRelativa {get;set;}
     }
 
 }

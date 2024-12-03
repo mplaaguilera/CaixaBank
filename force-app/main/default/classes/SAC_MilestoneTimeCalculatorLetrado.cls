@@ -88,10 +88,9 @@ public with sharing class SAC_MilestoneTimeCalculatorLetrado implements Support.
 
         /** Se vuelven a cambiar las BBHH de 10 a 24 horas (Antes se tenia una horario de 8:00 - 18:00)*/
         slaTotal = (slaTotal * 1440);
-        System.debug('slaTotal antes ' + slaTotal);
+
         //Llamada al método calcularTiempoParadaSubsanacion para que le sume al tiempo total devuelto el tiempo de la parada de subsanación US959472
         slaTotal = SAC_Utils.calcularTiempoParadaSubsanacion(caso[0], slaTotal);
-        System.debug('slaTotal despues ' + slaTotal);
 
         return slaTotal; //días de 24horas
         //return slaTotal * 600;  // 600 son los minutos de 10 horas que son las que se han definido en las Business Hours

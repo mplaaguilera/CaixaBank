@@ -311,7 +311,7 @@ public with sharing class SPV_LCMP_InsertarPretension {
                         nuevaPretension.SEG_Grupo__c = reclamacionActual.SAC_PretensionPrincipal__r.SEG_Grupo__c;      
                         nuevaPretension.OwnerId = reclamacionActual.SAC_PretensionPrincipal__r.OwnerId; 
                     }else{
-                        nuevaPretension.OwnerId = reclamacionActual.OwnerId;
+                    nuevaPretension.OwnerId = reclamacionActual.OwnerId;
                     }
                     nuevasPretensiones.add(nuevaPretension);    
                 } else if (reclamacionActual.Status == 'SAC_002') { //Si la reclamación padre está en Análisis, se crea con el owner y el grupo de la pretensión principal
@@ -322,10 +322,10 @@ public with sharing class SPV_LCMP_InsertarPretension {
             }
         }
         
-
+        
         //si hay 1 o mas mccs repetidos
         if(!detalleMotivoRepetidos.isEmpty()){
-           
+            
             for(Id idDetalle : detalleMotivoRepetidos.KeySet()){
                 
                 Id detalle = idDetalle;

@@ -9,8 +9,9 @@ public with sharing class CC_EmailSendController {
                 Account.AV_OficinaPrincipal__r.Name, Account.PersonEmail, Account.RecordType.DeveloperName, Account.RecordTypeId,
                 Account.CC_Marca_senior__c, CC_Tipo_Cliente__c, CC_Canal_Procedencia__c, Contact.Phone, CC_Tipo_Cliente_Formula__c,
                 CC_MCC_Motivo__c, Origin, Status, Subject, CreatedDate, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, CC_Grupo_3N__c,
-                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c, CC_MCC_Causa__c,
-                CC_MCC_Solucion__c, ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
+                CC_No_Identificado__c, CC_En_Segundo_Nivel__c, CC_Traslado_2N__c, CC_En_Tercer_Nivel__c, CC_Canal_Operativo__c, 
+                CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,CC_MCC_Motivo__r.CC_Ambito_Tareas_Imagin__c , CC_MCC_Causa__c,
+                CC_MCC_Solucion__c,CC_Oportunidad_Creada__c,ParentId, Parent.RecordType.DeveloperName, CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_Representante__c
                 FROM Case WHERE Id = :recordId];
     }
 
@@ -1891,14 +1892,14 @@ public with sharing class CC_EmailSendController {
         return (!permiso.isEmpty()) ? true : false;
     }
 
-    @AuraEnabled
-    public static Boolean comprobarVisibilidadBotonOnboarding(Id recordId) {
-        return [SELECT CC_MCC_Motivo__r.CC_AplicaOnboarding__c FROM Case WHERE Id = :recordId LIMIT 1].CC_MCC_Motivo__r.CC_AplicaOnboarding__c;
-    }
+    // @AuraEnabled
+    // public static Boolean comprobarVisibilidadBotonOnboarding(Id recordId) {
+    //     return [SELECT CC_MCC_Motivo__r.CC_AplicaOnboarding__c FROM Case WHERE Id = :recordId LIMIT 1].CC_MCC_Motivo__r.CC_AplicaOnboarding__c;
+    // }
 
-    @AuraEnabled
-    public static void llamadaWSOnboarding() {
-        CC_WS_Onboarding.test();
-    }
+    // @AuraEnabled
+    // public static void llamadaWSOnboarding() {
+    //     CC_WS_Onboarding.test();
+    // }
 
 }

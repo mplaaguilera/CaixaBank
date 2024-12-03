@@ -26,11 +26,11 @@ public with sharing class CIBE_FeedCommentTriggerHelper {
                 setIdOpp.add(fc.parentId);
             }
             Set<Id> setRTOppo = CIBE_OpportunityTriggerHelper.getAllRT();
-            List<Opportunity> lstOpp = [SELECT Id, Name, Account.Name, OwnerId, RecordTypeId FROM Opportunity WHERE Id IN :setIdOpp AND RecordtypeId IN:setRTOppo];
+            List<Opportunity> lstOpp = [SELECT Id, Name, Account.Name, OwnerId, RecordTypeId FROM Opportunity WHERE Id IN :setIdOpp AND RecordtypeId IN:setRTOppo AND Owner.IsActive = true];
             List<CustomNotificationType> notificationTypes = [SELECT Id, DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'CIBE_NewChatMessage'];
 
             if(!listNews.isEmpty() && !notificationTypes.isEmpty() && !lstOpp.isEmpty()) {
-                List<OpportunityTeamMember> teamMembers = [SELECT Id, UserId FROM OpportunityTeamMember WHERE OpportunityId = :lstOpp.get(0).Id AND UserId != :lstOpp.get(0).OwnerId];
+                List<OpportunityTeamMember> teamMembers = [SELECT Id, UserId FROM OpportunityTeamMember WHERE OpportunityId = :lstOpp.get(0).Id AND UserId != :lstOpp.get(0).OwnerId AND User.Isactive = true];
                 Set<String> memberIds = new Set<String>();
                 for(OpportunityTeamMember teamMember : teamMembers) {
                     memberIds.add(teamMember.UserId);

@@ -70,7 +70,7 @@ public with sharing class CC_WS_Recuperar_Tarjetas_Test {
 
         CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
         customSetting.Name = 'CC_Recuperar_Tarjetas';
-        customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/cards/creditCard/bis/cards/customers/id/request';
+        customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/cards/creditCard/bis/cards/customers/id/request';
         customSetting.RegistroTrazaIntegracion__c = true;
        
         System.runAs (usuario1) {

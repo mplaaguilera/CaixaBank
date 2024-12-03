@@ -6,27 +6,30 @@ Proposito: clase test de CIBE_SIR_Integration
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-VERSION		USER_STORY              AUTHOR                 DATE			Description
+VERSION		USER_STORY              AUTHOR                 DATE			    Description
     1.0     US473463                Alexandre Pérez        19/06/2023       Initial version
+    1.1     US841839                Borja Lavesiera        12/03/2024       Eliminar Http, HttpRequest y HttpResponse Constructor  
 ***********************************************************************************************************************/
 @isTest
 public with sharing class CIBE_SIR_IntegrationTest {
     @TestSetup
     static void setup(){
-
         List<CBK_IntegrationSetting__c> listEndpointConf = new list<CBK_IntegrationSetting__c>();
         CBK_IntegrationSetting__c endpointConf = new CBK_IntegrationSetting__c(Name='getSir', NamedCredential__c = 'callout:API_GWT_CIBE/customerManagement/customerCreditRating/customers/id/scoring/risks/evaluable');
         listEndpointConf.add(endpointConf);
         insert listEndpointConf;
+        test.setCreatedDate(listEndpointConf[0].id, dateTime.newInstance(2023, 5, 1));
+        update listEndpointConf;
 
+        user usrAdm = CIBE_TestHelper.createUser('System Administrator', '1234');
     }
     @isTest
     public static void sirIntegrationCalloutOK_Test() {
- 
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
         User cIBUser;
         String result;
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+       System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
         }
         Account dummyAcc;
         System.runAs(cIBUser) {
@@ -48,13 +51,13 @@ public with sharing class CIBE_SIR_IntegrationTest {
 
     @istest
     public static void sirIntegrationCalloutKO_Test() {
-
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
         Account dummyAcc;
         User cIBUser;
         String result;
 
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+        System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
         }
 
         System.runAs(cIBUser) {
@@ -81,13 +84,13 @@ public with sharing class CIBE_SIR_IntegrationTest {
 
     @istest
     public static void sirIntegrationCalloutRefresco_Test() {
-
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
         Account dummyAcc;
         User cIBUser;
         String result;
 
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+        System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
         }
 
         System.runAs(cIBUser) {
@@ -115,13 +118,13 @@ public with sharing class CIBE_SIR_IntegrationTest {
 
     @istest
     public static void sirIntegrationCalloutJsonKO_Test() {
-
+        User usrRun = [SELECT Id FROM USER WHERE AV_ExternalID__c = '1234' limit 1];
         Account dummyAcc;
         User cIBUser;
         String result;
 
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
+        System.runAs(usrRun) {
+            cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '123', new List<String>{'CIBE_OperativaCIB', 'CIBE_CustomMetadata', 'CIBE_Analytics'});
         }
 
         System.runAs(cIBUser) {

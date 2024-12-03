@@ -4,11 +4,9 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
     @testSetup
     private static void testSetup() {
         
-        
         Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
         Id profileAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
         UserRole rolCC = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
-        
         
         User usuario = new User();
         usuario.LastName = 'Gestor CC Test';
@@ -26,6 +24,8 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
         PermissionSet psCC = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_Cliente'];
         insert new PermissionSetAssignment(PermissionSetId = psCC.id, AssigneeId = usuario.Id);
         
+        List<EmailTemplate> lstTemplates = new List<EmailTemplate>();
+
         EmailTemplate plantillaDocumento = new EmailTemplate();
         plantillaDocumento.DeveloperName = 'CC_Test_Generar_Doc_' + System.now().getTime();
         plantillaDocumento.Name = 'plantillaPdf';
@@ -34,15 +34,56 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
         plantillaDocumento.isActive = true;
         plantillaDocumento.Body = 'cuerpo';
         plantillaDocumento.HtmlValue = '<html><body>cuerpo</body></html>';
+        lstTemplates.add(plantillaDocumento);
+
+        EmailTemplate plantillaHeader = new EmailTemplate();
+        plantillaHeader.DeveloperName = 'CC_Header';
+        plantillaHeader.Name = 'CC_Header';
+        plantillaHeader.TemplateType = 'custom';
+        plantillaHeader.FolderId = usuario.Id;
+        plantillaHeader.isActive = true;
+        lstTemplates.add(plantillaHeader);
+
+        EmailTemplate plantillaFooter = new EmailTemplate();
+        plantillaFooter.DeveloperName = 'CC_Footer';
+        plantillaFooter.Name = 'CC_Footer';
+        plantillaFooter.TemplateType = 'custom';
+        plantillaFooter.FolderId = usuario.Id;
+        plantillaFooter.isActive = true;
+        lstTemplates.add(plantillaFooter);
+
+        EmailTemplate plantillaEncabezado = new EmailTemplate();
+        plantillaEncabezado.DeveloperName = 'CC_Encabezado_Correo_Postal_CAS';
+        plantillaEncabezado.Name = 'CC_Encabezado_Correo_Postal_CAS';
+        plantillaEncabezado.TemplateType = 'custom';
+        plantillaEncabezado.FolderId = usuario.Id;
+        plantillaEncabezado.isActive = true;
+        lstTemplates.add(plantillaEncabezado);
+
+        EmailTemplate plantillaPieFirma = new EmailTemplate();
+        plantillaPieFirma.DeveloperName = 'CC_Pie_Firma_Correo_Postal_CAS';
+        plantillaPieFirma.Name = 'CC_Pie_Firma_Correo_Postal_CAS';
+        plantillaPieFirma.TemplateType = 'custom';
+        plantillaPieFirma.FolderId = usuario.Id;
+        plantillaPieFirma.isActive = true;
+        lstTemplates.add(plantillaPieFirma);
+
+        EmailTemplate plantillaFirma = new EmailTemplate();
+        plantillaFirma.DeveloperName = 'CC_Firma_Correo_Postal_CAS';
+        plantillaFirma.Name = 'CC_Firma_Correo_Postal_CAS';
+        plantillaFirma.TemplateType = 'custom';
+        plantillaFirma.FolderId = usuario.Id;
+        plantillaFirma.isActive = true;
+        lstTemplates.add(plantillaFirma);
         System.runAs(usuario) {
-            insert plantillaDocumento;
+            insert lstTemplates;
         }
         
-        Id tematicaId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Tematica').getRecordTypeId();
-        Id productoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Producto_Servicio').getRecordTypeId();
-        Id motivoId = Schema.SObjectType.CC_MCC__c.getRecordTypeInfosByDeveloperName().get('CC_Motivo').getRecordTypeId();
+        Id tematicaId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
+        Id productoId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
+        Id motivoId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
         
-                User usuarioAdmin = new User();        
+        User usuarioAdmin = new User();        
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = rolCC.Id;
         usuarioAdmin.FirstName = '';
@@ -59,46 +100,45 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
         insert usuarioAdmin;
 
 
-        System.runAs(usuarioAdmin)
-        {
+        System.runAs(usuarioAdmin) {
         
-        
-        CC_MCC__c tematica = new CC_MCC__c(
-            Name = 'Tematica Test2',
-            RecordTypeId = tematicaId,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Canal_Operativo__c = 'Cajero',
-            CC_Codigo_Externo__c = 'TE-000001'
-        );
-        insert tematica;
-        CC_MCC__c producto = new CC_MCC__c(
-            Name = 'Producto Test2',
-            RecordTypeId = productoId,
-            CC_Tematica__c = tematica.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Codigo_Externo__c = 'PR-000001'
-        );
-        insert producto;
-        CC_MCC__c motivo = new CC_MCC__c(
-            Name = 'Motivo Test2',
-            RecordTypeId = motivoId,
-            CC_Producto_Servicio__c = producto.Id,
-            CC_Tipo_Cliente__c = 'Cliente',
-            CC_Link__c = 'https://test.com',
-            CC_Codigo_Externo__c = 'MO-000001'
-        );
-        insert motivo;
-        
-        //Comprobamos en el caso de que haya alguna plantilla asociada
-        EmailTemplate plantilla = [SELECT Name, DeveloperName FROM EmailTemplate WHERE Id = :plantillaDocumento.Id LIMIT 1];
-        CC_MCC_Plantilla__c mccPlantilla = new CC_MCC_Plantilla__c(
-            CC_MCC__c = tematica.Id,
-            CC_MCC_Plantilla_Name__c = plantilla.Name,
-            CC_MCC_Plantilla_DeveloperName__c = plantilla.DeveloperName
-        );
-        insert mccPlantilla;
-        
-        
+            CC_MCC__c tematica = new CC_MCC__c(
+                Name = 'Tematica Test2',
+                RecordTypeId = tematicaId,
+                CC_Tipo_Cliente__c = 'Cliente',
+                CC_Canal_Operativo__c = 'Cajero',
+                CC_Codigo_Externo__c = 'TE-000001'
+            );
+            insert tematica;
+            CC_MCC__c producto = new CC_MCC__c(
+                Name = 'Producto Test2',
+                RecordTypeId = productoId,
+                CC_Tematica__c = tematica.Id,
+                CC_Tipo_Cliente__c = 'Cliente',
+                CC_Codigo_Externo__c = 'PR-000001'
+            );
+            insert producto;
+            CC_MCC__c motivo = new CC_MCC__c(
+                Name = 'Motivo Test2',
+                RecordTypeId = motivoId,
+                CC_Producto_Servicio__c = producto.Id,
+                CC_Tipo_Cliente__c = 'Cliente',
+                CC_Link__c = 'https://test.com',
+                CC_Codigo_Externo__c = 'MO-000001'
+            );
+            insert motivo;
+            
+            //Comprobamos en el caso de que haya alguna plantilla asociada
+            EmailTemplate plantilla = [SELECT Name, DeveloperName FROM EmailTemplate WHERE Id = :plantillaDocumento.Id LIMIT 1];
+            CC_MCC_Plantilla__c mccPlantilla = new CC_MCC_Plantilla__c(
+                CC_MCC__c = tematica.Id,
+                CC_MCC_Plantilla_Name__c = plantilla.Name,
+                CC_MCC_Plantilla_DeveloperName__c = plantilla.DeveloperName
+            );
+            insert mccPlantilla;
+            
+            
+            List<Case> lstCasos = new List<Case>();
             Case caso = new Case(
                 RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
                 Origin = 'Email',
@@ -114,7 +154,43 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
                 Subject = 'Prueba Gestor Documento',
                 Description = 'Prueba'
             );
-            insert caso;
+            lstCasos.add(caso);
+
+            Case casoCAT = new Case(
+                RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_MCC_Tematica__c = tematica.Id,
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivo.Id,
+                CC_Idioma__c = 'ca',
+                CC_Canal_Respuesta__c = 'Email',
+                OwnerId = usuario.Id,
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                Subject = 'Prueba Gestor Documento CAT',
+                Description = 'Prueba'
+            );
+            lstCasos.add(casoCAT);
+
+            Case casoGA = new Case(
+                RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
+                Origin = 'Email',
+                Status = 'Activo',
+                CC_MCC_Tematica__c = tematica.Id,
+                CC_MCC_ProdServ__c = producto.Id,
+                CC_MCC_Motivo__c = motivo.Id,
+                CC_Idioma__c = 'ga',
+                CC_Canal_Respuesta__c = 'Email',
+                OwnerId = usuario.Id,
+                CC_Grupo_3N__c = 'Grupo 3N',
+                CC_Canal_Procedencia__c = 'Formulario web',
+                Subject = 'Prueba Gestor Documento GA',
+                Description = 'Prueba'
+            );
+            lstCasos.add(casoGA);
+
+            insert lstCasos;
             
             String recordId = caso.Id;
             String docId = '';
@@ -176,27 +252,23 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
             
             //Caso sin gestor documental
             GestorDocumentalController.generaDocumento(recordId, docId, idioma, sexo, cambioficina, faltaentrega, espera, 
-                                                       contactocliente, allinone, irrespetuoso, fraude, movimientoCuenta, usuarioNow, cuentaminombre,
-                                                       respuestacliente, contestarrespuestacliente, bloqueoretencionsaldo, solicitudcancelacionseguro, solicitudtestamentaria,
-                                                       solicitud, solicitudDocumentacion, informaciondocumentacionadicional, helloletter, codigoprestamo, fechafinalcalculo,
-                                                       cuadroamortizacion, partedocumentacion, documentacionadicional, documentacionnolocalizada,
-                                                       detalleinformacionenviar, camposBoleanos, camposTexto);      
+                                                    contactocliente, allinone, irrespetuoso, fraude, movimientoCuenta, usuarioNow, cuentaminombre,
+                                                    respuestacliente, contestarrespuestacliente, bloqueoretencionsaldo, solicitudcancelacionseguro, solicitudtestamentaria,
+                                                    solicitud, solicitudDocumentacion, informaciondocumentacionadicional, helloletter, codigoprestamo, fechafinalcalculo,
+                                                    cuadroamortizacion, partedocumentacion, documentacionadicional, documentacionnolocalizada,
+                                                    detalleinformacionenviar, camposBoleanos, camposTexto);      
             
             //Actualizar caso con gestor documental
             caso = [SELECT CC_Gestor_Documental__c FROM CASE WHERE Id = :caso.Id];
             docId = caso.CC_Gestor_Documental__c;
             
             GestorDocumentalController.generaDocumento(recordId, docId, idioma, sexo, cambioficina, faltaentrega, espera, 
-                                                       contactocliente, allinone, irrespetuoso, fraude, movimientoCuenta, usuarioNow, cuentaminombre,
-                                                       respuestacliente, contestarrespuestacliente, bloqueoretencionsaldo, solicitudcancelacionseguro, solicitudtestamentaria,
-                                                       solicitud, solicitudDocumentacion, informaciondocumentacionadicional, helloletter, codigoprestamo, fechafinalcalculo,
-                                                       cuadroamortizacion, partedocumentacion, documentacionadicional, documentacionnolocalizada,
-                                                       detalleinformacionenviar, camposBoleanos, camposTexto);       
-            
-            
-            
-            
-            
+                                                    contactocliente, allinone, irrespetuoso, fraude, movimientoCuenta, usuarioNow, cuentaminombre,
+                                                    respuestacliente, contestarrespuestacliente, bloqueoretencionsaldo, solicitudcancelacionseguro, solicitudtestamentaria,
+                                                    solicitud, solicitudDocumentacion, informaciondocumentacionadicional, helloletter, codigoprestamo, fechafinalcalculo,
+                                                    cuadroamortizacion, partedocumentacion, documentacionadicional, documentacionnolocalizada,
+                                                    detalleinformacionenviar, camposBoleanos, camposTexto);
+
         }             
         
         
@@ -270,25 +342,39 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex_Test {
             System.assertNotEquals(null, resultado, 'resultado should not be null');
         }
     }
+
+    @isTest
+    public static void buscarPlantillasMCC() {
+        User usuario = [SELECT Id FROM User WHERE LastName = 'Gestor CC Test' LIMIT 1];
+        System.runAs(usuario) {
+            Test.startTest();
+            List<EmailTemplate> resultado = CC_GenerarDocumentoPlantilla_Apex.buscarPlantillasMCC('cadena_búsqueda');
+            Test.stopTest();
+            
+            System.assertNotEquals(null, resultado, 'resultado should not be null');
+        }
+    }
     
     @isTest
     static void obtenerDatosTemplateTest(){
         User usuario = [SELECT Id FROM User WHERE LastName = 'Gestor CC Test' LIMIT 1];
        
-        CC_GenerarDocumentoPlantilla_Apex.WrapperTemplate infoTemplate; 
+        CC_GenerarDocumentoPlantilla_Apex.WrapperTemplate infoTemplate;
+        CC_GenerarDocumentoPlantilla_Apex.WrapperTemplate infoTemplate2;
+        CC_GenerarDocumentoPlantilla_Apex.WrapperTemplate infoTemplate3;
         System.runAs(usuario) {
-            //Map<String, Object> campos = new Map<String, Object>{'CSBD_GenerarDocumentoHtml__c' => '<p>hola&nbsp;OP-344833701 - 2</p>'};
-            //Opportunity oportunidad = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
-            Case caso = [SELECT Id, CaseNumber FROM Case WHERE Subject = 'Prueba Gestor Documento' LIMIT 1];
+            List<Case> casos = [SELECT Id FROM Case WHERE Subject IN ('Prueba Gestor Documento', 'Prueba Gestor Documento CAT', 'Prueba Gestor Documento GA')];
             
             EmailTemplate plantillaPdf = [SELECT Id FROM EmailTemplate WHERE Name = 'plantillaPdf'];
             Test.startTest();
-            infoTemplate = CC_GenerarDocumentoPlantilla_Apex.obtenerDatosTemplate(plantillaPdf.Id, caso.Id);
+            infoTemplate = CC_GenerarDocumentoPlantilla_Apex.obtenerDatosTemplate(plantillaPdf.Id, casos[0].Id);
+            infoTemplate2 = CC_GenerarDocumentoPlantilla_Apex.obtenerDatosTemplate(plantillaPdf.Id, casos[1].Id);
+            infoTemplate3 = CC_GenerarDocumentoPlantilla_Apex.obtenerDatosTemplate(plantillaPdf.Id, casos[2].Id);
             Test.stopTest();
-            
+
             Assert.areNotEqual(null, infoTemplate, 'Ha fallado la obtención de datos de la plantilla');
+            Assert.areNotEqual(null, infoTemplate2, 'Ha fallado la obtención de datos de la plantilla');
+            Assert.areNotEqual(null, infoTemplate3, 'Ha fallado la obtención de datos de la plantilla');
         }
     }
-    
-    
 }

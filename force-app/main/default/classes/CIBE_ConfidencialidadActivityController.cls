@@ -17,12 +17,14 @@ public with sharing class CIBE_ConfidencialidadActivityController {
         result.id = recordId;
         if(String.isNotBlank(recordId) && Event.SObjectType.getDescribe().isAccessible()) {
             if(recordId.startsWith('00U')) {
-                for(Event ev : [SELECT Id, CIBE_Confidential__c FROM Event WHERE Id = :recordId]) {
+                for(Event ev : [SELECT Id, CIBE_Confidential__c, RecordType.DeveloperName FROM Event WHERE Id = :recordId]) {
                     result.confidential = ev.CIBE_Confidential__c;
+                    result.rtDeveloperName = ev.RecordType.DeveloperName;
                 }
             } else if(recordId.startsWith('00T') && Task.SObjectType.getDescribe().isAccessible()) {
-                for(Task tsk : [SELECT Id, CIBE_Confidential__c FROM Task WHERE Id = :recordId]) {
+                for(Task tsk : [SELECT Id, CIBE_Confidential__c, RecordType.DeveloperName FROM Task WHERE Id = :recordId]) {
                     result.confidential = tsk.CIBE_Confidential__c;
+                    result.rtDeveloperName = tsk.RecordType.DeveloperName;
                 }
             }
         }
@@ -177,6 +179,8 @@ public with sharing class CIBE_ConfidencialidadActivityController {
     public class Activity {
         @AuraEnabled public String id {get;set;}
         @AuraEnabled public Boolean confidential {get;set;}
+        @AuraEnabled public String rtDeveloperName {get;set;}
+
     }
 
 }

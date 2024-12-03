@@ -112,6 +112,6 @@ public with sharing class CIBE_AccTMAccConRelBatch_Test {
         }  
         test.stopTest();
         system.assertEquals([SELECT Id, AccountId, UserId from AccountTeamMember].size(),0, 'Se debería haber borrado el registro en la accountTeamMember');
-        //System.assertNotEquals(0, [SELECT ID FROM CBK_Framework_Batch__c].size());
+        //System.assertNotEquals(0, [SELECT ID FROM CBK_Framework_Batch__c].size()); 
     }
 }

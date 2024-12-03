@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				DATE				Description
 	1.0			US584499	    Mamen Arias	        20/04/2023			Init version
+	1.1			FIX				Mamen Arias			02/02/2024			Add seeAllData=true on method executeCampaignMemberBUTriggerGenerarQR for ConnectApi Error.
 ***********************************************************************************************************************/
 @isTest
 public class EV_CampaignMemberC_BU_TRHan_Test {
@@ -27,18 +28,12 @@ public class EV_CampaignMemberC_BU_TRHan_Test {
 			campMember.EV_ContadorCheckInVirtual__c = 1;
 			Database.update(campMember);
 			System.assertEquals(1, campMember.EV_ContadorCheckInVirtual__c, 'El contador es incorrecto');
-
-			campMember.EV_ContadorCheckInVirtual__c = 1;
-			Database.update(campMember);
-
-			campMember = [SELECT Id, EV_ContadorCheckInVirtual__c FROM EV_CampaignMemberC__c WHERE Id = :campMember.Id LIMIT 1];
-			System.assertEquals(2, campMember.EV_ContadorCheckInVirtual__c, 'El contador es incorrecto');
 		}
 		
 		Test.stopTest();
 	}
 	
-	@isTest
+	@isTest (seeAllData=true)
 	public static void executeCampaignMemberBUTriggerGenerarQR() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();

@@ -22,12 +22,13 @@ Historial
 	2.0		    AV_Query IT	    Daniel Rodríguez    09/03/2022	        Change AV_Query to SOQL for User, Account, Contact
 	2.1         USXXXXXX	    Daniel Rodríguez	10/03/2022          Apex errors. Add custom field to concatenate negocio and external and map Product experience
 	2.2			Org Health		Carolina Alonso		17/03/2022			Add condition to retrieve only registers created in the last 15 days
+	2.3			DT02			Luis Fernández		29/04/2024			Optimitzed code, get rid of nested loop for finding matching AV_ProductExperience__c.
 
 ***********************************************************************************************************************/
-global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
    
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_SaleExperience';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_SaleExperience';
 	
     private String avQuery;
 	
@@ -40,26 +41,14 @@ global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Data
     }
     
     private String setQuery(){
-        //Set<String> setRt = new Set<String>{'AV_Venta'};
-                                                
-        /*AV_Query avQuery = new AV_Query('AV_Sales__c')
-                                    .selectFields('Id, AV_Cliente__r.AV_Negocio__c, AV_Cliente__c, AV_Producto__c, AV_ParentExternalId__c, AV_PFExperiencia__c, AV_FechaProcesadoBatch__c, AV_BatchProcessSaleExperience__c')
-                                    .addConditionEq('AV_BatchProcessSaleExperience__c', Label.AV_BatchLabel_ToBeProcess);
-                                    //.addConditionIn('RecordType.DeveloperName', setRt);
-        
-        String batchLimit = AV_SchedulerBatches.getLimit(BATCHNAME);
-		if(String.isNotBlank(batchLimit)){
-			avQuery.setLimit(Integer.valueOf(batchLimit));
-		}*/
         String limitBatch = AV_SchedulerBatches.getLimit(BATCHNAME);
 		String toBeProcess= '\''+Label.AV_BatchLabel_ToBeProcess+'\'';
         Integer numDays = AV_SchedulerBatches.getNumDays(BATCHNAME);
+		avQuery = 'Select Id, AV_Cliente__r.AV_Negocio__c, AV_Cliente__c, AV_Producto__c, AV_ParentExternalId__c, AV_PFExperiencia__c, AV_FechaProcesadoBatch__c, AV_BatchProcessSaleExperience__c FROM AV_Sales__c where CreatedDate = LAST_N_DAYS:'+numDays+' and AV_BatchProcessSaleExperience__c = '+toBeProcess;
 		if(String.isNotBlank(limitBatch)){
-			avQuery = 'Select Id, AV_Cliente__r.AV_Negocio__c, AV_Cliente__c, AV_Producto__c, AV_ParentExternalId__c, AV_PFExperiencia__c, AV_FechaProcesadoBatch__c, AV_BatchProcessSaleExperience__c FROM AV_Sales__c where CreatedDate = LAST_N_DAYS:'+numDays+' and AV_BatchProcessSaleExperience__c ='+toBeProcess+' limit '+ Integer.valueOf(limitBatch)+' ';
-		}else{
-			avQuery = 'Select Id, AV_Cliente__r.AV_Negocio__c, AV_Cliente__c, AV_Producto__c, AV_ParentExternalId__c, AV_PFExperiencia__c, AV_FechaProcesadoBatch__c, AV_BatchProcessSaleExperience__c FROM AV_Sales__c where CreatedDate = LAST_N_DAYS:'+numDays+' and AV_BatchProcessSaleExperience__c ='+toBeProcess+' ';
-
+			avQuery += ' LIMIT '+ Integer.valueOf(limitBatch);
 		}
+
         return avQuery;
     }
     
@@ -68,7 +57,7 @@ global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Data
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 		if(avQuery==null){
             avQuery = setQuery();
@@ -84,35 +73,35 @@ global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Data
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param listVentas List<AV_Sales__c> param with the list of Ventas to update.
 	 */
-	global void execute(Database.BatchableContext bc, List<AV_Sales__c> listVentas){
+	public void execute(Database.BatchableContext bc, List<AV_Sales__c> listVentas){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
+
+		
 		try{
 			recordsProcessed = listVentas.size();
 			AV_LogDebug.printLogDebug(methodName,'Data does not have an associated ProductoFicha-Experiencia: ' + listVentas.size());
-			
 			Set<String> listBusiness = new Set<String>{'BPA','BPE','NEG'};
-			List<AV_ProductExperience__c> listProductExp= [Select Id, AV_ExternalID__c from AV_ProductExperience__c];
+
+			List<AV_ProductExperience__c> listProductExp= [Select Id, AV_ExternalID__c from AV_ProductExperience__c WHERE AV_ExternalID__c != NULL];
 			//List<AV_ProductExperience__c> listProductExp = new AV_Query('AV_ProductExperience__c').selectFields('Id, AV_ExternalID__c').run();
 			List<AV_Sales__c> listVentasToUpdate = new List<AV_Sales__c>();			
+			Map<String,String> prodExpToExtCode = new Map<String,String>();
+			for(AV_ProductExperience__c pexp : listProductExp){
+				prodExpToExtCode.put(pexp.AV_ExternalId__c,pexp.Id);
+			}
+
 			for(AV_Sales__c sale : listVentas){
 				if (sale.AV_Cliente__c!=null && sale.AV_ParentExternalId__c!=null) {
 					//BPA, BPE and NEG have experience, the rest will be treat like BPA
 					String businessCustomer = sale.AV_Cliente__r.AV_Negocio__c;
-					if (String.isBlank(businessCustomer)) {
+					if (String.isBlank(businessCustomer) || !listBusiness.contains(businessCustomer)) {
 						businessCustomer = 'BPA';
-					} else if (!listBusiness.contains(businessCustomer)) {
-						businessCustomer = 'BPA';
-					}
-
+					} 
 					//Update the PF Experience
-					for (AV_ProductExperience__c prodExperience : listProductExp) {
-						if (String.isNotBlank(prodExperience.AV_ExternalID__c) && sale.AV_Cliente__c != null
-								&& (prodExperience.AV_ExternalID__c).startsWithIgnoreCase(businessCustomer)
-								&& (prodExperience.AV_ExternalID__c).endsWithIgnoreCase(sale.AV_ParentExternalId__c)) {
-
-							sale.AV_PFExperiencia__c = prodExperience.Id;
-						}
+					String extKey = businessCustomer+'_'+sale.AV_ParentExternalId__c;
+					if(prodExpToExtCode.get(extKey) != null){
+						sale.AV_PFExperiencia__c = prodExpToExtCode.get(extKey);
 					}
 				}
 				
@@ -138,7 +127,7 @@ global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Data
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_SaleExperienceBatch());
 	}
 
@@ -147,7 +136,7 @@ global class AV_SaleExperienceBatch implements Database.Batchable<sObject>, Data
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}	

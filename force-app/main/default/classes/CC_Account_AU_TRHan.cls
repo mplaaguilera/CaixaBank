@@ -19,16 +19,15 @@ public with sharing class CC_Account_AU_TRHan extends CC_TriggerHandlerBase {
             if (cuenta.RecordTypeId == centroRecordTypeId) {
 				centrosCaixabank.add(cuenta);
 			}
-			//&& String.isNotEmpty(cuenta.CC_NumPerso__c)
 			// Nos guardamos las cuentas que no sean CC_CentroCaixaBank ni las CC_Generico y sean cuentas confidenciales
-			if (!String.isBlank(cuenta.RecordTypeId) && cuenta.RecordTypeId != centroRecordTypeId &&  cuenta.RecordTypeId != centroGenericoRecordTypeId && (cuenta.CC_Confidencial__c != cuentasViejas.get(cuenta.Id).CC_Confidencial__c) && cuenta.CC_Confidencial__c  && cuenta.CC_NumPerso__c == null) {
+			if (!String.isBlank(cuenta.RecordTypeId) && cuenta.RecordTypeId != centroRecordTypeId &&  cuenta.RecordTypeId != centroGenericoRecordTypeId && (cuenta.CC_Confidencial__c != cuentasViejas.get(cuenta.Id).CC_Confidencial__c) && cuenta.CC_Confidencial__c && String.isNotEmpty(cuenta.CC_NumPerso__c) &&cuenta.AV_NumPerso__c ==null) {
 			
                 cuentasConfidenciales.add(cuenta);
 			}
             if (!String.isBlank(cuenta.RecordTypeId) 
                 && cuenta.RecordTypeId != centroRecordTypeId 
                 && cuenta.RecordTypeId != centroGenericoRecordTypeId 
-                && String.isNotEmpty(cuenta.CC_NumPerso__c)
+                && String.isNotEmpty(cuenta.AV_NumPerso__c)
                 && (cuenta.CC_Confidencial__c || cuenta.AV_Confidencial__c) && cuenta.CC_Confidencial__c != cuentasViejas.get(cuenta.Id).CC_Confidencial__c) {
 			
                 cuentasConfidencialesNueva.add(cuenta);

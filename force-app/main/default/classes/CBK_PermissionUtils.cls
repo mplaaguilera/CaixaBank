@@ -10,13 +10,13 @@
 **/
 public with sharing class CBK_PermissionUtils {
 
-    public static List<PermissionSetAssignment> retrievePermissionSetAssignments(){
-        List<PermissionSetAssignment> perm =  (System.Test.isRunningTest()?[SELECT Id, PermissionSetId, PermissionSet.Name, PermissionSetGroupId, PermissionSetGroup.DeveloperName, AssigneeId, Assignee.CreatedDate, Assignee.LastLoginDate FROM PermissionSetAssignment ORDER BY Assignee.CreatedDate ASC Limit 50]:[SELECT Id, PermissionSetId, PermissionSet.Name, PermissionSetGroupId, PermissionSetGroup.DeveloperName, AssigneeId, Assignee.CreatedDate, Assignee.LastLoginDate FROM PermissionSetAssignment]);
+    public static List<PermissionSetAssignment> retrievePermissionSetAssignments(Set<String> permissionSetAssignList, List<User> userList){
+        List<PermissionSetAssignment> perm =  (System.Test.isRunningTest()?[SELECT Id, PermissionSetId, PermissionSet.Name, PermissionSetGroupId, PermissionSetGroup.DeveloperName, AssigneeId, Assignee.CreatedDate, Assignee.LastLoginDate FROM PermissionSetAssignment WHERE AssigneeId IN :userList ORDER BY Assignee.CreatedDate ASC Limit 50]:[SELECT Id, PermissionSetId, PermissionSet.Name, PermissionSetGroupId, PermissionSetGroup.DeveloperName, AssigneeId, Assignee.CreatedDate, Assignee.LastLoginDate FROM PermissionSetAssignment WHERE AssigneeId IN :userList]);
         return perm;
     }
 
-    public static List<PermissionSetLicenseAssign> retrievePermissionSetLicenseAssignments(){     
-        List<PermissionSetLicenseAssign> perm =  (System.Test.isRunningTest()?[SELECT Id, PermissionSetLicenseId, PermissionSetLicense.DeveloperName, AssigneeId,Assignee.CreatedDate, Assignee.LastLoginDate  FROM PermissionSetLicenseAssign ORDER BY Assignee.CreatedDate ASC Limit 50]:[SELECT Id, PermissionSetLicenseId, PermissionSetLicense.DeveloperName, AssigneeId,Assignee.CreatedDate, Assignee.LastLoginDate  FROM PermissionSetLicenseAssign]);
+    public static List<PermissionSetLicenseAssign> retrievePermissionSetLicenseAssignments(Set<String> permissionSetLicenseAssignList, List<User> userList){     
+        List<PermissionSetLicenseAssign> perm =  (System.Test.isRunningTest()?[SELECT Id, PermissionSetLicenseId, PermissionSetLicense.DeveloperName, AssigneeId,Assignee.CreatedDate, Assignee.LastLoginDate  FROM PermissionSetLicenseAssign WHERE AssigneeId IN :userList ORDER BY Assignee.CreatedDate ASC Limit 50]:[SELECT Id, PermissionSetLicenseId, PermissionSetLicense.DeveloperName, AssigneeId,Assignee.CreatedDate, Assignee.LastLoginDate  FROM PermissionSetLicenseAssign WHERE AssigneeId IN :userList]);
         return perm;        
     }
 
@@ -29,10 +29,11 @@ public with sharing class CBK_PermissionUtils {
             }
         }
         if (System.Test.isRunningTest()){
-            //insertamos las entradas necesarias para los tests de CBK_PermissionUtils_Test
-            User us = [SELECT Id,LastLoginDate,createdDate FROM User WHERE UserType= 'Standard' AND IsActive = true AND UserRoleId != null ORDER BY LastLoginDate  DESC NULLS LAST LIMIT 1];
-            integer daysCheck = System.Math.abs(Date.today().daysBetween(date.valueof(((us.LastLoginDate != null)?us.LastLoginDate:(us.createdDate != null)?us.createdDate:Date.today().addDays(-900))-5)));
-
+                //insertamos las entradas necesarias para los tests de CBK_PermissionUtils_Test
+                User us = [SELECT Id,LastLoginDate,createdDate FROM User WHERE UserType= 'Standard' AND IsActive = true AND UserRoleId != null ORDER BY LastLoginDate  DESC NULLS LAST LIMIT 1];
+                integer daysCheck = System.Math.abs(Date.today().daysBetween(date.valueof(((us.LastLoginDate != null)?us.LastLoginDate:(us.createdDate != null)?us.createdDate:Date.today().addDays(-900))-5)));
+            
+            
             List <PermissionSetLicense> listPSL = [SELECT Id,DeveloperName FROM PermissionSetLicense ORDER BY ID DESC LIMIT 2];
             List <PermissionSet> listPS = [SELECT Id, Name FROM PermissionSet WHERE PermissionSetGroupId = null and iscustom = true and IsOwnedByProfile = false AND LicenseId = null ORDER BY ID DESC LIMIT 4];
             List <PermissionSet> listPSG = [SELECT Id, Name, PermissionSetGroup.DeveloperName FROM PermissionSet WHERE PermissionSetGroupId != null and iscustom = true and IsOwnedByProfile = false AND LicenseId = null ORDER BY ID DESC LIMIT 4];
@@ -103,7 +104,8 @@ public with sharing class CBK_PermissionUtils {
             cfg8.CBK_Operacion__c = 'CBK_Exclusion_CP';
             cfg8.CBK_DesactivarUsuario__c = false;
             activos.add(cfg8);
-        }
+
+            }
         return activos;
     }
 
@@ -140,6 +142,7 @@ public with sharing class CBK_PermissionUtils {
         }
     }
 
+    /*
     public static void recyclePermissionSetLicenses(List<Id> recycledPermissionSetLicenseIDs){
         if (recycledPermissionSetLicenseIDs.size()>0){
             List <PermissionSetLicenseAssign> delPSL = [SELECT id FROM PermissionSetLicenseAssign WHERE Id in :recycledPermissionSetLicenseIDs];
@@ -147,15 +150,51 @@ public with sharing class CBK_PermissionUtils {
                 delete delPSL;
             }
         }
+    }*/
+
+    public static void recyclePermissionSetLicenses(List<Id> recycledPermissionSetLicenseIDs){
+        if (recycledPermissionSetLicenseIDs != null && !recycledPermissionSetLicenseIDs.isEmpty()){
+            // Validar permisos de CRUD para PermissionSetLicenseAssign
+            if (Schema.sObjectType.PermissionSetLicenseAssign.isDeletable()) {
+                // Realizar la consulta SOQL y eliminar los registros si es posible
+                List <PermissionSetLicenseAssign> delPSL = [SELECT id FROM PermissionSetLicenseAssign WHERE Id IN :recycledPermissionSetLicenseIDs];
+                if (!delPSL.isEmpty()) {
+                    delete delPSL;
+                }
+            } else {
+                // Manejar la falta de permisos adecuadamente
+                System.debug('No tienes permisos para eliminar PermissionSetLicenseAssign');
+                // Agrega aquí tu lógica para manejar el caso en que no tienes permisos de eliminación
+            }
+        }
     }
+
+    
     public static void deactivateUsers(List<Id> usersIds){
         if (usersIds.size()>0){
             List <User> actUsers = new List<User>();
-            for (User us : [SELECT id, IsActive FROM User WHERE ID in :usersIds AND IsActive = true]){
-                us.IsActive = false;
-                actUsers.add(us);
+            for (User us : [SELECT CBK_VIP__c,id, IsActive,CommunityNickname,Username,EmployeeNumber,FederationIdentifier,AV_ExternalID__c FROM User WHERE ID in :usersIds AND IsActive = true]){
+                
+                if (!us.CBK_VIP__c){   //Comprobamos que no sea VIP el usuario a desactivar
+                    us.IsActive = false;
+                
+                    //Actualizaciones para actulizar al usuario
+                    Datetime now = Datetime.now();
+                    Date fechaHoy = Date.today();
+                    //String fechaFormateada = String.valueOf(fechaHoy.year()) + String.valueOf(fechaHoy.month()).leftPad(2, '0') + String.valueOf(fechaHoy.day()).leftPad(2, '0');
+                    String fechaHoraMinutos = now.format('yyyyMMddHHmm');
+                    String fechaFormateada = now.format('yyyyMMdd');
+
+                    us.Username  = (us.Username + '.old' + Datetime.now().format('yyyyMMddHHmmss')).left(80);              // String 80
+                    us.CommunityNickname = (us.CommunityNickname + '.old' + fechaHoraMinutos).left(40); // String 40
+                    us.EmployeeNumber = (us.EmployeeNumber + '.old' + fechaFormateada).left(20);    //String 20
+                    us.FederationIdentifier = (us.FederationIdentifier + '.old' + Datetime.now().format('yyyyMMddHHmmss')).left(512);    //String 512
+                    us.AV_ExternalID__c = (us.AV_ExternalID__c + '.old' + fechaFormateada).left(255);       //String 255
+                    actUsers.add(us);
+                }
             }
             if (actUsers.size()>0){
+                
                 update actUsers;
             }     
         }

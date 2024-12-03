@@ -10,6 +10,8 @@ Historial
    1.0			App FSC			Maria Telleria		14/07/2020			Init version
    1.1			App FSC			Carolina Alonso		26/10/2020			Add RecordType in Test
    1.2			App FSC			Sandra Gómez		04/11/2020			Refactor
+   1.3		    FIX11070844	    Oscar Moreno		22/07/2024	        Insert    System.enqueueJob(new AV_DeleteRecordsContactBatchQueueable); 
+
 
 ***********************************************************************************************************************/
 @isTest
@@ -40,11 +42,14 @@ private class AV_DeleteRecordsContactBatch_Test {
 	static void executeBatchDeleteRecord() {
 		System.assertEquals(10, [select count() from Contact where AV_ToDelete__c = true]);
 		Test.startTest();
+		AV_DeleteRecordsContactBatch obj2 = new AV_DeleteRecordsContactBatch('');
 		AV_DeleteRecordsContactBatch obj = new AV_DeleteRecordsContactBatch();
 		DataBase.executeBatch(obj);
 		Test.stopTest();
 		// Check if the inserted Contact are deleted correctly
 		System.assertEquals(0, [select count() from Contact where AV_ToDelete__c = true]);
+		System.enqueueJob(new AV_DeleteRecordsContactBatchQueueable()); 
+		
 	}
 	
 }

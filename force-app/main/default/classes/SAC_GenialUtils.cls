@@ -594,6 +594,7 @@ public with sharing class SAC_GenialUtils {
     public static Integer calcularDiasARetornar(Case caso, Id recTypeReclamacion, Id recTypePretension) {
 
         Integer retornarDias = 30;
+
         if (caso != null && (caso.RecordTypeId == recTypeReclamacion || caso.RecordTypeId == recTypePretension)) {
             if(caso.SAC_TiempoSLARegulatorio__c != null ){
                 retornarDias = Integer.valueOf(caso.SAC_TiempoSLARegulatorio__c);

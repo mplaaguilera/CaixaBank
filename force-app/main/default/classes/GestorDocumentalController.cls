@@ -10,7 +10,6 @@ public with sharing class GestorDocumentalController {
         if (docId != null && docId != ''){
             CC_Gestor_Documental__c genDoc = new CC_Gestor_Documental__c();
             genDoc.Id = docId;
-            genDoc.CC_Case__c = recordId;
             genDoc.CC_Idioma__c = idioma;
             genDoc.CC_Sexo__c = sexo;
             genDoc.CC_Cambio_Oficina__c = cambioficina;
@@ -68,7 +67,6 @@ public with sharing class GestorDocumentalController {
         } else {
             CC_Gestor_Documental__c genDoc = new CC_Gestor_Documental__c();
             genDoc.CC_Idioma__c = idioma;
-            genDoc.CC_Case__c = recordId;
             genDoc.CC_Sexo__c = sexo;
             genDoc.CC_Cambio_Oficina__c = cambioficina;
             genDoc.CC_Falta_Entrega__c = faltaentrega;

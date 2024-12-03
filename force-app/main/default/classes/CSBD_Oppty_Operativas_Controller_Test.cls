@@ -1,56 +1,98 @@
+// Clase test de CSBD_Opportunity_Operativas_Controller
+// Nombre no convencional porque Apex tiene un límite de carácteres
 @IsTest
-public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
+public class CSBD_Oppty_Operativas_Controller_Test {
 
 	@TestSetup
 	private static void altaDatosPrueba() {
+		User usuarioGestor = CSBD_Usuarios.usuarioGestor();
+        
+        User usuarioGestor2 = CSBD_Usuarios.usuarioDerivarGestor();
+		usuarioGestor2.AV_ExternalID__c = 'U0123456789';
+		update usuarioGestor2;
+        
+        User userAdmin = CSBD_Usuarios.usuarioAdministrador();
+        
+		CSBD_TestDataFactory.crearCuentaContacto('12345678N');
+		// Account cuenta = crearCuentaContacto('12345678N');
+
+		// AccountShare acshare = new AccountShare();
+		// acshare.AccountId = cuenta.Id;
+		// acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1].Id;
+		// acshare.AccountAccessLevel = 'Edit';
+		// acshare.OpportunityAccessLevel = 'Edit';
+		// acshare.CaseAccessLevel = 'Edit';
+		// insert acshare;
+
+		//CSBD: Traspaso Imagin - Destinatarios
+		CC_Lista_Valores__c listaValoresTraslado = new CC_Lista_Valores__c();
+		listaValoresTraslado.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+		listaValoresTraslado.Name = 'CSBD: Traspaso Imagin - Destinatarios';
+		listaValoresTraslado.CC_Activa__c = true;
+		System.runAs(usuarioGestor){
+			insert listaValoresTraslado;
+		}
+
+		CC_Lista_Valores__c valorTraslado = new CC_Lista_Valores__c();
+		valorTraslado.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+		valorTraslado.CC_Lista__c = listaValoresTraslado.Id;
+		valorTraslado.Name = 'CMB';
+		valorTraslado.CC_Valor__c = 'test@test.com';
+		valorTraslado.CC_Activa__c = true;
+		System.runAs(usuarioGestor){
+			insert valorTraslado;
+		}
+
+		//Alta de las parametrizaciones que necesita el trigger BI de oportunidades
+		CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
+		listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
+		listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
+		listaValores.CC_Activa__c = true;
+		System.runAs(usuarioGestor){
+			insert listaValores;
+		}
+
+		CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
+		valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
+		valor.CC_Lista__c = listaValores.Id;
+		valor.Name = 'Préstamo';
+		valor.CC_Valor__c = '1';
+		valor.CC_Activa__c = true;
+		System.runAs(usuarioGestor){
+			insert valor;
+		}
+
+		Pricebook2 listaPrecios = new Pricebook2(Name = 'CSBD Price Book', Description = 'CSBD Price Book', IsActive = true );
+		System.runAs(usuarioGestor){
+			insert listaPrecios;
+		}
+
+		List<Group> colaPrestamos = [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'CSBD_Prestamos_I'];
+
+		if(colaPrestamos.isEmpty()) {
+			Group nuevaColaPrestamos = new Group(Name='Now In Sales - Préstamos I', DeveloperName = 'CSBD_Prestamos_I', Type='Queue');
+			insert nuevaColaPrestamos;
+		}
+
+		CC_Lista_Valores__c reglaAsignacion = new CC_Lista_Valores__c();
+		reglaAsignacion.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Regla_asignacion_oportunidad').getRecordTypeId();
+		reglaAsignacion.Name = 'Oportunidades - Préstamos I';
+		reglaAsignacion.CSBD_Cola_Oportunidad__c = 'CSBD_Prestamos_I';
+		reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
+		reglaAsignacion.CC_Orden__c = 1;
+		reglaAsignacion.CC_Activa__c = true;
+		System.runAs(usuarioGestor) {
+			insert reglaAsignacion;
+		}
 
 		CBK_IntegrationSetting__c integrationSetting = new CBK_IntegrationSetting__c();
 		integrationSetting.Name = 'CSBD_WS_Adobe';
 		integrationSetting.NamedCredential__c = 'callout:CSBD_WS_CredentialAdobe/{PARAMS_1}/{PARAMS_2}/{PARAMS_3}/{PARAMS_4}';
 		insert integrationSetting;
 
-		User usuarioGestor = CSBD_Usuarios.usuarioGestor();
-		System.runAs(usuarioGestor) {
-			CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
-			listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-			listaValores.Name = 'CSBD: Días cierre oportunidad por defecto';
-			listaValores.CC_Activa__c = true;
-			CC_Lista_Valores__c listaValoresTraslado = new CC_Lista_Valores__c();
-			listaValoresTraslado.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-			listaValoresTraslado.Name = 'CSBD: Traspaso Imagin - Destinatarios';
-			listaValoresTraslado.CC_Activa__c = true;
-			CC_Lista_Valores__c reglaAsignacion = new CC_Lista_Valores__c();
-			reglaAsignacion.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Regla_asignacion_oportunidad').getRecordTypeId();
-			reglaAsignacion.Name = 'Oportunidades - Préstamos I';
-			reglaAsignacion.CSBD_Cola_Oportunidad__c = 'CSBD_Prestamos_I';
-			reglaAsignacion.CSBD_Tipo_de_oportunidad__c = 'Préstamo';
-			reglaAsignacion.CC_Orden__c = 1;
-			reglaAsignacion.CC_Activa__c = true;
-			insert new List<CC_Lista_Valores__c>{listaValores, listaValoresTraslado, reglaAsignacion};
-
-			CC_Lista_Valores__c valor = new CC_Lista_Valores__c();
-			valor.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-			valor.CC_Lista__c = listaValores.Id;
-			valor.Name = 'Préstamo';
-			valor.CC_Valor__c = '1';
-			valor.CC_Activa__c = true;
-			CC_Lista_Valores__c valorTraslado = new CC_Lista_Valores__c();
-			valorTraslado.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-			valorTraslado.CC_Lista__c = listaValoresTraslado.Id;
-			valorTraslado.Name = 'CMB';
-			valorTraslado.CC_Valor__c = 'test@test.com';
-			valorTraslado.CC_Activa__c = true;
-			insert new List<CC_Lista_Valores__c>{valor, valorTraslado};
-
-			insert new Pricebook2(Name = 'CSBD Price Book', Description = 'CSBD Price Book', IsActive = true);
-		}
-
-		CSBD_TestDataFactory.crearCuentaContacto('12345678N');
-
 		//List<CSBD_Criterios_asignacion_oportunidad__mdt> criterios = [SELECT CSBD_Cola_Asignada__c, CSBD_Criterio_1__c, CSBD_Criterio_2__c FROM CSBD_Criterios_asignacion_oportunidad__mdt];
 	}
 
-	/*
 	private static Account crearCuentaContacto(String nif) {
 		Account cuenta = new Account();
 		cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
@@ -71,7 +113,6 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 
 		return cuenta;
 	}
-	*/
 
 	private static Opportunity crearOportunidadPrestamo(Account cuenta) {
 		Map<String, Object> campos = new Map<String, Object>();
@@ -85,6 +126,19 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 		return CSBD_Opportunity.crearOportunidad('CSBD_Prestamo', campos);
 	}
 
+	private static void crearPublicGroup(String nombreGrupo, User user) {//crea un public group con el nombre que recibe e incluye al usuario que se le pasa
+		Group newGroup = new Group();
+		newGroup.Name = nombreGrupo;
+		insert(newGroup);
+
+		GroupMember gpm = new GroupMember();
+		gpm.GroupId = newGroup.Id;
+		gpm.UserOrGroupId = user.Id;
+		Database.insert(gpm);
+
+		return ;
+	}
+
 	@IsTest
 	public static void subdirectorios() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
@@ -95,19 +149,21 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			List<Folder> carpetas = CSBD_Opportunity_Operativas_Controller.subdirectorios('CSBD_Operativas');
 			Test.stopTest();
 
-			System.assert(carpetas != null, 'El retorno debe ser una lista');
+			System.assert(carpetas != null);
 		}
 	}
 
 	@IsTest
 	public static void plantillas() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
+		//Ejecución de la prueba
 		System.runAs(usuarioGestor){
 			Test.startTest();
 			List<EmailTemplate> plantillas = CSBD_Opportunity_Operativas_Controller.plantillas('CSBD_Operativas_SolInfo_ESP_Formal');
 			Test.stopTest();
 
-			System.assert(plantillas != null, 'Ko');
+			System.assert(plantillas != null);
 		}
 	}
 
@@ -143,8 +199,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Test.stopTest();
 
 			//Evaluación del resultado de la prueba
-			System.assertEquals('<b>CSBD</b> <i>Plantilla</i> <u>Test</u>', cuerpoPlantillaHTML, 'Cuerpo HTML incorrecto');
-			System.assertEquals('CSBD Plantilla Test', cuerpoPlantillaTextoPlano, 'Cuerpo sin formato incorrecto');
+			System.assertEquals('<b>CSBD</b> <i>Plantilla</i> <u>Test</u>', cuerpoPlantillaHTML);
+			System.assertEquals('CSBD Plantilla Test', cuerpoPlantillaTextoPlano);
 		}
 	}
 
@@ -188,8 +244,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Test.stopTest();
 
 			//Evaluación del resultado de la prueba
-			System.assertEquals('CSBD_Plantilla_Test', oportunidad.CSBD_Plantilla_Correo__c, 'Plantilla incorrecta');
-			System.assertEquals(17, oportunidad.CSBD_Referencia_Correo_Saliente__c.length(), 'Referencia incorrecta');
+			System.assertEquals('CSBD_Plantilla_Test', oportunidad.CSBD_Plantilla_Correo__c);
+			System.assertEquals(17, oportunidad.CSBD_Referencia_Correo_Saliente__c.length());
 		}
 	}
 
@@ -250,8 +306,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Map<String, String> oportunidadesAnteriores = CSBD_Opportunity_Operativas_Controller.numeroOportunidadesAnteriores(cuenta.Id, CC_MetodosUtiles.getRecordTypeDeveloperNameFromId('Opportunity', nuevaOportunidad.RecordTypeId));
 			Test.stopTest();
 
-			System.assertEquals('Préstamos recientes', oportunidadesAnteriores.get('titulo'), 'Ko');
-			System.assertEquals('Solicitados en los últimos 365 días: 3\nDenegados últimos 365 días: 3\nDenegados últimos 30 días: 2', oportunidadesAnteriores.get('mensaje'), 'Mensaje incorrecto');
+			System.assertEquals('Préstamos recientes', oportunidadesAnteriores.get('titulo'));
+			System.assertEquals('Solicitados en los últimos 365 días: 3\nDenegados últimos 365 días: 3\nDenegados últimos 30 días: 2', oportunidadesAnteriores.get('mensaje'));
 		}
 	}
 
@@ -283,7 +339,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Opportunity oportunidadCerrada = CSBD_Opportunity_Operativas_Controller.cerrarOportunidad(oportunidad.Id, 'Formalizada', 'Tarjeta crédito');
 			Test.stopTest();
 
-			System.assertEquals('Cerrada', oportunidadCerrada.CSBD_Estado__c, 'Estado incorrecto');
+			System.assertEquals('Cerrada', oportunidadCerrada.CSBD_Estado__c);
 		}
 	}
 
@@ -306,7 +362,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 		insert oppshare;
 
 		//Ejecución de la prueba
-		System.runAs (usuarioGestor) {
+		System.runAs ( usuarioGestor ) {
 			oportunidad.OwnerId = usuarioGestor.Id;
 			update oportunidad;
 
@@ -314,8 +370,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Opportunity oportunidadReactivada = CSBD_Opportunity_Operativas_Controller.reactivarOportunidad(oportunidad.Id, 'Solicitud');
 			Test.stopTest();
 
-			System.assertEquals('Solicitud', oportunidadReactivada.StageName, 'La etapa debería ser "Solicitud"');
-			System.assertEquals('Activa', oportunidadReactivada.CSBD_Estado__c, 'El estado debería ser Activa');
+			System.assertEquals('Solicitud', oportunidadReactivada.StageName);
+			System.assertEquals('Activa', oportunidadReactivada.CSBD_Estado__c);
 		}
 	}
 
@@ -340,8 +396,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			CSBD_Opportunity_Operativas_Controller.programarCita(oportunidad.Id, false, false, usuarioGestor.Id, comienzoCita);
 			Test.stopTest();
 
-			List<Event> citas1Hora = [SELECT Id FROM Event WHERE DurationInMinutes = 60];
-			System.assertEquals(1, citas1Hora.size(), 'No se ha creado el registro de Event');
+			List<Event> citas1Hora  = [SELECT Id FROM Event WHERE DurationInMinutes = 60];
+			System.assertEquals(1, citas1Hora.size());
 		}
 	}
 
@@ -380,7 +436,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 	@IsTest
 	public static void enviarNotificacinPushSMS() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-
+		
         Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c, Phone FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
        	cuenta.Phone = '123456789';
 		update cuenta;
@@ -393,7 +449,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 
 			List<Task> actividadesSMS = [SELECT Status FROM Task
 										WHERE WhatId = :prestamo.Id AND Type = 'Notificación - Salida'];
-			System.assertEquals(actividadesSMS[0].Status, 'Completed', 'El estado de la tarea debería ser "Completed"');
+			System.assertEquals(actividadesSMS[0].Status, 'Completed');
 		}
 	}
 
@@ -435,8 +491,8 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			CSBD_Opportunity_Operativas_Controller.actualizarDatosRiesgoContacto(prestamo.Id);
 			Test.stopTest();
 
-			Contact contacto = [SELECT CSBD_Actualizacion_Datos_Riesgo__c FROM Contact WHERE Id = :prestamo.CSBD_Contact__c];
-			System.assertEquals(false, contacto.CSBD_Actualizacion_Datos_Riesgo__c, 'Ko');
+			Contact contacto = [SELECT CSBD_Tramo_Riesgo__c, CSBD_Actualizacion_Datos_Riesgo__c, CSBD_Ultima_Actualizacion_SIR__c FROM Contact WHERE Id = :prestamo.CSBD_Contact__c];
+			System.assertEquals(false, contacto.CSBD_Actualizacion_Datos_Riesgo__c);
 		}
 	}
 
@@ -498,16 +554,9 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
 		Boolean check = false;
-		Set<String> groupsNames = new Set<String>();
+		Set<String> groupsNames= new Set<String>();
 
-		Group publicGroup = new Group();
-		publicGroup.Name = 'CSBD Administrador';
-		insert publicGroup;
-
-		GroupMember publicGroupMember = new GroupMember();
-		publicGroupMember.GroupId = publicGroup.Id;
-		publicGroupMember.UserOrGroupId = usuarioGestor.Id;
-		insert publicGroupMember;
+		crearPublicGroup('CSBD Administrador', usuarioGestor);
 
 		System.runAs(usuarioGestor) {
 			List<GroupMember> publicGroups = [SELECT Group.Name FROM GroupMember WHERE UserOrGroupId =: usuarioGestor.Id];
@@ -530,7 +579,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 	}
 
 	@IsTest
-	private static void solicitarAltaOmnichannelTest() {
+	private static void solicitarAltaOmnichannel_Test() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
 		Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
@@ -553,13 +602,13 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			CSBD_Opportunity_Operativas_Controller.solicitarAltaOmnichannel(oportunidad.Id);
 			Test.stopTest();
 
-			List<CSBD_Gestor_Oportunidad__c> gestorOportunidad = [SELECT Id FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id AND CSBD_Estado__c != 'Inactivo'];
-			System.assert(!gestorOportunidad.isEmpty(), 'No se ha creado el registro de CSBD_Gestor_Oportunidad__c');
+			List<CSBD_Gestor_Oportunidad__c> gestorOportunidad = [SELECT Id, OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id AND CSBD_Estado__c != 'Inactivo'];
+			System.assert(!gestorOportunidad.isEmpty());
 		}
 	}
 
 	@IsTest
-	private static void solicitarBajaOmnichannelTest() {
+	private static void solicitarBajaOmnichannel_Test() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
 		Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
@@ -584,16 +633,19 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Test.stopTest();
 
 			List<CSBD_Gestor_Oportunidad__c> gestorOportunidad = [SELECT Id, OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id AND CSBD_Estado__c = 'Inactivo'];
-			System.assert(!gestorOportunidad.isEmpty(), 'No se ha creado el registro de CSBD_Gestor_Oportunidad__c');
+			System.assert(!gestorOportunidad.isEmpty());
 		}
 	}
 
 	@IsTest
-	private static void actualizarOwnerOportunidadTest() {
+	private static void actualizarOwnerOportunidad_Test() {
+		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+
 		Account cuenta = [SELECT Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
 
-		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+		
 		System.runAs(usuarioGestor) {
+            
             Map<String, Object> campos = new Map<String, Object>();
 			campos.put('Name', 'oportunidad de prueba');
 			campos.put('CSBD_Estado__c', 'Activa');
@@ -610,7 +662,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			CSBD_GestorOportunidad.insertarGestorOportunidad(new List<Opportunity>{oportunidad}, 'Pendiente de asignar');
 
 			List<CSBD_Gestor_Oportunidad__c> gestorOportunidadCambiarOwnerUsuario = [SELECT OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
-
+            
 			gestorOportunidadCambiarOwnerUsuario[0].OwnerId = usuarioGestor.Id;
 			update gestorOportunidadCambiarOwnerUsuario;
 
@@ -620,12 +672,12 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 
 			List<CSBD_Gestor_Oportunidad__c> gestorOportunidad = [SELECT OwnerId, CSBD_Estado__c FROM CSBD_Gestor_Oportunidad__c WHERE CSBD_Oportunidad__c =: oportunidad.Id ORDER BY CreatedDate DESC LIMIT 1];
 			List<Opportunity> oportunidadActualizada = [SELECT OwnerId FROM Opportunity WHERE Id = :oportunidad.Id];
-			System.assertEquals(gestorOportunidad[0].OwnerId, oportunidadActualizada[0].OwnerId, 'El owner no se ha actualizado');
+			System.assertEquals(gestorOportunidad[0].OwnerId, oportunidadActualizada[0].OwnerId);
 		}
 	}
 
 	@IsTest
-	private static void trasladoImaginTest(){
+	private static void trasladoImagin_Test(){
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
 
 		Account cuenta = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
@@ -792,7 +844,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			CSBD_Opportunity_Operativas_Controller.ampliarVencimiento(oportunidad.Id, fechaActual);
 			Test.stopTest();
 			Opportunity opp = [SELECT id, CSBD_Fecha_vencimiento_alta__c FROM Opportunity WHERE id = :oportunidad.Id LIMIT 1];
-			System.assertEquals(fechaActual.addMonths(1), opp.CSBD_Fecha_vencimiento_alta__c, 'Nueva fecha de vencimiento incorrecta');
+			System.assertEquals(fechaActual.addMonths(1), opp.CSBD_Fecha_vencimiento_alta__c);
 		}
 	}
 
@@ -841,7 +893,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 	@IsTest
 	public static void obtenerResolucionesTest() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-
+        
 		CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
 		listaValores.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CSBD_Resoluciones').getRecordTypeId();
 		listaValores.Name = 'Resolución Test';
@@ -866,26 +918,23 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			List<String> resoluciones = CSBD_Opportunity_Operativas_Controller.obtenerResoluciones('Alta Cliente', 'Hipoteca', 'Formalizada');
 			Test.stopTest();
 
-			System.assertEquals(resoluciones[0], 'Resolución Test', 'No se puede recuperar la resolución insertada');
+			System.assertEquals(resoluciones[0], 'Resolución Test');
 		}
 	}
 
 	@IsTest
 	public static void crearTareaGestorTest() {
-
-        User usuarioGestor = CSBD_Usuarios.usuarioDerivarGestor();
-		usuarioGestor.AV_ExternalID__c = 'U0123456789';
-		update usuarioGestor;
-
+        
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorDerivar' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
         List<Account> cuenta = [SELECT Id, Name, CC_Numero_Documento__c, Phone FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
         Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta[0].Id];
-
+        
         Product2 product = new Product2();
         product.Name = 'Producto de prueba';
-        product.IsActive = true;
+        product.IsActive = true; 
         product.AV_ExternalID__c = '123456';
         insert product;
-
+       
 		Opportunity oportunidad = new Opportunity();
         oportunidad.RecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('CSBD_Prestamo').getRecordTypeId();
 		oportunidad.Name = 'Opportunity Test';
@@ -894,82 +943,86 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
         oportunidad.AccountId = cuenta[0].Id;
         oportunidad.AV_PF__c = product.id;
 		insert oportunidad;
-
+        
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
         contacto.Email = 'test@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
         contacto.AccountId = cuenta[0].Id;
         update contacto;
-        List<Opportunity> opp = [SELECT Id FROM Opportunity WHERE Id = :oportunidad.Id   LIMIT 2];
-
+        List<Opportunity> opp = [SELECT Id FROM Opportunity WHERE Id = :oportunidad.Id   LIMIT 2]; 
+        
 		System.runAs(usuarioGestor) {
 			Test.startTest();
             CSBD_Opportunity_Operativas_Controller.crearTareaGestor(oportunidad.Id, 'U0123456789',contacto.id, 'Test');
 			Test.stopTest();
         }
-
+                    
         List<Opportunity> oportunidadGestor = [SELECT Id FROM Opportunity WHERE Name = 'Rema Gestor - CSBD' LIMIT 2];
-		System.assertEquals(oportunidadGestor.size(), 1, 'No se ha creado la tarea gestor');
+		System.assertEquals(oportunidadGestor.size(), 1);
+		
 	}
-
-	@IsTest
-	public static void crearTareaGestorTestSinGestor() {
-        User usuarioGestor = CSBD_Usuarios.usuarioDerivarGestor();
-		Contact contacto = [SELECT AccountId FROM Contact WHERE Account.CC_Numero_Documento__c = :'12345678N'];
-
-		Product2 product = new Product2();
-		product.Name = 'Producto de prueba';
-		product.IsActive = true;
-		product.AV_ExternalID__c = '123456';
-		insert product;
-
+   
+		@IsTest
+    	public static void crearTareaGestorTestSinGestor() {
+        
+        User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorDerivar' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
+        List<Account> cuenta = [SELECT Id, Name, CC_Numero_Documento__c, Phone FROM Account WHERE CC_Numero_Documento__c = '12345678N'];
+        Contact contacto = [SELECT Id FROM Contact WHERE AccountId =: cuenta[0].Id];
+		User usuarioAdmin = [SELECT Id FROM User WHERE FirstName = 'AdminCSBD' AND Profile.Name = 'System Administrator' LIMIT 1];
+      
+			Product2 product = new Product2();
+        	product.Name = 'Producto de prueba';
+        	product.IsActive = true; 
+        	product.AV_ExternalID__c = '123456';
+        	insert product;
+            
 		Opportunity oportunidad = new Opportunity();
         oportunidad.RecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get('CSBD_Prestamo').getRecordTypeId();
 		oportunidad.Name = 'Opportunity Test';
 		oportunidad.StageName = 'Solicitud';
         oportunidad.OwnerId = usuarioGestor.Id;
-        oportunidad.AccountId = contacto.AccountId;
+        oportunidad.AccountId = cuenta[0].Id;
         oportunidad.AV_PF__c = product.id;
 		insert oportunidad;
-
-		//Contacto y user genéricos
+       //Contacto y user genéricos
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
         contacto.Email = 'test@test.com';
         contacto.FirstName = 'Nombre';
         contacto.LastName = 'Apellido';
-        contacto.AccountId = contacto.AccountId;
+        contacto.AccountId = cuenta[0].Id;
         contacto.CC_Matricula__c = '000000';
         update contacto;
-        List<Opportunity> opp = [SELECT Id FROM Opportunity WHERE Id = :oportunidad.Id   LIMIT 2];
-
-		User usuarioAdmin = CSBD_Usuarios.usuarioAdministrador();
-		System.runAs(usuarioAdmin) {
-			User gestor = new User();
-			gestor.FirstName = 'GestorCSBD';
-			gestor.LastName = '1';
-			gestor.IsActive = true;
-			gestor.Alias = 'Gestor';
-			gestor.Email = 'usuario_test@test.com';
-			gestor.EmailEncodingKey = 'ISO-8859-1';
-			gestor.LanguageLocaleKey = 'es';
-			gestor.LocaleSidKey = 'es_ES';
-			gestor.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'CSBD Genérico'].Id;
-			gestor.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CSBD Gestor'].Id;
-			gestor.TimeZoneSidKey = 'Europe/Madrid';
-			gestor.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
-			gestor.AV_ExternalID__c = '000000';
-			insert gestor;
-		}
-
+        List<Opportunity> opp = [SELECT Id FROM Opportunity WHERE Id = :oportunidad.Id   LIMIT 2]; 
+            
+         System.runAs(usuarioAdmin) {
+            User gestor = new User();
+            gestor.FirstName = 'GestorCSBD';
+            gestor.LastName = '1';
+            gestor.IsActive = true;
+            gestor.Alias = 'Gestor';
+            gestor.Email = 'usuario_test@test.com';
+            gestor.EmailEncodingKey = 'ISO-8859-1';
+            gestor.LanguageLocaleKey = 'es';
+            gestor.LocaleSidKey = 'es_ES';
+            gestor.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'CSBD Genérico'].Id;
+            gestor.ProfileId = [SELECT Id FROM Profile WHERE Name = 'CSBD Gestor'].Id;
+            gestor.TimeZoneSidKey = 'Europe/Madrid';
+            gestor.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com';
+        	gestor.AV_ExternalID__c = '000000';
+            insert gestor;
+         }
+      
+        		
 		System.runAs(usuarioGestor) {
 			Test.startTest();
             CSBD_Opportunity_Operativas_Controller.crearTareaGestor(oportunidad.Id, '','', 'Test');
 			Test.stopTest();
         }
-
+                    
         List<Opportunity> oportunidadGestor = [SELECT Id FROM Opportunity WHERE Name = 'Rema Gestor - CSBD' LIMIT 2];
-		System.assertEquals(oportunidadGestor.size(), 1, 'No se ha creado la oportunidad');
+		System.assertEquals(oportunidadGestor.size(), 1);
+		
 	}
 
 	@IsTest
@@ -998,7 +1051,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 	@IsTest
 	public static void obtenerEntidadesTest() {
 		User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
-
+        
 		CC_Lista_Valores__c listaValoresEntidades = new CC_Lista_Valores__c();
 		listaValoresEntidades.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
 		listaValoresEntidades.Name = 'CSBD: Entidades competencia';
@@ -1006,7 +1059,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 		System.runAs(usuarioGestor){
 			insert listaValoresEntidades;
 		}
-
+        
         CC_Lista_Valores__c valorEntidad = new CC_Lista_Valores__c();
 		valorEntidad.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
 		valorEntidad.CC_Lista__c = listaValoresEntidades.Id;
@@ -1020,7 +1073,7 @@ public with sharing class CSBD_Oppty_Operativas_Controller_Test { //NOPMD
 			Test.startTest();
 			List<String> resoluciones = CSBD_Opportunity_Operativas_Controller.obtenerEntidades();
 			Test.stopTest();
-			System.assertEquals(resoluciones[0], 'Entidad prueba', 'No se puede recuperar la resolución insertada');
+			System.assertEquals(resoluciones[0], 'Entidad prueba');
 		}
 	}
 }

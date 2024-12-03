@@ -20,48 +20,23 @@ Historial
 	3.9			Fix					David Rufo			16/03/2021		Delete header-task before delete event
 	4.0			FIX					David Rufo			31/05/2021		Use the Query FWK
 	4.1			FIX					David Rufo			22/06/2021		Use the number of days via Custom Metadata
-	4.2		    AV_Query IT	        Daniel Rodríguez    03/03/2022	        Change AV_Query to SOQL for User, Account, Contact
+	4.2		    AV_Query IT	        Daniel Rodríguez    03/03/2022	    Change AV_Query to SOQL for User, Account, Contact
+	4.3			FIX01080926			Ángel Medina		14/08/2024		Modify call enqueueJob to call AV_DeleteRecordsContactBatchQueueable
+    4.4         FIX28080841         Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.
 
 ***********************************************************************************************************************/
-global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 	
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_DeleteEvents';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_DeleteEvents';
 	
-    /*private AV_Query avQuery;
-	
-    public AV_DeleteRecordsEventBatch(){
-        avQuery = setQuery();
-    }
-
-    public AV_DeleteRecordsEventBatch(AV_Query avQuery){
-        this.avQuery = avQuery;
-    }
-    
-    private AV_Query setQuery(){
-        Set<String> setRt = new Set<String>{AV_AppConstants.EVENTCLIENTE_RT, AV_AppConstants.EVENTGESTOR_RT};
-        
-        Integer numDays = AV_SchedulerBatches.getNumDays(BATCHNAME);
-        AV_Query avQuery = new AV_Query('Event')
-                                    .selectFields('ID, AV_ToDelete__c, AV_Task__c, RecordTypeId')
-                                    .addConditionEq('AV_ToDelete__c', true)
-            						.addConditionEq('SystemModstamp', AV_Query.LAST_N_DAYS(numDays))
-                                    .addConditionIn('RecordType.DeveloperName', setRt);
-		
-        String batchLimit = AV_SchedulerBatches.getLimit(BATCHNAME);
-		if(String.isNotBlank(batchLimit)){
-			avQuery.setLimit(Integer.valueOf(batchLimit));
-		}
-            
-        return avQuery;
-    }*/
     
 	/**
 	 * Delete the selected list of Events where the field AV_ToDelete__c is checked.
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 		String avQuery = '';
 		List<String> newsetRt = new List<String>();
@@ -72,9 +47,8 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 		}
 
 		Integer numDays = AV_SchedulerBatches.getNumDays(BATCHNAME);
-		
 		String limitBatch = AV_SchedulerBatches.getLimit(BATCHNAME);
-		system.debug('@@newsetrt '+ newsetRt);
+
 		if(String.isNotBlank(limitBatch)){
 			avQuery = 'Select ID, AV_ToDelete__c, AV_Task__c, RecordTypeId FROM Event where AV_ToDelete__c = true and SystemModstamp = LAST_N_DAYS:'+numDays+' and RecordType.DeveloperName in '+newSetRt+' limit '+ Integer.valueOf(limitBatch)+' ';
 		}else{
@@ -82,23 +56,11 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 
 		}
 		//Enqueue the next delete batch
-		AV_LogDebug.printLogDebug(methodName, 'Next delete job: \'AV_DeleteRecordsTaskOppBatchQueueable\'');
-		System.enqueueJob(new AV_DeleteRecordsTaskOppBatchQueueable());
+		AV_LogDebug.printLogDebug(methodName, 'Next delete job: \'AV_DeleteRecordsContactBatchQueueable\'');
+		System.enqueueJob(new AV_DeleteRecordsContactBatchQueueable());
 
 		AV_LogDebug.printLogDebug(methodName, 'Query to execute: ' + avQuery);
         return Database.getQueryLocator(avQuery);
-
-
-        /*if(avQuery==null){
-            avQuery = setQuery();
-        }
-        AV_LogDebug.printLogDebug(methodName, 'Query to execute: ' + avQuery.toQueryString());
-        
-          //Enqueue the next delete batch
-		  AV_LogDebug.printLogDebug(methodName, 'Next delete job: \'AV_DeleteRecordsTaskOppBatchQueueable\'');
-		  System.enqueueJob(new AV_DeleteRecordsTaskOppBatchQueueable());
-		
-		return avQuery.getQueryLocator();*/
 	}
 
 	/**
@@ -107,7 +69,7 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param listEvents List<Event> param with the list of Eventos to delete
 	 */
-	global void execute(Database.BatchableContext bc, List<Event> scope){
+	public void execute(Database.BatchableContext bc, List<Event> scope){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -136,7 +98,7 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_DeleteRecordsEventBatch());
 	}
 
@@ -145,7 +107,7 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 		//Database.executeBatch(new AV_DeleteRecordsTaskOppBatch ());
@@ -183,10 +145,6 @@ global class AV_DeleteRecordsEventBatch implements Database.Batchable<sObject>, 
 		String methodName = 'getTareaOppAsociada';
 		try{
 			listTareaOportunidadToDelete = [Select Id, AV_ExternalID__c From AV_CustomActivityOpportunity__c Where AV_Task__c in :listCabeceraTarea];
-			/*listTareaOportunidadToDelete = new AV_Query('AV_CustomActivityOpportunity__c')
-				.selectFields('Id, AV_ExternalID__c')
-				.addConditionIn('AV_Task__c', listCabeceraTarea)
-				.run();*/
 			
 			if(listTareaOportunidadToDelete != null && !listTareaOportunidadToDelete.isEmpty()){
 				AV_LogDebug.printLogDebug(methodName,'Data for delete of AV_CustomActivityOpportunity__c: ' + listTareaOportunidadToDelete.size());

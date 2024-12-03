@@ -63,6 +63,7 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
             l1.MobilePhone = '633657845';
             l1.AV_IsClient__c = false;
             l1.AV_numperso__c = acc.Id;
+            l1.RecordTypeId = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_LEAD, AV_AppConstants.LEAD_PPHH_RT).Id;  //mio
             leadList.add(l1);
             
             Lead l2 = AV_TestHelper.createLeadSinInsert(rtLead);
@@ -76,6 +77,17 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
             l2.AV_IsClient__c = true;
             l2.AV_numperso__c = acc.Id;
             leadList.add(l2);
+            //insert leadList;
+            
+            
+            Lead l3 = AV_TestHelper.createLeadSinInsert(rtLead);
+            l3.AV_CustomerId__c = 'X1234567A';
+            l3.Email = 'test3@gmail.com';
+            l2.MobilePhone = '633227845';
+            l2.AV_IsClient__c = true;
+            l3.AV_numperso__c = acc.Id;
+            l3.RecordTypeId = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_LEAD, AV_AppConstants.LEAD_PPHH_RT).Id;
+            leadList.add(l3);
             insert leadList;
             
            
@@ -83,12 +95,14 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
             //leadOpp.AV_Status__c = '01';
             //leadOpp.AV_DueDate__c = Date.newInstance(2000, 12, 9);
             leadOpp.AV_CreationDate__c = Date.today();
-            leadOpp.AV_Lead__c = l1.Id;
             leadOpp.AV_Lead2__c = l2.Id;
-            leadOpp.AV_EstadoEnvioOfComercial__c='1';
+            leadOpp.AV_EstadoEnvioOfComercial__c= '1';
+            leadOpp.AV_Lead__c = l1.Id; 
             leadOppList.add(leadOpp);
             //AV_LeadOpportunity__c leadOpp2 = AV_TestHelper.createRejectedLeadOpportunity(l1);
             insert leadOppList;
+            
+            
         }
 	}
     	
@@ -139,6 +153,7 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
     @isTest
     private static void checkHolderIsClientTestHolder2() {
         User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
+        List<Lead> le = [Select id from Lead where Email = 'test3@gmail.com' limit 1];
 		Test.startTest();
         System.runAs(userGestor){
             String typeOfHolder = 'holder2';
@@ -146,7 +161,7 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
             AV_LeadOpportunity__c leadOpp = new AV_LeadOpportunity__c();
             leadOpp.AV_Comment__c = 'ABELLOTS and CAUCASIC';
             leadOpp.AV_CreationDate__c = Date.today();
-            leadOpp.AV_Lead2__c = [SELECT Id from Lead WHERE AV_IsClient__c = false LIMIT 1].Id;
+            leadOpp.AV_Lead__c = le[0].Id;
             leadOpp.AV_Status__c = AV_AppConstants.LEADOPP_STATUS_NUEVO;
             leadOpp.AV_StatusLeadOpp__c = AV_AppConstants.LEADOPP_STAGE_POTENCIAL;
             leadOppList.add(leadOpp);
@@ -163,6 +178,7 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
     @isTest
     private static void checkHolderIsClientTestHolder1() {
         User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
+        List<Lead> le = [Select id from Lead where AV_CustomerId__c = 'X1234567A' limit 1];
 		Test.startTest();
         System.runAs(userGestor){
             String typeOfHolder = 'holder1';
@@ -170,7 +186,7 @@ public with sharing class AV_LeadOpportunityTriggerHelperTest {
             AV_LeadOpportunity__c leadOpp = new AV_LeadOpportunity__c();
             leadOpp.AV_Comment__c = 'ABELLOTS and CAUCASIC';
             leadOpp.AV_CreationDate__c = Date.today();
-            leadOpp.AV_Lead__c = [SELECT Id from Lead WHERE AV_IsClient__c = false LIMIT 1].Id;
+            leadOpp.AV_Lead__c = le[0].Id;
             leadOpp.AV_Status__c = AV_AppConstants.LEADOPP_STATUS_NUEVO;
             leadOpp.AV_StatusLeadOpp__c = AV_AppConstants.LEADOPP_STAGE_POTENCIAL;
             leadOppList.add(leadOpp);

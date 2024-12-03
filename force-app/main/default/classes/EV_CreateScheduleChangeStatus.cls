@@ -6,28 +6,38 @@ Proposito: Creacion de schedule para cambiar el estado de la camapaña sin shari
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-VERSION    USER_STORY        AUTHOR            DATE            Description
+VERSION    USER_STORY       AUTHOR              DATE              Description
 1.0        DE75856          Daniel Rodriguez    04/10/2023        Init version
-
+1.1        DE86361          Carolina Lopez      06/02/2024        Modify method createJob include call CBK_ChangeStatus_EV__e.
+1.2        IN1146345        Carolina Lopez      08/04/2024        Include recordType of Festivales in the query logic.
+1.3        TechSummit       Carolina Lopez      21/05/2024        Include RecordType of TechSummit.
 ***********************************************************************************************************************/
 public without sharing class EV_CreateScheduleChangeStatus {
     static final String EV_PLACE_OF_CELEBRATION = 'Online';
     static final String ALTA_MASIVA = 'Alta masiva';
     static List<Id> jobDelete = null;
     private static EV_Utilities.SearchRT rtFisico     = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_EventoFisico);
+    private static EV_Utilities.SearchRT rtFestival     = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_FestivalesYexperiencias);
     private static EV_Utilities.SearchRT rtVirtual    = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_EventoVirtual);
     private static EV_Utilities.SearchRT rtHibrido    = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_EventoHibrido);
     private static EV_Utilities.SearchRT rtAccionista  = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_EventosAccionistas);
     private static EV_Utilities.SearchRT rtCatVirtual  = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CatalogoEventoVirtual);
     private static EV_Utilities.SearchRT rtCatFisico  = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CatalogoEventoFisico);
     private static EV_Utilities.SearchRT rtCatHibrido  = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CatalogoEventoHibrido);
+    private static EV_Utilities.SearchRT rtFisicoTech   = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitFisico);
+    private static EV_Utilities.SearchRT rtVirtualTech   = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitVirtual);
+    private static EV_Utilities.SearchRT rtHibridoTech    = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitHibrido);
     private static Set<Id> setRtFisico          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFisico});
-  private static Set<Id> setRtVirtual          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtVirtual});
+    private static Set<Id> setRtFestival         = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFestival});
+    private static Set<Id> setRtVirtual          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtVirtual});
     private static Set<Id> setRtHibrido          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtHibrido});
     private static Set<Id> setRtAccionista        = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtAccionista});
     private static Set<Id> setRtCatFisico        = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtCatFisico});
     private static Set<Id> setRtCatVirtual        = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtCatVirtual});
     private static Set<Id> setRtCatHibrido        = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtCatHibrido});
+    private static Set<Id> setRtFisicoTech          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFisicoTech});
+    private static Set<Id> setRtVirtualTech          = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtVirtualTech});
+    private static Set<Id> setRtHibridoTech         = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtHibridoTech});
     
          /**
    * @description       NEW Get the ID's of the RT's requested by param
@@ -54,6 +64,10 @@ public without sharing class EV_CreateScheduleChangeStatus {
         setIdsRts.addAll(setRTVirtual);
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTAccionista);
+        setIdsRts.addAll(setRtFestival);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         Set<String> setStatusEntry= new Set<String>{Label.EV_Invitaciones_Enviadas, Label.EV_Apunto_Empezar, Label.EV_En_Curso, Label.EV_Finalizado, Label.EV_Publico_Validado};
             
             List<Campaign> listCampaign = new List<Campaign>();
@@ -76,6 +90,11 @@ public without sharing class EV_CreateScheduleChangeStatus {
         setIdsRts.addAll(setRTVirtual);
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTAccionista);
+        setIdsRts.addAll(setRtFestival);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
+
         Set<String> setStatusToStart = new Set<String>{Label.EV_Invitaciones_Enviadas, Label.EV_Apunto_Empezar};
             
             List<Campaign> iEChange = [  SELECT Id, EV_DiaHora_eventoAE__c, EV_DiaHora_evento__c, EV_FechaHoraFin__c, Status
@@ -185,29 +204,17 @@ public without sharing class EV_CreateScheduleChangeStatus {
 * @param jobName      name of job
 */
     public static void createJob(DateTime fechaProxEje) {
-        String jobName = 'Job-CampaignStatusChange';
+        EV_LogDebug.printLogDebug('@@EV_CreateScheduleChangeStatus ', 'createJob');
         String schedule = '0 ' + fechaProxEje.minute() + ' ' + fechaProxEje.hour() + ' ' + fechaProxEje.day() + ' ' + fechaProxEje.month() + ' ?' + ' ' + fechaProxEje.year();
-        
-        EV_LogDebug.printLogDebug('jobName', String.valueof(jobName));
-        EV_LogDebug.printLogDebug('schedule', String.valueof(schedule));
-        
-        Map<String, CronTrigger> mapJobPending = new Map<String, CronTrigger>();
-        for(CronTrigger jobs : [SELECT Id, CronjobDetail.Name, State, NextFireTime 
-                                FROM CronTrigger 
-                                WHERE CronjobDetail.JobType = '7' AND CronjobDetail.Name = :jobName]) {
-                                    mapJobPending.put(jobs.cronjobdetail.name, jobs);
-                                }
-        
-        if(mapJobPending.containsKey(jobName)) {
-            CronTrigger jobStarted = mapJobPending.get(jobName);
-            if(jobStarted.NextFireTime != fechaProxEje) {
-                System.abortJob(jobStarted.Id);
-                System.schedule(jobName, schedule, new EV_SCHChangeStatus());
+        EV_ChangeStatus__e eventsche = new EV_ChangeStatus__e(
+                EV_ScheduledTime__c = schedule,
+                EV_ExecutionDate__c = fechaProxEje
+            );
+        Database.SaveResult sr = EventBus.publish(eventsche);
+        if (!sr.isSuccess()) {
+            for(Database.Error err : sr.getErrors()) {
+                EV_LogDebug.printLogDebug('Error returned: ' , err.getMessage());
             }
-        } else {
-            System.schedule(jobName, schedule, new EV_SCHChangeStatus());
         }
     }
-    
-    
 }

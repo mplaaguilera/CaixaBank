@@ -8,7 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				DATE				Description
 	1.0			App Eventos	    Jorge Centella	    29/10/2020			Init version
-
+	1.1			FIX				Mamen Arias			02/02/2024			Add seeAllData=true on method executeCampaignMemberAITriggerLead for ConnectApi Error.
 ***********************************************************************************************************************/
 @isTest
 public class EV_CampaignMember_AI_TRHan_Test {
@@ -23,7 +23,7 @@ public class EV_CampaignMember_AI_TRHan_Test {
 		Test.stopTest();
 	}
 
-	@isTest
+	@isTest (seeAllData=true)
 	public static void executeCampaignMemberAITriggerLead() {
 		Test.startTest();
 		

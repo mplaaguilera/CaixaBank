@@ -20,6 +20,8 @@ Historial
    1.9			US542315		   Patricia Solano 		22/03/2023		  Modified public class to fix quality clouds warnings
    2.0			US592987		   Ángel Medina		    29/05/2023		  Changed AV_Query to SOQL queries
    2.1			Fix PMD Errors	   Daniel Rodriguez	    05/10/2023		  Add WITH SECURITY_ENFORCED in queries
+   2.2          PPM100492394       Oscar Moreno         18/09/2024        Add getGestoresMultigestor method to return the contact's name if AV_Pool__c = true and the gestor of the account is'Banca de Particulares'
+   2.3			FIX21111255		   Sandra Gómez			22/11/2024		  Change method getGestoresMultigestor to fix null
 ***********************************************************************************************************************/
 public with sharing class AV_SObjectRelatedInfoCController {
 	
@@ -141,6 +143,7 @@ public with sharing class AV_SObjectRelatedInfoCController {
 			dataObject = capsulateQuery(q);
 	
 		}
+
 		
 		//Creo una lista de Tipo FieldSetMember y voy añadiendo los campos
 		List<FieldSetMember> fset = new List<FieldSetMember>();
@@ -222,6 +225,7 @@ public with sharing class AV_SObjectRelatedInfoCController {
 			String q = 'SELECT ' + filterField + ' FROM ' + objectApiName + ' WHERE Id = \''  + recordId + '\'' ;
 			List<SObject> filterNameList =(List<SObject>) capsulateQuery(q);
 
+
 			if(filterNameList.size() > 0){
 				SObject interact = filterNameList.get(0);
 				filterSObjectID = (String) interact.get(filterField);
@@ -265,5 +269,45 @@ public with sharing class AV_SObjectRelatedInfoCController {
 	private static List<SObject> capsulateQuery(String avQuery){
 		return (List<SObject>) Database.query(avQuery);
 	} 
+
 	
+	@AuraEnabled
+	public static String getGestoresMultigestor(String recordId) {
+		String namesToReturn;
+		if(recordId != null){
+			List<Account> acc = [SELECT Id,AV_OficinaPrincipal__c,AV_OficinaPrincipal__r.CC_Numero_Oficina__c, AV_EAPGestor__c,AV_EAPGestor__r.name FROM Account WHERE id=:recordId];
+			String officeNumber;
+			Boolean isMultigestor = false;
+			if(acc!=null && !acc.isEmpty() && acc[0].AV_OficinaPrincipal__c != null && acc[0].AV_OficinaPrincipal__r.CC_Numero_Oficina__c != null && acc[0].AV_EAPGestor__c != null){
+				officeNumber = acc[0].AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
+				isMultigestor = acc[0].AV_EAPGestor__r.Name.contains(AV_AppConstants.MULTIGENAME);
+			}
+			
+			if(officeNumber!= null  && isMultigestor ){
+				List<Contact> contacts = [SELECT Id, Name,AV_Pool__c FROM contact WHERE AV_Pool__c = true AND CC_Numero_Oficina__c =: officeNumber];
+				if(contacts != null && !contacts.isEmpty()){
+					List<String> validNames = new List<String>();
+					for(Contact c : contacts){
+						validNames.add(c.Name);
+					}
+					namesToReturn = String.join(validNames, ', ');
+				}
+			}
+		}
+		return namesToReturn;
+	}
+
+	
+	@AuraEnabled
+	public static Boolean isBancaParticularesEAPGestor(String recordId){
+		Boolean response = false;
+		if(recordId != null){
+			List<Account> acc = [SELECT Id,AV_OficinaPrincipal__c,AV_OficinaPrincipal__r.CC_Numero_Oficina__c, AV_EAPGestor__c,AV_EAPGestor__r.name FROM Account WHERE id=:recordId];
+			if (acc!= null && !acc.isEmpty() && acc[0].AV_EAPGestor__c != null && acc[0].AV_EAPGestor__r.Name != null && acc[0].AV_EAPGestor__r.Name.contains(AV_AppConstants.MULTIGENAME)) {
+				response =  true;
+			}
+		}
+		return response;
+	}
+
 }

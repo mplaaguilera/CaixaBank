@@ -11,13 +11,13 @@ Historial
 ***********************************************************************************************************************/
 @isTest
 public with sharing class CIBE_CustomCalendar_Controller_Test {
- @TestSetup
- static void setup(){
+   @TestSetup
+   static void setup(){
+      CIBE_TestInitialSetup.setupInitialDataEMP();
+   }
 
-    AV_TestHelper.createUser(null);
     
     
- }
 
  @isTest
  public static void retrieveEventsTest(){
@@ -25,11 +25,63 @@ public with sharing class CIBE_CustomCalendar_Controller_Test {
    System.runAs(new User(Id = UserInfo.getUserId())) {
       Test.startTest();
       
-      User u = [Select ID FROM User WHERE Alias = 'tsAlias' AND Email = 'test@test.dev'];
+      User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
       String stringDate= '2023-04-01';
       System.runAs(u){
          result = CIBE_CustomCalendar_Controller.retrieveEvents(u.Id,stringDate);
          CIBE_CustomCalendar_Controller.retrieveEvents('',stringDate);
+      }
+      Test.stopTest();
+   }
+   System.assert(result.isEmpty());
+}
+
+
+   @isTest
+   public static void retrieveEventsWeekTest(){
+   List<Event> result = new List<Event>();   
+   System.runAs(new User(Id = UserInfo.getUserId())) {
+      Test.startTest();
+      
+      User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+      String stringDate= '2023-04-01';
+      System.runAs(u){
+         result = CIBE_CustomCalendar_Controller.retrieveEventsWeek(u.Id,stringDate);
+         CIBE_CustomCalendar_Controller.retrieveEventsWeek('',stringDate);
+      }
+      Test.stopTest();
+   }
+   System.assert(result.isEmpty());
+ }
+    
+    @isTest
+   public static void retrieveEventsWeekCIBTest(){
+   List<Event> result = new List<Event>();   
+   System.runAs(new User(Id = UserInfo.getUserId())) {
+      Test.startTest();
+      
+      User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+      String stringDate= '2023-04-01';
+      System.runAs(u){
+         result = CIBE_CustomCalendar_Controller.retrieveEventsCIB(u.Id,stringDate);
+         CIBE_CustomCalendar_Controller.retrieveEventsCIB('',stringDate);
+      }
+      Test.stopTest();
+   }
+   System.assert(result.isEmpty());
+ }
+
+ @isTest
+   public static void retrieveEventsMonthTest(){
+   List<Event> result = new List<Event>();   
+   System.runAs(new User(Id = UserInfo.getUserId())) {
+      Test.startTest();
+      
+      User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+      String stringDate= '2023-04-01';
+      System.runAs(u){
+         result = CIBE_CustomCalendar_Controller.retrieveEventsMonth(u.Id,stringDate);
+         CIBE_CustomCalendar_Controller.retrieveEventsMonth('',stringDate);
       }
       Test.stopTest();
    }

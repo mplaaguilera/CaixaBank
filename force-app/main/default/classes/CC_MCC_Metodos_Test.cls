@@ -94,7 +94,7 @@ public with sharing class CC_MCC_Metodos_Test {
             }
             insert psAssignments;
         //}
-
+        
         User usuarioOperador = OS_Usuarios.usuarioOperador();
     }
 
@@ -852,6 +852,86 @@ public with sharing class CC_MCC_Metodos_Test {
         Test.stopTest();
         
         }
+        //System.assertEquals('Completed', actividad.Status);
+    }
+
+    @isTest
+	static void generaExternalIdGRR() {
+
+        System.runAs(GRR_TestDataFactory.usuarioPruebasGRR()) {
+        
+        Id recordTypeIdTematica = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica');
+        Id recordTypeIdProducto = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio');
+        Id recordTypeIdMotivo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo');
+        //Id recordTypeIdCausa = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Causa').getRecordTypeId();
+        //Id recordTypeIdSolucion = Schema.getGlobalDescribe().get('CC_MCC__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Solucion').getRecordTypeId();
+        
+        List<CC_MCC__c> mccInsert = new List<CC_MCC__c>();
+        List<Id> listMccs = new List<Id>();
+        
+        CC_MCC__c mcc = new CC_MCC__c();
+        mcc.RecordTypeId = recordTypeIdTematica;
+        mcc.Name = 'Tematica Test GRR';
+        mcc.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        mcc.CC_Canal_Operativo__c = 'Sin canal';
+        mcc.CC_Codigo_Externo__c = 'TEGR-000001';
+        mccInsert.add(mcc);
+        
+        CC_MCC__c mcc1 = new CC_MCC__c();
+        mcc1.RecordTypeId = recordTypeIdTematica;
+        mcc1.Name = 'Tematica1 Test GRR';
+        mcc1.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        mcc1.CC_Canal_Operativo__c = 'Sin canal';
+        mccInsert.add(mcc1);
+        listMccs.add(mcc1.Id);
+        
+        CC_MCC__c producto = new CC_MCC__c();        
+        producto.RecordTypeId = recordTypeIdProducto;
+        producto.Name = 'Producto Test GRR';
+        producto.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        producto.CC_Tematica__c = mcc.Id;
+        producto.CC_Codigo_Externo__c = 'PRGR-000001';
+        mccInsert.add(producto);
+        
+        CC_MCC__c producto1 = new CC_MCC__c();        
+        producto1.RecordTypeId = recordTypeIdProducto;
+        producto1.Name = 'Producto1 Test GRR';
+        producto1.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        producto1.CC_Tematica__c = mcc1.Id;
+        mccInsert.add(producto1);
+        listMccs.add(producto1.Id);
+        
+        CC_MCC__c motivo = new CC_MCC__c();        
+        motivo.RecordTypeId = recordTypeIdMotivo;
+        motivo.Name = 'Motivo Test GRR';
+        motivo.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        motivo.CC_Producto_Servicio__c = producto.Id;
+        motivo.CC_Codigo_Externo__c = 'MOGR-000001';
+        mccInsert.add(motivo);
+        
+        CC_MCC__c motivo1 = new CC_MCC__c();        
+        motivo1.RecordTypeId = recordTypeIdMotivo;
+        motivo1.Name = 'Motivo1 Test GRR';
+        motivo1.CC_Tipo_Cliente__c = 'Cliente (GRR)';
+        motivo1.CC_Producto_Servicio__c = producto1.Id;
+        mccInsert.add(motivo1);
+        listMccs.add(motivo1.Id);
+        
+
+        insert mccInsert;
+        
+        Test.startTest();
+        CC_MCC_Metodos.generaExternalId(listMccs);
+        Test.stopTest();
+        System.assertEquals('Cliente (GRR)', motivo1.CC_Tipo_Cliente__c);
+        }
+       /* Test.startTest();
+        CC_MCC_Metodos.generaExternalId(listMccs);
+        CC_MCC__c mccTest = [SELECT Id,CC_Codigo_Externo__c FROM CC_MCC__c WHERE Name = 'Tematica1 Test GRR' LIMIT 1];
+        assert.areNotEqual(mccTest.CC_Codigo_Externo__c,null);
+        Test.stopTest();
+        
+        }*/
         //System.assertEquals('Completed', actividad.Status);
     }
 

@@ -20,6 +20,7 @@ public without sharing class CC_MCC_Metodos {
 			Boolean mccFRA = false;
 			Boolean mccGenerico = false;
             Boolean mccCC = false;
+            Boolean mccGRR = false;
 			
 			for (CC_MCC__c mcc : listMccs) {
 				if (mcc.CC_Tipo_Cliente__c == 'Cliente' || mcc.CC_Tipo_Cliente__c == 'Empleado' || mcc.CC_Tipo_Cliente__c == 'Cliente/Empleado' || mcc.CC_Tipo_Cliente__c == 'Prejubilado' || mcc.CC_Tipo_Cliente__c == 'Proveedor / Empleado') {
@@ -36,6 +37,8 @@ public without sharing class CC_MCC_Metodos {
 					mccHDT = true;
 				}else if (mcc.CC_Tipo_Cliente__c.contains('FRA')) {
 					mccFRA = true;
+				}else if (mcc.CC_Tipo_Cliente__c.contains('GRR')) {
+					mccGRR = true;
 				}else {
 					mccGenerico = true;
 				}
@@ -60,15 +63,15 @@ public without sharing class CC_MCC_Metodos {
 
 				if (mccGenerico){
                     List <CC_MCC__c> codigosExternosTematica = [SELECT CC_Codigo_Externo__c FROM CC_MCC__c WHERE RecordTypeId = :recordTypeIdTematica AND CC_Codigo_Externo__c <> null AND (NOT CC_Tipo_Cliente__c IN('Cliente','Empleado','Cliente/Empleado','Prejubilado','Proveedor / Empleado')) 
-                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%')AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
+                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%')AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') AND (NOT CC_Tipo_Cliente__c = 'Cliente (GRR)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
                     List <CC_MCC__c> codigosExternosProducto = [SELECT CC_Codigo_Externo__c FROM CC_MCC__c WHERE RecordTypeId = :recordTypeIdProducto AND CC_Codigo_Externo__c <> null AND (NOT CC_Tipo_Cliente__c IN('Cliente','Empleado','Cliente/Empleado','Prejubilado','Proveedor / Empleado'))
-                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
+                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') AND (NOT CC_Tipo_Cliente__c = 'Cliente (GRR)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
                     List <CC_MCC__c> codigosExternosMotivo = [SELECT CC_Codigo_Externo__c FROM CC_MCC__c WHERE RecordTypeId = :recordTypeIdMotivo AND CC_Codigo_Externo__c <> null AND (NOT CC_Tipo_Cliente__c IN('Cliente','Empleado','Cliente/Empleado','Prejubilado','Proveedor / Empleado'))
-                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
+                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') AND (NOT CC_Tipo_Cliente__c = 'Cliente (GRR)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
                     List <CC_MCC__c> codigosExternosCausa = [SELECT CC_Codigo_Externo__c FROM CC_MCC__c WHERE RecordTypeId = :recordTypeIdCausa AND CC_Codigo_Externo__c <> null AND (NOT CC_Tipo_Cliente__c IN('Cliente','Empleado','Cliente/Empleado','Prejubilado','Proveedor / Empleado'))
-                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
+                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') AND (NOT CC_Tipo_Cliente__c = 'Cliente (GRR)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
                     List <CC_MCC__c> codigosExternosSolucion = [SELECT CC_Codigo_Externo__c FROM CC_MCC__c WHERE RecordTypeId = :recordTypeIdSolucion AND CC_Codigo_Externo__c <> null AND (NOT CC_Tipo_Cliente__c IN('Cliente','Empleado','Cliente/Empleado','Prejubilado','Proveedor / Empleado'))
-                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
+                                        AND (NOT CC_Tipo_Cliente__c like '%COPS%') AND (NOT CC_Tipo_Cliente__c like '%CSI%') AND (NOT CC_Tipo_Cliente__c like '%CAM%') AND (NOT CC_Tipo_Cliente__c like '%SACH%') AND (NOT CC_Tipo_Cliente__c like '%HDT%') AND (NOT CC_Tipo_Cliente__c = 'SAC') AND (NOT CC_Tipo_Cliente__c = 'Segmentos') AND (NOT CC_Tipo_Cliente__c = 'Cliente (FRA)') AND (NOT CC_Tipo_Cliente__c = 'Cliente (GRR)') ORDER BY CC_Codigo_Externo__c DESC LIMIT 1 ];
 				
 				//TEMÁTICA
 				if (!codigosExternosTematica.isEmpty()) {
@@ -664,6 +667,60 @@ public without sharing class CC_MCC_Metodos {
 				}
 				
 			}
+            
+            String codigoExternoTematicaGRR;
+			String[] codExternoTematicaGRR;
+                Integer numTematicaGRR = 0;
+                String codigoExternoProductoGRR;
+                String[] codExternoProductoGRR;
+                Integer numProductoGRR = 0;
+                String codigoExternoMotivoGRR;
+                String[] codExternoMotivoGRR;
+                Integer numMotivoGRR = 0;
+                
+			
+			if(mccGRR){
+				
+				String clienteGRR = 'GRR';
+				List<CC_MCC__c> codigosExternosTematicaGRR = getMCCS(recordTypeIdTematica, clienteGRR);
+				List<CC_MCC__c> codigosExternosProductoGRR = getMCCS(recordTypeIdProducto, clienteGRR);
+				List<CC_MCC__c> codigosExternosMotivoGRR = getMCCS(recordTypeIdMotivo, clienteGRR);
+				List<CC_MCC__c> codigosExternosCausaGRR = getMCCS(recordTypeIdCausa, clienteGRR);
+				List<CC_MCC__c> codigosExternosSolucionGRR = getMCCS(recordTypeIdSolucion, clienteGRR);
+				
+				//TEMÁTICAS
+				if (!codigosExternosTematicaGRR.isEmpty()){
+					codigoExternoTematicaGRR = codigosExternosTematicaGRR.get(0).CC_Codigo_Externo__c;
+					if(codigoExternoTematicaGRR.contains('-')){
+						codExternoTematicaGRR= codigoExternoTematicaGRR.split('-');
+						if(codExternoTematicaGRR[1].isNumeric()){
+							numTematicaGRR = Integer.ValueOf(codExternoTematicaGRR[1]);
+						}
+					}
+				}
+				//PRODUCTOS
+				if(!codigosExternosProductoGRR.isEmpty()){
+					codigoExternoProductoGRR = codigosExternosProductoGRR.get(0).CC_Codigo_Externo__c;
+					if(codigoExternoProductoGRR.contains('-')){
+						codExternoProductoGRR = codigoExternoProductoGRR.split('-');
+						if(codExternoProductoGRR[1].isNumeric()){
+							numProductoGRR = Integer.ValueOf(codExternoProductoGRR[1]);
+						}
+					}
+				}
+				//MOTIVOS
+				if(!codigosExternosMotivoGRR.isEmpty()){
+					codigoExternoMotivoGRR = codigosExternosMotivoGRR.get(0).CC_Codigo_Externo__c;
+					if(codigoExternoMotivoGRR.contains('-')){
+						codExternoMotivoGRR = codigoExternoMotivoGRR.split('-');
+						if(codExternoMotivoGRR[1].isNumeric()){
+							numMotivoGRR = Integer.ValueOf(codExternoMotivoGRR[1]);
+						}
+					}
+				}
+				
+			}
+
 			
 			for (CC_MCC__c mcc : listMccs) {
 				if (mcc.RecordType.DeveloperName == 'CC_Tematica' && mcc.CC_Codigo_Externo__c == null){
@@ -705,6 +762,11 @@ public without sharing class CC_MCC_Metodos {
 						codigoExternoTematicaFRA = String.valueOf(numTematicaFRA).leftPad(6, '0');
 						codigoExternoTematicaFRA = codExternoTematicaFRA[0] + '-' +codigoExternoTematicaFRA;
 						mcc.CC_Codigo_Externo__c = codigoExternoTematicaFRA;
+					}else if(mcc.CC_Tipo_Cliente__c.contains('GRR')){
+						numTematicaGRR = numTematicaGRR+1;
+						codigoExternoTematicaGRR = String.valueOf(numTematicaGRR).leftPad(6, '0');
+						codigoExternoTematicaGRR = codExternoTematicaGRR[0] + '-' +codigoExternoTematicaGRR;
+						mcc.CC_Codigo_Externo__c = codigoExternoTematicaGRR;
 					}else{
 						numTematica = numTematica+1;
 						codigoExternoTematica = String.valueOf(numTematica).leftPad(6, '0');
@@ -747,6 +809,11 @@ public without sharing class CC_MCC_Metodos {
 						codigoExternoProductoFRA = String.valueOf(numProductoFRA).leftPad(6, '0');
 						codigoExternoProductoFRA = codExternoProductoFRA[0] + '-' +codigoExternoProductoFRA;
 						mcc.CC_Codigo_Externo__c = codigoExternoProductoFRA;
+					}else if(mcc.CC_Tipo_Cliente__c.contains('GRR')){
+						numProductoGRR = numProductoGRR+1;
+						codigoExternoProductoGRR = String.valueOf(numProductoGRR).leftPad(6, '0');
+						codigoExternoProductoGRR = codExternoProductoGRR[0] + '-' +codigoExternoProductoGRR;
+						mcc.CC_Codigo_Externo__c = codigoExternoProductoGRR;
 					}else{
 						numProducto = numProducto+1;
 						codigoExternoProducto = String.valueOf(numProducto).leftPad(6, '0');
@@ -789,6 +856,11 @@ public without sharing class CC_MCC_Metodos {
 						codigoExternoMotivoFRA = String.valueOf(numMotivoFRA).leftPad(6, '0');
 						codigoExternoMotivoFRA = codExternoMotivoFRA[0] + '-' +codigoExternoMotivoFRA;
 						mcc.CC_Codigo_Externo__c = codigoExternoMotivoFRA;
+					}else if(mcc.CC_Tipo_Cliente__c.contains('GRR')){
+						numMotivoGRR = numMotivoGRR+1;
+						codigoExternoMotivoGRR = String.valueOf(numMotivoGRR).leftPad(6, '0');
+						codigoExternoMotivoGRR = codExternoMotivoGRR[0] + '-' +codigoExternoMotivoGRR;
+						mcc.CC_Codigo_Externo__c = codigoExternoMotivoGRR;
 					}else{
 						numMotivo = numMotivo+1;
 						codigoExternoMotivo = String.valueOf(numMotivo).leftPad(6, '0');

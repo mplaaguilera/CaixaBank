@@ -316,12 +316,7 @@ public with sharing class SPV_LCMP_BusquedaCliente {
     @AuraEnabled
     public static void actualizarReclamanteNoCliente(String caseId, String accountId){
         try {
-            /*Case caso = new Case();
-            caso.Id = caseId;
-            caso.CC_No_Identificado__c = false;
-            SPV_DatabaseDML.updateDML(caso, true);*/
             SAC_HandlerWithoutSharingMethods.actualizarReclamanteNoClienteWithoutSharing(caseId, accountId);
-
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }

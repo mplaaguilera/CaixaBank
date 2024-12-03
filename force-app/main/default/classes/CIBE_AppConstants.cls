@@ -9,7 +9,7 @@ Historial
    	VERSION        USER_STORY       AUTHOR           DATE                Description
    	1.0            App Constantes   Jose Maria       08/08/2022          Init version
     1.1            US486064         Bea y Ali        01/09/2023          Add value of reports of CIB and EMP, 'COUNT_RESULTS'
-
+    1.3            PPM100492394     Ángel Medina     21/10/2024          Add SINGESTOR_EAP_CENTRO
 ***********************************************************************************************************************/
 public with sharing class CIBE_AppConstants {
 
@@ -28,6 +28,7 @@ public with sharing class CIBE_AppConstants {
     public static final String OBJECT_NAME_CARTERA_GESTOR	= 'AV_BookManagementMember__c';
 	public static final String OBJECT_NAME_CARTERA_CLIENTE	= 'AV_BookMember__c';
     public static final String OBJECT_NAME_ACCACCRELATION	= 'FinServ__AccountAccountRelation__c';
+    public static final String OBJECT_NAME_PICKLISTVALUE	= 'CBK_PicklistValues__c';
     
     //RecordTypes
     public static final String ACCOUNT_CLIENTE_RT 			= 'CC_Cliente';
@@ -53,6 +54,9 @@ public with sharing class CIBE_AppConstants {
     public static final String EVENT_CLIENTE_RT 			= 'CIBE_EventoCliente';
     public static final String EVENT_GESTOR_RT 				= 'CIBE_EventodelGestor';
     
+    public static final String EVENT_CLIENTE_CIB_RT 			= 'CIBE_EventoClienteCIB';
+    public static final String EVENT_GESTOR_CIB_RT 				= 'CIBE_EventoGestorCIB';
+    
 
     public static final String TASK_ALERTACOMERCIAL_CIB_RT	     = 'CIBE_AlertaComercialCIB';
     public static final String TASK_ALERTACOMERCIAL_EMP_RT	     = 'CIBE_AlertaComercialEMP';
@@ -71,10 +75,14 @@ public with sharing class CIBE_AppConstants {
     public static final String CONTACT_CONTACTO_COMERCIAL_RT	 = 'CIBE_ContactoComercial';
 
     public static final String HIERARCHY_EMPLOYEE_RT	         = 'CIBE_Employee';
+
+    public static final String PICKLIST_VALUE_RT	             = 'CBK_PicklistValue';
+    public static final String PICKLIST_RT	                     = 'CBK_Picklist';
     
     //Event StageNames
     public static final String EVENT_STATUS_PENDIENTE 		= 'Pendiente';
-
+    public static final String EVENT_STATUS_PLANIFICADA 	= 'Planificada';
+    public static final String EVENT_STATUS_GESTIONADAPOS 	= 'Gestionada Positiva';
     //Opportunity StageNames
     public static final String OPPORTUNITY_STATUS_POTENCIAL	= 'Potencial';
     public static final String OPPORTUNITY_STATUS_ENCURSO	= 'En curso';
@@ -119,7 +127,13 @@ public with sharing class CIBE_AppConstants {
     public static final String USER_CIBEOPERATIVAEMP 			= 'CIBE_OperativaEMP';
     public static final String USER_CIBEOPERATIVACIB 			= 'CIBE_OperativaCIB';
     public static final String USER_AV_AVOIDBULKAPI 			= 'AV_AvoidBulkApi';
+    public static final String USER_CBK_BYPASSVALIDATIONRULE 	= 'CBK_BypassValidationRules';
+    public static final String USER_CIBE_BYPASSVR 			    = 'CIBE_ByPassVR';
+
+    
     public static final String EXTENDEDHOME_LINK                = 'CIBE_ExtendedHomeLink';
+    public static final String EVENT_BUTTON_OVERRIDE            = 'CIBE_EventButtonOv';
+
 
     
     //System Exception Errors
@@ -199,6 +213,12 @@ public with sharing class CIBE_AppConstants {
     public static final String CIBE_EVENTOS_HOY = 'CIBE_TodaysAppointments';
     public static final String CIBE_NOTIFICACIONES = 'CIBE_PendingConversation';
 
+    //Metadata Configuración Gráfico
+
+    public static final String CIBE_OPPN7DAYS = 'CIBE_OpportunitiesNext7Days_EMP';
+    public static final String CIBE_CITAS_7DAYS = 'CIBE_CitasProximos7Dias';
+
+
     //AV_InOutBound__c picklist values
 	
 	public static final String INOUTBOUND_ENTRADA = '002';  //Empleado
@@ -210,6 +230,16 @@ public with sharing class CIBE_AppConstants {
 	public static final String ORIGEN_ACT_MURO = 'AV_Muro';   
 	public static final String ORIGEN_ACT_STOPGO = 'AV_R2B';   
     public static final String ORIGEN_ACT_ON_BOARDING = 'AV_OnBoarding';  
-    public static final String ORIGEN_ACT_OP_PENDIENTE_FIRMA = 'CIBE_OperacionesPendientesFirma';  
+    public static final String ORIGEN_ACT_OP_PENDIENTE_FIRMA = 'CIBE_OperacionesPendientesFirma'; 
+    
+    //CIBE_Negocio User Values
+    public static final String NEGOCIO_INSTI = 'Institutional Banking';  
+    public static final String NEGOCIO_RESTRINGIDO = 'Restringido';  
+	public static final String NEGOCIO_TOTAL = 'Total';
+    
+    //User CBK Tech
+    public static final String CBK_TECH = '@caixabanktech.com';
 
+	//Other Constants
+    public static final String SINGESTOR_EAP_CENTRO = 'No asignado - CENTRO ';
 }

@@ -90,10 +90,7 @@ public without sharing class SAC_MilestoneTimeCalculator implements Support.Mile
                 }
                 
                 //Calculamos la fecha final del SLA regulatorio
-                System.debug('mesesAnadir ' + mesesAnadir);
-                System.debug('fechaInicial ' + fechaInicial);
                 fechaFin = fechaInicial.addMonths(mesesAnadir);
-                System.debug('fechaFin ' + fechaFin);
                 Boolean esDiaHabil = BusinessHours.isWithin(ideBH, fechaFin);
 
                 if(!esDiaHabil){//Si no entra en horario de BH necesitamos calcular el siguiente día hábil                    
@@ -264,6 +261,7 @@ public without sharing class SAC_MilestoneTimeCalculator implements Support.Mile
     public static Integer minutosHastaMedianoche(DateTime fecha) {
         // Calcula la fecha de medianoche del día actual
         DateTime medianoche = DateTime.newInstance(fecha.year(), fecha.month(), fecha.day(), 23, 59, 59);
+        
         // Calcula la diferencia en minutos entre la fecha dada y medianoche
         Long diferenciaMinutos = (medianoche.getTime() - fecha.getTime()) / (1000 * 60);
         // Convierte la diferencia en minutos a un valor absoluto

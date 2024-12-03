@@ -76,9 +76,6 @@ public with sharing class CC_Int_AltaCitaGestor {
             HTTPResponse respuesta = http.send(req);
             statusCode = String.valueOf(respuesta.getStatusCode());
             salida = String.valueOf(respuesta.getBody());
-
-            System.debug('CC_Int_AltaCitaGestor - Respuesta status code: '+respuesta.getStatusCode());
-            System.debug('CC_Int_AltaCitaGestor - Respuesta body: '+respuesta.getBody());
             
             if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200){
                 RespuestaAltaContacto resultadoAltaContacto = (RespuestaAltaContacto) System.JSON.deserialize(respuesta.getBody(), RespuestaAltaContacto.class);
@@ -113,21 +110,17 @@ public with sharing class CC_Int_AltaCitaGestor {
                     tarea.Type = 'Cita gestor';
                     insert tarea;
                     CBK_Activity_Extension__c tareaExtension = new CBK_Activity_Extension__c();
-                    String tipo = medio == String.valueOf(42) ? 'Entrevista' : 'Llamada telefónica';
-                    tareaExtension.CC_Tipo_de_cita__c = tipo;
+                    tareaExtension.CC_Tipo_de_cita__c = medio == String.valueOf(42) ? 'Cita presencial' : 'Cita telefónica';
                     tareaExtension.AV_ActivityId__c = tarea.Id;
                     insert tareaExtension;
                     finOk = true;
                 }
-            }
-            else {
+            } else {
                 error = 'El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida.';
                 salida = String.valueOf(resultadoAltaCitaGestor.get('resultat'));
                 finOk = false;
                 throw new DefaultException('El proceso de consulta de alta de cita ha funcionado pero no se ha obtenido una respuesta válida. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
             }
-            System.debug('CC_Int_AltaCitaGestor - Respuesta status code: '+respuesta.getStatusCode());
-            System.debug('CC_Int_AltaCitaGestor - Respuesta body: '+respuesta.getBody());
         }
         CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_Int_ObtInfCarterizaCliente', endpoint, statusCode, entrada, error, salida, finOK);
         if(traza != null){

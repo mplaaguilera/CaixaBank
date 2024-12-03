@@ -98,7 +98,7 @@ public with sharing class SAC_Contratos_Controller {
         ResponseData response = new ResponseData();
         List<CustomerContrato> lstContratosMostrar = new List<CustomerContrato>();
         List<String> lstCodProductos = new List<String>();
-        
+
         Case reclamacion = [Select Account.CC_NumPerso__c from Case where id = :idRegistro limit 1];
 
         if(reclamacion != null && reclamacion.Account.CC_NumPerso__c != null){

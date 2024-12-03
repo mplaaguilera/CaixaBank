@@ -8,11 +8,13 @@ Historial
 -----------------------------------------------------------------------------------------------------------------------
 VERSION  USER_STORY       AUTHOR           DATE          Description
 1.0      US365180         Víctor Santiago  12/04/2022    Init version
+1.1      FIX28080841     Oscar Moreno      02/09/2024          Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
-global class AV_CheckOnOff_Queueable implements Queueable, Database.AllowsCallouts {
+public class AV_CheckOnOff_Queueable implements Queueable, Database.AllowsCallouts {
     
-    global static final String BATCHNAME = 'AV_CheckOnOff_Queueable';
+    public static final String BATCHNAME = 'AV_CheckOnOff_Queueable';
     private static final String SUFFIX_EXTERNALID = 'Opp-';
     
     
@@ -68,8 +70,7 @@ global class AV_CheckOnOff_Queueable implements Queueable, Database.AllowsCallou
          this.dateExternalId = externalId;
     }
     
-    global void execute(System.QueueableContext qc) {
-        System.debug('AV_CheckOnOff_Queueable ');
+    public void execute(System.QueueableContext qc) {
         System.debug(qc);
         if(this.deleteTareaOpp != null && !this.deleteTareaOpp.isEmpty()) {
             Database.delete(this.deleteTareaOpp, false);

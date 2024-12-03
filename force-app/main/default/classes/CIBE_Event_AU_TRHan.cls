@@ -26,14 +26,16 @@ public class CIBE_Event_AU_TRHan extends CC_TriggerHandlerBase{
 		if (listData!=null && !listData.isEmpty()){
 			CIBE_EventTriggerHelper.updateHeaderCustomActivityExtId(listData, mapOldObj);
 			CIBE_EventTriggerHelper.updateAccessList(listData, mapOldObj);
+			CIBE_EventTriggerHelper.updateNextMeetingDate(listData, mapOldObj, null);
 		}
 
 		if (listDataWithoutOutlook!=null && !listDataWithoutOutlook.isEmpty()){
 			CIBE_EventTriggerHelper.syncEvents(listDataWithoutOutlook, mapOldObj);
-			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
-			if (!hasCustomPermission && !System.isbatch()){
-				CIBE_EventTriggerHelper.updateNextManagementDateOpp(listDataWithoutOutlook, mapOldObj);
-			}
+			// Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
+			// if (!hasCustomPermission && !System.isbatch()){
+			// 	CIBE_EventTriggerHelper.updateNextManagementDateOpp(listDataWithoutOutlook, mapOldObj);
+				
+			// }
 		}
 	}
 }

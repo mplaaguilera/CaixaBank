@@ -53,20 +53,20 @@ public class SIR_cls_WS_altaAccionWorkflowTest {
             update accion;
             listAccion.add(accion);
             // alta catalogo accion
-            SIR_CatalogoSirec__c catalogoA = new SIR_CatalogoSirec__c(
+            SIREC__SIREC_obj_Catalogo__c  catalogoA = new SIREC__SIREC_obj_Catalogo__c (
 				Name = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL,
-            	SIR_Descripcion__c = SIR_Constantes.ACCION_TIPO_LLAMADA_EMITIDA, 
-                SIR_Codigo__c = accion.SIREC__SIREC_fld_tipo__c+'|A|'+accion.SIREC__SIREC_fld_accion__c,
-                SIR_MasterRecordId__c = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL+'|'+accion.SIREC__SIREC_fld_tipo__c+'|A|'+accion.SIREC__SIREC_fld_accion__c
+            	SIREC__SIREC_fld_Descripcion__c = SIR_Constantes.ACCION_TIPO_LLAMADA_EMITIDA, 
+                SIREC__SIREC_fld_Codigo__c = accion.SIREC__SIREC_fld_tipo__c+'|A|'+accion.SIREC__SIREC_fld_accion__c,
+                SIREC__SIREC_fld_MasterRecordId__c   = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL+'|'+accion.SIREC__SIREC_fld_tipo__c+'|A|'+accion.SIREC__SIREC_fld_accion__c
             
 			);
             insert catalogoA;
             // alta catalogo respuesta
-            SIR_CatalogoSirec__c catalogoR = new SIR_CatalogoSirec__c(
+            SIREC__SIREC_obj_Catalogo__c  catalogoR = new SIREC__SIREC_obj_Catalogo__c (
                 Name = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL,
-                SIR_Descripcion__c = SIR_Constantes.ACCION_TIPO_LLAMADA_EMITIDA, 
-                SIR_Codigo__c = accion.SIREC__SIREC_fld_tipo__c+'|R|'+accion.SIREC__SIREC_fld_resultado__c,
-                SIR_MasterRecordId__c = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL+'|'+accion.SIREC__SIREC_fld_tipo__c+'|R|'+accion.SIREC__SIREC_fld_resultado__c
+                SIREC__SIREC_fld_Descripcion__c = SIR_Constantes.ACCION_TIPO_LLAMADA_EMITIDA, 
+                SIREC__SIREC_fld_Codigo__c = accion.SIREC__SIREC_fld_tipo__c+'|R|'+accion.SIREC__SIREC_fld_resultado__c,
+                SIREC__SIREC_fld_MasterRecordId__c   = SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL+'|'+accion.SIREC__SIREC_fld_tipo__c+'|R|'+accion.SIREC__SIREC_fld_resultado__c
             );
             insert catalogoR;
             List<Object> lstResponse;

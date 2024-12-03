@@ -12,133 +12,84 @@ Historial
 ***********************************************************************************************************************/
 @isTest
 public with sharing class CIBE_Path_Opportunity_Controller_Test {
-    @isTest
-    private static void testGetRecordTypeVerificationAccionComercial() {
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
 
-        //Create a new opportunity
-        Opportunity testingOpportunity = CIBE_TestHelper.createOpportunity(testingAccount);
-        Id idOfRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Acción Comercial CIB').getRecordTypeId();
-        testingOpportunity.RecordTypeId = idOfRecordType;
-        //Insert the opportunity
-        update testingOpportunity;
-        
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-        Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(testingOpportunity.Id);
-        Test.stopTest();        //Verify if the result is true
-        System.assertEquals(true, result);
+    @TestSetup
+    static void makeData(){
+
+        ID rtOpp = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.OPP_INICIATIVAEMP_RT).getRecordTypeId();
+        ID rtOppCIB = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.OPP_INICIATIVACIB_RT).getRecordTypeId();
+
+
+        CIBE_TestInitialSetup.setupInitialDataCIB();
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor' AND CreatedDate = Today ];
+        List<Opportunity> listaOpp = new List<Opportunity>();
+
+        Account acc = CIBE_TestHelper.createCustomer(usuario);
+        Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
+
+        Opportunity opp = new Opportunity();
+            opp.ownerId = usuario.Id;
+            opp.RecordTypeId = rtOppCIB;
+            opp.CloseDate = System.today();
+            opp.AccountId = acc.Id;
+            opp.Name = 'Alerta Comercial Test';
+            opp.StageName = 'En curso';
+            opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+            opp.AV_PF__c = prodPF.Id;
+
+
+        Opportunity opp2 = new Opportunity();
+            opp2.ownerId = usuario.Id;
+            opp2.RecordTypeId = rtOpp;
+            opp2.CloseDate = System.today();
+            opp2.AccountId = acc.Id;
+            opp2.Name = 'Alerta Comercial Test2';
+            opp2.StageName = 'En curso';
+            opp2.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+            opp2.AV_PF__c = prodPF.Id;
+
+        listaOpp.add(opp); 
+        listaOpp.add(opp2); 
+        insert  listaOpp;
+
     }
 
     @isTest
-    private static void testGetRecordTypeVerificationIniciativaEmpleadoCIB() {
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
+    public static void validateCIB() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor' AND CreatedDate = Today ];
 
-        //Create a new opportunity
-        Opportunity testingOpportunity = CIBE_TestHelper.createOpportunity(testingAccount);
-        //Insert the opportunity
-        Id idOfRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Iniciativa Empleado CIB').getRecordTypeId();
-        testingOpportunity.RecordTypeId = idOfRecordType;
-        update testingOpportunity;
-
-
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-        Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(testingOpportunity.Id);
-        Test.stopTest();        //Verify if the result is true
-        System.assertEquals(true, result);
+        System.runAs(usuario) {
+			Test.startTest();
+            List<Opportunity> listOoppCIB = [SELECT id FROM Opportunity WHERE Name = 'Alerta Comercial Test' LIMIT 1];
+            System.assertEquals(1, listOoppCIB.size());
+            Boolean oppCIB = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(listOoppCIB[0].Id);
+            System.assertEquals(true, oppCIB);
+            
+            List<Opportunity> listOoppEMP = [SELECT id FROM Opportunity WHERE Name = 'Alerta Comercial Test2' LIMIT 1];
+            System.assertEquals(1, listOoppEMP.size());
+            Boolean oppCEMP = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(listOoppEMP[0].Id);
+            System.assertEquals(false, oppCEMP);
+		}
+        
     }
 
     @isTest
-    private static void testGetRecordTypeVerificationSugerencia() {
-      
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
+    public static void validateEMP() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor' AND CreatedDate = Today ];
 
-        //Create a new opportunity
-        Opportunity testingOpportunity = CIBE_TestHelper.createOpportunity(testingAccount);
-        Id idOfRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Sugerencia CIB').getRecordTypeId();
-        testingOpportunity.RecordTypeId = idOfRecordType;
-        //Insert the opportunity
-        update testingOpportunity;
+        System.runAs(usuario) {
+			Test.startTest();
+            List<Opportunity> listOoppCIB = [SELECT id FROM Opportunity WHERE Name = 'Alerta Comercial Test' LIMIT 1];
+            System.assertEquals(1, listOoppCIB.size());
+            Boolean oppCIB = CIBE_Path_Opportunity_Controller.oppEmp(listOoppCIB[0].Id);
+            System.assertEquals(false, oppCIB);
+            
+            List<Opportunity> listOoppEMP = [SELECT id FROM Opportunity WHERE Name = 'Alerta Comercial Test2' LIMIT 1];
+            System.assertEquals(1, listOoppEMP.size());
+            Boolean oppCEMP = CIBE_Path_Opportunity_Controller.oppEmp(listOoppEMP[0].Id);
+            System.assertEquals(true, oppCEMP);
+		}
         
-
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-        Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(testingOpportunity.Id);
-        Test.stopTest();        //Verify if the result is true
-        System.assertEquals(true, result);
-    }
-
-    @isTest
-    private static void testGetRecordTypeVerificationAlerta() {
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
-
-        //Create a new opportunity
-        Opportunity testingOpportunity = CIBE_TestHelper.createOpportunity(testingAccount);
-        Id idOfRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Alerta Comercial CIB').getRecordTypeId();
-        testingOpportunity.RecordTypeId = idOfRecordType;
-
-        //Insert the opportunity
-        update testingOpportunity;
-        
-
-
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-        Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(testingOpportunity.Id);
-        Test.stopTest();        //Verify if the result is true
-        System.assertEquals(true, result);
-    }
-
-    
-    @isTest
-    private static void testGetRecordTypeVerificationWrongType() {
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
-
-        //Create a new opportunity
-        Opportunity testingOpportunity = CIBE_TestHelper.createOpportunity(testingAccount);
-        Id idOfRecordType = Schema.SObjectType.Opportunity.getRecordTypeInfosByName().get('Alerta Comercial EMP').getRecordTypeId();
-        testingOpportunity.RecordTypeId = idOfRecordType;
-
-        //Insert the opportunity
-        update testingOpportunity;
-        
-
-
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-            Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification(testingOpportunity.Id);
-        Test.stopTest();
-        //Verify if the result is true
-        System.assertEquals(false, result);
-    }
-    
-    @isTest
-    private static void testGetRecordTypeVerificationWrongTypeAndNoOpportunity() {
-        //Create a new account
-        Account testingAccount = CIBE_TestHelper.createCustomer();
-        //Insert the account
-
- 
-        
-
-
-        //Call the method getRecordTypeVerification with the opportunity id
-        Test.startTest();
-            Boolean result = CIBE_Path_Opportunity_Controller.getRecordTypeVerification('00000000P');
-        Test.stopTest();
-        //Verify if the result is true
-        System.assertEquals(null, result);
     }
 
 }

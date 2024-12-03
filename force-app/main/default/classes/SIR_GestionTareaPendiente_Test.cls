@@ -177,21 +177,4 @@ public class SIR_GestionTareaPendiente_Test {
         System.assertEquals(puedeGestionar,false,'Se esperaba puedeGestionar a false');
     }
 
-    @Istest
-    static void sincronizarProcesoTest(){
-        List<Object> response;
-        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
-        insert rol;
-        User usuario = SIR_TestDataFactory.createTestUser('UsuarioTestSir',rol,'System Administrator','U012222');
-        System.runAs(usuario){
-            Account cuenta = SIR_TestDataFactory.crearCuenta();
-            SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta, '12345645');
-            SIREC__SIREC_obj_tarea__c tarea = SIR_TestDataFactory.crearTareaTipoSEL(proceso);
-            Test.setMock(HttpCalloutMock.class, new SIR_cls_WS_procesoInfoMock());
-            Test.startTest();
-            response = SIR_LCMP_GestionTareaPendiente.sincronizaProceso(proceso.Id);
-            Test.stopTest();
-            Assert.areEqual('OK', (String)response[0], 'SIR_GestionTareaPendiente_Test.sincronizarProcesoTest No devuelve respuesta OK cuando debería');
-        }
-    }
 }

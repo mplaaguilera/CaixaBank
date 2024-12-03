@@ -16,7 +16,9 @@ public class AV_LinkOperativoController_Test {
     @TestSetup
 	static void setup() {
         User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-        String pea = 'Acceso operativa{|}https://tst.tf7.lacaixa.es/TF7WebUtilities/redirect/test';
+        String pea = 'Acceso operativa{|}https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/test';
+        String pea2 = '01{|}Acceso operativa{|}https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/test';
+        String pea3 = '02{|}Acceso operativa{|}https://google.com';
         
         System.runAs(usuario) {
             
@@ -28,12 +30,29 @@ public class AV_LinkOperativoController_Test {
 			AV_TestHelper.insertNeededPermissions(u);
             Task t = AV_TestHelper.createTarea(u);            
             Opportunity opp= AV_TestHelper.createOpportunity(customerTest);
-            opp.AV_PEA__c = pea;
+            opp.AV_PEA__c = pea2;
             t.AV_PEA__c=pea;
-            opp.AV_PEA2__c=pea;
+            opp.AV_PEA2__c=pea2;
             t.AV_PEA2__c=pea;
             update t;
             update opp;
+            Test.startTest();
+
+            RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKALERTACOM_RT);
+            Task tarea2  = new Task();
+            tarea2.Subject = 'Llamada Saliente Test';
+            tarea2.OwnerId = u.Id;
+            tarea2.Status = 'Pendiente no localizado';
+            tarea2.Priority = 'Normal';
+            tarea2.AV_ExternalID__c = '01928323';
+            tarea2.RecordTypeId = rt.Id;
+            tarea2.AV_PEA__c=pea3;
+            tarea2.AV_PEA2__c=pea3;
+            tarea2.ActivityDate = System.today()-3;
+            insert tarea2;
+            Test.stopTest();
+
+            
             
         }
 	}
@@ -80,6 +99,7 @@ public class AV_LinkOperativoController_Test {
         Account a= [SELECT id FROM Account WHERE AV_NumPerso__c = '123'];
         Task t = [SELECT id FROM Task WHERE Subject = 'Llamada Saliente'];
         Opportunity opp= [Select id FROM Opportunity WHERE Name = 'Alerta Comercial'];
+        Task t2 = [SELECT id FROM Task WHERE Subject = 'Llamada Saliente Test'];
         
         Test.startTest();
         System.runAs(us1){
@@ -87,11 +107,15 @@ public class AV_LinkOperativoController_Test {
         AV_LinkOperativoController.LinksOperativos loOpp = AV_LinkOperativoController.getOppLinkPEA(opp.Id, 'Opportunity','AV_PEA__c');
         AV_LinkOperativoController.LinksOperativos loTask2 = AV_LinkOperativoController.getOppLinkPEA(t.Id, 'Task','AV_PEA2__c');
         AV_LinkOperativoController.LinksOperativos loOpp2 = AV_LinkOperativoController.getOppLinkPEA(opp.Id, 'Opportunity','AV_PEA2__c');
+        AV_LinkOperativoController.LinksOperativos loTask3 = AV_LinkOperativoController.getOppLinkPEA(t2.Id, 'Task','AV_PEA__c');
+        AV_LinkOperativoController.LinksOperativos loTask4 = AV_LinkOperativoController.getOppLinkPEA(t2.Id, 'Task','AV_PEA2__c');
         Test.stopTest();
         System.assertNotEquals(loTask, null);
         System.assertNotEquals(loOpp, null);
         System.assertNotEquals(loTask2, null);
         System.assertNotEquals(loOpp2, null);
+        System.assertNotEquals(loTask3, null);
+        System.assertNotEquals(loTask3, null);
         }
     }
 

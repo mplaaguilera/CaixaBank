@@ -58,14 +58,14 @@ public class OS_Activity_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Case caso = [SELECT Id, ownerId, Status FROM Case WHERE Status = 'Rechazado' LIMIT 1];
-        System.assertEquals(0, [SELECT COUNT() FROM Task WHERE Type = 'Rechazado' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')]);
+        System.assertEquals(0, [SELECT Id FROM Task WHERE Type = 'Rechazado' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')].size());
         
         System.runAs (usuarioOperador) {
             Test.startTest();
             OS_Activity.crearActividad(caso.Id, caso.Status, 'Pruebas de actividad');
             Test.stopTest();
 
-            System.assertEquals(1, [SELECT COUNT() FROM Task WHERE Type = 'Rechazado' AND Subject = :caso.Status AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')]);
+            System.assertEquals(1, [SELECT Id FROM Task WHERE Type = 'Rechazado' AND Subject = :caso.Status AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')].size());
         }
     }
     
@@ -74,14 +74,14 @@ public class OS_Activity_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Case caso = [SELECT Id, ownerId, Status FROM Case WHERE Status = 'Rechazado' LIMIT 1];
-        System.assertEquals(0, [SELECT COUNT() FROM Task WHERE Type = 'Rechazado' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')]);
+        System.assertEquals(0, [SELECT Id FROM Task WHERE Type = 'Rechazado' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')].size());
         
         System.runAs (usuarioOperador) {
             Test.startTest();
         		OS_Activity.crearActividad(caso.Id, caso.Status, 'Pruebas','Pruebas de actividad', null);
             Test.stopTest();
 
-            System.assertEquals(1, [SELECT COUNT() FROM Task WHERE Type = 'Rechazado' AND Subject = 'Pruebas' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')]);
+            System.assertEquals(1, [SELECT Id FROM Task WHERE Type = 'Rechazado' AND Subject = 'Pruebas' AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')].size());
         }
     }
     
@@ -90,14 +90,14 @@ public class OS_Activity_Test {
         User usuarioOperador = [SELECT Id FROM User WHERE FirstName = 'OperadorOS' AND Profile.Name = 'OS_Operador' LIMIT 1];
 
         Case caso = [SELECT Id, OS_Alerta_Fecha__c, ownerId FROM Case WHERE Status = 'Pendiente Alerta' LIMIT 1];
-        System.assertEquals(0, [SELECT COUNT() FROM Event WHERE Type = 'Alerta programada']);
+        System.assertEquals(0, [SELECT Id FROM Event WHERE Type = 'Alerta programada'].size());
 
         System.runAs (usuarioOperador) {
             Test.startTest();
             OS_Activity.crearEvento(caso.Id, caso.OS_Alerta_Fecha__c, caso.ownerId, '');
             Test.stopTest();
 
-            System.assertEquals(1, [SELECT COUNT() FROM Event WHERE Type = 'Alerta programada']);
+            System.assertEquals(1, [SELECT Id FROM Event WHERE Type = 'Alerta programada'].size());
         }
     }
 
@@ -113,7 +113,7 @@ public class OS_Activity_Test {
             OS_Activity.borrarEvento(caso.Id, caso.OS_Alerta_Fecha__c);
             Test.stopTest();
 
-            System.assertEquals(0, [SELECT COUNT() FROM Event WHERE Type = 'Alerta programada' AND WhatId = :caso.Id]);
+            System.assertEquals(0, [SELECT Id FROM Event WHERE Type = 'Alerta programada' AND WhatId = :caso.Id].size());
         }
     }
 }

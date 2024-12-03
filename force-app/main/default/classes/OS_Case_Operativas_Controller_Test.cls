@@ -408,7 +408,7 @@ public class OS_Case_Operativas_Controller_Test {
 
         List<Case> caseList = new List<Case>();
         caseList.add(new Case(CC_Idioma__c = null));
-        caseList.add(new Case(Origin = 'Phone', CC_Detalles_Consulta__c= 'AAAAA', CC_Canal_Procedencia__c = 'Cajeros', CC_Tipo_Contacto__c = 'Avería',
+        caseList.add(new Case(Origin = 'Phone', CC_Detalles_Consulta__c= 'AAAAA', CC_Canal_Procedencia__c = 'Centralita', CC_Tipo_Contacto__c = 'Consulta',
         CC_MCC_Tematica__c = mccTematica.Id, CC_MCC_ProdServ__c = mccProducto.Id, CC_MCC_Motivo__c = mccMotivo.Id));
         insert caseList;
 

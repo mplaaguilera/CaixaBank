@@ -24,7 +24,8 @@ public class CIBE_HomeTareas7Dias_Controller_Test {
             Account acc = CIBE_TestHelper.createCustomer(usrGestor);
             RecordType rt = AV_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_TASK, CIBE_AppConstants.TASK_OTROS_EMP_RT);
             Task task = CIBE_TestHelper.createTareaOrigenApp(usrGestor, rt);
-           // task.AV_VisibleByLoggedUser__c = 'true';
+            task.Status = 'Open';
+            update task;
         }
     }
 
@@ -33,7 +34,13 @@ public class CIBE_HomeTareas7Dias_Controller_Test {
         User usuarioGe = [SELECT Id, name, AV_ExternalId__c FROM User WHERE profile.name = 'CIBE_Gestor' AND AV_ExternalID__c = 'U0009003' LIMIT 1];
         
         System.runAs(usuarioGe) {
-            Task task = [SELECT Id FROM Task WHERE ActivityDate >= LAST_N_DAYS:7 AND ActivityDate < TODAY AND RecordType.DeveloperName LIKE 'CIBE_OtrosEMP' AND Status in ('Open','Pendiente no localizado') AND AV_OrigenApp__c != 'AV_SalesforceTaskOpp' AND AV_VisibleByLoggedUser__c = true LIMIT 1];
+            Task task = [SELECT Id FROM Task WHERE 
+            ActivityDate >= LAST_N_DAYS:7 
+            AND ActivityDate < TODAY 
+            AND RecordType.DeveloperName LIKE 'CIBE_OtrosEMP'
+            AND Status in ('Open', 'No gestionada') 
+            AND AV_VisibleByLoggedUser__c = true 
+            LIMIT 1];
             Test.startTest();
             List<CIBE_HomeTareas7Dias_Controller.Wrapper> results = CIBE_HomeTareas7Dias_Controller.tasks();
             System.assert(!results.isEmpty());

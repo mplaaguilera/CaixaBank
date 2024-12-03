@@ -11,7 +11,7 @@
  * VERSION        USER_STORY       AUTHOR         DATE         Description
  * 1.0            US313245       Marcela Neira   21/01/22     Creación
 *****************************************************************/
-public with sharing class SAC_LCMP_InformacionCualitativa {
+public without sharing class SAC_LCMP_InformacionCualitativa {
      /*****************************************************************
      * Proposito: Busca la información incial (Caso y topics asignados) 
      *             y devuelve un Wrapper con la información para que el 

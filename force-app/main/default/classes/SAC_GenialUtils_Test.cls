@@ -764,7 +764,7 @@ public with sharing class SAC_GenialUtils_Test {
         casoReclamacion.SAC_FechaVencimientoSLA__c = System.today().addDays(15); // Fecha inicial arbitraria que asegure diferencia
         update casoReclamacion;
         DateTime actualTriggerTime;
-
+    
         System.runAs(usuario){
             Test.startTest();
             actualTriggerTime = SAC_GenialUtils.calculateMilestoneTriggerTime(casoReclamacion);

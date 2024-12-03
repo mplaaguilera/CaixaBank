@@ -13,37 +13,44 @@ Historial
     1.3			USXXXXXX		Sandra Gómez		22/11/2021			add FWK Batches
     1.4		    AV_Query IT		Daniel Rodríguez	3/02/2022			Change AV_Query to SOQL for User and Account
     1.5         US592987	    Ángel Medina		30/05/2023		    Changed AV_Query to SOQL queries
+    1.6			Fix error		Daniel Rodriguez	15/01/2024			Fix to null map
+	1.7         FIX28080841     Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.
 
+    
 ***********************************************************************************************************************/
-global class  AV_ProccessTasksOwnersBatch implements Database.Batchable<sObject>, Database.Stateful{
+public class  AV_ProccessTasksOwnersBatch implements Database.Batchable<sObject>, Database.Stateful{
     
-    global Integer recordsProcessed = 0;
-	global String limitBatch;
-	global Set<String> setUserIds;
+    public Integer recordsProcessed = 0;
+	public String limitBatch;
+	public Set<String> setUserIds;
     
-    global AV_ProccessTasksOwnersBatch(String limitQuery, Set<String> userId) {
+    public AV_ProccessTasksOwnersBatch(String limitQuery, Set<String> userId) {
 		limitBatch = limitQuery;
 		setUserIds = new Set<String>();
         setUserIds.addAll(userId);
     }
 
-    global AV_ProccessTasksOwnersBatch() {}
-	
+    public AV_ProccessTasksOwnersBatch(){}
+    
+    
 	/**
 	 * Get a list of Tasks to process the owners
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
         String methodName = 'start';
 		AV_LogDebug.printLogDebug(methodName, 'Batch limit: ' + limitBatch);
         AV_LogDebug.printLogDebug(methodName, 'List users ids: ' + setUserIds);
         
         Map<String, User> mapUsers = getUsers();
-        
         String avQuery = 'SELECT Id, AV_CodigoGestorAsignado__c, OwnerId FROM Task ';
 		avQuery += ' WHERE LastModifiedDate >= LAST_N_MONTHS:2 ';
-		avQuery += ' AND AV_CodigoGestorAsignado__c IN ' + AV_AppUtilities.setToStringIn(mapUsers.keySet());
+        if(!mapUsers.isEmpty() && mapUsers != null){
+			avQuery += ' AND AV_CodigoGestorAsignado__c IN ' + AV_AppUtilities.setToStringIn(mapUsers.keySet());
+        }else{
+            avQuery += ' AND AV_CodigoGestorAsignado__c IN ' + '(\'\')';
+        }
 		
 		if(String.isNotBlank(limitBatch)){
             avQuery += ' LIMIT ' + Integer.valueOf(limitBatch);
@@ -72,7 +79,7 @@ global class  AV_ProccessTasksOwnersBatch implements Database.Batchable<sObject>
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<Task> param with the list of Tasks
 	 */
-	global void execute(Database.BatchableContext bc, List<Task> scope){
+	public void execute(Database.BatchableContext bc, List<Task> scope){
         // Procesar cada batch de registros
 		String methodName = 'execute';
         try{
@@ -102,7 +109,7 @@ global class  AV_ProccessTasksOwnersBatch implements Database.Batchable<sObject>
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
         AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 
@@ -110,9 +117,7 @@ global class  AV_ProccessTasksOwnersBatch implements Database.Batchable<sObject>
 		params.put('limitBatch',limitBatch);
 		params.put('setUserIds',setUserIds);
 		CBK_BatchJob.executeBatch('AV_ProccessEventsOwnersBatch', 200 ,params); 
-        
-        //AV_ProccessEventsOwnersBatch eventBatch = new AV_ProccessEventsOwnersBatch(limitBatch, setUserIds);
-        //Database.executeBatch(eventBatch);
+
     }
 
 }

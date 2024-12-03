@@ -1,19 +1,22 @@
-/**********************************************************************************************************************
+/*************************************************************************************************************************************************************************************
 Name:	  CIBE_MetricChart_Controller
 Copyright © 2019  CaixaBank
------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Proposito: Clase controladora del componente "cibe_MetricChart"
------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Historial
----------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     VERSION     USER_STORY              AUTHOR              DATE            Description
 	1.0         US486064             	Ali y Bea         	01/09/2023      Init version
+	1.1			US746418				Bea					08/11/2023		Se añaden los metadataChart de "Citas en los próximos 7 días" y "Oportunidades en lo próximos 7 días"
 
-***********************************************************************************************************************/
+**************************************************************************************************************************************************************************************/
 public with sharing class CIBE_MetricChart_Controller {
 
     private static final String USER_ID_TAG = '#userId';
-	public static final String PERMISSION_SET_NAME = 'CIBE_ShowHomeV4';
+	private static final String OFICINA_ID_TAG = '#oficinaGestor';
+
+	// public static final String PERMISSION_SET_NAME = 'CIBE_ShowHomeV4';
 
 
     public class ChartData {
@@ -27,6 +30,7 @@ public with sharing class CIBE_MetricChart_Controller {
 		public List<Integer> numRecordsList;
 		@AuraEnabled
 		public Boolean hasLinkPermission;
+
     }
 
     /**
@@ -48,7 +52,19 @@ public with sharing class CIBE_MetricChart_Controller {
 			String queryString = chartConfig.AV_Data__c;
 			if(chartConfig.AV_Data__c.containsIgnoreCase(USER_ID_TAG)){
 				String userId = String.valueOf(UserInfo.getUserId());
-				queryString = chartConfig.AV_Data__c.replaceAll(USER_ID_TAG, userId);
+				queryString = chartConfig.AV_Data__c.replace(USER_ID_TAG, userId);
+			}
+
+			if(chartConfig.AV_Data__c.containsIgnoreCase(OFICINA_ID_TAG)){
+				String centroUser = [SELECT AV_Funcion__c, AV_NumeroOficinaEmpresa__c
+				FROM User WHERE Id = :UserInfo.getUserId()].AV_NumeroOficinaEmpresa__c;
+				if(centroUser != null){
+					String centroU = centroUser.split('-')[1];
+					queryString = queryString.replace(OFICINA_ID_TAG, centroU);
+				} else{
+					queryString = queryString.replace(OFICINA_ID_TAG, '');
+				}
+				
 			}
 
 			ChartData chart = new ChartData();
@@ -144,9 +160,10 @@ public with sharing class CIBE_MetricChart_Controller {
 			|| metadataChart == CIBE_AppConstants.CIBE_CLIENTES_GESTIONAR_PRIORIZADOS_EMP
 			|| metadataChart == CIBE_AppConstants.CIBE_EVENTOS_HOY
 			|| metadataChart == CIBE_AppConstants.CIBE_NOTIFICACIONES
+			|| metadataChart == CIBE_AppConstants.CIBE_OPPN7DAYS
+			|| metadataChart == CIBE_AppConstants.CIBE_CITAS_7DAYS
 			){
 				List<AggregateResult> sobjectList = Database.query(queryString);
-		
 				if(metadataChart == CIBE_AppConstants.CIBE_CLIENTES_GESTIONAR_PRIORIZADOS_EMP){
 					
 
@@ -180,18 +197,36 @@ public with sharing class CIBE_MetricChart_Controller {
 				else if(metadataChart == CIBE_AppConstants.CIBE_TAREAS_PROXIMOS_7DIAS_EMP){
 					
 					//Tareas proximos 7 días
+					// Integer numRtPriorizadosEMP = 0;
 					Integer numRtIniciativaEMP = 0;
-					
+					Integer numRtExpClienteEMP = 0;
+					// Integer numRtAlertaEMP = 0;
+					// Integer numRtOnboardingEMP = 0;
 					for(AggregateResult taskObject : sobjectList){
 
+						// if(taskObject.get('DeveloperName') == CIBE_AppConstants.TASK_PRIORIZADOS_EMP_RT){
+						// 	numRtPriorizadosEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);
+						// }
 						if(taskObject.get('DeveloperName') == CIBE_AppConstants.TASK_OTROS_EMP_RT){
-							numRtIniciativaEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);					
+								numRtIniciativaEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);
 						}
+						if(taskObject.get('DeveloperName') == CIBE_AppConstants.TASK_EXPERIENCIACLIENTE_EMP_RT){
+							numRtExpClienteEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);					
+						}
+						// if(taskObject.get('DeveloperName') == CIBE_AppConstants.TASK_ALERTACOMERCIAL_EMP_RT){
+						// 	numRtAlertaEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);
+						// }
+						// if(taskObject.get('DeveloperName') == CIBE_AppConstants.TASK_ONBOARDING_EMP_RT){
+						// 	numRtOnboardingEMP = (Integer) taskObject.get(CIBE_AppConstants.COUNT_RESULTS);
+						// }
 					}
 					
-					List<Integer> numList = new List<Integer>{numRtIniciativaEMP};
+					
+					// List<Integer> numList = new List<Integer>{ numRtPriorizadosEMP,numRtIniciativaEMP,numRtExpClienteEMP, numRtAlertaEMP, numRtOnboardingEMP};
+					List<Integer> numList = new List<Integer>{numRtIniciativaEMP,numRtExpClienteEMP};
 					chart.numRecordsList = numList;
-					chart.numRecords = (numRtIniciativaEMP);
+					// chart.numRecords = (numRtPriorizadosEMP + numRtIniciativaEMP + numRtExpClienteEMP + numRtAlertaEMP +   numRtOnboardingEMP );
+					chart.numRecords = (numRtIniciativaEMP + numRtExpClienteEMP);
 
 				}
 				// Avisos de hoy
@@ -208,21 +243,24 @@ public with sharing class CIBE_MetricChart_Controller {
 					chart.numRecordsList = numList;
 					chart.numRecords = (avisosEMP);
 					
-				}else if(metadataChart == CIBE_AppConstants.CIBE_EVENTOS_HOY ){
-
+				}else if(metadataChart == CIBE_AppConstants.CIBE_EVENTOS_HOY || metadataChart == CIBE_AppConstants.CIBE_CITAS_7DAYS){
 					Integer numEventosHoyCliente = 0;
 					Integer numEventosHoyGestor = 0;
+					
+					
 					for(AggregateResult activityObject : sobjectList){
 						if(activityObject.get('AV_InOutbound__c') == '001'){
 							numEventosHoyCliente = (Integer) activityObject.get(CIBE_AppConstants.COUNT_RESULTS);
-						}if(activityObject.get('AV_InOutbound__c') == '002'){
+						}
+						
+						if(activityObject.get('AV_InOutbound__c') == '002'){
 							numEventosHoyGestor = (Integer) activityObject.get(CIBE_AppConstants.COUNT_RESULTS);
 						}
 					}
 					List<Integer> numList = new List<Integer>{numEventosHoyCliente,numEventosHoyGestor};
+					
 					chart.numRecordsList = numList;
 					chart.numRecords = (numEventosHoyCliente+numEventosHoyGestor);
-
 				}
 				else if(metadataChart == CIBE_AppConstants.CIBE_NOTIFICACIONES ){
 
@@ -244,9 +282,38 @@ public with sharing class CIBE_MetricChart_Controller {
 					List<Integer> numList = new List<Integer>{numLlamadas, numMuro, numStopGo, numOpPendienteFirma};
 					chart.numRecordsList = numList;		
 					chart.numRecords = (numLlamadas + numMuro + numStopGo + numOpPendienteFirma);
+
+					//Opportunities next 7 days
+				}else if(metadataChart == CIBE_AppConstants.CIBE_OPPN7DAYS ){
+					// Integer iniEmpleado = 0;
+					// Integer alertaCom = 0;
+					// Integer accCom = 0;
+					// Integer sugerencia = 0;
+					Integer allOpp = 0;
+
+					
+					// for(AggregateResult opportunityObject : sobjectList){
+					// 	if(opportunityObject.get('DeveloperName') == CIBE_AppConstants.OPP_INICIATIVAEMP_RT ){
+					// 		iniEmpleado = (Integer) opportunityObject.get(CIBE_AppConstants.COUNT_RESULTS);
+					// 	}else if(opportunityObject.get('DeveloperName') == CIBE_AppConstants.OPP_ALERTAEMP_RT ){
+					// 		alertaCom = (Integer) opportunityObject.get(CIBE_AppConstants.COUNT_RESULTS);
+					// 	}else if(opportunityObject.get('DeveloperName') == CIBE_AppConstants.OPP_ACCIONEMP_RT){
+					// 		accCom = (Integer) opportunityObject.get(CIBE_AppConstants.COUNT_RESULTS);
+					// 	}else if(opportunityObject.get('DeveloperName') == CIBE_AppConstants.OPP_SUGERENCIAEMP_RT){
+					// 		sugerencia = (Integer) opportunityObject.get(CIBE_AppConstants.COUNT_RESULTS);
+					// 	}
+					// }
+					for(AggregateResult opportunityObject : sobjectList){
+						allOpp = (Integer) opportunityObject.get(CIBE_AppConstants.COUNT_RESULTS);
+					}
+					// List<Integer> numList = new List<Integer>{iniEmpleado, alertaCom, accCom, sugerencia};
+					List<Integer> numList = new List<Integer>{allOpp};
+					chart.numRecordsList = numList;		
+					// chart.numRecords = (iniEmpleado + alertaCom + accCom + sugerencia);
+					chart.numRecords = (allOpp);	
 				}
 			}
-			else{
+			else{	
 				chart.numRecords = Database.countQuery(queryString);
 			}
 
@@ -258,31 +325,33 @@ public with sharing class CIBE_MetricChart_Controller {
 
 			chart.title = String.isNotBlank(translations.get(chartConfig.Label)) ? translations.get(chartConfig.Label) : chartConfig.Label;
 			List<Report> rep = [SELECT Id FROM Report WHERE DeveloperName = :chartConfig.AV_ReportName__c];
-			if(rep.size() > 0)chart.reportId = rep != null ? rep[0].Id : null;
-			chart.hasLinkPermission = (FeatureManagement.checkPermission(CIBE_AppConstants.EXTENDEDHOME_LINK) && chartConfig.AV_Redirect__c);
+			if(!rep.isEmpty())chart.reportId = rep != null ? rep[0].Id : null;
+			// chart.hasLinkPermission = (FeatureManagement.checkPermission(CIBE_AppConstants.EXTENDEDHOME_LINK) && chartConfig.AV_Redirect__c);
+			chart.hasLinkPermission = (chartConfig.AV_Redirect__c);
 			return chart;
 		}
+
 		return null;
     }
 
-	@AuraEnabled(cacheable=true)
-	public static Boolean userHasPermissionSet() {
-		String userId = UserInfo.getUserId();
+	// @AuraEnabled(cacheable=true)
+	// public static Boolean userHasPermissionSet() {
+	// 	String userId = UserInfo.getUserId();
 
-		List<PermissionSetAssignment> permissionSetAssignments = [
-			SELECT Id, AssigneeId, PermissionSetId, PermissionSet.Name 
-			FROM PermissionSetAssignment 
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :PERMISSION_SET_NAME
-		];
+	// 	List<PermissionSetAssignment> permissionSetAssignments = [
+	// 		SELECT Id, AssigneeId, PermissionSetId, PermissionSet.Name 
+	// 		FROM PermissionSetAssignment 
+	// 		WHERE AssigneeId = :userId AND PermissionSet.Name = :PERMISSION_SET_NAME
+	// 	];
 
-		if (!permissionSetAssignments.isEmpty()) {
-		   // El usuario tiene asignado el Permission Set
-			return true;
-		} else {
-		   // El usuario no tiene asignado el Permission Set
-			return false;
-	}
-		}
+	// 	if (!permissionSetAssignments.isEmpty()) {
+	// 	   // El usuario tiene asignado el Permission Set
+	// 		return true;
+	// 	} else {
+	// 	   // El usuario no tiene asignado el Permission Set
+	// 		return false;
+	// 	}
+	// }
 	
 
 }

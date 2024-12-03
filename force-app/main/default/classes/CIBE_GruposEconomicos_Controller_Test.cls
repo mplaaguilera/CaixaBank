@@ -50,7 +50,7 @@ public class CIBE_GruposEconomicos_Controller_Test {
 
         
         User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
-      
+        
         FinServ__ReciprocalRole__c role = new FinServ__ReciprocalRole__c(
             Name = 'Parent',
             FinServ__InverseRole__c = 'Cliente'
@@ -76,6 +76,7 @@ public class CIBE_GruposEconomicos_Controller_Test {
             CIBE_TipoGrupo__c = '110'
         );
         insert accR2; 
+        
     }
     
     @isTest
@@ -88,10 +89,12 @@ public class CIBE_GruposEconomicos_Controller_Test {
         Test.StartTest();
         listEntry = CIBE_GruposEconomicos_Controller.getData(prueba.Id, '110');
         listEntry2 = CIBE_GruposEconomicos_Controller.getData(prueba2.Id, '110');
-        Test.StopTest();
 
-        System.assert(!listEntry.isEmpty());
-        System.assert(listEntry2.isEmpty());
+        System.runAs(usrTest){
+            System.assert(!listEntry.isEmpty());
+            System.assert(listEntry2.isEmpty());
+        }
+        Test.StopTest();
         
     }
 
@@ -105,11 +108,11 @@ public class CIBE_GruposEconomicos_Controller_Test {
         Test.StartTest();
         breadCrumbs = CIBE_GruposEconomicos_Controller.getParentsData(prueba2.Id, '110', 0, null);
         breadCrumbs2 =  CIBE_GruposEconomicos_Controller.getParentsData(prueba2.Id, '110', 0, breadCrumbs);  
+        System.runAs(usrTest){
+            System.assert(breadCrumbs.isEmpty());
+            System.assert(breadCrumbs2.isEmpty());
+        }
         Test.StopTest();
-        System.debug('breadCrumbs  -->' + breadCrumbs2);
-        System.debug('breadCrumbs2  -->' + breadCrumbs2);
-        System.assert(breadCrumbs.isEmpty());
-        System.assert(breadCrumbs2.isEmpty());
     }
 
     @isTest
@@ -117,11 +120,12 @@ public class CIBE_GruposEconomicos_Controller_Test {
         User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
         Account prueba2 = [SELECT Id FROM Account WHERE Name = 'Prueba sin Relacion'];
         List<List<CIBE_GruposEconomicos_Controller.Breadcrumb>> breadCrumbs = new  List<List<CIBE_GruposEconomicos_Controller.Breadcrumb>>();
-
         Test.StartTest();
         breadCrumbs = CIBE_GruposEconomicos_Controller.getParentsData(prueba2.Id, '110', 0, null);
+        System.runAs(usrTest){
+            System.assert(breadCrumbs.isEmpty());
+        }
         Test.StopTest();
-        System.debug('breadCrumbs  -->' + breadCrumbs);
-        System.assert(breadCrumbs.isEmpty());
+        
     }
 }

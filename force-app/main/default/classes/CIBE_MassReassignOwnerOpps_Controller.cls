@@ -1,14 +1,16 @@
-/**********************************************************************************************************************
+/******************************************************************************************************************************************
  Name:      CIBE_MassReassignOwnerOpps_Controller
  Copyright © 2022  CaixaBank
------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
 Proposito: Controller class for CIBE_MassReassignOwnerOpps_Controller LWC
------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
 Historial
----------------------
-	VERSION  USER_STORY			AUTHOR				DATE        Description
-	1.0      US380297			Luis Martínez		16/11/2022  Init version
-***********************************************************************************************************************/
+-------------------------------------------------------------------------------------------------------------------------------------------
+	VERSION  USER_STORY			AUTHOR				DATE        		Description
+	1.0      US380297			Luis Martínez		16/11/2022  		Init version
+	2.0		 US747476			Bea					07/12/2023			Added else if in method getOppsFilter for including All RT of EMP
+	2.1		 PPM100492394		Ángel Medina		21/10/2024			Change label Sin Gestor/EAP to No Asignado
+******************************************************************************************************************************************/
 public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 
 	private final static Integer MAX_RESULTS 	= 10;
@@ -32,6 +34,82 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 		}
 		return result;
 	}
+	@AuraEnabled
+	public static List<OptionsEmployee> getEmployeesOtherOffice(String officeFilterData){
+		List <Account> centerNumberOffParameter = [SELECT Id, CC_Numero_Oficina_Empresa__c FROM Account WHERE Recordtype.DeveloperName = 'CC_CentroCaixaBank' AND CC_Numero_Oficina__c = :officeFilterData];
+		List<String> centerNumbersComplete = new List<String>();
+		if(!centerNumberOffParameter.isEmpty()){
+			for(Account a : centerNumberOffParameter){
+				centerNumbersComplete.add(a.CC_Numero_Oficina_Empresa__c);
+			}
+		}
+		List <Account> centers = [SELECT Id, CC_Numero_Oficina__c, CC_Numero_Oficina_Empresa__c FROM Account WHERE Recordtype.DeveloperName = 'CC_CentroCaixaBank' AND CC_Numero_Oficina__c != :officeFilterData];
+		List<String> centerNumbers = new List<String>();
+		
+
+		if(!centers.isEmpty()){
+			for(Account a : centers){
+				centerNumbers.add(a.CC_Numero_Oficina__c);
+			}
+		}
+		List <Opportunity> opp = [SELECT Id, AV_Center__c, AV_Gestor__c FROM Opportunity WHERE AV_Center__c = :officeFilterData AND Owner.AV_NumeroOficinaEmpresa__c NOT IN :centerNumbersComplete AND RecordType.DeveloperName LIKE '%EMP' AND Owner.Name != 'No asignado'];
+		List <String> gestores = new List <String>();
+		if(!opp.isEmpty()){
+			for(Opportunity o : opp){
+				gestores.add(o.AV_Gestor__c);
+			}
+		}
+		
+		List <Contact> emplo = [SELECT Id, Name FROM Contact WHERE CC_Numero_Oficina__c IN :centerNumbers AND CC_Numero_Oficina__c != :officeFilterData  AND Id IN :gestores ];
+		List<OptionsEmployee> employees = new List<OptionsEmployee>();
+		
+		if(!emplo.isEmpty()){
+			for(Contact cont : emplo){
+				employees.add(new OptionsEmployee(cont.Id, cont.Name));
+			}
+		}
+		return employees;
+
+	}
+
+
+
+	@AuraEnabled
+	public static List<OptionsEmployee> getEmployeesEMP(String officeFilterData){
+		List<OptionsEmployee> employees = new List<OptionsEmployee>();
+		List<OptionsEmployee> employeesSorted = new List<OptionsEmployee>();
+		List<Id> employeesId = new List<Id>();
+		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
+		List<Profile> lstProfileId = [SELECT Id FROM Profile WHERE Name = :AV_AppConstants.AV_PROFILE OR Name = :CIBE_AppConstants.CIBE_GESTOR];
+
+		if (String.isNotBlank(officeFilterData)) {
+			String[] data = officeFilterData.split('\\{\\|}');
+			if (data.size() > 1) {
+				employees = getEmployeesOtherOffice(data[0]);
+
+			} else if (data.size() == 1) {
+				List<List<SObject>> searchResults = [FIND :officeFilterData IN ALL FIELDS 
+                RETURNING User(Id, Name, AV_NumeroOficinaEmpresa__c WHERE IsActive = true) LIMIT :MAX_LIMIT];
+				List<User> emps = (List<User>) searchResults[0];
+				if(!emps.isEmpty() && emps != null){
+					for(User u : emps){
+						employeesId.add(u.Id);
+						employeesSorted.add(new OptionsEmployee(u.Id,u.Name));
+					}
+				}
+			}
+		}
+		String employeesAlls=string.join(employeesId,',');
+		if(employeesId.size()>1) {
+			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO ' + officeFilterData.split('\\{\\|}')[0]));
+		}
+		employees.add(new OptionsEmployee(ID_GCF, CIBE_AppConstants.SINGESTOR_EAP_CENTRO + officeFilterData.split('\\{\\|}')[0]));
+		employeesSorted.sort();
+		employees.addAll(employeesSorted);
+		return employees;		
+	}
+
+
 
 	@AuraEnabled
 	public static List<OptionsEmployee> getEmployees(String officeFilterData){
@@ -55,6 +133,7 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 						employeesSorted.add(new OptionsEmployee((Id)opp.get('OwnerId'),(String)opp.get('Name')));
 					}
 				}
+
 			} else if (data.size() == 1) {
 				List<List<SObject>> searchResults = [FIND :officeFilterData IN ALL FIELDS 
                 RETURNING User(Id, Name, AV_NumeroOficinaEmpresa__c WHERE IsActive = true) LIMIT :MAX_LIMIT];
@@ -71,35 +150,34 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 		if(employeesId.size()>1) {
 			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO ' + officeFilterData.split('\\{\\|}')[0]));
 		}
-		employees.add(new OptionsEmployee(ID_GCF,'Sin Gestor / Eap - CENTRO ' + officeFilterData.split('\\{\\|}')[0]));
+		employees.add(new OptionsEmployee(ID_GCF, CIBE_AppConstants.SINGESTOR_EAP_CENTRO + officeFilterData.split('\\{\\|}')[0]));
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
 	}
 
 	private static ObjectList getOppsFilter(Date fechaCierreD,Date fechaCierreH, String[] filterList, String[] employeeFilter, String origenFilter, String statusFilter, String subjectFilter, String clientFilter, String page, String office, 
-	String targetProbabilidad, Double importeFilter ,String[] participesFilter) {
+String targetProbabilidad, Double importeFilter ,String[] participesFilter) {
 		String methodName = 'getOppsFilter';
 		Integer totalSize;
 		Id oppRecordTypeId;
-		User emp  = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c From User Where Id = :UserInfo.getUserId()];
 		Set<String> setLabelsRts = new Set<String>{CIBE_AppConstants.OPP_ACCIONEMP_RT,CIBE_AppConstants.OPP_SUGERENCIAEMP_RT,CIBE_AppConstants.OPP_ALERTAEMP_RT,CIBE_AppConstants.OPP_INICIATIVAEMP_RT};
-
-		//ERI
-		Set<Id> setIdsRts = AV_AppUtilities.getRecordTypeIdsInSet(setLabelsRts);
-		//OTM
+		List<RecordType> listRt = new List<RecordType>();
+        if(Schema.sObjectType.RecordType.isAccessible() && !setLabelsRts.isEmpty()){
+            listRT = [SELECT Id, DeveloperName from RecordType WHERE DeveloperName in :setLabelsRts AND SobjectType = 'Opportunity' WITH SECURITY_ENFORCED ];
+        }
+		Set<Id> setIdsRts = (new Map<Id,RecordType>(listRT)).keySet().clone();
 		List<OpportunityTeamMember> listaOtm = new List<OpportunityTeamMember>();
 		Set<Id> setIdsOP = new Set<Id>();
-
 		String childOtm=',(Select id, name, OpportunityId, CIBE_Centro__c from OpportunityTeamMembers)';
 		if(String.isBlank(origenFilter)){origenFilter =CIBE_AppConstants.OPP_INICIATIVAEMP_RT;}
-
-		oppRecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(origenFilter).getRecordTypeId();
-
-		if(participesFilter!=null && !participesFilter.isEmpty() ){
-			listaOtm  = [Select id, name, OpportunityId, userid from OpportunityTeamMember WHERE id IN:participesFilter OR user.name IN:participesFilter];
+		if (origenFilter != 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP'){
+			oppRecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(origenFilter).getRecordTypeId();
 		}
 		
+		if(participesFilter!=null && !participesFilter.isEmpty() ){
+			listaOtm  = [SELECT Id, Name, OpportunityId, UserId FROM OpportunityTeamMember WHERE Id IN:participesFilter OR User.Name IN:participesFilter];
+		}
 		Set<String> stageNull = new Set<String>{'Potencial', 'En curso'};
 		Set<String> setOppFields = new Set<String>{'Id', 'Name', 'AV_PF__c','AV_Product__c', 'AV_ClientProduct__c','AV_PF__r.Name',
 													'CIBE_Balance__c','Amount','CIBE_Comisiones__c',
@@ -113,36 +191,54 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 		String toLabelFields = 'TOLABEL(StageName), TOLABEL(AV_Potencial__c), TOLABEL(Account.AV_MyBox__c), TOLABEL(Account.AV_TargetAuto__c),TOLABEL(CIBE_ProbabilidadExito__c) ';
 		
 		query = 'SELECT ' + String.join(new List<String>(setOppFields), ',') + ', ' + toLabelFields + ''+childOtm+' FROM Opportunity WHERE AV_ToDelete__c = false';
-		
+		String aux;
 		if(subjectFilter != null){
+			aux= ' AND Name Like \'%' + subjectFilter + '%\'';
 			query += ' AND Name Like \'%' + subjectFilter + '%\'';
 		}
 		if(fechaCierreD != null){
 			Datetime dt = (DateTime) fechaCierreD;
+			aux = ' AND CloseDate  >= ' + dt.format('yyyy-MM-dd');
 			query += ' AND CloseDate  >= ' + dt.format('yyyy-MM-dd');
 		}
 		if(fechaCierreH != null){
 			Datetime dt2 = (DateTime) fechaCierreH;
+			aux = ' AND CloseDate <=' + dt2.format('yyyy-MM-dd');
 			query += ' AND CloseDate <=' + dt2.format('yyyy-MM-dd');
 		}
 		if(filterList != null && !filterList.isEmpty()){
+			aux = ' AND AV_PF__c IN ' + AV_AppUtilities.arrayToStringIn(filterList);
 			query += ' AND AV_PF__c IN ' + AV_AppUtilities.arrayToStringIn(filterList);
 		}
-		if(origenFilter != null){
+		if(origenFilter != null && origenFilter != 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP'){
+			aux = ' AND RecordType.Id = \'' + oppRecordTypeId + '\'';
 			query += ' AND RecordType.Id = \'' + oppRecordTypeId + '\'';
+		} else if (origenFilter != null && origenFilter == 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP') {
+			Set<String> setIdsRtsConComillas = new Set<String>();
+
+			for (String elemento : setIdsRts) {
+				setIdsRtsConComillas.add('\'' + elemento + '\'');
+			}
+			aux= ' AND RecordType.Id IN ' + setIdsRtsConComillas;
+			String nuevaCadena = aux.replace('{', '(').replace('}', ')');
+			query += nuevaCadena;			
 		} else {
 			query += ' AND RecordType.Id IN ' + setIdsRts;
 		}
 		if(clientFilter != null){
+			aux = ' AND AccountId = \'' + clientFilter + '\'';
 			query += ' AND AccountId = \'' + clientFilter + '\'';
 		}
 		if(!String.IsBlank(statusFilter) ){
+			aux = ' AND StageName = \'' + statusFilter + '\'';
 			query += ' AND StageName = \'' + statusFilter + '\'';
 		}
 		if(targetProbabilidad != null){
+			aux = ' AND CIBE_ProbabilidadExito__c = \'' + targetProbabilidad + '\'';
 			query += ' AND CIBE_ProbabilidadExito__c = \'' + targetProbabilidad + '\'';
 		}
 		if(importeFilter != null && importeFilter != 0){
+			aux = ' AND Amount > ' + importeFilter ;
 			query += ' AND Amount > ' + importeFilter ;
 		}
 		if(!listaOtm.isEmpty()) {
@@ -150,40 +246,139 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 			for(OpportunityTeamMember tm:listaOtm){
 				setOtm.add(tm.OpportunityId);
 			}
-			system.debug('setOtm: ' + setOtm);
+			aux = ' AND id IN '+AV_AppUtilities.arrayToStringIn(setOtm);
 			query = query + ' AND id IN '+AV_AppUtilities.arrayToStringIn(setOtm);
 		}
 		if(employeeFilter != null) {
 			if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1) {
+				aux = ' AND OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'';
 				query = query + ' AND OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'';
             } else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size()==1) {
+				aux = ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
 				query = query + ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
-            } else if (employeeFilter.contains(ID_GCF)) {
+			} else if (employeeFilter.contains(ID_GCF)) {
 				employeeFilter.remove(employeeFilter.indexOf(ID_GCF));
+				aux = ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter)+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
 				query = query + ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter)+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
             } else {
+				aux = ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
 				query = query + ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
             }
 		} else {
+			aux = ' AND AV_CodigoGestorAsignado__c = null';
 			query = query + ' AND AV_CodigoGestorAsignado__c = null';
 		}
+		aux = ' ORDER BY CloseDate ASC LIMIT ' + Integer.valueOf(page)*100 + ' OFFSET ' + (Integer.valueOf(page)-1)*100;
 		query += ' ORDER BY CloseDate ASC LIMIT ' + Integer.valueOf(page)*100 + ' OFFSET ' + (Integer.valueOf(page)-1)*100;
+
 		query = query.replaceAll('[{}]', '');
+
 		AV_LogDebug.printLogDebug(methodName, '-----> Query to execute: ' + query);
-		//totalSize = '1'.equals(page) ? getNumberOfOpps(fechaCierreD, fechaCierreH, filterList, employeeFilter, origenFilter, statusFilter, subjectFilter, clientFilter, page, office, targetProbabilidad,importeFilter,participesFilter) : -1;
-		//totalSize = '1'.equals(page) ? getNumberOfOpps(query) : -1;
-	
 		List<Opportunity> lista = capsulateQuery(query);
-		system.debug('lista: '+lista);
-		totalSize = '1'.equals(page) ? lista.size() : -1;
+		totalSize = getOpportunityCount(fechaCierreD,fechaCierreH,filterList,employeeFilter,origenFilter,statusFilter,subjectFilter,clientFilter,office,targetProbabilidad,importeFilter,setIdsRts,listaOtm);
 
 		return new ObjectList('Opportunity', totalSize, lista);
+	}
+
+	private static Integer getOpportunityCount(Date fechaCierreD,Date fechaCierreH, String[] filterList, String[] employeeFilter, String origenFilter, String statusFilter, String subjectFilter, String clientFilter, String office, 
+	String targetProbabilidad, Double importeFilter, Set<Id> setIdsRts, List<OpportunityTeamMember> listaOtm){
+		String oppRecordTypeId = '';
+		if (origenFilter != 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP'){
+			oppRecordTypeId = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(origenFilter).getRecordTypeId();
+		}
+		String query = 'SELECT COUNT(ID) total FROM Opportunity WHERE AV_ToDelete__c = false ';
+		String aux;
+		if(subjectFilter != null){
+            aux= ' AND Name Like \'%' + subjectFilter + '%\'';
+			query += ' AND Name Like \'%' + subjectFilter + '%\'';
+		}
+		if(fechaCierreD != null){
+			Datetime dt = (DateTime) fechaCierreD;
+            aux = ' AND CloseDate  >= ' + dt.format('yyyy-MM-dd');
+			query += ' AND CloseDate  >= ' + dt.format('yyyy-MM-dd');
+		}
+		if(fechaCierreH != null){
+			Datetime dt2 = (DateTime) fechaCierreH;
+            aux = ' AND CloseDate <=' + dt2.format('yyyy-MM-dd');
+			query += ' AND CloseDate <=' + dt2.format('yyyy-MM-dd');
+		}
+		if(filterList != null && !filterList.isEmpty()){
+            aux = ' AND AV_PF__c IN ' + AV_AppUtilities.arrayToStringIn(filterList);
+			query += ' AND AV_PF__c IN ' + AV_AppUtilities.arrayToStringIn(filterList);
+		}
+		if(origenFilter != null && origenFilter != 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP'){
+			aux = ' AND RecordType.Id = \'' + oppRecordTypeId + '\'';
+            query += ' AND RecordType.Id = \'' + oppRecordTypeId + '\'';
+		} else if (origenFilter != null && origenFilter == 'CIBE_IniciativaEmpleadoEMP,CIBE_AccionComercialEMP,CIBE_SugerenciaEMP,CIBE_AlertaComercialEMP') {
+			Set<String> setIdsRtsConComillas = new Set<String>();
+
+			for (String elemento : setIdsRts) {
+				setIdsRtsConComillas.add('\'' + elemento + '\'');
+			}
+            aux= ' AND RecordType.Id IN ' + setIdsRtsConComillas;
+			String nuevaCadena = aux.replace('{', '(').replace('}', ')');
+			query += nuevaCadena;
+			
+		} else {
+			query += ' AND RecordType.Id IN ' + setIdsRts;
+		}
+		if(clientFilter != null){
+            aux = ' AND AccountId = \'' + clientFilter + '\'';
+			query += ' AND AccountId = \'' + clientFilter + '\'';
+		}
+		if(!String.IsBlank(statusFilter) ){
+            aux = ' AND StageName = \'' + statusFilter + '\'';
+			query += ' AND StageName = \'' + statusFilter + '\'';
+		}
+		if(targetProbabilidad != null){
+            aux = ' AND CIBE_ProbabilidadExito__c = \'' + targetProbabilidad + '\'';
+			query += ' AND CIBE_ProbabilidadExito__c = \'' + targetProbabilidad + '\'';
+		}
+		if(importeFilter != null && importeFilter != 0){
+            aux = ' AND Amount > ' + importeFilter ;
+			query += ' AND Amount > ' + importeFilter ;
+		}
+		if(!listaOtm.isEmpty()) {
+			List<String> setOtm = new List<String>();
+			for(OpportunityTeamMember tm:listaOtm){
+				setOtm.add(tm.OpportunityId);
+			}
+            aux = ' AND id IN '+AV_AppUtilities.arrayToStringIn(setOtm);
+			query = query + ' AND id IN '+AV_AppUtilities.arrayToStringIn(setOtm);
+		}
+		if(employeeFilter != null) {
+			if (ID_GCF.equalsIgnoreCase(employeeFilter[0]) && employeeFilter.size()==1) {
+                aux = ' AND OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'';
+				query = query + ' AND OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'';
+            } else if (employeeFilter[0].contains(ID_GCF) && employeeFilter.size()==1) {
+				aux = ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
+                query = query + ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter[0].remove(ID_GCF+',').split(','))+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
+			} else if (employeeFilter.contains(ID_GCF)) {
+				employeeFilter.remove(employeeFilter.indexOf(ID_GCF));
+                aux = ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter)+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
+				query = query + ' AND (OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter)+' OR (OwnerId = \''+ID_GCF+'\' AND AV_Center__c =\''+office+'\'))';
+            } else {
+                aux = ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
+				query = query + ' AND OwnerId IN '+AV_AppUtilities.arrayToStringIn(employeeFilter);
+            }
+		} else {
+            aux = ' AND AV_CodigoGestorAsignado__c = null';
+			query = query + ' AND AV_CodigoGestorAsignado__c = null';
+		}
+
+		List<AggregateResult> result = capsulateCountQuery(query);
+
+		return (Integer) result[0].get('total');
 	}
 
 
 	
 	private static List<Opportunity> capsulateQuery(String q){//Método para pasar qualityClouds
 		return (List<Opportunity>) Database.query(q);
+	}
+
+	private static List<AggregateResult> capsulateCountQuery(String q){//Método para pasar qualityClouds
+		return (List<AggregateResult>) Database.query(q);
 	}
 
 	//Utilizado para buscador de oportunidades
@@ -343,7 +538,6 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 				LIMIT :MAX_RESULTS
 			];
 		}		
-		system.debug('searchResults: '+searchResults);
 		String productIcon = 'standard:account';
 		Account[] listAccount = (List<Account>) searchResults[0];
 		for (Account acc : listAccount) {
@@ -358,8 +552,6 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 			);
 		}
 		results.sort();
-		system.debug('results: '+results);
-
 		return results;
 	}
 
@@ -381,11 +573,8 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 		Account centroUsuario = [SELECT Id, Name, CC_Numero_Oficina__c, AV_CentroSuperior__c, CC_Numero_Oficina_Empresa__c
 								FROM Account
 								WHERE CC_Numero_Oficina_Empresa__c = :currentUser.AV_NumeroOficinaEmpresa__c ];
-		system.debug('currentUser: '+currentUser);
-		system.debug('centroUsuario: '+centroUsuario);
 	
 		if (String.isNotBlank(currentUser.AV_Funcion__c) && directores.contains(currentUser.AV_Funcion__c)) {
-				system.debug('1 if 2 query: ');
 				if(!Test.isRunningTest()){
 					searchResults = [FIND :searchT IN ALL FIELDS RETURNING
 					Account(Id, Name, CC_Numero_Oficina__c, CC_Numero_Oficina_Empresa__c WHERE Id IN :offices and RecordType.Id =: accRecordTypeId)
@@ -450,10 +639,8 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 				teamMembers.add(q);
 			}
 		}
-		System.debug('teamMembers: '+teamMembers);
 		String productIcon = 'standard:user';
 		for (OpportunityTeamMember p : teamMembers) {
-			System.debug('for teamMembers: '+p);
 			results.add(
 				new AV_LookupSearchResult(
 					p.id,
@@ -465,28 +652,66 @@ public without sharing class CIBE_MassReassignOwnerOpps_Controller {
 			);
 		}
 		results.sort();
-		system.debug('results: '+results);
 
 		return results;
 	}
 	@AuraEnabled
-	public static String assign(String objectName , String contactId, List<sObject> selectedRows){
+	public static String assign(String objectName , String contactId, List<String> selectedRowIds){
 		Database.DMLOptions dmlOptions = new Database.DMLOptions();
         dmlOptions.OptAllOrNone = false;
 		dmlOptions.EmailHeader.triggerUserEmail = false;
-		system.debug('objectName: '+objectName);
-		system.debug('contactId: '+contactId);
-		system.debug('selectedRows: '+selectedRows);
 
 		List<Opportunity> oppos = new List<Opportunity>();
-		for(sObject o : selectedRows){
-			String oId = o.get('Id').toString();
-			Opportunity oppo = new Opportunity(Id = oId, OwnerId = contactId);
+		for(String o : selectedRowIds){
+			Opportunity oppo = new Opportunity(Id = o, OwnerId = contactId);
 			oppos.add(oppo);
 		}
-		system.debug('oppos: '+oppos);
 
 		Database.SaveResult[] srList = Database.update(oppos, dmlOptions);
+		boolean hasError = false;
+		List<Object> objs = new List<Object>();
+		Map<String, String> msjs = new Map<String, String>();
+		for (Integer i = 0; i < oppos.size(); i++) {
+			Database.SaveResult sr = srList[i];
+			if(!sr.isSuccess() && !sr.getErrors().isEmpty()) {
+				msjs.put(oppos[i].Id + '_' + oppos[i].Name, ((String)sr.getErrors()[0].getMessage()));
+				objs.add(oppos[i]);
+				hasError = true;
+			}
+		}
+		if(hasError) {
+			CBK_Log.error(msjs, objs);
+		}
+		return String.valueOf(srList.size());
+	}
+
+	@AuraEnabled
+	public static String assign2(String contactId, List<String> selectedRows){
+		Database.DMLOptions dmlOptions = new Database.DMLOptions();
+        dmlOptions.OptAllOrNone = false;
+		dmlOptions.EmailHeader.triggerUserEmail = false;
+
+		List<Opportunity> oppos = new List<Opportunity>();
+		for(String o : selectedRows){
+			Opportunity oppo = new Opportunity(Id = o, OwnerId = contactId);
+			oppos.add(oppo);
+		}
+
+		Database.SaveResult[] srList = Database.update(oppos, dmlOptions);
+		boolean hasError = false;
+		List<Object> objs = new List<Object>();
+		Map<String, String> msjs = new Map<String, String>();
+		for (Integer i = 0; i < oppos.size(); i++) {
+			Database.SaveResult sr = srList[i];
+			if(!sr.isSuccess() && !sr.getErrors().isEmpty()) {
+				msjs.put(oppos[i].Id + '_' + oppos[i].Name, ((String)sr.getErrors()[0].getMessage()));
+				objs.add(oppos[i]);
+				hasError = true;
+			}
+		}
+		if(hasError) {
+			CBK_Log.error(msjs, objs);
+		}
 		return String.valueOf(srList.size());
 	}
 

@@ -17,15 +17,7 @@ public with sharing class CIBE_HomeTareas7Dias_Controller {
     public static List<Wrapper> tasks () {
         List<Wrapper> listReturn = new List<Wrapper>();
 
-        if(Task.SObjectType.getDescribe().isAccessible()
-            && Schema.SObjectType.Task.fields.Id.isAccessible()
-            && Schema.SObjectType.Task.fields.AV_Origen__c.isAccessible()
-            && Schema.SObjectType.Task.fields.Status.isAccessible()
-            && Schema.SObjectType.Task.fields.ActivityDate.isAccessible()
-            && Schema.SObjectType.Task.fields.Subject.isAccessible()
-            && Schema.SObjectType.Task.fields.AV_OrigenApp__c.isAccessible()
-            && Schema.SObjectType.Task.fields.AV_VisibleByLoggedUser__c.isAccessible()
-            && Schema.SObjectType.Task.fields.AV_ToDelete__c.isAccessible()) {
+        if(Task.SObjectType.getDescribe().isAccessible()) {
                 
             Map<String,String> pickListValuesMap = new Map<String,String>();
             for( Schema.PicklistEntry pickListVal : Task.Status.getDescribe().getPicklistValues()){
@@ -39,8 +31,8 @@ public with sharing class CIBE_HomeTareas7Dias_Controller {
                 }
             }
             for(Task task : [SELECT Id, Account.Name, AV_Origen__c, Subject, Status, ActivityDate FROM Task 
-                            WHERE (ActivityDate >= LAST_N_DAYS:7 AND ActivityDate < TODAY) AND RecordType.DeveloperName =: CIBE_AppConstants.TASK_OTROS_EMP_RT AND 
-                            Status in ('Open','Pendiente no localizado') AND AV_OrigenApp__c IN :pickListOrigen AND AV_VisibleByLoggedUser__c = true AND AV_ToDelete__c = false
+                            WHERE (ActivityDate >= LAST_N_DAYS:7 AND ActivityDate < TODAY) AND RecordType.DeveloperName LIKE '%EMP' AND 
+                            Status in ('Open', 'No gestionada') AND AV_OrigenApp__c IN :pickListOrigen AND AV_VisibleByLoggedUser__c = true AND AV_ToDelete__c = false
                             AND OwnerId =: userinfo.getUserId() 
                             ORDER BY ActivityDate DESC]) {
                 listReturn.add(

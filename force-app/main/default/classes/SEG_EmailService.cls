@@ -84,7 +84,7 @@ public with sharing class SEG_EmailService implements Messaging.InboundEmailHand
             FROM SEG_Buzon__mdt WHERE SEG_Email_SF__c = :envelope.toAddress  LIMIT 1];
 
             List<OS_Correo__mdt> buzonesOS = [SELECT OS_Email__c, OS_Cola_Procedencia__c, OS_Canal_Procedencia__c, OS_Correo__c, OS_Recordtype_Caso_Defecto__c
-            FROM OS_Correo__mdt];
+            FROM OS_Correo__mdt WHERE OS_Canal_Procedencia__c IN ('Buzón UAFE Express','Buzón UAFE')];
             List<String> direccionesOS = new List<String>();
             for (OS_Correo__mdt buzon : buzonesOS) {
                 direccionesOS.add(buzon.OS_Correo__c);

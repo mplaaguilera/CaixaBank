@@ -44,8 +44,11 @@ public with sharing class SIR_LCMP_GetProfileClient {
             String deudaPendiente =  null;
             String deudaVencida   =  null;
             String ingresosTotal  =  null;
+            // Comun
+            String importePP = null;  
+            String deudaRefinanciada = null;
             
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
                 SIREC__SIREC_obj_proceso__c[] procesoCliente =  [SELECT SIREC__SIREC_fld_cliente__c 
                                                             FROM SIREC__SIREC_obj_proceso__c 
                                                             WHERE Id =: recordId
@@ -55,63 +58,13 @@ public with sharing class SIR_LCMP_GetProfileClient {
                     clienteId = procesoCliente[0].SIREC__SIREC_fld_cliente__c;
                 }
             }
-            /*
-            if(clienteId != null){
-                if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
-                    SIREC__SIREC_obj_informacionCliente__c[] infoCliente = [SELECT tolabel(SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c), tolabel(SIREC__SIREC_fld_segmentoSiREC__c) , SIREC__SIREC_fld_saldPasivo__c,SIREC__SIREC_fld_ingresosTotal__c,
-                                                                        SIREC__SIREC_fld_ingresosNomina__c, SIREC__SIREC_fld_ingresosPension__c, SIREC__SIREC_fld_ingresosParo__c , SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_segmentoSiRECTexto__c,
-                                                                        SIREC__SIREC_fld_deudaVencidaTotal__c , SIREC__SIREC_fld_deudaPendienteTotal__c , SIREC__SIREC_fld_diasImpago__c ,SIREC__SIREC_fld_ciclosImpago__c,
-                                                                        SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c
-                                                                        FROM SIREC__SIREC_obj_informacionCliente__c
-                                                                        WHERE SIREC__SIREC_fld_cliente__c =:clienteId
-                                                                        LIMIT 1];
-
-                    if(infoCliente.size() > 0){
-                                                                   
-                        // Conversión a divisa 
-                        
-                        saldoPositivo  = valorConvert(infoCliente[0].SIREC__SIREC_fld_saldPasivo__c); 
-                        nomina         = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosNomina__c);
-                        pension        = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosPension__c);
-                        paro           = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosParo__c);
-                        deudaTotal     = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaTotal__c);                  
-                        deudaPendiente = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                  
-                        deudaVencida   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c);                        
-                        ingresosTotal   = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosTotal__c);
-                        List<SIR_CatalogoSirec__c> lstCatalogo = new List<SIR_CatalogoSirec__c>();
-                        if(SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible()){
-                            lstCatalogo = [SELECT SIR_Codigo__c, SIR_Descripcion__c FROM SIR_CatalogoSirec__c WHERE SIR_MasterRecordId__c = : SIR_Constantes.CATALOGO_PREFIJO_SEGMENTO + infoCliente[0].SIREC__SIREC_fld_segmentoSiRECTexto__c];
-                        }
-                        // Rellenar el Wrapper
-                        SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
-                        wrapperCabecera.persona 					= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
-                        wrapperCabecera.segmento                    = lstCatalogo.isEmpty() ? '' : lstCatalogo.get(0).SIR_Descripcion__c;
-                        wrapperCabecera.saldoPasivo                 = saldoPositivo;
-                        wrapperCabecera.ingresosNomina              = nomina;
-                        wrapperCabecera.ingresosPension             = pension;
-                        wrapperCabecera.ingresosParo                = paro;
-                        wrapperCabecera.deudaTotal 					= deudaTotal;
-                        wrapperCabecera.deudaPendienteVencer		= deudaPendiente;
-                        wrapperCabecera.deudaVencida			    = deudaVencida;
-                        wrapperCabecera.diasImpagoPeor				= infoCliente[0].SIREC__SIREC_fld_diasImpago__c;
-                        wrapperCabecera.numeroCliclos				= infoCliente[0].SIREC__SIREC_fld_numCiclosImpago__c;
-                        wrapperCabecera.numeroCiclosTotal			= infoCliente[0].SIREC__SIREC_fld_ciclosImpago__c;
-                        wrapperCabecera.prioridad					= infoCliente[0].SIREC__SIREC_fld_detaSolucion__c;
-                        wrapperCabecera.arquetipo					= infoCliente[0].SIREC__SIREC_fld_arquetipo__c;
-                        wrapperCabecera.capacidadDePago 			= infoCliente[0].SIREC__SIREC_fld_capacidadDePago__c;
-                        wrapperCabecera.motorSolucion 			    = infoCliente[0].SIREC__SIREC_fld_solucionMotor__c;
-                        wrapperCabecera.ingresosTotal 			    = ingresosTotal;
-                        
-                        wrapper.add(wrapperCabecera);
-                    }
-                }	
-            }       */ 
             SIREC__SIREC_obj_informacionCliente__c[] infoCliente;
-            if(clienteId != null && SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+            if(clienteId != null && Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
                     infoCliente = [SELECT tolabel(SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c), tolabel(SIREC__SIREC_fld_segmentoSiREC__c) , SIREC__SIREC_fld_saldPasivo__c,SIREC__SIREC_fld_ingresosTotal__c,
                                         SIREC__SIREC_fld_ingresosNomina__c, SIREC__SIREC_fld_ingresosPension__c, SIREC__SIREC_fld_ingresosParo__c , SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_segmentoSiRECTexto__c,
                                         SIREC__SIREC_fld_deudaVencidaTotal__c , SIREC__SIREC_fld_deudaPendienteTotal__c , SIREC__SIREC_fld_diasImpago__c ,SIREC__SIREC_fld_ciclosImpago__c,
-                                        SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c
+                                        SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c,
+                                        SIR_ImportePP__c, SIR_DeudaRefinanciada__c, tolabel(SIR_IndicadorProbationPeriod__c)
                                         FROM SIREC__SIREC_obj_informacionCliente__c
                                         WHERE SIREC__SIREC_fld_cliente__c =:clienteId
                                         LIMIT 1];
@@ -129,14 +82,16 @@ public with sharing class SIR_LCMP_GetProfileClient {
                 deudaPendiente = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                  
                 deudaVencida   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c);                        
                 ingresosTotal   = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosTotal__c);
-                List<SIR_CatalogoSirec__c> lstCatalogo = new List<SIR_CatalogoSirec__c>();
-                if(SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible()){
-                    lstCatalogo = [SELECT SIR_Codigo__c, SIR_Descripcion__c FROM SIR_CatalogoSirec__c WHERE SIR_MasterRecordId__c = : SIR_Constantes.CATALOGO_PREFIJO_SEGMENTO + infoCliente[0].SIREC__SIREC_fld_segmentoSiRECTexto__c];
+                importePP         = valorConvert(infoCliente[0].SIR_ImportePP__c);
+                deudaRefinanciada = valorConvert(infoCliente[0].SIR_DeudaRefinanciada__c);
+                List<SIREC__SIREC_obj_Catalogo__c > lstCatalogo = new List<SIREC__SIREC_obj_Catalogo__c >();
+                if(Schema.SObjectType.SIREC__SIREC_obj_Catalogo__c .isAccessible()){
+                    lstCatalogo = [SELECT  SIREC__SIREC_fld_Descripcion__c  FROM SIREC__SIREC_obj_Catalogo__c  WHERE SIREC__SIREC_fld_MasterRecordId__c = : SIR_Constantes.CATALOGO_PREFIJO_SEGMENTO + infoCliente[0].SIREC__SIREC_fld_segmentoSiRECTexto__c];
                 }
                 // Rellenar el Wrapper
                 SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
                 wrapperCabecera.persona 					= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
-                wrapperCabecera.segmento                    = lstCatalogo.isEmpty() ? '' : lstCatalogo.get(0).SIR_Descripcion__c;
+                wrapperCabecera.segmento                    = lstCatalogo.isEmpty() ? '' : lstCatalogo.get(0).SIREC__SIREC_fld_Descripcion__c ;
                 wrapperCabecera.saldoPasivo                 = saldoPositivo;
                 wrapperCabecera.ingresosNomina              = nomina;
                 wrapperCabecera.ingresosPension             = pension;
@@ -152,7 +107,9 @@ public with sharing class SIR_LCMP_GetProfileClient {
                 wrapperCabecera.capacidadDePago 			= infoCliente[0].SIREC__SIREC_fld_capacidadDePago__c;
                 wrapperCabecera.motorSolucion 			    = infoCliente[0].SIREC__SIREC_fld_solucionMotor__c;
                 wrapperCabecera.ingresosTotal 			    = ingresosTotal;
-                
+                wrapperCabecera.importePP 			        = importePP;
+                wrapperCabecera.deudaRefinanciada 			= deudaRefinanciada;
+                wrapperCabecera.indicadorPP 			    = infoCliente[0].SIR_IndicadorProbationPeriod__c;
                 wrapper.add(wrapperCabecera);
             }	
         }catch(exception e){
@@ -176,14 +133,12 @@ public with sharing class SIR_LCMP_GetProfileClient {
     @AuraEnabled(cacheable=true)
 	public static Map<String,List<SIR_WrapperCabecera>> wrapperCabeceraTabs(string recordId){
         String metodo = 'wrapperCabeceraTabs';
-
         Set<String> setSituaciones = new Set<String>{SIR_Constantes.PROCESO_SITUACION_FINALIZADO};
         Id recordTypeIdPRESOL = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId();
         Id recordTypeIdAmistoso = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId();
         
+        List<SIREC__SIREC_obj_proceso__c> procesosActivos = new List<SIREC__SIREC_obj_proceso__c>();	
         List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = new List<SIREC__SIREC_obj_informacionCliente__c>();
-        //List<SIREC__SIREC_obj_proceso__c> infoProcesoLst = new List<SIREC__SIREC_obj_proceso__c>();	
-        //List<SIREC__SIREC_obj_proceso__c> infoProcesoIMPA = new List<SIREC__SIREC_obj_proceso__c>();	
         List<SIREC__SIREC_obj_proceso__c> infoProcesoPRESOL = new List<SIREC__SIREC_obj_proceso__c>();	
         
         List<SIR_WrapperCabecera> wrapperIMPA = new List<SIR_WrapperCabecera>();
@@ -201,7 +156,6 @@ public with sharing class SIR_LCMP_GetProfileClient {
             String deudaTotal     =  null;
             String deudaPendiente =  null;
             String deudaVencida   =  null;
-
             //PRESOL
             String saldoActivo  =    null;
             String saldoPasivo  =    null;
@@ -209,49 +163,37 @@ public with sharing class SIR_LCMP_GetProfileClient {
             String deudaTotalPRESOL     =  null;
             String deudaPendientePRESOL =  null;
             String deudaVencidaPRESOL   =  null;
-            String circulante = null;
-            
+            String circulante = null;   
+            // Comun
+            String importePP = null;  
+            String deudaRefinanciada = null;       
 
             if(recordId != null){
-                //Se busca el registro de Informacion Cliente vinculado al Cliente
-                if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
-                    infoCliente = [SELECT tolabel(SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c), tolabel(SIREC__SIREC_fld_segmentoSiREC__c) , SIREC__SIREC_fld_saldPasivo__c,SIREC__SIREC_fld_ingresosTotal__c,
-                                   SIREC__SIREC_fld_ingresosNomina__c, SIREC__SIREC_fld_ingresosPension__c, SIREC__SIREC_fld_ingresosParo__c , SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_segmentoSiRECTexto__c,
-                                   SIREC__SIREC_fld_deudaVencidaTotal__c , SIREC__SIREC_fld_deudaPendienteTotal__c , SIREC__SIREC_fld_diasImpago__c ,SIREC__SIREC_fld_ciclosImpago__c,
-                                   SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c 
-                                   FROM SIREC__SIREC_obj_informacionCliente__c
-                                   WHERE SIREC__SIREC_fld_cliente__c =:recordId
-                                   LIMIT 1];
-                }
-
                 //Se buscan los registros de Procesos vinculados al Cliente
-                if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
-                    
-                    /*infoProcesoIMPA = [SELECT tolabel(SIREC__SIREC_fld_estrategia__c), SIR_SegmentoPRESOL__c, SIR_PrioridadPRESOL__c, SIR_MotivoInclusion__c, tolabel(SIR_IndEnvio3m__c),
+                if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()
+                    && Schema.SObjectType.Account.isAccessible() ){ 
+                    procesosActivos = [SELECT SIREC__SIREC_fld_descEstrategiaCatalogo__c, SIR_SegmentoPRESOL__c, SIR_PrioridadPRESOL__c, SIR_MotivoInclusion__c, tolabel(SIR_IndEnvio3m__c),
                                         SIR_ResGestion3m__c, SIR_RatingScoring__c, SIR_SaldoPasivoMedio__c, SIR_SaldoDispuesto__c, SIR_Circulante__c, SIR_DeudaTotal__c,
                                         SIR_DeudaPendienteDeVencer__c, SIR_DeudaVencidaImpagada__c, SIR_MaximoDiasImpago__c, SIR_FechaVtoCarenciaCBP__c, SIR_FechaVencimientoICO__c,
-                                        SIR_FechaVtoCarencia__c, SIR_FechaVtoCCR__c, SIR_AvisoCentralizado__c, SIR_TenenciaICO__c, SIR_AlertaPRESOL__c, RecordTypeId, SIREC__SIREC_fld_situacion__c
+                                        SIR_FechaVtoCarencia__c, SIR_FechaVtoCCR__c, SIR_AvisoCentralizado__c, SIR_TenenciaICO__c, SIR_AlertaPRESOL__c, RecordTypeId, SIREC__SIREC_fld_situacion__c, 
+                                        SIR_saldActivo__c, SIR_ProximaFechaCura__c, SIR_FechaEstimadaSalidaPP__c
                                         FROM SIREC__SIREC_obj_proceso__c
-                                        WHERE SIREC__SIREC_fld_cliente__c =:recordId 
-                                        AND RecordTypeId =: recordTypeIdAmistoso
-                                        LIMIT 1];*/
-
-                    infoProcesoPRESOL = [SELECT tolabel(SIREC__SIREC_fld_estrategia__c), SIR_SegmentoPRESOL__c, SIR_PrioridadPRESOL__c, SIR_MotivoInclusion__c, tolabel(SIR_IndEnvio3m__c),
-                                        SIR_ResGestion3m__c, SIR_RatingScoring__c, SIR_SaldoPasivoMedio__c, SIR_SaldoDispuesto__c, SIR_Circulante__c, SIR_DeudaTotal__c,
-                                        SIR_DeudaPendienteDeVencer__c, SIR_DeudaVencidaImpagada__c, SIR_MaximoDiasImpago__c, SIR_FechaVtoCarenciaCBP__c, SIR_FechaVencimientoICO__c,
-                                        SIR_FechaVtoCarencia__c, SIR_FechaVtoCCR__c, SIR_AvisoCentralizado__c, SIR_TenenciaICO__c, SIR_AlertaPRESOL__c, RecordTypeId, SIREC__SIREC_fld_situacion__c, SIR_saldActivo__c
-                                        FROM SIREC__SIREC_obj_proceso__c
-                                        WHERE SIREC__SIREC_fld_cliente__c =:recordId 
-                                        AND RecordTypeId =: recordTypeIdPRESOL
-                                        AND SIREC__SIREC_fld_situacion__c !=: SIR_Constantes.PROCESO_SITUACION_FINALIZADO
-                                        LIMIT 1];
-                }
-
-                  
-                //Proceso IMPA
-                if(!infoCliente.isEmpty()){
-                    //for(SIREC__SIREC_obj_proceso__c infoProceso : infoProcesoIMPA){
-                        //if(infoProceso.RecordTypeId == recordTypeIdAmistoso){
+                                        WHERE SIREC__SIREC_fld_cliente__c =:recordId  
+                                        AND (RecordTypeId =: recordTypeIdPRESOL OR RecordTypeId =: recordTypeIdAmistoso)                                
+                                        AND SIREC__SIREC_fld_situacion__c !=: SIR_Constantes.PROCESO_SITUACION_FINALIZADO];
+                    if(!procesosActivos.isEmpty()){
+                        // Hay procesos Activos
+                        // Se busca el registro de Informacion Cliente vinculado al Cliente
+                        infoCliente = [SELECT tolabel(SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c), tolabel(SIREC__SIREC_fld_segmentoSiREC__c), SIREC__SIREC_fld_saldPasivo__c, SIREC__SIREC_fld_ingresosTotal__c,
+                                    SIREC__SIREC_fld_ingresosNomina__c, SIREC__SIREC_fld_ingresosPension__c, SIREC__SIREC_fld_ingresosParo__c, SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_segmentoSiRECTexto__c,
+                                    SIREC__SIREC_fld_deudaVencidaTotal__c, SIREC__SIREC_fld_deudaPendienteTotal__c, SIREC__SIREC_fld_diasImpago__c, SIREC__SIREC_fld_ciclosImpago__c,
+                                    SIREC__SIREC_fld_numCiclosImpago__c, SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c, SIREC__SIREC_fld_capacidadDePago__c, SIREC__SIREC_fld_solucionMotor__c ,
+                                    SIR_ImportePP__c, SIR_DeudaRefinanciada__c, tolabel(SIR_IndicadorProbationPeriod__c)
+                                    FROM SIREC__SIREC_obj_informacionCliente__c
+                                    WHERE SIREC__SIREC_fld_cliente__c =:recordId
+                                    LIMIT 1]; 
+                        // Proceso IMPA
+                        if(!infoCliente.isEmpty()){                    
                             // Conversión a divisa 
                             saldoPositivo  = valorConvert(infoCliente[0].SIREC__SIREC_fld_saldPasivo__c); 
                             nomina         = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosNomina__c);
@@ -261,16 +203,18 @@ public with sharing class SIR_LCMP_GetProfileClient {
                             deudaPendiente = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                  
                             deudaVencida   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c);                        
                             ingresosTotal  = valorConvert(infoCliente[0].SIREC__SIREC_fld_ingresosTotal__c);
+                            importePP         = valorConvert(infoCliente[0].SIR_ImportePP__c);
+                            deudaRefinanciada = valorConvert(infoCliente[0].SIR_DeudaRefinanciada__c);
 
-                            List<SIR_CatalogoSirec__c> lstCatalogo = new List<SIR_CatalogoSirec__c>();
-                            if(SIR_CatalogoSirec__c.SObjectType.getDescribe().isAccessible()){
-                                lstCatalogo = [SELECT SIR_Codigo__c, SIR_Descripcion__c FROM SIR_CatalogoSirec__c WHERE SIR_MasterRecordId__c = : SIR_Constantes.CATALOGO_PREFIJO_SEGMENTO + infoCliente[0].SIREC__SIREC_fld_segmentoSiRECTexto__c];
+                            List<SIREC__SIREC_obj_Catalogo__c > lstCatalogo = new List<SIREC__SIREC_obj_Catalogo__c >();
+                            if(Schema.SObjectType.SIREC__SIREC_obj_Catalogo__c .isAccessible()){
+                                lstCatalogo = [SELECT SIREC__SIREC_fld_Descripcion__c  FROM SIREC__SIREC_obj_Catalogo__c  WHERE SIREC__SIREC_fld_MasterRecordId__c = : SIR_Constantes.CATALOGO_PREFIJO_SEGMENTO + infoCliente[0].SIREC__SIREC_fld_segmentoSiRECTexto__c];
                             }
                             //Creamos el Wrapper
                             SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
                             // Rellenar el Wrapper
                             wrapperCabecera.persona 					= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
-                            wrapperCabecera.segmento                    = lstCatalogo.isEmpty() ? '' : lstCatalogo.get(0).SIR_Descripcion__c;
+                            wrapperCabecera.segmento                    = lstCatalogo.isEmpty() ? '' : lstCatalogo.get(0).SIREC__SIREC_fld_Descripcion__c ;
                             wrapperCabecera.saldoPasivo                 = saldoPositivo;
                             wrapperCabecera.ingresosNomina              = nomina;
                             wrapperCabecera.ingresosPension             = pension;
@@ -286,67 +230,77 @@ public with sharing class SIR_LCMP_GetProfileClient {
                             wrapperCabecera.capacidadDePago 			= infoCliente[0].SIREC__SIREC_fld_capacidadDePago__c;
                             wrapperCabecera.motorSolucion 			    = infoCliente[0].SIREC__SIREC_fld_solucionMotor__c;
                             wrapperCabecera.ingresosTotal 			    = ingresosTotal;
+                            wrapperCabecera.importePP 			        = importePP;
+                            wrapperCabecera.deudaRefinanciada 			= deudaRefinanciada;
+                            wrapperCabecera.indicadorPP 			    = infoCliente[0].SIR_IndicadorProbationPeriod__c;                            
                             wrapperIMPA.add(wrapperCabecera);
-
                             wrapperMap.put('IMPA',wrapperIMPA);
-                        //}
-                    //}
-                }
-
-                //Proceso PRESOL
-                if(!infoProcesoPRESOL.isEmpty() && !infoCliente.isEmpty()){
-                    for(SIREC__SIREC_obj_proceso__c infoProceso : infoProcesoPRESOL){
-
-                        //Situacion Proceso no Finalizado
-                        if(infoProceso.SIREC__SIREC_fld_situacion__c != SIR_Constantes.PROCESO_SITUACION_FINALIZADO){
-                            // Conversión a divisa 
-                            saldoActivo    = valorConvert(infoProceso.SIR_saldActivo__c); 
-                            saldoPasivo    = valorConvert(infoProceso.SIR_SaldoPasivoMedio__c); 
-                            saldoDispuesto = valorConvert(infoProceso.SIR_SaldoDispuesto__c); 
-                            deudaTotalPRESOL     = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaTotal__c);                  
-                            deudaPendientePRESOL = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                 
-                            deudaVencidaPRESOL   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c);
-                            circulante =   valorConvert(infoProceso.SIR_Circulante__c);                      
-                    
-                            //Creamos el Wrapper
-                            SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
-                            // Rellenar el Wrapper
-                            wrapperCabecera.estrategiaPRESOL            = infoProceso.SIREC__SIREC_fld_estrategia__c;
-                            wrapperCabecera.personaPRESOL 				= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
-                            wrapperCabecera.segmentoPRESOL              = infoProceso.SIR_SegmentoPRESOL__c;
-                            wrapperCabecera.prioridadPRESOL             = infoProceso.SIR_PrioridadPRESOL__c;
-                            wrapperCabecera.motivoInclusion             = infoProceso.SIR_MotivoInclusion__c;
-                            wrapperCabecera.indEnvio                    = infoProceso.SIR_IndEnvio3m__c;
-                            wrapperCabecera.resGestion                  = infoProceso.SIR_ResGestion3m__c;
-                            if(infoProceso.SIR_RatingScoring__c != null){
-                                wrapperCabecera.rating                  = infoProceso.SIR_RatingScoring__c.format();
-                            } else {
-                                wrapperCabecera.rating = '';
-                            }
-                            wrapperCabecera.saldoActivo                 = saldoActivo;
-                            wrapperCabecera.saldoPasivoPRESOL           = saldoPasivo;
-                            wrapperCabecera.saldoDispuestoPRESOL        = saldoDispuesto;
-                            wrapperCabecera.circulante                  = circulante;
-                            wrapperCabecera.deudaTotalPRESOL            = deudaTotalPRESOL;
-                            wrapperCabecera.deudaPendienteVencerPRESOL  = deudaPendientePRESOL;
-                            wrapperCabecera.deudaVencidaPRESOL          = deudaVencidaPRESOL;
-                            wrapperCabecera.diasImpagoPeorPRESOL        = infoCliente[0].SIREC__SIREC_fld_diasImpago__c;
-                            wrapperCabecera.numeroCiclosPRESOL          = infoCliente[0].SIREC__SIREC_fld_numCiclosImpago__c;
-                            wrapperCabecera.numeroCiclosTotalPRESOL     = infoCliente[0].SIREC__SIREC_fld_ciclosImpago__c;
-                            wrapperCabecera.vtoCBP                      = infoProceso.SIR_FechaVtoCarenciaCBP__c;
-                            wrapperCabecera.vtoICO                      = infoProceso.SIR_FechaVencimientoICO__c;
-                            wrapperCabecera.vtoCarencia                 = infoProceso.SIR_FechaVtoCarencia__c;
-                            wrapperCabecera.vtoCCR                      = infoProceso.SIR_FechaVtoCCR__c;
-                            wrapperCabecera.aviso                       = infoProceso.SIR_AvisoCentralizado__c;
-                            wrapperCabecera.tenenciaICO                 = infoProceso.SIR_TenenciaICO__c;
-                            wrapperCabecera.alertaPRESOL                = infoProceso.SIR_AlertaPRESOL__c;
-                            wrapperPRESOL.add(wrapperCabecera);
-
-                            wrapperMap.put('PRESOL',wrapperPRESOL);
                         }
-
-                    }
-                }        	
+                       
+                        //Proceso PRESOL
+                        if(!procesosActivos.isEmpty() && !infoCliente.isEmpty()){
+                            for(SIREC__SIREC_obj_proceso__c infoProceso : procesosActivos){
+                                //Situacion Proceso no Finalizado
+                                if(infoProceso.SIREC__SIREC_fld_situacion__c != SIR_Constantes.PROCESO_SITUACION_FINALIZADO
+                                    && infoProceso.RecordTypeId == recordTypeIdPRESOL){
+                                    // Conversión a divisa 
+                                    saldoActivo    = valorConvert(infoProceso.SIR_saldActivo__c); 
+                                    saldoPasivo    = valorConvert(infoProceso.SIR_SaldoPasivoMedio__c); 
+                                    saldoDispuesto = valorConvert(infoProceso.SIR_SaldoDispuesto__c); 
+                                    deudaTotalPRESOL     = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaTotal__c);                  
+                                    deudaPendientePRESOL = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                 
+                                    deudaVencidaPRESOL   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c);
+                                    circulante =   valorConvert(infoProceso.SIR_Circulante__c);                    
+                                    // Creamos el Wrapper
+                                    SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
+                                    // Rellenar el Wrapper
+                                    wrapperCabecera.estrategiaPRESOL            = infoProceso.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
+                                    wrapperCabecera.personaPRESOL 				= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
+                                    wrapperCabecera.segmentoPRESOL              = infoProceso.SIR_SegmentoPRESOL__c;
+                                    wrapperCabecera.prioridadPRESOL             = infoProceso.SIR_PrioridadPRESOL__c;
+                                    wrapperCabecera.motivoInclusion             = infoProceso.SIR_MotivoInclusion__c;
+                                    wrapperCabecera.indEnvio                    = infoProceso.SIR_IndEnvio3m__c;
+                                    wrapperCabecera.resGestion                  = infoProceso.SIR_ResGestion3m__c;
+                                    if(infoProceso.SIR_RatingScoring__c != null){
+                                        wrapperCabecera.rating                  = infoProceso.SIR_RatingScoring__c.format();
+                                    } else {
+                                        wrapperCabecera.rating = '';
+                                    }
+                                    wrapperCabecera.saldoActivo                 = saldoActivo;
+                                    wrapperCabecera.saldoPasivoPRESOL           = saldoPasivo;
+                                    wrapperCabecera.saldoDispuestoPRESOL        = saldoDispuesto;
+                                    wrapperCabecera.circulante                  = circulante;
+                                    wrapperCabecera.deudaTotalPRESOL            = deudaTotalPRESOL;
+                                    wrapperCabecera.deudaPendienteVencerPRESOL  = deudaPendientePRESOL;
+                                    wrapperCabecera.deudaVencidaPRESOL          = deudaVencidaPRESOL;
+                                    wrapperCabecera.diasImpagoPeorPRESOL        = infoCliente[0].SIREC__SIREC_fld_diasImpago__c;
+                                    wrapperCabecera.numeroCiclosPRESOL          = infoCliente[0].SIREC__SIREC_fld_numCiclosImpago__c;
+                                    wrapperCabecera.numeroCiclosTotalPRESOL     = infoCliente[0].SIREC__SIREC_fld_ciclosImpago__c;
+                                    wrapperCabecera.vtoCBP                      = infoProceso.SIR_FechaVtoCarenciaCBP__c;
+                                    wrapperCabecera.vtoICO                      = infoProceso.SIR_FechaVencimientoICO__c;
+                                    wrapperCabecera.vtoCarencia                 = infoProceso.SIR_FechaVtoCarencia__c;
+                                    wrapperCabecera.vtoCCR                      = infoProceso.SIR_FechaVtoCCR__c;
+                                    wrapperCabecera.aviso                       = infoProceso.SIR_AvisoCentralizado__c;
+                                    wrapperCabecera.tenenciaICO                 = infoProceso.SIR_TenenciaICO__c;
+                                    wrapperCabecera.alertaPRESOL                = infoProceso.SIR_AlertaPRESOL__c;
+                                    wrapperCabecera.fechaProximaCura 		    = infoProceso.SIR_ProximaFechaCura__c;                                    
+                                    wrapperCabecera.importePP 			        = importePP;
+                                    wrapperCabecera.deudaRefinanciada 			= deudaRefinanciada;
+                                    wrapperCabecera.indicadorPP 			    = infoCliente[0].SIR_IndicadorProbationPeriod__c; 
+                                    wrapperCabecera.fechaEstimadaSalidaPP 		= infoProceso.SIR_FechaEstimadaSalidaPP__c;                                              
+                                    wrapperPRESOL.add(wrapperCabecera);
+                                    wrapperMap.put('PRESOL',wrapperPRESOL);
+                                }
+                            }
+                        }        	
+                    } else {
+                        // No hay procesos Activos
+                        SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
+                        List<SIR_WrapperCabecera> wrapperSinProcesos = new List<SIR_WrapperCabecera>();
+                        wrapperSinProcesos.add(wrapperCabecera);
+                        wrapperMap.put('NoProcesoActivo',wrapperSinProcesos);
+                    }                   
+                }
             }        
         }catch(exception e){
             CBK_log.error(e, 'Error : Clase Sir_lwc_cabeceraCliente - Método wrapperCabeceraTabs -- ' + e.getTypeName() + ': ' + e.getMessage());
@@ -387,13 +341,16 @@ public with sharing class SIR_LCMP_GetProfileClient {
             String deudaPendientePRESOL =  null;
             String deudaVencidaPRESOL   =  null;
             String circulante = null;
-
+            // Comun
+            String importePP = null;  
+            String deudaRefinanciada = null;
             
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
-                infoProceso = [SELECT SIREC__SIREC_fld_cliente__c, tolabel(SIREC__SIREC_fld_estrategia__c), SIR_SegmentoPRESOL__c, SIR_PrioridadPRESOL__c, SIR_MotivoInclusion__c, tolabel(SIR_IndEnvio3m__c),
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
+                infoProceso = [SELECT SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_descEstrategiaCatalogo__c, SIR_SegmentoPRESOL__c, SIR_PrioridadPRESOL__c, SIR_MotivoInclusion__c, tolabel(SIR_IndEnvio3m__c),
                                    SIR_ResGestion3m__c, SIR_RatingScoring__c, SIR_SaldoPasivoMedio__c, SIR_SaldoDispuesto__c, SIR_Circulante__c, SIR_DeudaTotal__c,
                                    SIR_DeudaPendienteDeVencer__c, SIR_DeudaVencidaImpagada__c, SIR_MaximoDiasImpago__c, SIR_FechaVtoCarenciaCBP__c, SIR_FechaVencimientoICO__c,
-                                   SIR_FechaVtoCarencia__c, SIR_FechaVtoCCR__c, SIR_AvisoCentralizado__c, SIR_TenenciaICO__c, SIR_AlertaPRESOL__c, SIR_saldActivo__c
+                                   SIR_FechaVtoCarencia__c, SIR_FechaVtoCCR__c, SIR_AvisoCentralizado__c, SIR_TenenciaICO__c, SIR_AlertaPRESOL__c, SIR_saldActivo__c,
+                                   SIR_ProximaFechaCura__c, SIR_FechaEstimadaSalidaPP__c
                                    FROM SIREC__SIREC_obj_proceso__c
                                    WHERE Id =:recordId 
                                    AND RecordTypeId =: recordTypeIdPRESOL
@@ -405,11 +362,12 @@ public with sharing class SIR_LCMP_GetProfileClient {
             }
             
             if(clienteId != null){
-                if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+                if(Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
                     infoCliente = [SELECT tolabel(SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c), tolabel(SIREC__SIREC_fld_segmentoSiREC__c) , SIREC__SIREC_fld_saldPasivo__c,SIREC__SIREC_fld_ingresosTotal__c,
                                     SIREC__SIREC_fld_ingresosNomina__c, SIREC__SIREC_fld_ingresosPension__c, SIREC__SIREC_fld_ingresosParo__c , SIREC__SIREC_fld_deudaTotal__c, SIREC__SIREC_fld_segmentoSiRECTexto__c,
                                     SIREC__SIREC_fld_deudaVencidaTotal__c , SIREC__SIREC_fld_deudaPendienteTotal__c , SIREC__SIREC_fld_diasImpago__c ,SIREC__SIREC_fld_ciclosImpago__c,
-                                    SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c 
+                                    SIREC__SIREC_fld_numCiclosImpago__c , SIREC__SIREC_fld_detaSolucion__c, SIREC__SIREC_fld_arquetipo__c , SIREC__SIREC_fld_capacidadDePago__c , SIREC__SIREC_fld_solucionMotor__c,
+                                    SIR_ImportePP__c, SIR_DeudaRefinanciada__c, tolabel(SIR_IndicadorProbationPeriod__c)
                                    FROM SIREC__SIREC_obj_informacionCliente__c
                                    WHERE SIREC__SIREC_fld_cliente__c =:clienteId
                                    LIMIT 1];
@@ -425,10 +383,12 @@ public with sharing class SIR_LCMP_GetProfileClient {
                     deudaPendientePRESOL = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaPendienteTotal__c);                  
                     deudaVencidaPRESOL   = valorConvert(infoCliente[0].SIREC__SIREC_fld_deudaVencidaTotal__c); 
                     circulante = valorConvert(infoProceso[0].SIR_Circulante__c); 
+                    importePP         = valorConvert(infoCliente[0].SIR_ImportePP__c);
+                    deudaRefinanciada = valorConvert(infoCliente[0].SIR_DeudaRefinanciada__c);
  
                     // Rellenar el Wrapper
                     SIR_WrapperCabecera wrapperCabecera = new SIR_WrapperCabecera();
-                    wrapperCabecera.estrategiaPRESOL            = infoProceso[0].SIREC__SIREC_fld_estrategia__c;
+                    wrapperCabecera.estrategiaPRESOL            = infoProceso[0].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                     wrapperCabecera.personaPRESOL 				= infoCliente[0].SIREC__SIREC_fld_cliente__r.CC_TipoPersona__c;
                     wrapperCabecera.segmentoPRESOL              = infoProceso[0].SIR_SegmentoPRESOL__c;
                     wrapperCabecera.prioridadPRESOL             = infoProceso[0].SIR_PrioridadPRESOL__c;
@@ -456,8 +416,12 @@ public with sharing class SIR_LCMP_GetProfileClient {
                     wrapperCabecera.vtoCCR                      = infoProceso[0].SIR_FechaVtoCCR__c;
                     wrapperCabecera.aviso                       = infoProceso[0].SIR_AvisoCentralizado__c;
                     wrapperCabecera.tenenciaICO                 = infoProceso[0].SIR_TenenciaICO__c;
-                    wrapperCabecera.alertaPRESOL                = infoProceso[0].SIR_AlertaPRESOL__c;
-
+                    wrapperCabecera.alertaPRESOL                = infoProceso[0].SIR_AlertaPRESOL__c;  
+                    wrapperCabecera.fechaProximaCura 		    = infoProceso[0].SIR_ProximaFechaCura__c;                   
+                    wrapperCabecera.importePP 			        = importePP;
+                    wrapperCabecera.deudaRefinanciada 			= deudaRefinanciada;
+                    wrapperCabecera.indicadorPP 			    = infoCliente[0].SIR_IndicadorProbationPeriod__c;   
+                    wrapperCabecera.fechaEstimadaSalidaPP 		= infoProceso[0].SIR_FechaEstimadaSalidaPP__c;           
                     wrapper.add(wrapperCabecera);
                 }
             }	
@@ -490,7 +454,7 @@ public with sharing class SIR_LCMP_GetProfileClient {
         List<SIREC__SIREC_obj_proceso__c> lstProcesosActivos = new List<SIREC__SIREC_obj_proceso__c>();
         try{
 
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
                 lstProcesosActivos = [SELECT Id, RecordTypeId
                                         FROM SIREC__SIREC_obj_proceso__c 
                                         WHERE SIREC__SIREC_fld_cliente__c =:recordId 
@@ -549,7 +513,6 @@ public with sharing class SIR_LCMP_GetProfileClient {
                 if(campoSplit.length() == 1 ){
                     campo = campo + constante.STRING_0;
                 }
-                
                 campo = campo + constante.STRING_EURO;
             }  
         }else{

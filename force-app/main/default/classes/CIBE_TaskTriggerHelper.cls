@@ -16,6 +16,7 @@ public with sharing class CIBE_TaskTriggerHelper {
     private static final String ERROR_MESSAGE		= Label.AV_deleteToTask;
     private static final String ERROR_MESSAGE_USER	= Label.AV_deleteToTaskUser;  
 
+
     /**
     * @description		 	Check the record types
     * @param listNews  	list of new records
@@ -752,16 +753,9 @@ public with sharing class CIBE_TaskTriggerHelper {
     * @param  mapOlds 	map of old Task records
     */
     public static void createManagementHistory(List<Task> listNews, Map<Id, Task> mapOlds) {
-
-        List<Task> lstToProcess = new List<Task>();
-        
-        for(Task ta : listNews) {
-            lstToProcess.add(ta);
-        }
-        
-        if(!lstToProcess.isEmpty()) {
             List<AV_ManagementHistory__c> histList = new List<AV_ManagementHistory__c>();
-            for(Task auxTa : lstToProcess) {
+        if(mapOlds == null ||  mapOlds.isEmpty()){
+			for(Task auxTa : listNews){
                 AV_ManagementHistory__c mh = new AV_ManagementHistory__c(
                     AV_ActivityId__c = auxTa.Id,
                     AV_Status__c = auxTa.Status,
@@ -774,13 +768,30 @@ public with sharing class CIBE_TaskTriggerHelper {
                 }
                 histList.add(mh);
             }
+		}else{
+			for(Task auxTa : listNews){
+                if(auxTa.Status != mapOlds.get(auxTa.Id).Status || auxTa.AV_Tipo__c != mapOlds.get(auxTa.Id).AV_Tipo__c || auxTa.Description != mapOlds.get(auxTa.Id).Description || auxTa.IsReminderSet != mapOlds.get(auxTa.Id).IsReminderSet){
+                        AV_ManagementHistory__c mh = new AV_ManagementHistory__c(
+                        AV_ActivityId__c = auxTa.Id,
+                        AV_Status__c = auxTa.Status,
+                        AV_Type__c = auxTa.AV_Tipo__c,
+                        AV_Comment__c = auxTa.Description,
+                        AV_Date__c = Date.today()
+                    );
+                    if (auxTa.IsReminderSet && auxTa.ReminderDateTime != null) {
+                        mh.AV_Reminder__c = auxTa.ReminderDateTime;
+                    }
+                    histList.add(mh);
+                }
+			}
+		}
+
             if (!histList.isEmpty()) {
                 if(AV_ManagementHistory__c.SObjectType.getDescribe().isCreateable()){
                     Database.insert(histList, false);
                 }
             }
         }
-    }
     
     /**
     * @description		 Change Centro task
@@ -1039,4 +1050,83 @@ public with sharing class CIBE_TaskTriggerHelper {
 			}
 		}
 	}
+
+
+    /**
+	* @description     	Delete deleteRelations objects related With Task
+	* @param  deletedTaskList  list of delete Task records
+	*/
+	public static void deleteRelations(List<Task> deletedTaskList){
+        User currentUser  = [SELECT Name, AV_ProfileName__c FROM User WHERE Id = :UserInfo.getUserId()];
+		String profileCu = currentUser.AV_ProfileName__c;
+
+        Set<String> setLabelsRtsEMP = new Set<String>{CIBE_AppConstants.TASK_PRIORIZADOS_EMP_RT, CIBE_AppConstants.TASK_AVISOS_EMP_RT, CIBE_AppConstants.TASK_ALERTACOMERCIAL_EMP_RT, CIBE_AppConstants.TASK_EXPERIENCIACLIENTE_EMP_RT,  CIBE_AppConstants.TASK_ONBOARDING_EMP_RT, CIBE_AppConstants.TASK_OTROS_EMP_RT};
+        Set<Id> setIdsRtsEMP = getIdsRT(setLabelsRtsEMP);
+
+        Set<String> setLabelsRtsCIB = new Set<String>{CIBE_AppConstants.TASK_PRIORIZADOS_CIB_RT, CIBE_AppConstants.TASK_AVISOS_CIB_RT , CIBE_AppConstants.TASK_ALERTACOMERCIAL_CIB_RT, CIBE_AppConstants.TASK_EXPERIENCIACLIENTE_CIB_RT,  CIBE_AppConstants.TASK_ONBOARDING_CIB_RT, CIBE_AppConstants.TASK_OTROS_CIB_RT};
+        Set<Id> setIdsRtsCIB = getIdsRT(setLabelsRtsCIB);
+
+        Set<String> tasks = new Set<String>();
+
+		if(!deletedTaskList.isEmpty() && profileCu == 'CIBE_Gestor'){
+            Set<String> tskSet =  new Set<String>();
+            List<Task> tskListCIB =  new List<Task>();
+			for(Task tsk: deletedTaskList){
+				if(setIdsRtsEMP.contains(tsk.RecordTypeId) ){
+					tskSet.add(tsk.Id);
+				}else if(setIdsRtsCIB.contains(tsk.RecordTypeId) ){
+					tskListCIB.add(tsk);
+				}
+			}
+
+
+            if(tskSet != null){
+                List<Task> tarea = [SELECT Id, AV_Task__c FROM Task WHERE Id IN :tskSet];
+    
+                if(!tarea.isEmpty()){
+
+                    for (Task header : tarea) {
+                        tasks.add(header.AV_Task__c);
+                    }
+
+
+                    List<AV_CustomActivityOpportunity__c> customActi = [SELECT Id, AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c IN :tasks];
+
+
+                    List<CIBE_RelaccionadoCita__c> relacionadoCita = [SELECT Id FROM CIBE_RelaccionadoCita__c  WHERE CIBE_TareaRelaccionada__c  IN :tasks];
+    
+                    if(!customActi.isEmpty()){
+                        List<Database.DeleteResult> srList = Database.delete(customActi,false);	
+                        for(Database.deleteResult res : srList) {
+                            if(!res.isSuccess()) {
+                                for(Database.Error err : res.getErrors()) {
+                                    CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                                }
+                            }
+                        }		
+                        
+                    }
+
+                    if(!relacionadoCita.isEmpty()){
+                        List<Database.DeleteResult> srList2 = Database.delete(relacionadoCita,false);	
+                        for(Database.deleteResult res2 : srList2) {
+                            if(!res2.isSuccess()) {
+                                for(Database.Error err : res2.getErrors()) {
+                                    CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                                }
+                            }
+                        }		
+                        
+                    }
+                }
+                
+            }
+            if(!tskListCIB.isEmpty()){
+                CIBE_TaskTriggerHelper.validateDeleteTask(tskListCIB);
+                
+            }
+
+        }
+	}
+
 }

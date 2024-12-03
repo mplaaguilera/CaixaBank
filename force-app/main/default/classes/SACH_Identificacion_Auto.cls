@@ -72,35 +72,28 @@ public with sharing class SACH_Identificacion_Auto {
         return retorno;
     }
 
-    /*
-    public static Contact identificarNUMPERSO(String numPerso){
-        String numPersoFormat = formatearNumperso(numPerso);
-    
-        Id clientePAId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
-        Id clienteId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-
-        List<Contact> contactos = [SELECT AccountId FROM Contact
-                                                    WHERE (RecordTypeId = :clienteId OR Account.RecordTypeId = :clientePAId)
-                                                    AND AV_NumPerso__c = :numPersoFormat];
-
-        if(!contactos.isEmpty()){
-            return contactos[0];
-        }
-        return null;
-
-    }*/
-
     public static Contact identificarNUMPERSOsinCodificar(String numPersoFormat){
         
-        Id clientePAId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
+        Id clientePAId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();  //Cliente Físico
         Id clienteId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+        Id cliente = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();        //Cliente Juridico
 
+        //Primero buscamos en los Contactos si son de tipo Cliente o Cliente PA
         List<Contact> contactos = [SELECT AccountId FROM Contact
                                                     WHERE (RecordTypeId = :clienteId OR Account.RecordTypeId = :clientePAId)
                                                     AND AV_NumPerso__c = :numPersoFormat];
 
         if(!contactos.isEmpty()){
             return contactos[0];
+        }else{
+            //Buscamos el primer contacto asociado al cliente jurídico
+            List<Account> cuentas = [SELECT Id FROM Account WHERE RecordTypeId = :cliente AND AV_NumPerso__c = :numPersoFormat LIMIT 1];
+            if(!cuentas.isEmpty()){
+                List<Contact> miscontactos = [SELECT Id FROM Contact WHERE AccountId = :cuentas[0].Id AND CC_Inactivo__c = false LIMIT 1];
+                if(!miscontactos.isEmpty()){
+                    return miscontactos[0];
+                }
+            }
         }
         return null;
 

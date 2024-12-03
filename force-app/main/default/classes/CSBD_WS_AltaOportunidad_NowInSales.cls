@@ -176,7 +176,7 @@ public with sharing class CSBD_WS_AltaOportunidad_NowInSales {
 				} else if (solicitud.tipoSolicitud == 'cmb') {
 					Datetime startDateTime = calcularHoraCMB(solicitud);
 					//llamar a CSBD_Opportunity.programarCita
-					CSBD_Opportunity.programarCita(oportunidad.Id, true, false, null, startDateTime);
+					CSBD_Opportunity.programarCita(oportunidad.Id, true, null, startDateTime);
 				}
 			}
 		}

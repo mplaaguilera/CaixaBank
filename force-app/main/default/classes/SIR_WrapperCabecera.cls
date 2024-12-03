@@ -47,6 +47,12 @@ public with sharing class SIR_WrapperCabecera {
     @AuraEnabled
     Public String motorSolucion;
     @AuraEnabled
+    public String importePP;
+    @AuraEnabled
+    public String deudaRefinanciada;
+    @AuraEnabled
+    public String indicadorPP;
+    @AuraEnabled
     public String tipo { get; set; }
 
 
@@ -101,4 +107,8 @@ public with sharing class SIR_WrapperCabecera {
     public String alertaPRESOL;
     @AuraEnabled
     public String saldoActivo;
+    @AuraEnabled
+    public Date fechaProximaCura;
+    @AuraEnabled
+    public Date fechaEstimadaSalidaPP;    
 }

@@ -7,6 +7,7 @@ Proposito: Clase controller para la recuperación de empleados en las altas masi
  * VERSION	USER_STORY	    AUTHOR			        DATE		    Description
  * 1.0		US585725	    Humberto Vilchez		25/07/2023   	Init Version
  * 1.1      US704873        Carolina Lopez          09/10/2023      Add AV_UsuarioAsociado__r filter in searchEmployees, getDirectGestContactIds.
+ * 1.2      Fix             Carolina Lopez          12/01/2024      Include the field BillingState in the query of contact.
 ***********************************************************************************************************************/
 public with sharing class EV_lookupEmployees_Controller {
     
@@ -16,9 +17,9 @@ public with sharing class EV_lookupEmployees_Controller {
         List<List<Contact>> employeesList = new List<List<Contact>>();   
         valueIn +='*';
         if(Test.isRunningTest()){
-            employeesList = [FIND :valueIn IN Name FIELDS RETURNING Contact(id, Name, CC_Nombre_Oficina__c, Account.CC_Numero_Oficina__c, AccountId, Account.BillingCity, Account.Name, Account.BillingStreet, Account.BillingPostalCode, CC_Matricula__c, AV_Responsabilidad__c, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.isActive  LIMIT 5)];
+            employeesList = [FIND :valueIn IN Name FIELDS RETURNING Contact(id, Name, CC_Nombre_Oficina__c, Account.CC_Numero_Oficina__c, AccountId, Account.BillingCity, Account.BillingState, Account.Name, Account.BillingStreet, Account.BillingPostalCode, CC_Matricula__c, AV_Responsabilidad__c, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.isActive  LIMIT 5)];
         }else{
-            employeesList = [FIND :valueIn IN Name FIELDS RETURNING Contact(id, Name, CC_Nombre_Oficina__c, Account.CC_Numero_Oficina__c, AccountId, Account.BillingCity, Account.Name, Account.BillingStreet, Account.BillingPostalCode, CC_Matricula__c, AV_Responsabilidad__c, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.isActive WHERE RecordType.DeveloperName = 'CC_Empleado' AND (CC_Matricula__c != null AND (not(CC_Matricula__c like '%INVALID%') )) AND AV_UsuarioAsociado__c != null  AND AV_UsuarioAsociado__r.isActive = true AND Account.CC_Numero_Oficina__c	!= null LIMIT 5)];
+            employeesList = [FIND :valueIn IN Name FIELDS RETURNING Contact(id, Name, CC_Nombre_Oficina__c, Account.CC_Numero_Oficina__c, AccountId, Account.BillingCity, Account.BillingState, Account.Name, Account.BillingStreet, Account.BillingPostalCode, CC_Matricula__c, AV_Responsabilidad__c, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.isActive WHERE RecordType.DeveloperName = 'CC_Empleado' AND (CC_Matricula__c != null AND (not(CC_Matricula__c like '%INVALID%') )) AND AV_UsuarioAsociado__c != null  AND AV_UsuarioAsociado__r.isActive = true AND Account.CC_Numero_Oficina__c	!= null LIMIT 5)];
         }
         if(!employeesList.isEmpty() && !employeesList.get(0).isEmpty()){
             return employeesList[0];     

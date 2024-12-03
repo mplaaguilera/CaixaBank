@@ -21,27 +21,30 @@ Historial
 	2.0			DE63338			Sandra Gómez		18/08/2022			WhitOut Events Outlook
     2.1			FIX		        Alex 			    16/11/2022			Dispatcher Previo Events
 	2.2			DE70392			Sandra Gómez		03/01/2023			Add AV_AvoidBulkApi in method updateCentro
+	2.3			Ejec. Lentas	Sandra Gómez		22/02/2024			Add method fieldSubjectStartDateTime
+	2.4			PPM100538432	Sandra Gómez		17/09/2024			Add method byPassEvent
+	2.5         Carga de citas Pool 
+				sin asignar 	Luis Fernández  	18/10/2024      	Added call to new method assignPoolEvents
 
 ***********************************************************************************************************************/
-public class AV_Event_BI_TRHan { //extends CC_TriggerHandlerBase {
+public class AV_Event_BI_TRHan extends AV_TriggerHandlerBase{
 	
-	/*public override void mainEntry(CC_TriggerParameters tp) {
+	public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Event>)tp.newList, (Map<Id, Event>)tp.newMap, (List<Event>) tp.oldList, (Map<Id, Event>) tp.oldMap);
-	}*/
+	}
 	
 	public void process(List<Event> listNewObj, Map<Id, Event> mapNewObj, List<Event> listOldObj, Map<Id, Event> mapOldObj) {
 		//General check the Record type's for intouch project
 		List<Event> listData = AV_EventTriggerHelper.checkGeneralRT(listNewObj);
 		List<Event> listDataWhitoutOutlook = AV_EventTriggerHelper.checkGeneralRTWithoutOutlook(listNewObj); //No tiene los eventos de Outlook
-
 		if (listData!=null && !listData.isEmpty()){
+			AV_EventTriggerHelper.fieldSubjectStartDateTime(listData);
 			AV_EventTriggerHelper.headerCustomActivity(listDataWhitoutOutlook);
 			AV_EventTriggerHelper.checkOutlookEvent(listData);
 			AV_EventTriggerHelper.changeOwner(listData, mapOldObj);
 			AV_EventTriggerHelper.insertOrUpdateCodigoGestorAsignado(listData, mapOldObj);
 		}
 		AV_EventTriggerHelper.setEventChanelAndPurpose(listNewObj);
-
 		if (listDataWhitoutOutlook != null && !listDataWhitoutOutlook.isEmpty()){
 			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 			/*if (!hasCustomPermission && AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c && !System.isbatch()) {
@@ -52,7 +55,10 @@ public class AV_Event_BI_TRHan { //extends CC_TriggerHandlerBase {
 			if (!hasCustomPermission) {
 				AV_EventTriggerHelper.updateCentro(listDataWhitoutOutlook,mapOldObj);
 			}
+			AV_EventTriggerHelper.assignPoolEvents(listDataWhitoutOutlook);
+		}
+		if (listData!=null && !listData.isEmpty()){
+			mapToByPassEvent = AV_EventTriggerHelper.byPassEvent(listData);
 		}
 	}
-	
 }

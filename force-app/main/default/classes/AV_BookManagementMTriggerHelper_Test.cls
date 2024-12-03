@@ -10,14 +10,17 @@ VERSION		USER_STORY	   AUTHOR		   		DATE			Description
 1.0			Test Class	   Daniel Rodriguez  	19/10/2021		Init version
 1.1			DE52465		   Sandra Gómez			03/11/2021		Coverage
 1.2	        AV_Query IT	   Daniel Rodríguez	    02/03/2022	        Change AV_Query to SOQL for User, Account, Contact
+1.3          QC            Oscar Moreno        12/06/2024       Delete UserInfo.geetUserId()
+
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_BookManagementMTriggerHelper_Test {
     
     @TestSetup
 	static void setup() {
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
         
-        System.runAs(new User(Id = UserInfo.getUserId())){
+        System.runAs(usuarioGcf){
             Account acc = AV_TestHelper.createCaixaCenter();
             Set<String> labelProfile = new Set<String>{'Standard User', 'Usuario estándar'};
             List<Profile> prof = [SELECT Id FROM Profile WHERE Name IN  :labelProfile ];
@@ -66,7 +69,9 @@ public with sharing class AV_BookManagementMTriggerHelper_Test {
     
     @isTest
     public static void testcheckGeneralRT() {
-        System.runAs(new User( Id = UserInfo.getUserId())){
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
+        System.runAs(usuarioGcf){
             Test.startTest();
             AV_BookManagementMember__c bmm = [SELECT Id, AV_ExternalID__c FROM AV_BookManagementMember__c LIMIT 1];
             bmm.AV_ExternalID__c = '00379BPE002';

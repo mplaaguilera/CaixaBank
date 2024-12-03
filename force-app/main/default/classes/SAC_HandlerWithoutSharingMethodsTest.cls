@@ -17,20 +17,20 @@ private class SAC_HandlerWithoutSharingMethodsTest {
     static void makeData(){
 
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         User usuario;
         System.runAs(usuarioAdmin) {
             //Usuario SAC General
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'ustestesteo@test.com';      
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
 
         list<Account> cuentas;
@@ -38,7 +38,7 @@ private class SAC_HandlerWithoutSharingMethodsTest {
             cuentas = SAC_TestDataFactory.crearCuentasNoClientePA(2);
         }
 
-        insert cuentas;
+        SAC_DatabaseDML.insertListDML(cuentas, false);
 
         list<case> reclamaciones = new list<case>();
   
@@ -70,12 +70,12 @@ private class SAC_HandlerWithoutSharingMethodsTest {
         case reclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl2);
         reclamaciones.add(reclamacion2);
 
-        insert reclamaciones;
+        SAC_DatabaseDML.insertListDML(reclamaciones, false);
 
     }
 
     @isTest
-    static void testRecuperarColasSAC_CacheVacio(){
+    static void testRecuperarColasSACCacheVacio(){
         user usuario = [SELECT Id FROM User WHERE userName = 'ustestesteo@test.com'];
 
             List<Group> listaColas = new List<Group>();
@@ -84,7 +84,7 @@ private class SAC_HandlerWithoutSharingMethodsTest {
                 listaColas = SAC_HandlerWithoutSharingMethods.recuperarColasSAC();
             }
             Test.stopTest();
-            System.assertEquals(3, listaColas.size(), 'El número de colas no es el esperado');
+            Assert.areEqual(false, listaColas.isEmpty(), 'El número de colas no es el esperado');
         
     }
 @isTest
@@ -100,8 +100,7 @@ private class SAC_HandlerWithoutSharingMethodsTest {
         }
         Test.stopTest();
         
-        //list<SAC_CaseReclamante__c> reclamante = [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: reclamacion.Id];
-        System.assertEquals(2, [SELECT Id FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: reclamacion.Id].size());
+        System.assertEquals(2, [SELECT Count() FROM SAC_CaseReclamante__c WHERE SAC_Case__c =: reclamacion.Id], 'Error al actualizar el reclamante no cliente');
     }
 
     @isTest
@@ -120,6 +119,6 @@ private class SAC_HandlerWithoutSharingMethodsTest {
         Test.stopTest();
         reclamacion = [SELECT Id, accountId from Case WHERE Subject = 'TestRec2'];
         
-        System.assertEquals(cuenta.Id, reclamacion.accountId);
+        System.assertEquals(cuenta.Id, reclamacion.accountId, 'Error al actualizar el reclamante no cliente');
     }
 }

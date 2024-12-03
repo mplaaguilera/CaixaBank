@@ -10,6 +10,24 @@ public class CSBD_Opportunity_Test {
 
         CSBD_TestDataFactory.crearCuentaContacto('12345678N');
 
+        /*
+        AccountShare acshare = new AccountShare();
+        acshare.AccountId = cuenta.Id;
+        acshare.UserOrGroupId = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1].Id;
+        acshare.AccountAccessLevel = 'Edit';
+        acshare.OpportunityAccessLevel = 'Edit';
+        acshare.CaseAccessLevel = 'Edit';
+        insert acshare;
+
+        AccountShare acshare2 = new AccountShare();
+        acshare2.AccountId = cuenta.Id;
+        acshare2.UserOrGroupId = [SELECT Id FROM Group WHERE DeveloperName = 'CSBD_Empleados' LIMIT 1].Id;
+        acshare2.AccountAccessLevel = 'Edit';
+        acshare2.OpportunityAccessLevel = 'Edit';
+        acshare2.CaseAccessLevel = 'Edit';
+        insert acshare2;
+        */
+
         //Alta de las parametrizaciones que necesita el trigger BI de oportunidades
         CC_Lista_Valores__c listaValores = new CC_Lista_Valores__c();
         listaValores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
@@ -22,19 +40,42 @@ public class CSBD_Opportunity_Test {
         valorPrestamo.CC_Lista__c = listaValores.Id;
         valorPrestamo.Name = 'Préstamo';
         valorPrestamo.CC_Valor__c = '1';
+        insert valorPrestamo;
+
         CC_Lista_Valores__c valorTpv = new CC_Lista_Valores__c();
         valorTpv.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
         valorTpv.CC_Lista__c = listaValores.Id;
         valorTpv.Name = 'TPV';
         valorTpv.CC_Valor__c = '5';
-        insert new List<CC_Lista_Valores__c>{valorPrestamo, valorTpv};
+        insert valorTpv;
 
         Pricebook2 listaPrecios = new Pricebook2();
         listaPrecios.Name = 'Standard Price Book';
+        insert listaPrecios;
+
         Pricebook2 pb = new Pricebook2(Name = 'CSBD Price Book', Description = 'CSBD Price Book', IsActive = true );
-        insert new List<Pricebook2>{listaPrecios, pb};
+        insert pb;
     }
 
+    /*
+    public static Account crearCuentaContacto(String nif) {
+        Account cuenta = new Account();
+        cuenta.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_Cliente');
+        cuenta.Name = 'test@test.com';
+        cuenta.CC_Numero_Documento__c = nif;
+        insert cuenta;
+
+        Contact contacto = new Contact();
+        contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
+        contacto.Email = 'test@test.com';
+        contacto.FirstName = 'Nombre';
+        contacto.LastName = 'Apellido';
+        contacto.AccountId = cuenta.Id;
+        insert contacto;
+
+        return cuenta;
+    }
+    */
 
     public static Opportunity crearOportunidadPrestamo(Account cuenta) {
         Map<String, Object> campos = new Map<String, Object>();
@@ -455,6 +496,18 @@ public class CSBD_Opportunity_Test {
         oportunidad3.Pricebook2Id = pb.Id;
         oportunidad3.OwnerId = usuarioGestor.Id;
         listaOportunidades.add(oportunidad3);
+
+        Opportunity oportunidadHija = new Opportunity();
+        oportunidadHija.RecordTypeId = Schema.getGlobalDescribe().get('Opportunity').getDescribe().getRecordTypeInfosByDeveloperName().get('CSBD_Prestamo').getRecordTypeId();
+        oportunidadHija.Name = 'Opportunity Test';
+        oportunidadHija.StageName = 'Rechazada';
+        oportunidadHija.CSBD_Resolucion__c = 'Dupicada';
+        oportunidadHija.Loss_Reason__c = 'Dupicada';
+        oportunidadHija.CSBD_Estado__c = 'Rechazada';
+        oportunidadHija.AccountId = cuenta.Id;
+        oportunidadHija.OwnerId = usuarioGestor.Id;
+        oportunidadHija.CSBD_Parent_Id__c = oportunidad3.Id;
+        listaOportunidades.add(oportunidadHija);
         insert listaOportunidades;
 
         //Ejecución de la prueba
@@ -463,11 +516,13 @@ public class CSBD_Opportunity_Test {
             oportunidad = CSBD_Opportunity.reactivarOportunidad(oportunidad.Id, 'Solicitud');
             oportunidad2 = CSBD_Opportunity.reactivarOportunidad(oportunidad2.Id, true);
             oportunidad3 = CSBD_Opportunity.reactivarOportunidad(oportunidad3.Id);
+            oportunidadHija = CSBD_Opportunity.reactivarOportunidad(oportunidadHija.Id);
             Test.stopTest();
 
             oportunidad = getOpportunity(oportunidad.Id);
             oportunidad2 = getOpportunity(oportunidad2.Id);
             oportunidad3 = getOpportunity(oportunidad3.Id);
+            oportunidadHija = getOpportunity(oportunidadHija.Id);
 
             //Evaluación del resultado de la prueba
             System.assertEquals('Solicitud', oportunidad.StageName, 'No se cumple');
@@ -484,6 +539,11 @@ public class CSBD_Opportunity_Test {
             System.assertEquals('Activa', oportunidad3.CSBD_Estado__c, 'No se cumple');
             System.assertEquals(null, oportunidad3.CSBD_Resolucion__c, 'No se cumple');
             System.assertEquals(null, oportunidad3.Loss_Reason__c,'No se cumple');
+
+            System.assertEquals('Solicitud', oportunidadHija.StageName, 'No se cumple');
+            System.assertEquals('Activa', oportunidadHija.CSBD_Estado__c, 'No se cumple');
+            System.assertEquals(null, oportunidadHija.CSBD_Resolucion__c, 'No se cumple');
+            System.assertEquals(null, oportunidadHija.Loss_Reason__c,'No se cumple');
         }
     }
 

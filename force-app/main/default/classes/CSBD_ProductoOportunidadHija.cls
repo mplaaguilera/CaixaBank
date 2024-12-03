@@ -2,11 +2,13 @@ public with sharing class CSBD_ProductoOportunidadHija {
 
 
     @AuraEnabled
-    public static List<String> crearOportunidadesHijas(List<String> productos, String etapa, String parentId, String nombreRecordType, String resolucion) {
+    public static List<String> crearOportunidadesHijas(List<String> productos, String estado, String parentId,String nombreRecordType,String resolucion ) {
         List<String> identificadores;
         List<CC_Lista_Valores__c> listasDeValores = [SELECT CC_Valor2__c, CC_Valor__c,Name FROM CC_Lista_Valores__c
-                                                        WHERE CC_Lista__r.Name = 'CSBD: Acciones comerciales oportunidad' AND CC_Activa__c = true
-                                                        AND CC_Valor_SFDC__c = :nombreRecordType AND CC_Valor2__c IN :productos];
+                                                        WHERE CC_Lista__r.Name = 'CSBD: Acciones comerciales oportunidad' AND CC_Valor_SFDC__c = :nombreRecordType AND CC_Activa__c = true AND CC_Valor2__c IN :productos ];
+        List<Task> tareasInsert = new List<Task>();
+        List<Opportunity> oportunidadesCerradas = new List<Opportunity>();
+
         if (!listasDeValores.isEmpty()) {
             Opportunity oportunidadPadre = [SELECT Recordtype.Name, AV_Producto__c, AV_FechaModificacion__c, AccountId, RecordTypeId, Name, Description, StageName, Probability, CloseDate, OwnerId, CSBD_Circuito_Contratacion_Online__c,
             CSBD_Contact__c, CSBD_Diferencial_Limite__c, CSBD_Email_Solicitud__c, CSBD_Empresa_Proveedora_Logo__c, CSBD_Empresa_Proveedora__c, CSBD_Estado__c, CSBD_Estado_Tracking__c, CSBD_Idioma_Solicitud__c,
@@ -24,13 +26,9 @@ public with sharing class CSBD_ProductoOportunidadHija {
             CSBD_Now_DiaPeticion__c, CSBD_Now_FechaContratacion__c, CSBD_Now_USUCLO__c, CSBD_OficinaLO__c, CSBD_Producto__c, CSBD_Programar_Propietario_Id__c, CSBD_Reactivada_Respuesta_Recibida__c,
             CSBD_Resolucion_QuickAction_Cerrar__c, CSBD_Resumen__c, CSBD_StageName_QuickAction_Cerrar__c, CSBD_Turno_Contacto__c, CSBD_Vehiculo_Renting__c, CSBD_Fecha_ultimacita__c, CSBD_Fecha_Firma__c,
             CSBD_Created_date_time__c, CSBD_Detalle_producto__c, CSBD_Comentarios_cliente__c, CSBD_Cliente_Internacional__c FROM Opportunity WHERE Id = :parentId];
-
-            List<Task> tareasInsert = new List<Task>();
-            List<Opportunity> oportunidadesCerradas = new List<Opportunity>();
             List<Opportunity> listaOportunidades = new List<Opportunity>();
-
             for (CC_Lista_Valores__c listaDeValores : listasDeValores) {
-                Opportunity oportunidadHija = nuevaOportunidadHija(oportunidadPadre, etapa, listaDeValores, CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Accion_Comercial'),resolucion);
+                Opportunity oportunidadHija = nuevaOportunidadHija(oportunidadPadre, estado, listaDeValores, CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Opportunity', 'CSBD_Accion_Comercial'),resolucion);
                 listaOportunidades.add(oportunidadHija);
                 if (oportunidadHija.StageName == 'Formalizada' || oportunidadHija.StageName == 'Rechazada' || oportunidadHija.StageName == 'Perdida') {
                     oportunidadesCerradas.add(oportunidadHija);
@@ -52,32 +50,26 @@ public with sharing class CSBD_ProductoOportunidadHija {
         return identificadores;
     }
 
-    public static Opportunity nuevaOportunidadHija(Opportunity oportunidadPadre, String etapa, CC_Lista_Valores__c listaDeValores, Id idRecordType,String resolucion) {
+    public static Opportunity nuevaOportunidadHija(Opportunity oportunidadPadre, String estado, CC_Lista_Valores__c listaDeValores, Id idRecordType,String resolucion) {
         Opportunity oportunidadHija = new Opportunity();
         oportunidadHija = oportunidadPadre.clone(false, false, false, false);
         oportunidadHija.Name = 'temp';
         oportunidadHija.CSBD_Producto__c = listaDeValores.CC_Valor2__c;
         oportunidadHija.CSBD_Familia_Producto__c = listaDeValores.CC_Valor__c;
         oportunidadHija.CSBD_Now_Codigo_Producto__c = listaDeValores.Name;
+        oportunidadHija.StageName = estado;
         oportunidadHija.CSBD_Parent_Id__c = oportunidadPadre.Id;
         oportunidadHija.RecordTypeId = idRecordType;
         oportunidadHija.OwnerId = oportunidadPadre.OwnerId;
         oportunidadHija.CSBD_Resolucion__c = resolucion;
-        oportunidadHija.CSBD_Canal__c = 'Venta cruzada ' + oportunidadPadre.RecordType.Name;
-        oportunidadHija.StageName = etapa;
-        oportunidadHija.CSBD_Estado__c = new Map<String, String>{
-            'Rechazada' => 'Rechazada', 'Formalizada' => 'Cerrada', 'Perdida' => 'Cerrada'
-        }.get(etapa) ?? 'Activa';
-
-        /*
-        if (oportunidadHija.StageName == 'Rechazada') {
+        if(oportunidadHija.StageName == 'Rechazada' ){
             oportunidadHija.CSBD_Estado__c = oportunidadPadre.StageName;
-        } else if (oportunidadHija.StageName == 'Formalizada' || oportunidadHija.StageName == 'Perdida') {
+        }else if(oportunidadHija.StageName == 'Formalizada' || oportunidadHija.StageName == 'Perdida'){
             oportunidadHija.CSBD_Estado__c = 'Cerrada';
-        } else {
+        }else{
             oportunidadHija.CSBD_Estado__c = 'Activa';
         }
-        */
+        oportunidadHija.CSBD_Canal__c = 'Venta cruzada '+ oportunidadPadre.RecordType.Name;
         return oportunidadHija;
     }
 
@@ -87,7 +79,7 @@ public with sharing class CSBD_ProductoOportunidadHija {
     }
 
     @AuraEnabled
-    public static List<Opportunity> obtenerOportunidadesHijas(id oportunidadId) {
+    public static List<Opportunity> obtenerOportunidadesHijas(id oportunidadId){
         return [SELECT CSBD_Producto__c ,CSBD_Familia_Producto__c ,Name ,CSBD_Now_Codigo_Producto__c ,StageName FROM Opportunity WHERE CSBD_Parent_Id__c = :oportunidadId AND Recordtype.DeveloperName = 'CSBD_Accion_Comercial' ];
     }
 
@@ -134,8 +126,13 @@ public with sharing class CSBD_ProductoOportunidadHija {
 
     @AuraEnabled(cacheable=true)
     public static Boolean obtenerOportunidadesHijasAbiertas(Id idOportunidad) {
-        return ![SELECT Id FROM Opportunity WHERE CSBD_Parent_Id__c = :idOportunidad AND IsClosed = FALSE
-                    AND RecordType.DeveloperName = 'CSBD_Accion_Comercial' LIMIT 1].isEmpty();
+        List<Opportunity> oportunidadesHijasAbiertas = [SELECT Id FROM Opportunity WHERE CSBD_Parent_Id__c = :idOportunidad AND IsClosed = false AND Recordtype.DeveloperName = 'CSBD_Accion_Comercial'];
+        if(!oportunidadesHijasAbiertas.isEmpty()) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @AuraEnabled(cacheable=true)
@@ -153,7 +150,7 @@ public with sharing class CSBD_ProductoOportunidadHija {
     @AuraEnabled
     public static Opportunity duplicarOpp (String oppId, String rt, String accId){
 
-        Opportunity oppActual = [SELECT Recordtype.Name, AV_Producto__c, AV_FechaModificacion__c, AccountId, RecordTypeId, Name, Description, StageName, Probability, CloseDate, OwnerId, CSBD_Circuito_Contratacion_Online__c,
+        Opportunity oppActual = [SELECT Id, Recordtype.Name, AV_Producto__c, AV_FechaModificacion__c, AccountId, RecordTypeId, Name, Description, StageName, Probability, CloseDate, OwnerId, CSBD_Circuito_Contratacion_Online__c,
         CSBD_Contact__c, CSBD_Diferencial_Limite__c, CSBD_Email_Solicitud__c, CSBD_Empresa_Proveedora_Logo__c, CSBD_Empresa_Proveedora__c, CSBD_Estado__c, CSBD_Estado_Tracking__c, CSBD_Idioma_Solicitud__c,
         CSBD_Importe_Producto_Principal__c, CSBD_Identificador__c, CSBD_Limite_Compra_Estrella__c, CSBD_Limite_Prestamos_Canales__c, CSBD_Limite_Prestamos_Oficinas__c, CSBD_Limite_Tarjetas_Canales__c, CSBD_Limite_Tarjetas_Oficinas__c,
         CSBD_Motivo_Pendiente_Interno__c, CSBD_Now_Boton__c, CSBD_Now_Codigo_Producto_Formato__c, CSBD_Now_Canal_Peticion__c, CSBD_Now_Id_Producto__c, CSBD_Skill__c, CSBD_Prioridad_Tracking__c,

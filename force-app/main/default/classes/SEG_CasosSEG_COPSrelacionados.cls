@@ -17,10 +17,11 @@ public with sharing class SEG_CasosSEG_COPSrelacionados implements Queueable{
             casos[0].CC_CasoRelacionado__c =casos[1].Id;
             casos[1].CC_CasoRelacionado__c =casos[0].Id;
             for(Case caso : casos){
-                if(caso.RecordType.DeveloperName.startsWith('SEG')){
+                /* if(caso.RecordType.DeveloperName.startsWith('SEG')){
                     caso.Status = 'Pendiente';
                     caso.SEG_Subestado__c='En gestión UAFE';
-                } else if(caso.RecordType.DeveloperName.startsWith('OS')){
+                } else */
+                if(caso.RecordType.DeveloperName.startsWith('OS')){
                     Task tarea = new Task();
                     tarea.RecordTypeId = recordTypeTask;
                     tarea.Type = 'Relación Segmentos';

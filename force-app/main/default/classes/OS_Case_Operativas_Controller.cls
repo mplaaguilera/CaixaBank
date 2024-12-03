@@ -493,8 +493,7 @@ public without sharing class OS_Case_Operativas_Controller {
         List<CC_Llamada__c> llamadas = [SELECT Name, CC_Tipo__c FROM CC_Llamada__c
                                         WHERE RecordTypeId IN :recordTypesLlamadasCOPS
                                         AND OwnerId = :UserInfo.getUserId() AND CC_Fecha_Fin__c = NULL];
-
-        if ([SELECT COUNT() FROM CC_Llamada__c WHERE RecordTypeId IN :recordTypesLlamadasCOPS AND OwnerId = :UserInfo.getUserId() AND CC_Fecha_Fin__c = NULL] == 1) {
+        if (llamadas.size() == 1) {
 
             //Vincular caso con llamada
 

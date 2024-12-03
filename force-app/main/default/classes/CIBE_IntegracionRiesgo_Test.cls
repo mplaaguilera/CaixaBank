@@ -9,7 +9,9 @@ Historial
     VERSION		USER_STORY                                          AUTHOR                  DATE            COMMENTS  
     1.0         SF - Integración con API's de Divisas              Jose Maria Fernandez    
     1.1         US470406                                           Alexandre Perez          6/2/2023       Adaptación con los cambios de la integracion y tratamiento de errores
+    1.2         US913542                                           Borja Lavesiera          25/06/2024     Restyling LWC detalle por producto con paginación
 ***********************************************************************************************************************/
+
 
 
 
@@ -51,7 +53,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
     private static void TestSendRequestTodosOK() {     
 
         integer productos=0;
-        User usrTest = [SELECT ID FROM USER LIMIT 1];  
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
         CIBE_IntegracionRiesgo.Response eventResponse = new CIBE_IntegracionRiesgo.Response();
         Test.setMock(HttpCalloutMock.class, new CIBE_MockCallout_Test('RIESGO','OK'));
         Account accTest = [SELECT Id FROM Account WHERE Name = 'Name' LIMIT 1];
@@ -70,7 +72,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
             CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues('getProductsAgrupado');
             system.debug(wsc);
             Test.StartTest();
-            eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+            eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS, '10214', '1');
             Test.StopTest();
         }
         
@@ -82,6 +84,33 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
 
         system.assertEquals(3,  eventResponse.responseAcumulado.totalBalance.size(), 'La cantidad de agrupaciones de productos no es la esperada');
         system.assertEquals(6, productos, 'La cantidad de productos no es la esperada');
+
+    }
+    @isTest
+    private static void testSendDetalleOK() {     
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
+        CIBE_IntegracionRiesgo.Response eventResponse = new CIBE_IntegracionRiesgo.Response();
+        Test.setMock(HttpCalloutMock.class, new CIBE_MockCallout_Test('RIESGO','OK'));
+        Account accTest = [SELECT Id FROM Account WHERE Name = 'Name' LIMIT 1];
+        list<CBK_IntegrationSetting__c> listEndpointConf = new list<CBK_IntegrationSetting__c>();
+        System.runAs(usrTest) {
+            CBK_IntegrationSetting__c endpointConf = new CBK_IntegrationSetting__c(Name=CIBE_IntegracionRiesgo.PARAM_RIESGO_AGRUPADO, NamedCredential__c = 'grouped');
+            listEndpointConf.add(endpointConf);
+            
+            CBK_IntegrationSetting__c endpointConf2 = new CBK_IntegrationSetting__c(Name=CIBE_IntegracionRiesgo.PARAM_RIESGO_DETALLADO, NamedCredential__c = 'detail');
+            listEndpointConf.add(endpointConf2);
+            insert listEndpointConf;
+            for(CBK_IntegrationSetting__c config : listEndpointConf){
+                test.setCreatedDate(config.id, dateTime.newInstance(2023, 5, 1));
+            }
+            update listEndpointConf;
+            CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues('getProductsDetalle');
+            system.debug(wsc);
+            Test.StartTest();
+            eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_DETALLADO, '15890', '1');
+            Test.StopTest();
+        }
+        system.assertEquals(6,  eventResponse.responseDetalle.Products.size(), 'La cantidad de agrupaciones de productos es la esperada');
 
     }
 
@@ -100,7 +129,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
             
             Test.StartTest();
             //segunda llamada en menos de 24 horas
-            eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+            eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS,'10214', '1');
             Test.StopTest();
         }
         
@@ -126,7 +155,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
         System.runAs(usrTest) {
             Test.StartTest();
             try {
-                eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+                eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS, '10214', '1' );
             } catch(Exception e) {
                 error = e.getMessage();
             }
@@ -148,7 +177,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
         System.runAs(usrTest) {
             Test.StartTest();
             try {
-                eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+                eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS, '10214', '1');
             } catch(Exception e) {
                 error = e.getMessage();
             }
@@ -171,7 +200,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
         System.runAs(usrTest) {
             Test.StartTest();
             try {
-                eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+                eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS, '10214', '1');
             } catch(Exception e) {
                 error = e.getMessage();
             }
@@ -193,7 +222,7 @@ public with sharing class CIBE_IntegracionRiesgo_Test {
         System.runAs(usrTest) {
             Test.StartTest();
             try {
-                eventResponse= CIBE_IntegracionRiesgo.getRiesgoProducts(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS);
+                eventResponse= CIBE_IntegracionRiesgo.getRiesgoController(accTest.Id, CIBE_IntegracionRiesgo.PARAM_RIESGO_TODOS, '10214', '1');
             } catch(Exception e) {
                 error = e.getMessage();
             }

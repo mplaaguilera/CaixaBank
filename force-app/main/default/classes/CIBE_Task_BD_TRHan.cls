@@ -16,12 +16,17 @@ public class CIBE_Task_BD_TRHan extends CC_TriggerHandlerBase{
     
     private void process(List<Task> listNewObj, Map<Id, Task> mapNewObj, List<Task> listOldObj, Map<Id, Task> mapOldObj) {
         //General check the Record type's for intouch project
+        System.debug('@@@ listOldObj: ' + listOldObj);
         List<Task> listData = CIBE_TaskTriggerHelper.checkGeneralRT(listOldObj);
-        
+        System.debug('@@@ listData: ' + listData);
+
         if (listData!=null && !listData.isEmpty()){
-            //CIBE_TaskTriggerHelper.deleteRecordsRelatedWithTask(listData);
+            CIBE_TaskTriggerHelper.deleteRecordsRelatedWithTask(listData);
             Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
+            System.debug('@@@ hasCustomPermission: ' + hasCustomPermission);
             if (!hasCustomPermission) {
+                CIBE_TaskTriggerHelper.deleteRelations(listData);
+            }else{
                 CIBE_TaskTriggerHelper.validateDeleteTask(listData);
             }
         }

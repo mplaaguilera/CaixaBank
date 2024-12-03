@@ -27,7 +27,7 @@ public with sharing class SIR_LCMP_GetCargasFinancieras {
     public static List<SIR_FormularioRefinanciacion__c> getCargasFormulario(String idFormulario) {
         String metodo = 'getCargasFormulario';
         List<SIR_FormularioRefinanciacion__c> formulario = new  List<SIR_FormularioRefinanciacion__c>();
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             formulario = [SELECT SIR_deudaTotalGarantiaReal__c, SIR_deudaTotalGarantiaPersonal__c, SIR_deudaTotalTarjeta__c, SIR_deudaTotalEmpresasGrupo__c, SIR_deudaTotalOtros__c,
                           SIR_cuotaGarantiaReal__c, SIR_CuotaGarantiaPersonal__c, SIR_CuotaMensualTarjetas__c, SIR_CuotaMensualEmpresasGrupo__c, SIR_CuotaMensualOtros__c,
                           SIR_deudaTotalGarantiaRealEnt__c, SIR_deudaTotalGarantiaPersonalEnt__c, SIR_deudaTotalTarjetaEnt__c, SIR_deudaTotalEmpresasGrupoEnt__c, SIR_deudaTotalOtrosEnt__c,
@@ -56,7 +56,7 @@ public with sharing class SIR_LCMP_GetCargasFinancieras {
     public static String guardarFormulario(String idFormulario , List<String> data) {
         String metodo = 'guardarFormulario';
         try {
-           if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){          
+           if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){          
                 SIR_FormularioRefinanciacion__c updateForm = [SELECT id, SIR_deudaTotalGarantiaRealEnt__c, SIR_cuotaGarantiaRealEnt__c, SIR_deudaTotalGarantiaPersonalEnt__c,
                                                     SIR_CuotaGarantiaPersonalEnt__c ,SIR_deudaTotalTarjetaEnt__c ,SIR_CuotaMensualTarjetasEnt__c ,SIR_deudaTotalEmpresasGrupoEnt__c ,
                                                     SIR_CuotaMensualEmpresasGrupoEnt__c ,SIR_deudaTotalOtrosEnt__c ,SIR_CuotaMensualOtrosEnt__c , SIR_TotalDeudaOtraEntidad__c ,

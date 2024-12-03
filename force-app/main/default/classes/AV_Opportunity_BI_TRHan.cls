@@ -24,8 +24,12 @@ Historial
 	4.3			DE70392			Sandra Gómez		03/01/2023			Add AV_AvoidBulkApi in method updateCentro
 	4.5		 	US411482	  	Vladislav Lityagin 	03/02/2023		 	Added call method assignPropensity
 	2.6			US546892		Sandra Gómez		14/09/2023			Add methods byPassOpp and validationsOpportunity
+	2.7         PPM100205278    Elisabeth R.        22/05/2024          Added fillSubState method
+	2.8       	PPM100130465    Sandra Gómez        05/08/2024			Add logical AV_OpportunityTriggerHelper.ResultadoByPass
+	2.9			IN1193860		Sandra Gómez		07/08/2024			change avoidbulkapi with method byPassOpp.
+
 ***********************************************************************************************************************/
-public class AV_Opportunity_BI_TRHan extends CC_TriggerHandlerBase {
+public class AV_Opportunity_BI_TRHan extends AV_TriggerHandlerBase {
 	
 	public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Opportunity>)tp.newList, (Map<Id, Opportunity>)tp.newMap, (List<Opportunity>) tp.oldList, (Map<Id, Opportunity>) tp.oldMap);
@@ -33,6 +37,7 @@ public class AV_Opportunity_BI_TRHan extends CC_TriggerHandlerBase {
 
 	public void process(List<Opportunity> listNewObj, Map<Id, Opportunity> mapNewObj, List<Opportunity> listOldObj, Map<Id, Opportunity> mapOldObj) {
 		//General check the Record type's for intouch project
+	
 		List<Opportunity> listData = AV_OpportunityTriggerHelper.checkGeneralRT(listNewObj);
         List<Opportunity> listDataCM = AV_OpportunityTriggerHelper.checkCallMeRT(listNewObj);
 		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
@@ -58,12 +63,16 @@ public class AV_Opportunity_BI_TRHan extends CC_TriggerHandlerBase {
 			if (!hasCustomPermission) {
 				AV_OpportunityTriggerHelper.updateCentro(listData,mapOldObj);
 			}
+			AV_OpportunityTriggerHelper.fillSubState(listData);
 		}
 		if (listData!=null && !listData.isEmpty()) {
 			if (!hasCustomPermission && !System.isbatch()) {
 				AV_OpportunityTriggerHelper.validationsOpportunity(listData,null);
-				mapToByPass = AV_OpportunityTriggerHelper.byPassOpp(listData,null);
 			}
+			AV_OpportunityTriggerHelper.ResultadoByPass rbp = AV_OpportunityTriggerHelper.byPassOpp(listData,null);
+			mapToByPass = rbp.mapByPass;
+			mapToByPassOld = rbp.mapByPassOld;
 		}
+	
 	}
 }

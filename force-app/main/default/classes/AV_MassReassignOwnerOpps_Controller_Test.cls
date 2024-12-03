@@ -10,47 +10,99 @@ Historial
     1.0			US377759   		        Víctor Santiago 	24/05/2022		Init version
     1.1			US295471   		        Víctor Santiago 	15/07/2022		Mejorada cobertura + getInferiorCenterIdsTest
                                                                             searchOfficeTest + getCenterIdsTest 
-    1.2         DE798963                Oscar Moreno        02/10/2023      Modify assignOppTest method                                                                     
+    1.2         DE798963                Oscar Moreno        02/10/2023      Modify assignOppTest method       
+    1.3			FIX PMD Error			Humberto Vilchez	05/12/2023		Modified to add permissions fields for Error
+                                                              
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
       
     @TestSetup
 	static void setup(){
-		Pricebook2 pb = new Pricebook2();
-		pb.Name = 'Standard Price Book';
-		insert pb;
+        Test.startTest();
         AV_TestHelper.activateLogger();
-        Profile p = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank'];
-        User usrOtraOficina = new User(
-            AV_ExternalID__c = 'U0009826',
-            Alias = 'tsAlias',
-            Email = 'test@test.dev',
-            EmailEncodingKey = 'UTF-8',
-            LastName = 'testLastName',
-            LanguageLocaleKey = 'es',
-            LocaleSidKey = 'es',
-            TimeZoneSidKey = 'Europe/Berlin',
-            AV_NumeroOficinaEmpresa__c = '12345',
-            ProfileId = p.Id,
-            UserName = 'test@test.dev.devsfc01',
-            IsActive = true
-        );
-        //insert usrOtraOficina;
-        User usrTestApiOnly = AV_TestHelper.createUserSinInsert('API Only', null);
-        User usrMiOficina = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank', null);
-        usrMiOficina.AV_NumeroOficinaEmpresa__c = '13297'; //used in searchTestMiOficina
-        insert new List<User>{usrOtraOficina, usrMiOficina, usrTestApiOnly};
-
-		Account accTest = AV_TestHelper.createCustomerSinInsert();
-		Account cenTest = AV_TestHelper.createCaixaCenterSinInsert();
-        insert new List<Account>{accTest, cenTest};
-		Contact conTest = AV_TestHelper.createEmployeeSinInsert(cenTest, usrOtraOficina);
-        Contact conTest2 = AV_TestHelper.createEmployeeSinInsert(cenTest,usrMiOficina);
-        insert new List<Contact>{conTest,conTest2};
+		AV_TestHelper.createPricebook2();
+        Set<String> setRTs = new Set<String>{AV_AppConstants.OPPALERTACOM_RT,AV_AppConstants.OPPINICIATIVA_RT,AV_AppConstants.OPPLLAMADA_RT,AV_AppConstants.EMPLOYEE_RT,'AV_ProductoFichaCliente'};
+		Map<String,RecordType> rtMap = AV_AppUtilities.getRecordTypeInMap(setRTs);
 		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-		      
-		
+		User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true];
+        System.runAs(userGcf){
+            User userGestor = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
+			userGestor.Email = 'gestor-test@test.com';
+			User usrTest = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01543678');
+			List<User> listUserInsert = new List<User>();
+			listUserInsert.add(userGestor);
+			listUserInsert.add(usrTest);
+			insert listUserInsert;
+			AV_TestHelper.insertNeededPermissions2(listUserInsert[0]);
+			AV_TestHelper.insertNeededPermissions2(listUserInsert[1]);
+        }
+        System.runAs(userCli){
+            Account accTest = AV_TestHelper.createConfidencialCustomerSinInsert();
+			Account accTest2 = AV_TestHelper.createCustomerWithNumpersonSinInsert('12345678');
+			accTest2.AV_Negocio__c = 'BPA;BPR';
+			Account cenTest = AV_TestHelper.createCaixaCenterSinInsert();
+			List<Account> listAccountInsert = new List<Account>();
+			listAccountInsert.add(accTest);
+			listAccountInsert.add(accTest2);
+			listAccountInsert.add(cenTest);
+			insert listAccountInsert;
+            RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_CTO_RT);
+        	Account center2 = new Account(Name = '00804 TEST CENTER',CC_Numero_Oficina_Empresa__c = '00804',CC_Numero_Oficina__c = '00804',RecordTypeId = rt.Id,AV_CentroSuperior__c = accTest.Id);
+            insert center2;
+        }
+        Test.stopTest();
+        System.runAs(userGcf){
+            Account accTest2 = [SELECT Id FROM Account WHERE AV_NumPerso__c = '12345678' LIMIT 1];
+			Account accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
+			Account cenTest = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = '00615' LIMIT 1];
+			User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com' AND AV_ExternalID__c = 'U01545454'];
+			User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01543678' AND IsActive = true];
+			Contact conTest = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGestor, rtMap.get('Empleado'),'U01545454',null);
+			Contact conTest2 = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGcf, rtMap.get('Empleado'));
+			Contact conTest3 = AV_TestHelper.createEmployeeSinInsert2(cenTest, usrTest, rtMap.get('Empleado'),'U01543678',userGestor);
+			conTest2.FirstName = 'Empleado2';
+			conTest3.FirstName = 'Empleado3';
+			List<Contact> listContactInsert = new List<Contact>();
+			listContactInsert.add(conTest);
+			listContactInsert.add(conTest2);
+			listContactInsert.add(conTest3);
+			insert listContactInsert;
+
+            List<Product2> prodsToInsert = new List<Product2>();
+			Product2 prodPF = AV_TestHelper.createProductSinInsert(null,null,'50112');
+			Product2 prodPF2 = AV_TestHelper.createProductSinInsert(null,null,'50113');
+			Product2 prodPF3 = AV_TestHelper.createProductSinInsert(null,null,'50114');
+			Product2 prodPF4 = AV_TestHelper.createProductSinInsert(null,null,'50115');
+			prodsToInsert.add(prodPF);
+			prodsToInsert.add(prodPF2);
+			prodsToInsert.add(prodPF3);
+			prodsToInsert.add(prodPF4);
+			insert prodsToInsert;
+
+            Opportunity opp = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest, conTest, prodPF4, rtMap.get('Iniciativa'), '00000002', userGestor.Id);
+			Opportunity opp1 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest, conTest, prodPF, rtMap.get('Alerta Comercial'), '00000001', userGestor.Id);
+			Opportunity opp2 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest2, conTest, prodPF3, rtMap.get('Alerta Comercial'), '00000003', userGestor.Id);
+			Opportunity opp3 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest2, conTest, prodPF3, rtMap.get('Alerta Comercial'), '00000004', userGestor.Id);
+            Opportunity opp4 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest2, conTest, prodPF3, rtMap.get('Alerta Comercial'), '00000005', userGestor.Id);
+            opp4.AV_Center__c = '00615';
+            opp4.AV_FechaProximoRecordatorio__c = System.today().addDays(2);
+            opp4.AV_Potencial__c = 'B';
+            Opportunity opp5 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest2, conTest, prodPF3, rtMap.get('Iniciativa'), '00000006', userGestor.Id);
+            opp5.AV_Center__c = '00615';
+            opp5.AV_FechaProximoRecordatorio__c = System.today().addDays(-2);
+            Opportunity opp6 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest2, conTest, prodPF3, rtMap.get('Iniciativa'), '00000007', userGestor.Id);
+            opp6.AV_Center__c = '00615';
+			List<Opportunity> listOpportunityInsert = new List<Opportunity>();
+			listOpportunityInsert.add(opp);
+			listOpportunityInsert.add(opp1);
+			listOpportunityInsert.add(opp2);
+			listOpportunityInsert.add(opp3);
+            listOpportunityInsert.add(opp4);
+			listOpportunityInsert.add(opp5);
+			listOpportunityInsert.add(opp6);
+			insert listOpportunityInsert;
+        }
 	} 
     
 	@isTest
@@ -117,8 +169,7 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
         String page = '1'; //needed for pagination
         Test.startTest();
         Contact c = [SELECT Id FROM Contact WHERE FirstName = 'Empleado' LIMIT 1];
-        AV_TestHelper.createOpportunityWithEmpleado(a, c);
-        User usuario  = [Select Id From User Where Email = 'test@test.dev' limit 1];
+        User usuario  = [Select Id From User Where Email = 'gestor-test@test.com' limit 1];
         employeeFilter.add(usuario.Id);
         ol = AV_MassReassignOwnerOpps_Controller.getBaseData(clientFilter, subjectFilter, origenFilter, statusFilter, dueDate2Filter, dueDateFilter, employeeFilter, filterList, fechaCierreFilter, fechaGestionFilter, page, myBoxFilter, preconceivedFilter, targetAutoFilter, office,potencial,fechaModif,indicadoresCli);
         System.assertEquals(true, ol!=null, 'getBaseDataOppsDatosTest');
@@ -128,38 +179,22 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
 	@isTest
 	private static void getEmployeesTest() {
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-        User u = [SELECT Id FROM User WHERE AV_ProfileName__c = :AV_AppConstants.AV_PROFILE AND AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
-        Contact cntUser = [SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c = :u.Id];
-        Account client = [SELECT Id FROM ACCOUNT WHERE CC_Numero_Documento__c = '9446386T'];
-
-        AV_TestHelper.insertNeededPermissions(u);
-        System.runAs(userGcf){
-            
-            Opportunity opp = AV_TestHelper.createOpportunityWithEmpleadoSinInsert(client,cntUser);
-            opp.OwnerId = u.Id;
-            insert opp;
-            Account offi = [Select Id From Account where CC_Numero_Oficina__c = '00615'];
-            update new Account(Id = offi.Id,OwnerId = u.Id);
-        }
-
+        User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
         System.runAs(u){
-	
-        List<AV_MassReassignOwnerOpps_Controller.optionsEmployee> employees = new List<AV_MassReassignOwnerOpps_Controller.optionsEmployee>();
-        
-        Test.startTest();
+        	List<AV_MassReassignOwnerOpps_Controller.OptionsEmployee> employees = new List<AV_MassReassignOwnerOpps_Controller.OptionsEmployee>();
+        	Test.startTest();
             Id[] fixedSearchResults = new Id[2];
             fixedSearchResults[0] = u.Id;
             fixedSearchResults[1] = userGcf.Id;
             Test.setFixedSearchResults(fixedSearchResults);
             String ofi = '00615';
-            
             employees= AV_MassReassignOwnerOpps_Controller.getEmployees(ofi);
-            Opportunity opp = [SELECT Id, StageName, AV_Center__c, RecordTypeId,RecordType.DeveloperName FROM Opportunity WHERE OwnerId = :u.Id];
+            Opportunity opp = [SELECT Id, StageName, AV_Center__c, RecordTypeId,RecordType.DeveloperName FROM Opportunity WHERE OwnerId = :u.Id LIMIT 1];
             String oficinaData = opp.AV_Center__c+'{|}' + opp.StageName+'{|}'+ opp.RecordType.DeveloperName;
             employees= AV_MassReassignOwnerOpps_Controller.getEmployees(oficinaData);
-            String oficinaData2 = '13297{|}' + opp.StageName+'{|}all';
-            List<AV_MassReassignOwnerOpps_Controller.optionsEmployee> employees2= AV_MassReassignOwnerOpps_Controller.getEmployees(oficinaData2);
-        System.assertEquals(true,!employees.isEmpty(), 'getEmployeesTest');
+            String oficinaData2 = '00615{|}' + opp.StageName+'{|}all';
+            List<AV_MassReassignOwnerOpps_Controller.OptionsEmployee> employees2= AV_MassReassignOwnerOpps_Controller.getEmployees(oficinaData2);
+        	System.assertEquals(true,!employees.isEmpty(), 'getEmployeesTest');
 	}
 	}
     
@@ -168,9 +203,10 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
 		String searchTerm = 'test';
 		List<AV_LookupSearchResult> listSearch = new List<AV_LookupSearchResult>();
         List<String> lista = new List<String>();
-        User userPass = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
-        System.runAs(userPass) {
-            User empMiOficina = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
+        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+        User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
+        System.runAs(u) {
+            User empMiOficina = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
             Id[] fixedSearchResults = new Id[1];
             fixedSearchResults[0] = empMiOficina.Id;
             // SOSL queries need fixed results in order to retrieve data
@@ -188,9 +224,9 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
 
 		List<AV_LookupSearchResult> listSearch = new List<AV_LookupSearchResult>();
         List<String> lista = new List<String>();
-        User userPass = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
+        User userPass = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '001-03044' LIMIT 1];
         System.runAs(userPass) {
-            User empOtraOficina = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c != '13297' LIMIT 1];
+            User empOtraOficina = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c != '001-03044' LIMIT 1];
             Id[] fixedSearchResults = new Id[1];
             fixedSearchResults[0] = null;
             // SOSL queries need fixed results in order to retrieve data
@@ -204,7 +240,7 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
     
     @isTest
 	public static void searchUserTest () {
-        User userPass = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
+        User userPass = [SELECT Id FROM User WHERE AV_NumeroOficinaEmpresa__c = '001-03044' LIMIT 1];
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
 	
 		String searchTerm = '*';
@@ -368,21 +404,29 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
             AV_Funcion__c = 'DAN'
         );
         insert u1;
-        Account a = [
-            SELECT Id
-            FROM Account
-            WHERE CC_Numero_Oficina__c = '00615'
-            LIMIT 1
-        ];
-        RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_CTO_RT);
-        Account center2 = new Account(
-            Name = '00803 TEST CENTER',
-            CC_Numero_Oficina_Empresa__c = '00803',
-            CC_Numero_Oficina__c = '00803',
-            RecordTypeId = rt.Id,
-            AV_CentroSuperior__c = a.Id
-        );
-        insert center2;
+
+		User user = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+        
+        System.runAs(user) {
+            AV_TestHelper.insertNeededPermissions(u1);   
+
+            Account a = [
+                SELECT Id
+                FROM Account
+                WHERE CC_Numero_Oficina__c = '00615'
+                LIMIT 1
+            ];
+            RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_CTO_RT);
+            Account center2 = new Account(
+                Name = '00803 TEST CENTER',
+                CC_Numero_Oficina_Empresa__c = '00803',
+                CC_Numero_Oficina__c = '00803',
+                RecordTypeId = rt.Id,
+                AV_CentroSuperior__c = a.Id
+            );
+            insert center2;
+        }
+
         System.runAs(u1) {
             res = AV_MassReassignOwner_Controller.getInferiorCenterIds(u1);
         }
@@ -397,8 +441,7 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
     public static void getOfficePermissionTest(){
  
          User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-         User u = [SELECT Id FROM User WHERE AV_ProfileName__c = :AV_AppConstants.AV_PROFILE AND AV_NumeroOficinaEmpresa__c = '13297' LIMIT 1];
-         AV_TestHelper.insertNeededPermissions(u);
+         User u = [SELECT Id FROM User WHERE AV_ProfileName__c = :AV_AppConstants.AV_PROFILE AND AV_NumeroOficinaEmpresa__c = '001-03044' LIMIT 1];
          Account oficina1;
          Account oficina2;
          Account oficina3;
@@ -502,7 +545,6 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
             IsActive = true,
             AV_Funcion__c = 'DAN'
         );
-        // insert u1;
         User u2 = new User(
             Alias = 'u2',
             Email = 'test2@test.dev',
@@ -518,7 +560,6 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
             IsActive = true,
             AV_Funcion__c = 'Gestor'
         );
-        // insert u2;
         User u3 = new User(
             Alias = 'u3',
             Email = 'test3@test.dev',
@@ -534,28 +575,16 @@ public with sharing class AV_MassReassignOwnerOpps_Controller_Test {
             IsActive = true,
             AV_Funcion__c = 'SSCC'
         );
-        // insert u3;
         insert new List<User>{u1,u2,u3};
-        Account a = [
-            SELECT Id
-            FROM Account
-            WHERE CC_Numero_Oficina__c = '00615'
-            LIMIT 1
-        ];
-        RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_CTO_RT);
-        Account center2 = new Account(
-            Name = '00804 TEST CENTER',
-            CC_Numero_Oficina_Empresa__c = '00804',
-            CC_Numero_Oficina__c = '00804',
-            RecordTypeId = rt.Id,
-            AV_CentroSuperior__c = a.Id
-        );
-        insert center2;
+        AV_TestHelper.insertNeededPermissions2(u1);
+        AV_TestHelper.insertNeededPermissions2(u2);
+        AV_TestHelper.insertNeededPermissions2(u3);
+        Account a = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = '00615' LIMIT 1];
+        Account center2 = [SELECT Id FROM Account WHERE CC_Numero_Oficina__c = '00804' LIMIT 1];
         Id[] fixedSearchResults = new Id[1];
         fixedSearchResults[0] = center2.Id;
         // SOSL queries need fixed results in order to retrieve data
         Test.setFixedSearchResults(fixedSearchResults);
-        
         // Director
         System.runAs(u1) {            
             res = AV_MassReassignOwnerOpps_Controller.searchOffice('00804', lista);

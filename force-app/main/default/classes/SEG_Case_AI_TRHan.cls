@@ -111,6 +111,7 @@ public with sharing class SEG_Case_AI_TRHan extends CC_TriggerHandlerBase{
                 mapCasosTaskConnect.put(idCaso, 'A'); //US745996 - Task Connect - Diferenciar primera invocación de las siguientes - Se indica que es un alta Taskconnect
             }
         }
+
         if (!mapCasosTaskConnect.isEmpty()) {
             SEG_TaskConnect.envioComunicacionTrigger(mapCasosTaskConnect);
         }

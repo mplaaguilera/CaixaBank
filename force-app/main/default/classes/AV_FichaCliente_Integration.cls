@@ -20,8 +20,8 @@ VERSION		USER_STORY							    AUTHOR			  	DATE			Description
 2.0			SF - Integración con API's de CLI		Sandra Gómez		16/08/2021		New Version AV_FichaCliente_MapaProductos, AV_FichaCliente and AV_FichaCliente_Alertas
 2.1		    AV_Query IT	       						Daniel Rodríguez    07/03/2022	    Change AV_Query to SOQL for User, Account, Contact
 2.2			Fix Aplication							Sandra	Gómez		06/02/2023		else app AV_CRM_Intouch
-
-
+2.3			Fix PMD Errors							Daniel Rodriguez	25/10/2023	    Add queries WITH SECURITY_ENFORCED 
+2.4			Fix Integer								Sandra Gómez		23/02/2024		Change Integers to Long necessary
 ***********************************************************************************************************************/
 public with sharing class AV_FichaCliente_Integration {
 
@@ -68,7 +68,7 @@ public with sharing class AV_FichaCliente_Integration {
 
 	public class CustomerData {
 		@AuraEnabled
-		public Integer customerInternalId;
+		public Long customerInternalId;
 		@AuraEnabled
 		public String customerName;
 		@AuraEnabled
@@ -88,7 +88,7 @@ public with sharing class AV_FichaCliente_Integration {
 		@AuraEnabled
 		public String employeeName;
 		@AuraEnabled
-		public Integer interlocId;
+		public Long interlocId;
 		@AuraEnabled
 		public String interlocName;
 		@AuraEnabled
@@ -177,7 +177,7 @@ public with sharing class AV_FichaCliente_Integration {
 		@AuraEnabled
 		public String subAttentionModel;
 		@AuraEnabled
-		public Integer mobilePhoneNumber;
+		public Long mobilePhoneNumber;
 		@AuraEnabled
 		public String phoneNumber;
 		@AuraEnabled
@@ -193,7 +193,7 @@ public with sharing class AV_FichaCliente_Integration {
 		@AuraEnabled
 		public String advisedClient;
 		@AuraEnabled
-		public Integer preconceived;
+		public Long preconceived;
 		@AuraEnabled
 		public String myBox;
 		@AuraEnabled
@@ -878,11 +878,7 @@ public with sharing class AV_FichaCliente_Integration {
 	 */
 	@AuraEnabled
 	public static CommercialProductsDataResponse getCommercialProductResponse(String recordId){
-		AV_ProductClient__c pfCliente  = [Select Id, AV_Cliente__r.AV_NumPerso__c, AV_ProductoFicha__r.AV_ProductoFicha__r.AV_ExternalID__c, AV_TenenciaProducto__c From AV_ProductClient__c where Id = :recordId limit 1]; 
-		/*AV_ProductClient__c pfCliente = (AV_ProductClient__c) new AV_Query('AV_ProductClient__c')
-											.selectFields('Id, AV_Cliente__r.AV_NumPerso__c, AV_ProductoFicha__r.AV_ProductoFicha__r.AV_ExternalID__c, AV_TenenciaProducto__c')
-											.addConditionEq('Id', recordId)
-											.fetch();*/
+		AV_ProductClient__c pfCliente  = [Select Id, AV_Cliente__r.AV_NumPerso__c, AV_ProductoFicha__r.AV_ProductoFicha__r.AV_ExternalID__c, AV_TenenciaProducto__c From AV_ProductClient__c where Id = :recordId WITH SECURITY_ENFORCED limit 1]; 
 
 		CommercialProductsDataResponse resultMethod = new CommercialProductsDataResponse();
 
@@ -913,11 +909,10 @@ public with sharing class AV_FichaCliente_Integration {
 						if (contractBalance!=null){
 							strContractBalance = String.valueOf(contractBalance).replace('.',',');
 							strContractBalance = contractBalance.setScale(2).format();
-							if(!strContractBalance.contains(',')){
-								//listaContratos.contract.balance = strContractBalance + ',00 €';
-								strContractBalance = strContractBalance + ',00 €';
-							} else{
-								strContractBalance = strContractBalance  + ' €';
+						    if (!strContractBalance.contains(',')) {
+								strContractBalance += ',00 €';
+							} else {
+								strContractBalance += ' €';
 							}
 						}
 					}
@@ -927,11 +922,7 @@ public with sharing class AV_FichaCliente_Integration {
 					resultMethod.totalNumberOfContracts = contractListSorted.size();
 					
 					totalBalance = totalBalanceDouble.setScale(2).format();
-					if(!totalBalance.contains(',')){
-						totalBalance = totalBalance + ',00 €';
-					} else{
-						totalBalance = totalBalance + ' €';
-					}
+					totalBalance = totalBalance.contains(',') ? totalBalance + ' €' : totalBalance + ',00 €';
 					//SET TOTAL BALANCE OF CONTRACTS
 					resultMethod.totalBalance = totalBalance;
 	

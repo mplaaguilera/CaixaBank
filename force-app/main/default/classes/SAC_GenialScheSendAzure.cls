@@ -8,9 +8,7 @@
 * Historial
 * -------
 * VERSION        USER_STORY       AUTHOR                 DATE         Description
-* 1.0            US914420         Alex Pérez             07/05/24     Creación  
-* 2.0            US967489         Alex Pérez             06/08/24     DEPRECADO
-* funcionalidad en SAC_GenialScheEnvioIntegracion
+* 1.0            US914420         Alex Pérez             07/05/24     Creación     
 *****************************************************************/
 public with sharing class SAC_GenialScheSendAzure extends CBK_SCH_Queueable_Abstract{
 

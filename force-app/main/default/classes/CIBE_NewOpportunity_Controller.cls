@@ -10,6 +10,7 @@ Historial
 	1.0			    	        Jose Maria       	20/06/2022		Init version
     2.0         US496487        Jose Maria          20/01/2023      División de funcionalidad en las otras clases del componente
     3.0         DE83223         Lucia               29/09/2023      Nuevo metodo search
+    3.1         PPM100455545    Lucia               16/09/2024      Nuevo metodo getPaisPicklist
 
 ***********************************************************************************************************************/
 public with sharing class CIBE_NewOpportunity_Controller {
@@ -122,6 +123,23 @@ public with sharing class CIBE_NewOpportunity_Controller {
         }
 		return results;
 	}
+
+
+    @AuraEnabled(cacheable=true) 
+    public static List<OptionsField> getPaisPicklist() {
+        List<OptionsField> selectOptions = new List<OptionsField>();
+
+        Schema.DescribeFieldResult objFieldDescribe = Opportunity.CIBE_PaisMulti__c.getDescribe();
+        List<Schema.PicklistEntry> lstPickListValues = objFieldDescribe.getPickListValues();
+
+        for (Schema.PicklistEntry objPickList : lstPickListValues) {
+            OptionsField opField= new OptionsField();
+            opField.value=objPickList.getValue();
+            opField.label=objPickList.getLabel();
+            selectOptions.add(opField);
+        }
+        return selectOptions;
+    }
     
    
 }

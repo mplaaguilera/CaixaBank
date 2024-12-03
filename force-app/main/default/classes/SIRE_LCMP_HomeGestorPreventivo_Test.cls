@@ -22,7 +22,13 @@ public class SIRE_LCMP_HomeGestorPreventivo_Test {
         insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
      
         System.runAs(usuario){            
-            Test.startTest();           
+            Test.startTest();   
+            SIR_Parametros__c setting = new SIR_Parametros__c();
+            setting.Name = 'maxCajas_PREVENTIVO';
+            setting.SIR_Valor__c = '8';
+            setting.SIR_Parametro__c = 'maxCajas_PREVENTIVO';
+            setting.SIR_Tipo__c = 'maxCajas_PREVENTIVO';
+            insert setting;
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             List<SIREC__SIREC_obj_proceso__c> proceso = SIR_TestDataFactory.crearProceso(1, cuenta, SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_PREVENTIVO);            
             SIREC__SIREC_obj_tarea__c tarea = SIR_TestDataFactory.crearTareaTipoCTLWS(proceso[0]);
@@ -30,7 +36,7 @@ public class SIRE_LCMP_HomeGestorPreventivo_Test {
             update tarea;
             
             SIRE_LCMP_HomeGestorPreventivo.getUsuarioLogeado(usuario.Id);
-            Id recordTypeProceso = SIRE_LCMP_HomeGestorPreventivo.getQueryRecordTypeProceso();
+            SIRE_LCMP_HomeGestorPreventivo.getAgrupacionesEstrategias();
             List<SIREC__SIREC_obj_proceso__c> procesos = SIRE_LCMP_HomeGestorPreventivo.getQueryProcesos();
             SIRE_LCMP_HomeGestorPreventivo.getQueryReports();
             

@@ -119,8 +119,10 @@ public with sharing class OS_Acuse_Recibo_Test {
             Test.startTest();
                 OS_Detector_Idioma.setIdiomaCaso(lstCasos, 'correo@prueba.com', buzon, 'Buzón UAFE Express', cuerpoEmail, true);
             Test.stopTest();  
+
+			EmailMessage[] resultCaso = [SELECT ParentId,FromAddress FROM EmailMessage WHERE ParentId = :caso.id ];
             
-            System.assertEquals(2, [SELECT COUNT() FROM EmailMessage WHERE ParentId = :caso.id ],'Resultado erróneo acuses size');
+            System.assertEquals(2, resultCaso.size(),'Resultado erróneo acuses size');
         }
     }
     
@@ -160,8 +162,11 @@ public with sharing class OS_Acuse_Recibo_Test {
             Test.startTest();
                 OS_Detector_Idioma.setIdiomaCaso(lstCasos, 'correo@prueba.com', buzon, 'Buzón UAFE Express', cuerpoEmail, true);
             Test.stopTest();  
+
+           
+            EmailMessage[] resultCaso = [SELECT ParentId,HtmlBody FROM EmailMessage WHERE ParentId = :caso.id AND FromAddress = :owea.Address];
         	
-            System.assertEquals(0, [SELECT COUNT() FROM EmailMessage WHERE ParentId = :caso.id AND FromAddress = :owea.Address],'Resultado erróneo acuses size');
+            System.assertEquals(0, resultCaso.size(),'Resultado erróneo acuses size');
         }
     }
 

@@ -3,7 +3,7 @@ public with sharing class CC_Trazabilidad_Methods {
      * Metodo principal de Trazabilidad que distribuirá hacía los distintos metodos en función del paso en el que se encuentre el proceso de Trazabilidad
      */
     /*@InvocableMethod(label='CC_CircuitoTRZ' description='Circuito Trazabilidad')
-  public static void CircuitoTrazabilidad(String metro, List<Id> IdCasos){
+	public static void CircuitoTrazabilidad(String metro, List<Id> IdCasos){
         Switch on metro {
             when 'Reapertura' {
                 
@@ -42,13 +42,13 @@ public with sharing class CC_Trazabilidad_Methods {
                                         WHERE CC_Id_Peticion__c = :CaseId AND CC_Estado__c = 'Activo'
                                         ORDER BY CreatedDate ASC, CC_Orden__c ASC];
         //Recuperamos el ID del proceso que es un parmaetro
-        List<CC_Trazabilidad__c> trazabilidadActualizaciones = new List<CC_Trazabilidad__c>();
         String sIdproceso = CC_MetodosUtiles.getParamValue('CC_IDPROCES');
         List<CC_Trazabilidad__c> trazabilidadInsertAlta =  new List<CC_Trazabilidad__c>();
         List<CC_Trazabilidad__c> trazabilidadInsertBaja =  new List<CC_Trazabilidad__c>();
-        List<CC_Trazabilidad__c> ListTRZUpd = new List<CC_Trazabilidad__c>();    
         for (Case oCaso : oListCaso) {
-            if (oCaso.CC_Fecha_Limite_Resolucion__c != null){                
+            if (oCaso.CC_Fecha_Limite_Resolucion__c != null){
+                List<CC_Trazabilidad__c> ListTRZUpd = new List<CC_Trazabilidad__c>();    
+                
                 String sDatfipeticio;
                 String sDatpeticio; 
                 Integer sNum = 3;
@@ -110,22 +110,19 @@ public with sharing class CC_Trazabilidad_Methods {
                             trAlta.CC_Oficina__c = oCaso.Account.CC_OficinaGestoraId__r.CC_Numero_Oficina__c;
                             trAlta.CC_Fecha_Inicio_Peticion__c = sDatpeticio;
                             trAlta.CC_Fecha_Fin_Peticion__c = sDatfipeticio;
-                            //update trAlta;
-                            trazabilidadActualizaciones.add(trAlta);
+                            update trAlta;
                         } else {
                             // Si existe un registro y ya esta enviado deberemos:
                             // 1. Actualizar el registro de Alta incorporandole estado "Rechazado"
                             trAlta.CC_Estado__c = 'Rechazado';
-                            //update trAlta;
-                            trazabilidadActualizaciones.add(trAlta);
+                            update trAlta;
                             sRechazId = trAlta.Id;
                             // 2. Rechazar una baja previa si existiera
                             if (sRechazId != null) {
                                 for (CC_Trazabilidad__c trBaja : TRZ) {
                                     if (trBaja.CC_Id_Peticion__c == oCaso.Id && trBaja.CC_Tipo_de_Registro__c == 'Baja') {
                                         trBaja.CC_Estado__c = 'Rechazado';
-                                        //update trAlta;
-                                        trazabilidadActualizaciones.add(trBaja);
+                                        update trBaja;
                                         break;
                                     }
                                 }
@@ -174,9 +171,9 @@ public with sharing class CC_Trazabilidad_Methods {
                                 }
                             }
                             // Actualizar registros Activos para volver a enviar
-                            // if (ListTRZUpd.size() > 0){
-                            //     //Database.SaveResult[] oResUp = Database.update(ListTRZUpd, false);
-                            // }
+                            if (ListTRZUpd.size() > 0){
+                                Database.SaveResult[] oResUp = Database.update(ListTRZUpd, false);
+                            }
                         }
                         trazabilidadEncontrada = true;
                         break;
@@ -211,10 +208,6 @@ public with sharing class CC_Trazabilidad_Methods {
                 }
             }
         }
-        if (ListTRZUpd.size() > 0){
-            Database.SaveResult[] oResUp = Database.update(ListTRZUpd, false);
-        }
-        update trazabilidadActualizaciones;
         if (!trazabilidadInsertBaja.isEmpty()){
             Database.SaveResult[] resultado = Database.insert(trazabilidadInsertBaja);
         }
@@ -222,7 +215,7 @@ public with sharing class CC_Trazabilidad_Methods {
             Database.SaveResult[] resultado = Database.update(trazabilidadInsertAlta);
         }
     }
-  
+	
     /*
      * Trazabilidad: Función encargada de crear un registro de paso de una petición en TRZ
      */
@@ -317,7 +310,7 @@ public with sharing class CC_Trazabilidad_Methods {
         }
         
         if(!idsCase.isEmpty()){
-          bajaAvisoList('I', 'CC_AVISREAPERTURA', idsCase);
+        	bajaAvisoList('I', 'CC_AVISREAPERTURA', idsCase);
             bajaAvisoList('I', 'CC_AVISREAPCLI', idsCase);
         }
     }
@@ -335,7 +328,7 @@ public with sharing class CC_Trazabilidad_Methods {
         oCaso = getCaseData(CaseId);
         
         if (oCaso != null){
-          //Recuperamos el ID del proceso que es un parmaetro
+        	//Recuperamos el ID del proceso que es un parmaetro
             Idproceso = CC_MetodosUtiles.getParamValue('CC_IDPROCES');
             Switch on codigoAviso {
                 when 'AVISPDTEOFI' {
@@ -374,7 +367,7 @@ public with sharing class CC_Trazabilidad_Methods {
      * Trazabilidad: Función encargada de crear un registro de BAJA de un aviso de una petición en TRZ
      */
     public static void bajaAviso(String tipoAviso, String codigoAviso, Id caseID){
-    
+		
         Case oCaso = null;
         String Idproceso = null;
         String CodAviso = null;
@@ -383,7 +376,7 @@ public with sharing class CC_Trazabilidad_Methods {
         oCaso = getCaseData(CaseId);
         List<CC_Trazabilidad__c> trazabilidadInsert =  new List<CC_Trazabilidad__c>();
         if (oCaso != null){
-          //Recuperamos el ID del proceso que es un parmaetro
+        	//Recuperamos el ID del proceso que es un parmaetro
             Idproceso = CC_MetodosUtiles.getParamValue('CC_IDPROCES');
             Switch on codigoAviso {
                 when 'AVISPDTEOFI' {
@@ -427,7 +420,7 @@ public with sharing class CC_Trazabilidad_Methods {
     }
     
     public static void bajaAvisoList(String tipoAviso, String codigoAviso, List<Id> idsCase){
-    
+		
         //Case oCaso = null;
         String idProceso = null;
         String codAviso = null;
@@ -436,7 +429,7 @@ public with sharing class CC_Trazabilidad_Methods {
         //oCaso = getCaseData(idsCase);
         List<CC_Trazabilidad__c> trazabilidadInsert =  new List<CC_Trazabilidad__c>();
         if (!idsCase.isEmpty()){
-          //Recuperamos el ID del proceso que es un parmaetro
+        	//Recuperamos el ID del proceso que es un parmaetro
             idProceso = CC_MetodosUtiles.getParamValue('CC_IDPROCES');
             Switch on codigoAviso {
                 when 'AVISPDTEOFI' {
@@ -515,7 +508,7 @@ public with sharing class CC_Trazabilidad_Methods {
     
     /*
      * Trazabilidad: Función encargada de crear un registro de Alta de petición en TRZ
-   */
+	 */
     public static void reapretura(String tipoPaso, Id CaseId){
         
         List<CC_Trazabilidad__c> ListTRZUpd = new List<CC_Trazabilidad__c>();
@@ -528,7 +521,7 @@ public with sharing class CC_Trazabilidad_Methods {
         String year = null;
         String month = null;
         String day = null;
-    String sRechazId= '@';
+		String sRechazId= '@';
         
         //Recuperamos los datos del caso
         oCaso = getCaseData(CaseId);
@@ -537,7 +530,7 @@ public with sharing class CC_Trazabilidad_Methods {
         List<CC_Trazabilidad__c> trazabilidadInsertNewPaso =  new List<CC_Trazabilidad__c>();
         
         if (oCaso != null){
-          //Recuperamos el ID del proceso que es un parmaetro
+        	//Recuperamos el ID del proceso que es un parmaetro
             Idproceso = CC_MetodosUtiles.getParamValue('CC_IDPROCES');
             //Damos formato a la fecha de reapertura
             year = String.valueOf(oCaso.CC_Fecha_Reapertura__c.year());
@@ -588,11 +581,11 @@ public with sharing class CC_Trazabilidad_Methods {
             
             if (!TRZ.isEmpty()){
                 // 1. Actualizar el registro de Alta incorporandole estado "Rechazado"
-        TRZ[0].CC_Estado__c = 'Rechazado';
-        update TRZ;
+				TRZ[0].CC_Estado__c = 'Rechazado';
+				update TRZ;
                 sRechazId = TRZ[0].Id;
-        // 2. Crear un registro de Baja copia del registro de Alta que acabamos de rechazar
-        CC_Trazabilidad__c bajaTRZ = TRZ[0].clone();
+				// 2. Crear un registro de Baja copia del registro de Alta que acabamos de rechazar
+				CC_Trazabilidad__c bajaTRZ = TRZ[0].clone();
                 bajaTRZ.CC_Orden__c = 0;
                 bajaTRZ.CC_Control_Envio__c = 'Pdte. Envio';
                 bajaTRZ.CC_Estado__c = 'Activo';
@@ -600,23 +593,23 @@ public with sharing class CC_Trazabilidad_Methods {
                 bajaTRZ.CC_Tipo_de_Registro__c = 'Baja';
                 trazabilidadInsertBaja.add(bajaTRZ);
                 //insert bajaTRZ;
-        // 3. Crear un registro de Alta con los nuevos parametros
-        CC_Trazabilidad__c altaTRZ = TRZ[0].clone();
+				// 3. Crear un registro de Alta con los nuevos parametros
+				CC_Trazabilidad__c altaTRZ = TRZ[0].clone();
                 altaTRZ.CC_Orden__c = 1;
                 altaTRZ.CC_Control_Envio__c = 'Pdte. Envio';
                 altaTRZ.CC_Estado__c = 'Activo';
                 altaTRZ.CC_Nueva_Instancia__c = 'A';
                 altaTRZ.CC_Tipo_de_Registro__c = 'Alta';
                 altaTRZ.CC_Fecha_Inicio_Peticion__c = sDatpeticio;
-        altaTRZ.CC_Fecha_Fin_Peticion__c = sDatfipeticio;
+				altaTRZ.CC_Fecha_Fin_Peticion__c = sDatfipeticio;
                 trazabilidadInsertAlta.add(altaTRZ);
-        //insert altaTRZ;
-        // 4. Actualizar todos los registros Activos incorporandoles el estado pendiente de envio
-        List<CC_Trazabilidad__c> ListTRZ = [SELECT Id, CC_Control_Envio__c, CC_Numperso__c, CC_Oficina__c, CC_Fecha_Inicio_Peticion__c, 
-                                  CC_Fecha_Fin_Peticion__c, CC_Orden__c, CC_Estado__c, CC_Tipo_de_Registro__c, CC_Id_Peticion__c, CC_Nueva_Instancia__c 
-                                    FROM CC_Trazabilidad__c WHERE CC_Id_Peticion__c = :oCaso.Id AND CC_Estado__c = 'Activo' 
-                                      AND (CC_Tipo_de_Registro__c != 'Alta' AND CC_Tipo_de_Registro__c != 'Baja')
-                                      ORDER BY CreatedDate asc, CC_Orden__c asc];
+				//insert altaTRZ;
+				// 4. Actualizar todos los registros Activos incorporandoles el estado pendiente de envio
+				List<CC_Trazabilidad__c> ListTRZ = [SELECT Id, CC_Control_Envio__c, CC_Numperso__c, CC_Oficina__c, CC_Fecha_Inicio_Peticion__c, 
+                									CC_Fecha_Fin_Peticion__c, CC_Orden__c, CC_Estado__c, CC_Tipo_de_Registro__c, CC_Id_Peticion__c, CC_Nueva_Instancia__c 
+                    								FROM CC_Trazabilidad__c WHERE CC_Id_Peticion__c = :oCaso.Id AND CC_Estado__c = 'Activo' 
+                        							AND (CC_Tipo_de_Registro__c != 'Alta' AND CC_Tipo_de_Registro__c != 'Baja')
+                        							ORDER BY CreatedDate asc, CC_Orden__c asc];
                 for (CC_Trazabilidad__c actTraz : ListTRZ){
                     actTraz.Id = actTraz.Id;
                     actTraz.CC_Estado__c = 'Activo';
@@ -631,9 +624,9 @@ public with sharing class CC_Trazabilidad_Methods {
                 }
                 // 5. Rechazar una baja previa si existiera
                 List<CC_Trazabilidad__c> TRZRechazo = [SELECT Id, CC_Control_Envio__c, CC_Numperso__c, CC_Oficina__c, CC_Fecha_Inicio_Peticion__c, 
-                                  CC_Fecha_Fin_Peticion__c, CC_Orden__c, CC_Estado__c, CC_Tipo_de_Registro__c, CC_Id_Peticion__c, CC_Nueva_Instancia__c 
-                                    FROM CC_Trazabilidad__c WHERE CC_Id_Peticion__c = :oCaso.Id AND CC_Estado__c = 'Activo' 
-                                      AND CC_Tipo_de_Registro__c = 'Baja' AND Id != :sRechazId];
+                									CC_Fecha_Fin_Peticion__c, CC_Orden__c, CC_Estado__c, CC_Tipo_de_Registro__c, CC_Id_Peticion__c, CC_Nueva_Instancia__c 
+                    								FROM CC_Trazabilidad__c WHERE CC_Id_Peticion__c = :oCaso.Id AND CC_Estado__c = 'Activo' 
+                        							AND CC_Tipo_de_Registro__c = 'Baja' AND Id != :sRechazId];
                 if (!TRZRechazo.isEmpty()){
                     TRZRechazo[0].CC_Estado__c = 'Rechazado';
                     update TRZRechazo;
@@ -650,11 +643,11 @@ public with sharing class CC_Trazabilidad_Methods {
                 newPasoTRZ.CC_Id_Paso__c = idPaso;
                 newPasoTRZ.CC_Fecha_Inicio_Peticion__c = sDatpeticio;
                 newPasoTRZ.CC_Control_Envio__c = 'Pdte. Envio';
-              newPasoTRZ.CC_Estado__c = 'Activo';
+            	newPasoTRZ.CC_Estado__c = 'Activo';
                 //insert newPasoTRZ;
                 trazabilidadInsertNewPaso.add(newPasoTRZ);
-        //Creamos el aviso
-        altaAviso(sDatpeticio, 'I', 'AVISREAPERTURA', oCaso.Id);
+				//Creamos el aviso
+				altaAviso(sDatpeticio, 'I', 'AVISREAPERTURA', oCaso.Id);
             }
         }
         if (!trazabilidadInsertBaja.isEmpty()){
@@ -687,8 +680,8 @@ public with sharing class CC_Trazabilidad_Methods {
         
         Case oCaso = null;
         List<Case> oListCaso = [SELECT Id, Account.CC_NumPerso__c, Account.CC_OficinaGestoraId__r.CC_Numero_Oficina__c, ContactId, CreatedDate, 
-                            CaseNumber, CC_Fecha_Reapertura__c, CC_Fecha_Limite_Resolucion__c 
-                            FROM Case WHERE ID IN :ListCaseId];
+                      			CaseNumber, CC_Fecha_Reapertura__c, CC_Fecha_Limite_Resolucion__c 
+                      			FROM Case WHERE ID IN :ListCaseId];
         
         return oListCaso;
     }

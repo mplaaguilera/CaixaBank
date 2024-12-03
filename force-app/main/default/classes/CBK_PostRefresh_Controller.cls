@@ -1,4 +1,6 @@
 public without sharing class CBK_PostRefresh_Controller {
+    
+    /*TEST COPADO*/ 
 	public static final Map<String, String> ENTORNOS_CERT = new Map<String, String> {
 		'dev' => 'API_GWT_TST',
 		'int' => 'API_GWT_PRE',

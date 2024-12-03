@@ -41,9 +41,7 @@ public with sharing class SIR_Constantes {
 
     ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// STRING ///////// 
     public final String STRING_MAYUS_S 		 = 'S';
-    public final String STRING_MINUS_S 		 = 's';
     public final String STRING_MAYUS_N 		 = 'N';
-    public final String STRING_MINUS_N 		 = 'n';
     public final String STRING_TEST   		 = 'TEST';
     public final String STRING_0	   		 = '0';
 	public final String STRING_100	   		 = '100';
@@ -65,6 +63,8 @@ public with sharing class SIR_Constantes {
     public static final String TIPOPROCESO_PREVENTIVO= 'Preventivo';
     public static final String TIPO_TGA= 'Tec. Ges. Act.';
     public static final String TIPO_ANALISTA_RIESGOS = 'Riesgo Emp.';    
+    public static final String CIBE_ANALISTA_DE_RIESGO = 'ANALISTA DE RIESGO';
+    public static final String CIBE_ANALISTA_SENIOR_DE_RIESGO = 'ANALISTA SENIOR DE RIESGO';
     public static final String DATO_PERSONA= 'PERSONA';
     public static final String DATO_CONTACTADA= 'CONTACTADA';
 
@@ -109,7 +109,12 @@ public with sharing class SIR_Constantes {
     public static final String ACCION_RESULTADO_SOLUCION_ESTRUCTURAL_24M = '36';
     public static final String ACCION_RESULTADO_SOLUCION_ANALISIS_REALIZADO_EXCLUIDO = '31';
     public static final String ACCION_RESULTADO_SOLUCION_ANALISIS_NO_REALIZADO = '32';
-    public static final String ACCION_RESULTADO_SOLUCION_ANALISIS_REALIZADO_NO_EXCLUIDO = '33';
+    public static final String ACCION_RESULTADO_SOLUCION_ANALISIS_REALIZADO_NO_EXCLUIDO = '33';    
+    public static final String ACCION_RESULTADO_SOLUCION_REFINANCIACION_REESTRUCTURACION = '42';
+    public static final String ACCION_RESULTADO_SOLUCION_ESTRUCTURAL_VENTA_DACION = '43';
+    public static final String ACCION_RESULTADO_NO_SOLUCION_NO_COLABORA = '44';
+    public static final String ACCION_RESULTADO_SEGUIRA_PAGANDO = '45';
+
 	
     // ACCION CAMPO TIPO
     public static final String ACCION_TIPO_LLAMADA_EMITIDA = '01';
@@ -132,20 +137,21 @@ public with sharing class SIR_Constantes {
     public static final String ACCION_ESTADO_PENDIENTE = 'Pendiente Sincronización';
     public static final String ACCION_ESTADO_ENVIADA = 'Enviada';
     public static final String ACCION_ESTADO_BORRAR = 'Borrar';
-
+   
     //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO //////// PROCESO ////////
-
     public static final String PROCESO_OBJECT_API_NAME = 'SIREC__SIREC_obj_proceso__c';
     // PROCESO RECORDTYPE
     public static final String PROCESO_RECORDTYPE_NAME_AMISTOSO = 'Proceso Amistoso';
     public static final String PROCESO_RECORDTYPE_NAME_PRESOL = 'PRESOL';
     public static final String PROCESO_RECORDTYPE_NAME_EMP_FLUJO = 'Flujo';
     public static final String PROCESO_RECORDTYPE_NAME_EMP_PREVENTIVO = 'Preventivo';
+    public static final String PROCESO_RECORDTYPE_NAME_EMP_AP_PP = 'Acuerdo Pago - Plan Pago';
 
     public static final String PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL = 'SIREC_rt_Anticipacion';
     public static final String PROCESO_RECORDTYPE_DEVELOPER_NAME_IMPA = 'SIREC_rt_procesoAmistoso';
     public static final String PROCESO_RECORDTYPE_DEVELOPER_NAME_EMP_FLUJO = 'SIRE_RT_Amistoso';
     public static final String PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP = 'SIRE_RT_PREVEMP';
+    public static final String PROCESO_RECORDTYPE_DEVELOPER_NAME_AP_PP = 'SIRE_RT_AP_PP';
 
     // PROCESO
     public static final String PROCESO_CODIGO_PRESOL_WORKFLOW = 'PDM-PRESOLW';    
@@ -178,6 +184,11 @@ public with sharing class SIR_Constantes {
     public static final String PROCESO_SITUACION_SOL_REFINAN = 'SF_SOLREFRES';
     public static final String PROCESO_SITUACION_SOL_ESTRUCTURAL = 'SF_SOLESTRUC';
     public static final String PROCESO_SITUACION_PTE_CONTACTAR = 'SF_PTECONTAC';
+    public static final String PROCESO_SITUACION_NO_COLABORA = 'SF_NOSNOC';
+    public static final String PROCESO_SITUACION_SEGUIRA_PAGANDO = 'SF_SEGPAG';
+    public static final String PROCESO_SITUACION_REFINANCIACION_REESTRUCTURACION = 'SF_REFREE';
+    public static final String PROCESO_SITUACION_ESTRUCTURAL_VENTA_DACION = 'SF_SOLESTVD';
+
     // PROCESO CAMPO SITUACION FLUJO
     public static final String PROCESO_SITUACION_SIRE_ACUERDO_PAGO_PENDIENTE = 'FEACPP';
     public static final String PROCESO_SITUACION_SIRE_PENDIENTE_CONTACTACION = 'FEPECO';
@@ -279,6 +290,23 @@ public with sharing class SIR_Constantes {
     //CODIGOS DE MODULO EN PROCESOS
     public static final String CODIGO_MODULO_PRESOL = 'PRESOL';
     public static final String CODIGO_MODULO_FLUJO = 'FLUJO EMPRESAS';
+    
+    /////// NEGOCIO //////// NEGOCIO ////////
+	public static final String NEGOCIO_IMPA ='IMPA';
+	public static final String NEGOCIO_PRESOL ='PRESOL';
+	public static final String NEGOCIO_FLUJO ='FLUJO';
+	public static final String NEGOCIO_PREVENTIVO ='PREVENTIVO';
+
+	// MAPA DE LOS NEGOCIOS Y SUS RT DE PROCESOS 
+	public static final Map<String,String> MAPA_NEGOCIO_RT = new Map<String,String>{
+                    NEGOCIO_IMPA => PROCESO_RECORDTYPE_DEVELOPER_NAME_IMPA,
+                    NEGOCIO_PRESOL => PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL,
+                    NEGOCIO_FLUJO => PROCESO_RECORDTYPE_DEVELOPER_NAME_EMP_FLUJO,
+                    NEGOCIO_PREVENTIVO => PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP
+	};
+    
+	// LISTA DE LOS NEGOCIOS   
+	public static final List<String> LIST_NEGOCIO = new List<String>{NEGOCIO_IMPA,NEGOCIO_PRESOL,NEGOCIO_FLUJO,NEGOCIO_PREVENTIVO};
 
     //CODIGOS DE TIPO DE GESTION PREVEMP
     public static final String GESTION_NEGOCIO = '1';
@@ -318,7 +346,10 @@ public with sharing class SIR_Constantes {
 
 
     //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO //////// CATALOGO 
+    public static final String CATALOGO_CNAE = 'CNAE';
+    public static final String CATALOGO_CNO = 'CNO';
     public static final String CATALOGO_PREFIJO_SEGMENTO = 'SEGM_SEGMENTO';
+    public static final String CATALOGO_PREFIJO_ESTRATEGIA = 'SEGM_ESTRATEGIA'; 
     public static final String CATALOGO_API_MAPEO_ACCIONES_PRESOL = 'API_MAPEO_ACCION_SF_SIREC';
     public static final String CATALOGO_API_MAPEO_ACCIONES_FLUJO  = 'API_MAPEO_ACCION_SF_SIREC_FLUJO';
 
@@ -343,6 +374,8 @@ public with sharing class SIR_Constantes {
     public static final String CODIGO_TAREA_SEL = 'SEL';
     public static final String CODIGO_TAREA_DAT = 'DAT';
     public static final String CODIGO_TAREA_CTL = 'CTL';
+    public static final String CODIGO_TAREA_OPC = 'OPC';
+    public static final String CODIGO_TAREA_BAT = 'BAT';
     public static final String CODIGO_SELECCION_UNICA = 'S';
     public static final String CODIGO_SELECCION_MULTIPLE = 'M';
     public static final String CODIGO_SELECCION_FECHA = 'F';
@@ -357,7 +390,41 @@ public with sharing class SIR_Constantes {
     public static final String CODIGO_PROPUESTA_CONJUNTA_RIE = 'SEL-PVC002';
     public static final String CODIGO_PROPUESTA_CONJUNTA_CON = 'SEL-PVC935';
     public static final String CODIGO_PROPUESTA_ORG_RESOLUTOR = 'SEL-PVC930';
+    public static final String CODIGO_BAT_AC1 = 'BAT-FEAC99';
+    public static final String CODIGO_BAT_AC2 = 'BAT-FEACPP';
+    public static final String CODIGO_BAT_PP1 = 'BAT-FEPPP2';
+    public static final String CODIGO_BAT_PP2 = 'BAT-FEPPPE';
 
+    //TAREA FUNCION EJE PARA PLAN PAGO/ACUERDO DE PAGO
+    public static final String FUNCION_EJE_PLANPAGO = 'PLANPAGO';
+
+    public static final List<String> LISTA_CODIGOS_PROPUESTA = new List<String>{CODIGO_PROPUESTA_NEGOCIO, CODIGO_PROPUESTA_RIESGO, CODIGO_PROPUESTA_CONJUNTA,
+                                                                                CODIGO_PROPUESTA_CONJUNTA_NEG,CODIGO_PROPUESTA_CONJUNTA_RIE,CODIGO_PROPUESTA_CONJUNTA_CON,
+                                                                                CODIGO_PROPUESTA_ORG_RESOLUTOR};
+    
+    public static final List<String> LISTA_CODIGOS_BAT_AC_PP = new List<String>{CODIGO_BAT_AC1, CODIGO_BAT_AC2, CODIGO_BAT_PP1, CODIGO_BAT_PP2};
+        
+    // TAREAS DE SEGUIMIENTO ACUERDO DE PAGO O PLAN DE PAGO 
+    public static final String CODIGO_TAREA_CTL_SEGUIMIENTO = 'CTL-SEGUIMIENTO';
+
+    //
+    public static final Map<String,String> MAP_CODIGO_ACTIVIDAD_AP_PP = new Map<String,String>{
+        'OPC-ACUEPAGO' => 'ACUERDO_DE_PAGO',                                            
+        'OPC-PLANPAGO' => 'PLAN_PAGO'
+    };
+    public static final Map<String,String> MAP_CODIGO_PDM_ACT_AP_PP = new Map<String,String>{
+        'OPC-ACUEPAGO' => 'PDM-PLANPAGO',                                            
+        'OPC-PLANPAGO' => 'PDM-ACUERDO'
+    };
+
+    public static final Map<String,String> MAP_SITUACION_COLECTIVO = new Map<String,String>{
+        'SF_PVNRAP' => 'No requiere acción preventiva',                                            
+        'SF_PVNRAP' => 'No requiere acción preventiva',    
+        'SF_PVCAPR' => 'Con Acción preventiva',
+        'SF_PVCAP4' => 'Con acción restrictiva pendiente',        
+        'SF_PVACAP' => 'Acción restrictiva aplicada',
+        'SF_INIGEST' => ''        
+    };
 
     //////// VARIABLES //////// VARIABLES //////// VARIABLES //////// VARIABLES //////// VARIABLES //////// VARIABLES //////// VARIABLES //////// VARIABLES ////////  
     public final static String CREACION_REGISTRO_CORRECTO = 'CREATE OK';
@@ -373,5 +440,8 @@ public with sharing class SIR_Constantes {
     // Modificar a SIREC_ cuando tengamos el actor de empresas creado y los custom setting duplicados
     public static final String APP_ACT_MCSOLEMP_PREFIX = '';
     
-   
+    // EXTERNAL CREDENTIAL PARA ALMACENAR KEY ENCRIPTADO
+    public static final String EXT_CRED_KEY_NUMPERSO = 'SIR_KeyNumPerso';
+    public static final String EXT_CRED_KEY_PRINCIPAL = 'Key';
+    public static final String KEY_NUMPERSO_TEST = 'qC+ktryIjVtl+hUwCq3KuQ==';    
 }

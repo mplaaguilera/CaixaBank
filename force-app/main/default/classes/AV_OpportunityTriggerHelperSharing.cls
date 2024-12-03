@@ -8,6 +8,8 @@ Historial
 ---------------------
 VERSION		USER_STORY	        AUTHOR		   		DATE				Description
 1.0			Fix		            Elisabeth R.	    11/09/2023		    Init version
+1.1         FIX IOP 7 Mayo      Elisabeth R.        06/052024           Added createCommentsHistory method from AV_OpportunityTriggerHelper class due to sharing settings of the CSBD user who is creating the opportunity with comments
+1.2         FIX IOP 22 Mayo     Elisabeth R.        09/05/2024          Added insertTareaOpp method from AV_OpportunityTriggerHelper class due to sharing settings of the CSBD user who is creating the AV_CustomActivityOpportunity__c 
 ***********************************************************************************************************************/
 public without sharing class AV_OpportunityTriggerHelperSharing {
     
@@ -91,5 +93,68 @@ public without sharing class AV_OpportunityTriggerHelperSharing {
 	}
 
 
+
+	/**
+	* @description   object AV_CommentsHistory is created when a new Opportunity with the AV_Comentarios__ field informed is inserted
+	* @param  listNew  list of new Opportunities 
+	*/
+	public static void createCommentsHistory(List<Opportunity> listNew,Map<String, Opportunity> mapByPass){
+		List<AV_CommentsHistory__c> lstCommHist = new List<AV_CommentsHistory__c>();
+
+		String commentOwnerId = UserInfo.getUserId();
+
+		List<User> commentUserId = [SELECT Id, AV_ExternalID__c FROM User WHERE Id =:commentOwnerId LIMIT 1];
+		List<Contact> commentEmployee = [SELECT Id FROM Contact WHERE CC_Matricula__c =: commentUserId[0].AV_ExternalID__c LIMIT 1];
+
+
+		for(Opportunity opp: listNew){
+			if(listNew != null && !mapByPass.containsKey(opp.AV_ExternalID__c) && (String.isNotBlank(opp.AV_Comentarios__c) || String.isNotBlank(opp.StageName))){
+				AV_CommentsHistory__c commHist = new AV_CommentsHistory__c();
+			    commHist.OwnerId = opp.LastModifiedById;
+				commHist.AV_ModificationDate__c = opp.AV_CommentLastModifiedDate__c;
+				commHist.AV_NewComment__c = opp.AV_Comentarios__c;
+				commHist.AV_OpportunityStatus__c = opp.StageName;
+				if(commentEmployee != null && !commentEmployee.isEmpty()){
+					commHist.AV_AssignedEmployee__c = commentEmployee[0].Id;
+				}else{
+					commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+				}
+				commHist.AV_Opportunity__c = opp.Id;
+				lstCommHist.add(commHist);
+			}
+		}
+		if(Schema.sObjectType.AV_CommentsHistory__c.isCreateable()){
+			List<Database.SaveResult> commHistResultInsert = Database.insert(lstCommHist,false);
+		}
+	}
+
+
+	/**
+	* @description       Insert AV_CustomActivityOpportunity__c without sharing
+	* @param listTareaOpp      List of the Task-Opp
+	*/
+	public static void insertTareaOpp(List<AV_CustomActivityOpportunity__c> listTareaOpp){
+
+		List<String> listErrorsTaskOpp = new List<String>();
+
+		Database.SaveResult[] resultList = Database.insert(listTareaOpp, false);
+	
+		Integer i = 0;
+		for(Database.SaveResult sr : resultList){
+			if (sr.getErrors()!=null) {
+				for(Database.Error err : sr.getErrors()) {
+					listErrorsTaskOpp.add('Error: ' + err.getMessage() + ' -> Id: ' + listTareaOpp.get(i).Id); 
+				}
+			}
+			i++;
+		}
+
+		if(listErrorsTaskOpp != null && !listErrorsTaskOpp.isEmpty()) {
+			CBK_log.error('Método insertTareaOpp listErrorsTaskOpp: '+listErrorsTaskOpp,listErrorsTaskOpp);
+		}
+
+
+	}
+    
 
 }

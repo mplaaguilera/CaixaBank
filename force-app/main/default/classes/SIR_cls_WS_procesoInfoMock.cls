@@ -10,7 +10,7 @@ public with sharing class SIR_cls_WS_procesoInfoMock implements HttpCalloutMock 
         Map<String, Object> errorMap = new  Map<String, Object>();
         response.setHeader('Content-Type', 'application/json');
         response.setStatusCode(200);
-        respuestaMap.put('idProceso',123456);
+        respuestaMap.put('idProceso',12345645);
         respuestaMap.put('idActividad',123456);     
         respMap.put('respuesta', respuestaMap);
         respMap.put('info', infoMap);
@@ -18,7 +18,6 @@ public with sharing class SIR_cls_WS_procesoInfoMock implements HttpCalloutMock 
         List<Object> lstError = new List<Object>();
         lstError.add(errorMap);
         respMap.put('error', lstError);
-
         if(req.getEndpoint().equals('callout:procesoInfo/12345645')){
             infoMap.put('codigo', 1);    
             response.setBody(Json.serializePretty(respMap));

@@ -23,11 +23,22 @@ public with sharing class CIBE_EventosFichaCliente_Controller {
         List<Contact> listContLog = new List<Contact>();
         Map<String,List<String>> mapCon = new Map<String,List<String>>();
         Boolean userRelation = false;
+        String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
         if(Event.SObjectType.getDescribe().isAccessible()) {
-                
-            events = [SELECT Id, AV_Tipo__c, Subject,toLabel(CSBD_Evento_Estado__c), StartDateTime, Owner.Name, CIBE_Confidential__c , OwnerId 
-            FROM Event WHERE StartDateTime >= TODAY AND CSBD_Evento_Estado__c IN ('Pendiente', 'Pendiente no localizado') AND
-            RecordType.DeveloperName IN ('CIBE_EventoCliente', 'CIBE_EventodelGestor') AND IsChild = false AND AccountId = :recordId];
+
+            if(roleUser == 'CIB'){
+                events = [SELECT Id, AV_Tipo__c, Subject,toLabel(CSBD_Evento_Estado__c), StartDateTime, Owner.Name, CIBE_Confidential__c , OwnerId 
+                FROM Event WHERE StartDateTime >= TODAY  AND RecordType.DeveloperName IN ('CIBE_EventoClienteCIB', 'CIBE_EventoGestorCIB') 
+                AND IsChild = false AND AccountId = :recordId];
+            }else if(roleUser == 'CIBE_CIBEmpresas'){
+                events = [SELECT Id, AV_Tipo__c, Subject,toLabel(CSBD_Evento_Estado__c), StartDateTime, Owner.Name, CIBE_Confidential__c , OwnerId 
+                FROM Event WHERE StartDateTime >= TODAY  AND RecordType.DeveloperName IN ('CIBE_EventoClienteCIB', 'CIBE_EventoGestorCIB','CIBE_EventoCliente', 'CIBE_EventodelGestor') 
+                AND IsChild = false AND AccountId = :recordId];
+            }else{
+                events = [SELECT Id, AV_Tipo__c, Subject,toLabel(CSBD_Evento_Estado__c), StartDateTime, Owner.Name, CIBE_Confidential__c , OwnerId 
+                FROM Event WHERE StartDateTime >= TODAY AND CSBD_Evento_Estado__c IN ('Pendiente', 'Pendiente no localizado') AND
+                RecordType.DeveloperName IN ('CIBE_EventoCliente', 'CIBE_EventodelGestor') AND IsChild = false AND AccountId = :recordId];
+            }
 
             if(!events.isEmpty() && EventRelation.SObjectType.getDescribe().isAccessible()){
                 for(EventRelation evr : [SELECT Id, EventId, RelationId, relation.name  FROM EventRelation WHERE EventId IN:events AND IsInvitee = true]){

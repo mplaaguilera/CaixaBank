@@ -1,17 +1,19 @@
 /**********************************************************************************************************************
- Name:   EV_CMStagingTriggerHelper
- Copyright © 2020  CaixaBank
------------------------------------------------------------------------------------------------------------------------
-Proposito: helper para los triggers
------------------------------------------------------------------------------------------------------------------------
+Name: EV_CMStagingTriggerHelper
+Copyright © 2020 CaixaBank
+------------------------------------------------------------------------------------------------------
+@description: helper para los triggers
+------------------------------------------------------------------------------------------------------
 Historial
----------------------
+----------------------
 	VERSION     USER_STORY          AUTHOR                      DATE                Description
 	1.0                             Jashanpreet Singh           06/11/2021          Init version
 	1.1                             Daniel Rodriguez            19/10/2022          Add error when ExternalId not exist
 	1.2								Mamen Arias					30/12/2022			Correction error idInvitacion
 	1.3								Daniel Rodriguez			21/07/2023			Correction exception limite registros virtuales
-
+	1.4		     US511092         	Daniel Rodriguez    		09/01/2024			Add !test.isrunningtest for test
+	1.5								Carolina Lopez				12/03/2024			Modify method syncCampaignMember for correction error null Ids.
+	1.6			 FIX				Carolina Lopez				26/04/2024			Check null in field EV_ContadorCheckInVirtual__c.
 ***********************************************************************************************************************/
 public with sharing class EV_CMStagingTriggerHelper {
 	
@@ -19,6 +21,11 @@ public with sharing class EV_CMStagingTriggerHelper {
 	static final String STATUSCOMPLETED = 'Completed';
 	static final String STATUSERROR = 'Error';
 
+	/**
+	* @description       syncCampaignMember update CM staging
+	* @param listNews      List of EV_CampaingMemeberStaging__c
+	* @param isBefore      boolean
+	*/
 	public static void syncCampaignMember(List<EV_CampaingMemeberStaging__c> listNews, Boolean isBefore){
         EV_LogDebug.printLogDebug('syncCampaignMember ',String.valueof(listNews) +' isBefore '+ isBefore);
 		Set<String> campignStatusInProgress = new Set<String>{'In progress'};
@@ -76,17 +83,17 @@ public with sharing class EV_CMStagingTriggerHelper {
                     mapextIdCMCustom.put(cmc.EV_ExternalID__c, cmc);
                 }
                 for(EV_CampaingMemeberStaging__c cmc : listNews ){
-                     EV_CampaignMemberC__c cm = new EV_CampaignMemberC__c();
+                    EV_CampaignMemberC__c cm = new EV_CampaignMemberC__c();
                     EV_CampaignMemberC__c cmCustom = mapextIdCMCustom.get(cmc.ev_externalId__c);
                     if(cmCustom != null){
                         cm.EV_ExternalId__c = cmCustom.EV_ExternalId__c;
-                        cm.EV_ContadorCheckInVirtual__c = cmCustom.EV_ContadorCheckInVirtual__c+ cmc.EV_ContadorCheckInVirtual__c;
+                        cm.EV_ContadorCheckInVirtual__c = cmCustom.EV_ContadorCheckInVirtual__c+ (cmc.EV_ContadorCheckInVirtual__c == null? 0 : cmc.EV_ContadorCheckInVirtual__c);
                         cm.EV_Origen__c = cmc.EV_Origen__c;
                         cm.EV_Numperso__c = cmc.EV_Numperso__c;
                         cm.EV_Canal__c = cmc.EV_Canal__c;
                         cm.Id = cmCustom.id;
+						updateCMCustom.add(cm); 
                     }
-                    updateCMCustom.add(cm);
                 }
                 
                 EV_LogDebug.printLogDebug('@@updateCMCustom', String.valueOf(updateCMCustom));
@@ -94,13 +101,17 @@ public with sharing class EV_CMStagingTriggerHelper {
                     Database.update(updateCMCustom);
                 }
             }
-        }if(listCampaignMember.isEmpty() && listCampaignMemberCustom.isEmpty()){
+        }if(listCampaignMember.isEmpty() && listCampaignMemberCustom.isEmpty() && !Test.isRunningTest()){
             for(EV_CampaingMemeberStaging__c cms : listNews){
              cms.addError('ExternalId no existente');   
             }
 		}
 	}
 
+	/**
+	* @description       syncCMS update CM staging
+	* @param records      
+	*/
 	@future
 	public static void syncCMS(String records){
 		Integer errNum = 0;

@@ -17,7 +17,7 @@ public with sharing class SIR_ValueAccion {
         for(SIREC__SIREC_obj_acciones__c accion : acciones){
             listId.add(accion.Id);
         }
-		if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isUpdateable()){
+		if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isUpdateable()){
     
             List<SIREC__SIREC_obj_acciones__c> listAcciones = [SELECT id ,SIR_valorAccion__c , toLabel(SIREC__SIREC_fld_accion__c) 
                                                                FROM SIREC__SIREC_obj_acciones__c 

@@ -1,5 +1,5 @@
 /********************************************************************************************************************
- Name:	  AV_TaskReport_Controller
+ Name:    AV_TaskReport_Controller
  Copyright © 2023  CaixaBank
 --------------------------------------------------------------------------------------------------------------------
  Proposito: Gives support to av_TaskReport LWC and child components.
@@ -7,13 +7,23 @@
 ---------------------------------------------------------------------------------------------------------------------
  Historial
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- VERSION		USER_STORY			AUTHOR				DATE			Description
- 1.0			US602653         	Sandra Gómez		29/09/2023		Init version.
- 
+ VERSION        USER_STORY          AUTHOR              DATE            Description
+ 1.0            US602653            Sandra Gómez        29/09/2023      Init version.
+ 1.1            Fix Sin Cita        Sandra Gómez        29/01/2024      Change method createEvent add AV_ContactGenerateAppointment__c
+ 1.2            US796306            Oscar Moreno        20/02/2024      Add unlinkOpp method
+ 1.3            US796361            Oscar Moreno        20/03/2024      Modify method eventAndTaskProcess
+ 1.4			PPM100205279		Luis Fernández		13/05/2024		Added new attribute to OpportunityWrapper NoOfrecerHasta in order to inform AV_NoOfrecerHasta__c when it proceds.
+ 1.5            PPM100130465        Oscar Moreno        05/07/2024       Replace PS_CHECKONOFF with PS_OLDHOMETASK
+ 1.6            PPM100265806        Oscar Moreno        12/09/2024       Add the owneridopp attribute to OpportunityWrap class 
+1.7				PM100492394			Luis Fernández		01/10/2024		Added owner property to task wrapper
  *********************************************************************************************************************/
 public with sharing class AV_TaskReport_Controller {
 
 	public class TaskWrapper{
+		@AuraEnabled
+		public String id {get;set;}
+		@AuraEnabled 
+		public String tipo {get;set;}
 		@AuraEnabled
 		public String accountId {get;set;}
 		@AuraEnabled
@@ -29,11 +39,17 @@ public with sharing class AV_TaskReport_Controller {
 		@AuraEnabled
 		public String statusTask {get;set;}
 		@AuraEnabled
-		public String activityDateTask {get;set;}
+		public Date activityDateTask {get;set;}
 		@AuraEnabled
 		public String priorityTask {get;set;}
 		@AuraEnabled
 		public String recordType {get;set;}
+		@AuraEnabled
+		public String descripcion {get;set;}
+		@AuraEnabled
+		public DateTime reminder {get;set;}
+		@AuraEnabled
+		public String owner {get;set;}
 	}
 
 	public class OppResulWrap {
@@ -96,6 +112,10 @@ public with sharing class AV_TaskReport_Controller {
 		public String accountId {get;set;}
 		@AuraEnabled
 		public String recordType {get;set;}
+		@AuraEnabled
+		public String comentaryTask {get;set;}
+		@AuraEnabled
+		public String ownerid {get;set;}
 	}
 
 	public class TaskBlockReport {
@@ -105,6 +125,8 @@ public with sharing class AV_TaskReport_Controller {
 		public String status {get;set;}
 		@AuraEnabled
 		public String comment {get;set;}
+		@AuraEnabled
+		public String owner {get;set;}
 	}
 
 	public class OpportunityReport {
@@ -150,6 +172,10 @@ public with sharing class AV_TaskReport_Controller {
 		public Boolean agendado {get;set;}
 		@AuraEnabled
 		public Boolean validable {get;set;}
+		@AuraEnabled
+		public Date noofrecerhasta {get;set;}
+		@AuraEnabled
+		public String owneridopp {get;set;}
 	}
 
 	public class ResultEventTask{
@@ -183,6 +209,8 @@ public with sharing class AV_TaskReport_Controller {
 		@AuraEnabled
 		public List<String> deleteIdEventInsert;
 		@AuraEnabled
+		public List<String> deleteIdCommentsHistoryInsert;
+		@AuraEnabled
 		public List<String> deleteManageHistInsert;
 		@AuraEnabled
 		public List<Task> updateTaskUpdated;
@@ -199,16 +227,21 @@ public with sharing class AV_TaskReport_Controller {
 		String methodName = 'getTaskData';
 		TaskWrapper taskWrapper = new TaskWrapper();
 		try {
-			Task ta = [SELECT Id, RecordType.DeveloperName, Subject, AccountId, ActivityDate, toLabel(Priority), toLabel(Status), Account.Name, Account.RecordType.DeveloperName, AV_Task__c FROM Task WHERE Id = :id LIMIT 1];
+			Task ta = [SELECT Id, OwnerId, RecordType.DeveloperName, Description,ReminderDateTime,Subject, AV_Tipo__c, AccountId, ActivityDate, toLabel(Priority), toLabel(Status), Account.Name, Account.RecordType.DeveloperName, AV_Task__c FROM Task WHERE Id = :id LIMIT 1];
+			taskWrapper.id = ta.Id;
+			taskWrapper.tipo = ta.AV_Tipo__c;
 			taskWrapper.accountId = ta.AccountId;
 			taskWrapper.accountName = ta.Account.Name;
 			taskWrapper.accountRt = ta.Account.RecordType.DeveloperName;
 			taskWrapper.headerId = ta.AV_Task__c;
 			taskWrapper.subjectTask = ta.Subject;
 			taskWrapper.statusTask = ta.Status;
-			taskWrapper.activityDateTask = ta.ActivityDate.format();
+			taskWrapper.activityDateTask = ta.ActivityDate;
 			taskWrapper.priorityTask = ta.Priority;
 			taskWrapper.recordType = ta.RecordType.DeveloperName;
+			taskWrapper.descripcion = ta.Description;
+			taskWrapper.reminder = ta.ReminderDateTime;
+			taskWrapper.owner = ta.OwnerId;
 			List<Contact> co = [SELECT AV_EmpleadoIntouch__c  FROM Contact WHERE AV_UsuarioAsociado__c = :UserInfo.getUserId() LIMIT 1];
 			if (co != null && !co.isEmpty()) {
 				taskWrapper.contactIntouch = co[0].AV_EmpleadoIntouch__c;
@@ -221,7 +254,7 @@ public with sharing class AV_TaskReport_Controller {
 	}
 
 	/**
-	 * @description		Lookup of Office
+	 * @description     Lookup of Office
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<AV_LookupSearchResult> searchOffice(String searchTerm, List<String> selectedIds) {
@@ -257,11 +290,11 @@ public with sharing class AV_TaskReport_Controller {
 	}
 
 	/**
-	 * @description			Lookup of Contact in field Contact Person
-	 * @param searchTerm 	filter to search in object Contact
-	 * @param selectedIds 	list of Ids selected of object contact
-	 * @param accountId 	Id of account to filter in query
-	 * @return 				Contact to show lookup
+	 * @description         Lookup of Contact in field Contact Person
+	 * @param searchTerm    filter to search in object Contact
+	 * @param selectedIds   list of Ids selected of object contact
+	 * @param accountId     Id of account to filter in query
+	 * @return              Contact to show lookup
 	 */
 	@AuraEnabled(cacheable=true)
 	public static List<AV_LookupSearchResult> searchContact(String searchTerm, List<String> selectedIds, String accountId){
@@ -316,22 +349,22 @@ public with sharing class AV_TaskReport_Controller {
 	}
 
 	/**
-	* @description 		method to query with string
-	* @param q 			query to execute
-	* @param listIds 	list of Ids contact
-	* @param accountId 	Id of account
-	* @return 			list contact of return query
+	* @description      method to query with string
+	* @param q          query to execute
+	* @param listIds    list of Ids contact
+	* @param accountId  Id of account
+	* @return           list contact of return query
 	*/
 	private static List<Contact> capsulateQuery(String q, List<String> listIds, String accountId) {
 		return (List<Contact>) Database.query(q);
 	}
 
 	/**
-	* @description 					to insert/update opportunity get of report
-	* @param opportunities 			map with id opportunity and map with data of opportunity to update/insert
-	* @param isInsert 				boolean of insert/update
-	* @param accountId 				Id of account
-	* @return 						result OK or error, list of ids insert/update and map of old opp update
+	* @description                  to insert/update opportunity get of report
+	* @param opportunities          map with id opportunity and map with data of opportunity to update/insert
+	* @param isInsert               boolean of insert/update
+	* @param accountId              Id of account
+	* @return                       result OK or error, list of ids insert/update and map of old opp update
 	*/
 	@AuraEnabled
 	public static OppResulWrap insertOrUpdateOpp(Map<String,OpportunityReport> opportunities,String accountId, Boolean isInsert){
@@ -404,13 +437,22 @@ public with sharing class AV_TaskReport_Controller {
 				if (accountId != null) {
 					nextOppo.AccountId = accountId;
 				}
+				if(wrappedOppo.closedate != null) {
+					nextOppo.CloseDate = wrappedOppo.closedate;
+				}
+				if(wrappedOppo.owneridopp != null) {
+					nextOppo.OwnerId = wrappedOppo.owneridopp;
+				}
+				if(wrappedOppo.noofrecerhasta != null){
+					nextOppo.AV_NoOfrecerHasta__c = wrappedOppo.noofrecerhasta; 
+				}	
 				listOpp.add(nextOppo);
 			} else {
 				listIds.add(wrappedOppo.id);
 			}
 		}
 		if (listIds != null && !listIds.isEmpty()) {
-			List<Opportunity> listOldOpp = [Select Id, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c from Opportunity where Id in :listIds];
+			List<Opportunity> listOldOpp = [Select Id, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c,OwnerId from Opportunity where Id in :listIds];  
 			if (listOldOpp != null && !listOldOpp.isEmpty()) {
 				for(Opportunity opp: listOldOpp) {
 					mapOldOpp.put(opp.Id,opp);
@@ -446,23 +488,25 @@ public with sharing class AV_TaskReport_Controller {
 	}
 
 	/**
-	* @description 					to insert/update event and task get of report
-	* @param opportunities 			map with id opportunity and map with data of opportunity to update/insert
-	* @param event 					data of event to insert
-	* @param task 					data of task to update
-	* @param taskBlock 				list of task to update of block of task priorizador or avisos
-	* @param mapOldOpp 				map of Opportunities old
-	* @param opposId 				list of Ids of Opportunities insert
-	* @return 						result OK or error, list of ids insert/update and map of old opp update
+	* @description                  to insert/update event and task get of report
+	* @param opportunities          map with id opportunity and map with data of opportunity to update/insert
+	* @param event                  data of event to insert
+	* @param task                   data of task to update
+	* @param taskBlock              list of task to update of block of task priorizador or avisos
+	* @param mapOldOpp              map of Opportunities old
+	* @param opposId                list of Ids of Opportunities insert
+	* @return                       result OK or error, list of ids insert/update and map of old opp update
 	*/
 	@AuraEnabled
 	public static ResultEventTask eventAndTaskProcess(EventReport event,TaskReport task, Map<String,TaskBlockReport> taskBlock, Map<String,OpportunityReport> opportunities,Map<String,Opportunity> mapOldOpp, List<String> opposId) {
+		Boolean hasCustomPermission = FeatureManagement.checkPermission(AV_AppConstants.PS_OLDHOMETASK);
 		Savepoint sp = Database.setSavepoint();
 		String result = 'OK';
 		//Back
 		List<Task> listTaskUpdateOld = new List<Task>();
 		List<String> listIdsManageHistInsert = new List<String>();
 		List<String> listIdsEventInsert = new List<String>();
+		List<String> listIdsCommentsHistoryInsert = new List<String>();
 		List<AV_CustomActivityOpportunity__c> listTaskOppDeleteOld = new List<AV_CustomActivityOpportunity__c>();
 		Map<String,String> mapNewHeader = new Map<String,String>();
 		List<Task> listTaskDeleteOld = new List<Task>();
@@ -498,6 +542,7 @@ public with sharing class AV_TaskReport_Controller {
 			for(Task ta : tskToUpt) {
 				ta.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP;
 			}
+
 			List<Database.SaveResult> srUpdtTsk = Database.update(tskToUpt,false);
 			for(Database.SaveResult err : srUpdtTsk){
 				if(!err.isSuccess()){
@@ -638,7 +683,7 @@ public with sharing class AV_TaskReport_Controller {
 				}
 			}
 			if (listTaskToDelete != null && listTaskToDeleteIds != null && !listTaskToDeleteIds.isEmpty() && !listTaskToDelete.isEmpty()) {
-				List<Task> listTaskToDeleteIdsAdd = [SELECT RecordTypeId, WhoId, WhatId, Subject, ActivityDate, Status, Priority, OwnerId, Description, ReminderDateTime, IsReminderSet,AV_ALVEN__c, AV_CodigoGestorAsignado__c, AV_Concepto1__c, AV_Concepto2__c, AV_NoGestionable__c, AV_Type__c, AV_ExternalID__c, AV_ConVenta__c, AV_Task__c, AV_Tipo__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_OrigenApp__c, AV_BranchPhysicalMeet__c, AV_ColorEtiqueta__c, AV_DurationToNoticeToManager__c, AV_FechaFinAccionComercial__c, AV_Center__c, AV_PrioritizingSort__c, AV_FechaInicioVigencia__c, AV_Chanel__c, AV_PEA__c, AV_Purpose__c, AV_IdDelActaMifid__c, AV_CenterRtIndex__c, AV_UrlsQR__c, AV_PriorityTask__c, AV_AssociatedOpportunityId__c, AV_SurveyValue__c, AV_PEA2__c, AV_OrigenAct__c, AV_VisiblePorElClienteEnNow__c, AV_Case__c FROM Task WHERE Id IN :listTaskToDeleteIds];
+				List<Task> listTaskToDeleteIdsAdd = [SELECT RecordTypeId, WhoId, WhatId, Subject, ActivityDate, Status, Priority, OwnerId, Description, ReminderDateTime, IsReminderSet,AV_ALVEN__c, AV_CodigoGestorAsignado__c,   AV_NoGestionable__c, AV_Type__c, AV_ExternalID__c, AV_ConVenta__c, AV_Task__c, AV_Tipo__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_OrigenApp__c, AV_BranchPhysicalMeet__c, AV_ColorEtiqueta__c, AV_DurationToNoticeToManager__c, AV_FechaFinAccionComercial__c, AV_Center__c, AV_PrioritizingSort__c, AV_FechaInicioVigencia__c, AV_Chanel__c, AV_PEA__c, AV_Purpose__c, AV_IdDelActaMifid__c, AV_CenterRtIndex__c, AV_PriorityTask__c, AV_AssociatedOpportunityId__c, AV_SurveyValue__c, AV_PEA2__c, AV_OrigenAct__c, AV_VisiblePorElClienteEnNow__c, AV_Case__c FROM Task WHERE Id IN :listTaskToDeleteIds];
 				if (listTaskToDeleteIdsAdd != null && !listTaskToDeleteIdsAdd.isEmpty()) {
 					List<Task> listTaskBack = new List<Task>();
 					for (Task ta : listTaskToDeleteIdsAdd) {
@@ -666,31 +711,33 @@ public with sharing class AV_TaskReport_Controller {
 				if(!sr.isSuccess()) {
 					result = sr.getErrors()[0].getMessage();
 				} else {
-					resultsEventTask.add(sr.getId());
+					resultsEventTask.add(sr.getId());  
 					listIdsEventInsert.add(sr.getId());
 				}
 			}
 			//Creaccion de las tareas de check on off
 			List<Task> recordsToInsert = new List<Task>();
-			if (mapProducIdOpp != null && mapCreateTaskCheckOnOff != null) {
-				List<Product2> listproducts = [Select Id, Name from Product2 where Id in :mapProducIdOpp.keySet()];
-				if (listproducts != null && !listproducts.isEmpty()) {
-					for (Product2 pro : listproducts) {
-						mapProducIdName.put(pro.Id,pro.Name);
-						mapProducNameId.put(pro.Name,pro.Id);
-					}
-					if (mapProducIdName != null && !mapProducIdName.isEmpty()) {
-						RecordType rtTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT);
-						for(String oppId : mapCreateTaskCheckOnOff.keySet()){ // Tareas de check on off
-							Task nextRecord = new Task();
-							nextRecord.RecordTypeId = rtTask.Id;
-							nextRecord.WhatId = task.accountId;
-							nextRecord.Status = 'Open';
-							nextRecord.Priority = 'A';
-							nextRecord.ActivityDate = mapCreateTaskCheckOnOff.get(oppId).proximaGestion;
-							nextRecord.Subject = mapProducIdName.get(mapCreateTaskCheckOnOff.get(oppId).ProdId);
-							nextRecord.AV_OrigenApp__c= AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF;
-							recordsToInsert.add(nextRecord);
+			if(hasCustomPermission){
+				if (mapProducIdOpp != null && mapCreateTaskCheckOnOff != null) {
+					List<Product2> listproducts = [Select Id, Name from Product2 where Id in :mapProducIdOpp.keySet()];
+					if (listproducts != null && !listproducts.isEmpty()) {
+						for (Product2 pro : listproducts) {
+							mapProducIdName.put(pro.Id,pro.Name);
+							mapProducNameId.put(pro.Name,pro.Id);
+						}
+						if (mapProducIdName != null && !mapProducIdName.isEmpty()) {
+							RecordType rtTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKINICIATIVA_RT);
+							for(String oppId : mapCreateTaskCheckOnOff.keySet()){ // Tareas de check on off
+								Task nextRecord = new Task();
+								nextRecord.RecordTypeId = rtTask.Id;
+								nextRecord.WhatId = task.accountId;
+								nextRecord.Status = 'Open';
+								nextRecord.Priority = 'A';
+								nextRecord.ActivityDate = mapCreateTaskCheckOnOff.get(oppId).proximaGestion;
+								nextRecord.Subject = mapProducIdName.get(mapCreateTaskCheckOnOff.get(oppId).ProdId);
+								nextRecord.AV_OrigenApp__c= AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF;
+								recordsToInsert.add(nextRecord);
+							}
 						}
 					}
 				}
@@ -706,6 +753,16 @@ public with sharing class AV_TaskReport_Controller {
 					}
 				}
 			}
+			
+			List<AV_CommentsHistory__c> commHistList = new List<AV_CommentsHistory__c>();
+			Set<Id> setIds = new Set<Id>();
+			for (String opportunityId : opportunities.keySet()) {
+				OpportunityReport oppRep = opportunities.get(opportunityId);
+				String id = oppRep.id;
+				setIds.add(id);
+				
+			}
+			List<Contact> contactList = [SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c =:UserInfo.getUserId() ];
 			headerActivitys = new Map<Id,TaskEvent>();
 			if (resultsEventTask != null && !resultsEventTask.isEmpty()) {
 				if (event != null && event.activityDateTime != null) {
@@ -719,6 +776,45 @@ public with sharing class AV_TaskReport_Controller {
 							te.activityDate = ev.ActivityDate;
 							te.origenApp = ev.AV_OrigenApp__c;
 							headerActivitys.put(ev.Id,te);
+							if(mapOldOpp != null){
+
+							for(String oppoId : opportunities.keySet()){
+								if(opportunities.get(oppoId)!= null  && (mapOldOpp.get(oppoId) == null || (mapOldOpp.get(oppoId) != null && (mapOldOpp.get(oppoId).AV_Comentarios__c != opportunities.get(oppoId).comentario || mapOldOpp.get(oppoId).StageName != opportunities.get(oppoId).newPath)))){
+									AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+									String comentario = (String)opportunities.get(oppoId).comentario;
+									ch.AV_NewComment__c = comentario;
+									ch.AV_Opportunity__c = (String)opportunities.get(oppoId).id;
+									if(mapOldOpp!=null && mapOldOpp.get(oppoId)!= null){
+										ch.AV_OldComment__c = (String)mapOldOpp.get(oppoId).AV_Comentarios__c;
+										ch.AV_OldStatus__c = mapOldOpp.get(oppoId).StageName;
+									}
+									ch.AV_ModificationDate__c = System.today();
+									if(contactList != null && !contactList.isEmpty()){
+										ch.AV_AssignedEmployee__c = contactList[0].Id;
+									}
+									ch.AV_OpportunityStatus__c = (String)opportunities.get(oppoId).newPath;
+									ch.AV_Event__c = (String)ev.Id;
+									commHistList.add(ch);
+								}
+							}
+						}else{
+							for(String oppoId : opportunities.keySet()){
+								AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+								String comentario = (String)opportunities.get(oppoId).comentario;
+								ch.AV_NewComment__c = comentario;
+								ch.AV_Opportunity__c = (String)opportunities.get(oppoId).id;
+								ch.AV_ModificationDate__c = System.today();
+								if(contactList != null && !contactList.isEmpty()){
+									ch.AV_AssignedEmployee__c = contactList[0].Id;
+								}
+								ch.AV_OpportunityStatus__c = (String)opportunities.get(oppoId).newPath;
+								ch.AV_Event__c = (String)ev.Id;
+								commHistList.add(ch);
+
+							}
+
+						}
+							//
 						}
 					}
 				}
@@ -732,9 +828,42 @@ public with sharing class AV_TaskReport_Controller {
 						te.activityDate = ta.ActivityDate;
 						te.origenApp = ta.AV_OrigenApp__c;
 						headerActivitys.put(ta.Id,te);
+						if(ta.Id == task.idTask && !(event != null && event.activityDateTime != null)) {
+							for(String oppoId : opportunities.keySet()){
+                                //if(opportunities.get(oppoId)!= null  && (mapOldOpp.get(oppoId) == null || (mapOldOpp.get(oppoId) != null && (mapOldOpp.get(oppoId).AV_Comentarios__c != opportunities.get(oppoId).comentario || mapOldOpp.get(oppoId).StageName != opportunities.get(oppoId).newPath)))){
+                                if(opportunities.get(oppoId)!= null  && (mapOldOpp == null || (mapOldOpp != null && mapOldOpp.get(oppoId) == null) || (mapOldOpp != null && mapOldOpp.get(oppoId) != null && (mapOldOpp.get(oppoId).AV_Comentarios__c != opportunities.get(oppoId).comentario || mapOldOpp.get(oppoId).StageName != opportunities.get(oppoId).newPath)))){
+                                    AV_CommentsHistory__c ch = new AV_CommentsHistory__c();
+                                    String comentario = (String)opportunities.get(oppoId).comentario;
+                                    ch.AV_NewComment__c = comentario;
+                                    ch.AV_Opportunity__c = (String)opportunities.get(oppoId).id;
+                                    if(mapOldOpp!=null && mapOldOpp.get(oppoId)!= null){
+                                        ch.AV_OldComment__c = (String)mapOldOpp.get(oppoId).AV_Comentarios__c;
+                                        ch.AV_OldStatus__c = mapOldOpp.get(oppoId).StageName;
+                                    }
+                                    ch.AV_ModificationDate__c = System.today();
+                                    if(contactList != null && !contactList.isEmpty()){
+                                        ch.AV_AssignedEmployee__c = contactList[0].Id;
+                                    }
+                                    ch.AV_OpportunityStatus__c = (String)opportunities.get(oppoId).newPath;
+                                    ch.AV_Task__c = (String)ta.Id;
+                                    commHistList.add(ch);
+                                }   
+							}
+						}
+					}
+				}
+				if(commHistList!= null){
+					List<Database.SaveResult> srCommHistList = Database.insert(commHistList,false);
+					for(Database.SaveResult ur : srCommHistList){
+						if(!ur.isSuccess()) {
+							result = ur.getErrors()[0].getMessage();
+						} else {
+							listIdsCommentsHistoryInsert.add(ur.getId());
+						}
 					}
 				}
 			}
+
 		} else if (event != null && event.activityDateTime != null) {
 			Database.SaveResult sr = Database.insert(createEvent(event,null),false);
 			if(!sr.isSuccess()) {
@@ -751,6 +880,7 @@ public with sharing class AV_TaskReport_Controller {
 		allBack.insertTaskOppDelete = listTaskOppDeleteOld;
 		allBack.deleteIdTasksInsert = listIdsTaskInsert;
 		allBack.deleteIdEventInsert = listIdsEventInsert;
+		allBack.deleteIdCommentsHistoryInsert = listIdsCommentsHistoryInsert;
 		allBack.deleteManageHistInsert = listIdsManageHistInsert;
 		allBack.updateTaskUpdated = listTaskUpdateOld;
 		allBack.mapNewHeader = mapNewHeader;
@@ -768,11 +898,11 @@ public with sharing class AV_TaskReport_Controller {
 	}
 
 	/**
-	 * @description		List to update of block task priorizador and avisos
-	 * @param tasks  	map of tasks update in block task priorizador and avisos
-	 * @param task  	task update of report
-	 * @param event  	event insert of report
-	 * @return 			list task to update
+	 * @description     List to update of block task priorizador and avisos
+	 * @param tasks     map of tasks update in block task priorizador and avisos
+	 * @param task      task update of report
+	 * @param event     event insert of report
+	 * @return          list task to update
 	 */
 	private static List<Task> blockTask(Map<String,TaskBlockReport> tasks, TaskReport task, EventReport event){
 		List<Task> taskToUpdt = new List<Task>();
@@ -784,6 +914,9 @@ public with sharing class AV_TaskReport_Controller {
 			}
 			if(tsk.status != null ){
 				nextTsk.Status = tsk.status;
+			}
+			if(tsk.owner != null ){
+				nextTsk.OwnerId = tsk.owner;
 			}
 			if (event != null && event.activityDateTime != null) {
 				nextTsk.ActivityDate =  Date.newInstance(event.activityDateTime.year(), event.activityDateTime.month(), event.activityDateTime.day());
@@ -798,16 +931,17 @@ public with sharing class AV_TaskReport_Controller {
 			} else {
 				nextTsk.AV_Tipo__c = task.typeTask;
 			}
+			// nextTsk.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT;
 			taskToUpdt.add(nextTsk);
 		}
 		return taskToUpdt;
 	}
 
 	/**
-	 * @description		Task to update of report
-	 * @param task  	task update of report
-	 * @param event  	event insert of report
-	 * @return 			task to update
+	 * @description     Task to update of report
+	 * @param task      task update of report
+	 * @param event     event insert of report
+	 * @return          task to update
 	 */
 	private static Task createTask(TaskReport task,EventReport event){
 		Task recordToInsert = new Task();
@@ -816,7 +950,7 @@ public with sharing class AV_TaskReport_Controller {
 		if(task.typeTask != null) {
 			recordToInsert.AV_Tipo__c = task.typeTask;
 		}
-		if (task.recordType == AV_AppConstants.TASKINICIATIVA_RT) {
+		if (task.recordType == AV_AppConstants.TASKINICIATIVA_RT || task.recordType == AV_AppConstants.TASKALERTACOM_RT) {
 			if (event != null && event.activityDateTime != null) {
 				recordToInsert.ActivityDate = Date.newInstance(event.activityDateTime.year(), event.activityDateTime.month(), event.activityDateTime.day());
 			} else {
@@ -824,14 +958,19 @@ public with sharing class AV_TaskReport_Controller {
 			}
 		}
 		recordToInsert.Status = task.statusTask;
+		recordToInsert.AV_ContactGenerateAppointment__c = AV_AppConstants.NO_GENERATE;
+		recordToInsert.Description = task.comentaryTask;
+		if(task.ownerid != null){
+			recordToInsert.OwnerId = task.ownerid;
+		}
 		return recordToInsert;
 	}
 
 	/**
-	 * @description		Event to update of report
-	 * @param task  	task update of report
-	 * @param event  	event insert of report
-	 * @return 			event to update
+	 * @description     Event to update of report
+	 * @param task      task update of report
+	 * @param event     event insert of report
+	 * @return          event to update
 	 */
 	private static Event createEvent(EventReport event, String nameOppMain){
 		RecordType rtEvent = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_EVENT,AV_AppConstants.EVENTCLIENTE_RT);
@@ -842,10 +981,13 @@ public with sharing class AV_TaskReport_Controller {
 		recordToInsert.AV_Tipo__c = event.typeEvent;
 		if (event.comercial) { //Si la cita es No comercial 
 			recordToInsert.Subject = 'Gestión operativa';
+			recordToInsert.AV_Purpose__c ='002';
 		}else if (nameOppMain != null){
 			recordToInsert.Subject = nameOppMain;
+			recordToInsert.AV_Purpose__c ='001'; 
 		}else {
 			recordToInsert.Subject = 'Gestión operativa';
+			recordToInsert.AV_Purpose__c ='002';
 		}
 		if (event.comment != null) {
 			recordToInsert.Description = event.comment;
@@ -863,13 +1005,14 @@ public with sharing class AV_TaskReport_Controller {
 			recordToInsert.WhoId = event.contactPerson;
 		}
 		recordToInsert.CSBD_Evento_Estado__c = AV_AppConstants.EVENT_STATUS_CERRADO;
+		recordToInsert.AV_ContactGenerateAppointment__c = AV_AppConstants.NO_GENERATE;
 		return recordToInsert;
 	}
 
 	/**
-	 * @description					Create Task-Opportunity
-	 * @param resultTaskEvent  		Result of create Task or Event with headers to associate with opportunity
-	 * @return 						response witn error or OK
+	 * @description                 Create Task-Opportunity
+	 * @param resultTaskEvent       Result of create Task or Event with headers to associate with opportunity
+	 * @return                      response witn error or OK
 	 */
 	@AuraEnabled
 	public static String createTaskOpp(String jsonResultTaskEvent, TaskReport task) {
@@ -992,6 +1135,32 @@ public with sharing class AV_TaskReport_Controller {
 			Database.rollback(sp);
 		}
 		return result;
+}
+
+
+	@AuraEnabled
+	public static void unlinkOpp(List<Id> oppId, String recInfo) {
+	String methodName = 'unlinkOpp';
+		// Query AV_CustomActivityOpportunity__c records using the list of Opportunity Ids
+		List<AV_CustomActivityOpportunity__c> listOppTask = [SELECT Id FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c IN :oppId AND AV_Task__c = :recInfo];
+		
+
+		// Change the owner
+		User user = AV_AppUtilities.getUserInfo();
+		List<AV_CustomActivityOpportunity__c> oppTaskToUpdate = new List<AV_CustomActivityOpportunity__c>();
+
+		for (AV_CustomActivityOpportunity__c oppTask : listOppTask) {
+			oppTaskToUpdate.add(new AV_CustomActivityOpportunity__c(Id = oppTask.Id, OwnerId = user.Id));
+		}
+
+		if (!oppTaskToUpdate.isEmpty()) {
+			Database.update(oppTaskToUpdate, false);
+			AV_LogDebug.printLogDebug(methodName, 'oppTaskToUpdate: ' + oppTaskToUpdate);
+			List<Database.DeleteResult> listDeleteResult = Database.delete(oppTaskToUpdate, false);
+			AV_AppUtilities.displayErrors(methodName, listDeleteResult);
+		}
 	}
+
+	
 
 }

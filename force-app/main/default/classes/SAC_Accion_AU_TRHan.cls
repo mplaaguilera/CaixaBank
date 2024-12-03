@@ -12,13 +12,16 @@
 *****************************************************************/
 public without sharing class SAC_Accion_AU_TRHan extends CC_TriggerHandlerBase {
 
-    private static Set<String> objetos = new Set<String>{'SAC_Accion__c', 'SAC_TMECaso__c'};
+    private static Set<String> objetos = new Set<String>{'SAC_Accion__c', 'SAC_TMECaso__c', 'Case'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SAC_Utils.getRecordTypesObjects(objetos);
 
     private final static Id RECTYPEMAESTROTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_MaestroDeTareas').getRecordTypeId();
     private final static Id RECTYPEOTRASTAREAS = mapRTsObjects.get('SAC_Accion__c').get('SAC_OtrasTareas').getRecordTypeId();
     private final static Id RECTYPEACCIONRESPONDERESC = mapRTsObjects.get('SAC_Accion__c').get('SAC_AccionResponderEsc').getRecordTypeId();
     private final static Id RECTYPETMETAREA = mapRTsObjects.get('SAC_TMECaso__c').get('SAC_TMETarea').getRecordTypeId();
+    private final static Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SAC_Reclamacion').getRecordTypeId();
+    private final static Id RECTYPEPRETENSION = mapRTsObjects.get('Case').get('SAC_Pretension').getRecordTypeId();
+
     
     public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<SAC_Accion__c>)tp.newList, (Map<Id, SAC_Accion__c>)tp.oldMap);
@@ -202,17 +205,20 @@ public without sharing class SAC_Accion_AU_TRHan extends CC_TriggerHandlerBase {
      * -------
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US356803        alex perez     19/10/22      Creación
+     * 1.1            US1063712       Raúl Santos    15/11/24      Modificación: Añadida la llamada al método calcularImportes()
     *****************************************************************/
     public void updatearReclamaPreten(map<Id, decimal> pretenImporteAbonado, map<Id, decimal> pretenImporteResuelto) {
 
-        list<Case> casosUpdate = [SELECT Id, CC_Importe_Abonado__c, SAC_Importe_Resuelto__c FROM Case WHERE Id IN : pretenImporteAbonado.KeySet() OR Id IN : pretenImporteResuelto.KeySet()];
+        Set<Id> setIdesRec = new Set<Id>();
+
+        list<Case> casosUpdate = [SELECT Id, CC_Importe_Abonado__c, SAC_Importe_Resuelto__c, SAC_Reclamacion__C, RecordTypeId FROM Case WHERE Id IN : pretenImporteAbonado.KeySet() OR Id IN : pretenImporteResuelto.KeySet()];
         for(Case caso : casosUpdate) {
             if(pretenImporteAbonado.containsKey(caso.Id)) {
                 if(caso.CC_Importe_Abonado__c == null) {
                     caso.CC_Importe_Abonado__c = pretenImporteAbonado.get(caso.Id);
                 } else {
                     caso.CC_Importe_Abonado__c += pretenImporteAbonado.get(caso.Id);
-                }
+                }  
             }
             if(pretenImporteResuelto.containsKey(caso.Id)) {
                 if(caso.SAC_Importe_Resuelto__c == null) {
@@ -221,7 +227,62 @@ public without sharing class SAC_Accion_AU_TRHan extends CC_TriggerHandlerBase {
                     caso.SAC_Importe_Resuelto__c += pretenImporteResuelto.get(caso.Id);
                 }
             }
+            if(caso.RecordTypeId == RECTYPEPRETENSION){
+                setIdesRec.add(caso.SAC_Reclamacion__C);
+            }
         }
-        update casosUpdate;
+
+        //Actualizar las reclamaciones/pretensiones con sus importes correspondientes
+        // update casosUpdate;
+        SAC_DatabaseDML.updateListDML(casosUpdate, false);
+
+        //Cuando se actualiza el importe abonado/resuelto en una tarea (creada en la pretensión) los cambios no se reflejan en la reclamación ya que no entra por el trigger SAC_Case_AU.
+        //Por ello, se simula el funcionamiento a seguir con este método.
+        calcularImportes(setIdesRec);
+    }
+
+    /**
+    * @description método que actualiza los importes de la reclamación cuando se actualiza una tarea de una pretensión
+    */
+    public void calcularImportes(Set<Id> setIdsReclamacion) {
+        List<Case> listCasosSelect = [SELECT Id, RecordTypeId, SAC_Reclamacion__c, CC_Importe_Reclamado__c, SAC_Importe_Resuelto__c, CC_Importe_Abonado__c, SAC_Quebranto__c FROM Case 
+                                        WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsReclamacion) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__C IN :setIdsReclamacion)];
+        
+        if (setIdsReclamacion == null) {
+            setIdsReclamacion = new Set<Id>();
+        }
+
+        Map<Id, List<Case>> mapListPretensiones = new Map<Id, List<Case>> ();
+		List<Case> listReclaUpdatear = new List<Case> ();
+        Map<Id, Case> mapaDatosCasosActualizar = new Map<Id, Case>();
+
+        for (Id ide : setIdsReclamacion) {
+            mapListPretensiones.put(ide, new List<Case>());
+        }
+
+		for (Case csPre : listCasosSelect) {
+            if(csPre.RecordTypeId == RECTYPEPRETENSION){
+                if (mapListPretensiones.containsKey(csPre.SAC_Reclamacion__c)) {
+                    mapListPretensiones.get(csPre.SAC_Reclamacion__c).add(csPre);
+                }
+            }
+		}
+
+        if(!mapListPretensiones.isEmpty()){
+            listReclaUpdatear = SAC_CaseCalcularImporte.calcularImporte(mapListPretensiones);
+        }
+
+        if(!listReclaUpdatear.isEmpty()){
+            for (Case caso : listReclaUpdatear) {
+                if(mapaDatosCasosActualizar.containsKey(caso.id)){
+                    mapaDatosCasosActualizar.get(caso.id).CC_Importe_Reclamado__c = caso.CC_Importe_Reclamado__c;
+                    mapaDatosCasosActualizar.get(caso.id).CC_Importe_Abonado__c = caso.CC_Importe_Abonado__c;
+                }else{
+                    mapaDatosCasosActualizar.put(caso.id, caso);
+                }
+            }
+        }
+
+        SAC_DatabaseDML.updateListDML(mapaDatosCasosActualizar.values(), false);
     }
 }

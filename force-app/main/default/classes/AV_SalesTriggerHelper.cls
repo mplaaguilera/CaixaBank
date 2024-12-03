@@ -28,6 +28,11 @@ Historial
 																	        updateLeadOppWhenInsertSales, updateOppWhenInsertSalesOld, 
 																			changeTypeSalesOld to add RecordType for Call Me opportunitties
 	2.2			Fix					Gonzalo Ávila		27/09/2023			Fix CBK_Log Error
+	2.3			US744932		    Oscar Moreno		16/11/2023		    Add updateProductoPFField and productoPFField methods
+	2.4                             Oscar Moreno        17/01/2024          Modify updateProductoPFField and productoPFField methods to incluide sales with product with AV_Nivel__c field that values 20
+	2.5			IN119526			Sandra Gómez		08/02/2024			Change methods gestionTareas and gestionEventos to add filter clase and tipo
+	2.6         Fix                 Oscar Moreno        19/02/2024          Modify updateProductoPFField to consider all products with  differents levels
+	2.7			Fix					Sandra Gómez		27/02/2024			delete updateProductoPFField and productoPFField to consider all products with differents levels
 ***********************************************************************************************************************/
 public with sharing class AV_SalesTriggerHelper {
 	
@@ -37,7 +42,6 @@ public with sharing class AV_SalesTriggerHelper {
 	 */
 	public static List<AV_Sales__c> checkGeneralRT(List<AV_Sales__c> listNews){
 		Set<Id> setIdsRt = getAllRT();
-		
 		List<AV_Sales__c> listData = new List<AV_Sales__c>();
 		for(AV_Sales__c dataNew : listNews){
 			if((setIdsRt).contains(dataNew.RecordTypeId)){
@@ -54,7 +58,6 @@ public with sharing class AV_SalesTriggerHelper {
 		Schema.DescribeSObjectResult objDescribe = AV_Sales__c.SObjectType.getDescribe();
 		List<Schema.RecordTypeInfo> recordTypeObj = objDescribe.getRecordTypeInfos();
 		Set<Id> setIdsRt = New Set<Id>();
-		
 		for (Schema.RecordTypeInfo rt: recordTypeObj){
 			if (rt.getDeveloperName().left(3)=='AV_') {
 				setIdsRt.add(rt.getRecordTypeId());
@@ -89,9 +92,9 @@ public with sharing class AV_SalesTriggerHelper {
 		Set<String> setIdsPF = new Set<String>();
 		Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};
 		Set<String> claseVenta = new Set<String>{'V'};
-		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_VENCIDO};
+		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_PROD_CONTR,AV_AppConstants.OPP_STATUS_NOINTERE,AV_AppConstants.OPP_STATUS_PROD_RECH, AV_AppConstants.OPP_STATUS_NO_GESTIONADA , AV_AppConstants.OPP_STATUS_VENCIDO};  //mio
         Set<String> estadoPasa = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION};
-		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_VENCIDO};
+		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST,AV_AppConstants.OPP_STATUS_PROD_CONTR ,AV_AppConstants.OPP_STATUS_NOINTERE,AV_AppConstants.OPP_STATUS_PROD_RECH, AV_AppConstants.OPP_STATUS_NO_GESTIONADA ,AV_AppConstants.OPP_STATUS_VENCIDO,AV_AppConstants.OPP_STATUS_NO_GESTIONADA};  //mio
 		Set<String> tiposDeVenta = new Set<String>{'010','011','012','013','020','030','031','040','100','110','130','131','150','151','152','153','220','223','270','400','410'};
 		if(listData!=null && !listData.isEmpty()){
 			for(AV_Sales__c sls : listData){
@@ -175,7 +178,8 @@ public with sharing class AV_SalesTriggerHelper {
 												daysUpdateDateOppUpdateAux = null;
 											}
 											Integer daysCreatedDateOppUpdateAux = math.abs(sa.AV_FechaVenta__c.daysBetween(oppToUpdate.CreatedDate.date())); //Dias de diferencia de la opp siguiente segun la fecha de creacion
-											if ((oppToUpdate.StageName=='Cerrado positivo' && opp.StageName=='Cerrado positivo') || (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName!='Cerrado positivo')) {//Si las opps tienen estado Cerrado positivo o Si las opps no tienen estado Cerrado positivo, la opcion de si la original tiene cerrado positivo y la nueva no porque nos quedariamos con la que esta
+											//if ((oppToUpdate.StageName=='Cerrado positivo' && opp.StageName=='Cerrado positivo') || (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName!='Cerrado positivo')) {//Si las opps tienen estado Cerrado positivo o Si las opps no tienen estado Cerrado positivo, la opcion de si la original tiene cerrado positivo y la nueva no porque nos quedariamos con la que esta
+											if ((oppToUpdate.StageName==AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName==AV_AppConstants.OPP_STATUS_CERRPOST) || (oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName!=AV_AppConstants.OPP_STATUS_CERRPOST)|| (oppToUpdate.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR) || (oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName!=AV_AppConstants.OPP_STATUS_PROD_CONTR)) {  //mio
 												if (daysUpdateDateOppUpdate != null && daysUpdateDateOppUpdateAux != null) {//las fechas de modificacion estan rellena
 													if (daysUpdateDateOppUpdate > daysUpdateDateOppUpdateAux) { //Si es menor la fecha de modificacion nueva, si es mayor me quedo con la que esta y si son iguales nos quedamos con la que tiene
 														idMapAccProd = idMapAccProdAux;
@@ -199,7 +203,9 @@ public with sharing class AV_SalesTriggerHelper {
 													oppToUpdate = opp;
                                                     indexUpdateOpp=contOpp;
 												}
-											} else if (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName=='Cerrado positivo') {//Si la nueva tiene el estado cerrado positivo y la original no
+											} 
+											else if ((oppToUpdate.StageName!= AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName==AV_AppConstants.OPP_STATUS_CERRPOST)||(oppToUpdate.StageName!= AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR)) {  //mio
+											//else if (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName=='Cerrado positivo') {//Si la nueva tiene el estado cerrado positivo y la original no
 												idMapAccProd = idMapAccProdAux;
 												daysUpdateDateOppUpdate = daysUpdateDateOppUpdateAux;
 												daysCreatedDateOppUpdate = daysCreatedDateOppUpdateAux;
@@ -277,7 +283,9 @@ public with sharing class AV_SalesTriggerHelper {
 											daysUpdateDateOppUpdateAux = null;
 										}
 										Integer daysCreatedDateOppUpdateAux = math.abs(mapAccProSale.get(idMapAccProdAux)[0].AV_FechaVenta__c.daysBetween(oppToUpdate.CreatedDate.date())); //Dias de diferencia de la opp siguiente segun la fecha de creacion
-										if ((oppToUpdate.StageName=='Cerrado positivo' && opp.StageName=='Cerrado positivo') || (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName!='Cerrado positivo')) {//Si las opps tienen estado Cerrado positivo o Si las opps no tienen estado Cerrado positivo, la opcion de si la original tiene cerrado positivo y la nueva no porque nos quedariamos con la que esta
+										//if ((oppToUpdate.StageName=='Cerrado positivo' && opp.StageName=='Cerrado positivo') || (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName!='Cerrado positivo')) {//Si las opps tienen estado Cerrado positivo o Si las opps no tienen estado Cerrado positivo, la opcion de si la original tiene cerrado positivo y la nueva no porque nos quedariamos con la que esta
+										if ((oppToUpdate.StageName==AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName==AV_AppConstants.OPP_STATUS_CERRPOST) || (oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName!=AV_AppConstants.OPP_STATUS_CERRPOST)||(oppToUpdate.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR) || (oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName!=AV_AppConstants.OPP_STATUS_PROD_CONTR)) {//mio
+										
 											if (daysUpdateDateOppUpdate != null && daysUpdateDateOppUpdateAux != null) {//las fechas de modificacion estan rellena
 												if (daysUpdateDateOppUpdate > daysUpdateDateOppUpdateAux) { //Si es menor la fecha de modificacion nueva, si es mayor me quedo con la que esta y si son iguales nos quedamos con la que tiene
 													idMapAccProd = idMapAccProdAux;
@@ -298,7 +306,9 @@ public with sharing class AV_SalesTriggerHelper {
 												daysCreatedDateOppUpdate = daysCreatedDateOppUpdateAux;
 												oppToUpdate = opp;
 											}
-										} else if (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName=='Cerrado positivo') {//Si la nueva tiene el estado cerrado positivo y la original no
+										} 
+										//else if (oppToUpdate.StageName!='Cerrado positivo' && opp.StageName=='Cerrado positivo') {//Si la nueva tiene el estado cerrado positivo y la original no
+										else if ((oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_CERRPOST && opp.StageName==AV_AppConstants.OPP_STATUS_CERRPOST)||(oppToUpdate.StageName!=AV_AppConstants.OPP_STATUS_PROD_CONTR && opp.StageName==AV_AppConstants.OPP_STATUS_PROD_CONTR)) {  //mio
 											idMapAccProd = idMapAccProdAux;
 											daysUpdateDateOppUpdate = daysUpdateDateOppUpdateAux;
 											daysCreatedDateOppUpdate = daysCreatedDateOppUpdateAux;
@@ -364,8 +374,6 @@ public with sharing class AV_SalesTriggerHelper {
 					if(!listErrorsTrigger.isEmpty()) {
 						CBK_log.error('Metodo: '+methodName+' listErrorsTrigger: '+listErrorsTrigger,listErrorsTrigger);
 					}
-
-
 					CBK_log.debug('Metodo: '+methodName+' listIdGood: '+listIdGood,listIdGood,LoggingLevel.DEBUG);
 					AV_AppUtilities.displayErrors(methodName, updateResults);
 				}
@@ -403,7 +411,6 @@ public with sharing class AV_SalesTriggerHelper {
 			if(!listErrorsTrigger2.isEmpty()) {
 				CBK_log.debug('Metodo: '+methodName+' listErrorsTrigger2: '+listErrorsTrigger2,listErrorsTrigger2,LoggingLevel.DEBUG);
 			}
-			
 			CBK_log.debug('Metodo: '+methodName+' listIdGood: '+listIdGood,listIdGood,LoggingLevel.DEBUG);
 		}
 	}
@@ -423,8 +430,7 @@ public with sharing class AV_SalesTriggerHelper {
 		Set<String> setIdsPF = new Set<String>();
 		List<String> listIdsAcc = new List<String>();
 		List<String> listIdsPF = new List<String>();
-		Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};
-            
+		Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};   
 		Map<String, List<AV_Sales__c>> mapAccProSale = new Map<String, List<AV_Sales__c>>();
 		if(listData!=null && !listData.isEmpty()) {
 			for(AV_Sales__c sls : listData){
@@ -706,8 +712,6 @@ public with sharing class AV_SalesTriggerHelper {
 						if(!listErrorsTrigger3.isEmpty()) {
 							CBK_log.error('Metodo: '+methodName+' listErrorsTrigger3: '+listErrorsTrigger3,listErrorsTrigger3);
 						}
-
-
 						CBK_log.debug('Metodo: '+methodName+' listIdGood: '+listIdGood,listIdGood,LoggingLevel.DEBUG);
 						AV_AppUtilities.displayErrors(methodName, updateResults);
 					}
@@ -756,9 +760,11 @@ public with sharing class AV_SalesTriggerHelper {
 		Map<String,Date> mapIdDate = new Map<String, Date>();
 		List<Task> listTaskConVentraTrue = new List<Task>();
 		Map<String, CBK_Activity_Extension__c> mapCBK = new Map<String, CBK_Activity_Extension__c>();
+		Set<String> claseVenta = new Set<String>{'V'};
+		Set<String> tiposDeVenta = new Set<String>{'010','011','012','013','020','030','031','040','100','110','130','131','150','151','152','153','220','223','270','400','410'};
 		if(listData!=null && !listData.isEmpty()){
 			for(AV_Sales__c sls : listData){
-				if (sls.AV_Cliente__c != null) {
+				if (claseVenta.contains(sls.AV_ClaseVenta__c) && tiposDeVenta.contains(sls.AV_TipoVenta__c) && sls.AV_Cliente__c != null) {
 					listSales.add(sls);
 					setIdsAcc.add(sls.AV_Cliente__c);
 				}		
@@ -847,9 +853,11 @@ public with sharing class AV_SalesTriggerHelper {
 		List<Event> listEventConVentraTrue = new List<Event>();
 		Map<String, CBK_Activity_Extension__c> mapCBK = new Map<String, CBK_Activity_Extension__c>();
 		List<CBK_Activity_Extension__c> listcbkUpsert = new List<CBK_Activity_Extension__c>();
+		Set<String> claseVenta = new Set<String>{'V'};
+		Set<String> tiposDeVenta = new Set<String>{'010','011','012','013','020','030','031','040','100','110','130','131','150','151','152','153','220','223','270','400','410'};
 		if(listData!=null && !listData.isEmpty()){
 			for(AV_Sales__c sls : listData){
-				if (sls.AV_Cliente__c != null) {
+				if (claseVenta.contains(sls.AV_ClaseVenta__c) && tiposDeVenta.contains(sls.AV_TipoVenta__c) && sls.AV_Cliente__c != null) {
 					listSales.add(sls);
 					setIdsAcc.add(sls.AV_Cliente__c);
 				}		
@@ -930,35 +938,28 @@ public with sharing class AV_SalesTriggerHelper {
 		Map<String, Date> mapAccSale = new Map<String, Date>();
 		Set<String> setIdsAcc = new Set<String>();
 		Set<String> setIdsPF = new Set<String>();
-        
         Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};
 		Set<String> claseVenta = new Set<String>{'V'};
-		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_VENCIDO};
+		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST,AV_AppConstants.OPP_STATUS_PROD_CONTR ,AV_AppConstants.OPP_STATUS_NOINTERE,AV_AppConstants.OPP_STATUS_PROD_RECH, AV_AppConstants.OPP_STATUS_NO_GESTIONADA , AV_AppConstants.OPP_STATUS_VENCIDO};  //mio
         Set<String> estadoPasa = new Set<String>{AV_AppConstants.OPP_STATUS_ENGESTION};
-		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.LEADOPP_STAGE_NEGATIVA, AV_AppConstants.OPP_STATUS_NOINTERE};//No pasa si estado --> 'No apto' o 'Vencido'
+		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST ,AV_AppConstants.LEADOPP_STAGE_NEGATIVA, AV_AppConstants.OPP_STATUS_NOINTERE};  //mio
+
 		Set<String> tiposDeVenta = new Set<String>{'010','011','012','013','020','030','031','040','100','110','130','131','150','151','152','153','220','223','270','400','410'};
-		
 		if(listData!=null && !listData.isEmpty()){
 			for(AV_Sales__c sls : listData){
 				if (claseVenta.contains(sls.AV_ClaseVenta__c) && tiposDeVenta.contains(sls.AV_TipoVenta__c)) {
 					String idMapAccPF = sls.AV_Cliente__c + '-' + sls.AV_ExternalIDProdNivelPF__c;
 					mapIdsProduct.put(idMapAccPF, sls.AV_Producto__c);
-					
 					String idMapAccProd = sls.AV_Cliente__c + '-' + sls.AV_Producto__c;
 					mapAccProd.put(idMapAccProd, sls.AV_Producto__c);
 					mapAccSale.put(idMapAccProd, sls.AV_FechaVenta__c);
-					
 					setIdsAcc.add(sls.AV_Cliente__c);
 					setIdsPF.add(sls.AV_ExternalIDProdNivelPF__c);
 				}
 			}
-
 			//Get the list of the opp's in base on Accounts + PF's
-			
-
 			List<AV_LeadOpportunity__c> listLeadOpp = [SELECT Id, AV_StatusLeadOpp__c, AV_FechaVenta__c, AV_Lead__r.AV_numperso__c, AV_Lead2__r.AV_numperso__c, AV_Producto__r.AV_ExternalID__c FROM AV_LeadOpportunity__c WHERE ((AV_Lead__r.AV_IsClient__c = true
 			AND AV_Lead__r.AV_numperso__c in :setIdsAcc) OR (AV_Lead2__r.AV_IsClient__c = true AND AV_Lead2__r.AV_numperso__c in :setIdsAcc)) AND RecordType.DeveloperName = :AV_AppConstants.LEAD_PPHH_RT];
-			
 			Map<Id, List<AV_LeadOpportunity__c>> leadOppMap = new Map<Id, List<AV_LeadOpportunity__c>>();
 			if (!listLeadOpp.isEmpty()) {
 				for(AV_LeadOpportunity__c lo : listLeadOpp) {
@@ -974,8 +975,6 @@ public with sharing class AV_SalesTriggerHelper {
 					}
 				}
 			}
-			
-			
 			List<AV_LeadOpportunity__c> listLeadOppToUpdate = new List<AV_LeadOpportunity__c>();
 			for(AV_LeadOpportunity__c lo : listLeadOpp){
 				String idMapAccPF = lo.AV_Lead__r.AV_numperso__c + '-' + lo.AV_Producto__r.AV_ExternalId__c;
@@ -1022,31 +1021,26 @@ public with sharing class AV_SalesTriggerHelper {
 		Set<String> setIdsPF = new Set<String>();
 		List<String> listIdsAcc = new List<String>();
 		List<String> listIdsPF = new List<String>();
-        
         Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};
 		Set<String> claseVenta = new Set<String>{'V'};
-		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_VENCIDO};
+		Set<String> estados = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_CERRPOST,AV_AppConstants.OPP_STATUS_PROD_CONTR ,AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_PROD_RECH, AV_AppConstants.OPP_STATUS_NO_GESTIONADA , AV_AppConstants.OPP_STATUS_VENCIDO};  //mio
         Set<String> estadoPasa = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION};
-		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_VENCIDO};
+		Set<String> estadoPasaConFecha = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST,AV_AppConstants.OPP_STATUS_PROD_CONTR ,AV_AppConstants.OPP_STATUS_NOINTERE,AV_AppConstants.OPP_STATUS_PROD_RECH, AV_AppConstants.OPP_STATUS_NO_GESTIONADA , AV_AppConstants.OPP_STATUS_VENCIDO};  //mio
 		Set<String> tiposDeVenta = new Set<String>{'010','011','012','013','020','030','031','040','100','110','130','131','150','151','152','153','220','223','270','400','410'};
-		
 		if(listData!=null && !listData.isEmpty()){
 			for(AV_Sales__c sls : listData){
 				if (claseVenta.contains(sls.AV_ClaseVenta__c) && tiposDeVenta.contains(sls.AV_TipoVenta__c)) {
 					String idMapAccPF = sls.AV_Cliente__c + '-' + sls.AV_ExternalIDProdNivelPF__c;
 					mapIdsProduct.put(idMapAccPF, sls.AV_Producto__c);
-					
 					String idMapAccProd = sls.AV_Cliente__c + '-' + sls.AV_Producto__c;
 					mapAccProd.put(idMapAccProd, sls.AV_Producto__c);
 					mapAccSale.put(idMapAccProd, sls.AV_FechaVenta__c);
-					
 					setIdsAcc.add(sls.AV_Cliente__c);
 					setIdsPF.add(sls.AV_ExternalIDProdNivelPF__c);
 					listIdsAcc.add(sls.AV_Cliente__c);
 					listIdsPF.add(sls.AV_ExternalIDProdNivelPF__c);
 				}
 			}
-
 			//Get the list of the opp's in base on Accounts + PF's
 			CBK_log.debug('OLD Metodo: '+methodName+' setIdsAcc: '+setIdsAcc,listIdsAcc,LoggingLevel.DEBUG);
 			CBK_log.debug('OLD Metodo: '+methodName+' setIdsPF: '+setIdsPF,listIdsPF,LoggingLevel.DEBUG);
@@ -1084,7 +1078,6 @@ public with sharing class AV_SalesTriggerHelper {
 					if (!sr.isSuccess()) {             
 						for(Database.Error err : sr.getErrors()) {                  
 							listErrorsTrigger4.add('OLD Method: ' + methodName + 'Error Code: ' + err.getStatusCode() + 'Error Message: ' + err.getMessage() + ' Error Fields: ' + err.getFields());
-
 						}
 					} else {
 						listSuccessTrigger4.add('OLD Method: '+methodName+' Update Id: '+sr.getId());
@@ -1096,7 +1089,6 @@ public with sharing class AV_SalesTriggerHelper {
 				if(!listSuccessTrigger4.isEmpty()) {
 					CBK_log.debug('Metodo: '+methodName+' listSuccessTrigger4: '+listSuccessTrigger4,listSuccessTrigger4,LoggingLevel.DEBUG);
 				}
-
                 AV_AppUtilities.displayErrors(methodName, updateResults);
 			}
 		}
@@ -1116,7 +1108,6 @@ public with sharing class AV_SalesTriggerHelper {
 		List<String> listIdsAcc = new List<String>();
 		List<String> listIdsPF = new List<String>();
         Set<String> recordTypeOpp = new Set<String>{AV_AppConstants.OPPALERTACOM_RT, AV_AppConstants.OPPINICIATIVA_RT, AV_AppConstants.OPPPROPUESTA_RT, AV_AppConstants.OPPSUGERENCIA_RT, AV_AppConstants.OPPLLAMADA_RT};
-
 		if(listData!=null && !listData.isEmpty() && mapOld!=null) {
 			for(AV_Sales__c sls : listData){
 				if (sls.AV_ClaseVenta__c != null && sls.AV_ClaseVenta__c.equalsIgnoreCase('AV') && sls.AV_ClaseVenta__c != mapOld.get(sls.Id).AV_ClaseVenta__c) {
@@ -1175,7 +1166,6 @@ public with sharing class AV_SalesTriggerHelper {
 							listSuccessTrigger5.add('OLD Method: '+methodName+' Update Id: '+sr.getId());
 						}
 					}
-
 					if(!listErrorsTrigger5.isEmpty()) {
 						CBK_log.error('Metodo: '+methodName+' listErrorsTrigger5: '+listErrorsTrigger5,listErrorsTrigger5);
 					}
@@ -1186,4 +1176,42 @@ public with sharing class AV_SalesTriggerHelper {
 			}
 		}
 	}
+
+	/**
+	 * @description			Update/Insert the value of AV_ProductoPF Field
+	 * @param  listData		list of new Sales records
+	 */
+	public static void productoPFField(List<AV_Sales__c> listData) {
+		Set<Id>idsProduct = new Set<Id>();
+		if(listData!=null && !listData.isEmpty()){
+			for(AV_Sales__c sls : listData){
+				idsProduct.add(sls.AV_Producto__c);
+			}
+		}
+		List<Product2> products = [SELECT Id, AV_NombrePF__c,AV_NombrePF__r.AV_NombrePF__c,AV_NombrePF__r.AV_NombrePF__r.AV_NombrePF__c,AV_Nivel__c,AV_NombrePF__r.AV_Nivel__c,AV_NombrePF__r.AV_NombrePF__r.AV_Nivel__c from Product2  where id =: idsProduct];
+		Map<Id,Product2> mapInsertar = new Map<Id,Product2>();
+		for(Product2 p : products){
+			if(p!=null && (p.AV_Nivel__c == '10' || p.AV_Nivel__c == '1' || p.AV_Nivel__c == '20') ){
+				mapInsertar.put(p.Id,p);
+			}
+		}
+		if (!listData.isEmpty()) {
+			for (AV_Sales__c s : listData) {
+				if (mapInsertar.get(s.AV_Producto__c) != null){
+					Product2 product = mapInsertar.get(s.AV_Producto__c);
+					if (product.AV_Nivel__c =='10' && product.AV_NombrePF__r.AV_Nivel__c == '20') {
+						s.AV_ProductoPF__c = product.AV_NombrePF__r.AV_NombrePF__c;
+					} else if (product.AV_Nivel__c =='10' && product.AV_NombrePF__r.AV_Nivel__c != '20') {
+						s.AV_ProductoPF__c = product.AV_NombrePF__c;
+					} else if (product.AV_Nivel__c =='1' && product.AV_NombrePF__r.AV_NombrePF__r.AV_Nivel__c != '20') {
+						s.AV_ProductoPF__c = product.AV_NombrePF__r.AV_NombrePF__c;
+					} else if (product.AV_Nivel__c =='1') {
+						s.AV_ProductoPF__c = product.AV_NombrePF__r.AV_NombrePF__r.AV_NombrePF__c;
+					} else if (product.AV_Nivel__c =='20') {
+						s.AV_ProductoPF__c = product.AV_NombrePF__c;
+					}
+				}	
+			}
+	    }
+    }
 }

@@ -12,8 +12,8 @@ Proposito:   Clases Mock necesario de la clase de test del WS en la clase SIR_cl
 *****************************************************************/
 
 @isTest
-global with sharing class SIR_cls_WS_EnviarComentarioMock implements HttpCalloutMock{
-    global HTTPResponse respond(HTTPRequest req) {
+public with sharing class SIR_cls_WS_EnviarComentarioMock implements HttpCalloutMock{
+    public HTTPResponse respond(HTTPRequest req) {
         
         SIR_cls_WS_EnviarComentario.ComentarioGestorRequest request = (SIR_cls_WS_EnviarComentario.ComentarioGestorRequest)JSon.deserialize(req.getBody(), SIR_cls_WS_EnviarComentario.ComentarioGestorRequest.class);
         SIR_cls_WS_EnviarComentario.ComentarioGestorResponse responseJson = new SIR_cls_WS_EnviarComentario.ComentarioGestorResponse();

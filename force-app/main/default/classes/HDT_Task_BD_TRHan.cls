@@ -1,48 +1,67 @@
 public with sharing class HDT_Task_BD_TRHan extends CC_TriggerHandlerBase {
-
-
+    
+    
 	public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Task>)tp.oldList, (Map<Id, Task>)tp.oldMap);
 	}
-
+    
     private void process(List<Task> listOldObj, Map<Id, Task> mapOldObj) {
-        Id idRecordTypeTareaHdt = Schema.SObjectType.Task.getRecordTypeInfosByDeveloperName().get('HDT_Task').getRecordTypeId();
-		List<Task> listOldObjHdt = new List<Task>();
-        Map<Id, Task> mapOldObjHdt = new Map<Id, Task>();
-		for (Task tarea : listOldObj) {
-			if (tarea.RecordTypeId == idRecordTypeTareaHdt) {
-				listOldObjHdt.add(tarea);
-				mapOldObjHdt.put(tarea.Id, tarea);
-			}
-		}
-
-        Boolean permisoBorrado = FeatureManagement.checkPermission('HDT_Borrado_Tasks') && !Test.isRunningTest();
-
-        List<CBK_Activity_Extension__c> lstExtDel = new List<CBK_Activity_Extension__c>();
-        Map<Id, CBK_Activity_Extension__c> mapTask = new Map<Id, CBK_Activity_Extension__c>();
-        for (CBK_Activity_Extension__c extTask : [SELECT CBK_Eliminable__c, AV_ActivityId__c FROM CBK_Activity_Extension__c
-                                                    WHERE AV_ActivityId__c IN :mapOldObjHdt.keySet() AND AV_ActivityId__c != NULL]) {
-            mapTask.put(extTask.AV_ActivityId__c, extTask);
+        
+        Boolean permisoBorrado = FeatureManagement.checkPermission('HDT_Borrado_Task');
+        if (Test.isRunningTest()){
+            permisoBorrado =false;
+        }        
+        List<String> rtBloqueados = New List<String>();
+		Schema.DescribeSObjectResult rtd = Task.SObjectType.getDescribe();
+		List<Schema.RecordTypeInfo> rtInfo = rtd.getRecordTypeInfos();        
+        for (Schema.RecordTypeInfo  rt : rtInfo ){
+            /* Cambiado por Moises Cano */
+            //if ((rt.developername.left(2)=='CC')||(rt.developername.left(2)=='OS')|| (rt.developername.left(3)=='HDT')||(rt.developername.left(2)=='OB')){
+            if ((rt.developername.left(3)=='HDT')){
+                rtBloqueados.add(rt.RecordTypeId);
+            } 
         }
-
-        for (Task tarea : listOldObjHdt) {
-            Boolean eliminable = mapTask.containsKey(tarea.Id);
-            if (eliminable) {
-                eliminable = mapTask.get(tarea.Id).CBK_Eliminable__c;
+        
+        //Control de registros incluidos en el contexto para aplicar lógica específica de borrado
+        //controlBorrado para evitar la necesidad de querys adicionales si no hay RT afectados 
+        boolean controlBorrado =false;
+        for (Task tarea: listOldObj){
+             if(rtBloqueados.contains(tarea.RecordTypeId)) {
+                 controlBorrado=true;
+             } 
+        }   
+        
+        list<CBK_Activity_Extension__c> lstExtDel = new list<CBK_Activity_Extension__c>();
+        
+        if (controlBorrado) {
+            map<Id,CBK_Activity_Extension__c > mapTask = new map<Id,CBK_Activity_Extension__c >();
+            for (CBK_Activity_Extension__c  extTask: [Select Id,CBK_Eliminable__c, AV_ActivityId__c  
+                                                        from CBK_Activity_Extension__c 
+                                                       where AV_ActivityId__c in :mapOldObj.keySet()]){
+                mapTask.put(extTask.AV_ActivityId__c ,extTask);
             }
+            
+            boolean eliminable;
+            for (Task tarea: listOldObj){
+//                if ((mapTask.containsKey(tarea.Id)) && (rtBloqueados.contains(tarea.RecordTypeId))){
+                if (rtBloqueados.contains(tarea.RecordTypeId)){
+					eliminable=	mapTask.containsKey(tarea.Id);
+                    if (eliminable) {
+                        eliminable=mapTask.get(tarea.Id).CBK_Eliminable__c;
+                    }
 
-            if (eliminable || permisoBorrado) {
-                if (mapTask.containsKey(tarea.Id)) {
-                    lstExtDel.add(mapTask.get(tarea.Id));
+                    if (eliminable||permisoBorrado){
+                        lstExtDel.add(mapTask.get(tarea.Id));
+                    } else {
+                        tarea.addError('No tiene permisos para eliminar el registro'); 
+                    }
                 }
-            } else {
-                tarea.addError('No tiene permisos para eliminar el registro');
+            }   
+            //Borramos registros de la extendida de registros autorizados
+            //linea borrada "delete lstExtDel;" y añadido para evitar que salte error
+            if (!lstExtDel.isEmpty()) {
+                 Database.delete(lstExtDel,false);
             }
-        }
-
-        //Borramos registros de la extendida de registros autorizados
-        if (!lstExtDel.isEmpty()) {
-            Database.delete(lstExtDel, false);
         }
     }
 }

@@ -31,7 +31,8 @@ public with sharing class CIBE_FichaCliOportEMP_Controller {
             && Schema.SObjectType.Opportunity.fields.CloseDate.isAccessible()) {
                 
             opp = [SELECT Id, Name, CIBE_AmountDivisa__c, CIBE_Divisa__c, StageName, AV_PF__r.Name, AV_PF__r.Id, Owner.Name, OwnerId, CIBE_DiasUltimaGestion__c, CloseDate
-                    FROM Opportunity WHERE StageName IN ('Potencial', 'CIBE_Pendiente_Firma', 'En curso') AND RecordType.DeveloperName LIKE 'CIBE_%' AND AccountId = :recordId AND AV_ToDelete__c = false ORDER BY CloseDate ASC];
+                    FROM Opportunity WHERE StageName IN ('Potencial', 'CIBE_Pendiente_Firma', 'En curso') AND RecordType.DeveloperName LIKE 'CIBE_%' AND AccountId = :recordId AND AV_ToDelete__c = false
+                    AND LastModifiedDate >= LAST_N_MONTHS:12 ORDER BY CloseDate ASC];
             
         }
         Map<String,String> pickListValuesMap = new Map<String,String>();

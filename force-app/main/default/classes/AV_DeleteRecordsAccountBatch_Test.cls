@@ -38,8 +38,11 @@ private class AV_DeleteRecordsAccountBatch_Test {
 	static void executeBatchDeleteRecord() {
 		System.assertEquals(10, [select count() from Account where AV_ToDelete__c = true]);
 		Test.startTest();
+		AV_DeleteRecordsAccountBatch obj2 = new AV_DeleteRecordsAccountBatch('');
 		AV_DeleteRecordsAccountBatch obj = new AV_DeleteRecordsAccountBatch();
 		DataBase.executeBatch(obj);
+
+
 		Test.stopTest();
 
 		// Comprobar que las cuentas insertadas se han borrado correctamente

@@ -3,7 +3,7 @@
  * Copyright © 2021  CaixaBank
  * 
  * Proposito: Redacción final de la reclamación
- *  
+ * 
  * Historial
  * -------
  * VERSION        USER_STORY       AUTHOR         DATE         Description
@@ -160,7 +160,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
         if(!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isAccessible() || !Schema.sObjectType.SAC_Accion__c.isUpdateable() || !Schema.sObjectType.Case.isUpdateable()){
             throw new AuraHandledException('No tienes privilegios para manipular la redacción.');
         }
-        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c, SAC_Envio_Comunicacion__c 
+        Case reclamacion = [SELECT Id, OS_Fecha_Resolucion__c, Status, SAC_Redaccion__c, OS_Email__c, CaseNumber, AccountId , CC_No_Identificado__c
                             FROM Case WHERE RecordTypeId =: RECTYPERECLAMACION AND Id =: id];
                             
         if(reclamacion.AccountId != null || reclamacion.CC_No_Identificado__c == true){
@@ -187,7 +187,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             }
             
             if(envioMail){
-           		reclamacion.SAC_Envio_Comunicacion__c = true;
+           
                 if(!tareas.isEmpty()){
                     reclamacion.Status = 'SAC_004';
                     reclamacion.SAC_StatusAuxiliar__c = 'SAC_004';
@@ -211,6 +211,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
             listaCasosUpdatear.addAll(pretensiones);
             listaCasosUpdatear.add(reclamacion);
             SAC_DatabaseDML.updateListDML(listaCasosUpdatear, true);
+
         }else{
             throw new AuraHandledException('Para resolver es necesario informar el cliente.');
         }
@@ -619,6 +620,7 @@ public without sharing class SAC_LCMP_RedaccionFinal {
                 idPlantilla = [SELECT id, SAC_PlantillaCastellanoId__c FROM SAC_PlantillaRedaccion__c WHERE  SAC_TipoPlantilla__c =:tipo LIMIT 1].SAC_PlantillaCastellanoId__c;
             }
         }
+
         return idPlantilla;
     }
     @AuraEnabled

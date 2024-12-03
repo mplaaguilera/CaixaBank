@@ -61,7 +61,9 @@ public class CBK_HttpServiceIntegration {
 				request.setMethod(wsc.CBK_Method__c);
 			}
 
-			if(String.isNotBlank(reqWrp.body)){
+			if(reqWrp.bodyBlob != null){
+				request.setBodyAsBlob(reqWrp.bodyBlob);
+			}else if(String.isNotBlank(reqWrp.body)){
 				request.setBody(reqWrp.body);
 			}
 
@@ -99,7 +101,7 @@ public class CBK_HttpServiceIntegration {
 	
 	private static HttpRequest getRequest(String body, String intSetting, String method, Map<String, string> mHeaders, Boolean oAuth2, Boolean refreshToken, Map<String, string> mUriParams, Map<String, string> mQueryParams) {
 		HttpRequest request = new HttpRequest();
-
+		configSetting = intSetting; //Guardamos el valor para poder utilizarlo en el callHttpService
 		RequestWapper requestWrp = new RequestWapper();
 		requestWrp.body = body;
 		requestWrp.intSetting = intSetting;
@@ -156,7 +158,6 @@ public class CBK_HttpServiceIntegration {
 				throw new CBK_HttpServiceIntegration.HttpServiceIntegrationException('Método deprecado para llamadas multiples - callHttpService(HttpRequest request, String identificador, String configInt). Utilice los nuevos métodos para multillamada - "multiCallHttpService(HttpRequest request, String identificador, String configInt)" y para registro de trazas - "registroTrazaIntegracion()"');
 			}
 
-			CBK_log.debug('request: Status = ' + request , LoggingLevel.INFO);
 			response = http.send(request);
 			dtStop = Datetime.now();
 			CBK_log.debug('Response:  ' + response, LoggingLevel.INFO);
@@ -291,7 +292,10 @@ public class CBK_HttpServiceIntegration {
 				for (String keyHeader : response.getHeaderKeys()) {
 					registroIntegracion.CBK_Datos_Respuesta__c =  ' ' + keyHeader + ': ' + response.getHeader(keyHeader);
 				}
-				registroIntegracion.CBK_Datos_Respuesta__c = registroIntegracion.CBK_Datos_Respuesta__c.left(10000);
+				if (registroIntegracion.CBK_Datos_Respuesta__c <> null) {
+					registroIntegracion.CBK_Datos_Respuesta__c = registroIntegracion.CBK_Datos_Respuesta__c.left(10000);
+				}
+				
 			}
 
 			if(response.getStatusCode() >= CBK_ServiceRestManager.CORRECT_STATUS_CODE && response.getStatusCode() <= CBK_ServiceRestManager.CORRECT_STATUS_CODE_ACCEPTED_MAX_RANGE){
@@ -338,10 +342,18 @@ public class CBK_HttpServiceIntegration {
 
 	public class RequestWapper{
 		public String body { get; set; }
+		public Blob bodyBlob { get; set; }
 		public String intSetting { get; set; }
 		public String method { get; set; }
 		public Map<String, string> mHeaders { get; set; }
 		public Map<String, string> mUriParams { get; set; }
 		public Map<String, string> mQueryParams { get; set; }
+
+		public RequestWapper() {
+			this.bodyBlob = null;
+			this.mHeaders = new Map<String, string>();
+			this.mUriParams = new Map<String, string>();
+			this.mQueryParams = new Map<String, string>();
+		}
 	}
 }

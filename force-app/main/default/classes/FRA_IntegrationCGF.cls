@@ -12,8 +12,8 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
         RestRequest req = RestContext.request;
         FRA_RequestWrapperCGF rw = new FRA_RequestWrapperCGF(); //Entrada Integración
         FRA_IntegrationCGF.Output output = new FRA_IntegrationCGF.Output(); //Salida Integración
-
-        if (req?.requestBody != null){
+ 
+        if (req?.requestBody != null){  
             try {
                 rw = (FRA_RequestWrapperCGF)JSON.deserializeStrict(req.requestBody.toString(), FRA_RequestWrapperCGF.class);
             } catch (Exception e) {
@@ -28,8 +28,8 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
         if (bOk){ 
             try {
                 //Búsqueda del usuario/agente
-                List<User> listaUsuarios = [SELECT Id, Name, EmployeeNumber FROM User WHERE EmployeeNumber = :rw.userId_CGF];
-                User user = (listaUsuarios.size() == 1) ? listaUsuarios[0]: null;
+                List<User> listaUsuarios = [SELECT Id, Name, EmployeeNumber FROM User WHERE EmployeeNumber = :rw.userId_CGF LIMIT 1];
+                User user = (!listaUsuarios.isEmpty()) ? listaUsuarios[0]: null;
 
                 if ((user != null) && (rw.tipoOperacion_CGF.equals('trasladoInfoCGF'))){   //Tipo de Operación : TRASLADO INFORMACIÓN
                     caseToUpdate = busquedaCasoCliente(rw);
@@ -72,14 +72,14 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
 
                 } else if ((user != null)&&(rw.tipoOperacion_CGF.equals('cierreCGF'))){ //Tipo de Operación : CIERRE CGF 
                     Id sCasoRecordType = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente'); 
-                    List<Case> listaCasoCierre = [SELECT Id, FRA_Id_Expediente_CGF__c, Status FROM Case WHERE FRA_Id_Expediente_CGF__c = :rw.idExpediente_CGF AND (RecordTypeId = :sCasoRecordType)];
+                    List<Case> listaCasoCierre = [SELECT Id, FRA_Id_Expediente_CGF__c, Status FROM Case WHERE FRA_Id_Expediente_CGF__c = :rw.idExpediente_CGF AND (RecordTypeId = :sCasoRecordType) LIMIT 1];
 
-                    if (listaCasoCierre.size() == 1){
+                    if (!listaCasoCierre.isEmpty()){
                         Case caseCierreCGF = listaCasoCierre[0];
                         statusAnterior = caseCierreCGF.Status;
                         esCierreCGF = true;
-
-                        caseCierreCGF.Status = 'Cerrado';
+                        
+                        caseCierreCGF.Status = 'Cerrado';    
                         update caseCierreCGF;
                         
                         crearTarea(caseCierreCGF, user, 'FRA_Cerrado_CGF', esCierreCGF, statusAnterior);
@@ -89,14 +89,14 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
                         output.codigo = '200';
                         output.descripcion = 'OK - La información solicitada ha sido registrada en Salesforce correctamente';
                         output.caseId = caseCierreCGF.Id;
-                    
+
                     } else { 
                         output.resultado = 'KO';
                         output.codigo = '401';
                         output.descripcion = 'Error - No existe ningún caso con el valor de idExpediente_CGF informado: ' + rw.idExpediente_CGF;
                         output.caseId = '';
                     }
-    
+
                 } else if (user != null){ //Tipo de Operación : NO VÁLIDO
                     output.resultado = 'KO';
                     output.codigo = '405';
@@ -141,11 +141,10 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
         Case casoEncontrado;
         Id sCasoRecordType = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente');
         List<Case> caseUpdate = [SELECT Id, FRA_Id_Expediente_CGF__c, Status, Origin, CC_Idioma__c, OwnerId, Subject, Description, AccountId, ContactId, CC_Telefono_Contacto__c FROM Case WHERE FRA_Id_Expediente_CGF__c = :rw.idExpediente_CGF AND 
-                                    (RecordTypeId = :sCasoRecordType) AND (Status = 'Activo' OR Status = 'FRA_001')]; // Estado: activo o pendiente contactar cliente
+                                    (RecordTypeId = :sCasoRecordType) AND (Status = 'Activo' OR Status = 'FRA_001') LIMIT 1]; // Estado: activo o pendiente contactar cliente
 
-        if (caseUpdate.size() == 1){
+        if (!caseUpdate.isEmpty()){
             casoEncontrado = caseUpdate[0];
-
         }else{ //No se encuentra ningún caso con el ID Expediente, podría ser llamada entrante (existe caso en SF) o llamada saliente (no existe caso en SF)
             Account cuentaIdentificada = identificarCliente(rw);
 
@@ -199,7 +198,7 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
             List<Account> listaCuentasIdentificadas = [SELECT Id, Name, CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = :rw.numDoc_CGF 
                                                         AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType) LIMIT 1];
 
-            if (listaCuentasIdentificadas.size() == 1) {
+            if (!listaCuentasIdentificadas.isEmpty()) {
                 cuentaIdentificada = listaCuentasIdentificadas[0];
             }
         } else {
@@ -208,7 +207,7 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
             List<Account> listaCuentasIdentificadas  = [SELECT Id, Name, CC_NumPerso__c FROM Account WHERE CC_NumPerso__c = :rw.numPerso_CGF 
                                                             AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType) LIMIT 1];
            
-            if (listaCuentasIdentificadas.size() == 1) {
+            if (!listaCuentasIdentificadas.isEmpty()) {
                 cuentaIdentificada = listaCuentasIdentificadas[0];
             }
         } 
@@ -216,11 +215,19 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
     }
 
     public static Case actualizarCrearCaso(Case caso, User agente, FRA_RequestWrapperCGF rw, Boolean esActualizar){
-        
         if (!esActualizar){
+            Boolean esCaixaBankNow = (rw.negocio_CGF.equalsIgnoreCase('Teléfono FRAUDE CaixaBankNow'));
+            Boolean esFicheros = (String.isNotBlank(rw.canal_CGF) && rw.canal_CGF.equalsIgnoreCase('Ficheros'));
+            rw.negocio_CGF = (esCaixaBankNow && esFicheros) ? 'Teléfono FRAUDE Ficheros' : rw.negocio_CGF;
+
             caso = new Case();
             caso.CC_Canal_Procedencia__c = rw.negocio_CGF;
-            caso.FRA_Canal_CGF__c = (rw.negocio_CGF.equals('Teléfono FRAUDE CaixaBankNow')) ? rw.canal_CGF : ''; 
+            caso.CC_Canal_Resolucion__c = rw.negocio_CGF;
+            caso.FRA_Canal_CGF__c = (esCaixaBankNow) ? rw.canal_CGF : ''; 
+            caso.FRA_Origen_Creacion__c = 'CGF';
+            if(String.isNotBlank(rw.negocio_CGF)){
+                caso.CC_Canal_Contacto__c = (rw.negocio_CGF == 'Teléfono FRAUDE Tarjetas Consumer') ? 'FRA_Cliente Consumer' : 'FRA_Cliente cbk'; 
+            }
         }
 
         caso.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente');
@@ -292,7 +299,7 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
             }
         }
 
-        if (oAlertasNuevas.size() > 0){
+        if (!oAlertasNuevas.isEmpty()){
             insert oAlertasNuevas;
         }
     }
@@ -303,13 +310,13 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
         List<Contact> contactoAlerta = [SELECT Id, AccountId FROM Contact WHERE CC_Numero_Documento__c = :alertaWrapper.numDocPersonaConectada AND (AccountId = :caso.AccountId) 
                                         AND RecordTypeId = :sContactoClienteRecordType LIMIT 1];
 
-        if (contactoAlerta.size() == 1) {    
+        if (!contactoAlerta.isEmpty()) {    
             nuevaAlerta.FRA_Contacto__c = contactoAlerta[0].Id; //Asocia el contacto 
         } else{
-            List <Account> cuentaAlerta = [SELECT Id, PersonContactId FROM Account WHERE CC_Numero_Documento__c = :alertaWrapper.numDocPersonaConectada AND (Id= :caso.AccountId) 
+            List<Account> cuentaAlerta = [SELECT Id, PersonContactId FROM Account WHERE CC_Numero_Documento__c = :alertaWrapper.numDocPersonaConectada AND (Id= :caso.AccountId) 
                                         AND (RecordTypeId = :sClientePARecordType) LIMIT 1];
 
-            if(cuentaAlerta.size() == 1){
+            if(!cuentaAlerta.isEmpty()){
                 nuevaAlerta.FRA_Contacto__c = cuentaAlerta[0].PersonContactId; //Asocia el contacto particular
             }
         }
@@ -334,10 +341,9 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
 
     @TestVisible
 	public static void identificarPorNumBusqueda(Case caso, String numBusqueda, Boolean esNumPerso) {
-		
 		if (!String.isEmpty(numBusqueda)) {
 			List<Contact> contactos = new List<Contact>();
-			Map<String, Object> mapaCuentasContactos = FRA_IntegrationCGF.IdentificarPersSFC(numBusqueda, esNumPerso);
+			Map<String, Object> mapaCuentasContactos = FRA_IntegrationCGF.identificarPersSFC(numBusqueda, esNumPerso);
 
 			List<Account> cuentas = (List<Account>)mapaCuentasContactos.get('CUENTAS');
 
@@ -347,11 +353,11 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
                 if (contactos.size() == 1) {
                     caso.AccountId = cuentas[0].Id;
                     caso.ContactId = contactos[0].Id;
-                    caso.CC_Telefono_Contacto__c = contactos[0].Phone; //Teléfono del representante
+                    caso.CC_Telefono_Contacto__c = seleccionarTelefono(contactos[0].MobilePhone, contactos[0].Phone, contactos[0].OtherPhone);
                 } else{
                     caso.AccountId = cuentas[0].Id;
                     caso.ContactId = null;
-                    caso.CC_Telefono_Contacto__c = cuentas[0].Phone; //Teléfono de la cuenta/empresa
+                    caso.CC_Telefono_Contacto__c = seleccionarTelefono(cuentas[0].Phone, cuentas[0].PersonMobilePhone, cuentas[0].PersonOtherPhone); //Teléfono de la cuenta/empresa
                 }
 
             } else if((cuentas.size() == 1) && (mapaCuentasContactos.containsKey('CONTACTOS'))){
@@ -360,18 +366,17 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
                 if (contactos.size() == 1) {
                     caso.AccountId = cuentas[0].Id;
                     caso.ContactId = contactos[0].Id;
-                    caso.CC_Telefono_Contacto__c = contactos[0].Phone; //Teléfono del contacto
+                    caso.CC_Telefono_Contacto__c = seleccionarTelefono(contactos[0].MobilePhone, contactos[0].Phone, contactos[0].OtherPhone);
                 } else{
                     caso.AccountId = cuentas[0].Id;
                     caso.ContactId = null;
-                    caso.CC_Telefono_Contacto__c = cuentas[0].Phone; //Teléfono de la cuenta/empresa
+                    caso.CC_Telefono_Contacto__c = seleccionarTelefono(cuentas[0].Phone, cuentas[0].PersonMobilePhone, cuentas[0].PersonOtherPhone); //Teléfono de la cuenta/empresa
                 }
 
             } else if (cuentas.size() == 1) { 
                 caso.AccountId = cuentas[0].Id;
-                caso.ContactId = null;
-                caso.CC_Telefono_Contacto__c = cuentas[0].Phone; //Teléfono de la cuenta/empresa
-
+                caso.ContactId = cuentas[0].PersonContactId;
+                caso.CC_Telefono_Contacto__c = seleccionarTelefono(cuentas[0].PersonMobilePhone, cuentas[0].Phone, cuentas[0].PersonOtherPhone); //Teléfono de la cuenta/empresa
             } else { //No se identifican cuentas o hay varias
                 caso.AccountId = null;
                 caso.ContactId = null;
@@ -379,8 +384,21 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
 		}
 	}
 
+	public static String seleccionarTelefono(String telefono1, String telefono2, String telefono3) {
+        String telefono; 
 
-    static public Map<String,Object> IdentificarPersSFC (String numBusqueda, Boolean esNumPerso) {
+        if (String.isNotBlank(telefono1)) {
+            telefono = telefono1;
+        } else if (String.isNotBlank(telefono2)) {
+            telefono = telefono2;
+        } else if (String.isNotBlank(telefono3)) {
+            telefono = telefono3;
+        }
+        return telefono;
+    }
+
+
+    public static Map<String,Object> identificarPersSFC (String numBusqueda, Boolean esNumPerso) {
         Map<String,Object> oRes = new Map<String,Object>();
         List<Contact> oContactos = new List<Contact>();
         List<Account> oCuentas = new List<Account>();
@@ -392,9 +410,9 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
         Id sClientePARecordType = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA');
         
         if (esNumPerso){
-            oCuentas = [SELECT Id, Name, Phone FROM Account WHERE CC_NumPerso__c = :numBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
+            oCuentas = [SELECT Id, Name, PersonContactId, Phone, PersonMobilePhone, PersonOtherPhone FROM Account WHERE CC_NumPerso__c = :numBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
         }else{
-            oCuentas = [SELECT Id, Name, Phone FROM Account WHERE CC_Numero_Documento__c = :numBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
+            oCuentas = [SELECT Id, Name, PersonContactId, Phone, PersonMobilePhone, PersonOtherPhone FROM Account WHERE CC_Numero_Documento__c = :numBusqueda AND (RecordTypeId = :sClienteRecordType OR RecordTypeId = :sClientePARecordType)];
         }
         
         // Buscar contactos de la cuenta.
@@ -406,12 +424,12 @@ global with sharing class FRA_IntegrationCGF extends CBK_HttpServiceIntegration_
 
         
         Id sRTRep = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Representante'); 
-        oContactos = [SELECT Id, AccountId, Name, Account.Name, Phone
+        oContactos = [SELECT Id, AccountId, Name, Account.Name, Phone, MobilePhone, OtherPhone
                         FROM Contact
                         WHERE AccountId IN :oAuxCli
                         AND (RecordTypeId <> :sRTRep)];  
 
-        oRepresentantes = [SELECT Id, AccountId, Name, Account.Name, Phone
+        oRepresentantes = [SELECT Id, AccountId, Name, Account.Name, Phone, MobilePhone, OtherPhone
                             FROM Contact
                             WHERE CC_CuentaRepresentada__c IN :oAuxCli
                             AND RecordTypeId = :sRTRep];

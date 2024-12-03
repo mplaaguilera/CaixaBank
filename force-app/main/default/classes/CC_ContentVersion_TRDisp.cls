@@ -8,7 +8,7 @@ public with sharing class CC_ContentVersion_TRDisp extends CC_TriggerDispatcherB
     private static Boolean isAfterUndeleteProcessing = false;
 	private static String objectApiName = 'ContentVersion';
     
-   /* public virtual override void beforeInsert(CC_TriggerParameters tp) {
+   public virtual override void beforeInsert(CC_TriggerParameters tp) {
         
         if (!isBeforeInsertProcessing) {           
             isBeforeInsertProcessing = true;
@@ -21,6 +21,7 @@ public with sharing class CC_ContentVersion_TRDisp extends CC_TriggerDispatcherB
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeInsert);
     }
     
+    /* 
     public virtual override void beforeUpdate(CC_TriggerParameters tp) {
         
         if (!isBeforeUpdateProcessing) {           
@@ -33,6 +34,7 @@ public with sharing class CC_ContentVersion_TRDisp extends CC_TriggerDispatcherB
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeUpdate);
     }
+	*/
     
    public virtual override void beforeDelete(CC_TriggerParameters tp) {
         
@@ -45,7 +47,7 @@ public with sharing class CC_ContentVersion_TRDisp extends CC_TriggerDispatcherB
             isBeforeDeleteProcessing = false;
         }
         else execute(null, tp, CC_TriggerParameters.TriggerEvent.beforeDelete);
-    }*/
+    }
     
     public virtual override void afterInsert(CC_TriggerParameters tp) {
         

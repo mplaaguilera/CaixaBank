@@ -15,6 +15,8 @@ Historial
 	1.3 		FIX				Sandra Gómez		02/12/2021			Fix Coverage
 	1.4			US268502		Daniel Rodríguez	31/01/2022			Add createReportOppTaskTest method
 	1.5			US481572		Patricia Solano 	27/01/2023	        Add searchByProductTest method and add runAs at all test methods
+    1.6                         Ángel Medina        22/01/2024          Modified method saveOppRecordsUpdateOppTasksTestError, saveOppRecordsUpdateOppTasksTestError2, saveOppRecordsUpdateOppTasksTestError3, saveOppRecordsUpdateOppTasksTest
+	1.7			US796361		Sandra Gómez		21/03/2024			Changed method saveOppRecords with mew parameter
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_NewOpportunity_Controller_Test {
@@ -58,6 +60,22 @@ public with sharing class AV_NewOpportunity_Controller_Test {
     }
 
     /**
+	 * get value status field 
+	 */
+	@isTest
+	public static void getStatusValuesTest() {
+        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+        System.runAs(usuario) {
+            Test.startTest();
+            List<Map<String, String>> listMapValue = AV_NewOpportunity_Controller.getStatusValues('Opportunity', 'StageName');
+            Test.stopTest(); 
+            if(!listMapValue.isEmpty()){
+                System.assert(listMapValue != Null); 
+            }
+        }
+    }
+
+    /**
 	 * get entity field
 	 */
 	@isTest
@@ -83,73 +101,55 @@ public with sharing class AV_NewOpportunity_Controller_Test {
         System.runAs(usuario) {
             Test.startTest();
             Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-            Product2 prod=[SELECT id from Product2 WHERE AV_ExternalID__c = '50033'];
-            Task  tarea= [SELECT id from Task where Priority = 'Normal'];
-            Date fechaGestion= Date.today();
-            Date fechaVencimineto= Date.today()+1;
-            Map<String, Object> mapDato= new Map<String, Object>();
-            mapDato.put('id',null);
-            mapDato.put('taskid',tarea.id);
-            mapDato.put('path','En gestión/insistir');
-            mapDato.put('fechagestion',fechaGestion);
-            mapDato.put('incluir',false);
-            mapDato.put('fechavencimiento',fechaVencimineto);
-            mapDato.put('entidad',null);
-            mapDato.put('comentario','Prueba comentario');
-            mapDato.put('importe','6,2');
-            mapDato.put('interes','6,2');
-            mapDato.put('producto',prod.id);
-            mapDato.put('oportunidad','Nombre oportunidad');
-            mapDato.put('cuota','6,2');
-            mapDato.put('matricula',null);
-            mapDato.put('otraentidadpick',null);
-            List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-            listDato.add(mapDato);
+            Task t = AV_TestHelper.createTareaExternalIdSinInsert(usuario, '999999');
+            t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF;
+            insert t;
+            Opportunity opp = AV_TestHelper.createOpportunity(acc);
+            AV_TestHelper.createTareaOportunidad(opp,t);
+            List<Opportunity> listOpp= new List<Opportunity> ();
+            listOpp.add(opp);
             Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
-            String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
+            String result =AV_NewOpportunity_Controller.saveOppRecords(listOpp,null,t.Id);
             Test.stopTest();
             System.assertEquals('OK', result, 'No se ha insertado la oportunidad.');     
         }
 	}
-    
-    /**
-	 * insert new opp error El estado de la oportunidad no permite incluirla en "clientes priorizados".
+      /**
+	 * insert new opp
 	 */
     @isTest
-	public static void saveOppRecordsInsertOppTestError() {
+	public static void saveOppRecordsInsertOppTest2() {
         User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
         System.runAs(usuario) {
             Test.startTest();
             Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-            Product2 prod = [SELECT id FROM Product2 WHERE AV_ExternalID__c = '50033'];
-            Task tarea = AV_TestHelper.createTareaExternalIdWithCustomer(null,null,acc);
-            Date fechaGestion= Date.today();
-            Date fechaVencimineto= Date.today()+1;
-            Map<String, Object> mapDato= new Map<String, Object>();
-            mapDato.put('id',null);
-            mapDato.put('taskid',tarea.id);
-            mapDato.put('path','No apto');
-            mapDato.put('fechagestion',fechaGestion);
-            mapDato.put('incluir',true);
-            mapDato.put('fechavencimiento',fechaVencimineto);
-            mapDato.put('entidad',null);
-            mapDato.put('comentario','Prueba comentario');
-            mapDato.put('importe','6,2');
-            mapDato.put('interes','6,2');
-            mapDato.put('producto',prod.id);
-            mapDato.put('oportunidad','Nombre oportunidad');
-            mapDato.put('cuota','6,2');
-            mapDato.put('matricula',null);
-            mapDato.put('otraentidadpick',null);
-            List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-            listDato.add(mapDato);
             Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
-            String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
+            Task t = AV_TestHelper.createTareaExternalIdSinInsert(usuario, '999999');
+            insert t;
+            Opportunity oppTask = AV_TestHelper.createOpportunity(acc);
+            oppTask.AccountId = t.Id;
+            oppTask.Id = null;
+            String result =AV_NewOpportunity_Controller.saveOppRecords(new List<Opportunity>{oppTask},null,t.Id);
             Test.stopTest();
-            System.assertNotEquals('OK', result, 'El estado de la oportunidad no permite incluirla en "clientes priorizados".');  
-        }   
-	}
-    
+            System.assertEquals('OK', result, 'No se ha insertado la oportunidad.');     
+        }
+    }
+    @isTest
+	public static void saveOppRecordsInsertOppTest3() {
+        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+        System.runAs(usuario) {
+            Test.startTest();
+            Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
+            Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
+            Event e = AV_TestHelper.createEventConCliente(usuario,System.today().addDays(1),acc);
+            Opportunity oppEvent = AV_TestHelper.createOpportunity(acc);
+            oppEvent.AccountId = e.Id;
+            oppEvent.Id = null;
+            String result2 =AV_NewOpportunity_Controller.saveOppRecords(new List<Opportunity>{oppEvent},null,e.Id);
+            Test.stopTest();
+            System.assertEquals('OK', result2, 'No se ha insertado la oportunidad.');     
+        }
+    }
     /**
 	 * insert new opp
 	 */
@@ -170,175 +170,6 @@ public with sharing class AV_NewOpportunity_Controller_Test {
             System.assertEquals('OK', tareaResult, 'OK'); 
         }    
 	}
-    
-    /**
-	 * update opp error incluir
-	 */
-    @isTest
-	public static void saveOppRecordsUpdateOppTasksTestError() {
-        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-        System.runAs(usuario) {
-            
-        Test.startTest();
-        CBK_ForbiddenWord__c word = new CBK_ForbiddenWord__c(CBK_EXPRES__c = 'ABELLOTS', CBK_TIPAVI__c = 'E', CBK_IsActive__c = true);
-        AV_Bypass__c bypass = new AV_Bypass__c(AV_ForbiddenWords__c = true);
-        Database.insert(word, false);
-        Database.insert(bypass, false);
-        Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-        Task tarea = AV_TestHelper.createTareaExternalIdWithCustomer(null,null,acc);
-        Opportunity opp=AV_TestHelper.createOpportunity(acc);
-        AV_CustomActivityOpportunity__c tareaOportunidad = AV_TestHelper.createTareaOportunidad(opp,tarea.AV_Task__c);
-        Product2 prod = [SELECT id FROM Product2 WHERE AV_ExternalID__c = '50033'];
-        Date fechaGestion= Date.today();
-        Date fechaVencimineto= Date.today()+1;
-        Map<String, Object> mapDato= new Map<String, Object>();
-        mapDato.put('id',tareaOportunidad.id);
-        mapDato.put('taskid',tarea.id);
-        mapDato.put('path','Potencial');
-        mapDato.put('fechagestion',fechaGestion);
-        mapDato.put('incluir',true);
-        mapDato.put('fechavencimiento',fechaVencimineto);
-        mapDato.put('entidad',null);
-        mapDato.put('comentario','Prueba comentario');
-        mapDato.put('importe','6,2');
-        mapDato.put('interes','6,2');
-        mapDato.put('producto',prod.id);
-        mapDato.put('oportunidad','Nombre oportunidad');
-        mapDato.put('cuota','6,2');
-        mapDato.put('matricula',null);
-        mapDato.put('otraentidadpick',null);
-        List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-        listDato.add(mapDato);
-		String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
-        Test.stopTest();
-		System.assertNotEquals('OK', result, 'No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.');     
-        }
-	}
-    
-    /**
-	 * update opp error Para la etapa seleccionada es obligatorio informar fecha de próxima gestión.
-	 */
-    @isTest
-	public static void saveOppRecordsUpdateOppTasksTestError2() {
-        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-        System.runAs(usuario) {
-            Test.startTest();
-            Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-            Task tarea = AV_TestHelper.createTareaExternalIdWithCustomer(null,null,acc);
-            Opportunity opp=AV_TestHelper.createOpportunity(acc);
-            AV_CustomActivityOpportunity__c tareaOportunidad = AV_TestHelper.createTareaOportunidad(opp,tarea.AV_Task__c);
-            Product2 prod = [SELECT id FROM Product2 WHERE AV_ExternalID__c = '50033'];
-            Date fechaGestion= Date.today();
-            Date fechaVencimineto= Date.today()+1;
-            
-            Map<String, Object> mapDato= new Map<String, Object>();
-            mapDato.put('id',tareaOportunidad.id);
-            mapDato.put('taskid',tarea.id);
-            mapDato.put('path','En gestión/insistir');
-            mapDato.put('fechagestion',null);
-            mapDato.put('incluir',true);
-            mapDato.put('fechavencimiento',fechaVencimineto);
-            mapDato.put('entidad',null);
-            mapDato.put('comentario','Prueba comentario');
-            mapDato.put('importe','6,2');
-            mapDato.put('interes','6,2');
-            mapDato.put('producto',prod.id);
-            mapDato.put('oportunidad','Nombre oportunidad');
-            mapDato.put('cuota','6,2');
-            mapDato.put('matricula',null);
-            mapDato.put('otraentidadpick',null);
-            List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-            listDato.add(mapDato);
-            String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
-            Test.stopTest();
-            System.assertNotEquals('OK', result, 'Para la etapa seleccionada es obligatorio informar fecha de próxima gestión.'); 
-        }    
-	}
-    
-    /**
-	 * update opp error El estado de la oportunidad no permite incluirla en "clientes priorizados".
-	 */
-    @isTest
-	public static void saveOppRecordsUpdateOppTasksTestError3() {
-        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-        System.runAs(usuario) {
-            Test.startTest();
-            Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-            Task tarea = AV_TestHelper.createTareaExternalIdWithCustomer(null,null,acc);
-            Opportunity opp=AV_TestHelper.createOpportunity(acc);
-            AV_CustomActivityOpportunity__c tareaOportunidad = AV_TestHelper.createTareaOportunidad(opp,tarea.AV_Task__c);
-            Product2 prod = [SELECT id FROM Product2 WHERE AV_ExternalID__c = '50033'];
-            Date fechaGestion= Date.today();
-            Date fechaVencimineto= Date.today()+1;
-            Map<String, Object> mapDato= new Map<String, Object>();
-            mapDato.put('id',tareaOportunidad.id);
-            mapDato.put('taskid',tarea.id);
-            mapDato.put('path','No apto');
-            mapDato.put('fechagestion',null);
-            mapDato.put('incluir',true);
-            mapDato.put('fechavencimiento',fechaVencimineto);
-            mapDato.put('entidad',null);
-            mapDato.put('comentario','Prueba comentario');
-            mapDato.put('importe','6,2');
-            mapDato.put('interes','6,2');
-            mapDato.put('producto',prod.id);
-            mapDato.put('oportunidad','Nombre oportunidad');
-            mapDato.put('cuota','6,2');
-            mapDato.put('matricula',null);
-            mapDato.put('otraentidadpick',null);
-            List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-            listDato.add(mapDato);
-            String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
-            Test.stopTest();
-            System.assertNotEquals('OK', result, 'El estado de la oportunidad no permite incluirla en "clientes priorizados".');   
-        }  
-	}
-     
-    /**
-	 * update opp
-	 */
-    @isTest
-	public static void saveOppRecordsUpdateOppTasksTest() {
-        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-        System.runAs(usuario) {
-            Test.startTest();
-            Account acc=[SELECT ID FROM ACCOUNT LIMIT 1];
-            Task tarea = AV_TestHelper.createTareaExternalIdWithCustomer(null,null,acc);
-            Opportunity opp=AV_TestHelper.createOpportunity(acc);
-            AV_CustomActivityOpportunity__c tareaOportunidad = AV_TestHelper.createTareaOportunidad(opp,tarea.AV_Task__c);
-            Product2 prod = [SELECT id FROM Product2 WHERE AV_ExternalID__c = '50033'];
-            Date fechaGestion= Date.today();
-            Date fechaVencimineto= Date.today()+1;
-            Map<String, Object> mapDato= new Map<String, Object>();
-            mapDato.put('id',tareaOportunidad.id);
-            mapDato.put('taskid',tarea.id);
-            mapDato.put('path','En gestión/insistir');
-            mapDato.put('fechagestion',fechaGestion);
-            mapDato.put('incluir',false);
-            mapDato.put('fechavencimiento',fechaVencimineto);
-            mapDato.put('entidad',null);
-            mapDato.put('comentario','Prueba comentario');
-            mapDato.put('importe','6,2');
-            mapDato.put('interes','6,2');
-            mapDato.put('producto',prod.id);
-            mapDato.put('oportunidad','Nombre oportunidad');
-            mapDato.put('cuota','6,2');
-            mapDato.put('matricula',null);
-            mapDato.put('otraentidadpick',null);
-            mapDato.put('origenapp',null);
-            mapDato.put('potencial',null);
-            mapDato.put('resolucion',null);
-            mapDato.put('byProduct',opp.AV_ByProduct__c);
-            mapDato.put('amount','6,2');
-            mapDato.put('margin','6,2');
-            List<Map<String, Object>> listDato= new List<Map<String, Object>> ();
-            listDato.add(mapDato);
-            String result =AV_NewOpportunity_Controller.saveOppRecords(listDato);
-            Test.stopTest();
-            System.assertEquals('OK', result, 'No se ha insertado la oportunidad.');   
-        }  
-	}
-
     /**
 	 * search product 
 	 */
@@ -373,11 +204,11 @@ public with sharing class AV_NewOpportunity_Controller_Test {
             List<String> lista = new List<String>();
             List<String> listaNoEmpty = new List<String>();
             listaNoEmpty.add('rdmString');
-            User u = AV_TestHelper.createUser('AV_Usuario_CaixaBank');
-            User u2 = AV_TestHelper.createUser('AV_Usuario_CaixaBank');
+            User u = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank', 'U01788899879');
+            User u2 = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank', 'U01788899876');
             u2.AV_NumeroOficinaEmpresa__c= '12';
             List<User> toUpdate = new List<User>{u,u2};
-            Database.update(toUpdate);
+            Database.insert(toUpdate);
             results = AV_NewOpportunity_Controller.getEmployees(u.Name,lista);
             results2 = AV_NewOpportunity_Controller.getEmployees(u.Name,listaNoEmpty);
             String idContact = AV_NewOpportunity_Controller.getContact(u.Id);
@@ -406,5 +237,22 @@ public with sharing class AV_NewOpportunity_Controller_Test {
             Test.stopTest();
             System.assertEquals(true,results.isEmpty(), 'searchByProductTest');
         }
+    }
+
+    @isTest 
+    public static void validatePFNewOppAndForbiddenWords(){
+        User usuario =[Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+        System.runAs(usuario) {
+            insert new AV_Bypass__c ( AV_ForbiddenWords__c = true , AV_MaxQueueSize__c = 100, 	AV_BMMMaxQueueSize__c = 100, 	CIBE_BMMMaxQueueSize__c = 100, 	CIBE_MaxQueueSize__c = 100);
+            AV_TestHelper.createForbiddenWords();
+            Task t = AV_TestHelper.createTareaExternalIdSinInsert(usuario, '999999');
+            t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_CHECK_ON_OFF;
+            insert t;
+            String prodFakeIdStr = UUID.randomUUID().toString();
+            String wrongWord = 'ABELLOTS';
+            String result = AV_NewOpportunity_Controller.validatePFNewOppAndForbiddenWords(prodFakeIdStr, (String) t.Id, new List<String>{wrongWord}, new List<String>{wrongWord});
+            System.assert(result != null);
+        }
+
     }
 }

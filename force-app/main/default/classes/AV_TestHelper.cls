@@ -38,6 +38,8 @@ Historial
 	2.5			AV_TestHelper			Sandra Gómez		16/08/2023			Add createEmployeeSinInsert2 with matricula and OwnerId 
 	2.6			AV_TestHelper			Sandra Gómez		21/09/2023			Add createTareaWithRT,createProductSinInsert(with rt) and createTareaWithRTSinInsert and createManagementHistoryWithOwner
 	2.7         AV_TestHelper           Oscar Moreno        16/10/2023          Add createRepresentante method to create contact with RecordType CC_Representante
+	2.8			AV_TestHelper			Gonzalo Ávila 		25/10/2023			Add createPFExperienceSinInsert and createPFClienteSinInsert
+	2.9			AV_TestHelper			Luis Fernández		19/12/2023			Add createExperienciaNegocioSinInsert
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_TestHelper {
@@ -1396,6 +1398,17 @@ public with sharing class AV_TestHelper {
 		insert exp;
 		return exp;
 	}
+	public static AV_ExperienceBusiness__c createExperienciaNegocioSinInsert(){
+		AV_ExperienceBusiness__c exp = new AV_ExperienceBusiness__c();
+		exp.AV_Negocio__c = 'BPA';
+		exp.AV_Activo__c = true;
+		exp.AV_Orden__c = 1;
+		exp.AV_MyBox__c = true;
+		exp.AV_CodigoTipoExperiencia__c = '001';
+		exp.AV_DescTipoExperiencia__c = 'Día a día';
+		exp.AV_ExternalID__c = 'BPA001';
+		return exp;
+	}
 	
 	public static AV_ProductClient__c createPFCliente(){
 		AV_ProductClient__c prodCliente = new AV_ProductClient__c();
@@ -1406,6 +1419,22 @@ public with sharing class AV_TestHelper {
 		prodCliente.AV_Potencialidad__c = 'S';
 		insert prodCliente;
 		return prodCliente;
+	}
+
+	public static AV_ProductClient__c createPFClienteSinInsert(){
+		AV_ProductClient__c prodCliente = new AV_ProductClient__c();
+		RecordType rt = AV_AppUtilities.getRecordType('AV_ProductClient__c', 'AV_ProductoFichaCliente');
+		prodCliente.RecordTypeId = rt.Id;
+		prodCliente.AV_Activo__c = true;
+		prodCliente.AV_TenenciaProducto__c = '1';
+		prodCliente.AV_Potencialidad__c = 'S';
+		return prodCliente;
+	}
+
+public static AV_ProductExperience__c createPFExperienceSinInsert(){
+		AV_ProductExperience__c prodExp = new AV_ProductExperience__c();
+		prodExp.AV_ExternalID__c = 'BPA004_50003';
+		return prodExp;
 	}
 	
 	public static Task createTareaOtherExternalID(User user){
@@ -1943,6 +1972,43 @@ public with sharing class AV_TestHelper {
 			AV_AppConstants.PS_CUSTOMERINTOUCH, 
 			AV_AppConstants.PS_CAMBIO_GESTOR_PROCESOS,
 			AV_AppConstants.PS_ORGANIZADOREVENTOS
+			
+		};
+
+		Set<String> SetPermissGroup = new Set<String>{
+			AV_AppConstants.PS_EXTERNO, 
+			AV_AppConstants.PS_GESTOR,
+			AV_AppConstants.PS_VISIBILIDAD_MIS_CLIENTES_SOLUTIONS};
+
+		List<PermissionSet> perSet = [SELECT Id FROM PermissionSet WHERE Name =:SetPermiss];
+
+		List<PermissionSetGroupComponent> unitaryPs = [SELECT Id, PermissionSetGroupId,
+			PermissionSetId, PermissionSet.Name from PermissionSetGroupComponent 
+			WHERE PermissionSetGroup.DeveloperName  IN :SetPermissGroup];
+
+		for(PermissionSetGroupComponent psgc : unitaryPs){
+			if(!perSet.contains(new PermissionSet(Id = psgc.PermissionSetId))){
+
+				perSet.add(new PermissionSet(Id = psgc.PermissionSetId));
+			}
+		}
+		for(PermissionSet ps: perSet){
+			PermissionSetAssignment pa = new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.Id);
+			permissionSetList.add(pa);
+		}
+		insert permissionSetList;	
+	}
+
+	public static void insertNeededPermissions2(User u){
+		List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
+
+		Set<String> SetPermiss = new Set<String>{
+			AV_AppConstants.PS_GESTORESCRITURA,
+			AV_AppConstants.PS_GESTORTABS,
+			AV_AppConstants.PS_GESTOROPERATIVA,
+			AV_AppConstants.PS_GESTOROPERATIVAESCRITURA,
+			AV_AppConstants.PS_CUSTOMERINTOUCH, 
+			AV_AppConstants.PS_CAMBIO_GESTOR_PROCESOS
 			
 		};
 

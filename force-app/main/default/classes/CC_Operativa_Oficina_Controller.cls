@@ -9,7 +9,8 @@ public with sharing class CC_Operativa_Oficina_Controller {
             Account.LastName, Account.AV_OficinaPrincipal__r.Name, CC_MCC_Motivo__r.Name, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c, Account.AV_EAPGestor__r.AccountId, Account.AV_OficinaPrincipal__c, 
             Account.FirstName, Account.CC_Numero_Documento__c, Account.AV_Cliente__c, CC_MCC_Solucion__r.Name, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__r.Name, Account.Recordtype.Developername,
             CC_MCC_Solucion__r.CC_AmbitoTareas__c, Account.Name, CC_Detalles_Consulta__c, Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c, Account.AV_Confidencial__c, Account.AV_NumPerso__c,
-            CC_Status_Autorizacion__c, CC_OTP_Nivel__c, CC_OTP_Valido__c, Account.AV_IndicadoresClientes__c, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c
+            CC_Status_Autorizacion__c, CC_OTP_Nivel__c, CC_OTP_Valido__c, Account.AV_IndicadoresClientes__c, Account.AV_EAPGestor__c, Account.AV_EAPGestor__r.Name, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c,
+            Account.AV_EAPGestor__r.AV_Pool__c, Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c, CC_Oportunidad_Creada__c, Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c
             FROM Case WHERE Id = :recordId LIMIT 1];
             List<CC_MCC_Grupo_Colaborador__c> listaGrupoColaborador = [SELECT Id, Name FROM CC_MCC_Grupo_Colaborador__c WHERE CC_MCC__c in (:caso.CC_MCC_Motivo__c, :caso.CC_MCC_ProdServ__C) LIMIT 1];
             List<CC_Lista_Valores__c> textos = [SELECT Name, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar' AND CC_Activa__c = true];
@@ -20,7 +21,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             String ambitoMotivo;
             Map<String, String> gestorGenerico = buscarGestorGenerico();
             String gestorGenericoName = gestorGenerico.get('nombre');
-            
+            CC_Settings__c consultarGestorPool = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
             for(CC_Lista_Valores__c texto : textos) {
                 textosMap.put(texto.Name, texto.CC_Mensajes_Mostrar__c);
             }
@@ -29,9 +30,14 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 imagin = true;
                 ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c;
                 retorno.put('alerta', caso.CC_MCC_Motivo__r.CC_Alerta_Imagin__c);
+                retorno.put('imagin', true);
             } else {
                 ambitoMotivo = caso.CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c;
                 retorno.put('alerta', caso.CC_MCC_Motivo__r.CC_Alerta_Caixa__c);
+            }
+
+            if(!Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c) && (ambitoMotivo == 'Hub Imagin' || ambitoMotivo == 'Oficina física')) {
+                ambitoMotivo = null;
             }
 
             if(/*!imagin && */(ambitoMotivo == 'CSBD 3N' || ambitoMotivo == 'CSBD Contratar' || ambitoMotivo == 'CSBD No Contratar')) {
@@ -59,7 +65,11 @@ public with sharing class CC_Operativa_Oficina_Controller {
                     retorno.put('mostrarModalCreacionTarea', true);
                 } else if(ambitoMotivo == '' || ambitoMotivo == null) {
                     if(imagin) {
-                        retorno.put('mostrarModalCreacionTarea', true);
+                        if(Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                            ambitoVentas = true;
+                        } else {
+                            retorno.put('mostrarModalCreacionTarea', true);
+                        }
                     } else {
                         ambitoVentas = true;
                     }
@@ -137,6 +147,16 @@ public with sharing class CC_Operativa_Oficina_Controller {
                     retorno.put('toastNoCliente', textosMap.get('Mensaje derivar no clientes'));
                     retorno.put('cambioOficina', true);
                     retorno.put('mostrarModalCreacionTarea', true);
+                } else if(ambitoMotivo == 'Hub Imagin') {
+                    retorno.put('hubImagin', true);
+                    ambitoVentas = true;
+                } else if(ambitoMotivo == 'Oficina física') {
+                    if(!caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c && !imagin) {
+                        ambitoVentas = true;
+                    } else {
+                        retorno.put('oficinaFisica', true);
+                        retorno.put('mostrarModalCreacionTarea', true);
+                    }
                 } else if(ambitoCSBD) {
                     if(caso.Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c) {
                         if(caso.CC_OTP_Nivel__c != null && caso.CC_Status_Autorizacion__c != 'APPROVED' && caso.CC_OTP_Valido__c == false) {
@@ -145,8 +165,12 @@ public with sharing class CC_Operativa_Oficina_Controller {
                             if(ambitoMotivo == 'CSBD 3N') {
                                 retorno.put('toastTrasladar3N', textosMap.get('Toast trasladar 3N'));
                             } else if(ambitoMotivo == 'CSBD No Contratar') {
+                                retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+                                retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
                                 retorno.put('toastCSBDNoContratar', textosMap.get('Toast CSBD No Contratar'));
                             } else if(ambitoMotivo == 'CSBD Contratar') {
+                                retorno.put('textoOportunidadExistente', textosMap.get('Texto Oportunidad Existente'));
+                                retorno.put('oportunidadCreada', caso.CC_Oportunidad_Creada__c);
                                 ambitoVentas = true;
                                 retorno.put('urlTF', textosMap.get('URL TF'));
                                 retorno.put('preguntaCSBDContratar', textosMap.get('Pregunta CSBD Contratar'));
@@ -159,12 +183,22 @@ public with sharing class CC_Operativa_Oficina_Controller {
                     }
                 }
 
-                if(ambitoVentas) {                    
-                    if(!imagin || ambitoCSBD || (ambitoMotivo == 'Oficina' && !imagin)) {
-                        if(gestorGenericoName == caso.Account.AV_EAPGestor__r.Name || caso.Account.AV_EAPGestor__c == null) {
-                            retorno.put('mostrarModalGestionGestorGenerico', true);
+                if(ambitoVentas) {
+                    if(!imagin || ambitoMotivo == 'CSBD Contratar' || (ambitoMotivo == 'Oficina' && !imagin) || (imagin && (ambitoMotivo == '' || ambitoMotivo == null))) {
+                        if(Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                            if(caso.Account.AV_EAPGestor__c != null && caso.Account.AV_EAPGestor__r.AV_Pool__c) {
+                                retorno.put('mostrarModalGestionGestorGenerico', true);
+                                retorno.put('citaRapida', true);
+                            } else {
+                                retorno.put('mostrarModalGestionGestorAsignado', true);
+                            }
                         } else {
-                            retorno.put('mostrarModalGestionGestorAsignado', true);
+                        if(gestorGenericoName == caso.Account.AV_EAPGestor__r.Name || caso.Account.AV_EAPGestor__c == null) {
+                                retorno.put('mostrarModalGestionGestorGenerico', true);
+                                retorno.put('citaRapida', false);
+                            } else {
+                                retorno.put('mostrarModalGestionGestorAsignado', true);
+                            }
                         }
                     } else {
                         retorno.put('mostrarModalCreacionTarea', true);
@@ -172,13 +206,15 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 }                
             }
 
+            retorno.put('citaRapidaPresencialToast', textosMap.get('Toast cita rapida presencial'));
             retorno.put('gestorGenericoName' , gestorGenericoName);
             retorno.put('detallesConsulta', caso.CC_Detalles_Consulta__c);
             retorno.put('numperso' , caso.Account.AV_NumPerso__c);
             retorno.put('nif' , caso.Account.CC_Numero_Documento__c);
             retorno.put('derivar', caso.CC_Derivar__c);
             retorno.put('gestor', caso.Account.AV_EAPGestor__c);
-            retorno.put('oficinaPrincipal', caso.Account.AV_OficinaPrincipal__c);            
+            retorno.put('oficinaPrincipal', caso.Account.AV_OficinaPrincipal__c);
+            retorno.put('numOficina', caso.Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c);
             retorno.put('gestores', buscarGestores(caso.Account.AV_OficinaPrincipal__c));
             return retorno;
         }
@@ -187,13 +223,21 @@ public with sharing class CC_Operativa_Oficina_Controller {
     @AuraEnabled
     public static void realizarTraslado3N(String recordId) {
         Id recordTypeIdGrupo = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Grupo_Colaborador__c', 'CC_Grupo_Tercer_Nivel');
-        CC_MCC_Grupo_Colaborador__c grupoColaborador = [SELECT CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.RecordtypeId, 
+        List <CC_MCC_Grupo_Colaborador__c> grupoColaborador = [SELECT CC_Grupo_Colaborador__r.Id, CC_Grupo_Colaborador__r.RecordtypeId, 
         CC_Grupo_Colaborador__r.Name, CC_Grupo_Colaborador__r.CC_Queue_Traslado__c
         FROM CC_MCC_Grupo_Colaborador__c
         WHERE CC_Grupo_Colaborador__r.CC_Queue_Traslado__c = 'Cola_3N_CSBD'
         AND CC_Grupo_Colaborador__r.RecordtypeId = :recordTypeIdGrupo
         ORDER BY Name ASC LIMIT 1];
-        CC_EmailSendController.cambiarPropietario(grupoColaborador.CC_Grupo_Colaborador__r.Name, grupoColaborador.CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, recordId, '', grupoColaborador.CC_Grupo_Colaborador__r.Id);
+        try{
+            if(!grupoColaborador.isEmpty()){
+                CC_EmailSendController.cambiarPropietario(grupoColaborador[0].CC_Grupo_Colaborador__r.Name, grupoColaborador[0].CC_Grupo_Colaborador__r.CC_Queue_Traslado__c, recordId, '', grupoColaborador[0].CC_Grupo_Colaborador__r.Id);
+            } else {
+                throw new AuraHandledException('El grupo colaborador no está correctamente informado');
+            }
+        } catch(Exception e){
+            throw new AuraHandledException('El grupo colaborador no ha sido informado ' + e.getMessage());
+        }
     }
     
     @AuraEnabled
@@ -208,6 +252,8 @@ public with sharing class CC_Operativa_Oficina_Controller {
             if(retorno.get('success') == true) {
                 Id recordTypeTareaCC = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
                 Case caso = [SELECT OwnerId, ContactId FROM CASE WHERE Id = :recordId LIMIT 1];
+                caso.CC_Oportunidad_Creada__c = true;
+                update caso;
                 Task tareaOportunidad = new Task();
                 tareaOportunidad.recordTypeId = recordTypeTareaCC;
                 tareaOportunidad.Subject = 'Creación oportunidad';
@@ -218,15 +264,26 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 tareaOportunidad.AV_OrigenAct__c = 'Contact Center';
                 tareaOportunidad.OwnerId = caso.OwnerId;
                 tareaOportunidad.Type = 'Oportunidad CSBD';
+                tareaOportunidad.AV_Case__c = recordId;
                 tareaOportunidad.WhoId = caso.ContactId;
                 insert tareaOportunidad;
-                
-                caso.CC_CierreAutomaticoCSBD__c = true;
-                caso.Status = 'Cerrado';
-                update caso;
             }
+            
         }
         return retorno;
+    }
+
+    @AuraEnabled
+    public static Boolean comprobarOportunidadExistente(String recordId) {
+        try {
+            List<Case> opCreada = [SELECT Id, CC_Oportunidad_Creada__c FROM Case WHERE Id = :recordId LIMIT 1];
+            if(!opCreada.isEmpty()) {
+                return opCreada[0].CC_Oportunidad_Creada__c;
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+        return false;
     }
     
     @AuraEnabled
@@ -236,16 +293,21 @@ public with sharing class CC_Operativa_Oficina_Controller {
         String numeroGestor;
         Boolean ambitoCSBD = false;
         Boolean imagin = false;
+        Boolean crearTareaVentas = false;
         User gestorCliente;
         Account resultado = new Account();
         List<Task> lstTask = new List<Task>();
         List<Task> lstTaskDirectores = new List<Task>();
         Date fechaActividadDate = Date.valueOf(fechaActividad);
+        Id oficinaOrigen;
+        String taskType;
+        List<Contact> directoresOficina;
         Id recordTypeTareaAV = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'AV_AlertaComercial');
         Id recordTypeTareaCC = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'CC_Task');
+        CC_Settings__c consultarGestorPool = CC_Settings__c.getValues('CC_Configuracion_Cita_Rapida');
         Case caso = [SELECT ContactId, Account.AV_OficinaPrincipal__c, Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c, AccountId, OwnerId, CC_MCC_Motivo__r.CC_AmbitoTareas__c, Account.AV_EAPGestor__r.CC_Matricula__c, 
         Account.AV_EAPGestor__c, Account.AV_IndicadoresClientes__c, Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c, Account.AV_EAPGestor__r.CC_Numero_Oficina__c, Account.AV_EAPGestor__r.Name, CC_MCC_Motivo__r.CC_Ambito_tareas_Imagin__c,
-        Account.AV_EAPGestor__r.AccountId, CC_Detalles_Consulta__c,Account.AV_Cliente__c, Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c
+        Account.AV_EAPGestor__r.AccountId, CC_Detalles_Consulta__c,Account.AV_Cliente__c, Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c, CC_MCC_Motivo__r.CC_Ambito_Tareas_Caixa__c, Account.AV_EAPGestor__r.AV_Pool__c
         FROM Case WHERE Id = :recordId LIMIT 1];
         List<CC_Lista_Valores__c> textos = [SELECT Name, CC_Mensajes_Mostrar__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'Textos operativa Derivar'];
         Map<String, String> textosMap = new Map<String, String>();
@@ -263,6 +325,10 @@ public with sharing class CC_Operativa_Oficina_Controller {
         
         if(ambitoMotivo == 'CSBD 3N' || ambitoMotivo == 'CSBD Contratar' || ambitoMotivo == 'CSBD No Contratar') {
             ambitoCSBD = true;
+        }
+
+        if(!Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c) && (ambitoMotivo == 'Hub Imagin' || ambitoMotivo == 'Oficina física')) {
+                ambitoMotivo = null;
         }
         
         Task tareaGestorCaso = new Task();
@@ -294,7 +360,9 @@ public with sharing class CC_Operativa_Oficina_Controller {
         tareaGestorAccount.AV_OrigenAct__c = 'Contact Center';
         
         if(!caso.Account.AV_Cliente__c) {
-            tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+            if(oficinaDestino != null) {
+                tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+            }
             gestorCliente = buscarGestor('generico');
             mensaje = textosMap.get('Mensaje caixabank oficina cliente else');
             tareaGestorCaso.Type = 'Tarea Oficina';
@@ -306,7 +374,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 tareaGestorCaso.Type = 'Tarea Oficina';
                 gestorCliente = buscarGestor('generico');
                 //tareaGestorAccount.Description += ' ' + caso.CC_Detalles_Consulta__c;
-            } else if (ambitoMotivo == 'Ventas') {
+            } else if(ambitoMotivo == 'Ventas') {
                 if (caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c) {
                     numeroGestor = caso.Account.AV_EAPGestor__r.CC_Matricula__c;
                     tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
@@ -320,8 +388,8 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 //tareaGestorAccount.Description += ' ' + caso.CC_Detalles_Consulta__c;
                 mensaje = textosMap.get('Mensaje imagin ventas');
             } else if(ambitoMotivo == 'Cambio de Oficina') {
-                Id oficinaOrigen = caso.Account.AV_OficinaPrincipal__c;
-                List<Contact> directoresOficina = [SELECT Id, AccountId, Account.CC_Numero_Oficina__c, CC_Matricula__c FROM Contact WHERE AV_DescFuncion__c = 'DIRECCION' AND CC_Inactivo__c = false AND AccountId IN (:oficinaDestino)];
+                oficinaOrigen = caso.Account.AV_OficinaPrincipal__c;
+                directoresOficina = [SELECT Id, AccountId, Account.CC_Numero_Oficina__c, CC_Matricula__c FROM Contact WHERE AV_DescFuncion__c = 'DIRECCION' AND CC_Inactivo__c = false AND AccountId IN (:oficinaDestino)];
                 for(Contact director : directoresOficina) {
                     Task tareaDirector = new Task();
                     tareaDirector.recordTypeId = recordTypeTareaAV;
@@ -343,59 +411,69 @@ public with sharing class CC_Operativa_Oficina_Controller {
                 tareaGestorCaso.Type = 'Tarea Cambio Oficina';
                 mensaje = textosMap.get('Mensaje imagin cambio de oficina');
             } else if(ambitoMotivo == 'Cambio de Gestor') {
-                mensaje = textosMap.get('Mensaje imagin cambio de gestor');
-                tareaGestorAccount.AV_Center__c = textosMap.get('Hub gestion');
-                tareaGestorCaso.Type = 'Tarea Cambio Gestor';
-                gestorCliente = buscarGestor('generico');
-            } else if(ambitoMotivo == null || ambitoMotivo == '') {
-                if (caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c) {
-                    numeroGestor = caso.Account.AV_EAPGestor__r.CC_Matricula__c;
-                    tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
-                    tareaGestorCaso.Type = 'Tarea gestor';
-                    gestorCliente = buscarGestor(numeroGestor);
+                if(caso.Account.AV_EAPGestor__r.AV_Pool__c && Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                    oficinaOrigen = caso.Account.AV_OficinaPrincipal__c;
+                    directoresOficina = [SELECT Id, AccountId, Account.CC_Numero_Oficina__c, CC_Matricula__c FROM Contact WHERE AV_DescFuncion__c = 'DIRECCION' AND CC_Inactivo__c = false AND AccountId IN (:oficinaOrigen)];
+                    mensaje = textosMap.get('Mensaje caixabank cambio de gestor');
+                    tareaGestorCaso.Type = 'Tarea Cambio Gestor';
+                    for(Contact director : directoresOficina) {
+                        Task tareaDirector = new Task();
+                        tareaDirector.recordTypeId = recordTypeTareaAV;
+                        tareaDirector.Subject = asunto;
+                        tareaDirector.Status = 'Open';
+                        tareaDirector.Priority = 'Normal';
+                        tareaDirector.Description = comentarios;
+                        tareaDirector.ActivityDate = Date.Today().addDays(7);
+                        tareaDirector.AV_Case__c = recordId;
+                        tareaDirector.WhatId = caso.AccountId;
+                        tareaDirector.AV_OrigenAct__c = 'Contact Center';
+                        tareaDirector.AV_Center__c = director.Account.CC_Numero_Oficina__c;
+                        tareaDirector.Type = 'Tarea gestor';
+                        numeroGestor = director.CC_Matricula__c;
+                        gestorCliente = buscarGestor(numeroGestor);
+                        tareaDirector.OwnerId = gestorCliente.Id;
+                        lstTaskDirectores.add(tareaDirector);
+                    }
                 } else {
+                    mensaje = textosMap.get('Mensaje imagin cambio de gestor');
                     tareaGestorAccount.AV_Center__c = textosMap.get('Hub gestion');
-                    tareaGestorCaso.Type = 'Tarea Hub Gestión';
+                    tareaGestorCaso.Type = 'Tarea Cambio Gestor';
                     gestorCliente = buscarGestor('generico');
                 }
-                //tareaGestorAccount.Description += ' ' + caso.CC_Detalles_Consulta__c;
-                mensaje = textosMap.get('Mensaje imagin else');
+            } else if(ambitoMotivo == null || ambitoMotivo == '') {
+                if(Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                    crearTareaVentas = true;
+                } else {
+                    if (caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c) {
+                        numeroGestor = caso.Account.AV_EAPGestor__r.CC_Matricula__c;
+                        tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
+                        tareaGestorCaso.Type = 'Tarea gestor';
+                        gestorCliente = buscarGestor(numeroGestor);
+                    } else {
+                        tareaGestorAccount.AV_Center__c = textosMap.get('Hub gestion');
+                        tareaGestorCaso.Type = 'Tarea Hub Gestión';
+                        gestorCliente = buscarGestor('generico');
+                    }
+                    //tareaGestorAccount.Description += ' ' + caso.CC_Detalles_Consulta__c;
+                    mensaje = textosMap.get('Mensaje imagin else');
+                }
+            } else if(ambitoMotivo == 'Oficina física') {
+                resultado = [SELECT Id, Name, RecordType.DeveloperName, CC_Numero_Oficina__c  FROM Account WHERE Id = :caso.Account.AV_OficinaPrincipal__c AND RecordType.DeveloperName = 'CC_CentroCaixaBank' LIMIT 1];
+                mensaje = textosMap.get('Toast oficina fisica');
+                tareaGestorAccount.AV_Center__c = caso.Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
+                tareaGestorCaso.Type = 'Tarea Oficina Física';
+                gestorCliente = buscarGestor('generico');
+            } else if(ambitoMotivo == 'Hub Imagin') {
+                tareaGestorAccount.AV_Center__c = textosMap.get('Hub Imagin');
+                tareaGestorCaso.Type = 'Tarea Hub Imagin';
+                gestorCliente = buscarGestor('generico');
+                mensaje = textosMap.get('Toast Hub Imagin');
             }
         } else if(!imagin || (ambitoCSBD && !caso.Account.AV_OficinaPrincipal__r.Parent.CC_Derivacion_CSBD__c) || (ambitoCSBD && imagin)) {
-            if(ambitoMotivo == 'Ventas' || ambitoCSBD || ambitoMotivo == null || ambitoMotivo == '' || ambitoMotivo == 'Oficina') {
-                Map<String, String> gestorGenerico = buscarGestorGenerico();
-                String nombreGestorGenerico = gestorGenerico.get('nombre').toString();
-                if(caso.Account.AV_EAPGestor__c != null && caso.Account.AV_EAPGestor__r.Name != nombreGestorGenerico) {
-                    if(crearTareaCitaGestor) {
-                        tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
-                        numeroGestor = caso.Account.AV_EAPGestor__r.CC_Matricula__c;
-                        gestorCliente = buscarGestor(numeroGestor);
-                        mensaje = textosMap.get('Mensaje caixabank cita tarea gestor');
-                    } else {
-                        tareaGestorAccount.AV_Center__c = gestorSeleccionadoBuscador.CC_Numero_Oficina__c;
-                        numeroGestor = gestorSeleccionadoBuscador.CC_Matricula__c;
-                        gestorCliente = buscarGestor(gestorSeleccionadoBuscador.CC_Matricula__c);
-                        mensaje = textosMap.get('Mensaje caixabank cita tarea gestor else');
-                    }
-                    tareaGestorCaso.Type = 'Tarea gestor';
-                } else {
-                    if(enviarTareaOficinaCliente) {
-                        tareaGestorAccount.AV_Center__c = caso.Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
-                        gestorCliente = buscarGestor('generico');
-                        mensaje = textosMap.get('Mensaje caixabank oficina cliente');
-                    } else {
-                        tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
-                        gestorCliente = buscarGestor('generico');
-                        mensaje = textosMap.get('Mensaje caixabank oficina cliente else');
-                    }
-                    tareaGestorCaso.Type = 'Tarea Oficina';
-                }
+            if(ambitoMotivo == 'Ventas' || ambitoCSBD || ambitoMotivo == null || ambitoMotivo == '' || ambitoMotivo == 'Oficina' || (ambitoMotivo == 'Oficina física' && !caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c)) {
+                crearTareaVentas = true;
             } else if (ambitoMotivo == 'Cambio de Oficina' || ambitoMotivo == 'Cambio de Gestor') {
-                Id oficinaOrigen;
-                String taskType;
                 oficinaOrigen = caso.Account.AV_OficinaPrincipal__c;
-                List<Contact> directoresOficina; 
-                
                 if(ambitoMotivo == 'Cambio de Gestor') {
                     directoresOficina = [SELECT Id, AccountId, Account.CC_Numero_Oficina__c, CC_Matricula__c FROM Contact WHERE AV_DescFuncion__c = 'DIRECCION' AND CC_Inactivo__c = false AND AccountId IN (:oficinaOrigen, :oficinaDestino)];
                     mensaje = textosMap.get('Mensaje caixabank cambio de gestor');
@@ -424,10 +502,62 @@ public with sharing class CC_Operativa_Oficina_Controller {
                     tareaDirector.OwnerId = gestorCliente.Id;
                     lstTaskDirectores.add(tareaDirector);
                 }
+            } else if (ambitoMotivo == 'Oficina física' && caso.Account.AV_EAPGestor__r.AV_EmpleadoIntouch__c) {
+                resultado = [SELECT Id, Name, RecordType.DeveloperName, CC_Numero_Oficina__c  FROM Account WHERE Id = :caso.Account.AV_OficinaPrincipal__c AND RecordType.DeveloperName = 'CC_CentroCaixaBank' LIMIT 1];
+                tareaGestorAccount.AV_Center__c = caso.Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
+                tareaGestorCaso.Type = 'Tarea Oficina Física';
+                gestorCliente = buscarGestor('generico');
+                mensaje = textosMap.get('Toast oficina fisica');
             }
         }
+
+        if(crearTareaVentas) {
+            Map<String, String> gestorGenerico = buscarGestorGenerico();
+            String nombreGestorGenerico = gestorGenerico.get('nombre').toString();
+            if(caso.Account.AV_EAPGestor__c != null && caso.Account.AV_EAPGestor__r.Name != nombreGestorGenerico) {
+                if(crearTareaCitaGestor && caso.Account.AV_EAPGestor__r.AV_Pool__c && Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c)) {
+                    tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
+                    gestorCliente = buscarGestor('generico');
+                    mensaje = textosMap.get('Mensaje caixabank cita tarea gestor');
+                    tareaGestorCaso.Type = 'Tarea Oficina';
+                } else if(crearTareaCitaGestor && (!caso.Account.AV_EAPGestor__r.AV_Pool__c || !Boolean.valueOf(consultarGestorPool.CC_Configuracion_3__c))) {
+                    tareaGestorAccount.AV_Center__c = caso.Account.AV_EAPGestor__r.CC_Numero_Oficina__c;
+                    numeroGestor = caso.Account.AV_EAPGestor__r.CC_Matricula__c;
+                    gestorCliente = buscarGestor(numeroGestor);
+                    mensaje = textosMap.get('Mensaje caixabank cita tarea gestor');
+                    tareaGestorCaso.Type = 'Tarea gestor';
+                } else if(gestorSeleccionadoBuscador != null) {
+                    tareaGestorAccount.AV_Center__c = gestorSeleccionadoBuscador.CC_Numero_Oficina__c;
+                    numeroGestor = gestorSeleccionadoBuscador.CC_Matricula__c;
+                    gestorCliente = buscarGestor(gestorSeleccionadoBuscador.CC_Matricula__c);
+                    mensaje = textosMap.get('Mensaje caixabank cita tarea gestor else');
+                    tareaGestorCaso.Type = 'Tarea gestor';
+                } else if(oficinaDestino != null) {
+                    tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+                    gestorCliente = buscarGestor('generico');
+                    mensaje = textosMap.get('Mensaje caixabank cita tarea gestor else');
+                    tareaGestorCaso.Type = 'Tarea Oficina';
+                }
+            } else {
+                if(enviarTareaOficinaCliente) {
+                    tareaGestorAccount.AV_Center__c = caso.Account.AV_OficinaPrincipal__r.CC_Numero_Oficina__c;
+                    gestorCliente = buscarGestor('generico');
+                    mensaje = textosMap.get('Mensaje caixabank oficina cliente');
+                } else {
+                    if(oficinaDestino != null) {
+                        tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+                    }
+                    gestorCliente = buscarGestor('generico');
+                    mensaje = textosMap.get('Mensaje caixabank oficina cliente else');
+                }
+                tareaGestorCaso.Type = 'Tarea Oficina';
+            }
+        }
+
         if (ambitoMotivo == 'No clientes') {
-            tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+            if(oficinaDestino != null) {
+                tareaGestorAccount.AV_Center__c = [SELECT CC_Numero_Oficina__c FROM Account WHERE Id = :oficinaDestino LIMIT 1].CC_Numero_Oficina__c;
+            }
             mensaje = textosMap.get('Mensaje derivar no clientes');
             tareaGestorCaso.Type = 'Tarea Oficina';
             //tareaGestorAccount.Description += '' + caso.CC_Detalles_Consulta__c;
@@ -736,7 +866,7 @@ public with sharing class CC_Operativa_Oficina_Controller {
             reabrirCasoCSBD(casesIds);
         }
     }
-    
+
     // usar esta excepcion internamente
     private class DefaultException extends Exception {}
 }

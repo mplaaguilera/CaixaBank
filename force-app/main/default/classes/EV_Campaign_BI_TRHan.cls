@@ -11,7 +11,7 @@ Historial
     1.1                           	Daniel Rodriguez    31/01/2023          Add method cambioStatusEncursoFinalizado to EV_Campaign_AI_TRHan. Remove setCampaignMemberRecordTypeId to EV_CampaignTriggerHelper
   	1.2 		US587001			Daniel Rodriguez	23/05/2023			Add method surveyActive
   	1.3		    US585725			Daniel Rodriguez	29/08/2023			Add differentiation between Alta masiva and normal Campaign
-
+    1.4         TechSummit          Carolina Lopez      16/05/2024          Add method setTechSummitCampaign.
 ***********************************************************************************************************************/
 
 public class EV_Campaign_BI_TRHan extends CC_TriggerHandlerBase {
@@ -37,6 +37,7 @@ public class EV_Campaign_BI_TRHan extends CC_TriggerHandlerBase {
             EV_CampaignTriggerHelper.fillPlaceOfCelebration(campaignEntry);
             EV_CampaignTriggerHelper.setCampaignMemberRecordTypeId(campaignEntry);
             EV_CampaignTriggerHelper.surveyActive(campaignEntry, mapNewObj, null);
+            EV_CampaignTriggerHelper.setTechSummitCampaign(campaignEntry);
         }
     }
 

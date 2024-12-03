@@ -17,6 +17,9 @@ public with sharing class SAC_BatchCargaSLAMCC implements Database.Batchable<sOb
     private static final Id RECTYPELETRADO= Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SAC_SLALetrado').getRecordTypeId();
     private static final Id RECTYPEREGULATORIO= Schema.SObjectType.SAC_ParametrizacionSLATME__c.getRecordTypeInfosByDeveloperName().get('SAC_SLARegulatorio').getRecordTypeId();
 
+    // public SAC_BatchCargaSLAMCC() {
+    //         // Este constructor es requerido por Salesforce para instanciar la clase en procesos batch.
+    // }
 
     public Database.QueryLocator start(Database.BatchableContext bc) {
         return Database.getQueryLocator([

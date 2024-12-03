@@ -19,15 +19,12 @@ public with sharing class CC_EmailMessage {
         //La referencia se envía entre estos los literales '#@' y '#' en los correos salientes.ApexPages
         String referencia = null;
         if (correo.TextBody != null) {
-            system.debug('NMAA referenciaInicial:'+correo.TextBody.substringBetween('#@', '#'));
             referencia = correo.TextBody.substringBetween('#@', '#');
-            system.debug('NMAA referencia0:'+referencia);
         }
         //En ocasiones el campo TextBody (sin formato) viene vacío, se busca en el campo HtmlBody
         if (referencia == null && correo.HtmlBody != null) {
             referencia = correo.HtmlBody.substringBetween('#@', '#');
         }
-        system.debug('NMAA referencia1:'+referencia);
         return referencia;
     }
 

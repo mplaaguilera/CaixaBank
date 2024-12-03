@@ -40,9 +40,7 @@ public with sharing class SPV_Utils {
                     when 'SAC_MaestroTemas__c' {
                         mapObjectRT.put(objeto,Schema.SObjectType.SAC_MaestroTemas__c.getRecordTypeInfosByDeveloperName());
                     }
-                    when 'SAC_ImagenDocumento__c' {
-                        mapObjectRT.put(objeto,Schema.SObjectType.SAC_ImagenDocumento__c .getRecordTypeInfosByDeveloperName());
-                    }
+                    
                     //Añadido
                     when 'Account' {
                         mapObjectRT.put(objeto, Schema.SobjectType.Account.getRecordTypeInfosByDeveloperName());

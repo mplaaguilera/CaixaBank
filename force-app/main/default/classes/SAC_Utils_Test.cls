@@ -23,7 +23,7 @@ public with sharing class SAC_Utils_Test {
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'Test');
-        camposRecl.put('SAC_TiempoParadaSubsanacion__c', 10);
+        camposRecl.put('SAC_TiempoParadaSubsanacion__c', 1);
         
         Case reclamacion = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl);
         Database.insert(reclamacion);
@@ -262,7 +262,7 @@ public with sharing class SAC_Utils_Test {
     @isTest
     static void getRecordTypeDevTest() {
         
-        Set<String> setObjetos = new Set<String>{'Case','SAC_Antecedentes__c','Account','Contact','Task','CC_MCC__c','CC_Grupo_Colaborador__c','CC_Grupo_Colaborador_Contact__c','SAC_Accion__c','SAC_Alerta__c','SAC_AdjuntoAntecedente__c','SAC_DocumentoEnvio__c','SAC_Interaccion__c','SAC_MaestroAccionesReclamacion__c','SAC_MaestroTemas__c','SAC_Marca_Case__c','SAC_ParametrizacionSLATME__c','SAC_ParametrizacionEscalado__c','SAC_PlantillaRedaccion__c','SAC_CaseReclamante__c','SAC_TiempoEstados__c','SAC_TMECaso__c','SEG_Auditoria__c','SAC_ImagenDocumento__c'};
+        Set<String> setObjetos = new Set<String>{'Case','SAC_Antecedentes__c','Account','Contact','Task','CC_MCC__c','CC_Grupo_Colaborador__c','CC_Grupo_Colaborador_Contact__c','SAC_Accion__c','SAC_Alerta__c','SAC_AdjuntoAntecedente__c','SAC_DocumentoEnvio__c','SAC_Interaccion__c','SAC_MaestroAccionesReclamacion__c','SAC_MaestroTemas__c','SAC_Marca_Case__c','SAC_ParametrizacionSLATME__c','SAC_ParametrizacionEscalado__c','SAC_PlantillaRedaccion__c','SAC_CaseReclamante__c','SAC_TiempoEstados__c','SAC_TMECaso__c','SEG_Auditoria__c','SAC_ImagenDocumento__c', 'CC_Caracteristica__c'};
         Map<String,Map<String,Schema.RecordTypeInfo>> mapaRT = new Map<String,Map<String,Schema.RecordTypeInfo>>();
         User usuario = [SELECT id FROM User WHERE Username = 'useradmintest0@test.com.testSetup' AND isActive = true LIMIT 1];
         System.runAs(usuario) {
@@ -446,7 +446,7 @@ public with sharing class SAC_Utils_Test {
 
         System.runAs(usuario) {
             Test.startTest();
-            tiempoTotal = SAC_Utils.calcularTiempoParadaSubsanacion(caso[0], 1440);
+            tiempoTotal = SAC_Utils.calcularTiempoParadaSubsanacion(caso[0], 10);
             Test.stopTest();
         }
         

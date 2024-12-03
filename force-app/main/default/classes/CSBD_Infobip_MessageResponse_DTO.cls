@@ -18,28 +18,3 @@ public with sharing class CSBD_Infobip_MessageResponse_DTO {
 		return (CSBD_Infobip_MessageResponse_DTO) System.JSON.deserialize(json, CSBD_Infobip_MessageResponse_DTO.class);
 	}
 }
-
-/*public class fromJSON{
-
-
-	static testMethod void testParse() {
-		String json=		'{'+
-		'  "bulkId": "a28dd97c-2222-4fcf-99f1-0b557ed381da",'+
-		'  "messages": ['+
-		'    {'+
-		'      "messageId": "a28dd97c-1ffb-4fcf-99f1-0b557ed381da",'+
-		'      "status": {'+
-		'        "groupId": 1,'+
-		'        "groupName": "PENDING",'+
-		'        "id": 26,'+
-		'        "name": "PENDING_ACCEPTED",'+
-		'        "description": "Message sent to next instance"'+
-		'      },'+
-		'      "destination": "441134960001"'+
-		'    }'+
-		'  ]'+
-		'}';
-		fromJSON obj = parse(json);
-		System.assert(obj != null);
-	}
-}*/

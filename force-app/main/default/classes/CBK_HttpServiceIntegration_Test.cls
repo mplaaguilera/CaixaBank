@@ -419,8 +419,8 @@ private class CBK_HttpServiceIntegration_Test extends CBK_HttpServiceIntegration
 		reqWrapper.mHeaders = mHeaders;
 		reqWrapper.mUriParams = muripar;
 		reqWrapper.mQueryParams = mqparam;
-
-		//Test.startTest();		
+		
+		Test.startTest();		
 		//SET MOCK
 		List<User> adminUser = [SELECT id, profileId, userRoleId, Name FROM User WHERE Name <> 'Administrador de sistema' LIMIT 1];
 
@@ -439,6 +439,62 @@ private class CBK_HttpServiceIntegration_Test extends CBK_HttpServiceIntegration
 
 			System.assertEquals(200,res2.getStatusCode());
 		}
-		//Test.stopTest();
+		Test.stopTest();
+	}
+
+	@isTest
+	private static void testGetRequestWrapperWithBodyBlob(){
+		string vJsonreq = '{\"Hola": "Adios"}';
+		string vJsonres = '{\"status": "OK"}';
+		string vCBKIntSetting = 'MyIntegrationTest';
+
+		CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
+		wsc.Name = 'MyIntegrationTest';
+		wsc.NamedCredential__c = 'callout:MyIntegrationTest/{PARAMS_1}/{PARAMS_2}/{PARAMS_3}/{PARAMS_4}';
+		wsc.CBK_Method__c = 'POST';
+		wsc.CBK_TimeOut__c = 120000;
+		wsc.CBK_ContentType__c = 'application/json';
+		wsc.RegistroTrazaIntegracion__c = true;
+		insert wsc;
+		
+		Test.setCreatedDate(wsc.Id, DateTime.newInstanceGmt(2022,12,12));
+		List<CBK_IntegrationSetting__c> wsc2 = [SELECT  Id, CreatedDate, Name, 	NamedCredential__c, RegistroTrazaIntegracion__c, ResourcePath__c, CBK_IsInput__c, CBK_ContentType__c, CBK_Method__c, CBK_TimeOut__c  FROM CBK_IntegrationSetting__c WHERE Id =: wsc.Id];
+		wsc2[0].NamedCredential__c = 'callout:MyIntegrationTest';
+		update wsc2;
+
+		CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+		reqWrapper.bodyBlob = Blob.valueof(vJsonreq);
+		reqWrapper.intSetting = 'MyIntegrationTest';
+		reqWrapper.method = 'POST';
+		reqWrapper.mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+		reqWrapper.mHeaders.put('Authorization', 'Bearer SESSIONID');
+		reqWrapper.mUriParams.put('PARAMS_1', 'salesforce');
+		reqWrapper.mUriParams.put('PARAMS_2', 'test');
+		reqWrapper.mUriParams.put('PARAMS_3', 'params');
+		reqWrapper.mUriParams.put('PARAMS_4', 'url');
+		reqWrapper.mQueryParams.put('name', 'value');
+		reqWrapper.mQueryParams.put('name1', 'value1');
+		reqWrapper.mQueryParams.put('name2', 'value2');
+
+		Test.startTest();		
+
+		List<User> adminUser = [SELECT id, profileId, userRoleId, Name FROM User WHERE Name <> 'Administrador de sistema' LIMIT 1];
+
+		System.runAs(adminUser[0]) {
+			
+			HttpResponse resp = new HttpResponse();
+			resp.setBody(vJsonres);		
+			resp.setStatusCode(200);
+			resp.setStatus('OK');
+
+			CBK_HttpService_Mock_TEST vMock = new CBK_HttpService_Mock_TEST(resp);
+			Test.setMock(HttpCalloutMock.class, vMock);
+
+			HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper);
+			HttpResponse res2 = CBK_HttpServiceIntegration.callHttpService(req, '', 'MyIntegrationTest');
+
+			System.assertEquals(200,res2.getStatusCode());
+		}
+		Test.stopTest();
 	}
 }

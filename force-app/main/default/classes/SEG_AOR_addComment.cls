@@ -81,7 +81,7 @@ public with sharing class SEG_AOR_addComment {
 
                     FeedItem feed = new FeedItem();
                     feed.ParentId = casoid; 
-                    feed.Body = 'Comentario añadido al caso de Asesoría Jurídica'; 
+                    feed.Body = 'Comentario añadido al caso de Asesoría Jurídica' + casoSEG.SEG_Comentario_AOR__c; 
                     insert feed;
                     update casoSEG;                                                                           
                     

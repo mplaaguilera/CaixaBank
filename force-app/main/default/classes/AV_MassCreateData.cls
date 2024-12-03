@@ -15,6 +15,7 @@ Historial
 	1.3             Fix        		Víctor Santiago 	08/09/2021		getHeaderCustomAct fixed
 	1.4		    	AV_Query IT	   Daniel Rodríguez	   04/02/2022	    Change AV_Query to SOQL for User, Account, Contact
 	1.5				US326386        Luis Fernández      20/10/2022      Deleted all "AV_AIniciativaDel__c" mentions 
+	1.6             Fix- Solve QC   Oscar Moreno        29/02/2024      Delete try-catch in clearCustomSetting method        
 
 ***********************************************************************************************************************/
 public with sharing class AV_MassCreateData {
@@ -519,11 +520,13 @@ public with sharing class AV_MassCreateData {
 	 */
 	private static void clearCustomSetting() {
 		List<AV_DataAnalyticsTest__c> dat = AV_DataAnalyticsTest__c.getAll().values();
-
-		try {
-			Database.DeleteResult[] deletionResult = Database.delete(dat, true);
-		} catch (Exception e) {
-			System.debug('ERROR: Records not deleted: ' + e);
+		Database.DeleteResult[] deletionResult = Database.delete(dat, true);
+		for(Database.deleteResult res : deletionResult) {
+			if(!res.isSuccess()) {
+				for(Database.Error err : res.getErrors()) {
+					CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+				}
+			}
 		}
 	}
 

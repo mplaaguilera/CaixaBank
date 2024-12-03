@@ -10,7 +10,7 @@ Historial
    1.0            App FSC          Jashanpreet Singh    07/10/2020          Init version
    1.1			  US164515		   Sandra Gómez			28/01/2021			Remodel Test
    1.2            App FSC          David Rufo         	11/02/2021          Fix performance problem
-
+   1.3			  Fix error		   Daniel Rodriguez		15/01/2024			Fix to pass test
 ***********************************************************************************************************************/
 @isTest
 private class AV_ProccessTasksOwnersBatch_Test {
@@ -21,10 +21,12 @@ private class AV_ProccessTasksOwnersBatch_Test {
 	@TestSetup
 	static void setup() {
 		AV_TestHelper.activateLogger();
-		User u1 = AV_TestHelper.createUser(null, 'U0100001');
-        //AV_LogDebug.printLogDebug('setup', 'User1: ' + u1);
-        Contact con =  AV_TestHelper.createEmployee(null,u1);
-        //AV_LogDebug.printLogDebug('setup', 'Contact: ' + con);
+		User u1 = AV_TestHelper.createUserSinInsert(null, 'U0188888888');
+        User u2 = AV_TestHelper.createUserSinInsert(null, 'U01999999999999999');
+		insert new List<User>{u1,u2};
+        Contact con =  AV_TestHelper.createEmployeeSinInsert(null,u1);
+        con.AV_UsuarioAsociado__c = u2.Id;
+        insert con;
 
 		List<Task> tasks = new List<Task>();
 		RecordType rt = AV_AppUtilities.getRecordType('Task', 'AV_AlertaComercial');
@@ -36,15 +38,12 @@ private class AV_ProccessTasksOwnersBatch_Test {
 			task.OwnerId = u1.Id;
 			task.AV_ExternalID__c = '01928374' + i;
 			task.RecordTypeId = rt.Id;
-			task.AV_CodigoGestorAsignado__c = 'U0100002';
+			task.AV_CodigoGestorAsignado__c = 'U01999999999999999';
 			tasks.add(task);
 		}
 		insert tasks;
         
-        User u2 = AV_TestHelper.createUser(null, 'U0100002');
-        //AV_LogDebug.printLogDebug('setup', 'User2: ' + u2);
-        con.AV_UsuarioAsociado__c = u2.Id;
-        update con;
+
 	}
 
 	/**
@@ -52,7 +51,7 @@ private class AV_ProccessTasksOwnersBatch_Test {
 	 */
 	@isTest
 	static void executeProccessTasksOwnersBatch() {
-        User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U0100002' limit 1];
+        User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U01999999999999999' limit 1];
         Set<String> setUserIds = new Set<String>{u2.Id};
         AV_LogDebug.printLogDebug('executeProccessTasksOwnersBatch', 'User2: ' + u2);
 		AV_ProccessTasksOwnersBatch b = new AV_ProccessTasksOwnersBatch('300', setUserIds);

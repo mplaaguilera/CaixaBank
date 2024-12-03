@@ -24,10 +24,8 @@ public with sharing class CSBD_LiveAgent_Welcome_Controller {
 		Response result = new Response();
 		try {
 			LiveChatTranscript chat = [SELECT OwnerId, CC_Cerrado_TimeOut__c, CSBD_Oportunidad_Id__c,
-										CSBD_Welcome_Enviado__c, CC_Idioma__c, Account.CC_Confidencial__c, //CreatedDate
+										CSBD_Welcome_Enviado__c, CC_Idioma__c, Account.CC_Confidencial__c,
 										Account.FirstName FROM LiveChatTranscript WHERE Id = :recordId];
-
-
 			String horaMensaje;
 			if (tipoMensaje == 'Despedida') {
 				Integer horaActual = DateTime.now().hour();
@@ -135,7 +133,8 @@ public with sharing class CSBD_LiveAgent_Welcome_Controller {
 
 	@AuraEnabled
 	public static void finChat(Id idChat, Boolean timeout) {
-		LiveChatTranscript chat = [SELECT CSBD_Oportunidad_Id__c FROM LiveChatTranscript WHERE Id = :idChat];
+		LiveChatTranscript chat = [SELECT CSBD_Oportunidad_Id__c
+									FROM LiveChatTranscript WHERE Id = :idChat];
 		if (timeout) {
 			chat.CC_Cerrado_TimeOut__c = true;
 			update chat;

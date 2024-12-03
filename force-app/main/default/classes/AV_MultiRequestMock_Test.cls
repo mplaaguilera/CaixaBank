@@ -11,7 +11,7 @@ Historial
     1.1         US268687        Maria Martinez      27/09/2021      Add Customer Service Request
 ***********************************************************************************************************************/
 @isTest
-global class AV_MultiRequestMock_Test  implements HttpCalloutMock {
+public class AV_MultiRequestMock_Test  implements HttpCalloutMock {
         Map<String, HttpCalloutMock> requests;
      
         public AV_MultiRequestMock_Test(Map<String, HttpCalloutMock> requests) {
@@ -21,6 +21,7 @@ global class AV_MultiRequestMock_Test  implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) {
 
             HttpCalloutMock mock = requests.get(req.getHeader('SOAPAction'));
+            
             if (mock != null) {
                 return mock.respond(req);
             }else{
@@ -40,6 +41,9 @@ global class AV_MultiRequestMock_Test  implements HttpCalloutMock {
                     mock = requests.get(req.getEndpoint());
                     return mock.respond(req);
                 }else if(req.getEndpoint().contains('/marketingAndDevelopment/customerSurveys/surveys')){
+                    mock = requests.get(req.getEndpoint());
+                    return mock.respond(req);
+                }else if(req.getEndpoint().contains('partyReferenceDataDirectory/basic/tickets')){
                     mock = requests.get(req.getEndpoint());
                     return mock.respond(req);
                 }

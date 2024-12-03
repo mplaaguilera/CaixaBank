@@ -17,6 +17,7 @@ public without sharing class SAC_LCMP_GestionEmails {
     */
     @AuraEnabled
     public static void finalizarRedaccion(String id, String para, String copia, String copiaOculta, String cuerpo, String asunto, String idAdjuntos){
+
         Case casoActual = [SELECT Id, SAC_FechaVencimientoSLA__c, SAC_MotivoDemora__c, SAC_ComentarioDemora__c, OS_Email__c, SuppliedEmail, CC_Idioma__c FROM Case WHERE Id = :id AND RecordTypeId = :RECTYPERECLAMACION LIMIT 1];
 
         //Añadido comprobar el target date del caseMilestone en lugar del campo SAC_FechaVencimientoSLA__c del caso
@@ -352,27 +353,7 @@ public without sharing class SAC_LCMP_GestionEmails {
 
     @AuraEnabled
     public static List<ContentVersion> getDocumentRedaccion(String id){
-        // List<ContentVersion> documentos = [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta')  AND FirstPublishLocationId =: id];
-        // System.debug('documentos ' + documentos);
-        // return documentos;
-
-        Map<Id, Boolean> contentOculto = new Map<Id, Boolean>();
-        List<Id> idsDocumentLink = new List<Id>();
-
-        try {
-            List<ContentDocumentLink> cdL = [SELECT Id, LinkedEntityId, ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId =: id AND ContentDocument.FileType != 'SNOTE'];  
-
-            for(ContentDocumentLink recordCdL : cdL){
-                idsDocumentLink.add(recordCdL.ContentDocumentId);
-            }
-
-            List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, SAC_Oculto__c, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_Numero_Prestamo__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta') AND ContentDocumentId IN: idsDocumentLink ORDER BY CreatedDate ASC];
-            System.debug('documentos ' + cv);
-
-            return cv;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
+        return [SELECT Id, Title, ContentDocumentId, SAC_ValidadoCV__c FROM ContentVersion WHERE SAC_Bloque__c INCLUDES ('SAC_Respuesta')  AND FirstPublishLocationId =: id]; //SAC_StringRedaccion_fileupload__c = 'ResolucionRedaccion'
     }
 
     /**

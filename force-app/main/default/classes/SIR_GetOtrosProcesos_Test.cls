@@ -1,8 +1,8 @@
 /*****************************************************************
- Name:  SIR_GetOtrosProcesos_Test
- Copyright © 2021  CaixaBank
+    Name: SIR_GetOtrosProcesos_Test
+    Copyright © 2021 CaixaBank
 ============================================================
-Proposito:   Clase Test de la clase controladora externa del LWC SIR_LCMP_GetOtrosProcesos                                                                                                          
+    Proposito: Clase Test de la clase controladora externa del LWC SIR_LCMP_GetOtrosProcesos                                                                                                          
 ============================================================
     Historial
     -------                                                            
@@ -14,7 +14,7 @@ Proposito:   Clase Test de la clase controladora externa del LWC SIR_LCMP_GetOtr
 public class SIR_GetOtrosProcesos_Test {
  
     /*****************************************************************
-        Proposito:  test1 sirve para comprobar la logica de la clase SIR_LCMP_EnviarFormulario                                                      
+        Proposito: getOtrosProcesosTest sirve para comprobar la logica de la clase SIR_LCMP_EnviarFormulario                                                      
         Parameters: No
         Returns: No
         Throws [Exceptions]: No                                                          
@@ -25,15 +25,20 @@ public class SIR_GetOtrosProcesos_Test {
     	1.0            US244045         Atmira         04/08/2021     	  Created   
         
 	*****************************************************************/    
-    @istest static void test1(){
+    @isTest
+    public static void getOtrosProcesosTest() {
         SIR_Constantes constantes = new SIR_Constantes();
-        Account cuenta = SIR_TestDataFactory.crearCuenta();
-		SIREC__SIREC_obj_informacionCliente__c infoCliente = SIR_TestDataFactory.CrearInfoCliente(cuenta); 
-        SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
-        Test.startTest();    
-        SIR_LCMP_GetOtrosProcesos.getProcesos(cuenta.Id);
-        Test.stopTest();
-        System.assertNotEquals(null,SIR_LCMP_GetOtrosProcesos.getProcesos(cuenta.Id), constantes.STRING_TEST);
+        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
+        insert rol;
+        User usuario = SIR_TestDataFactory.createTestUser('usuarioTest', rol, 'System Administrator', 'U0111111', '001-09999');
+        System.runAs(usuario) {
+            Account cuenta = SIR_TestDataFactory.crearCuenta();
+            SIREC__SIREC_obj_informacionCliente__c infoCliente = SIR_TestDataFactory.CrearInfoCliente(cuenta); 
+            SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
+            Test.startTest();    
+            SIR_LCMP_GetOtrosProcesos.getProcesos(cuenta.Id);
+            Test.stopTest();
+            System.assertNotEquals(null,SIR_LCMP_GetOtrosProcesos.getProcesos(cuenta.Id), constantes.STRING_TEST);
+        }
     }
-
 }

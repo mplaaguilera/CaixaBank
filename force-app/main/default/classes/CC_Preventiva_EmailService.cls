@@ -289,7 +289,7 @@ global with sharing class CC_Preventiva_EmailService implements Messaging.Inboun
                                         oPAccount.PersonEmail = emailOrigen;
                                         oPAccount.FirstName = vFirstName;
                                         oPAccount.LastName = (vLastName != NULL ? vLastName : emailOrigen);
-                                        oPAccount.AV_Idioma__c = idioma;
+                                        oPAccount.CC_Idioma__pc = idioma;
                                         oPAccount.CC_Numero_Documento__c = vNif + '';
                                         oPAccount.CC_Numero_Documento__pc = vNif + '';
                                         oPAccount.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
@@ -301,7 +301,7 @@ global with sharing class CC_Preventiva_EmailService implements Messaging.Inboun
                                             oPAccount.PersonEmail = emailOrigen;
                                             oPAccount.FirstName = vFirstName;
                                             oPAccount.LastName = (vLastName != NULL ? vLastName : emailOrigen);
-                                            oPAccount.AV_Idioma__c = idioma;
+                                            oPAccount.CC_Idioma__pc = idioma;
                                             oPAccount.CC_Numero_Documento__c = vNif + '';
                                             oPAccount.CC_Numero_Documento__pc = vNif + '';
                                             oPAccount.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();

@@ -93,11 +93,10 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 	 */
 	private void actualizarCasoCRyMCC(List<Id> casosSEG, Map<Id, Case> mapNewObj, Map<Id, Case> mapOldObj){
 		Map<Id, SEG_ClasificacionRapida__c> mapClasificacionRapida = new Map<Id, SEG_ClasificacionRapida__c>();
-		Map<Id, Case> mapCasosCRChange = new Map<Id, Case>();
-		Map<Id, Case> mapCasosMCCChange = new Map<Id, Case>();
-		Map<Id, CC_MCC__c> mapRetipificacionMCC = new Map<Id, CC_MCC__c>();
+		Set<Id> idCasosCR = new Set<Id>();
+		Set<Id> idCasosMCC = new Set<Id>();
 		Set<Id> setCasosModificados = new Set<Id>();
-		List<Id> casosMCC = new List<Id>();
+		Set<Id> setTematicasCasos = new Set<Id>();
 
 		for (Id casoId : casosSEG) {
 			if(mapNewObj.get(casoId).SEG_ClasificacionRapida__c != mapOldObj.get(casoId).SEG_ClasificacionRapida__c ||
@@ -115,8 +114,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 				if (mapNewObj.get(casoId).SEG_ClasificacionRapida__c <> mapOldObj.get(casoId).SEG_ClasificacionRapida__c){
 					// Cambio CR.
 					mapClasificacionRapida.put(mapNewObj.get(casoId).SEG_ClasificacionRapida__c, null);
-					mapCasosCRChange.put(casoId, mapNewObj.get(casoId));
-					casosMCC.add(casoId);
+					idCasosCR.add(casoId);
 
 					// Asignar la clasificación original si no está informada.
 					if (mapOldObj.get(casoId).SEG_ClasificacionRapidaOrigen__c == null)
@@ -127,86 +125,77 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 					// Detectar cambios en MCC. Quitar CR.
 					if (mapOldObj.get(casoId).SEG_ClasificacionRapida__c != null){
 						mapClasificacionRapida.put(mapOldObj.get(casoId).SEG_ClasificacionRapida__c, null);
-						mapCasosMCCChange.put(casoId, mapNewObj.get(casoId));
-					}
-
-					// Datos para la creación de la tarea tras retipificar.
-					casosMCC.add(casoId);
-					if (mapNewObj.get(casoId).SEG_Detalle__c != null)
-					{
-						mapRetipificacionMCC.put(mapNewObj.get(casoId).SEG_Detalle__c, null);
-					} else if (mapNewObj.get(casoId).CC_MCC_Motivo__c != null) {
-						mapRetipificacionMCC.put(mapNewObj.get(casoId).CC_MCC_Motivo__c, null);
-					}
-
-					if (mapOldObj.get(casoId).SEG_Detalle__c != null)
-					{
-						mapRetipificacionMCC.put(mapOldObj.get(casoId).SEG_Detalle__c, null);
-					} else if (mapOldObj.get(casoId).CC_MCC_Motivo__c != null) {
-						mapRetipificacionMCC.put(mapOldObj.get(casoId).CC_MCC_Motivo__c, null);
+						idCasosMCC.add(casoId);
+						setTematicasCasos.add(mapNewObj.get(casoId).CC_MCC_Tematica__c);
 					}
 				}
 			}
-			// Buscar CRs que se ha detectado cambio.
-			for (SEG_ClasificacionRapida__c datosCR :[SELECT id, SEG_Tematica__c, SEG_Producto__c, SEG_Motivo__c, SEG_Detalle__c, SEG_CRAuditoria__c
-														FROM SEG_ClasificacionRapida__c WHERE Id IN :mapClasificacionRapida.keySet()]){
-				mapClasificacionRapida.put(datosCR.Id, datosCR);
-
-				if (datosCR.SEG_Detalle__c != null)
-				{
-					mapRetipificacionMCC.put(datosCR.SEG_Detalle__c, null);
-				} else if (datosCR.SEG_Motivo__c != null) {
-					mapRetipificacionMCC.put(datosCR.SEG_Motivo__c, null);
+			Map <Id,SEG_ClasificacionRapida__c> mapNuevaCR = new Map <Id,SEG_ClasificacionRapida__c> ([SELECT id, name, SEG_Tematica__c, SEG_Producto__c, SEG_Motivo__c, SEG_Detalle__c, SEG_TPMV__c, SEG_CRAuditoria__c
+			FROM SEG_ClasificacionRapida__c WHERE CBK_Negocio__c = 'Segmentos' AND (SEG_Tematica__c IN :setTematicasCasos OR Id IN :mapClasificacionRapida.keySet())]);
+			for (Id casoId : setCasosModificados) {
+				if(!mapNuevaCR.isEmpty()){
+					for(Id nuevasCR : mapNuevaCR.keySet()){
+						System.debug(':::id tematica corto - '+ String.valueOf(mapNewObj.get(casoId).CC_MCC_Tematica__c).left(15));
+						System.debug(':::id producto corto - '+String.valueOf(mapNewObj.get(casoId).CC_MCC_ProdServ__c).left(15));
+						System.debug(':::id motivo corto - '+String.valueOf(mapNewObj.get(casoId).CC_MCC_Motivo__c).left(15));
+						//System.debug(':::id detalle corto - '+String.valueOf(mapNewObj.get(casoId).SEG_Detalle__c).left(15));
+						System.debug(':::TPMV CR - '+mapNuevaCR.get(nuevasCR).SEG_TPMV__c);
+						if(mapNewObj.get(casoId).SEG_ClasificacionRapida__c == mapOldObj.get(casoId).SEG_ClasificacionRapida__c && mapNewObj.get(casoId).SEG_ClasificacionRapida__c != nuevasCR){							
+							if(mapNewObj.get(casoId).SEG_Detalle__c != null && mapNuevaCR.get(nuevasCR).SEG_TPMV__c.endsWith(String.valueOf(mapNewObj.get(casoId).SEG_Detalle__c).left(15))){
+								mapNewObj.get(casoId).SEG_ClasificacionRapida__c = nuevasCR;
+								System.debug(':::Detalle');
+							} else if(mapNewObj.get(casoId).CC_MCC_Motivo__c != null && mapNuevaCR.get(nuevasCR).SEG_TPMV__c.contains(String.valueOf(mapNewObj.get(casoId).CC_MCC_Motivo__c).left(15))){
+								mapNewObj.get(casoId).SEG_ClasificacionRapida__c = nuevasCR;
+								System.debug(':::Motivo');
+							} else if(mapNewObj.get(casoId).CC_MCC_ProdServ__c != null && mapNuevaCR.get(nuevasCR).SEG_TPMV__c.contains(String.valueOf(mapNewObj.get(casoId).CC_MCC_ProdServ__c).left(15))){
+								mapNewObj.get(casoId).SEG_ClasificacionRapida__c = nuevasCR;
+								System.debug(':::Producto');
+							} else if(mapNuevaCR.get(nuevasCR).SEG_TPMV__c.contains(String.valueOf(mapNewObj.get(casoId).CC_MCC_Tematica__c).left(15))){
+								mapNewObj.get(casoId).SEG_ClasificacionRapida__c = nuevasCR;
+								System.debug(':::Tematica');
+							}
+						}
+						System.debug('::: nueva CR -'+mapNewObj.get(casoId).SEG_ClasificacionRapida__r.Name );
+					}
 				}
-			}
-
-			// Buscar MCCs que se ha detectado cambio.
-			for (CC_MCC__c datosMCC :[SELECT CC_Clasif_Completa_Visible_Formula__c FROM CC_MCC__c WHERE Id IN :mapRetipificacionMCC.keySet()]){
-				mapRetipificacionMCC.put(datosMCC.Id, datosMCC);
 			}
 
 			// Volcar los datos de las CRs a los casos.
-			for (Id casoChangeCR : mapCasosCRChange.keySet()){
-				Case casoTratado = mapCasosCRChange.get(casoChangeCR);
-				if (casoTratado.SEG_ClasificacionRapida__c == null)
-				{
+			for (Id casoChangeCR : idCasosCR){
+				if (mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c == null) {
 					// Borrar datos de clasificación.
-					casoTratado.CC_MCC_Tematica__c = null;
-					casoTratado.CC_MCC_ProdServ__c = null;
-					casoTratado.CC_MCC_Motivo__c = null;
-					casoTratado.SEG_Detalle__c = null;
+					mapNewObj.get(casoChangeCR).CC_MCC_Tematica__c = null;
+					mapNewObj.get(casoChangeCR).CC_MCC_ProdServ__c = null;
+					mapNewObj.get(casoChangeCR).CC_MCC_Motivo__c = null;
+					mapNewObj.get(casoChangeCR).SEG_Detalle__c = null;
 				} else {
 					// Reasignar campos de la CR.
-					SEG_ClasificacionRapida__c datosCR = mapClasificacionRapida.get(casoTratado.SEG_ClasificacionRapida__c);
-
-					if (datosCR != null)
-					{
-						casoTratado.CC_MCC_Tematica__c = datosCR.SEG_Tematica__c;
-						casoTratado.CC_MCC_ProdServ__c = datosCR.SEG_Producto__c;
-						casoTratado.CC_MCC_Motivo__c = datosCR.SEG_Motivo__c;
-						casoTratado.SEG_Detalle__c = datosCR.SEG_Detalle__c;
-						casoTratado.SEG_SRAuditoria__c = datosCR.SEG_CRAuditoria__c;
-						
+					if (mapNuevaCR.containsKey(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c)){
+						mapNewObj.get(casoChangeCR).CC_MCC_Tematica__c = mapNuevaCR.get(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c).SEG_Tematica__c;
+						mapNewObj.get(casoChangeCR).CC_MCC_ProdServ__c = mapNuevaCR.get(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c).SEG_Producto__c;
+						mapNewObj.get(casoChangeCR).CC_MCC_Motivo__c = mapNuevaCR.get(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c).SEG_Motivo__c;
+						mapNewObj.get(casoChangeCR).SEG_Detalle__c = mapNuevaCR.get(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c).SEG_Detalle__c;
+						mapNewObj.get(casoChangeCR).SEG_SRAuditoria__c = mapNuevaCR.get(mapNewObj.get(casoChangeCR).SEG_ClasificacionRapida__c).SEG_CRAuditoria__c;
 					} else {
-						casoTratado.addError('La clasificación rápida del caso <' + casoTratado.Id + '> no está correctamente configurada');
+						mapNewObj.get(casoChangeCR).addError('La clasificación rápida del caso <' + casoChangeCR + '> no está correctamente configurada');
 					}
 				}
 			}
-
+/*
 			// Validar si está rellenando datos de MCC que no estaban en la CR.
-			for (Id casoChangeMCC : mapCasosMCCChange.keySet()){
-				Case casoTratado = mapCasosMCCChange.get(casoChangeMCC);
-				SEG_ClasificacionRapida__c datosCR = mapClasificacionRapida.get(casoTratado.SEG_ClasificacionRapida__c);
+			for (Id casoChangeMCC : idCasosMCC){
+				SEG_ClasificacionRapida__c datosCR = mapNuevaCR.get(mapNewObj.get(casoChangeMCC).SEG_ClasificacionRapida__c);
 
-				if (datosCR?.SEG_Tematica__c != null && datosCR?.SEG_Tematica__c != casoTratado.CC_MCC_Tematica__c ||
-					datosCR?.SEG_Producto__c != null && datosCR?.SEG_Producto__c != casoTratado.CC_MCC_ProdServ__c ||
-					datosCR?.SEG_Motivo__c != null && datosCR?.SEG_Motivo__c != casoTratado.CC_MCC_Motivo__c ||
-					datosCR?.SEG_Detalle__c != null && datosCR?.SEG_Detalle__c != casoTratado.SEG_Detalle__c)
-				{
+				if (datosCR != null && datosCR?.SEG_Tematica__c != null && datosCR?.SEG_Tematica__c != mapNewObj.get(casoChangeMCC).CC_MCC_Tematica__c ||
+					datosCR?.SEG_Producto__c != null && datosCR?.SEG_Producto__c != mapNewObj.get(casoChangeMCC).CC_MCC_ProdServ__c ||
+					datosCR?.SEG_Motivo__c != null && datosCR?.SEG_Motivo__c != mapNewObj.get(casoChangeMCC).CC_MCC_Motivo__c ||
+					datosCR?.SEG_Detalle__c != null && datosCR?.SEG_Detalle__c != mapNewObj.get(casoChangeMCC).SEG_Detalle__c) {
 					// Se ha modificado un nivel que no está en la CR.
-					casoTratado.SEG_ClasificacionRapida__c = null;
+					mapNewObj.get(casoChangeMCC).SEG_ClasificacionRapida__c = null;
+					System.debug('::: se borra la CR');
 				}
 			}
+			*/
 		}
 	}
 
@@ -839,7 +828,7 @@ public with sharing class SEG_Case_BU_TRHan extends CC_TriggerHandlerBase {
 					cm.completionDate = Datetime.now();
 				}
 				try {
-					Database.update(cmsToUpdate, false);
+				Database.update(cmsToUpdate, false);
                 } catch (Exception e) {
                     
                     CBK_Log.error(e, 'Error en cerrar milestone', cmsToUpdate);

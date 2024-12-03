@@ -5,13 +5,13 @@ public with sharing class SPV_ContentVersionHelper_Test {
     static void makeData(){
     
         User usuarioAdmin = SPV_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        insert usuarioAdmin;
+        Database.insert(usuarioAdmin);
 
         List<User> listUsuarios;
 
         System.runAs(usuarioAdmin){
             listUsuarios  = SPV_TestDataFactory.crearUsuarioSPVGeneral(1);
-            insert listUsuarios;
+            Database.insert(listUsuarios);
         }
 
         List<Case> listaReclamaciones = new List<Case>();
@@ -26,7 +26,7 @@ public with sharing class SPV_ContentVersionHelper_Test {
 
         Case casoReclamacion3 = SPV_TestDataFactory.crearCaso('Reclamacion', camposReclamacion3);
         listaReclamaciones.add(casoReclamacion3);
-        insert listaReclamaciones;
+        Database.insert(listaReclamaciones);
     }
 
     @isTest
@@ -42,7 +42,7 @@ public with sharing class SPV_ContentVersionHelper_Test {
             ContentVersion cv = SPV_TestDataFactory.crearContentVersion(reclamacion);
             List<ContentVersion> listaCV = new List<ContentVersion>();
             listaCV.add(cv);
-            insert listaCV;
+            Database.insert(listaCV);
         }
 
         SAC_Alerta__c alerta = [SELECT Id FROM SAC_Alerta__c WHERE SAC_Reclamacion__c = :reclamacion.Id LIMIT 1];

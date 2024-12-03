@@ -36,6 +36,7 @@ public class CIBE_Event_BU_TRHan extends CC_TriggerHandlerBase{
 
         if (listData!=null && !listData.isEmpty()){
             CIBE_EventTriggerHelper.changeOwner(listData, mapOldObj);
+            CIBE_EventTriggerHelper.updateRelacionadoGC(listData);
         }
 
         if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()) {

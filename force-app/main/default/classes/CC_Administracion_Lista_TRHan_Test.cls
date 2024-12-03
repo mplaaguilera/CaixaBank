@@ -46,7 +46,9 @@ public with sharing class CC_Administracion_Lista_TRHan_Test {
         List<CC_Administracion_Lista_Blanca__c> dominiosCreados = new List<CC_Administracion_Lista_Blanca__c>();
         for(CC_Administracion_Lista_Blanca__c dominio: registrosAdministracionListaInsert) {
             try {
-                insert dominio;              
+                insert dominio;
+                dominiosCreados = [SELECT Id FROM CC_Administracion_Lista_Blanca__c WHERE Name = '@domino2.com'];
+                System.assert(!dominiosCreados.isEmpty());
             }
             catch(Exception e) {
                 Boolean expectedExceptionThrown = e.getMessage().contains('El dominio indicado no está permitido para la Lista Blanca del negocio COPS.') ? true : false;
@@ -54,8 +56,6 @@ public with sharing class CC_Administracion_Lista_TRHan_Test {
             }
         }
         dominiosCreados = [SELECT Id FROM CC_Administracion_Lista_Blanca__c WHERE Name = '@domino2.com'];
-        System.assert(!dominiosCreados.isEmpty());
-        
         dominiosCreados[0].Name = '@domino1.com';
         try {
             Update dominiosCreados;

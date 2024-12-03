@@ -10,7 +10,7 @@
 
 
 
-public with sharing class SAC_LCMP_EnvioComunicacionCartaPostal {
+public without sharing class SAC_LCMP_EnvioComunicacionCartaPostal {
     
     private static final Id RECTYPERECLAMACION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
     private static final Id RECTYPEPRETENSION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();

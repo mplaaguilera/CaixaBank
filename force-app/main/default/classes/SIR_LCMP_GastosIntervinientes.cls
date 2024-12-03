@@ -25,7 +25,7 @@ public with sharing  class SIR_LCMP_GastosIntervinientes {
     @AuraEnabled(Cacheable=true)
     public static List<SIR_FormularioRefinanciacion__c> getFormulario(String idFormulario) {
         List<SIR_FormularioRefinanciacion__c> formulario = new List<SIR_FormularioRefinanciacion__c>();
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             formulario = [SELECT id, SIR_MiembrosUnidadFamiliar__c, SIR_ImporteMinSubsistencia__c,
                           SIR_AlquilerViviendaHabitual__c, SIR_PensionAlimenticia__c, SIR_Otros__c, SIR_JustificarOtrosGastos__c, SIR_TotalGastos__c
                           FROM SIR_FormularioRefinanciacion__c WHERE id =: idFormulario]; 
@@ -81,7 +81,7 @@ public with sharing  class SIR_LCMP_GastosIntervinientes {
     @AuraEnabled(Cacheable=false)
     public static string updateFormulario(String idFormulario ,List<String> data) {
         try {
-            if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){    
+            if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){    
                 SIR_FormularioRefinanciacion__c updateForm = new SIR_FormularioRefinanciacion__c();
                 updateForm.Id = idFormulario;
                 updateForm.SIR_MiembrosUnidadFamiliar__c = data[0];

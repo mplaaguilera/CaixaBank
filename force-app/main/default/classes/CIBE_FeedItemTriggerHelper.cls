@@ -19,8 +19,6 @@ public with sharing class CIBE_FeedItemTriggerHelper {
 	*/
 
     public static void createNotificationNewChat(List<FeedItem> listNews){
-        System.debug('ENTRA en createNotificationNewChat');
-
         Set<String> setUsers = new Set<String>();
         Set<Id> setIdOpp = new Set<Id>();
         Boolean isGestor = FeatureManagement.checkPermission(CIBE_AppConstants.CIBE_GESTOR);
@@ -30,13 +28,11 @@ public with sharing class CIBE_FeedItemTriggerHelper {
                 setUsers.add(fi.CreatedById);
                 setIdOpp.add(fi.parentId);
             }
-        
             Set<Id> setRTOppo = CIBE_OpportunityTriggerHelper.getAllRT();
-            List<Opportunity> lstOpp = [SELECT Id, Name, Account.Name, OwnerId, RecordTypeId FROM Opportunity WHERE Id IN :setIdOpp AND RecordTypeId IN:setRTOppo];
+            List<Opportunity> lstOpp = [SELECT Id, Name, Account.Name, OwnerId, RecordTypeId FROM Opportunity WHERE Id IN :setIdOpp AND RecordTypeId IN:setRTOppo AND Owner.IsActive = true];
             List<CustomNotificationType> notificationTypes = [SELECT Id, DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'CIBE_NewChatMessage'];
-
             if(!listNews.isEmpty() && !notificationTypes.isEmpty() && !lstOpp.isEmpty()) {
-                List<OpportunityTeamMember> teamMembers = [SELECT Id, UserId FROM OpportunityTeamMember WHERE OpportunityId = :lstOpp.get(0).Id AND UserId != :lstOpp.get(0).OwnerId];
+                List<OpportunityTeamMember> teamMembers = [SELECT Id, UserId FROM OpportunityTeamMember WHERE OpportunityId = :lstOpp.get(0).Id AND UserId != :lstOpp.get(0).OwnerId AND User.Isactive = true];
                 Set<String> memberIds = new Set<String>();
                 for(OpportunityTeamMember teamMember : teamMembers) {
                     memberIds.add(teamMember.UserId);

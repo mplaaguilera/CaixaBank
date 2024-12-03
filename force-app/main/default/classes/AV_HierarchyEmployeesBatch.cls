@@ -10,12 +10,14 @@ Historial
 	1.0			App FSC			Carolina Alonso		05/05/2020			Init version
 	1.1			FIX				David Rufo			31/05/2021			Use the Query FWK
 	1.2		    AV_Query IT	    Daniel Rodríguez    04/02/2022	        Change AV_Query to SOQL for User,Account, Contact
+    1.3		    FIX11070844	    Oscar Moreno		22/07/2024			Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
-global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
    
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_HierarchyEmployees';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_HierarchyEmployees';
 	
     private AV_Query avQuery;
 	
@@ -48,7 +50,7 @@ global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
         /*if(avQuery==null){
             avQuery = setQuery();
@@ -76,7 +78,7 @@ global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, 
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param contactList List<Contact> param with the list of Contact to update AV_Supervisor__c
 	 */
-	global void execute(Database.BatchableContext bc, List<Contact> contactList){
+	public void execute(Database.BatchableContext bc, List<Contact> contactList){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -99,6 +101,7 @@ global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, 
 			
 			recordsProcessed = updatedContacts.size();
 			Database.update(updatedContacts);
+			
 
 		}catch(System.Exception e){
 			AV_LogDebug.printException(methodName, e);
@@ -110,7 +113,7 @@ global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_HierarchyEmployeesBatch());
 	}
 
@@ -119,7 +122,7 @@ global class AV_HierarchyEmployeesBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}	

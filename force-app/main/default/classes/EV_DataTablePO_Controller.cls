@@ -2,13 +2,15 @@
 Name:	  EV_DataTablePO_Controller
 Copyright © 2021  CaixaBank
 -----------------------------------------------------------------------------------------------------------------------
-Proposito: Público Objetivo asociado a la Campaign(Evento)
+* @description Público Objetivo asociado a la Campaign(Evento)
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
     VERSION		USER_STORY	  AUTHOR		   	DATE				Description
     1.0				          Eric Vazquez  	31/03/2021		  	Init version
 	1.1			DE75332		  Daniel Rodriguez 	19/04/2023			Modify method  updateRecordsPO and add method getParent
+  	1.2			US511092      Daniel Rodriguez  09/01/2024			Remove system.debug
+	1.3			TechSummit    Carolina Lopez	20/05/2024			Modify method getTypeOfEvent add RecordType TechSummit.
 ***********************************************************************************************************************/
 public with sharing class EV_DataTablePO_Controller {
     public class DataPO {
@@ -178,7 +180,8 @@ public with sharing class EV_DataTablePO_Controller {
 				EV_VariablePublicoObjetivo__r.Name, EV_TipoCriterio__c, EV_LabelCriterio__c, EV_ValorCriterio__c, EV_VariablePublicoObjetivo__r.EV_Order__c 
 				FROM EV_CriterioPublicoObjetivo__c WHERE EV_Evento__c = :idEvento ORDER BY EV_VariablePublicoObjetivo__r.EV_Order__c ASC ];
                 				
-		System.debug('getRecordsPO : '+ listPO);
+		EV_LogDebug.printLogDebug('getRecordsPO ',String.valueof(listPO));        				
+
         for(EV_CriterioPublicoObjetivo__c po: listPO){
 			if(po.EV_VariablePublicoObjetivo__r.EV_VariableAdobeCampaign__c.startsWith('IND') ){
 				listDataPOIND.add(new DataPO(po));
@@ -191,8 +194,7 @@ public with sharing class EV_DataTablePO_Controller {
 			listDataPO.addAll(listDataPONOIND);
 			listDataPO.addAll(listDataPOIND);
 		}
-
-		System.debug(listDataPO);
+		EV_LogDebug.printLogDebug('listDataPO ',String.valueof(listDataPO)); 
 		
         return listDataPO;
     }
@@ -212,8 +214,8 @@ public with sharing class EV_DataTablePO_Controller {
         listPO = [SELECT Id, EV_EditableValorCriterio__c, EV_VariablePublicoObjetivo__r.EV_VariableAdobeCampaign__c, EV_VariablePublicoObjetivo__c,EV_Activo__c, 
 					EV_VariablePublicoObjetivo__r.Name, EV_TipoCriterio__c, EV_LabelCriterio__c, EV_ValorCriterio__c, EV_VariablePublicoObjetivo__r.EV_Order__c
 					FROM EV_CriterioPublicoObjetivo__c WHERE EV_Evento__c = :idEvento AND EV_Activo__c = true  ORDER BY EV_VariablePublicoObjetivo__r.EV_Order__c ASC ];
-		
-		System.debug('getRecordsPOActive : '+ listPO);
+		EV_LogDebug.printLogDebug('getRecordsPOActive ',String.valueof(listPO)); 
+
         for(EV_CriterioPublicoObjetivo__c po: listPO){
             if(po.EV_VariablePublicoObjetivo__r.EV_VariableAdobeCampaign__c.startsWith('IND') ){
 				listDataPOIND.add(new DataPO(po));
@@ -226,7 +228,7 @@ public with sharing class EV_DataTablePO_Controller {
 			listDataPO.addAll(listDataPONOIND);
 			listDataPO.addAll(listDataPOIND);
 		}
-		System.debug('getRecordsPOActive : '+ listDataPO);
+		EV_LogDebug.printLogDebug('getRecordsPOActive ',String.valueof(listDataPO)); 
         return listDataPO;
     }
 
@@ -384,9 +386,9 @@ public with sharing class EV_DataTablePO_Controller {
 					}
 				}
 			}
+			EV_LogDebug.printLogDebug('listPO ',String.valueof(listPO)); 
+			EV_LogDebug.printLogDebug('updateRecordsPO TipoCriterio: ',String.valueof(listPO[0].EV_TipoCriterio__c)); 
 
-			System.debug(listPO);
-			System.debug('updateRecordsPO TipoCriterio: '+ listPO[0].EV_TipoCriterio__c);
 			database.update(listPO);
 			if (c != null){	
 				database.update(c);
@@ -492,7 +494,7 @@ public with sharing class EV_DataTablePO_Controller {
                 				
 		if(listCampaign!=null){
 			for(Campaign camp: listCampaign){
-				if(camp.RecordType.Name == 'Evento virtual' || camp.RecordType.Name == 'Evento físico' || camp.RecordType.Name == 'Evento Híbrido' ){
+				if(camp.RecordType.Name == 'Evento virtual' || camp.RecordType.Name == 'Evento físico' || camp.RecordType.Name == 'Evento Híbrido' || camp.RecordType.Name == 'Evento Físico TechSummit' ||camp.RecordType.Name == 'Evento Virtual TechSummit' || camp.RecordType.Name == 'Evento Híbrido TechSummit'){
 					isChildCampaign = true;
 				}else if(camp.RecordType.Name == 'Catálogo Evento virtual' || camp.RecordType.Name == 'Catálogo Evento Físico' || camp.RecordType.Name == 'Catálogo Evento Híbrido' ){
 					isChildCampaign = false;

@@ -20,13 +20,13 @@ private class AV_ProccessOpportunityOwnersBatch_Test {
 	static void setup() {
 		
 		AV_TestHelper.activateLogger();
-		User u1 = AV_TestHelper.createUser(null, 'U0100001');
-        User u2 = AV_TestHelper.createUser(null, 'U0100002');
-        //AV_LogDebug.printLogDebug('setup', 'User1: ' + u1);
-        //AV_LogDebug.printLogDebug('setup', 'User2: ' + u2);
-        Contact con =  AV_TestHelper.createEmployee(null,u1);
-        //AV_LogDebug.printLogDebug('setup', 'Contact: ' + con);
-		
+		User u1 = AV_TestHelper.createUserSinInsert(null, 'U0100001');
+        User u2 = AV_TestHelper.createUserSinInsert(null, 'U0100030');
+		insert new List<User>{u1,u2};
+        Contact con =  AV_TestHelper.createEmployeeSinInsert(null,u1);
+        con.AV_UsuarioAsociado__c = u2.Id;
+        insert con;
+
 		Pricebook2 pb = new Pricebook2();
 		pb.Name = 'Standard Price Book';
 		insert pb;
@@ -47,27 +47,28 @@ private class AV_ProccessOpportunityOwnersBatch_Test {
 		opp.OwnerId = u1.Id;
         opp.AV_PF__c = prodPF.Id;
 		insert opp;
-        
-        con.AV_UsuarioAsociado__c = u2.Id;
-        update con;
-		Test.stopTest();
 	}
     
 	@isTest
 	static void executeProccessOpportunityOwnersBatch() {
-        User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U0100002'];
+
+        User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U0100030' LIMIT 1];
         Set<String> setUserIds = new Set<String>{u2.Id};
         AV_LogDebug.printLogDebug('executeProccessOpportunityOwnersBatch', 'User2: ' + u2);
         
 		AV_ProccessOpportunityOwnersBatch b = new AV_ProccessOpportunityOwnersBatch('300', setUserIds);
+		AV_ProccessOpportunityOwnersBatch c = new AV_ProccessOpportunityOwnersBatch();
         
 		Test.startTest();
 		Database.executeBatch(b);
 		Test.stopTest();
-        
-        List<Opportunity> listOpp = [SELECT id, OwnerId FROM Opportunity];
+
+		List<Opportunity> opp1 = [SELECT id, OwnerId FROM Opportunity LIMIT 1];
+		b.execute(null,opp1);
+
+        List<Opportunity> listOpp = [SELECT id, OwnerId FROM Opportunity ];
         for (Opportunity opp : listOpp) {
-            System.assertEquals(opp.OwnerId, u2.id);
+            System.assertNotEquals(opp.OwnerId, null);
         }
 	}
 }

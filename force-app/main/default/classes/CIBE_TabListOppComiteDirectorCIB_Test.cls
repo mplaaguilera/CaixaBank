@@ -22,10 +22,10 @@ public with sharing class CIBE_TabListOppComiteDirectorCIB_Test {
         string rtJerarquia = Schema.getGlobalDescribe().get('CIBE_Hierarchy__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CIBE_Employee').getRecordTypeId();
 
         CIBE_TestInitialSetup.setupInitialDataCIB();
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        User userTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
         Contact contacto = [SELECT Id FROM Contact WHERE CC_Matricula__c = 'U0000001'];
         
-        System.runAs(new User(Id = UserInfo.getUserId())) {
+        System.runAs(userTest) {
             Account cliente = CIBE_TestHelper.createCustomer();
     
             CBK_PicklistValues__c pick = new CBK_PicklistValues__c();
@@ -65,7 +65,7 @@ public with sharing class CIBE_TabListOppComiteDirectorCIB_Test {
             pickVal4.CBK_HasDependency__c = true;
             pickVal4.CBK_Dependencies__c = 'Valor22';
             insert pickVal4;
-                  
+            
             CBK_PicklistValues__c pickVal5 = new CBK_PicklistValues__c();
             pickVal5.RecordTypeId = rtIdPickVal;
             pickVal5.CBK_Picklist__c = pick.Id;
@@ -137,20 +137,19 @@ public with sharing class CIBE_TabListOppComiteDirectorCIB_Test {
             opp.CIBE_TipoOperacion__c = 'Nueva';
             opp.CIBE_ESG__c = false;
             opp.CIBE_ComiteDirector__c = true;
-         
-            opp.OwnerId = usuario.Id;
+            opp.OwnerId = userTest.Id;
             insert opp;
         }
     }
     
     @isTest
     public static void getOpportunityTest() {
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-        List<CBK_PicklistValues__c> lstPickV = [Select id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1' limit 1];
+        User userTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        List<CBK_PicklistValues__c> lstPickV = [SELECT id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1' LIMIT 1];
         Test.startTest();
-        System.runAs(usuario) {
+        System.runAs(userTest) {
 
-            List<CIBE_TabListOppComiteDirectorCIB_Contr.OpportunityWrapper> wrapperList = CIBE_TabListOppComiteDirectorCIB_Contr.getOpportunity(0, lstPickV[0].id,null, null, null);
+            List<CIBE_TabListOppComiteDirectorCIB_Contr.OpportunityWrapper> wrapperList = CIBE_TabListOppComiteDirectorCIB_Contr.getOpportunity(0, lstPickV[0].id,null, null, null,'todas');
             System.assert(!wrapperList.isEmpty());
         }
         Test.stopTest();
@@ -158,12 +157,26 @@ public with sharing class CIBE_TabListOppComiteDirectorCIB_Test {
     
     @isTest
     public static void exportTest() {
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-        List<CBK_PicklistValues__c> lstPickV = [Select id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1' limit 1];
+        User userTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        List<CBK_PicklistValues__c> lstPickV = [SELECT id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1' LIMIT 1];
         Test.startTest();
-        System.runAs(usuario) {
-            List<String> csv = CIBE_TabListOppComiteDirectorCIB_Contr.exportOpportunities(lstPickV[0].id,null, null,null);
+        System.runAs(userTest) {
+            List<String> csv = CIBE_TabListOppComiteDirectorCIB_Contr.exportOpportunities(lstPickV[0].id,null, null,null,'todas');
             System.assert(!csv.isEmpty());
+        }
+        Test.stopTest();
+    }
+    
+    @isTest
+    public static void countOppTest() {
+        User userTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        List<CBK_PicklistValues__c> lstPickV = [SELECT id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1' LIMIT 1];
+        Test.startTest();
+        System.runAs(userTest) {
+            Integer response = CIBE_TabListOppComiteDirectorCIB_Contr.countOpp(lstPickV[0].id,null, null,null, 'todas');
+            CIBE_TabListOppComiteDirectorCIB_Contr.getContactName(userTest.Id);
+            CIBE_TabListOppComiteDirectorCIB_Contr.getContactIds(userTest.Id);
+            System.assert(response != 0);
         }
         Test.stopTest();
     }

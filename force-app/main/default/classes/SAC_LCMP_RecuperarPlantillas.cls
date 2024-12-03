@@ -105,39 +105,25 @@ public with sharing class SAC_LCMP_RecuperarPlantillas {
      * Historial
      * VERSION        USER_STORY            AUTHOR                DATE        Description
      * 1.0             US783324           Sergio Martín         02/02/24       Creación
-     * 1.1             US1005847            Álex Polo           31/10/24       Añadidos Footers de distitnos idiomas
      * *******************************************************************************************/
     @AuraEnabled
-    public static WrapperTemplate obtenerDatosTemplate(String idTemplate, String idObject, String idioma){
-        System.debug('El idioma ' + idioma);
+    public static WrapperTemplate obtenerDatosTemplate(String idTemplate, String idObject){
         EmailTemplate plantillaSeleccionada = new EmailTemplate();
         EmailTemplate plantillaHeader = new EmailTemplate();
         EmailTemplate plantillaFooter = new EmailTemplate();
         List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
 
         if (Schema.sObjectType.EmailTemplate.isAccessible()){
-            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idTemplate OR Developername IN ('SAC_Header','SAC_Footer', 'SAC_Footer_ENG', 'SAC_FOOTER_CAT', 'SAC_FOOTER_Valenciano', 'SAC_FOOTER_Gallego', 'SAC_FOOTER_Euskera')];
-        }   
-       
-
-
+            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idTemplate OR Developername IN ('SAC_Header','SAC_Footer')];
+        }
+        
         if(lstPlantillas != null && !lstPlantillas.isEmpty()) {
             for(EmailTemplate em : lstPlantillas) {
                 if(em.id == idTemplate) {
                     plantillaSeleccionada = em;
-                } else if(em.DeveloperName == 'SAC_Header' && idioma == 'es') {
+                } else if(em.DeveloperName == 'SAC_Header') {
                     plantillaHeader = em;
-                } else if(em.DeveloperName == 'SAC_Footer' && idioma == 'es') {
-                    plantillaFooter = em;
-                } else if(em.DeveloperName == 'SAC_Footer_ENG' && idioma == 'en'){
-                    plantillaFooter = em;
-                } else if(em.DeveloperName == 'SAC_Footer_CAT' && idioma == 'ca'){
-                    plantillaFooter = em;
-                } else if(em.DeveloperName == 'SAC_FOOTER_Valenciano' && idioma == 'va'){
-                    plantillaFooter = em;
-                } else if(em.DeveloperName == 'SAC_FOOTER_Gallego' && idioma == 'ga'){
-                    plantillaFooter = em;
-                } else if(em.DeveloperName == 'SAC_FOOTER_Euskera' && idioma == 'eu'){
+                } else if(em.DeveloperName == 'SAC_Footer') {
                     plantillaFooter = em;
                 }
             }

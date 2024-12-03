@@ -11,6 +11,8 @@ Historial
 	1.0			US372930		Jose Maria		   	05/07/2022		  	Init version
     2.0         US496487        Jose Maria          20/01/2023      	División de funcionalidad en las otras clases del componente
     3.0         DE83223         Lucia               29/09/2023          Nuevo metodo searchTest
+    4.0         PPM100455545    Lucia               19/09/2024          Nuevo metodo getPaisPicklistTest
+
 		
 ***********************************************************************************************************************/
 @isTest
@@ -20,17 +22,17 @@ public with sharing class CIBE_NewOpportunity_Controller_Test {
     @testSetup 
     public static void setup() {
         CIBE_TestInitialSetup.setupInitialDataEMP();
-        Id RTProduct = Schema.SObjectType.Product2.getRecordTypeInfosByDeveloperName().get('AV_PF').getRecordTypeId();
+        Id rtProduct = Schema.SObjectType.Product2.getRecordTypeInfosByDeveloperName().get('AV_PF').getRecordTypeId();
+        User usuarioSetUp = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
 
+        System.runAs(usuarioSetUp){
 
-        System.runAs(new User(Id = UserInfo.getUserId())){
-
-            User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor' AND createdbyId = :UserInfo.getUserId()];
+            User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor'];
 
             Product2 p = new Product2();
                 p.Name = 'ProductoTest';
                 p.AV_Nivel__c = '1';
-                p.RecordTypeId = RTProduct;
+                p.RecordTypeId = rtProduct;
                 p.AV_ExternalID__c = '11100';
                 p.AV_Profesional__c = false;
                 p.AV_Activo__c = true;
@@ -59,7 +61,7 @@ public with sharing class CIBE_NewOpportunity_Controller_Test {
     
     @isTest
     public static void searchTest(){
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor' AND createdbyId = :UserInfo.getUserId()];
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor'];
         Test.startTest();
         List<AV_LookupSearchResult> results = new List<AV_LookupSearchResult>();
         System.runAs(usuario) {
@@ -68,4 +70,19 @@ public with sharing class CIBE_NewOpportunity_Controller_Test {
         }
         Test.stopTest();
     }
+
+
+    @isTest
+	public static void getPaisPicklistTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND Profile.Name ='CIBE_Gestor'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            List<CIBE_NewOpportunity_Controller.OptionsField> listValues = CIBE_NewOpportunity_Controller.getPaisPicklist();
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
+    
 }

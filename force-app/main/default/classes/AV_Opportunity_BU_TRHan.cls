@@ -32,9 +32,13 @@ Historial
 	9.7         DE80526         Elisabeth R.        14/08/2023          Added createTaskCallMe method
 	9.8			Fix				Sandra Gómez		17/08/2023			Add method backReport
 	9.9			US546892		Sandra Gómez		14/09/2023			Delete methods checkStageName, backReport and blockCloseDateUpdate and add methods byPassOpp and validationsOpportunity
+	10.0        US621640        Oscar Moreno        05/12/2024          validationsOpportunity method is invoked before to updateCloseDate
+	10.1        PPM100205278    Elisabeth R.        22/05/2024          Added blankSubState method
+	10.2        PPM100130465    Sandra Gómez        30/07/2024			Add logical AV_OpportunityTriggerHelper.ResultadoByPass
+	10.3		IN1193860		Sandra Gómez		07/08/2024			change avoidbulkapi with method byPassOpp.
 
 ***********************************************************************************************************************/
-public class AV_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
+public class AV_Opportunity_BU_TRHan extends AV_TriggerHandlerBase {
 	
 	public override void mainEntry(CC_TriggerParameters tp) {
 		process((List<Opportunity>)tp.newList, (Map<Id, Opportunity>)tp.newMap, (List<Opportunity>) tp.oldList, (Map<Id, Opportunity>) tp.oldMap);
@@ -55,7 +59,6 @@ public class AV_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
 				}*/
 				AV_OpportunityTriggerHelper.saveFieldsFromOpp(listData, mapOldObj, true);
 			}
-			AV_OpportunityTriggerHelper.updateCloseDate(listData, mapOldObj);
             AV_OpportunityTriggerHelper.updateSinGestor(listData,mapOldObj);
 			AV_OpportunityTriggerHelper.processOwnerEAPGestor(listData, mapOldObj);
 			AV_OpportunityTriggerHelper.createOpportunityComentarios(listData, mapOldObj);
@@ -70,6 +73,8 @@ public class AV_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
             AV_OpportunityTriggerHelper.updateStageName(listData,mapOldObj);
             AV_OpportunityTriggerHelper.assignPropensity(listData,mapOldObj);
 			AV_OpportunityTriggerHelper.updateFechaActivacion(listData,mapOldObj);
+			AV_OpportunityTriggerHelper.blankSubState(listData,mapOldObj);
+
 		}
         if(listDataCM!=null && !listDataCM.isEmpty()){
 			AV_OpportunityTriggerHelper.createTaskCallMe(listDataCM,mapOldObj);
@@ -77,8 +82,11 @@ public class AV_Opportunity_BU_TRHan extends CC_TriggerHandlerBase {
 		if (listData!=null && !listData.isEmpty()) {
 			if (!hasCustomPermission && !System.isbatch()) {
 				AV_OpportunityTriggerHelper.validationsOpportunity(listData,mapOldObj);
-				mapToByPass = AV_OpportunityTriggerHelper.byPassOpp(listData,mapOldObj);
 			}
+			AV_OpportunityTriggerHelper.ResultadoByPass rbp = AV_OpportunityTriggerHelper.byPassOpp(listData,mapOldObj);
+			mapToByPass = rbp.mapByPass;
+			mapToByPassOld = rbp.mapByPassOld;
+			AV_OpportunityTriggerHelper.updateCloseDate(listData, mapOldObj);
 		}
 	}
 }

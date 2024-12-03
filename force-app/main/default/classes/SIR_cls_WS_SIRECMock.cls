@@ -12,8 +12,8 @@
     *****************************************************************/
 
 @isTest
-global with sharing class SIR_cls_WS_SIRECMock implements HttpCalloutMock{
-    global HTTPResponse respond(HTTPRequest req) {
+public with sharing class SIR_cls_WS_SIRECMock implements HttpCalloutMock{
+    public HTTPResponse respond(HTTPRequest req) {
         Map<String, Object> request = (Map<String, Object>)JSon.deserializeUntyped(req.getBody());       
         HttpResponse response = new HttpResponse();
         response.setHeader('Content-Type', 'application/json');   

@@ -76,7 +76,10 @@ public class OS_Case_Test {
             System.assertNotEquals(null, casoHijo.Id, 'Los campos no coinciden');
 
             //Probar que se ha creado la actividad de caso duplicado
-            System.assert([SELECT Count() FROM Task WHERE WhatId = :casoHijo.Id AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')] == 4, 'Los campos no coinciden');
+            List<Task> tareasDuplicar = [SELECT Id FROM Task
+                                            WHERE WhatId = :casoHijo.Id AND RecordTypeId = :CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'OS_Task')];
+
+            System.assert(tareasDuplicar.size() == 4, 'Los campos no coinciden');
         }
     }
 
@@ -110,7 +113,9 @@ public class OS_Case_Test {
             insert contacto;
             Test.stopTest();
 
-            System.assertEquals(1, [SELECT Count() FROM Task WHERE WhatId = :caso.Id AND Type = 'Canal de procedencia modificado'], 'Los campos no coinciden');
+            List<Task> tareas = [SELECT Id FROM Task WHERE WhatId = :caso.Id AND Type = 'Canal de procedencia modificado'];
+
+            System.assertEquals(1, tareas.size(), 'Los campos no coinciden');
         }
     }
     
@@ -338,7 +343,7 @@ public class OS_Case_Test {
         caso.CC_Canal_Procedencia__c = 'Buzón Comercio Exterior';
         caso.CC_Canal_Resolucion__c = 'Buzón Comercio Exterior';
         caso.CC_Tipo_Contacto__c = 'Asesoramiento';
-       // caso.CC_Buzon_Salida__c= 'bluewolf.copsdev.test@gmail.com';
+        caso.CC_Buzon_Salida__c= 'bluewolf.copsdev.test@gmail.com';
         caso.OwnerId = usuarioOperador.Id;
         insert caso;
 

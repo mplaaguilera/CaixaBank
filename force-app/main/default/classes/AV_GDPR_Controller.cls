@@ -15,6 +15,8 @@ VERSION		USER_STORY							   AUTHOR			  DATE				Description
 1.3			US258114							   Jashanpreet		  27/08/2021		  Flow
 1.4			AV_Query IT							   Daniel Rodríguez	  3/02/2022			  Change AV_Query to SOQL for User and Account
 1.5												   Vladislav Lityagin 14/03/2023		  Replaced checkTreatments call to checkTreatmentsFw
+1.6			PMD Errors							   Humberto Vilchez   26/10/2023		  Add WITH SECURITY_ENFORCED to querys and curly space to else 
+1.1         US866754                              Oscar Moreno        25/04/2024          Add  getJsonGDPR  method  
 ***********************************************************************************************************************/
 public with sharing class AV_GDPR_Controller {
 
@@ -55,76 +57,36 @@ public with sharing class AV_GDPR_Controller {
 		}
 	}
 	
-	/**
-	 * @description	 Retrieve the treatments of the customer
-	 * @param   recordId  -> SF Identifier of the customer
-	 */
+	
+	public class Alerta {
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String key;
+    }
+
 	@AuraEnabled
-	public static Response getTreatments(String recordId) {
-		Response resp = new Response();
-			String methodName = 'getTreatments';
-			try{
-				Account acc = [Select Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c From Account Where Id = :recordId limit 1];
-				/*Account acc = (Account)new AV_Query('Account')
-									.selectFields('Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c')
-									.addConditionEq('Id', recordId)
-									.fetch();*/
-				User user = [Select Id, AV_ExternalID__c From User Where Id = :UserInfo.getUserId() limit 1];
-				/*User user = (User)new AV_Query('User')
-									.selectFields('Id, AV_ExternalID__c')
-									.addConditionEq('Id', UserInfo.getUserId())
-									.fetch();*/
-				//Customer not found or ID empty
-				boolean statusOK = true;
-				if (acc==null || String.isBlank(acc.AV_Numperso__c)){
-					resp.severity = AV_AppConstants.ERROR;
-					String msg = Label.AV_GDPR_ErrorNumper;
-					resp.descError = Label.AV_UnknownError + AV_AppConstants.BREAK_LINE + msg;
-					AV_LogDebug.printLogDebug(methodName, msg);
-					statusOK = false;
-				}
-				//Employee not found or ID empty
-				else if (user==null || String.isBlank(user.AV_ExternalId__c)){
-					resp.severity = AV_AppConstants.ERROR;
-					String msg = Label.AV_GDPR_ErrorEmployee;
-					resp.descError = Label.AV_UnknownError + AV_AppConstants.BREAK_LINE + msg;
-					AV_LogDebug.printLogDebug(methodName, msg);
-					statusOK = false;
-				}
-				
-				//Validate response API
-				if (statusOK){
-					String numper = acc.AV_Numperso__c;
-					String employeeU01 = user.AV_ExternalId__c;
-					Long hours = 0;
-					if(acc.AV_FechaRefrescoGDPR__c != Null){
-						hours = AV_AppUtilities.calculateTimeDifferences(acc.AV_FechaRefrescoGDPR__c, DateTime.now());
-					}
-					if(String.isBlank(acc.AV_JSONGDPR__c) || (acc.AV_FechaRefrescoGDPR__c != null && hours>24)){
-						AV_GDPR_Integration.GDPRResponse dataGDPR1 = AV_GDPR_Integration.checkTreatmentsFw(AV_TREATMENTID_1, AV_APP_CODE, numper, employeeU01);
-						AV_GDPR_Integration.GDPRResponse dataGDPR2 = AV_GDPR_Integration.checkTreatmentsFw(AV_TREATMENTID_2, AV_APP_CODE, numper, employeeU01);
-						resp = checkGDPRResponse(resp, dataGDPR1, false);
-						resp = checkGDPRResponse(resp, dataGDPR2, false);
-						if('200'.equalsIgnoreCase(dataGDPR1.StatusCode) || '200'.equalsIgnoreCase(dataGDPR2.StatusCode)){
-							acc.AV_JSONGDPR__c =  JSON.serialize(resp);
-							acc.AV_FechaRefrescoGDPR__c = Datetime.now();
-							Database.update(acc);
-						}
-						AV_LogDebug.printLogDebug(methodName, '********************++++++++++++++++++++++++');
-						AV_LogDebug.printLogDebug(methodName, resp.toString());
-					}else{
-						Type typeClass = Type.forName('AV_GDPR_Controller.Response');
-						AV_GDPR_Controller.Response avConsent = (AV_GDPR_Controller.Response)JSON.deserializeStrict(acc.AV_JSONGDPR__c, typeClass);
-						resp = avConsent;
-					}
-				}
-			}catch(Exception e){
-				AV_LogDebug.printException(methodName, e);
-				resp.severity = AV_AppConstants.ERROR;
-				resp.descError = Label.AV_UnknownError + AV_AppConstants.BREAK_LINE + e.getMessage();
-			}
-		return resp;
-	}
+    public static void getJsonGDPR(String recordId) {
+		Account acc = [Select Id, AV_JSONAlertas__c,AV_JSONGDPR__c From Account Where Id = :recordId  limit 1];
+		
+        if(acc != null && acc.AV_JSONAlertas__c != null){
+            List<AV_GDPR_Controller.Alerta> alertas = (List<AV_GDPR_Controller.Alerta>)JSON.deserialize(acc.AV_JSONAlertas__c, List<AV_GDPR_Controller.Alerta>.class);
+            List<AV_GDPR_Controller.Alerta> alertasKey21 = new List<AV_GDPR_Controller.Alerta>();
+			for(AV_GDPR_Controller.Alerta alerta : alertas){
+                if(alerta.key == '21'){
+                    alertasKey21.add(alerta);               
+                }
+            }
+            
+            if (!alertasKey21.isEmpty()) {
+                acc.AV_JSONGDPR__c = JSON.serialize(alertasKey21[0]);                
+                Database.update(acc);
+            }
+        }
+       
+    }
+
+	
 	
 	@TestVisible
 	private static Response checkGDPRResponse(Response resp, AV_GDPR_Integration.GDPRResponse dataGDPR, boolean checkEmpty){
@@ -184,26 +146,14 @@ public with sharing class AV_GDPR_Controller {
 	@invocableMethod(label='checkGDPR')
 	public static List<Boolean> getGDPRForCampaigns(List<List<String>> fields){
         Response res = new Response();
-		/*Account acc = null;
-		if(fields != null && !fields.isEmpty()){
-			acc = (Account)new AV_Query('Account')
-									.selectFields('Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c')
-									.addConditionEq('Id', fields[0][0])
-									.fetch();
-		}*/
+
 		Response resp = new Response();
 			String methodName = 'getTreatments';
 			try{
-				Account acc = [Select Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c From Account Where Id = :fields[0][0] limit 1];
-				/*Account acc = (Account)new AV_Query('Account')
-									.selectFields('Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c')
-									.addConditionEq('Id', fields[0][0])
-									.fetch();*/
-				User user = [Select Id, AV_ExternalID__c From User Where Id = :UserInfo.getUserId() limit 1];
-				/*User user = (User)new AV_Query('User')
-									.selectFields('Id, AV_ExternalID__c')
-									.addConditionEq('Id', UserInfo.getUserId())
-									.fetch();*/
+				Account acc = [Select Id, AV_Numperso__c, AV_FechaRefrescoGDPR__c, AV_JSONGDPR__c From Account Where Id = :fields[0][0] WITH SECURITY_ENFORCED limit 1];
+
+				User user = [Select Id, AV_ExternalID__c From User Where Id = :UserInfo.getUserId() WITH SECURITY_ENFORCED limit 1];
+
 				//Customer not found or ID empty
 				boolean statusOK = true;
 				if (acc==null || String.isBlank(acc.AV_Numperso__c)){
@@ -247,7 +197,9 @@ public with sharing class AV_GDPR_Controller {
                         if(c.consentDesc == AV_CONTACT_MANAGER && Boolean.valueOf(c.isConsent)){
                             return new List<Boolean>{true};
                         } 
-                        else return new List<Boolean>{false};
+                        else {
+							return new List<Boolean>{false};
+						}
                     }
                 }
 			}

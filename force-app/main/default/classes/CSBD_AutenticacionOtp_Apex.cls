@@ -194,60 +194,83 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		return preguntas;
 	}
 
-	@AuraEnabled //No cacheable porque para validar cuenta y tarjeta es necesario realizar un callout
-	public static Map<String, Object> n2ValidarRespuestasPreguntas(Id recordId, String pregunta1, String pregunta2, String respuesta1, String respuesta2, Boolean enviarSMS) {
-		Opportunity opp = [SELECT CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
-							AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
-							Account.PersonBirthdate, Account.AV_NumPerso__c, Account.CC_NumPerso__c,
-							CSBD_Contact__r.RecordType.DeveloperName, CSBD_Contact__r.CIBE_Telefono1__c,
-							CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c,
-							CSBD_CasoOrigen__r.CC_Representante__c,
-							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
-							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonBirthdate,
-							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
-							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
-							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c
-							FROM Opportunity WHERE Id = :recordId];
 
-		String numperso = getNumpersoClienteOportunidad(opp);
-		Boolean resultado1 = validarRespuesta(opp, pregunta1, respuesta1, numperso);
-		Boolean resultado2 = validarRespuesta(opp, pregunta2, respuesta2, numperso);
-		Boolean ok = resultado1 && resultado2;
+	@AuraEnabled
+	public static Map<String, String> segundoNivel(Id recordId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS) { //Boolean enviarPreguntas
+		String resultado = 'OK';
+		Opportunity oportunidad = [SELECT AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+									CSBD_CasoOrigen__r.CC_Representante__c,
+									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
+									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
+									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
+									CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c,
+									CSBD_Contact__r.RecordType.DeveloperName,
+									CSBD_Contact__r.CIBE_Telefono1__c, Account.AV_NumPerso__c,
+									CSBD_Contact__r.AV_NumPerso__c, Account.CC_NumPerso__c,
+									CSBD_Contact__r.CC_NumPerso__c, CSBD_Idioma_Solicitud__c
+									FROM Opportunity WHERE Id = :recordId];
 
+		Task llamada = [SELECT CC_Llamada_Id__r.CC_Tipo__c, CC_Llamada_Id__r.CC_DNIS__c FROM Task
+						WHERE WhatId = :recordId AND RecordType.DeveloperName = 'CSBD_Task'
+						AND CreatedDate = TODAY AND Status = 'Open' AND CC_Llamada_Id__c != null
+						ORDER BY CreatedDate DESC LIMIT 1] ?? null;
+
+		//Crear registro
 		CC_Comunicaciones__c autenticacion = new CC_Comunicaciones__c();
 		autenticacion.RecordTypeId = Schema.SObjectType.CC_Comunicaciones__c.getRecordTypeInfosByDeveloperName().get('CSBD_Autenticacion').getRecordTypeId();
 		autenticacion.CSBD_Opportunity__c = recordId;
-		autenticacion.CC_Cliente__c = opp.AccountId;
-		autenticacion.CC_Nivel__c = 'Nivel 2';
-		autenticacion.CC_Perfil_empleado__c = perfilUsuarioFormat();
-		autenticacion.CC_Fecha_Validacion__c = System.now();
+		autenticacion.CC_Cliente__c = oportunidad.AccountId;
+		autenticacion.CC_Nivel__c = nivel;
+		Boolean preguntaRespuestaVacia1 = String.isEmpty(pregunta1) || String.isEmpty(respuesta1);
+		Boolean preguntaRespuestaVacia2 = String.isEmpty(pregunta2) || String.isEmpty(respuesta2);
+
 		autenticacion.CC_Pregunta_1__c = pregunta1;
 		autenticacion.CC_Respuesta_1__c = respuesta1;
-		autenticacion.CC_Validacion_1__c = resultado1 ?  'OK' : 'NOK';
 		autenticacion.CC_Pregunta_2__c = pregunta2;
 		autenticacion.CC_Respuesta_2__c = respuesta2;
-		autenticacion.CC_Validacion_2__c = resultado2 ? 'OK' : 'NOK';
-		autenticacion.CC_Tipo_Llamada__c = [SELECT CC_Llamada_Id__r.CC_Tipo__c FROM Task WHERE RecordType.DeveloperName = 'CSBD_Task'
-											AND WhatId = :recordId AND Status = 'Open' AND CreatedDate = TODAY AND CC_Llamada_Id__c != null
-											ORDER BY CreatedDate DESC LIMIT 1]?.CC_Llamada_Id__r?.CC_Tipo__c ?? null;
-		if (ok) {
-			if (!enviarSMS) {
-				autenticacion.CC_Estado__c = 'Pdte. Envío';
-			} else {
-				autenticacion.CC_Estado__c = 'Aprobado';
-				opp.CSBD_EstadoAutenticacion__c  = 'APPROVED';
+		// if (!enviarPreguntas) {
+			if (!preguntaRespuestaVacia1) {
+				autenticacion.CC_Validacion_1__c = (!String.isEmpty(validacion1) && validacion1 == 'true') ?  'OK' : 'NOK';
 			}
-		} else {
-			opp.CSBD_UltimaAutenticacionOk__c = false;
-			opp.CSBD_IntentosAutenticacion__c = 0;
+			if (!preguntaRespuestaVacia2) {
+				autenticacion.CC_Validacion_2__c = (!String.isEmpty(validacion2) && validacion2 == 'true') ?  'OK' : 'NOK';
+			}
+		// }
 
+		if (nivel != 'Emergencia') {
+			autenticacion.CC_Perfil_empleado__c = perfilUsuarioFormat();
+			autenticacion.CC_Tipo_Llamada__c = llamada?.CC_Llamada_Id__r?.CC_Tipo__c;
+		}
+
+		// if ((valido || enviarPreguntas) && !enviarSMS) {
+		if (valido && !enviarSMS) {
+			autenticacion.CC_Estado__c = 'Pdte. Envío';
+		// } else if (enviarSMS && (valido || enviarPreguntas)) {
+		} else if (valido && enviarSMS) {
+			autenticacion.CC_Estado__c = 'Aprobado';
+			oportunidad.CSBD_EstadoAutenticacion__c  = 'APPROVED';
+		} else {
 			autenticacion.CC_Estado__c = 'Cerrado';
+			autenticacion.CC_Fecha_Validacion__c = Datetime.now();
 			autenticacion.CC_Resultado_Validacion__c = 'Identificación NOK';
+
+			String idioma = new Map<String, String>{'Castellano' => 'es', 'Catalán' => 'ca', 'Inglés' => 'en'}.get(oportunidad.CSBD_Idioma_Solicitud__c) ?? 'es';
+			resultado = [SELECT CC_Texto_Plantilla__c FROM CC_ConfigNotifCliente__mdt
+														WHERE CC_Proceso__c = 'Notificacion OTP KO'
+														AND CC_Canal__c = 'Email' AND CC_Idioma__c = :idioma
+														AND CC_Activa__c = true LIMIT 1]?.CC_Texto_Plantilla__c ?? 'OK';
 		}
 		insert autenticacion;
-		update opp;
 
-		return new Map<String, Object>{'ok' => ok, 'idAutenticacion' => String.valueOf(autenticacion.Id)};
+		oportunidad.CSBD_UltimaAutenticacionNivel__c = nivel;
+		if (!valido) {
+			oportunidad.CSBD_UltimaAutenticacionOk__c = valido;
+			oportunidad.CSBD_IntentosAutenticacion__c = 0;
+			oportunidad.CSBD_UltimaAutenticacionFecha__c = Datetime.now();
+		}
+		update oportunidad;
+
+		return new Map<String, String>{'id' => String.valueOf(autenticacion.Id), 'resultado' => resultado};
 	}
 
 	@AuraEnabled(cacheable=true)
@@ -531,6 +554,34 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 		return CC_WS_Envio_OTP.CC_WS_Envio_OTP(new Set<Id>{idAutenticacion})[0];
 	}
 
+	@AuraEnabled
+	public static Map<String, Boolean> validacionRespuestasNivel2(Id recordId, String pregunta1, String pregunta2, String respuesta1, String respuesta2) {
+		SavePoint sp = Database.setSavepoint();
+		Opportunity opp = [SELECT CSBD_CasoOrigen__r.CC_MCC_Motivo__r.CC_Motivo_OmitirSMSNivel2__c,
+							AccountId, Account.RecordType.DeveloperName, Account.AV_Age__c, Account.PersonMobilePhone,
+							Account.PersonBirthdate, Account.AV_NumPerso__c, Account.CC_NumPerso__c,
+							CSBD_Contact__r.RecordType.DeveloperName, CSBD_Contact__r.CIBE_Telefono1__c,
+							CSBD_Contact__r.AV_NumPerso__c, CSBD_Contact__r.CC_NumPerso__c,
+							CSBD_CasoOrigen__r.CC_Representante__c,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonMobilePhone,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.PersonBirthdate,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_Age__c,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.CC_NumPerso__c,
+							CSBD_CasoOrigen__r.CC_Representante__r.CC_Representante__r.AV_NumPerso__c
+							FROM Opportunity WHERE Id = :recordId];
+
+		String numperso = getNumpersoClienteOportunidad(opp);
+		Database.releaseSavepoint(sp);
+		return new Map<String, Boolean>{
+			'respuesta1' => validarRespuesta(opp, pregunta1, limpiarRespuesta(respuesta1), numperso),
+			'respuesta2' => validarRespuesta(opp, pregunta2, limpiarRespuesta(respuesta2), numperso)
+		};
+	}
+
+	private static String limpiarRespuesta(String respuesta) {
+		return (respuesta ?? '').replace('+34 ', '').replace('+3400', '').replace('+34', '').replace(' ', '');
+	}
+
 	private static String getNumpersoClienteOportunidad(Opportunity opp) {
 		if (opp.CSBD_CasoOrigen__r?.CC_Representante__c != null) {
 			return opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r?.AV_NumPerso__c != null ? opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.AV_NumPerso__c : opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.CC_NumPerso__c != null ? opp.CSBD_CasoOrigen__r?.CC_Representante__r.CC_Representante__r.CC_NumPerso__c : '';
@@ -646,8 +697,8 @@ public with sharing class CSBD_AutenticacionOtp_Apex {
 
 		} else {
 			//Llamada saliente
-			String telefonoLlamada = llamada.CC_Llamada_Id__r?.CC_DNIS__c ?? '';
-			telefonoLlamada = telefonoLlamada.replaceAll('+34 ', '').replaceAll('+3400', '').replaceAll('+34', '').replaceAll(' ', '');
+			String telefonoLlamada = limpiarRespuesta(llamada.CC_Llamada_Id__r.CC_DNIS__c);
+
 			if (casoOrigen?.CC_Representante__c != null) {
 				//Llamada saliente a representante
 				String telfRepresentante = casoOrigen.CC_Representante__r?.CC_Representante__r?.PersonMobilePhone ?? '';

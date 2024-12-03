@@ -11,6 +11,7 @@ Historial
 	1.1			Palabras prohibidas			Álvaro Lóepz		26/11/2020			Added TestSetup and validateForbWordsTest method
 	1.2			Fix							Sandra Gómez		26/08/2021			Fix product opportunity
 	1.3		    AV_Query IT	       			Daniel Rodríguez    03/03/2022	        Change AV_Query to SOQL for User, Account, Contact
+	1.4			Cambio de logica			Ángel Medina 		22/01/2024			Modified method updateMainRecordTest
 ***********************************************************************************************************************/
 @isTest
 public class AV_DetailOppTask_Controller_Test {
@@ -24,9 +25,7 @@ public class AV_DetailOppTask_Controller_Test {
 		listWords.add(word2);
 		Database.insert(listWords, false);
 	}
-	/**
-	 * Link opp to customActivityOpp
-	 */
+	
 	@isTest
 	public static void updateMainRecordTest() {
 		Test.startTest();
@@ -37,32 +36,25 @@ public class AV_DetailOppTask_Controller_Test {
 		insert pb;
 
 		Opportunity opp = AV_TestHelper.createOpportunity(acc);
-
 		Task tarea  = AV_TestHelper.createTarea(null);
 		String idCabeceraTarea = [SELECT AV_Task__c FROM Task WHERE AV_ExternalID__c = '01928374' LIMIT 1].AV_Task__c;
 		tarea.AV_Task__c = idCabeceraTarea;
 		update tarea;
-		AV_CustomActivityOpportunity__c tareaOpp= AV_TestHelper.createTareaOportunidad(opp, idCabeceraTarea);
-		tareaOpp.AV_IsMain__c = true;
-		update tareaOpp;
-		
-		AV_CustomActivityOpportunity__c tareaOppMain= AV_TestHelper.createTareaOportunidad(opp, idCabeceraTarea);
 
-		AV_DetailOppTask_Controller.updateMainRecord(tareaOppMain);
-		Test.stopTest();
-		
-		List<AV_CustomActivityOpportunity__c> listTareaOpp = [Select Id from AV_CustomActivityOpportunity__c where AV_IsMain__c = true];
-		/*List<AV_CustomActivityOpportunity__c> listTareaOpp = new AV_Query('AV_CustomActivityOpportunity__c')
-													.selectField('Id')
-													.addConditionEq('AV_IsMain__c', true)
-													.run();*/
-		if(!listTareaOpp.isEmpty()){
-			System.assert(listTareaOpp.size() == 1);
-			System.assertEquals(tareaOppMain.Id, listTareaOpp.get(0).Id);
-		}
+        AV_CustomActivityOpportunity__c testOptyTask1 = new AV_CustomActivityOpportunity__c(AV_Opportunity__c = opp.Id, AV_Task__c = idCabeceraTarea, AV_IsMain__c = false);
+        AV_CustomActivityOpportunity__c testOptyTask2 = new AV_CustomActivityOpportunity__c(AV_Opportunity__c = opp.Id, AV_Task__c = idCabeceraTarea, AV_IsMain__c = true);
 
-        AV_DetailOppTask_Controller.unlinkOpp(tareaOppMain);
+        insert new List<AV_CustomActivityOpportunity__c>{testOptyTask1, testOptyTask2};
+
+        AV_DetailOppTask_Controller.updateMainRecord(opp, idCabeceraTarea);
+
+        List<AV_CustomActivityOpportunity__c> listupdate = [SELECT Id, AV_Opportunity__c, AV_IsMain__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c = :opp.Id AND AV_IsMain__c = true];
+
+        System.assertEquals(true, listupdate[0].AV_IsMain__c);
+		Test.stopTest();	
+		AV_DetailOppTask_Controller.unlinkOpp(opp, idCabeceraTarea);
 	}
+
 	
 	@isTest
 	public static void validateForbWordsTestE() {

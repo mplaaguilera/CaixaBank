@@ -23,12 +23,20 @@ Historial
 	2.1			US304978		Víctor Santiago		07/04/2022			Added AV_BranchPhysicalMeet__c to buildBodyRequest
 	2.2			US456937		Patricia Solano		10/11/2022			Modified insertOrUpdateEvent method to not call the Api of GCF
 																		in case of AV_Tipo__c is not equal to 'FH'
+	2.3							Daniel Rodriguez	09/01/2024			Revision future insertOrUpdateEvent
+	2.4         IN1123492       Elisabeth R.        04/04/2024          Add contact person in event params
+	2.5			Fix				Sandra Gómez		18/04/2024			Comment legalRepresentativeName and legalRepresentativeId
+	2.6         IN1153182.05    Oscar Moreno        02/07/2024          Modify insertOrUpdateEvent method to change the type of cumstomHeaders variable from List to Map (customHeadersMap) to avoid duplicates ids
+	2.7			PPM100538432	Sandra Gómez		11/09/2024			Add methods mapMatriculaAtt and validateMatriculaAtt an change method buildBodyRequest to add parameters legalRepresentativeName, legalRepresentativeId and MandatoryAssistances
+	2.8			PPM100492394	Sandra Gómez		25/10/2024			Change methods buildBodyRequest to send in parameter meetingPlace AV_ExternalId__c and insertOrUpdateEvent to add when 200 add AV_externalId__c
+	2.9			FixCenter00012	Sandra Gómez		14/11/2024			Change method insertOrUpdateEvent to send center whitout 001-
 ***********************************************************************************************************************/
 public with sharing class AV_CitaPrevia_SyncEvents {
 
 	@future(callout=true)
 	public static void insertOrUpdateEvent(String jsonString, Boolean isUpdate){
 		String methodName = 'insertOrUpdateEvent';
+		Integer limiteQ = 1;
 		Id evGestorRT = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_EVENT, AV_AppConstants.EVENTGESTOR_RT).Id;
 		List<Event> eventToUpdate = new List<Event>();
 		List<CBK_Activity_Extension__c> crmTareas = new List<CBK_Activity_Extension__c>();
@@ -40,7 +48,8 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 		Map<String,Event> mapEventsHeaders = new Map<String,Event>();
         Map<Id,Event> mapRecurrentEvents = new Map<Id,Event>();
 		List<Event> eventList = (List<Event>)Json.deserialize(jsonString,List<Event>.class);
-		List<AV_HeaderCustomActivity__c> cumstomHeaders = new List<AV_HeaderCustomActivity__c>();
+		Set<Id> idsContactPerson = new Set<Id>();
+		Map<Id, AV_HeaderCustomActivity__c> customHeadersMap = new Map<Id, AV_HeaderCustomActivity__c>(); 
 		for(Event e : eventList){
 			if (e.IsRecurrence2 || e.IsRecurrence){
 				mapRecurrentEvents.put(e.Id, e);
@@ -50,17 +59,27 @@ public with sharing class AV_CitaPrevia_SyncEvents {
             if (!String.isEmpty(e.AV_ExternalId__c)) {
 				mapEventsHeaders.put(e.AV_ExternalId__c, e);
 			}
+			if(String.isNotBlank(e.WhoId)) {
+                idsContactPerson.add(e.WhoId);
+            }
 		}
 		//Get list of employees
-		List<User> employeeList = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c, Username From User Where Id in :idsOwner];					
-		for(User u : employeeList){
-			mapEmployee.put(u.Id,u);
-		}
+		mapEmployee = new Map<Id, User>([SELECT Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c, Username 
+										FROM User 
+										WHERE Id IN :idsOwner
+										]);
+		//PERSONA DE CONTACTO										
+        Map<Id, Contact> mapContactPerson = new Map<Id, Contact>();
+        if(Contact.SObjectType.getDescribe().isAccessible() &&
+            Schema.SObjectType.Contact.fields.CIBE_NumPerso__c.isAccessible()) {
+            limiteQ = idsContactPerson.size();
+            mapContactPerson = new Map<Id, Contact>([SELECT Id, Name, CIBE_NumPerso__c FROM Contact WHERE Id IN :idsContactPerson Limit :limiteQ]);
+        }								
 		//Get list of customers related with the events
-		List<Account> customer = [Select Id, AV_NumPerso__c, FirstName, LastName From Account Where Id In :idsAccount];
-		for(Account a : customer){
-			mapCustomer.put(a.Id,a);
-		}
+		mapCustomer = new Map<Id, Account>([SELECT Id, AV_NumPerso__c, FirstName, LastName 
+											FROM Account 
+											WHERE Id IN :idsAccount
+											]);
 		//Get the list of externalID for recurrent event
 		Map<String, String> mapEventIds;
         if(mapRecurrentEvents != null && !mapRecurrentEvents.isEmpty()){
@@ -82,19 +101,23 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 					if(mapHeaderTask != null && !mapHeaderTask.isEmpty()) {
 						headerTask = mapHeaderTask.get(e.AV_ExternalID__c);
 					}
-					AV_CitaPrevia_Integration.Event parms = buildBodyRequest(e, null, mapCustomer.get(e.WhatId), mapEmployee.get(e.OwnerId), headerTask);
+					AV_CitaPrevia_Integration.Event parms = buildBodyRequest(e, null, mapCustomer.get(e.WhatId), mapEmployee.get(e.OwnerId), headerTask, mapContactPerson?.get(e.WhoId));
 					String externalID = e.AV_ExternalID__c;
 					if (e.IsRecurrence2 || e.IsRecurrence){
 						externalID = mapEventIds.get(e.Id);
 					}
 					//UPDATE
+					String centreEmployee;
+                    if (mapEmployee.get(e.OwnerId) != null && mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c != null) {
+                        centreEmployee = mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c.contains('-') ? mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c.substringAfter('-') : mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c;
+                    }
 					if((isUpdate && String.isNotBlank(externalID) && !externalID.startsWith(AV_EventTriggerHelper.SUFFIX_EXTERNALID))
 							|| ((e.IsRecurrence2 || e.IsRecurrence) && String.isNotBlank(externalID))){
 						AV_CitaPrevia_Integration.MoCntResponse res;
 						if (!mapEmployee.get(e.OwnerId).Username.contains('gcf-integration')){
-							res =  AV_CitaPrevia_Integration.moCnt(parms, mapEmployee.get(e.OwnerId).AV_ExternalID__c, externalID, mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c);
+							res =  AV_CitaPrevia_Integration.moCnt(parms, mapEmployee.get(e.OwnerId).AV_ExternalID__c, externalID, centreEmployee);
 						} else {
-							res =  AV_CitaPrevia_Integration.moCnt(parms, e.AV_CodigoGestorAsignado__c, externalID, mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c);
+							res =  AV_CitaPrevia_Integration.moCnt(parms, e.AV_CodigoGestorAsignado__c, externalID, centreEmployee);
 						}
 						
 						AV_LogDebug.printLogDebug(methodName, 'Update response: ' + res);
@@ -102,9 +125,9 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 					} else{ //NEW
 						AV_CitaPrevia_Integration.InsCntResponse res;
 						if (!mapEmployee.get(e.OwnerId).Username.contains('gcf-integration')){
-							res = AV_CitaPrevia_Integration.intCnt(parms, mapEmployee.get(e.OwnerId).AV_ExternalID__c, mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c);
+							res = AV_CitaPrevia_Integration.intCnt(parms, mapEmployee.get(e.OwnerId).AV_ExternalID__c, centreEmployee);
 						}else {
-							res = AV_CitaPrevia_Integration.intCnt(parms, e.AV_CodigoGestorAsignado__c, mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c);
+							res = AV_CitaPrevia_Integration.intCnt(parms, e.AV_CodigoGestorAsignado__c, centreEmployee);
 						}
 						AV_LogDebug.printLogDebug(methodName, 'Insert response: ' + res);
 						if('201'.equalsIgnoreCase(res.StatusCode)){
@@ -121,7 +144,7 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 							if (e.RecordTypeId == evGestorRT && (e.IsRecurrence2 || e.IsRecurrence)) {
 								AV_HeaderCustomActivity__c headerCustomAct = createRecurrentEventHeader(e, res.eventPremiumId);
 								if (headerCustomAct != null) {
-									cumstomHeaders.add(headerCustomAct);
+									customHeadersMap.put(headerCustomAct.Id, headerCustomAct);
 								}
 							}
 						}
@@ -148,6 +171,7 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 			List<Database.UpsertResult> listResult2 = Database.upsert(crmTareas, false);
 			AV_AppUtilities.displayErrors(methodName, listResult2);
 		}
+		List<AV_HeaderCustomActivity__c> cumstomHeaders = customHeadersMap.values(); 
 		if (cumstomHeaders!=null && !cumstomHeaders.isEmpty()) {
 			AV_LogDebug.printLogDebug(methodName, 'Result insert HEADER TASK----');
 			List<Database.SaveResult> listResult = Database.insert(cumstomHeaders, false);
@@ -178,12 +202,7 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 		Map<String, String> mapEventIds =new Map<String, String>();
 		if (mapRecurrentEvents!=null && !mapRecurrentEvents.isEmpty()){
 			List<AV_HeaderCustomActivity__c> listRecurrentEvent  = [Select Id, IDTask__c, AV_ExternalID__c From AV_HeaderCustomActivity__c Where IDTask__c in :mapRecurrentEvents.keySet() and CreatedDate > :startDate.addHours(-1) and CreatedDate < :endDate.addHours(1)];
-			/*List<AV_HeaderCustomActivity__c> listRecurrentEvent = new AV_Query('AV_HeaderCustomActivity__c')
-										.selectFields('Id, IDTask__c, AV_ExternalID__c')
-										.addConditionIn('IDTask__c', mapRecurrentEvents.keySet())
-										.addConditionGT('CreatedDate', startDate.addHours(-1))
-										.addConditionLT('CreatedDate', endDate.addHours(1))
-										.run();*/
+			
 			for (AV_HeaderCustomActivity__c data : listRecurrentEvent){
 				mapEventIds.put(data.IDTask__c, data.AV_ExternalID__c);
 			}
@@ -220,13 +239,6 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 		}
 		List<CBK_Activity_Extension__c> crmTaskListExist = [Select Id, Name, AV_ActivityId__c, AV_ReasignarCartera_Id_Task__c, AV_ReasignarCartera_Id_Cliente__c, 
 		AV_Reasignar_cartera_Owner__c, AV_ReasignarCartera_JSONAPI__c From CBK_Activity_Extension__c Where AV_ReasignarCartera_Id_Task__c in :mapCrmTareas.keySet() or AV_ActivityId__c in :mapCrmTareas.keySet()];
-		/*List<CBK_Activity_Extension__c> crmTaskListExist = new AV_Query('CBK_Activity_Extension__c')
-			.selectFields('Id, Name, AV_ActivityId__c, AV_ReasignarCartera_Id_Task__c, AV_ReasignarCartera_Id_Cliente__c, AV_Reasignar_cartera_Owner__c, AV_ReasignarCartera_JSONAPI__c')
-			.addConditionIn('AV_ReasignarCartera_Id_Task__c', mapCrmTareas.keySet())
-			.addConditionIn('AV_ActivityId__c', mapCrmTareas.keySet())
-			.switchToDisjunction()
-			.run();*/
-		
 		for (CBK_Activity_Extension__c crmTaskOld : crmTaskListExist){
 			if (String.isNotBlank(crmTaskOld.AV_ReasignarCartera_Id_Task__c) 
 					&& mapCrmTareas.get(crmTaskOld.AV_ReasignarCartera_Id_Task__c)!=null){
@@ -237,7 +249,6 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 				crmTaskNew.AV_ReasignarCartera_Id_Cliente__c = crmTaskOld.AV_ReasignarCartera_Id_Cliente__c;
 				crmTaskNew.AV_Reasignar_cartera_Owner__c = crmTaskOld.AV_Reasignar_cartera_Owner__c;
 				crmTaskNew.AV_ReasignarCartera_JSONAPI__c = crmTaskOld.AV_ReasignarCartera_JSONAPI__c;
-				
 				crmTaskToUpdate.add(crmTaskNew);
 			}
 			else if (String.isNotBlank(crmTaskOld.AV_ActivityId__c)
@@ -249,7 +260,6 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 				crmTaskNew.AV_ReasignarCartera_Id_Cliente__c = crmTaskOld.AV_ReasignarCartera_Id_Cliente__c;
 				crmTaskNew.AV_Reasignar_cartera_Owner__c = crmTaskOld.AV_Reasignar_cartera_Owner__c;
 				crmTaskNew.AV_ReasignarCartera_JSONAPI__c = crmTaskOld.AV_ReasignarCartera_JSONAPI__c;
-				
 				crmTaskToUpdate.add(crmTaskNew);
 			}
 		}
@@ -273,6 +283,7 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 	@future(callout=true)
 	public static void insertEventTelephoneContracting(String jsonString){
         String methodName = 'insertEventTelephoneContracting';
+		Integer limiteQ = 1;
 		List<Event> eventsUpsert = new List<Event>();
 		List<CBK_Activity_Extension__c> crmTareas = new List<CBK_Activity_Extension__c>();
 		Set<Id> idsAccount = new Set<Id>();
@@ -281,56 +292,45 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 		Map<Id,Account> mapCustomer = new Map<Id,Account>();
 		Map<Id,User> mapEmployee = new Map<Id,User>();
 		List<Opportunity> oppoList = (List<Opportunity>)Json.deserialize(jsonString,List<Opportunity>.class);
+		Set<Id> idsContactPerson = new Set<Id>();
 		for(Opportunity o : oppoList){
 			idsAccount.add(o.AccountId);
 			idsOppo.add(o.Id);
 			idsOwner.add(o.OwnerId);
 		}
 		List<User> employeeList = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c, Username From User Where Id in :idsOwner];
-		/*List<User> employeeList = new AV_Query('User')
-									.selectFields('Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c')
-									.addConditionIn('Id', idsOwner)
-									.run();*/
-								
 		for(User u : employeeList){
 			mapEmployee.put(u.Id,u);
 		}
-		List<Account> customer = [Select Id, AV_NumPerso__c, FirstName, LastName From Account Where Id In :idsAccount];
-		/*List<Account> customer = new AV_Query('Account')
-									.selectFields('Id, AV_NumPerso__c, FirstName, LastName')
-									.addConditionIn('Id', idsAccount)
-									.run();*/
-
-									
+		List<Account> customer = [Select Id, AV_NumPerso__c, FirstName, LastName From Account Where Id In :idsAccount];						
 		for(Account a : customer){
 			mapCustomer.put(a.Id,a);
 		}
 		Map<Id,Id> oppoIds = new Map<Id,Id>();
 		//Set<String> setTaskOppFields = new Set<String>{'Id', 'AV_Task__c', 'AV_Opportunity__c'};
 		List<AV_CustomActivityOpportunity__c> listTareaOpp = [Select Id, AV_Task__c,AV_Opportunity__c From AV_CustomActivityOpportunity__c Where AV_Opportunity__c in :idsOppo];
-		/*List<AV_CustomActivityOpportunity__c> listTareaOpp = new AV_Query('AV_CustomActivityOpportunity__c')
-															.selectFields(setTaskOppFields)
-															.addConditionIn('AV_Opportunity__c', idsOppo)
-															.run();*/
-
 		if(listTareaOpp != null && !listTareaOpp.isEmpty()){
 			for(AV_CustomActivityOpportunity__c cp : listTareaOpp){
 				oppoIds.put(cp.AV_Task__c ,cp.AV_Opportunity__c );
 			}
 		}
 		List<Event> listEvents = [Select Id,Subject, AV_Task__c,IsPrivate,Description,StartDateTime,EndDateTime,CSBD_Evento_Estado__c, AV_Tipo__c,RecordTypeId,OwnerId,WhatId From Event Where AV_Task__c in :oppoIds.keySet()];
-		/*List<Event> listEvents = new AV_Query('Event')
-								.selectFields('Id,Subject, AV_Task__c,IsPrivate,Description,StartDateTime,EndDateTime,CSBD_Evento_Estado__c, AV_Tipo__c,RecordTypeId,OwnerId,WhatId')
-								.addConditionIn('AV_Task__c', oppoIds.keySet())
-								.run();*/
-
 		Map<Id,Event> oppoEventIds = new Map<Id,Event>();
 		if(listEvents != null && !listEvents.isEmpty()){
 			for(Event ev : listEvents){
 				oppoEventIds.put(oppoIds.get(ev.AV_Task__c), ev );
+				if(String.isNotBlank(ev.WhoId)) {
+					idsContactPerson.add(ev.WhoId);
+				}
 			}
-		}                                           
-		
+		}
+		//PERSONA DE CONTACTO										
+        Map<Id, Contact> mapContactPerson = new Map<Id, Contact>();
+        if(Contact.SObjectType.getDescribe().isAccessible() &&
+            Schema.SObjectType.Contact.fields.CIBE_NumPerso__c.isAccessible()) {
+            limiteQ = idsContactPerson.size();
+            mapContactPerson = new Map<Id, Contact>([SELECT Id, Name, CIBE_NumPerso__c FROM Contact WHERE Id IN :idsContactPerson Limit :limiteQ]);
+        }
 		for(Opportunity o : oppoList){
 			Event e = new Event();
 			if(oppoEventIds.containsKey(o.Id)){
@@ -347,9 +347,9 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 			}
 			//Send to API
             try{
-                AV_CitaPrevia_Integration.Event parms = buildBodyRequest(e, o, mapCustomer.get(o.AccountId), mapEmployee.get(o.OwnerId), null);
+                AV_CitaPrevia_Integration.Event parms = buildBodyRequest(e, o, mapCustomer.get(o.AccountId), mapEmployee.get(o.OwnerId), null, mapContactPerson?.get(e.WhoId));
                 AV_CitaPrevia_Integration.InsCntResponse res =  AV_CitaPrevia_Integration.intCnt(parms,mapEmployee.get(e.OwnerId).AV_ExternalID__c,
-                                                                                                 String.valueOf(mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c) );
+				String.valueOf(mapEmployee.get(e.OwnerId).AV_NumeroOficinaEmpresa__c) );
                 if('201'.equalsIgnoreCase(res.StatusCode)){
                     e.AV_ExternalID__c = res.eventPremiumId;
                     e.AV_origenApp__c = AV_AppConstants.SALESFORCE_ORIGENAPP;
@@ -361,7 +361,6 @@ public with sharing class AV_CitaPrevia_SyncEvents {
                 saveResponseAPI(crmTareas, e, 'Description field with more than 2000 characters');
             }
 		}
-	   
 		//Save to DB
 		if(eventsUpsert!=null && !eventsUpsert.isEmpty()){
 			Database.upsert(eventsUpsert, false);
@@ -374,15 +373,13 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 	/**
 	 * Build the request to send to API (Cita Previa)
 	 */
-	public static AV_CitaPrevia_Integration.Event buildBodyRequest(Event event, Opportunity oppo, Account customer, User employee, AV_HeaderCustomActivity__c headerTask){
+	public static AV_CitaPrevia_Integration.Event buildBodyRequest(Event event, Opportunity oppo, Account customer, User employee, AV_HeaderCustomActivity__c headerTask, Contact contactPerson){
         if(String.isNotBlank(event.Description) && event.Description.length()>2000){
         	throw new AV_ApplicationException('Event with more than 2000 characters in description field');
         }
-        
 		AV_CitaPrevia_Integration.Event parms = new AV_CitaPrevia_Integration.Event();
 		AV_CitaPrevia_Integration.Customer c = new AV_CitaPrevia_Integration.Customer();
 		String strRecordName = Schema.SObjectType.Event.getRecordTypeInfosById().get(event.RecordTypeId).getDeveloperName();
-        
 		parms.salesforceEventId = event.Id;
 		if(customer != null && customer.AV_NumPerso__c !=null){
 			c.customerId = Integer.valueOf(customer.AV_NumPerso__c);
@@ -393,13 +390,11 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 		parms.subject = event.Subject;
 		parms.Customer = c;
 		parms.employeeEvent = employee.AV_ExternalID__c;
-		//parms.MandatoryAssistances = new List<String>{employee.AV_ExternalID__c};
 		//branchId
 		if(!String.isEmpty( employee.AV_NumeroOficinaEmpresa__c)) {
 			String branchId = employee.AV_NumeroOficinaEmpresa__c.contains('-') ? employee.AV_NumeroOficinaEmpresa__c.substringAfter('-') : employee.AV_NumeroOficinaEmpresa__c;
 			parms.branchId = Integer.valueOf(branchId);
 		}
-		
 		//type
 		if(strRecordName.equals(AV_AppConstants.EVENTCLIENTE_RT)
 		   		&& AV_AppConstants.LLAMADA_TIPO.equalsIgnoreCase(event.AV_Tipo__c)){
@@ -463,6 +458,75 @@ public with sharing class AV_CitaPrevia_SyncEvents {
 			parms.MetadataFields = new List<AV_CitaPrevia_Integration.MetadataField> {mfields};
 			parms.metadataId = '110';
 		}
+
+		if (contactPerson != null) {
+            parms.legalRepresentativeId = contactPerson.CIBE_NumPerso__c;
+            parms.legalRepresentativeName = contactPerson.Name;
+        }
+
+		List<String> matriculasAtt = mapMatriculaAtt(event);
+        if (matriculasAtt != null) {
+            parms.MandatoryAssistance = matriculasAtt;
+        }
+
 		return parms;
 	}
+
+	/**
+     * Map ExternalID of attendeess
+     */
+    public static List<String> mapMatriculaAtt(Event evt){
+        List<String> matriculasAtt = new List<String>();
+        List<String> matriVal = new List<String>();
+        Set<String> userIds = new Set<String>();
+        Set<String> contactIds = new Set<String>();
+        if(evt.OwnerId != null){
+            userIds.add(evt.OwnerId);
+        }
+        if(AcceptedEventRelation.SObjectType.getDescribe().isAccessible()) {
+            for(AcceptedEventRelation aAttende : [SELECT Id, EventId, RelationId FROM AcceptedEventRelation WHERE EventId = :evt.Id ]) {
+                if(String.isNotBlank(aAttende.RelationId)) {
+                    if(((String)aAttende.RelationId).startsWith('005')) {
+                        userIds.add(aAttende.RelationId);
+                    } else {
+                        contactIds.add(aAttende.RelationId);
+                    }
+                } 
+            }            
+            for(UndecidedEventRelation uAttende : [SELECT Id, EventId, RelationId FROM UndecidedEventRelation WHERE EventId = :evt.Id ]) {
+                if(String.isNotBlank(uAttende.RelationId)) {
+                    if(((String)uAttende.RelationId).startsWith('005')) {
+                        userIds.add(uAttende.RelationId);
+                    } else {
+                        contactIds.add(uAttende.RelationId);
+                    }
+                } 
+            }
+            if(Contact.SObjectType.getDescribe().isAccessible()) {
+                for(Contact contacto : [SELECT Id, Name, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.AV_ExternalId__c FROM Contact WHERE (Id IN :contactIds OR AV_UsuarioAsociado__c IN :userIds)]) {
+                    if(String.isNotBlank(contacto.AV_UsuarioAsociado__c) && String.isNotBlank(contacto.AV_UsuarioAsociado__r.AV_ExternalId__c) &&
+                        !matriculasAtt.contains(contacto.AV_UsuarioAsociado__r.AV_ExternalId__c) ) {
+                        matriculasAtt.add( contacto.AV_UsuarioAsociado__r.AV_ExternalId__c);
+                    }
+                }
+            }
+        }
+        matriVal = validateMatriculaAtt(matriculasAtt);
+        return !matriVal.isEmpty() ? matriVal : null;
+    }
+    
+    /**
+     * Validate Matricula Attendee
+     */
+    public static List<String> validateMatriculaAtt(List<String> lstMat){
+        List<String> matriculasAtt = new List<String>();
+        if(!lstMat.isEmpty()) {
+            for(String mat : lstMat) {
+                if(mat.length() == 8) {
+                    matriculasAtt.add(mat);
+                } 
+            }            
+        }
+        return matriculasAtt;
+    }  
 }

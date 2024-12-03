@@ -14,22 +14,25 @@ Historial
     1.4			USXXXXXX		Sandra Gómez		22/11/2021			add FWK Batches
     1.5		    AV_Query IT		Daniel Rodríguez	3/02/2022			Change AV_Query to SOQL for User and Account
     1.6         US592987	    Ángel Medina		29/05/2023		    Changed AV_Query to SOQL queries
-
+    1.1		    FIX11070844	    Oscar Moreno	    22/07/2024			Fix error The Global modifier should be avoided.
+   
 ***********************************************************************************************************************/
-global class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject>, Database.Stateful{
+public class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject>, Database.Stateful{
 
-    global Integer recordsProcessed = 0;
-	global String limitBatch;
-	global Set<String> setUserIds;
+    public Integer recordsProcessed = 0;
+	public String limitBatch;
+	public Set<String> setUserIds;
     
-    global AV_ProccessEventsOwnersBatch(String limitQuery, Set<String> userId) {
+    public AV_ProccessEventsOwnersBatch(String limitQuery, Set<String> userId) {
 		limitBatch = limitQuery;
 		setUserIds = new Set<String>();
         setUserIds.addAll(userId);
         Map<String, User> mapUsers = getUsers();
     }
 
-    global AV_ProccessEventsOwnersBatch() {} 
+    public AV_ProccessEventsOwnersBatch(){}
+
+    
 	
 	/**
 	 * Get a list of Events to process the owners
@@ -37,7 +40,7 @@ global class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 
         String methodName = 'start';
 		AV_LogDebug.printLogDebug(methodName, 'Batch limit: ' + limitBatch);
@@ -76,7 +79,7 @@ global class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<Event> param with the list of Events
 	 */
-	global void execute(Database.BatchableContext bc, List<Event> scope){
+	public void execute(Database.BatchableContext bc, List<Event> scope){
         // Procesar cada batch de registros
 
 		String methodName = 'execute';
@@ -95,9 +98,11 @@ global class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject
             } 
           
             AV_LogDebug.printLogDebug(methodName,'Data for update: ' + listDataToUpdate.size());
-            recordsProcessed = listDataToUpdate.size();
-            List<Database.SaveResult> listUpdateResult = Database.update(listDataToUpdate, false);
-            displayErrors(listUpdateResult);
+            if (!listDataToUpdate.isEmpty()) {
+                recordsProcessed = listDataToUpdate.size();
+                List<Database.SaveResult> listUpdateResult = Database.update(listDataToUpdate, false);
+                displayErrors(listUpdateResult);
+            }
 
         }catch(System.Exception e){
             AV_LogDebug.printException(methodName, e);
@@ -122,7 +127,7 @@ global class  AV_ProccessEventsOwnersBatch implements Database.Batchable<sObject
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 

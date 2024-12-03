@@ -12,51 +12,31 @@ Historial
 public class CIBE_OpportunityStateSchedulable implements Database.Batchable<sObject>, Database.Stateful {
 
     public Integer recordsProcessed = 0;
+    public String limitBatch;
     public static final String BATCHNAME = 'CIBE_OpportunityState_Batch';
-	private static List<String> listRTs = new List<String>{CIBE_AppConstants.OPP_INICIATIVA_RT,
-												CIBE_AppConstants.OPP_INICIATIVACIB_RT,
+	private static List<String> listRTs = new List<String>{	CIBE_AppConstants.OPP_INICIATIVACIB_RT,
 												CIBE_AppConstants.OPP_INICIATIVAEMP_RT,
 												CIBE_AppConstants.OPP_ACCIONCIB_RT,
 												CIBE_AppConstants.OPP_ACCIONEMP_RT,
 												CIBE_AppConstants.OPP_ALERTACIB_RT,
 												CIBE_AppConstants.OPP_ALERTAEMP_RT,
 												CIBE_AppConstants.OPP_SUGERENCIACIB_RT,
-												CIBE_AppConstants.OPP_SUGERENCIAEMP_RT, 
-												CIBE_AppConstants.OPP_CENTRALIZADA_RT};
+												CIBE_AppConstants.OPP_SUGERENCIAEMP_RT};
 
 	private static List<String> stageName = new List<String>{CIBE_AppConstants.OPPORTUNITY_STATUS_POTENCIAL,
                                                             CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO,
                                                             CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA,
                                                             CIBE_AppConstants.OPPORTUNITY_STATUS_CONVENTA,
                                                             CIBE_AppConstants.OPPORTUNITY_STATUS_NOAPTO,
-                                                            CIBE_AppConstants.OPPORTUNITY_STATUS_NOINTERE};
-		
-    private String avQuery;
-    
-    /*public CIBE_OpportunityStateSchedulable(){
-		
-    }*/
+                                                            CIBE_AppConstants.OPPORTUNITY_STATUS_NOINTERE};                     
 	
     public CIBE_OpportunityStateSchedulable(){
-		
-		this.avQuery = setQuery();
+        limitBatch = AV_ScheduleBatch__mdt.getInstance(BATCHNAME).AV_Limit__c;
     }
 
     public CIBE_OpportunityStateSchedulable(String avQuery){
-		
-		this.avQuery = avQuery;
-    }
-
-	private String setQuery(){
-		String batchLimit = AV_SchedulerBatches.getLimit(BATCHNAME);
-
-		if (String.isBlank(batchLimit)){
-            avQuery = 'SELECT Id, CloseDate, StageName, Name FROM Opportunity WHERE CloseDate >= LAST_N_MONTHS:18 AND CloseDate < TODAY AND StageName IN :stageName AND RecordType.DeveloperName IN : listRTs';
-        } else{
-        	avQuery = 'SELECT Id, CloseDate, StageName, Name FROM Opportunity WHERE CloseDate >= LAST_N_MONTHS:18 AND CloseDate < TODAY AND StageName IN :stageName AND RecordType.DeveloperName IN : listRTs LIMIT '+ batchLimit;
-        }
-		
-        return avQuery;
+        //AV_SchedulerBatches.getLimit(BATCHNAME);
+        limitBatch = AV_ScheduleBatch__mdt.getInstance(BATCHNAME).AV_Limit__c;
     }
     
 	/**
@@ -65,10 +45,13 @@ public class CIBE_OpportunityStateSchedulable implements Database.Batchable<sObj
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
     public Database.QueryLocator start(Database.BatchableContext bc){
-        if(String.isBlank(avQuery)){
-            avQuery = setQuery();
+        String  cibeQuery;
+        if (String.isBlank(limitBatch)){
+            cibeQuery = 'SELECT Id, RecordType.DeveloperName, CIBE_LastUpdatedCerradoNegativo__c, CloseDate, StageName, Name FROM Opportunity WHERE CloseDate >= LAST_N_MONTHS:18 AND CloseDate < TODAY AND StageName IN :stageName AND RecordType.DeveloperName IN : listRTs';
+        } else{
+            cibeQuery = 'SELECT Id, RecordType.DeveloperName, CIBE_LastUpdatedCerradoNegativo__c, CloseDate, StageName, Name FROM Opportunity WHERE CloseDate >= LAST_N_MONTHS:18 AND CloseDate < TODAY AND StageName IN :stageName AND RecordType.DeveloperName IN : listRTs LIMIT '+ limitBatch;
         }
-        return Database.getQueryLocator(avQuery);
+        return Database.getQueryLocator(cibeQuery);
     }
     
 	/**
@@ -78,15 +61,15 @@ public class CIBE_OpportunityStateSchedulable implements Database.Batchable<sObj
 	 * @param scope List<Opportunity> param with the list of Accounts.
 	 */
     public void execute(Database.BatchableContext bc, List<Opportunity> scope) {
+        DateTime createdFormatDate = System.today();
 		try{
             if(!scope.isEmpty()){
                 recordsProcessed = scope.size();
 				
                 for(Opportunity opp : scope){
-					// opp.CloseDate = Date.today();
                     opp.StageName = 'CIBE_Vencido';
                 }
-                if(!scope.isEmpty() && Schema.Opportunity.SObjectType.getDescribe().isUpdateable()){
+                if(!scope.isEmpty() && Opportunity.SObjectType.getDescribe().isUpdateable()){
                     Database.SaveResult[] srList = Database.update(scope, false);
                     boolean hasError = false;
                     List<Object> objs = new List<Object>();
@@ -115,17 +98,9 @@ public class CIBE_OpportunityStateSchedulable implements Database.Batchable<sObj
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
     public void finish(Database.BatchableContext bc){
-        String methodName='finish';
-		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
+        map<String,Object> params = new map<String,Object>();
+		params.put('limitBatch',limitBatch);
+        CBK_BatchJob.executeBatch('CIBE_OpportunityStateSchedulable', 5 ,params);    
     }
-
-	/**
-	 * Executes the scheduled Apex job
-	 *
-	 * @param sc	SchedulableContext param that contains the job ID
-	 */
-	public void execute(SchedulableContext sc) {
-		Database.executeBatch(new CIBE_OpportunityStateSchedulable());
-	}
     
 }

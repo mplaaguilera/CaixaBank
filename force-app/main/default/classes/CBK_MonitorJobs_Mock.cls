@@ -19,7 +19,7 @@ global class CBK_MonitorJobs_Mock implements HttpCalloutMock {
             body = body + '  "createdById" : "' + usr.Id + '",';
             body = body + '  "createdDate" : "2020-09-29T06:06:52.000+0000",';
             body = body + '  "systemModstamp" : "2020-09-29T06:07:03.000+0000",';
-            body = body + '  "state" : "Closed",';
+            body = body + '  "state" : "JobComplete",';
             body = body + '  "concurrencyMode" : "Parallel",';
             body = body + '  "contentType" : "CSV",';
             body = body + '  "apiVersion" : 49.0,';
@@ -42,7 +42,7 @@ global class CBK_MonitorJobs_Mock implements HttpCalloutMock {
             body = body +'    "createdById" : "' + usr.Id + '",';
             body = body +'    "createdDate" : "2020-09-30T03:00:53.000+0000",';
             body = body +'    "systemModstamp" : "2020-09-30T03:01:04.000+0000",';
-            body = body +'    "state" : "Closed",';
+            body = body +'    "state" : "JobComplete",';
             body = body +'    "concurrencyMode" : "Parallel",';
             body = body +'    "contentType" : "CSV",';
             body = body +'    "apiVersion" : 49.0,';

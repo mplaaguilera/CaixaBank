@@ -11,6 +11,7 @@ Historial
 	2.0				US532487			Jose Maria			15/03/2023		Jerarquia CIB desde cartera cliente
 	3.0									Jose Maria			23/03/2023		Nuevos campos Redes,Negocios,Sectores.
 	4.0									Jose Maria			20/04/2023		Auto cálculo de jerarquía
+	4.1				PPM100492394		Ángel Medina		21/10/2024		Change label Sin Gestor/EAP to No Asignado
 ***********************************************************************************************************************/
 public with sharing class CIBE_MassReassignOwner_Controller {
 
@@ -222,7 +223,7 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 		if(employeesId.size()>1) {
 			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO '+oficina.split('\\{\\|}')[0]));
 		}
-		employees.add(new OptionsEmployee(ID_GCF,'Sin Gestor / Eap - CENTRO '+oficina.split('\\{\\|}')[0]));
+		employees.add(new OptionsEmployee(ID_GCF, CIBE_AppConstants.SINGESTOR_EAP_CENTRO +oficina.split('\\{\\|}')[0]));
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
@@ -307,7 +308,6 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 		}		
 
 		String avQuery='Select Id, Subject, AV_CenterRtIndex__c, RecordType.DeveloperName, ActivityDate, AV_Valor1__c, Account.Name, Owner.Name, OwnerId, AccountId, AV_Origen__c, TOLABEL(Status), TOLABEL(Priority),AV_Center__c FROM Task WHERE ';
-		//String subQuery = ', (Select Id, Name,AV_NumeroOficinaEmpresa__c FROM User) ';
 		if(statusFilter != null){
 			avQuery = avQuery + 'Status IN '+AV_AppUtilities.arrayToStringIn(statusFilter);
 		}
@@ -576,29 +576,16 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 		}
 
 		List<Contact> listContacts = [SELECT Id,Name, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.name, AV_UsuarioAsociado__r.IsActive FROM Contact WHERE Id=: listContactsHierar];
-//		List<Id> listUserContacts = new List<Id>();
 		List<Id> listIdUser = new List<Id>();
 
 		for(Contact c : listContacts){
-			//listUserContacts.add(c.AV_UsuarioAsociado__c);
 			if(c.AV_UsuarioAsociado__r.IsActive){
 				listIdUser.add(c.AV_UsuarioAsociado__c);
 				employeesId.add(c.AV_UsuarioAsociado__c);
 				employeesSorted.add(new OptionsEmployee(c.AV_UsuarioAsociado__c,c.AV_UsuarioAsociado__r.Name));
 			}
 		}
-
-		/*List<String> listIdUser = new List<String>();
-		List<User> listUsers =  [SELECT Id, Name, AV_NumeroOficinaEmpresa__c FROM User WHERE IsActive = true AND Id=:listUserContacts LIMIT :MAX_LIMIT];
-		if(!listUsers.isEmpty()){
-			for(User u : listUsers){
-				listIdUser.add(u.Id);
-				employeesId.add(u.Id);
-				employeesSorted.add(new OptionsEmployee(u.Id,u.Name));
-			}
-		}*/
 		
-
 		String employeesAlls=string.join(employeesId,',');
 		if(employeesId.size()>1) {
 			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO '));
@@ -606,7 +593,7 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 		if(!listIdUser.contains(userLogin)){	
 			employees.add(new OptionsEmployee(userLogin,userName));
 		}
-		employees.add(new OptionsEmployee(ID_GCF,'Sin Gestor / Eap - CENTRO '));
+		employees.add(new OptionsEmployee(ID_GCF,CIBE_AppConstants.SINGESTOR_EAP_CENTRO));
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;
@@ -648,7 +635,6 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 	public static List<PicklistItems> picklistValuesDependency(String inputField, String inputValue, String inputObj) {		
 		List<CBK_PicklistValues__c> pickObj = [SELECT Id, CBK_ParentId__c, CBK_HasDependency__c, CBK_Dependencies__c, CBK_Picklist__c, Name, CBK_Object__c, CBK_Picklist__r.Name FROM CBK_PicklistValues__c where CBK_Picklist__r.Name = :inputField AND Id = :inputValue AND CBK_Picklist__r.CBK_Object__c =:inputObj];
 		List<PicklistItems> lstpickItemAll = new list<PicklistItems> ();
-        System.debug('pickObj '+pickObj);
 
 		if(!pickObj.isEmpty()){
 			List<string> valuesName = new List<string> ();
@@ -657,13 +643,9 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 					valuesName.addAll(pv.CBK_Dependencies__c.split(';'));
 				}
 			}
-			System.debug('valuesName '+valuesName);
 
 			String pickDepend = getPicklistDependiente(inputField);
-			System.debug('pickDepend '+pickDepend);
-
 			List<CBK_PicklistValues__c> pickObjDepend = [SELECT Id, Name, CBK_Picklist__r.Name FROM CBK_PicklistValues__c WHERE NAME =: valuesName AND CBK_Picklist__r.Name =:pickDepend ORDER BY Name];
-			System.debug('pickObjDepend '+pickObjDepend);
 
 			for (CBK_PicklistValues__c pv : pickObjDepend) {
 				PicklistItems pickItem = new PicklistItems();
@@ -672,8 +654,6 @@ public with sharing class CIBE_MassReassignOwner_Controller {
 				lstpickItemAll.add(pickItem);
 			}
 		}
-		System.debug('lstpickItemAll '+lstpickItemAll);
-
 		return lstpickItemAll;		
 	}
 

@@ -8,9 +8,11 @@ Historial
 ---------------------
    VERSION        USER_STORY       AUTHOR           DATE                Description
    1.0            Integrations     David Rufo       11/02/2020          Init version
+   1.1		      FIX11070844	   Oscar Moreno		   22/07/2024			Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
-global with sharing class AV_IntegrationConstants {
+public with sharing class AV_IntegrationConstants {
 
     /**
 	 * Values for Header 'Authorization'

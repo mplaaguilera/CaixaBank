@@ -43,6 +43,9 @@ Historial
     3.9         US686939        Oscar Moreno        29/08/2023      Created updateCommentsHistoryTest method
 	4.0			US546892		Sandra Gómez		21/09/2023		Add metthods validationsOpportunity1, validationsOpportunity2,validationsOpportunity3, validationsOpportunity4, validationsOpportunity5, validationByPassOpp and validationByPassOpp2
 	4.1			Fix PMD Errors  Daniel Rodriguez    05/10/2023	    Modify method assignPropensityTest
+	4.2			Fix			    Sandra Gómez	    20/11/2023	    Change methods validateUpdateFechaActivacion and validatePF to add fecha proxima gestion
+	4.8			US839366		Ángel Medina 		19/03/2024		Modify 	validateDeleteOpportunityErrorTest solution for to many queries
+	4.9			PPM100265161	Ángel Medina		18/10/2024		Create methods updateTaskWithOppEnhancedTest to coverage
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_OpportunityTriggerHelper_Test {
@@ -71,18 +74,32 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		insert listPropensity;
 		Set<String> setRTs = new Set<String>{AV_AppConstants.OPPALERTACOM_RT,AV_AppConstants.OPPINICIATIVA_RT,AV_AppConstants.OPPLLAMADA_RT,AV_AppConstants.EMPLOYEE_RT,'AV_ProductoFichaCliente'};
 		Map<String,RecordType> rtMap = AV_AppUtilities.getRecordTypeInMap(setRTs);
-		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-		User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true];
+		User userGcf = [SELECT Id, AV_ExternalID__c FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true limit 1];
+		User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true limit 1];
+		
 		System.runAs(userGcf){
 			User userGestor = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
 			userGestor.Email = 'gestor-test@test.com';
-			User usrTest = AV_TestHelper.createUserSinInsert('Standard User','U01543678');
+			User usrTest = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01543678');
 			List<User> listUserInsert = new List<User>();
 			listUserInsert.add(userGestor);
 			listUserInsert.add(usrTest);
 			insert listUserInsert;
+			
 			List<PermissionSetAssignment> permissionSetList = new List<PermissionSetAssignment>();
 			List<PermissionSet> perSet = [SELECT Id FROM PermissionSet WHERE Name IN :new List<String>{ 'AV_GestorOperativa', 'AV_CustomMetadata' }];
+			List<AV_PilotCenters__c> listCentrosPiloto = new List<AV_PilotCenters__c>();
+        	AV_PilotCenters__c centrosPiloto = new AV_PilotCenters__c();
+        	centrosPiloto.Name = 'Centros_Piloto';
+        	centrosPiloto.AV_OfficeNumber__c = '00002, 00035, 00654';
+        	AV_PilotCenters__c centrosPiloto2 = new AV_PilotCenters__c();
+        	centrosPiloto2.Name = 'Centros_Piloto2';
+        	centrosPiloto2.AV_OfficeNumber__c = '00302, 02035, 00354';
+
+        	listCentrosPiloto.add(centrosPiloto);
+        	listCentrosPiloto.add(centrosPiloto2);
+
+        insert listCentrosPiloto;
 			for(PermissionSet ps : perSet) {
 				permissionSetList.add(
 					new PermissionSetAssignment(
@@ -103,12 +120,36 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			insert listAccountInsert;
 		}
 		System.runAs(userGcf){
+			User userGestor = [SELECT ID FROM USER WHERE AV_ExternalId__c = 'U01545454'];
+			RecordType rtScore = [SELECT Id FROM RecordType WHERE DeveloperName = :AV_AppConstants.OPPORTUNITY_RT_SCORING LIMIT 1];
+			Set<String> retailRts = new Set<String>{ 
+				AV_AppConstants.OPPINICIATIVA_RT,
+				AV_AppConstants.OPPALERTACOM_RT,
+				AV_AppConstants.OPPPROPUESTA_RT,
+				AV_AppConstants.OPPSUGERENCIA_RT,
+				AV_AppConstants.OPPLLAMADA_RT
+			};
+			List<AV_Score__c> testScore = new List<AV_Score__c>();
+			for(String rtOppo : retailRts){
+				testScore.add(
+					new AV_Score__c(OwnerId = userGestor.Id,
+					AV_Active__c = true,
+					AV_Object__c = AV_AppConstants.OBJECT_NAME_OPPORTUNITY,
+					RecordTypeId = rtScore.Id,
+					AV_RecordType__c=rtOppo+'-'+AV_AppConstants.OPP_STATUS_ENGESTION,
+					AV_Score__c = 100)
+				);
+			}
+			insert testScore;
+			Test.stopTest();
+		
 			Account accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
 			Account cenTest = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = '00615' LIMIT 1];
-			User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
 			User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01543678' AND IsActive = true];
-			Contact conTest = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGestor, rtMap.get('Empleado'));
-			Contact conTest2 = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGcf, rtMap.get('Empleado'));
+
+
+			Contact conTest = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGestor, rtMap.get('Empleado'),'U01545454', userGestor);
+			Contact conTest2 = AV_TestHelper.createEmployeeSinInsert2(cenTest, userGcf, rtMap.get('Empleado'), userGcF.AV_ExternalID__c, userGcF);
 			Contact conTest3 = AV_TestHelper.createEmployeeSinInsert2(cenTest, usrTest, rtMap.get('Empleado'),'U01543678',userGestor);
 			conTest2.FirstName = 'Empleado2';
 			conTest3.FirstName = 'Empleado3';
@@ -127,7 +168,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			prodsToInsert.add(prodPF3);
 			prodsToInsert.add(prodPF4);
 			insert prodsToInsert;
-			Test.stopTest();
+			
 			Opportunity opp = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest, conTest, prodPF4, rtMap.get('Iniciativa'), '00000002', userGestor.Id);
 			Opportunity opp1 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest, conTest, prodPF, rtMap.get('Alerta Comercial'), '00000001', userGestor.Id);
 			Opportunity opp2 = AV_TestHelper.createOpportunityIniciativaWithChecktPrioritySinInsert2(accTest, conTest2, prodPF2, rtMap.get('Iniciativa'), '83489', userGestor.Id);
@@ -144,11 +185,19 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			oppCallMe.AV_Gestor__c = conTest2.Id;
 			oppCallMe.OwnerId = userGcf.Id;
 			oppCallMe.AV_FechaProximoRecordatorio__c = System.today();
+
+			opp.AV_FechaProximoRecordatorio__c = System.today();
+			opp1.AV_FechaProximoRecordatorio__c = System.today();			
+
+			Opportunity opp4 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(accTest, conTest, prodPF, rtMap.get('Iniciativa'), '00000022', userGestor.Id);
+			opp4.StageName = AV_AppConstants.OPP_STATUS_ENESPERA;
+
 			List<Opportunity> listOpportunityInsert = new List<Opportunity>();
 			listOpportunityInsert.add(opp);
 			listOpportunityInsert.add(opp1);
 			listOpportunityInsert.add(opp2);
 			listOpportunityInsert.add(opp3);
+			listOpportunityInsert.add(opp4);
 			listOpportunityInsert.add(oppCallMe);
 			insert listOpportunityInsert;
 			AV_ProductExperience__c prodExp = new AV_ProductExperience__c();
@@ -166,25 +215,9 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			Task task = AV_TestHelper.createTareaExternalIdWithCustomer(userGestor, 'ID-0001', accTest);
 			Task taskRetri = [SELECT AV_Task__c FROM Task WHERE Id = :task.Id LIMIT 1];
 			update new AV_HeaderCustomActivity__c( Id = taskRetri.AV_Task__c,OwnerId = userGestor.Id);
-		}
-	}
 
-	@isTest
-	private static void validateSetFieldsFromOppTask() {
-	   	User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-		List<Opportunity> listOpp = [SELECT Id,Name FROM Opportunity WHERE RecordType.DeveloperName='AV_Iniciativa' LIMIT 1];
-		Task tarea = [SELECT Id FROM Task WHERE AV_ExternalID__c = 'ID-0001'  LIMIT 1];
-		List<Task> listTask = [SELECT AV_Task__c  FROM Task WHERE Id = :tarea.id LIMIT 1];
-		AV_CustomActivityOpportunity__c oppTask = new AV_CustomActivityOpportunity__c(Name='Prueba Tarea Oportunidad', AV_Task__c=listTask[0].AV_Task__c, AV_Opportunity__c=listOpp[0].id, ownerId = userGcf.Id);
-		insert oppTask;
-		Test.startTest();
-			System.runAs(userGcf){
-				listOpp[0].Name='Prueba Opportunity Cambio';
-				update listOpp;
-			}
-		Test.stopTest();
-		List<AV_CustomActivityOpportunity__c> listOppTask = [SELECT Id,Name,AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE Id = :oppTask.id];
-		System.assertEquals(listOpp[0].Name, listOppTask[0].Name, 'El name de oportunity es '+listOpp[0].Name+' y el name de tarea oportunidad es '+listOppTask[0].Name+' y deberian ser iguales.');
+
+		}
 	}
 
 	/**
@@ -230,14 +263,14 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 	 */
 	@isTest
 	private static void validateDeleteOpportunityErrorTest() {
+		Test.startTest();
 		User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
 		Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('GCF_ALTAOPP','OK'));
 		Account acc = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
 		Contact employee = [SELECT Id FROM Contact WHERE RecordType.DeveloperName = 'CC_Empleado' and CC_Matricula__c != null LIMIT 1];
-		Task tsk = AV_TestHelper.createTareaExternalIdWithCustomer(null, 'XXX-0001', acc);
+		Task tsk = AV_TestHelper.createTareaExternalIdWithCustomer(userGestor, 'XXX-0001', acc);
 		Opportunity opp = [SELECT Id, OwnerId, AccountId,AV_ModificacionTelefonica__c,AV_Contrato__c FROM Opportunity LIMIT 1];
 		AV_CustomActivityOpportunity__c cao = AV_TestHelper.createTareaOportunidadExt(opp, tsk.AV_ExternalId__c);
-		Test.startTest();
 		System.runAs(userGestor){
 			try{
 				Database.delete(opp);
@@ -353,13 +386,13 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 	
 	@isTest
 	public static void updateTaskWithOppTest(){
+		Test.startTest();
 		User userGestor = [SELECT Id FROM User WHERE Profile.Name = :AV_AppConstants.AV_PROFILE AND IsActive = true AND Email = 'gestor-test@test.com'];
 		Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
 		List<Opportunity> listOpp = [SELECT Id,Name FROM Opportunity WHERE RecordType.DeveloperName=:AV_AppConstants.OPPALERTACOM_RT LIMIT 1];
 		Account accTest = [SELECT ID FROM ACCOUNT WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_PA_RT LIMIT 1];
 		Event evtTest = AV_TestHelper.createEvent(userGestor, System.today()+1, accTest);
         Event event = [Select id, AV_Task__c from Event where Id =:evtTest.Id];
-		Test.startTest();
 		AV_CustomActivityOpportunity__c oppTask = new AV_CustomActivityOpportunity__c(
 			Name='Prueba Tarea Oportunidad', 
 			AV_Task__c=event.AV_Task__c,
@@ -381,6 +414,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 
 	@isTest 
 	public static void updateTaskWithOppSecondTest(){
+		Test.startTest();
 		User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
 		Task tarea = [SELECT Id,AV_Task__c FROM Task WHERE AV_ExternalID__c = 'ID-0001'];
 		List<Opportunity> listOpp = [SELECT Id,Name FROM Opportunity WHERE RecordType.DeveloperName='AV_AlertaComercial' LIMIT 1];
@@ -392,7 +426,6 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			OwnerId =userGestor.Id
 		);
 		insert oppTask;
-		Test.startTest();
 		System.runAs(userGestor){
 			tarea.Status = 'Rechazada';
 			tarea.AV_OrigenApp__c = 'AV_SalesforceTaskOpp';
@@ -413,6 +446,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 	
 	@isTest 
 	public static void updateTaskWithOppFourthTest(){
+		Test.startTest();
 		User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
 		Task tarea = [SELECT Id,AV_Task__c FROM Task WHERE AV_ExternalID__c = 'ID-0001'];
 		List<Opportunity> listOpp = [SELECT Id,Name FROM Opportunity LIMIT 1];
@@ -424,7 +458,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             OwnerId =userGestor.Id
         );
 		insert oppTask;
-		Test.startTest();
+		
 		System.runAs(userGestor){
 			tarea.Status = 'Rechazada';
 			tarea.AV_OrigenApp__c = 'AV_SalesforceTaskOpp';
@@ -436,6 +470,80 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		Test.stopTest();
 		System.assertEquals(listOpp[0].AV_IncludeInPrioritizingCustomers__c, true);
 	}
+
+	@isTest
+	public static void updateTaskWithOppEnhancedTest(){
+		Test.startTest();
+		User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
+		Contact contact = [SELECT Id FROM Contact WHERE CC_Matricula__c = 'U01545454' LIMIT 1];
+		Account accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
+		Product2 product = [SELECT Id FROM Product2 WHERE AV_ExternalID__c = '50113' LIMIT 1];
+
+		List<Opportunity> listOpp = [SELECT Id,Name, AccountId, StageName, AV_Center__c, AV_ExternalID__c, AV_PF__c, AV_Gestor__c, AV_FechaProximoRecordatorio__c FROM Opportunity WHERE AV_ExternalID__c = '00000002' LIMIT 1];
+		List<Opportunity> listOpp1 = [SELECT Id,Name, AccountId, StageName, AV_Center__c, AV_ExternalID__c, AV_PF__c, AV_Gestor__c, AV_FechaProximoRecordatorio__c FROM Opportunity WHERE AV_ExternalID__c = '00000001' LIMIT 1];
+		Map<Id, Opportunity> mapOldObj = new Map<Id, Opportunity>();
+
+		Opportunity oldOpp1 = new Opportunity(
+			Id = listOpp[0].Id,
+			AV_IncludeInPrioritizingCustomers__c = true,
+			AV_ExternalID__c = listOpp[0].AV_ExternalID__c,
+			AV_PF__c = listOpp[0].AV_PF__c,
+			AV_Gestor__c = listOpp[0].AV_Gestor__c,
+			AV_FechaProximoRecordatorio__c = listOpp[0].AV_FechaProximoRecordatorio__c,
+			StageName = listOpp[0].StageName,
+			Name = listOpp[0].Name
+		);
+
+		Opportunity oldOpp2 = new Opportunity(
+			Id = listOpp1[0].Id,
+			AV_IncludeInPrioritizingCustomers__c = false,
+			AV_ExternalID__c = listOpp1[0].AV_ExternalID__c,
+			AV_PF__c = listOpp1[0].AV_PF__c,
+			AV_Gestor__c = listOpp1[0].AV_Gestor__c,
+			AV_FechaProximoRecordatorio__c = listOpp1[0].AV_FechaProximoRecordatorio__c,
+			StageName = listOpp1[0].StageName,
+			Name = listOpp1[0].Name
+		);
+		mapOldObj.put(oldOpp1.Id, oldOpp1);
+		mapOldObj.put(oldOpp2.Id, oldOpp2);
+		Event evtTest = AV_TestHelper.createEvent(userGestor, System.today() + 1, accTest);
+		Event event = [Select id, AV_Task__c from Event where Id =:evtTest.Id];
+
+		AV_CustomActivityOpportunity__c oppTask = new AV_CustomActivityOpportunity__c(
+			Name='Prueba Tarea Oportunidad', 
+			AV_Task__c=event.AV_Task__c,
+			AV_Opportunity__c=listOpp[0].id,
+			AV_IsMain__c=true,
+			OwnerId =userGestor.Id
+		);
+		insert oppTask;
+		System.runAs(userGestor) {
+		
+			listOpp[0].AV_PF__c = product.Id;
+			listOpp1[0].AV_PF__c = product.Id;
+			listOpp[0].AV_Gestor__c = contact.Id;
+			listOpp1[0].AV_Gestor__c = contact.Id;
+			listOpp[0].AV_IncludeInPrioritizingCustomers__c = false;
+			listOpp1[0].AV_IncludeInPrioritizingCustomers__c = true;
+			listOpp[0].StageName = 'Potencial';
+			listOpp1[0].StageName = 'En gestión/insistir';
+		
+			List<Opportunity> listOpportunityUpdate = new List<Opportunity>();
+			listOpportunityUpdate.add(listOpp[0]);
+			listOpportunityUpdate.add(listOpp1[0]);
+			update listOpportunityUpdate;
+
+			AV_OpportunityTriggerHelper.updateTaskWithOpp(listOpportunityUpdate, mapOldObj, new Map<String, Opportunity>());
+		}
+
+		List<Task> tasks = [SELECT Id, Status, AV_ExternalID__c, ActivityDate FROM Task WHERE AccountId = :accTest.Id];
+		System.assertEquals(2, tasks.size(), 'Debe haber dos tareas para las oportunidades');
+		System.assertEquals(false, listOpp[0].AV_IncludeInPrioritizingCustomers__c, 'Debe haber cambiado el estado de la primera oportunidad');
+		System.assertEquals(true, listOpp1[0].AV_IncludeInPrioritizingCustomers__c, 'Debe haber cambiado el estado de la segunda oportunidad');
+
+		Test.stopTest();
+	}
+
 
 	@isTest
 	public static void createTaskCheckOnOffTest() {
@@ -516,6 +624,8 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 			if(!mapPs.containsKey(userGestor.id)) {
 				insert new PermissionSetAssignment(PermissionSetGroupId = psg.Id, AssigneeId = userGestor.Id);    
 			}
+            
+            
 			opp.Name = 'BfrChange';
 			update opp;
 			oppNameBeforeUpdt = [SELECT name FROM opportunity WHERE Id = :opp.id LIMIT 1].Name;
@@ -558,6 +668,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		System.runAs(userGestor){	
 			opp.StageName='En gestión/insistir';
 			opp.AV_OrigenApp__c = 'AV_SalesforceReport';
+            opp.AV_FechaProximoRecordatorio__c = Date.today();
 			Database.update(opp);
 		}
 		Test.stopTest();
@@ -568,7 +679,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 	@isTest
 	public static void validateUpdateCentro(){
 		User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
-		User newOwner = [SELECT Id,AV_NumeroOficinaEmpresa__c FROM USER WHERE AV_ExternalID__c = 'U01543678'][0];
+		User newOwner = [SELECT Id,AV_NumeroOficinaEmpresa__c FROM USER WHERE AV_ExternalID__c = 'U01543678' LIMIT 1];
 		RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPALERTACOM_RT);
 		Account accId= [SELECT Id FROM ACCOUNT LIMIT 1];
 		Test.startTest();
@@ -592,9 +703,14 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		}
 		Test.stopTest();
 
-		Opportunity newCenter = [SELECT AV_Center__c FROM Opportunity WHERE Name='PruebaTest'][0];
-		System.AssertEquals(newCenter.AV_Center__c,newOwner.AV_NumeroOficinaEmpresa__c.mid(4, 5),'No se ha actualizado el centro');
+		Opportunity newCenter = [SELECT AV_Center__c FROM Opportunity WHERE Name='PruebaTest'];
+		String expectedCenter = newOwner.AV_NumeroOficinaEmpresa__c.substring(newOwner.AV_NumeroOficinaEmpresa__c.length() - 5); // Extrae los últimos 5 caracteres
+		System.AssertEquals(newCenter.AV_Center__c,expectedCenter,'No se ha actualizado el centro');
 	}
+
+
+
+	
 
    	@isTest 
    	public static void validarBlockCloseDateUpdateKO(){
@@ -641,7 +757,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		FROM OPPORTUNITY LIMIT 1];	
 		System.runAs(userGcf){
 		testOppo.AV_ToDelete__c = false;
-		testOppo.StageName = AV_AppConstants.OPP_STATUS_NOAPTO;
+		testOppo.StageName = AV_AppConstants.OPP_STATUS_PROD_RECH;
 		testOppo.AV_ExternalID__c = '12344321';
 		testOppo.AV_OrigenApp__c = 'AV_SalesforceReport';
 		testOppo.OwnerId = userGcf.id;
@@ -662,7 +778,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 
 		Opportunity oppoAU = [SELECT ID,Name,StageName,AV_ToDelete__c,AV_Comentarios__c,AV_FechaProximoRecordatorio__c,AV_Center__C,AV_Gestor__c FROM Opportunity WHERE id = :oppoAntes.Id LIMIT 1];
 		System.assert(!oppoAU.AV_ToDelete__c);
-		System.assertEquals(testOppo.StageName, oppoAU.StageName);
+		System.assertEquals( testOppo.StageName, oppoAU.StageName);
 		System.assertEquals(testOppo.AV_Comentarios__c, oppoAU.AV_Comentarios__c);
 		System.assertEquals(testOppo.AV_Center__c, oppoAU.AV_Center__c);
    }
@@ -703,6 +819,7 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		System.runAs(userGcf){
 			Opportunity opp = [SELECT ID, OwnerId, AV_ExternalID__c, AccountId, Name FROM Opportunity WHERE Name = 'Opp Call Me'];
 			opp.OwnerId = userGestor.Id;
+			opp.AV_Subestado__c = null;
 			update opp;
 		}
 		Test.stopTest();
@@ -737,26 +854,33 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
 		List<Opportunity> oppList = [SELECT ID, AV_Propensity__c FROM Opportunity WHERE AV_Propensity__c=210];
 		System.assertEquals(oppList[0].AV_Propensity__c, 210);
 	} 
-   
+
 	@isTest
 	public static void validatePFTest(){
 		Test.startTest();
 		User userGestor = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
 		Account acc= [SELECT Id FROM ACCOUNT LIMIT 1];
 		Product2 product = [SELECT Id FROM Product2 WHERE AV_ExternalID__c = '50113' LIMIT 1];
-		Opportunity opp = [SELECT Id, AV_PF__c, AccountId, SystemModStamp, AV_ExternalID__c, StageName, Name, AV_OrigenApp__c FROM Opportunity WHERE RecordType.DeveloperName=:AV_AppConstants.OPPINICIATIVA_RT LIMIT 1];
+		List<Opportunity> opp = [SELECT Id, AV_PF__c, RecordTypeId, RecordType.DeveloperName, AccountId, SystemModStamp, AV_ExternalID__c, StageName, Name, AV_OrigenApp__c, AV_FechaProximoRecordatorio__c FROM Opportunity WHERE RecordType.DeveloperName=:AV_AppConstants.OPPINICIATIVA_RT LIMIT 1];
+		Opportunity opp1 = [SELECT Id, StageName FROM Opportunity WHERE AV_ExternalID__c = '00000022'];
 		System.runAs(userGestor){    
-			opp.AV_PF__c = product.Id;
-			opp.AccountId = acc.Id;
-			opp.StageName = 'En gestión/insistir';
-			opp.Name = 'PruebaTest';
-			opp.AV_OrigenApp__c = 'AV_SalesforceReport';
+			opp[0].AV_PF__c = product.Id;
+			opp[0].AccountId = acc.Id;
+			opp[0].StageName = 'En gestión/insistir';
+			opp[0].Name = 'PruebaTest';
+			opp[0].AV_OrigenApp__c = 'AV_SalesforceReport';
+            opp[0].AV_FechaProximoRecordatorio__c = Date.today();
 			Database.update(opp);
+			List<Opportunity> oppList = [SELECT Id, AV_PF__c, RecordTypeId, RecordType.DeveloperName, AccountId, SystemModStamp, AV_ExternalID__c, StageName, Name, AV_OrigenApp__c, AV_FechaProximoRecordatorio__c 
+            FROM Opportunity WHERE Id IN :new List<Id>{opp[0].Id, opp1.Id}];
+			AV_OpportunityTriggerHelper.validatePF(oppList);
+			
+			List<Opportunity> opportunityNew = [SELECT Id, RecordTypeId, RecordType.DeveloperName, AV_PF__c, AccountId, SystemModStamp, AV_ExternalID__c, StageName, Name FROM Opportunity WHERE AV_PF__c = :product.Id AND AccountId  = :acc.Id LIMIT 1];
+		    System.assertEquals(true, opportunityNew[0].AccountId == opp[0].AccountId,Label.AV_PFDuplicate);
 		}
 		Test.stopTest();
-		List<Opportunity> opportunityNew = [SELECT Id, AV_PF__c, AccountId, SystemModStamp, AV_ExternalID__c, StageName, Name FROM Opportunity WHERE AV_PF__c = :product.Id AND AccountId  = :acc.Id LIMIT 1];
-		System.assertEquals(true, opportunityNew[0].AccountId == opp.AccountId, 'El cliente ya tiene una oportunidad para este producto.');
 	}
+
     
     @isTest
     public static void updateCommentsHistoryTest(){
@@ -766,10 +890,12 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
         System.runAs(userGcf){
             opp4.AV_Comentarios__c = 'Cambiar comentario 01';
             Database.update(opp4);
+            
         }
         Test.stopTest();
         AV_CommentsHistory__c cm =[SELECT ID,AV_NewComment__c,AV_Opportunity__c FROM AV_CommentsHistory__c  LIMIT 1];
         System.assertNotEquals(cm.AV_NewComment__c,null);
+        
     }
     
     @isTest
@@ -785,9 +911,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,Label.AV_ValidateOppStage);
         }
         Test.stopTest();
-        System.assertEquals(result,'No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.');
+        
     }
     
     @isTest
@@ -804,9 +931,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,Label.AV_checkStatusClientePriorizador);
+
         }
         Test.stopTest();
-        System.assertEquals(result,'El estado de la oportunidad no permite incluirla en "clientes priorizados".');
     }
     
     @isTest
@@ -822,9 +950,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,Label.AV_ValidateOppNoResoIfNegClosed);
         }
         Test.stopTest();
-        System.assertEquals(result,'No es posible seleccionar la resolución si el estado de la oportunidad no es "Cerrada negativa".');
+        
     }
     
     @isTest
@@ -842,9 +971,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,Label.AV_ValidateOppCommentReq);
         }
         Test.stopTest();
-        System.assertEquals(result,'Por favor, debe añadir algun comentario.');
+        
     }
     
     @isTest
@@ -861,9 +991,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,Label.AV_ValidateOppNoResoDisSalesIsAutomRes);
         }
         Test.stopTest();
-        System.assertEquals(result,'No es posible cambiar la resolución a Venta desestimada, es una resolución automática.');
+        
     }
     
     @isTest
@@ -879,9 +1010,10 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
             if(!sr.isSuccess()) {
                 result = sr.getErrors()[0].getMessage();
             }
+            System.assertEquals(result,'OK');
         }
         Test.stopTest();
-        System.assertEquals(result,'OK');
+        
     }
     
     @isTest
@@ -890,20 +1022,38 @@ public with sharing class AV_OpportunityTriggerHelper_Test {
         String result='OK';
         Account acc = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
         User userGestor = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         Contact gestor = [SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c = :userGestor.Id LIMIT 1];
         Product2 producto = AV_TestHelper.createProductSinInsert(null,null,'50119');
         insert producto; 
         RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
-        System.runAs(userGestor){
-            Opportunity opp = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(acc, gestor, producto, rt, '123123123131',userGestor.Id);
+        System.runAs(userGcf){
+			Opportunity opp = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(acc, gestor, producto, rt, '123123123131',userGestor.Id);
             opp.StageName = AV_AppConstants.OPP_STATUS_ENGESTION;
             opp.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_BACK_REPORT;
             Database.SaveResult sr = Database.insert(opp,false);
             if(!sr.isSuccess()) {
-                result = sr.getErrors()[0].getMessage();
+				result = sr.getErrors()[0].getMessage();
             }
-        }
+			System.assertEquals(result,'OK');
+		}
         Test.stopTest();
-        System.assertEquals(result,'OK');
     }
+	
+	@isTest
+	public static void deleteOppoTest(){
+		User userGestor = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
+		Test.startTest();
+		System.runAs(userGestor){
+			Opportunity oppToDel = [SELECT ID FROM OPPORTUNITY WHERE AV_ExternalID__c = '00000002'];
+			delete new Opportunity(Id = oppToDel.Id);
+			
+		}
+		
+		Test.stopTest();
+		List<Opportunity> oppToDelCheck = [SELECT ID FROM OPPORTUNITY WHERE AV_ExternalID__c = '00000002'];
+		System.assert(oppToDelCheck.isEmpty());
+		
+
+	}
 }

@@ -38,18 +38,11 @@ public with sharing class CC_Marcar_Casos_KPI_Batch_Test {
         usuario2.LanguageLocaleKey = 'es';
         usuario2.LocaleSidKey = 'es_ES';
         userList.add(usuario2);
-        insert userList;       
+        insert userList;
         
         insert new PermissionSetAssignment(AssigneeId = usuario1.Id, PermissionSetId = ps.Id);
         insert new PermissionSetAssignment(AssigneeId = usuario2.Id, PermissionSetId = ps.Id);
-            
-        System.runAs(usuario1) {
-        	CC_Settings__c setting1 = new CC_Settings__c();
-			setting1.Name = 'CC_Contar_Casos_KPI_Batch_Ejecuciones';
-			setting1.CC_Configuracion_1__c = '5';
-            setting1.CC_Activa__c = true;
-			insert setting1;
-        }
+        
     }
     
     @isTest

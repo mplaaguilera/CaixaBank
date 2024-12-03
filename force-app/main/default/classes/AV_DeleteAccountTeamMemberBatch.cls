@@ -11,13 +11,15 @@ Historial
 	1.1		    AV_Query IT	    Daniel Rodríguez	02/03/2022	        Change AV_Query to SOQL for User, Account, Contact
 	1.2			Fix Confidencial	Carolina Alonso	26/09/2022			Add condition to check that the record is from MC's proyect (AV_Tipo__c = 'MC')
 	1.3			US423397		Carolina Alonso		17/11/2022			Delete call to AV_ConfidentialBatch
+    1.4		    FIX11070844	    Oscar Moreno		24/07/2024			Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
-global class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 
-	global Integer recordsProcessed = 0;
-    global static final String BATCHNAME = 'AV_DeleteAccountTeamMemberBatch';
-	global static final String TIPOMC  = 'MC';
+	public Integer recordsProcessed = 0;
+    public static final String BATCHNAME = 'AV_DeleteAccountTeamMemberBatch';
+	public static final String TIPOMC  = 'MC';
 	
     
 	/**
@@ -25,7 +27,7 @@ global class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObje
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 		String avQuery = '';
 		//List<String> setRt = new List<String>{'AV_CarteraCliente'};
@@ -48,7 +50,7 @@ global class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObje
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param listAccountMember List<AccountTeamMember> param with the list of AccountTeamMember.
 	 */
-	global void execute(Database.BatchableContext bc, List<AccountTeamMember> listAccountMember){
+	public void execute(Database.BatchableContext bc, List<AccountTeamMember> listAccountMember){
 		// Procesar cada batch de registros
         String methodName = 'execute';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + listAccountMember);
@@ -73,7 +75,7 @@ global class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObje
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_DeleteAccountTeamMemberBatch());
 	}
 
@@ -82,7 +84,7 @@ global class AV_DeleteAccountTeamMemberBatch implements Database.Batchable<sObje
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
         AV_LogDebug.printLogDebug(methodName, 'Call Batch Confidential');

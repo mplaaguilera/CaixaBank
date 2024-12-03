@@ -67,7 +67,7 @@
     public static List<String> sendAction(String accionId){
         List<String> lstResponse = new List<String>();
         WrapperclassAction wrapper = new WrapperclassAction();
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
             List<Integer> listIdPersonas = new List<Integer>();
             
             SIREC__SIREC_obj_acciones__c accion = [SELECT id ,SIREC__SIREC_fld_accion__c , SIREC__SIREC_fld_resultado__c , SIREC__SIREC_fld_tipo__c,
@@ -77,7 +77,7 @@
                                                                 WHERE Id = :accionId];
                                                                             
             String gestor = null;
-            if(accion.SIREC__SIREC_fld_responsable__c != null && USER.SObjectType.getDescribe().isAccessible()){
+            if(accion.SIREC__SIREC_fld_responsable__c != null && Schema.SObjectType.USER.isAccessible()){
                 List <USER> usuario = [SELECT id ,EmployeeNumber FROM USER WHERE id =: accion.SIREC__SIREC_fld_responsable__c];
                 if(usuario[0].EmployeeNumber != null){
                     gestor = usuario[0].EmployeeNumber;
@@ -134,7 +134,7 @@
 
                 String body = JSON.serialize(wrapper);
                 if(!SIR_WS_Configuration__mdt.getInstance('SendNewAction').SIR_fld_isActive__c &&
-                    SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible() &&
+                    Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible() &&
                     Schema.sObjectType.SIREC__SIREC_obj_acciones__c.fields.SIR_accionEnviada__c.isUpdateable()){
                     lstResponse.add('OK');
                     accion.SIR_accionEnviada__c = true;
@@ -144,14 +144,14 @@
                                                             FROM SIREC__SIREC_obj_proceso__c
                                                             WHERE SIREC__SIREC_fld_masterRecordId__c = : accion.SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_masterRecordId__c];
                     try {
-                        HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'altaResultAcciones', 'POST', mHeaders);
-                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                        HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'altaResultAcciones', 'POST', mHeaders);                        
+                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR','altaResultAcciones');
                         AccionResponse resp = (AccionResponse)JSon.deserialize(res.getBody(), AccionResponse.class); 
                         if(res.getStatusCode() == 200){
                             if(resp.codigoSalida == '1'){
                                 // Actualizamos la accion con este campo a true para controlar el envio duplicado en el process
                                 lstResponse.add('OK');
-                                if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){
+                                if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){
                                     accion.SIR_accionEnviada__c = true;
                                     update accion;
                                 }
@@ -200,8 +200,8 @@
         lstSObjects.add(proceso);
         lstSObjects.add(accion);
         try{
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() &&
-            Schema.sObjectType.SIREC__SIREC_obj_proceso__c.fields.SIR_fld_Situacion_SF__c.isUpdateable()){
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() &&
+               Schema.sObjectType.SIREC__SIREC_obj_proceso__c.fields.SIR_fld_Situacion_SF__c.isUpdateable()){
                 if(accion.SIREC__SIREC_fld_resultado__c != SIR_Constantes.ACCION_RESULTADO_INTENTO_DE_CONTACTO){
                     if(proceso.recordtype.Name == SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL){
                         proceso.SIR_fld_Situacion_SF__c = SIR_Constantes.mapSituacionesPresol.get(accion.SIREC__SIREC_fld_resultado__c);

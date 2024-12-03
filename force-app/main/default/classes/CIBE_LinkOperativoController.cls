@@ -8,6 +8,7 @@ Historial
 ---------------------
 VERSION		USER_STORY		AUTHOR				DATE			Description
 1.0			Init    		Alicia       	    25/05/2023		Init version
+1.1			US701075        Lucia       	    2/02/2024		Modify getOppLinkPEA method
 
 ***********************************************************************************************************************/
 public with sharing class CIBE_LinkOperativoController {
@@ -127,13 +128,11 @@ public with sharing class CIBE_LinkOperativoController {
         }
         
         List<CIBE_Section_Link__mdt> listSectionsLinks = [SELECT id, CIBE_Link_Reference__c, CIBE_Section_Reference__c FROM CIBE_Section_Link__mdt where CIBE_Section_Reference__c =:mapSection.keySet() and CIBE_Link_Reference__r.CIBE_Active__c = true];
-
 		Set<Id> listSections = new Set<Id>();        
         for(CIBE_Section_Link__mdt sectionLink : listSectionsLinks){
             listSections.add(sectionLink.CIBE_Link_Reference__c);
         }
-        
-        Map<Id, CIBE_Link__mdt> mapLinks =new Map<Id, CIBE_Link__mdt>([SELECT id, CIBE_Order__c, CIBE_Parameters__c,  CIBE_Title__c,CIBE_URL__c  FROM CIBE_Link__mdt where Id=:listSections and CIBE_Active__c = true ORDER BY CIBE_Order__c ASC]);
+        Map<Id, CIBE_Link__mdt> mapLinks =new Map<Id, CIBE_Link__mdt>([SELECT id, CIBE_Order__c, CIBE_Parameters__c, CIBE_URL_Long__c,  CIBE_Title__c,CIBE_URL__c  FROM CIBE_Link__mdt where Id=:listSections and CIBE_Active__c = true ORDER BY CIBE_Order__c ASC]);
         Map<Id, List<ReferenceWrapper>> mapSectionLink = new Map<Id, List<ReferenceWrapper>>();
         for(CIBE_Section_Link__mdt sectionLink : listSectionsLinks){
             if(!mapSectionLink.containsKey(sectionLink.CIBE_Section_Reference__c)){
@@ -143,7 +142,6 @@ public with sharing class CIBE_LinkOperativoController {
                 new ReferenceWrapper(sectionLink.CIBE_Link_Reference__c, mapLinks.get(sectionLink.CIBE_Link_Reference__c).CIBE_Order__c)
             );
         }
-        
         for(List<ReferenceWrapper> sets : mapSectionLink.values()) {
             sets.sort();
         }
@@ -163,6 +161,7 @@ public with sharing class CIBE_LinkOperativoController {
 
         Map<String, String> sectionTranslations = CIBE_TranslationUtilities.getInstance().addTranslationNames(translationSectionNames).queryTranslations().getTranslations();
         Map<String, String> linkTranslations = CIBE_TranslationUtilities.getInstance().addTranslationNames(translationLinkNames).queryTranslations().getTranslations();
+        
         for(Id key :mapSectionLink.keySet()) {
             Section sect=new Section();
             sect.columns = 'slds-col slds-p-bottom_small slds-size_1-of-' + String.valueOf(((Integer) mapSection.get(key).CIBE_Collumns__c));
@@ -175,7 +174,15 @@ public with sharing class CIBE_LinkOperativoController {
             for(ReferenceWrapper rw : mapSectionLink.get(key)){
                 Id linkData = rw.reference;
                 LinkData lkData= new LinkData();
-                lkData.url = generateURL(mapLinks.get(linkData).CIBE_Title__c, mapLinks.get(linkData).CIBE_URL__c, mapLinks.get(linkData).CIBE_Parameters__c, filterObject, customerId, rtName,empContacto);
+                String tipoURL = String.isBlank(mapLinks.get(linkData).CIBE_URL_Long__c) ? mapLinks.get(linkData).CIBE_URL__c: mapLinks.get(linkData).CIBE_URL_Long__c;
+
+                if(mapLinks.get(linkData).CIBE_Title__c.equals('Mis Clientes')){
+                    lkData.url = '/';
+                }else{
+                    lkData.url = generateURL(mapLinks.get(linkData).CIBE_Title__c, tipoURL, mapLinks.get(linkData).CIBE_Parameters__c, filterObject, customerId, rtName,empContacto, setting);
+                }
+                
+                //lkData.url = generateURL(mapLinks.get(linkData).CIBE_Title__c, mapLinks.get(linkData).CIBE_URL__c, mapLinks.get(linkData).CIBE_Parameters__c, filterObject, customerId, rtName,empContacto);
                 lkData.label = linkTranslations.containsKey(mapLinks.get(linkData).CIBE_Title__c) && String.isNotBlank(linkTranslations.get(mapLinks.get(linkData).CIBE_Title__c)) ? linkTranslations.get(mapLinks.get(linkData).CIBE_Title__c) : mapLinks.get(linkData).CIBE_Title__c;
                 sect.links.add(lkData);
             }
@@ -188,8 +195,9 @@ public with sharing class CIBE_LinkOperativoController {
     /**
      * Generate URL with dynamic parameters from JSON configuration
      */
-    private static String generateURL(String title, String url, String parameters, String filterObject, String filterId, RecordType rtName,String empContacto){
+    private static String generateURL(String title, String url, String parameters, String filterObject, String filterId, RecordType rtName,String empContacto, String setting){
         String methodName = 'generateURL';
+
         Obj wrapper = (Obj) System.JSON.deserialize(parameters, Obj.class);
         AV_LogDebug.printLogDebug(methodName, 'Parameters: ' + parameters);
         Map<String, String> mapParams =  new Map<String, String>();
@@ -265,7 +273,14 @@ public with sharing class CIBE_LinkOperativoController {
                 }
             }
         }
-        url = url.replaceAll( '\\s+', '%20'); 
+    if(setting.equals('CIBE0002')){
+
+        url = url.replaceAll('nombre%3D', 'nombreCliente=');
+        url = url.replaceAll( '\\s+', '+');
+
+    }else{
+        url = url.replaceAll( '\\s+', '%20');
+    }
         return url;
     }
     
@@ -275,6 +290,7 @@ public with sharing class CIBE_LinkOperativoController {
 	@AuraEnabled
 	public static LinksOperativos getOppLinkPEA(String id,String objApiName,String peaF) {
 
+        String parteFija = null;
         String methodName = 'getObjectLinkPEA2';
         String pea= null;
 		String pea2 = null;
@@ -285,32 +301,24 @@ public with sharing class CIBE_LinkOperativoController {
         LinksOperativos loPEA2 = new LinksOperativos();
 
         if(peaF.contains('AV_PEA__c')){
-            // if(objApiName.equals('Opportunity')){
-            //     opp = [SELECT Id, AV_PEA__c,Name FROM Opportunity WHERE Id = :id limit 1];
-            //     if (opp != null) {
-            //         pea=opp[0].AV_PEA__c;                   
-            //     }
-            // }else
-            if(objApiName.equals('Task')){
+            if(objApiName.equals('Opportunity')){
+                opp = [SELECT Id, AV_PEA__c,Name FROM Opportunity WHERE Id = :id limit 1];
+                if (opp != null) {
+                    pea=opp[0].AV_PEA__c;                   
+                }
+            }else if(objApiName.equals('Task')){
                 tsk = [SELECT Id, AV_PEA__c FROM Task WHERE Id = :id LIMIT 1];
                 if (tsk != null) {
                     pea= tsk[0].AV_PEA__c;                   
                 }
             }
-            // else if(objApiName.equals('Event')) {
-            //     evt = [SELECT Id, AV_PEA__c FROM Event WHERE Id = :id limit 1];
-            //     if (evt != null) {
-            //         pea= evt[0].AV_PEA__c;                    
-            //     }
-            // }
         }else if(peaF.contains('AV_PEA2__c')){
-            // if(objApiName.equals('Opportunity')){
-            //     opp = [SELECT Id, AV_PEA2__c,Name FROM Opportunity WHERE Id = :id limit 1];
-            //     if (opp != null) {
-            //         pea2=opp[0].AV_PEA2__c;                 
-            //     }
-            // }else 
-            if(objApiName.equals('Task')){
+            if(objApiName.equals('Opportunity')){
+                opp = [SELECT Id, AV_PEA2__c,Name FROM Opportunity WHERE Id = :id limit 1];
+                if (opp != null) {
+                    pea2=opp[0].AV_PEA2__c;                 
+                }
+            }else if(objApiName.equals('Task')){
                 tsk = [SELECT Id, AV_PEA2__c FROM Task WHERE Id = :id LIMIT 1];
                 if (tsk != null) {
                     pea2= tsk[0].AV_PEA2__c;
@@ -319,15 +327,45 @@ public with sharing class CIBE_LinkOperativoController {
         }
 
         if ((opp != null || tsk != null || evt != null) && ( pea2 != null || pea != null)) {
-			String parteFija = [SELECT AV_URL__c FROM AV_ParteFijaPEA__mdt WHERE DeveloperName='AV_Header_PEA_Link' LIMIT 1].AV_URL__c;
-            if(pea!=null){
+			parteFija =  [SELECT AV_URL__c FROM AV_ParteFijaPEA__mdt where DeveloperName='AV_Header_PEA_Link'  LIMIT 1].AV_URL__c; //no soporta getInstance
+            if(pea!=null && pea.startsWith('01') ){
+
                 String[] peaInfo = pea.split('\\{\\|}');  // splits by {|} 
-                loPEA.url = String.isNotBlank(peaInfo[1]) ? parteFija+''+peaInfo[1] : '';
-                loPEA.label = String.isNotBlank(peaInfo[0])  ? peaInfo[0] : '';
-            }if(pea2!=null){
+                loPEA.url = (peaInfo != null && peaInfo.size() == 3) ? (String.isNotBlank(peaInfo[2])  && parteFija != null ? parteFija + ''+ peaInfo[2] : '') : '';
+                loPEA.label = (peaInfo != null && peaInfo.size() == 3) ? (String.isNotBlank(peaInfo [1]) ? peaInfo [1] : '') : '';
+
+
+            }else if (pea!=null && pea.startsWith('02')){
+                
+                String[] peaInfo = pea.split('\\{\\|}');  // splits by {|} 
+                loPEA.url = (peaInfo != null && peaInfo.size() == 3) ? (String.isNotBlank(peaInfo [2]) ?  peaInfo [2] : '') : '';
+                loPEA.label = (peaInfo != null && peaInfo.size() == 3) ? (String.isNotBlank(peaInfo [1]) ? peaInfo [1] : '') : '';
+
+            }else if(pea2!=null && pea2.startsWith('01')){
+
                 String[] pea2Info = pea2.split('\\{\\|}');  // splits by {|}
-                loPEA2.url = String.isNotBlank(pea2Info[1]) ? parteFija+''+pea2Info[1] : '';
-                loPEA2.label = String.isNotBlank(pea2Info[0])  ? pea2Info[0] : '';
+                loPEA2.url = (pea2Info != null && pea2Info.size() == 3) ? (String.isNotBlank(pea2Info [2]) && parteFija != null ? parteFija + ''+ pea2Info [2] : '') : '';
+                loPEA2.label = (pea2Info != null && pea2Info.size() == 3) ? (String.isNotBlank(pea2Info [1]) ? pea2Info [1] : '') : '';
+
+            }else if(pea2!=null && pea2.startsWith('02')){
+
+                String[] pea2Info = pea2.split('\\{\\|}');  // splits by {|} 
+                loPEA2.url = (pea2Info != null && pea2Info.size() == 3) ? (String.isNotBlank(pea2Info [2]) ?  pea2Info [2] : '') : '';
+                loPEA2.label = (pea2Info != null && pea2Info.size() == 3) ? (String.isNotBlank(pea2Info [1]) ? pea2Info [1] : '') : '';
+
+            }else{
+                if(pea!=null){
+                    String[] peaInfo = pea.split('\\{\\|}');  // splits by {|} 
+                    loPEA.url = (peaInfo != null && peaInfo.size() == 2) ? (String.isNotBlank(peaInfo [1]) && parteFija != null ? parteFija + ''+ peaInfo [1] : '') : '';
+                    loPEA.label = (peaInfo != null && peaInfo.size() == 2) ? (String.isNotBlank(peaInfo [0]) ? peaInfo [0] : '') : '';
+                }
+                
+    
+                if(pea2!=null){
+                    String[] pea2Info = pea2.split('\\{\\|}');  // splits by {|}
+                    loPEA2.url = (pea2Info != null && pea2Info.size() == 2) ? (String.isNotBlank(pea2Info [1]) && parteFija != null ? parteFija + ''+ pea2Info [1] : '') : '';
+                    loPEA2.label = (pea2Info != null && pea2Info.size() == 2) ? (String.isNotBlank(pea2Info [0]) ? pea2Info [0] : '') : '';
+                }
             }
 		}
         if(loPEA2.url != null || loPEA2.label != null) {

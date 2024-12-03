@@ -871,12 +871,6 @@ public with sharing class CC_IdentCliente_Future {
                     sInterfazDOC = 'SAC_Int_ALF_DOC';
                     sInterfazIntALF = 'SAC_Int_ALF';
                 }
-                when 'Supervisores'
-                {
-                    sInterfaz = 'SPV_Int_ALF_REP_JUR';
-                    sInterfazDOC = 'SPV_Int_ALF_DOC';
-                    sInterfazIntALF = 'SPV_Int_ALF';
-                }
                 when else {
                     sInterfaz = 'CC_Int_ALF_REP_JUR';
                     sInterfazDOC = 'CC_Int_ALF_DOC';

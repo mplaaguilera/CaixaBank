@@ -12,13 +12,18 @@ Historial
 @isTest
 public with sharing class cibe_secondNewOpportunity_CIB_Ctr_Test {
 
+
+    @TestSetup
+    static void makeData(){
+        CIBE_TestInitialSetup.setupInitialDataCIB();
+    }
+
     /**
 	 * 
 	 */
 	@isTest
-	public static void getAppDefinition_Test() {
-        List<String> listPermissionsSet = new List<String>{CIBE_AppConstants.CIBE_OPERATIVACIB};
-        User usuario = CIBE_TestHelper.loginUser(null, null, null,listPermissionsSet);
+	public static void getAppDefinitionTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
 
         System.runAs(usuario){
             AppDefinition appDefinition = [SELECT DurableId, Label FROM AppDefinition WHERE DeveloperName = 'CIBE_MisClientesCIB' LIMIT 1];        
@@ -30,13 +35,26 @@ public with sharing class cibe_secondNewOpportunity_CIB_Ctr_Test {
     }
     
     @isTest
-	public static void getExitoPicklist_Test() {
-        List<String> listPermissionsSet = new List<String>{CIBE_AppConstants.CIBE_OPERATIVACIB};
-        User usuario = CIBE_TestHelper.loginUser(null, null, null,listPermissionsSet);
+	public static void getExitoPicklistTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
         
         System.runAs(usuario){
             List<cibe_secondNewOpportunity_CIB_Controller.OptionsField> listValues= new List<cibe_secondNewOpportunity_CIB_Controller.OptionsField>();
             listValues=cibe_secondNewOpportunity_CIB_Controller.getExitoPicklist();
+            System.assert(!listValues.isEmpty());
+        }
+    }
+
+
+    @isTest
+	public static void getPaisPicklistTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        
+        System.runAs(usuario){
+            List<cibe_secondNewOpportunity_CIB_Controller.OptionsField> listValues= new List<cibe_secondNewOpportunity_CIB_Controller.OptionsField>();
+            listValues=cibe_secondNewOpportunity_CIB_Controller.getPaisPicklist();
             System.assert(!listValues.isEmpty());
         }
     }

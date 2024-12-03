@@ -12,7 +12,8 @@ VERSION		USER_STORY				AUTHOR				DATE				Description
 3.0         US523654                Lucía Muñoz         14/02/2023          Nuevos métodos de prueba
 4.0         US556905                Lucía Muñoz         23/03/2023          Creados los metodos createPFExperience, createPFCliente, createExperienciaNegocio
 5.0         DE74043                 Bea                 14/04/2023          Creados los métodos createTareaOrigenApp y createTareaOrigenAppToday
-6.0         US609754                 Lucía Muñoz         28/06/2023          Nuevos métodos createUserSinInsert, createEmployeeSinInsert,createCustomerWithEAPGestor, createTareaExternalIdWithCustomerSinInsert, createTareaExternalIdCustomStatusWithCustomerSinInsert, createEventConClienteEAPGestorSinInsert y 
+6.0         US609754                Lucía Muñoz         28/06/2023          Nuevos métodos createUserSinInsert, createEmployeeSinInsert,createCustomerWithEAPGestor, createTareaExternalIdWithCustomerSinInsert, createTareaExternalIdCustomStatusWithCustomerSinInsert, createEventConClienteEAPGestorSinInsert y 
+7.0         US746418                Bea                 17/11/2023          Nuevo método de createOpportunityWithEmpleado pasándole más parámetros (CloseDate, RecordType y OwnerId)
 ***********************************************************************************************************************/
 @isTest
 public with sharing class CIBE_TestHelper {
@@ -113,9 +114,8 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
-		}		
+		}
+		
 		tarea.Status = 'Pendiente no localizado';
 		tarea.Priority = 'Normal';
 		tarea.AV_ExternalID__c = '01928363';
@@ -130,9 +130,7 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
-		}		
+		}	
 		tarea.Status = 'Pendiente no localizado';
 		tarea.Priority = 'Normal';
         tarea.AV_OrigenApp__c = ' ';
@@ -149,9 +147,8 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
-		}		
+		}
+		
 		tarea.Status = 'Pendiente no localizado';
 		tarea.Priority = 'Normal';
         tarea.AV_OrigenApp__c = ' ';
@@ -196,13 +193,12 @@ public with sharing class CIBE_TestHelper {
             Name = CIBE_AppConstants.ACC_SINCLIENTE,
             RecordTypeId = rt.Id,
             AV_NumPerso__c = 'SinCliCIBE',
-            AV_Negocio__c = 'BPA',
+            AV_Negocio__c = 'CIB',
             AV_InterlocName__c = CIBE_AppConstants.ACC_SINCLIENTE
         );
         insert acc;
 		return acc;
 	}
-
     public static Account createCustomerWithNumperson(String numper){
 		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
 		Account acc = new Account(
@@ -261,8 +257,6 @@ public with sharing class CIBE_TestHelper {
         }
         if (user != null){
             employee.AV_UsuarioAsociado__c = user.Id;
-        }else{
-            employee.AV_UsuarioAsociado__c = UserInfo.getUserId();
         }
         
         insert employee;
@@ -285,8 +279,6 @@ public with sharing class CIBE_TestHelper {
         }
         if (user != null){
             employee.AV_UsuarioAsociado__c = user.Id;
-        }else{
-            employee.AV_UsuarioAsociado__c = UserInfo.getUserId();
         }
         return employee;
     }
@@ -307,8 +299,6 @@ public with sharing class CIBE_TestHelper {
 		}
 		if (user!=null){
 			employee.AV_UsuarioAsociado__c = user.Id;
-		}else{
-			employee.AV_UsuarioAsociado__c = UserInfo.getUserId();
 		}
 		insert employee;
 		return employee;
@@ -348,6 +338,22 @@ public with sharing class CIBE_TestHelper {
         return opp;
     }
 
+    public static Opportunity createOpportunity(Account acc, RecordType rt, String estado, String ownerId){
+        Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
+        // RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, recordType);
+        Opportunity opp = new Opportunity();
+        opp.OwnerId = ownerId;
+        opp.AccountId = acc.Id;
+        opp.Name = 'Alerta Comercial';
+        opp.StageName = estado;
+        opp.RecordTypeId = rt.Id;
+        opp.CloseDate = System.today() + 5;
+        opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+        opp.AV_PF__c = prodPF.Id;
+        insert opp;
+        return opp;
+    }
+
     public static OpportunityTeamMember createOpportunityTeam(Account acc){
         Opportunity opp = createOpportunity(acc);
         OpportunityTeamMember otm = new OpportunityTeamMember();
@@ -375,6 +381,22 @@ public with sharing class CIBE_TestHelper {
         return opp;
     }
 
+    public static Opportunity createOpportunityWithEmpleadoSinInsert(Account acc, Product2 prodPF, RecordType rt, String externalId, Id ownerId){
+		Opportunity opp = new Opportunity();
+		opp.AccountId = acc.Id;
+		opp.AV_ExternalID__c = externalId;
+		opp.Name = 'Alerta Comercial';
+		opp.StageName = 'Potencial';
+		opp.RecordTypeId = rt.Id;
+		opp.CloseDate = System.today() + 5;
+		opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+		if(prodPF != null){
+            opp.AV_PF__c = prodPF.Id;
+        }
+        opp.OwnerId = ownerId;
+		return opp;
+	}
+
     public static Opportunity createOpportunityWithEmpleado(Account acc, Contact empleado, String estado){
         Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
         RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVACIB_RT);
@@ -388,10 +410,29 @@ public with sharing class CIBE_TestHelper {
             opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
             opp.AV_Gestor__c = empleado.Id;
             opp.AV_PF__c = prodPF.Id;
+            opp.AV_FechaAlta__c = System.today() + 5;
         insert opp;
         return opp;
     }
-    
+    public static Opportunity createOpportunityWithEmpleado(Account acc, Contact empleado, String estado, Date closeDate, String recordTypeId, String ownerId){
+        //Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
+        RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVAEMP_RT);
+        Opportunity opp = new Opportunity();
+            opp.AccountId = acc.Id;
+            opp.AV_ExternalID__c = '00000001';
+            opp.Name = 'Alerta Comercial';
+            opp.StageName = !string.Isblank(estado) ? estado :'En curso';
+            opp.RecordTypeId = !string.Isblank(recordTypeId) ? recordTypeId : rt.Id;
+            opp.CloseDate = closeDate;
+            opp.AV_ToDelete__c = false;
+            opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+            opp.AV_Gestor__c = empleado.Id;
+            //opp.AV_PF__c = prodPF.Id;
+            opp.OwnerId = ownerId;
+            opp.CIBE_AmountDivisa__c = 123.45;
+        insert opp;
+        return opp;
+    }
     public static Opportunity createOpportunityWithProductSinInsert(Account acc, Contact empleado, Product2 prodPF, String externalID,Date fechaMod,String status, Recordtype rt){
 		//RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPPROPUESTA_RT);
 		Opportunity opp = new Opportunity();
@@ -428,6 +469,28 @@ public with sharing class CIBE_TestHelper {
             AV_Negocio__c = 'CIB'
         );
         insert acc;
+        return acc;
+    }
+
+    public static Account createAccountGC(){
+        RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_G_COMERCIAL_RT);
+        Account acc = new Account(
+            Name = 'GC-Account',
+            RecordTypeId = rt.Id,
+            AV_NumPerso__c = '567',
+            AV_Negocio__c = 'CIB'
+        );
+        return acc;
+    }
+
+    public static Account createCustomerSinInsert(){
+        RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
+        Account acc = new Account(
+            Name = 'Name',
+            RecordTypeId = rt.Id,
+            AV_NumPerso__c = '123',
+            AV_Negocio__c = 'CIB'
+        );
         return acc;
     }
 
@@ -491,6 +554,30 @@ public with sharing class CIBE_TestHelper {
         insert prod;
         return prod;
     }
+
+    public static Product2 createProductSinInsert(Product2 product, String level,String externalID){
+        Product2 prod = new Product2();
+		prod.Name = 'Product: ' + getRandomValue();
+		prod.AV_Nivel__c = level;
+		if (externalID != null) {
+			prod.AV_ExternalID__c = externalID;
+		}else if(String.isNotBlank(level) && level == '1'){
+			prod.AV_ExternalID__c = '50000';
+		} else if(String.isNotBlank(level) && level == '10'){
+			prod.AV_ExternalID__c = '50001';
+		} else if(String.isNotBlank(level) && level == '20'){
+			prod.AV_ExternalID__c = '50002';
+		} else {
+			prod.AV_ExternalID__c = '50003';
+		}
+		
+		if (product!=null){
+			prod.AV_NombrePF__c = product.Id;
+		}
+		prod.AV_Profesional__c = false;
+		prod.AV_Activo__c = true;
+		return prod;
+    }
     
     public static AV_CustomActivityOpportunity__c createTareaOportunidad(Opportunity opp, String idCabeceraTarea){
         AV_CustomActivityOpportunity__c tareaOpp= new AV_CustomActivityOpportunity__c();
@@ -508,9 +595,8 @@ public with sharing class CIBE_TestHelper {
 		event.whatId = acc.Id;
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
+        
 		event.RecordTypeId = rt.Id;
 		event.DurationInMinutes= 60;
 		event.ActivityDateTime = activityDate;
@@ -526,16 +612,17 @@ public with sharing class CIBE_TestHelper {
         Event event = new Event();
         event.Subject = 'Call';
         event.WhatId = acc.Id;
+        event.AV_Tipo__c = 'VLD';
         if (user!=null){
             event.OwnerId = user.Id;
-        }else{
-            event.OwnerId = UserInfo.getUserId();
         }
         
-        String externalId = '999999';
+        
+        String externalId = String.valueof((Math.random() * 10000000));
         AV_HeaderCustomActivity__c acthead = new AV_HeaderCustomActivity__c(
             AV_ExternalID__c = externalId,
-            AV_ToDelete__c = true
+            AV_ToDelete__c = true,
+            OwnerId = user.Id
         );
         insert acthead;
         
@@ -545,7 +632,6 @@ public with sharing class CIBE_TestHelper {
         event.DurationInMinutes= 60;
         event.AV_Task__c=acthead.id;
         event.ActivityDateTime = activityDate;
-        event.AV_Tipo__c = 'EC';
         event.StartDateTime = activityDate;
         event.EndDateTime = activityDate.addMinutes(60);
         event.CSBD_Evento_Estado__c = CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
@@ -555,6 +641,29 @@ public with sharing class CIBE_TestHelper {
         return event;
     }
     
+    public static Event createEventVideocCallNoInsert(User user, Datetime activityDate, Account acc){
+		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
+		Event event = new Event();
+		event.Subject = 'Call';
+		event.WhatId = acc.Id;
+		if (user!=null){
+			event.OwnerId = user.Id;
+		}
+        
+		// String randomExternalId = String.valueof((Math.random() * 10000000));
+		// event.AV_ExternalID__c = 'Evt-' +  randomExternalId;
+		event.RecordTypeId = rt.Id;
+		event.DurationInMinutes= 60;
+		event.ActivityDateTime = activityDate;
+		event.AV_Tipo__c = 'VLD';
+		event.StartDateTime = activityDate;
+		event.EndDateTime = activityDate.addMinutes(60);
+		event.CSBD_Evento_Estado__c = CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
+		event.AV_OrigenApp__c = CIBE_AppConstants.SALESFORCE_ORIGENAPP;
+        event.Description = 'Prueba';
+		return event;
+	}
+    
     public static Event createEventVideocCall(User user, Datetime activityDate, Account acc){
 		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
 		Event event = new Event();
@@ -562,11 +671,31 @@ public with sharing class CIBE_TestHelper {
 		event.WhatId = acc.Id;
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
-		String randomExternalId = String.valueof((Math.random() * 10000000));
-		event.AV_ExternalID__c = randomExternalId;
+		// String randomExternalId = String.valueof((Math.random() * 10000000));
+		// event.AV_ExternalID__c = 'Evt-' +  randomExternalId;
+		event.RecordTypeId = rt.Id;
+		event.DurationInMinutes= 60;
+		event.ActivityDateTime = activityDate;
+		event.AV_Tipo__c = 'VLD';
+		event.StartDateTime = activityDate;
+		event.EndDateTime = activityDate.addMinutes(60);
+		event.CSBD_Evento_Estado__c = CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
+		event.AV_OrigenApp__c = CIBE_AppConstants.SALESFORCE_ORIGENAPP;
+        event.Description = 'Prueba';
+		insert event;
+		return event;
+	}
+
+    public static Event createEventVideocCall2(User user, Datetime activityDate, Account acc){
+		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
+		Event event = new Event();
+		event.Subject = 'Call Test';
+		event.WhatId = acc.Id;
+		if (user!=null){
+			event.OwnerId = user.Id;
+		}
+
 		event.RecordTypeId = rt.Id;
 		event.DurationInMinutes= 60;
 		event.ActivityDateTime = activityDate;
@@ -586,9 +715,8 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
-		}		
+		}
+	
 		tarea.Status = 'Open';
 		tarea.Priority = 'Normal';
 		if(String.isNotBlank(externalId)){
@@ -605,9 +733,8 @@ public with sharing class CIBE_TestHelper {
 		event.Subject = 'Call';
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
+
 		if(String.isNotBlank(externalId)){
 			event.AV_ExternalID__c = externalId;
 		}
@@ -619,19 +746,18 @@ public with sharing class CIBE_TestHelper {
 		return event;
 	}
     public static Event createEventActivityDateTime(User user, DateTime activityDate, Account acc){
-		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
+		RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_CIB_RT);
 		Event event = new Event();
 		event.Subject = 'Call';
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
+
 		event.RecordTypeId = rt.Id;
 		event.DurationInMinutes= 60;
 		event.ActivityDateTime = activityDate;
 		event.WhatId = acc.Id;
-        event.CSBD_Evento_Estado__c = 'Pendiente';
+        event.CSBD_Evento_Estado__c = 'Planificada';
 		insert event;
 		return event;
 	}
@@ -641,9 +767,8 @@ public with sharing class CIBE_TestHelper {
         tarea.Subject = 'Llamada Saliente';
         if (user!=null){
             tarea.OwnerId = user.Id;
-        }else{
-            tarea.OwnerId = UserInfo.getUserId();
         }
+
         tarea.Status = 'Open';
         tarea.Priority = 'Normal';
         if(String.isNotBlank(externalId)){
@@ -663,9 +788,8 @@ public with sharing class CIBE_TestHelper {
         tarea.Subject = 'Llamada Saliente';
         if (user!=null){
             tarea.OwnerId = user.Id;
-        }else{
-            tarea.OwnerId = UserInfo.getUserId();
         }
+
         tarea.Status = 'Open';
         tarea.Priority = 'Normal';
         if(String.isNotBlank(externalId)){
@@ -684,9 +808,8 @@ public with sharing class CIBE_TestHelper {
         tarea.Subject = 'Llamada Saliente';
         if (user!=null){
             tarea.OwnerId = user.Id;
-        }else{
-            tarea.OwnerId = UserInfo.getUserId();
         }
+
         tarea.Status = 'Open';
         tarea.Priority = 'Normal';
         if(String.isNotBlank(externalId)){
@@ -706,9 +829,8 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
 		}
+
 		tarea.Status = customStatus;
 		tarea.Priority = 'Normal';
 		if(String.isNotBlank(externalId)){
@@ -718,6 +840,7 @@ public with sharing class CIBE_TestHelper {
 		if (acc != null) {
 			tarea.WhatId = acc.Id;
 		}
+        tarea.Description = 'test';
 		insert tarea;
 		return tarea;
 	}
@@ -728,9 +851,8 @@ public with sharing class CIBE_TestHelper {
 		tarea.Subject = 'Llamada Saliente';
 		if (user!=null){
 			tarea.OwnerId = user.Id;
-		}else{
-			tarea.OwnerId = UserInfo.getUserId();
 		}
+
 		tarea.Status = customStatus;
 		tarea.Priority = 'Normal';
 		if(String.isNotBlank(externalId)){
@@ -750,9 +872,8 @@ public with sharing class CIBE_TestHelper {
 		event.WhatId = customer.Id;
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
+
 		String randomExternalId = String.valueof((Math.random() * 10000000));
 		event.AV_ExternalID__c = randomExternalId;
 		event.RecordTypeId = rt.Id;
@@ -775,9 +896,8 @@ public with sharing class CIBE_TestHelper {
 		event.WhatId = customer.Id;
 		if (user!=null){
 			event.OwnerId = user.Id;
-		}else{
-			event.OwnerId = UserInfo.getUserId();
 		}
+
 		String randomExternalId = String.valueof((Math.random() * 10000000));
 		event.AV_ExternalID__c = randomExternalId;
 		event.RecordTypeId = rt.Id;
@@ -856,8 +976,6 @@ public with sharing class CIBE_TestHelper {
 		}
 		if (user!=null){
 			employee.AV_UsuarioAsociado__c = user.Id;
-		}else{
-			employee.AV_UsuarioAsociado__c = UserInfo.getUserId();
 		}
 		insert employee;
 		return employee;
@@ -893,9 +1011,8 @@ public with sharing class CIBE_TestHelper {
         event.WhatId = customer.Id;
         if (user!=null){
             event.OwnerId = user.Id;
-        }else{
-            event.OwnerId = UserInfo.getUserId();
         }
+        
         String randomExternalId = String.valueof((Math.random() * 10000000));
         event.AV_ExternalID__c = randomExternalId;
         event.RecordTypeId = rt.Id;
@@ -912,20 +1029,22 @@ public with sharing class CIBE_TestHelper {
     
     
     public static Event createEventConClienteRecurrente(User user, Account customer){
+        DateTime now = System.now();
         RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
         Event event = new Event();
         event.Subject = 'Test Event 001-A';
-		//String randomExternalId = String.valueof((Math.random() * 10000000));
-		//event.AV_ExternalID__c = randomExternalId;
+		String randomExternalId = String.valueof((Math.random() * 10000000));
+		event.AV_ExternalID__c = 'Evt-#' +  randomExternalId;
         event.WhatId = customer.Id;
         event.RecordTypeId = rt.Id;
         if (user!=null){
             event.OwnerId = user.Id;
-        }else{
-            event.OwnerId = UserInfo.getUserId();
         }
+        
         event.DurationInMinutes = 60;
-        event.ActivityDateTime = System.now();
+        event.ActivityDateTime = now;
+        event.StartDateTime = now;
+		event.EndDateTime = System.now().addMinutes(60);
         event.IsRecurrence = true;
         event.RecurrenceStartDateTime = System.now();
         event.RecurrenceEndDateOnly = System.today()+2;
@@ -936,6 +1055,35 @@ public with sharing class CIBE_TestHelper {
 		event.AV_Tipo__c = 'VLD';
         
         insert event;
+        return event;
+    }
+    
+    public static Event createEventConClienteRecurrenteNoInsert(User user, Account customer){
+        DateTime now = System.now();
+        RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
+        Event event = new Event();
+        event.Subject = 'Test Event 001-A';
+		String randomExternalId = String.valueof((Math.random() * 10000000));
+		event.AV_ExternalID__c = 'Evt-#' +  randomExternalId;
+        event.WhatId = customer.Id;
+        event.RecordTypeId = rt.Id;
+        if (user!=null){
+            event.OwnerId = user.Id;
+        }
+
+        event.DurationInMinutes = 60;
+        event.ActivityDateTime = now;
+        event.StartDateTime = now;
+		event.EndDateTime = System.now().addMinutes(60);
+        event.IsRecurrence = true;
+        event.RecurrenceStartDateTime = System.now();
+        event.RecurrenceEndDateOnly = System.today()+2;
+        event.RecurrenceType = 'RecursEveryWeekday';
+        event.RecurrenceDayofWeekMask = 1;
+        event.AV_OrigenApp__c = CIBE_AppConstants.SALESFORCE_ORIGENAPP;
+		event.CSBD_Evento_Estado__c = CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
+		event.AV_Tipo__c = 'VLD';
+        
         return event;
     }
     
@@ -1061,5 +1209,4 @@ public with sharing class CIBE_TestHelper {
 		PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = :psLabel];
 		insert new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = ps.Id);
 	}
-    
 }

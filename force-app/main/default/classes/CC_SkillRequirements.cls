@@ -4,15 +4,15 @@ public class CC_SkillRequirements {
     public static List<String> recuperarSkills(List<List<SkillRequirement>> skillsRerquirement)
 	{
         //CC_TrazaInt__c oTraza0 = new CC_TrazaInt__c();
-        CC_TrazaInt__c oTraza = new CC_TrazaInt__c();
-        oTraza.Name = 'FlowChatSkillRequirement';
+        //CC_TrazaInt__c oTraza = new CC_TrazaInt__c();
+        //oTraza0.Name = 'ENTRAMOS';
         Set<Id> setIdSkills = new Set<Id>();
         String idioma = '';
         String agenteohidden = '';
         String skillextra = '';
         String tipoChat = '';
         String str = '';
-        String proveedorpordefecto = 'DXC';  //Cambiar
+        String proveedorpordefecto = 'DXC';
         List <SkillRequirement> skillReqs = skillsRerquirement.get(0);
         
         //Recogemos los Skills ID de los SkillRequirements
@@ -108,10 +108,9 @@ public class CC_SkillRequirements {
     
                 List<String> listtoreturn = New List<String>();
                 listtoreturn.add(proveedorfinal);
-                //listtoreturn.add('MST');
     
-                oTraza.CC_DetalleError__c = proveedorfinal;
-                Database.insert(oTraza);
+                //oTraza.CC_DetalleError__c = proveedorfinal;
+                //Database.insert(oTraza);
                 
                 return listtoreturn;
             } else if(!capacidades.isEmpty() && tipoChat == 'Clientes'){
@@ -166,16 +165,13 @@ public class CC_SkillRequirements {
     
                 List<String> listtoreturnCli = New List<String>();
                 listtoreturnCli.add(proveedorfinalCli);
-                // listtoreturnCli.add('MST');
-                oTraza.CC_DetalleError__c = proveedorfinalCli;
-                Database.insert(oTraza);
+                
                 return listtoreturnCli;
             }else {
                 
                 List<String> lstproovpordefecto = New List<String>();
                 lstproovpordefecto.add(proveedorpordefecto);
-                oTraza.CC_DetalleError__c = proveedorpordefecto;
-                Database.insert(oTraza);
+                
                 return lstproovpordefecto;
                 
                 
@@ -184,11 +180,8 @@ public class CC_SkillRequirements {
         else{
             List<String> lstproovpordefecto = new List<String>();
             lstproovpordefecto.add(proveedorpordefecto);
-            oTraza.CC_DetalleError__c = proveedorpordefecto;
-            Database.insert(oTraza);
             return lstproovpordefecto;
         }   
-        
                 
     }
 }

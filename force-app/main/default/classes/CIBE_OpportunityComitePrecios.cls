@@ -21,8 +21,10 @@ public with sharing class CIBE_OpportunityComitePrecios {
         if(ref_ext!=null && String.isNotBlank(result?.CIBE_URL__c)) {
             system.debug('OK: '+result?.CIBE_URL__c.replace('{ref_ext}',ref_ext).replace('{org}', 'SRE'));
             return result?.CIBE_URL__c.replace('{ref_ext}',ref_ext).replace('{org}', 'SRE');
+
+        }else if(ref_ext!=null){
+            throw new AuraHandledException('Fallo en getUrl - El usuario no tiene permisos o CIBE_Link__mdt esta vacio.');
         }
-        
-        throw new AuraHandledException('Fallo en getUrl - El usuario no tiene permisos o CIBE_Link__mdt esta vacio.');
+        return '';
     }  
 }

@@ -18,7 +18,7 @@ private class AV_ProcessInactiveUserOppBatch_Test {
 	static void setup() {
 		AV_TestHelper.activateLogger();
 		User u1 = AV_TestHelper.createUser(null, 'U01000012');
-		Contact con =  AV_TestHelper.createEmployee(null,u1);
+		Contact con =  AV_TestHelper.createEmployee(null,u1,u1.AV_ExternalId__c);
 		
 		Pricebook2 pb = new Pricebook2();
 		pb.Name = 'Standard Price Book';

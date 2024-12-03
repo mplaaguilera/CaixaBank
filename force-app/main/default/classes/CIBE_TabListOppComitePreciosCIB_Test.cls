@@ -8,6 +8,8 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR			DATE			Description
 	1.0			US52277         Ali 		    17/10/2023	    Init version
+    1.1			US850814    	Lucía	  	    05/06/2024		Errores QC
+    1.2			PPM100538662    Lucía	  	    22/10/2024		New methods getOptionsHierarchyTestm, getDocumentOppTest
 
 ***********************************************************************************************************************/
 
@@ -16,17 +18,17 @@ public with sharing class CIBE_TabListOppComitePreciosCIB_Test {
     
     @TestSetup
     public static void setup() {
-        string rtIdPickVal = Schema.getGlobalDescribe().get('CBK_PicklistValues__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CBK_PicklistValue').getRecordTypeId();
-        string rtIdPick = Schema.getGlobalDescribe().get('CBK_PicklistValues__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CBK_Picklist').getRecordTypeId();
-        string rtContact = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-        string rtJerarquia = Schema.getGlobalDescribe().get('CIBE_Hierarchy__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CIBE_Employee').getRecordTypeId();
+        string rtIdPickVal = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_PicklistValue').getRecordTypeId();
+        string rtIdPick = Schema.SObjectType.CBK_PicklistValues__c.getRecordTypeInfosByDeveloperName().get('CBK_Picklist').getRecordTypeId();
+        string rtContact = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        string rtJerarquia = Schema.SObjectType.CIBE_Hierarchy__c.getRecordTypeInfosByDeveloperName().get('CIBE_Employee').getRecordTypeId();
 
         CIBE_TestInitialSetup.setupInitialDataCIB();
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
-        Contact contacto = [SELECT Id FROM Contact WHERE CC_Matricula__c = 'U0000001'];
+        User admin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
+        Contact contacto = [SELECT Id, av_usuarioAsociado__c FROM Contact WHERE CC_Matricula__c = 'U0000001'];
         
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            Account cliente = CIBE_TestHelper.createCustomer();
+        System.runAs(admin) {
+            Account cliente = CIBE_TestHelper.createCustomerWithEAPGestor(contacto);
     
             CBK_PicklistValues__c pick = new CBK_PicklistValues__c();
             pick.RecordTypeId = rtIdPick;
@@ -41,7 +43,14 @@ public with sharing class CIBE_TabListOppComitePreciosCIB_Test {
             pickVal.CBK_HasDependency__c = true;
             pickVal.CBK_Dependencies__c = 'Valor1';
             insert pickVal;
-    
+
+            CBK_PicklistValues__c pickValValor = new CBK_PicklistValues__c();
+            pickValValor.RecordTypeId = rtIdPickVal;
+            pickValValor.CBK_Picklist__c = pick.Id;
+            pickValValor.Name = 'Valor1';
+            pickValValor.CBK_HasDependency__c = false;
+            insert pickValValor;
+
             CBK_PicklistValues__c pickVal2 = new CBK_PicklistValues__c();
             pickVal2.RecordTypeId = rtIdPickVal;
             pickVal2.CBK_Picklist__c = pick.Id;
@@ -141,14 +150,38 @@ public with sharing class CIBE_TabListOppComitePreciosCIB_Test {
             opp.CIBE_ECAs__c = true;
             opp.CIBE_AlgunaOperRAR__c = true;
             opp.CIBE_DictamenALM__c = false;
-            opp.CIBE_Visto__c = 'IG';
+            opp.CIBE_Visto__c = 'SI';
             opp.CIBE_Nivel__c = '';
             opp.CIBE_Sindicaciones__c = false;
+            opp.CIBE_SyndicationTeamOpinion__c = 'NO';
             opp.CIBE_Observaciones__c = '';
             opp.CIBE_VigenciaOferta__c = null;
-            opp.OwnerId = usuario.Id;
+            opp.OwnerId = contacto.av_usuarioAsociado__c;
             opp.AV_FechaAlta__c = System.today() - 5;
+            opp.AV_Gestor__c = contacto.Id;
+            opp.CIBE_ApprovalType__c = 'Price comittee';
             insert opp;
+
+            ContentVersion contentVersion = new ContentVersion(
+            Title = 'a picture',
+            PathOnClient = 'Pic.jpg',
+            VersionData = Blob.valueOf('Test Content'),
+            IsMajorVersion = true);
+            insert contentVersion;
+
+            List<ContentDocument> documents = [SELECT Id, Title, LatestPublishedVersionId FROM ContentDocument];
+
+			//create ContentDocumentLink record
+			ContentDocumentLink cdl = new ContentDocumentLink();
+			cdl.LinkedEntityId = opp.Id;
+			cdl.ContentDocumentId = documents[0].Id;
+			cdl.ShareType = 'V';
+			cdl.Visibility = 'AllUsers';
+			insert cdl;
+
+
+
+
         }
     }
     
@@ -161,8 +194,8 @@ public with sharing class CIBE_TabListOppComitePreciosCIB_Test {
             Date fecha = Date.newInstance(2023, 02, 03);
             Date fechaDesde = null;
             Date fechaHasta = null;
-
-            List<CIBE_TabListOppComitePreciosCIBContr.OpportunityWrapper> wrapperList = CIBE_TabListOppComitePreciosCIBContr.getOpportunity(0, fecha, fechaDesde, fechaHasta);
+            CIBE_Hierarchy__c hier = [SELECT Id,CIBE_Negocios__c,CIBE_RedesSegmentos__c,CIBE_SectoresPaises__c,CIBE_CentrosCarteras__c,CIBE_Contact__c FROM CIBE_Hierarchy__c WHERE CIBE_Contact__r.AV_UsuarioAsociado__c = :usuario.Id LIMIT 1];
+            List<CIBE_TabListOppComitePreciosCIBContr.OpportunityWrapper> wrapperList = CIBE_TabListOppComitePreciosCIBContr.getOpportunity(0, fecha, fechaDesde, fechaHasta,hier.CIBE_Negocios__c,hier.CIBE_RedesSegmentos__c,hier.CIBE_SectoresPaises__c,hier.CIBE_CentrosCarteras__c,0,100000, null, null, null);
             System.assert(!wrapperList.isEmpty());
         }
         Test.stopTest();
@@ -177,10 +210,75 @@ public with sharing class CIBE_TabListOppComitePreciosCIB_Test {
             Date fecha = Date.newInstance(2023, 02, 03);
             Date fechaDesde = null;
             Date fechaHasta = null;
+            CIBE_Hierarchy__c hier = [SELECT Id,CIBE_Negocios__c,CIBE_RedesSegmentos__c,CIBE_SectoresPaises__c,CIBE_CentrosCarteras__c,CIBE_Contact__c FROM CIBE_Hierarchy__c WHERE CIBE_Contact__r.AV_UsuarioAsociado__c = :usuario.Id LIMIT 1];
 
-            List<String> csv = CIBE_TabListOppComitePreciosCIBContr.exportOpportunities();
+            List<String> csv = CIBE_TabListOppComitePreciosCIBContr.exportOpportunities(fecha, fechaDesde, fechaHasta,hier.CIBE_Negocios__c,hier.CIBE_RedesSegmentos__c,hier.CIBE_SectoresPaises__c,hier.CIBE_CentrosCarteras__c,0,100000, null, null, null);
+
             System.assert(!csv.isEmpty());
         }
         Test.stopTest();
     }
+
+    @isTest
+	public static void getTipoAprobacionTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            List<CIBE_TabListOppComitePreciosCIBContr.OptionsField> listValues = CIBE_TabListOppComitePreciosCIBContr.getTipoAprobacion();
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
+    @isTest
+	public static void getSectorTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            List<CIBE_TabListOppComitePreciosCIBContr.OptionsField> listValues = CIBE_TabListOppComitePreciosCIBContr.getSector('Field Picklist', 'Opcion1');
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
+    @isTest
+	public static void getCarteraTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            Id sector = [SELECT Id FROM CBK_PicklistValues__c WHERE Name = 'Opcion1'].Id;
+            List<CIBE_TabListOppComitePreciosCIBContr.OptionsField> listValues = CIBE_TabListOppComitePreciosCIBContr.getCartera(sector, 'Field Picklist');
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
+    @isTest
+	public static void getOptionsHierarchyTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            List<CIBE_TabListOppComitePreciosCIBContr.OptionsField> listValues = CIBE_TabListOppComitePreciosCIBContr.getOptionsHierarchy();
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
+    @isTest
+	public static void getDocumentOppTest() {
+        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+
+        System.runAs(usuario) {
+            Test.startTest();
+            Opportunity opp = [SELECT Id FROM Opportunity WHERE Name = 'Alerta Comercial'];
+            List<CIBE_TabListOppComitePreciosCIBContr.DocumentsField> listValues = CIBE_TabListOppComitePreciosCIBContr.getDocumentOpp(opp.Id);
+            System.assert(!listValues.isEmpty());
+            Test.stopTest(); 
+        }
+    }
+
 }

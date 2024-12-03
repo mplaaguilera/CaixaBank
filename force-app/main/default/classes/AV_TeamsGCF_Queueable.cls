@@ -8,9 +8,11 @@ Historial
 ---------------------
    VERSION		USER_STORY		AUTHOR				DATE				Description
    1.0			App FSC			Sandra Gómez		27/06/2022			Init version
-
+   1.1			Fix PMD Errors  Daniel Rodriguez	05/10/2023			Add square brackets to if clauses
+   1.2          IN1123492       Elisabeth R.        04/04/2024          Add contact person in event params
+   1.3         FIX28080841     Oscar Moreno         03/09/2024          Fix error The Global modifier should be avoided.
 ***********************************************************************************************************************/
-global class AV_TeamsGCF_Queueable implements Queueable, Database.AllowsCallouts {
+public class AV_TeamsGCF_Queueable implements Queueable, Database.AllowsCallouts {
     
     String jsonString;
     String subject;
@@ -34,7 +36,7 @@ global class AV_TeamsGCF_Queueable implements Queueable, Database.AllowsCallouts
 	 * Executes the Queueable job
 	 * @param qc	QueueableContext param that contains the context of the queueable
 	 */
-	global void execute(QueueableContext qc) {
+	public void execute(QueueableContext qc) {
         futureCreateMeeting(subject, endDateTime, startDateTime, headerId, userName, azureId, jsonString);
         if (!Test.isRunningTest()) {
             insertEventGCFFuture(jsonString);
@@ -56,12 +58,19 @@ global class AV_TeamsGCF_Queueable implements Queueable, Database.AllowsCallouts
 		Map<String,Event> mapEventsHeaders = new Map<String,Event>();
         Map<Id,Event> mapRecurrentEvents = new Map<Id,Event>();
 		List<AV_HeaderCustomActivity__c> cumstomHeaders = new List<AV_HeaderCustomActivity__c>();
+
+		Integer limiteQ = 1;
+		Set<Id> idsContactPerson = new Set<Id>();
+		idsContactPerson.add(evento.WhoId);
+
 		if (evento.IsRecurrence2 || evento.IsRecurrence){
 			mapRecurrentEvents.put(evento.Id, evento);
 		}
 		idsAccount.add(evento.WhatId);
 		idsOwner.add(evento.OwnerId);
-		if(!String.isEmpty(evento.AV_ExternalId__c)) mapEventsHeaders.put(evento.AV_ExternalId__c, evento);
+		if(!String.isEmpty(evento.AV_ExternalId__c)){
+			 mapEventsHeaders.put(evento.AV_ExternalId__c, evento);
+		}
 		//Get list of employees
 		List<User> employeeList = [Select Id, AV_ExternalID__c, AV_NumeroOficinaEmpresa__c, Username From User Where Id in :idsOwner];					
 		for(User u : employeeList){
@@ -85,11 +94,23 @@ global class AV_TeamsGCF_Queueable implements Queueable, Database.AllowsCallouts
 				mapHeaderTask.put(aux.AV_ExternalID__c, aux);
 			}
 		}
+
+		// TEST PERSONA DE CONTACTO										
+        Map<Id, Contact> mapContactPerson = new Map<Id, Contact>();
+        if(Contact.SObjectType.getDescribe().isAccessible() &&
+            Schema.SObjectType.Contact.fields.AV_NumPerso__c.isAccessible()) {
+            limiteQ = idsContactPerson.size();
+            mapContactPerson = new Map<Id, Contact>([SELECT Id, Name, AV_NumPerso__c FROM Contact WHERE Id IN :idsContactPerson Limit :limiteQ]);
+        }
+
+
 		//Send the data to GCF and save the response
 		try{
 			AV_HeaderCustomActivity__c headerTask = null;
-			if(mapHeaderTask != null && !mapHeaderTask.isEmpty()) headerTask = mapHeaderTask.get(evento.AV_ExternalID__c);
-			AV_CitaPrevia_Integration.Event parms = AV_CitaPrevia_SyncEvents.buildBodyRequest(evento, null, mapCustomer.get(evento.WhatId), mapEmployee.get(evento.OwnerId), headerTask);
+			if(mapHeaderTask != null && !mapHeaderTask.isEmpty()){
+				 headerTask = mapHeaderTask.get(evento.AV_ExternalID__c);
+			}
+			AV_CitaPrevia_Integration.Event parms = AV_CitaPrevia_SyncEvents.buildBodyRequest(evento, null, mapCustomer.get(evento.WhatId), mapEmployee.get(evento.OwnerId), headerTask, mapContactPerson?.get(evento.WhoId));
 			String externalID = evento.AV_ExternalID__c;
 			if (evento.IsRecurrence2 || evento.IsRecurrence){
 				externalID = mapEventIds.get(evento.Id);

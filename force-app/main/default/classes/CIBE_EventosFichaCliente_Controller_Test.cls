@@ -15,32 +15,36 @@ public class CIBE_EventosFichaCliente_Controller_Test {
 	
     @TestSetup
     static void setup(){
-        List <String> ps = new list<String>{CIBE_AppConstants.CIBE_OPERATIVACIB,CIBE_AppConstants.CIBE_CUSTOMMETADATA,CIBE_AppConstants.CIBE_ANALYTICS,CIBE_AppConstants.CIBE_OPERATIVAEMP};
-        User usrGestor = CIBE_TestHelper.loginUser('CIBE_Gestor', null, 'U0009003',ps);
-        
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            Account centro = CIBE_TestHelper.createCaixaCenter('00615 STORE DOS DE MAIG-ROSSELLO','00615');
-            Contact employee = CIBE_TestHelper.createEmployee(centro, usrGestor);
-            Account acc = CIBE_TestHelper.createCustomer(usrGestor);
+
+        CIBE_TestInitialSetup.setupInitialDataEMP();
+        User managerUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
+
+        System.runAs(managerUser) {
+            // Account centro = CIBE_TestHelper.createCaixaCenter('00615 STORE DOS DE MAIG-ROSSELLO','00615');
+            // Contact employee = CIBE_TestHelper.createEmployee(centro, managerUser);
+            RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
+
+            Account acc = CIBE_TestHelper.createCustomer(managerUser);
             Datetime activityDate = Date.Today().addMonths(1); 
-            Event ev = CIBE_TestHelper.createEventActivityDateTime(usrGestor, activityDate, acc);
-            ev.OwnerId = usrGestor.Id;
+            Event ev = CIBE_TestHelper.createEventActivityDateTime(managerUser, activityDate, acc);
+            ev.recordtypeId = rt.Id;
+            ev.CSBD_Evento_Estado__c ='Pendiente';
+            ev.OwnerId = managerUser.Id;
             update(ev);
         }
     }
 
     @isTest
 	public static void eventsTest() {
-        User usuarioGe = [SELECT Id, name, AV_ExternalId__c FROM User WHERE profile.name = 'CIBE_Gestor' AND AV_ExternalID__c = 'U0009003' LIMIT 1];
+        User managerUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
         Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName= :CIBE_AppConstants.ACCOUNT_CLIENTE_RT AND AV_NumPerso__c = '123' LIMIT 1];
         
-        System.runAs(usuarioGe) {
-            Event ev = [SELECT Id, AccountId FROM Event WHERE AccountId = :acc.Id AND StartDateTime >= TODAY AND CSBD_Evento_Estado__c IN ('Pendiente', 'Pendiente no localizado') AND RecordType.DeveloperName IN ('CIBE_EventoCliente', 'CIBE_EventodelGestor') AND IsChild = false LIMIT 1];
+        System.runAs(managerUser) {
+            Event ev = [SELECT Id, AccountId FROM Event WHERE AccountId = :acc.Id AND StartDateTime >= TODAY AND CSBD_Evento_Estado__c IN ('Pendiente', 'Pendiente no localizado', 'Planificada') AND RecordType.DeveloperName IN ('CIBE_EventoCliente', 'CIBE_EventodelGestor', 'CIBE_EventoClienteCIB') AND IsChild = false LIMIT 1];
             Test.startTest();
             List<CIBE_EventosFichaCliente_Controller.Wrapper> results = CIBE_EventosFichaCliente_Controller.eventsFichaCli(ev.AccountId);
             System.assert(!results.isEmpty());
             Test.stopTest();
         }
-    }  
-    
+    }    
 }

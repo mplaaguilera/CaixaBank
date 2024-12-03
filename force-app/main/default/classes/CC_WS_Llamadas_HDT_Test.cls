@@ -136,10 +136,10 @@ public with sharing class CC_WS_Llamadas_HDT_Test {
             c1.CC_NumPerso__c = '123456';
             c1.CC_Tipo_Cliente__c = 'Cliente';
             c1.Status = 'Activo';
-            c1.Origin = 'Phone';
+            c1.Origin = 'Comentarios Stores';
             c1.CC_Numero_Documento__c = '60236005V';
             c1.CC_Tipo_Contacto__c = 'Petición de servicio';
-            c1.CC_Canal_Procedencia__c = 'Accionista';
+            c1.CC_Canal_Procedencia__c = 'Google Play Store';
             c1.CC_Id_Cognitivo__c = 'HDD_666555666';
             c1.CC_Oficina_Afectada_Lookup__c = cuenta.Id;
             c1.CC_MCC_Motivo__c = mccMotivo.Id;

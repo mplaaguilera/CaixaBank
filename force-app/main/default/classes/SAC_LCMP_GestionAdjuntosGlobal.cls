@@ -10,7 +10,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
 
     @AuraEnabled
     public static oficinaWrapper recuperarDatos(String idRegistro, String fieldApiName, String objectApiName){
-
+    
         fieldApiName = fieldApiName + ', RecordType.DeveloperName';
     
         String globalObject = 'SELECT ' + String.escapeSingleQuotes(fieldApiName) + ' FROM ' + String.escapeSingleQuotes(objectApiName) + ' WHERE  id = :idRegistro';
@@ -125,7 +125,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                             }
 
                         }else{ //Si lo mete el letrado, se mete en la seccion de 'Tramitacion'
-                            listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
+                    listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
                         }
                     }else{
                         listaCV[0].SAC_Bloque__c = 'SAC_Tramitacion';
@@ -134,7 +134,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 }
             }
             // Fin añadido
-
+            
             if(alertaDocumentosGestorSPV){
 
                 List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
@@ -147,7 +147,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 if(String.isNotBlank(caso[0].SAC_PretensionPrincipal__r.Owner.Email)) {
                     listaEmails.add(caso[0].SAC_PretensionPrincipal__r.Owner.Email);
                 }
-            
+
                 //Se envia alerta el owner de las pretensiones y al grupo letrado
                 SAC_WrapperAlerta wrapAlerta = new SAC_WrapperAlerta(caso[0].Id,
                                                 'SPV_017',
@@ -166,7 +166,7 @@ public without sharing class SAC_LCMP_GestionAdjuntosGlobal {
                 //Si tenemos alertas que enviar, se llama al método que las envía
                 if (!listaWrapperAlerta.isEmpty()) {
                     SAC_Alertas.generarAlertas(listaWrapperAlerta);
-                }
+            }
             }
 
             if(!soloActual){

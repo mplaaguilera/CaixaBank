@@ -190,7 +190,7 @@ public without sharing class SAC_Alertas {
                     colaboradores.add(mapUsuariosporMail.get(emailUser));
                 }
             } else if(String.isNotBlank(wrapAlerta.idUsuarioDestinatario)) {
-                colaboradores.add(wrapAlerta.idUsuarioDestinatario); 
+                colaboradores.add(wrapAlerta.idUsuarioDestinatario);
             }
             if ((String.isNotBlank(wrapAlerta.idUsuarioDestinatario) || !colaboradores.isEmpty()) && !mapaColas.containsKey(wrapAlerta.idUsuarioDestinatario)) {
                 Id objetoId=obtenerElObjeto(wrapAlerta);
@@ -449,9 +449,9 @@ public without sharing class SAC_Alertas {
                 if(wrapAlerta.proyecto == 'SPV'){
                     listaSEMSPV.add(mail);  
                 }else{
-                    listaSEM.add(mail);   
-                }
+                listaSEM.add(mail);   
             }
+        }
         }
 
         // Recorremos la lista de emails a enviar y pasamos los valores a una nueva lista filtrada en la que no se incluyen los emails con un targetObjectId que equivalga a alguna de las queues (groups) SAC_PteSupervisor, SAC_PendienteAsignar o SPV_PendienteAsignar
@@ -496,23 +496,23 @@ public without sharing class SAC_Alertas {
         }else{
             listEmailsNoValidos = [SELECT Name FROM SAC_MaestroTemas__c WHERE RecordTypeId =: RECORDTYPEBLACKLIST AND SAC_Activo__c = true];
         }
-        //Le paso la listaEmailsNoValidos, la lista de EM a enviar, y un mapa con el id del usuario y su email. En este método se recupera de cada id del toAddress de la lista de EM a enviar
-        //su email asociado (ayudandonos del mapa de mapUsuarioEmail). Y tras recuperar el email se comprueba si esta en la listEmailsNoValidos. Devolverá una lista filtrada con únicamente los
-        //EM que se deben enviar (toAddress es una dirección válida, no está en la blackList)
-        List<Messaging.SingleEmailMessage> listEMEnviar = SAC_Utils.comprobarEmailsBlackListIds(listEmailsNoValidos, mapaUsuarioEmail, listaSEMFiltrada);
+            //Le paso la listaEmailsNoValidos, la lista de EM a enviar, y un mapa con el id del usuario y su email. En este método se recupera de cada id del toAddress de la lista de EM a enviar
+            //su email asociado (ayudandonos del mapa de mapUsuarioEmail). Y tras recuperar el email se comprueba si esta en la listEmailsNoValidos. Devolverá una lista filtrada con únicamente los
+            //EM que se deben enviar (toAddress es una dirección válida, no está en la blackList)
+            List<Messaging.SingleEmailMessage> listEMEnviar = SAC_Utils.comprobarEmailsBlackListIds(listEmailsNoValidos, mapaUsuarioEmail, listaSEMFiltrada);
 
-        if(!listEMEnviar.isEmpty()){
-            //Enviar los emails creados y filtrados en una sola llamada
-            Messaging.sendEmail(listEMEnviar);
+            if(!listEMEnviar.isEmpty()){
+                //Enviar los emails creados y filtrados en una sola llamada
+                Messaging.sendEmail(listEMEnviar);
 
-            //Comprobar listEMEnviar y listaParaEnviarEmail, para en caso de no haber enviado alertas por email no valido (blackList) quitar esa alerta de listaParaEnviarEmail
-            //para así no intentar relacionar esa alerta con un EmailMessage que no existe (evitando que se relacione con otro sin ninguna relación)
-            listaParaEnviarEmail = comprobarActualizarEMAlerta(listEMEnviar, listaParaEnviarEmail);
-            
-            //Actualizar EmailMessages con el lookup a su alerta correspondiente
-            actualizarEMAlerta(listaParaEnviarEmail, mapaTipoMaestro, mapaObjetoId);
-        }  
-    }
+                //Comprobar listEMEnviar y listaParaEnviarEmail, para en caso de no haber enviado alertas por email no valido (blackList) quitar esa alerta de listaParaEnviarEmail
+                //para así no intentar relacionar esa alerta con un EmailMessage que no existe (evitando que se relacione con otro sin ninguna relación)
+                listaParaEnviarEmail = comprobarActualizarEMAlerta(listEMEnviar, listaParaEnviarEmail);
+                
+                //Actualizar EmailMessages con el lookup a su alerta correspondiente
+                actualizarEMAlerta(listaParaEnviarEmail, mapaTipoMaestro, mapaObjetoId);
+            }  
+        }        
 
     /*****************************************************************
      * Proposito: Recupera los emails de los usuarios de la lista de wrapperAlerta introducida

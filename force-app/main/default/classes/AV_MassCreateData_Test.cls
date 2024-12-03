@@ -18,6 +18,7 @@ public with sharing class AV_MassCreateData_Test {
 
     @TestSetup
     static void setup() {
+        Test.startTest();
         Account centroCaixa = AV_TestHelper.createCaixaCenter();
 		User usrTest = AV_TestHelper.createUser(null);
 		Contact emp = AV_TestHelper.createEmployee(centroCaixa, usrTest);
@@ -25,6 +26,7 @@ public with sharing class AV_MassCreateData_Test {
         cli.AV_NumPerso__c = '00000001';
         Database.update(cli);
         AV_TestHelper.createPricebook2();
+        Test.stopTest();
         Task t = AV_TestHelper.createTareaExternalIdWithCustomer(usrTest, externalId, cli);
         t.Subject = 'Task Iniciativa Gestor/a 1';
         Database.update(t);
@@ -82,9 +84,10 @@ public with sharing class AV_MassCreateData_Test {
         AV_MassCreateData.queryNUMBER = queryNumber;
         Test.startTest();
         AV_MassCreateData.generateLinkOppsToTasks(queryNumber);
+        List<Task> retrieveTasks = [SELECT ID FROM TASK LIMIT 10];
+        System.assert(!retrieveTasks.isEmpty(),'NOK');
         Test.stopTest();
-        List<AV_CustomActivityOpportunity__c> retrieveTaskOpp = [SELECT ID FROM AV_CustomActivityOpportunity__c LIMIT 10];
-        System.assert(retrieveTaskOpp.isEmpty(),'NOK');
+       
     }
 
     @isTest

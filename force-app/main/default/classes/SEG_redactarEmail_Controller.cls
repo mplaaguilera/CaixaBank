@@ -350,7 +350,9 @@ public with sharing class SEG_redactarEmail_Controller {
 		
 		Messaging.SingleEmailMessage correo = new Messaging.SingleEmailMessage();
 		
-		List<String> lstMails = new List<String>{caso.SEG_Email_Buzon_Entrada__c, caso.SEG_Buz_n_de_la_zona__c};
+		//List<String> lstMails = new List<String>{caso.SEG_Email_Buzon_Entrada__c, caso.SEG_Buz_n_de_la_zona__c};
+
+		List<String> lstMails = new List<String>{caso.SEG_Buz_n_de_la_zona__c};
 
 		paraList =  SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(paraList, lstMails);
 		copiaList = SEG_MetodosComunes.depuracionCorreosBuzonSegmentos(copiaList, lstMails);

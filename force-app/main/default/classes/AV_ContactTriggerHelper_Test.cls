@@ -12,7 +12,7 @@ Historial
     1.2			FIX				Patricia Villacañas	24/05/2023			Modified to set run as
     1.2			US586011		Luis Fernández  	07/06/2023			Added 'BPR' AV_Rol__c to contact test in order to give covertry to processBPRRol method
     1.3			US590740		Lucía Muñoz     	13/06/2023			New methods updateContactMatriculaInvalidTest, updateContactMatriculaInvalidTestUsuarioAsociado
-
+    1.4         PPM100492394    Ángel Medina        17/09/2024          New methods employeeExistsTest and isPoolContactTest
 ***********************************************************************************************************************/
 @isTest
 public class AV_ContactTriggerHelper_Test {
@@ -23,7 +23,7 @@ public class AV_ContactTriggerHelper_Test {
 	@TestSetup
 	static void setup() {
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-        
+        Test.startTest();
         System.runAs(userGcf){
             AV_TestHelper.activateLogger();
             Account centro = AV_TestHelper.createCaixaCenter();
@@ -33,7 +33,12 @@ public class AV_ContactTriggerHelper_Test {
             c.AV_JobLevels__c = '100';
             c.AV_Rol__c = 'BPR';
             Database.update(c);
+
+            User u1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank');
+            u1.AV_ExternalID__c = 'U01XYZ01';
+            Database.update(u1);
         }
+        Test.stopTest();
         Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('GCF_JOBLEVEL','OK'));
     }
 
@@ -42,15 +47,7 @@ public class AV_ContactTriggerHelper_Test {
         User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true];
 
         Account centroEmpl = [Select Id, AV_TipoCentro__c From Account Where Name = '00615 STORE DOS DE MAIG-ROSSELLO' limit 1];
-        /*Account centroEmpl = (Account) new AV_Query('Account')
-                        .selectFields('Id, AV_TipoCentro__c')
-                        .addConditionEq('Name', '00615 STORE DOS DE MAIG-ROSSELLO')
-                        .fetch();*/
-        List<Contact> listNewObj= [Select Id, AV_JobLevels__c, AV_TipoCentro__c, RecordTypeId, AV_UsuarioAsociado__c, AccountId, AV_DescFuncion__c,AV_EmpleadoIntouch__C, AV_TipoGestor__c, CIBE_Manager__c From Contact Where CC_Matricula__c = 'U01XYZ01'];
-        /*List<Contact> listNewObj = new AV_Query('Contact')
-                        .selectFields('Id, AV_JobLevels__c, AV_TipoCentro__c, RecordTypeId, AV_UsuarioAsociado__c, AccountId')
-                        .addConditionEq('CC_Matricula__c', 'U01XYZ01')
-                        .run();*/
+        List<Contact> listNewObj= [Select Id, AV_JobLevels__c, AV_TipoCentro__c, RecordTypeId, AV_UsuarioAsociado__c, AccountId, AV_DescFuncion__c,AV_EmpleadoIntouch__C, AV_TipoGestor__c, CIBE_Manager__c,AV_CodFuncion__c From Contact Where CC_Matricula__c = 'U01XYZ01'];
         Map<Id, Contact> mapOldObj = new Map<Id, Contact> {
             listNewObj.get(0).Id => listNewObj.get(0)
         };
@@ -63,15 +60,9 @@ public class AV_ContactTriggerHelper_Test {
         System.runAs(userCli){
             AV_ContactTriggerHelper.updateUserFuncion(listNewObj, mapOldObj);
         }
+       
         Test.stopTest();
-        
         User updatedUser  = [Select Id, AV_Funcion__c From User Where AV_ExternalID__c = 'U0009003' AND Email = 'test@test.dev'];
-        /*User updatedUser = (User) new AV_Query('User')
-                        .selectFields('Id, AV_Funcion__c')
-                        .addConditionEq('AV_ExternalID__c', 'U0009003')
-                        .addConditionEq('Email', 'test@test.dev')
-                        .fetch();*/
-
         System.assertEquals(true, 'SSCC'.equals(updatedUser.AV_Funcion__c), 'AV_Funcion__c not updated');
     }
 
@@ -79,6 +70,7 @@ public class AV_ContactTriggerHelper_Test {
     public static void updateContactMatriculaInvalidTest(){
         User usuario = [SELECT Id FROM User WHERE UserName LIKE 'gcf-integration@cc-caixabank.com%'];
         RecordType rtContact = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_CONTACT, CIBE_AppConstants.EMPLOYEE_RT);
+        Test.startTest();
         Contact employee = new Contact();
             employee.RecordTypeId = rtContact.Id;
             employee.FirstName = 'Empleado Test';
@@ -90,7 +82,6 @@ public class AV_ContactTriggerHelper_Test {
 
         System.runAs(usuario){
             Contact c = [SELECT Id, LastName, CC_Inactivo__c FROM Contact WHERE FirstName = 'Empleado Test' AND LastName = '1'];
-            Test.startTest();
             c.LastName = '12';
             update c;
             Test.stopTest();
@@ -102,11 +93,10 @@ public class AV_ContactTriggerHelper_Test {
     public static void updateContactMatriculaInvalidTestUsuarioAsociado(){
         User usuario = [SELECT Id FROM User WHERE UserName LIKE 'gcf-integration@cc-caixabank.com%'];
         RecordType rtContact = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_CONTACT, CIBE_AppConstants.EMPLOYEE_RT);
-
+        Test.startTest();
         User userTest = CIBE_TestHelper.createUser('CIBE_Gestor');
 
         System.runAs(usuario){
-            Test.startTest();
             Contact employee = new Contact();
             employee.RecordTypeId = rtContact.Id;
             employee.FirstName = 'Empleado Test 2';
@@ -116,8 +106,9 @@ public class AV_ContactTriggerHelper_Test {
             employee.CC_Matricula__c = 'U01234_Invalid';
             employee.AV_UsuarioAsociado__c = userTest.Id;
             insert employee;
-            Test.stopTest();
+            
             Contact c = [SELECT Id, CC_Inactivo__c, AV_UsuarioAsociado__c FROM Contact WHERE Id =: employee.Id];
+            Test.stopTest();
             User u = [SELECT Id, isActive FROM User WHERE Id =: userTest.Id];
             System.assertEquals(true, c.CC_Inactivo__c);
             System.assertEquals(null, c.AV_UsuarioAsociado__c);
@@ -127,13 +118,12 @@ public class AV_ContactTriggerHelper_Test {
     
     @isTest
     public static void migrateApoderadoTest(){
+        Test.startTest();
         User usuario = [SELECT Id FROM User WHERE UserName LIKE 'gcf-integration@cc-caixabank.com%'];
         RecordType apoderadoRT = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_CONTACT, 'CIBE_Apoderado');
-
         User userTest = CIBE_TestHelper.createUser('CIBE_Gestor');
 
         System.runAs(usuario){
-            Test.startTest();
             Contact employee = new Contact();
             employee.RecordTypeId = apoderadoRT.Id;
             employee.FirstName = 'Empleado Test 2';
@@ -152,5 +142,32 @@ public class AV_ContactTriggerHelper_Test {
         }
     }
 
+    @isTest
+    public static void employeeExistsTest(){
+        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+        List<Contact> contacts = [SELECT Id, CC_Matricula__c, AV_UsuarioAsociado__c FROM Contact WHERE CC_Matricula__c = 'U01XYZ01' LIMIT 1];
+        User user = [SELECT Id FROM User WHERE AV_ExternalID__c  = 'U01XYZ01' LIMIT 1];
+        Test.startTest();
+            System.runAS(userGcf){
+                AV_ContactTriggerHelper.employeeExists(contacts);
+            }
+        Test.stopTest();
+        Contact updatedContact = [SELECT Id, AV_UsuarioAsociado__c, CC_Matricula__c FROM Contact WHERE CC_Matricula__c = 'U01XYZ01' LIMIT 1];
+        System.assertEquals(user.Id, updatedContact.AV_UsuarioAsociado__c);
+    }
 
+    @isTest
+    public static void isPoolContactTest(){
+        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+        List<Contact> contacts = [SELECT Id, CC_Matricula__c, AV_UsuarioAsociado__c, AV_Pool__c, Account.CC_Numero_Oficina_Empresa__c FROM Contact WHERE CC_Matricula__c = 'U01XYZ01' LIMIT 1];
+        User user = [SELECT Id, AV_Pool__c, AV_NumeroOficinaEmpresa__c FROM User WHERE AV_ExternalID__c  = 'U01XYZ01' LIMIT 1];
+        Test.startTest();
+        System.runAS(userGcf){
+            AV_ContactTriggerHelper.isPoolContact(contacts, null);
+        }
+        Test.stopTest();
+        Contact updatedContact = [SELECT Id, AV_UsuarioAsociado__c, CC_Matricula__c, AV_Pool__c, Account.CC_Numero_Oficina_Empresa__c FROM Contact WHERE CC_Matricula__c = 'U01XYZ01' LIMIT 1];
+        System.assertEquals(user.AV_Pool__c, updatedContact.AV_Pool__c);
+        System.assertEquals(user.AV_NumeroOficinaEmpresa__c, updatedContact.Account.CC_Numero_Oficina_Empresa__c);
+    }
 }

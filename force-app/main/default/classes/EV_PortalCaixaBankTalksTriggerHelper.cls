@@ -8,8 +8,41 @@ Historial
 ---------------------
   VERSION	USER_STORY		AUTHOR				DATE			Description
   1.0		US633077		Mamen Arias			06/09/2023		Init version
+  1.1		US854993		Carolina Lopez		10/04/2024		Add method transferDateVisibility.
 ***********************************************************************************************************************/
 public without sharing class EV_PortalCaixaBankTalksTriggerHelper {
+	/**
+	* @description  update portal visibility with related event information
+	* @param listNews    List to EV_PortalCaixaBankTalks__c
+	*/
+	public static void transferDateVisibility(List<EV_PortalCaixaBankTalks__c> listNews){
+		EV_LogDebug.printLogDebug('transferDateVisibility ',String.valueof(listNews));
+		List<EV_PortalCaixaBankTalks__c> listPortal = new List<EV_PortalCaixaBankTalks__c>();
+    	List<EV_PortalCaixaBankTalks__c> listPortalToUpdate = new List<EV_PortalCaixaBankTalks__c>();
+
+		if(Schema.sObjectType.EV_PortalCaixaBankTalks__c.isAccessible()){
+			listPortal = [SELECT Id, Name, EV_Evento__c, EV_Evento__r.EV_Fechadespublicacion__c, EV_Orden__c, EV_Posicionamiento__c, EV_Fechadespublicacion__c 
+				FROM EV_PortalCaixaBankTalks__c WHERE id IN:listNews AND EV_Posicionamiento__c != '008' AND EV_Evento__r.EV_Fechadespublicacion__c!= null];
+		}
+		if(!listPortal.isEmpty()){
+			for(EV_PortalCaixaBankTalks__c ptl : listPortal){
+				ptl.EV_Fechadespublicacion__c = ptl.EV_Evento__r.EV_Fechadespublicacion__c;
+				listPortalToUpdate.add(ptl);
+			}
+			EV_LogDebug.printLogDebug('@@listPortalToUpdate ',String.valueof(listPortalToUpdate));
+			if(!listPortalToUpdate.isEmpty()){
+				Database.SaveResult[] updateResults = Database.update(listPortalToUpdate, false);
+                for(Database.SaveResult result : updateResults){
+                    if(!result.isSuccess()){
+                        for(Database.Error error : result.getErrors()){
+                            EV_LogDebug.printLogDebug('@@Error al actualizar ',String.valueof(error.getMessage()));
+                        }
+                    }
+                }
+			}
+		}
+	}
+
 	public static void checkExist(List<EV_PortalCaixaBankTalks__c> listNews){
 
 		Map<String,EV_PortalCaixaBankTalks__c> oldDestacado = new Map<String,EV_PortalCaixaBankTalks__c>();

@@ -92,6 +92,25 @@ VERSION  USER_STORY   AUTHOR        	 DATE        	 Description
 11.4	 Fix		  Sandra Gómez		 07/10/2023		 Change method setFieldsFromOppTask add parameter mapByPass
 11.5	 Fix		  Sandra Gómez		 13/11/2023		 Change method setFieldsFromOppTask add fields resolution and channel
 11.6	 Fix		  Sandra Gómez		 24/11/2023		 Change method createTaskCallMe delete WITH SECURITY_ENFORCED in query CustomNotificationType
+11.7	 Fix 		  Sandra Gómez		 16/11/2023		 Change method updateTaskWithOpp to change variable updateTask of List to Map
+11.8     US621640     Oscar Moreno       05/12/2023      Change updateCloseDate method. When AV_FechaProximoRecordatorio__c is modified, the CloseDate  will be equal AV_FechaProximoRecordatorio__c + 7 days
+11.8	 Fix Label	  Humberto Vilchez	 05/12/2023		 Change method validationsOpportunity replace messages with Custom Labels
+11.9	 FE144643     Luis Fernández     27/12/2023		 Added new calculateScoreOpp method 
+12.0	 FE144643     Luis Fernández     29/12/2023		 Added new calculateScoreClient method
+12.1	              Gonzalo Ávila      11/01/2024      Added a check of the AV_PilotCenters__c customSetting centers before creating the task in the createTask and createTaskCallMe methods
+12.2                  Oscar Moreno       12/01/2024      Comment setFieldsFromOppTask method
+12.3	US839366	  Ángel Medina		 06/03/2024		 Add bypass of origin updatewallet in method byPassOpp	
+12.4	US839366	  Ángel Medina		 06/03/2024		 Change method updateGCF add condition AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET
+12.5	Fix PF		  Sandra Gómez		 06/03/2024		 Change method validatePF to see externalId with · date, change method sendDataToGCF to not send if externalId with · date and change method byPassOpp to validate externalid null in insert
+12.6    IN1135458     Elisabeth R.       19/03/2024      Changed createCommentsHistory and updateCommentsHistory to map employee
+12.3	FIX18040954	  Luis Fernández	 19/04/2024		 Added null controll in all loops in calculateScoreClient in order to not send empty Id accounts to queuable
+12.4	DT08		  Luis Fernández	 22/04/2024		 Elimintated calculateScoreOpp and sended to a without sharing class AV_OpportunityTriggerAux to avoid sharing rules
+12.5    FIX IOP 7 Mayo Elisabeth R.      06/052024       Changed createCommentsHistory method to AV_OpportunityTriggerHelperSharing class due to sharing settings of the CSBD user who is creating the opportunity with comments
+12.6    FIX IOP 22 Mayo Elisabeth R.     09/05/2024      Changed createTareaOportunidad method to AV_OpportunityTriggerHelperSharing class due to sharing settings of the CSBD user who is creating the AV_CustomActivityOpportunity__c 
+12.3	PPM100205278   Luis Fernández	 21/05/2024		 Added Producto Rechazado to the evaluated StageNames in emptyResolutionField method and all places where its needed (Because of the presence of Cerrado positivo or No interesado) and No gestionada wherever Vencida is
+12.4    PPM100205278   Elisabeth R.      22/05/2024      Added fillSubState and blankSubState methods
+12.5    PPM100130465   Sandra Gómez      30/07/2024		 Change metohds updateCommentsHistory and byPassOpp to add parameter mapByPassOld
+12.6	PPM100265161   Sandra Gómez		 11/10/2024		 Change method updateGCF and byPassOpp to add filter DATAPIPELINES_ORIGENAPP
 ***********************************************************************************************************************/
 public with sharing class AV_OpportunityTriggerHelper {
 	private static final String SUFFIX_EXTERNALID     = 'Opp-';
@@ -168,14 +187,32 @@ public with sharing class AV_OpportunityTriggerHelper {
 	public static void createTask(List<Opportunity> listOpp) {  
 		String methodName='createTask';  
 		Id rtTask     = (new List<Id>(setRtTaskAlerta)).get(0);
-		Id rtTaskIni   = (new List<Id>(setRtTaskIniciativa)).get(0);
 		List<Task> listTask = new List<Task>();
 		Map<String, Task> mapTask     = new Map<String, Task>();
 		List<Opportunity> listUsedOpp   = new List<Opportunity>();
 		Map<Id, String> mapAccNames   = getMapAccountNames(listOpp);
 		Map<Id, Contact> mapGestor     = getMapGestores(listOpp);
+		List<AV_PilotCenters__c> listAvPilotCenters = AV_PilotCenters__c.getall().values();
+		List<String> officeNumbers = new List<String>();
+		if(listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+			for (AV_PilotCenters__c pilotCenterGroup : listAvPilotCenters){
+				List<String> pilotCenterOfficeNumbers = new List<String>();
+				if(pilotCenterGroup.AV_OfficeNumber__c!=null && !String.isEmpty(pilotCenterGroup.AV_OfficeNumber__c)){
+					pilotCenterOfficeNumbers = pilotCenterGroup.AV_OfficeNumber__c.split(',');
+					for(String officeNumber : pilotCenterOfficeNumbers){
+							officeNumbers.add(officeNumber);
+					}
+				}
+			}
+		}
 		for(Opportunity opp : listOpp){
-			if(setRtAlerta.contains(opp.RecordTypeId) && String.isNotBlank(opp.AV_ExternalID__c)){
+			Boolean checkPilotCenters = true;
+			if(opp.AV_Center__c != null && !String.isEmpty(opp.AV_Center__c) && listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+				if(officeNumbers.contains(opp.AV_Center__c)){
+					checkPilotCenters = false;
+				}
+			}
+			if(setRtAlerta.contains(opp.RecordTypeId) && String.isNotBlank(opp.AV_ExternalID__c) && checkPilotCenters){
 				Date activityDate = date.today() + 5;
 				if(opp.AV_DueDateTask__c!=null){
 					activityDate= opp.AV_DueDateTask__c;
@@ -186,14 +223,12 @@ public with sharing class AV_OpportunityTriggerHelper {
 				mapTask.put(tarea.AV_ExternalID__c, tarea);
 			}
 		}
-		//Insertar la lista de Tareas creadas.
-		if (listTask!=null && !listTask.isEmpty()){
+		if (listTask!=null && !listTask.isEmpty()) { //Insertar la lista de Tareas creadas.
 			List<Database.SaveResult> updateResults= Database.insert(listTask, false);
 			AV_AppUtilities.displayErrors(methodName, updateResults);
 			Set<String> setExternalIds = new Set<String>();
 			setExternalIds = mapTask.keySet();
-			//Crear una Tarea-Oportunidad asociada a la oportunidad y la cabecera-tarea asociada a la tarea.
-			createTareaOportunidad(setExternalIds, listUsedOpp);
+			createTareaOportunidad(setExternalIds, listUsedOpp); //Crear una Tarea-Oportunidad asociada a la oportunidad y la cabecera-tarea asociada a la tarea.
 		}
 	}
 
@@ -212,7 +247,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 		List<Opportunity> listUsedOpp = new List<Opportunity>();
 		Map<String, Task> mapNewTask = new Map<String, Task>();
 		List<Task> newTask = new List<Task>();
-		List<Task> updateTask = new List<Task>();
+		Map<Id,Task> updateTask = new Map<Id,Task>();
 		List<Id> deleteTareaOpp = new List<Id>();
 		List<Id> deleteHeaderTsk = new List<Id>();
 		List<Id> deleteTask = new List<Id>();
@@ -308,7 +343,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 		//    + "Status Task" + "Check On/Off" 
 		//***************************************************
 		//Lists used to insert or update or delete
-		if (listOppNews != null && !listOppNews.isEmpty()) {
+		if (listOppNews != null && !listOppNews.isEmpty()) {  
 			for(Opportunity opp : listOppNews) {
 				List<String> extIdTask = new List<String>();
 				if(mapExtIdTaskOpp != null && !mapExtIdTaskOpp.isEmpty()){
@@ -379,7 +414,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 								mapNewTask.put(tarea.AV_ExternalID__c, tarea);
 							} else if (taskNotClosed!=null) {
 								taskNotClosed.ActivityDate = opp.AV_FechaProximoRecordatorio__c;
-								updateTask.add(taskNotClosed);
+								updateTask.put(taskNotClosed.Id,taskNotClosed);
 							}
 						} 
 						//Check change from ON to OFF
@@ -410,22 +445,20 @@ public with sharing class AV_OpportunityTriggerHelper {
 				}
 			}
 		}
-		
 		//Create task's + task-opp
 		if(!newTask.isEmpty()){
 			System.enqueueJob(new AV_CheckOnOff_Queueable(newTask, mapNewTask, listUsedOpp, dateExternalId));
 		}
 		//Update Task's
 		if (updateTask!=null && !updateTask.isEmpty()){
-			AV_LogDebug.printLogDebug(methodName, 'updateTask: ' + updateTask);
-			System.enqueueJob(new AV_CheckOnOff_Queueable(updateTask));
+			AV_LogDebug.printLogDebug(methodName, 'updateTask: ' + updateTask.values());
+			System.enqueueJob(new AV_CheckOnOff_Queueable(updateTask.values()));
 		}
 		//Delete Task-Opp, Header-Task and Task
 		if (deleteTareaOpp!=null && !deleteTareaOpp.isEmpty() && deleteHeaderTsk!=null && !deleteHeaderTsk.isEmpty() && deleteTask!=null && !deleteTask.isEmpty()){
 			System.enqueueJob(new AV_CheckOnOff_Queueable(deleteTareaOpp,deleteTask,deleteHeaderTsk));
 		}
 		if (!updateListOpp.isEmpty() && !System.isFuture() && !System.isBatch()) {
-			String jsonString = json.serialize(updateListOpp);
 			System.enqueueJob(new AV_CheckOnOff_Queueable(updateListOpp));
 		}
 	}
@@ -532,7 +565,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 	*/
 	private static void createTareaOportunidad(Set<String> setExternalIds, List<Opportunity> listOpp) {
 		//Obtenemos todas las Cabecera-Tarea creadas.
-		List<Task> listTareas = [Select Id, AV_ExternalID__c, AV_Task__c from Task where AV_ExternalID__c in :setExternalIds WITH USER_MODE ];
+		List<Task> listTareas = [Select Id, AV_ExternalID__c, AV_Task__c from Task where AV_ExternalID__c in :setExternalIds WITH SECURITY_ENFORCED];
 		//Creo un mapa para guardar los externalId con sus correspondientes IDs de Tareas.              
 		Map<String, String> mapTaskExternalID = new Map<String, String>();
 		for(Task tarea : listTareas){
@@ -550,8 +583,9 @@ public with sharing class AV_OpportunityTriggerHelper {
 				listTareaOpp.add(tareaOpp);
 			}  
 		}
+		
 		if(Schema.sObjectType.AV_CustomActivityOpportunity__c.isCreateable()){
-			Database.insert(listTareaOpp, false);
+			AV_OpportunityTriggerHelperSharing.insertTareaOpp(listTareaOpp);
 		}    
 	}
 	
@@ -663,14 +697,14 @@ public with sharing class AV_OpportunityTriggerHelper {
 			if(setRts.contains(opp.RecordTypeId)){
 				//Copy the closedate to "fechaProximoRecordatorio"
 				if(opp.AV_FechaProximoRecordatorio__c != null && (mapOldObj == null ||  (mapOldObj != null && opp.AV_FechaProximoRecordatorio__c != mapOldObj.get(opp.Id).AV_FechaProximoRecordatorio__c))){
-					opp.CloseDate = opp.AV_FechaProximoRecordatorio__c;
+					opp.CloseDate = opp.AV_FechaProximoRecordatorio__c.addDays(7); 
 				}
 				//Copy the "fechaProximoRecordatorio" to closedate
 				else if(opp.AV_FechaProximoRecordatorio__c == null && 'En gestión/insistir'.equalsIgnoreCase(opp.StageName)){
 					opp.AV_FechaProximoRecordatorio__c = opp.CloseDate;
 				}
 			}
-			if (opp.AV_FechaProximoRecordatorio__c == null && (AV_AppConstants.OPP_STATUS_NOINTERE.equals(opp.StageName) || AV_AppConstants.OPP_STATUS_CERRPOST.equals(opp.StageName))) {
+			if (opp.AV_FechaProximoRecordatorio__c == null && (AV_AppConstants.OPP_STATUS_NOINTERE.equals(opp.StageName) || AV_AppConstants.OPP_STATUS_CERRPOST.equals(opp.StageName) || AV_AppConstants.OPP_STATUS_PROD_RECH.equals(opp.StageName) || AV_AppConstants.OPP_STATUS_PROD_CONTR.equals(opp.StageName))) {
 				opp.AV_FechaProximoRecordatorio__c = System.today();
 				opp.CloseDate = opp.AV_FechaProximoRecordatorio__c;
 			}
@@ -708,7 +742,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  listOpp    List of Opportunities
 	* @param  mapOldObj    Map of old status Opportunities
 	*/
-	public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Opportunity> mapOlds, Map<String, Opportunity> mapByPass) {
+	/*public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Opportunity> mapOlds, Map<String, Opportunity> mapByPass) {
 		List<Opportunity> listToProcess = new List<Opportunity>();
 		for(Opportunity opp : listNews) {
 			if((setRtAll).contains(opp.RecordTypeId) && mapOlds.get(opp.Id).Name != opp.Name || mapOlds.get(opp.Id).AV_PF__c != opp.AV_PF__c ||
@@ -788,7 +822,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 				Database.update(listOppTaskToProcess, false);
 			}
 		}
-	}
+	}*/
 	
 	/**
 	* @description     Procces owners of Opportunity where field EAP Gestor has changed
@@ -799,8 +833,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 		Set<Id> gestorsIds = new Set<Id>();
 		List<Opportunity> listOpp = new List<Opportunity>();
 		List<Opportunity> listOppSinEap = new List<Opportunity>();
-		Map<String,String> mapConGestorUser = new Map<String,String>();
-		List<String> listIdGestores = new List<String>();
 		//Comparamos los valores de los Gestores asociados antiguos y nuevos.
 		//Si han cambiado el Gestor asociado lo añadimos a una lista para actualizar.
 		if(mapOlds != null && !mapOlds.isEmpty()) {
@@ -854,11 +886,11 @@ public with sharing class AV_OpportunityTriggerHelper {
 	*/
 	public static void sendDataToGCF(List<Opportunity> listNews, String origen,  Map<String, Opportunity> mapByPass){
 		List<Opportunity> listOpps = new List<Opportunity>();
-		User userLog = AV_AppUtilities.getUserInfo();
+		String bigdot = AV_AppConstants.BIGDOT;
 		Boolean hasBulkApi = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if(!hasBulkApi && !System.isFuture() && !System.isBatch() && listNews!=null && !listNews.isEmpty()){
 			for(Opportunity opp: listNews){
-				if(setRtIniciativa.contains(opp.RecordTypeId) && !mapByPass.containsKey(opp.AV_ExternalID__c)){
+				if(setRtIniciativa.contains(opp.RecordTypeId) && !mapByPass.containsKey(opp.AV_ExternalID__c) && ((opp.AV_ExternalID__c != null && !opp.AV_ExternalID__c.contains(bigdot)) || opp.AV_ExternalID__c == null)){
 					//Fix segunda llamada a GCF
 					DateTime dtNow = Datetime.now();
 					DateTime createdDateOpp = opp.CreatedDate.addSeconds(12);
@@ -881,7 +913,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 	*/
 	public static void telephoneContracting(List<Opportunity> listNews,  Map<Id, Opportunity> mapOlds){
 		List<Opportunity> listOpps = new List<Opportunity>();
-		User userLog = AV_AppUtilities.getUserInfo();
 		Boolean hasBulkApi = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if(!hasBulkApi && !System.isFuture() && !System.isBatch()){
 			if(mapOlds != null && !mapOlds.isEmpty()) {
@@ -945,8 +976,8 @@ public with sharing class AV_OpportunityTriggerHelper {
 		Set<String> openStatusInitiativeRT = new Set<String>{
 			AV_AppConstants.OPP_STATUS_POTENCIAL, 
 			AV_AppConstants.OPP_STATUS_ENGESTION,
-			AV_AppConstants.OPP_STATUS_NOAPTO,
-			AV_AppConstants.OPP_STATUS_VENCIDO
+			AV_AppConstants.OPP_STATUS_VENCIDO,
+			AV_AppConstants.OPP_STATUS_NO_GESTIONADA
 		};
 
 		Set<String> closedStatusInitiativeRT = new Set<String>{
@@ -954,13 +985,14 @@ public with sharing class AV_OpportunityTriggerHelper {
 			AV_AppConstants.OPP_STATUS_CERRPOST,
 			AV_AppConstants.OPP_STATUS_CERRNEG,
 			AV_AppConstants.OPP_STATUS_NOINTERE,
-			AV_AppConstants.OPP_STATUS_CONVENTA
+			AV_AppConstants.OPP_STATUS_CONVENTA,
+			AV_AppConstants.OPP_STATUS_PROD_CONTR,
+			AV_AppConstants.OPP_STATUS_PROD_RECH
 		};
 
 		Set<String> openStatusOtherRT = new Set<String>{
 			AV_AppConstants.OPP_STATUS_POTENCIAL, 
-			AV_AppConstants.OPP_STATUS_ENGESTION,
-			AV_AppConstants.OPP_STATUS_NOAPTO
+			AV_AppConstants.OPP_STATUS_ENGESTION
 		};
 
 		Set<String> rts = new Set<String>{
@@ -1001,7 +1033,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 							accProdListOpp.get(newkey).add(oppToCheck);
 						}
 					}
-					Map<Id, Opportunity> mapOpps = new Map<Id, Opportunity>(listOpp);
 					List<Opportunity> listOpportunity = new List<Opportunity>();
 					for(Opportunity opp : listOpp){
 						if(closedStatusInitiativeRT.contains(opp.stageName) && opp.RecordType.DeveloperName == AV_AppConstants.OPPINICIATIVA_RT){
@@ -1009,14 +1040,14 @@ public with sharing class AV_OpportunityTriggerHelper {
 							Opportunity opportunityNew = mapNew.get(oppVigente);
 							if(opportunityNew != null){
 								String stringSystemModStamp = string.valueOfGmt(opp.SystemModStamp);				
-								for(Opportunity existentOppo : accProdListOpp.get(oppVigente)){
-									if(opp.AV_ExternalID__c != null){										
-										if(!opp.AV_ExternalID__c.contains(bigdot)){
-											opportunityNew.AV_ExternalID__c = opp.AV_ExternalID__c;
-											opp.AV_ExternalID__c =  opp.AV_ExternalID__c + bigdot + stringSystemModStamp; 
-											listOpportunity.add(opp);	
-											break;						
-										}	
+								for(Opportunity existentOppo : accProdListOpp.get(oppVigente)){								
+									if(opp.AV_ExternalID__c != null && !opp.AV_ExternalID__c.contains(bigdot)){
+										opportunityNew.AV_ExternalID__c = opp.AV_ExternalID__c;
+										opp.AV_ExternalID__c =  opp.AV_ExternalID__c + bigdot + stringSystemModStamp; 
+										listOpportunity.add(opp);
+										break;
+									} else if (opp.AV_ExternalID__c != null && opp.AV_ExternalID__c.contains(bigdot)) {
+										opportunityNew.AV_ExternalID__c = opp.AV_ExternalID__c.split(bigdot)[0];
 									}
 								}
 							}
@@ -1025,14 +1056,12 @@ public with sharing class AV_OpportunityTriggerHelper {
 							String idProd = mapAccProd.get(opp.AccountId);
 							if (String.isNotBlank(idProd)){
 								for(Opportunity newOpp : listNew){
-									//RecordType iniciativa = AV_AppUtilities.getRecordType('Opportunity','AV_Iniciativa');
 									if (newOpp.AV_PF__c != null && opp.AV_PF__c != null && newOpp.AV_PF__c == opp.AV_PF__c  && newOpp.AccountId != null && opp.AccountId != null && newOpp.AccountId == opp.AccountId && setRtIniciativa.contains(newOpp.RecordTypeId)/*newOpp.RecordTypeId.equals(iniciativa.Id)*/ && opp.RecordTypeId != newOpp.RecordTypeId &&  openStatusOtherRT.contains(opp.stageName)){
                                         newOpp.addError(ERROR_MESSAGE_PF);
                                     }
                                     if (newOpp.AV_PF__c != null && opp.AV_PF__c != null && newOpp.AV_PF__c == opp.AV_PF__c  && newOpp.AccountId != null && opp.AccountId != null && newOpp.AccountId == opp.AccountId && setRtIniciativa.contains(newOpp.RecordTypeId) /*newOpp.RecordTypeId.equals(iniciativa.Id)*/ && opp.RecordTypeId == newOpp.RecordTypeId &&  openStatusInitiativeRT.contains(opp.stageName)){
                                         newOpp.addError(ERROR_MESSAGE_PF);
                                     }
-									
 								}
 							}
 						}
@@ -1189,7 +1218,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 	*/
 	public static void saveFieldsFromOpp(List<Opportunity> listNews, Map<Id, Opportunity> mapOldObj, Boolean isUpdate){
 		Map<Id, List<Opportunity>> mapOppOwners = new Map<Id, List<Opportunity>>();
-		Set<Id> usuariosGestoresIds = new Set<Id>();
 		Set<String> updatedFields=new Set<String>();
 		if (isUpdate) {
 			updatedFields = checkUserFields(listNews, mapOldObj);
@@ -1258,7 +1286,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  mapOlds   map of old Opportunity records
 	*/
 	public static void changeOwner(List<Opportunity> listNews, Map<Id, Opportunity> mapOlds) {
-		Map<Id, List<Opportunity>> mapOppOwners = new Map<Id, List<Opportunity>>();
 		List<Opportunity> listToProcess= new List<Opportunity>();
 		List<String> listOwners= new List<String>();
 		if(mapOlds == null) { 
@@ -1391,7 +1418,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 			String newStage = opp.StageName;
 			String oldStage = mapOldObj.get(opp.Id).StageName;
 			if(oldStage!= newStage){
-				if(oldStage == 'Potencial' && newStage!='Vencido' ){
+				if(oldStage == 'Potencial' && newStage!='Vencido' && newStage != AV_AppConstants.OPP_STATUS_NO_GESTIONADA ){
 					opp.AV_FechaActivacion__c= System.today();
 				}
 			}
@@ -1408,8 +1435,6 @@ public with sharing class AV_OpportunityTriggerHelper {
 		Set<Id> owners = new Set<Id>();
 		List<Opportunity> oppToProcess = new List<Opportunity>();
 		String offiNumber='';
-		//RecordType iniciativa = AV_AppUtilities.getRecordType('Opportunity','AV_Iniciativa');
-		//RecordType alertaComercial = AV_AppUtilities.getRecordType('Opportunity','AV_AlertaComercial');
 		if(mapOldObj != null && !mapOldObj.isEmpty()){//Updating existint opp
 			for(Opportunity opp : listOpp){
 				if(opp.OwnerId != mapOldObj.get(opp.Id).OwnerId){
@@ -1417,9 +1442,8 @@ public with sharing class AV_OpportunityTriggerHelper {
 					oppToProcess.add(opp);        
 				}      
 			}
-		} else{//New Oppo
+		} else{
 			for(Opportunity opp : listOpp){
-				//if(opp.RecordTypeId.equals(iniciativa.Id) ||opp.RecordTypeId.equals(alertaComercial.Id)){
 				if(setRtIniciativa.contains(opp.RecordTypeId) || setRtAlerta.contains(opp.RecordTypeId)){
 					owners.add(opp.OwnerId);
 					oppToProcess.add(opp);        
@@ -1452,33 +1476,32 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  mapOldObj   map of old Opportunity records
 	*/
 	public static void updateGCF(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj){ 	
-		Set<String> stageOpen = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL, AV_AppConstants.OPP_STATUS_ENGESTION};
-		Set<String> stageClose = new Set<String>{AV_AppConstants.OPP_STATUS_CERRPOST, AV_AppConstants.OPP_STATUS_NOINTERE, AV_AppConstants.OPP_STATUS_NOAPTO, AV_AppConstants.OPP_STATUS_CONVENTA, AV_AppConstants.OPP_STATUS_VENCIDO};
-		
 		if (UserInfo.getUserId() == userGFC.id) {
 			if(mapOldObj != null){
 				for(Opportunity opp : listOpp) {
-					Opportunity oldOpp = mapOldObj.get(opp.Id);
-					//Si te llega el toDelete a true y la fecha de actualización está rellena -->  pongo el toDelete a lo previo 
-					if (opp.AV_FechaModificacion__c != null && oldOpp.AV_ToDelete__c != opp.AV_ToDelete__c && opp.AV_ToDelete__c == true) { 
-						opp.AV_ToDelete__c = oldOpp.AV_ToDelete__c;
-					}
-					//Si estaba en etapa Cerrada positiva, cerrada negativa o no apto y no pasa a Con Venta llegando una modificación de etapa, fecha de próxima gestión o comentario --> pongo etapa, fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos 
-					//Si estaba en etapa Con venta y no pasa a Cerrado Negativo llegando una modificación de etapa, fecha de próxima gestión o comentario --> pongo etapa, fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos
-					//Si estaba en etapa En gestión/insistir y pasa a Potencial llegando una modificación de etapa, fecha de próxima gestión o comentario -->  pongo fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos 
-					if ((oldOpp.AV_Comentarios__c != opp.AV_Comentarios__c || oldOpp.AV_FechaProximoRecordatorio__c != opp.AV_FechaProximoRecordatorio__c || oldOpp.StageName != opp.StageName) && (((oldOpp.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || oldOpp.StageName == AV_AppConstants.OPP_STATUS_NOAPTO || oldOpp.StageName == AV_AppConstants.OPP_STATUS_NOINTERE) && opp.StageName != AV_AppConstants.OPP_STATUS_CONVENTA) || (oldOpp.StageName == AV_AppConstants.OPP_STATUS_CONVENTA && opp.StageName != AV_AppConstants.OPP_STATUS_NOINTERE) || (oldOpp.StageName == AV_AppConstants.OPP_STATUS_ENGESTION && opp.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL))) { 
-						opp.StageName = oldOpp.StageName;
-						opp.AV_Comentarios__c = oldOpp.AV_Comentarios__c;
-						opp.AV_FechaProximoRecordatorio__c = oldOpp.AV_FechaProximoRecordatorio__c;
-					} 
-					//Si llega un cambio de centro o empleado y la fecha de actualización está rellena --> pongo centro o empleado previo y dejo pasar el resto de cambios 
-					if ((oldOpp.AV_Center__c != opp.AV_Center__c || oldOpp.AV_Gestor__c != opp.AV_Gestor__c) && opp.AV_FechaModificacion__c != null) { 
-						opp.AV_Center__c = oldOpp.AV_Center__c;
-						opp.AV_Gestor__c = oldOpp.AV_Gestor__c;
-					}
+					if(opp.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET && opp.AV_OrigenApp__c != AV_AppConstants.DATAPIPELINES_ORIGENAPP){
+						Opportunity oldOpp = mapOldObj.get(opp.Id);
+						//Si te llega el toDelete a true y la fecha de actualización está rellena -->  pongo el toDelete a lo previo 
+						if (opp.AV_FechaModificacion__c != null && oldOpp.AV_ToDelete__c != opp.AV_ToDelete__c && opp.AV_ToDelete__c == true) { 
+							opp.AV_ToDelete__c = oldOpp.AV_ToDelete__c;
+						}
+						//Si estaba en etapa Cerrada positiva, Producto rechazado, cerrada negativa o Producto Contratado y no pasa a Con Venta llegando una modificación de etapa, fecha de próxima gestión o comentario --> pongo etapa, fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos 
+						//Si estaba en etapa Con venta y no pasa a Cerrado Negativo o Producto Rechazado llegando una modificación de etapa, fecha de próxima gestión o comentario --> pongo etapa, fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos
+						//Si estaba en etapa En gestión/insistir y pasa a Potencial llegando una modificación de etapa, fecha de próxima gestión o comentario -->  pongo fecha de próxima gestión y comentario lo previo y dejo pasar el resto de campos 
+						if ((oldOpp.AV_Comentarios__c != opp.AV_Comentarios__c || oldOpp.AV_FechaProximoRecordatorio__c != opp.AV_FechaProximoRecordatorio__c || oldOpp.StageName != opp.StageName) && (((oldOpp.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || oldOpp.StageName == AV_AppConstants.OPP_STATUS_PROD_RECH || oldOpp.StageName == AV_AppConstants.OPP_STATUS_NOINTERE || oldOpp.StageName == AV_AppConstants.OPP_STATUS_PROD_CONTR) && opp.StageName != AV_AppConstants.OPP_STATUS_CONVENTA) || (oldOpp.StageName == AV_AppConstants.OPP_STATUS_CONVENTA && (opp.StageName != AV_AppConstants.OPP_STATUS_NOINTERE && opp.StageName != AV_AppConstants.OPP_STATUS_PROD_RECH) ) || (oldOpp.StageName == AV_AppConstants.OPP_STATUS_ENGESTION && opp.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL))) { 
+							opp.StageName = oldOpp.StageName;
+							opp.AV_Comentarios__c = oldOpp.AV_Comentarios__c;
+							opp.AV_FechaProximoRecordatorio__c = oldOpp.AV_FechaProximoRecordatorio__c;
+						} 
+						//Si llega un cambio de centro o empleado y la fecha de actualización está rellena --> pongo centro o empleado previo y dejo pasar el resto de cambios 
+						if ((oldOpp.AV_Center__c != opp.AV_Center__c || oldOpp.AV_Gestor__c != opp.AV_Gestor__c) && opp.AV_FechaModificacion__c != null) { 
+							opp.AV_Center__c = oldOpp.AV_Center__c;
+							opp.AV_Gestor__c = oldOpp.AV_Gestor__c;
+						}
 
-					if((oldOpp.CloseDate) != opp.CloseDate && oldOpp.StageName != AV_AppConstants.OPP_STATUS_POTENCIAL){
-						opp.CloseDate = oldOpp.CloseDate;
+						if((oldOpp.CloseDate) != opp.CloseDate && oldOpp.StageName != AV_AppConstants.OPP_STATUS_POTENCIAL){
+							opp.CloseDate = oldOpp.CloseDate;
+						}
 					}
 				}
 			}
@@ -1493,7 +1516,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 	public static void updateSinGestor(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj){
 
 		for(Opportunity opp :listOpp){
-			if((opp.StageName == AV_AppConstants.OPP_STATUS_ENGESTION ||opp.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || opp.StageName == AV_AppConstants.OPP_STATUS_CERRNEG || opp.StageName == AV_AppConstants.OPP_STATUS_NOAPTO) && opp.StageName != mapOldObj.get(opp.Id).StageName && opp.OwnerId == userGFC.Id){
+			if((opp.StageName == AV_AppConstants.OPP_STATUS_ENGESTION ||opp.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || opp.StageName == AV_AppConstants.OPP_STATUS_CERRNEG ||opp.StageName == AV_AppConstants.OPP_STATUS_PROD_RECH || opp.StageName == AV_AppConstants.OPP_STATUS_PROD_CONTR) && opp.StageName != mapOldObj.get(opp.Id).StageName && opp.OwnerId == userGFC.Id){
 				opp.OwnerId = UserInfo.getUserId();
 			} else if(opp.StageName == AV_AppConstants.OPP_STATUS_CONVENTA && opp.StageName != mapOldObj.get(opp.Id).StageName && opp.AV_AssignedManagerSales__c != null && opp.OwnerId == userGFC.Id &&  opp.AV_AssignedManagerSales__c != opp.AV_Gestor__c){
 				opp.AV_Gestor__c = opp.AV_AssignedManagerSales__c;     
@@ -1522,12 +1545,11 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  mapOldObj  list of old Opportunities
 	*/
 	public static void createTaskCallMe(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj) {
-		String methodName='createTaskCallMe';
 		List<Opportunity> oppToCreateTaskList = new List<Opportunity>();
 		Set<Id> ownerOppsIds = new Set<Id>();
 		for(Opportunity opp : listOpp){
 			//SI LA OPP TIENE ESTADO POTENCIAL Y SE HA ACTUALIZADO EL OWNER, SE CAMBIA EL ESTADO A 'EN GESTIÓN/INSISTIR' Y SE CREARÁ UNA TAREA ALERTA COMERCIAL
-			if(opp.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL && opp.OwnerId != mapOldObj.get(opp.Id).OwnerId){  
+			if(opp.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL && opp.OwnerId != mapOldObj.get(opp.Id).OwnerId){ 
 				opp.StageName = AV_AppConstants.OPP_STATUS_ENGESTION;
 				oppToCreateTaskList.add(opp);
 				ownerOppsIds.add(opp.OwnerId);
@@ -1539,10 +1561,32 @@ public with sharing class AV_OpportunityTriggerHelper {
 			List<Task> taskToInsertList = new List<Task>();
 			Map<Id, String> oppIdTaskExternalIdMap = new Map<Id, String>();
 			Map<Id,User> userMap = new Map<Id,User>([SELECT Id, AV_NumeroOficinaEmpresa__c FROM User WHERE Id IN: ownerOppsIds]);
+			List<AV_PilotCenters__c> listAvPilotCenters = AV_PilotCenters__c.getall().values();
+			List<String> officeNumbers = new List<String>();
+			if(listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+				for (AV_PilotCenters__c pilotCenterGroup : listAvPilotCenters){
+					List<String> pilotCenterOfficeNumbers = new List<String>();
+					if(pilotCenterGroup.AV_OfficeNumber__c!=null && !String.isEmpty(pilotCenterGroup.AV_OfficeNumber__c)){
+						pilotCenterOfficeNumbers = pilotCenterGroup.AV_OfficeNumber__c.split(',');
+						for(String officeNumber : pilotCenterOfficeNumbers){
+								officeNumbers.add(officeNumber);
+						}
+					}
+				}	
+			}
 			for(Opportunity o : oppToCreateTaskList){
-				Task taskToInsert = createTaskCommercialAlert( o, activityDate, rtTask, userMap.get(o.ownerId).AV_NumeroOficinaEmpresa__c );
-				oppIdTaskExternalIdMap.put(o.Id, taskToInsert.AV_ExternalID__c);
-				taskToInsertList.add(taskToInsert);
+				Boolean checkPilotCenters = true;
+					if(o.AV_Center__c != null && !String.isEmpty(o.AV_Center__c) && listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+						if(officeNumbers.contains(o.AV_Center__c)){
+							checkPilotCenters = false;
+						}
+					}
+					if(checkPilotCenters){
+
+						Task taskToInsert = createTaskCommercialAlert( o, activityDate, rtTask, userMap.get(o.ownerId).AV_NumeroOficinaEmpresa__c );
+						taskToInsertList.add(taskToInsert);
+						oppIdTaskExternalIdMap.put(o.Id, taskToInsert.AV_ExternalID__c);
+					}			
 			}
 			if (taskToInsertList!=null && !taskToInsertList.isEmpty()){
 				//INSERTA LAS TAREAS PARA CADA OPORTUNIDAD
@@ -1572,7 +1616,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 							taskOpp.AV_Opportunity__c = opp.Id;
 							taskOppList.add(taskOpp);
 					}
-					Database.SaveResult[] rList =Database.insert(taskOppList, false);
+					Database.insert(taskOppList, false);
 				}
 			}  
 		}
@@ -1687,7 +1731,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 	**/
 	public static void emptyResolutionField(List<Opportunity> listNew, Map<Id, Opportunity> mapOld) {
 		for (Opportunity o : listNew) {
-			if (!o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName) && !o.StageName.equalsIgnoreCase('No interesado') && !String.isBlank(o.AV_Resolucion__c) ) {
+			if (!o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName) && !(o.StageName.equalsIgnoreCase(AV_AppConstants.OPP_STATUS_NOINTERE) || o.StageName.equalsIgnoreCase(AV_AppConstants.OPP_STATUS_PROD_RECH)) && !String.isBlank(o.AV_Resolucion__c) ) {
 				o.AV_Resolucion__c = null;
 			}
 		}
@@ -1709,17 +1753,30 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  listNew  list of new Opportunities 
 	* @param  mapOld   map of old Opportunities 
 	*/
-	public static void updateCommentsHistory(List<Opportunity> listNew, Map<Id, Opportunity> mapOld){
+	public static void updateCommentsHistory(List<Opportunity> listNew, Map<Id, Opportunity> mapOld,Map<String, Opportunity> mapByPass, Map<String, Opportunity> mapByPassOld){
 		List<AV_CommentsHistory__c> lstCommHist = new List<AV_CommentsHistory__c>();
+
+		String commentOwnerId = UserInfo.getUserId();
+
+		List<User> commentUserId = [SELECT Id, AV_ExternalID__c FROM User WHERE Id =:commentOwnerId LIMIT 1];
+		List<Contact> commentEmployee = [SELECT Id FROM Contact WHERE CC_Matricula__c =: commentUserId[0].AV_ExternalID__c LIMIT 1];
+
 		for(Opportunity opp : listNew){
-			if(opp.AV_Comentarios__c != null && String.isNotBlank(opp.AV_Comentarios__c) && !opp.AV_Comentarios__c.equals(mapOld.get(opp.Id).AV_Comentarios__c)){
+			if(opp.AV_Comentarios__c != null && !mapByPass.containsKey(opp.AV_ExternalID__c) && !mapByPassOld.containsKey(opp.AV_ExternalID__c) && ((String.isNotBlank(opp.AV_Comentarios__c) && !opp.AV_Comentarios__c.equals(mapOld.get(opp.Id).AV_Comentarios__c)) || mapOld.get(opp.Id).StageName != opp.StageName)){
 				AV_CommentsHistory__c commHist = new AV_CommentsHistory__c();
 				commHist.OwnerId = opp.LastModifiedById;
 				commHist.AV_ModificationDate__c = opp.AV_CommentLastModifiedDate__c;
-				commHist.AV_OldComment__c = mapOld.get(opp.Id).AV_Comentarios__c;
-				commHist.AV_NewComment__c = opp.AV_Comentarios__c;
+				if (String.isNotBlank(opp.AV_Comentarios__c)) {
+					commHist.AV_OldComment__c = mapOld.get(opp.Id).AV_Comentarios__c;
+					commHist.AV_NewComment__c = opp.AV_Comentarios__c;
+				}
 				commHist.AV_OpportunityStatus__c = opp.StageName;
-				commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+				commHist.AV_OldStatus__c = mapOld.get(opp.Id).StageName;
+				if(commentEmployee != null && !commentEmployee.isEmpty()){
+					commHist.AV_AssignedEmployee__c = commentEmployee[0].Id;
+				}else{
+					commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+				}
 				commHist.AV_Opportunity__c = opp.Id;
 				lstCommHist.add(commHist);
 			}	
@@ -1729,29 +1786,7 @@ public with sharing class AV_OpportunityTriggerHelper {
 		}
 	}
 
-	/**
-	* @description   object AV_CommentsHistory is created when a new Opportunity with the AV_Comentarios__ field informed is inserted
-	* @param  listNew  list of new Opportunities 
-	*/
-	public static void createCommentsHistory(List<Opportunity> listNew){
-		List<AV_CommentsHistory__c> lstCommHist = new List<AV_CommentsHistory__c>();
-		for(Opportunity opp: listNew){
-			if(listNew != null && String.isNotBlank(opp.AV_Comentarios__c)  ){
-				AV_CommentsHistory__c commHist = new AV_CommentsHistory__c();
-			    commHist.OwnerId = opp.LastModifiedById;
-				commHist.AV_ModificationDate__c = opp.AV_CommentLastModifiedDate__c;
-				commHist.AV_NewComment__c = opp.AV_Comentarios__c;
-				commHist.AV_OpportunityStatus__c = opp.StageName;
-				commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
-				commHist.AV_Opportunity__c = opp.Id;
-				lstCommHist.add(commHist);
-			}
-		}
-		if(Schema.sObjectType.AV_CommentsHistory__c.isCreateable()){
-			Database.insert(lstCommHist,false);
-		}
-	}
-
+	
 	/**
 	* @description     	Delete AV_CommentsHistory objects related With Opportunity
 	* @param  deletedOpportunityList  list of delete Opportunity records
@@ -1776,39 +1811,39 @@ public with sharing class AV_OpportunityTriggerHelper {
 		for(Opportunity o : listNew) {
 			if (mapOld != null) { //Update
 				if ((mapOld.get(o.Id).StageName != AV_AppConstants.OPP_STATUS_POTENCIAL && o.StageName != AV_AppConstants.OPP_STATUS_ENGESTION && o.AV_FechaProximoRecordatorio__c == mapOld.get(o.Id).AV_FechaProximoRecordatorio__c) && (!o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName) && !AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c))) {
-					o.addError('Para modificar la oportunidad utiliza el botón "Reportar Oportunidad".');
+					o.addError(Label.AV_ValidateOppToEditOppUseButt	);
 				}
 				if (o.CloseDate != o.AV_FechaProximoRecordatorio__c && o.CloseDate != mapOld.get(o.Id).CloseDate && (!AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(o.AV_OrigenApp__c) && !AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(o.AV_OrigenApp__c) && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c))){
-					o.addError('No se puede modificar la fecha de cierre manualmente.');
+					o.addError(Label.AV_ValidateOppChangeCloseDateManual);
 				}
 				if (UserInfo.getUserId() == userGFC.id || Test.isRunningTest()) {
-					if (o.StageName != mapOld.get(o.Id).StageName && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk) && (o.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL || o.StageName == AV_AppConstants.OPP_STATUS_CONVENTA || o.StageName == AV_AppConstants.OPP_STATUS_VENCIDO)) {
-						o.addError('No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.'); //El gestor no puede cambiar el estado a "Vencido", "Con venta" y "Potencial", ni modificar estado de "Con Venta"
+					if (o.StageName != mapOld.get(o.Id).StageName && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk) && (o.StageName == AV_AppConstants.OPP_STATUS_POTENCIAL || o.StageName == AV_AppConstants.OPP_STATUS_CONVENTA || o.StageName == AV_AppConstants.OPP_STATUS_NO_GESTIONADA||o.StageName == AV_AppConstants.OPP_STATUS_VENCIDO)) {
+						o.addError(Label.AV_ValidateOppStage); //El gestor no puede cambiar el estado a "Vencido", "Con venta" y "Potencial", ni modificar estado de "Con Venta"
 					}
-					if (o.StageName != mapOld.get(o.Id).StageName && mapOld.get(o.Id).StageName == AV_AppConstants.OPP_STATUS_CONVENTA && (o.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || o.StageName == AV_AppConstants.OPP_STATUS_NOINTERE || o.StageName == AV_AppConstants.OPP_STATUS_ENGESTION || o.StageName == AV_AppConstants.OPP_STATUS_NOAPTO) && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-						o.addError('No se puede retroceder de etapa si está en estado Con Venta.'); //No permite modificar a una etapa anterior si está en estado 'Con Venta'
+					if (o.StageName != mapOld.get(o.Id).StageName && mapOld.get(o.Id).StageName == AV_AppConstants.OPP_STATUS_CONVENTA && (o.StageName == AV_AppConstants.OPP_STATUS_CERRPOST || o.StageName == AV_AppConstants.OPP_STATUS_NOINTERE || o.StageName == AV_AppConstants.OPP_STATUS_ENGESTION ||o.StageName == AV_AppConstants.OPP_STATUS_PROD_RECH || o.StageName == AV_AppConstants.OPP_STATUS_PROD_CONTR) && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
+						o.addError(Label.AV_ValidateOppReturnStagInSalesStatus); //No permite modificar a una etapa anterior si está en estado 'Con Venta'
 					}
 					if (o.AV_IncludeInPrioritizingCustomers__c != mapOld.get(o.Id).AV_IncludeInPrioritizingCustomers__c && o.AV_IncludeInPrioritizingCustomers__c && o.StageName != AV_AppConstants.OPP_STATUS_POTENCIAL && o.StageName != AV_AppConstants.OPP_STATUS_ENGESTION && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-						o.addError('El estado de la oportunidad no permite incluirla en "clientes priorizados".');
+						o.addError(Label.AV_checkStatusClientePriorizador);
 					}
 					if (o.AV_IncludeInPrioritizingCustomers__c != mapOld.get(o.Id).AV_IncludeInPrioritizingCustomers__c && o.AV_IncludeInPrioritizingCustomers__c && o.AV_FechaProximoRecordatorio__c < date.today() && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-						o.addError('La fecha de próxima gestión no puede ser anterior a hoy.');
+						o.addError(Label.AV_controlFechaRecordatorio); 
 					}
-					if (o.AV_Resolucion__c != mapOld.get(o.Id).AV_Resolucion__c && o.StageName == mapOld.get(o.Id).StageName && o.StageName != AV_AppConstants.OPP_STATUS_NOINTERE && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-						o.addError('No es posible seleccionar la resolución si el estado de la oportunidad no es "Cerrada negativa".');
+					if (o.AV_Resolucion__c != mapOld.get(o.Id).AV_Resolucion__c && o.StageName == mapOld.get(o.Id).StageName && (o.StageName != AV_AppConstants.OPP_STATUS_NOINTERE ||o.StageName != AV_AppConstants.OPP_STATUS_PROD_RECH  )&& o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
+						o.addError(Label.AV_ValidateOppNoResoIfNegClosed);
 					}
 					if (o.AV_Resolucion__c != mapOld.get(o.Id).AV_Resolucion__c && o.AV_Resolucion__c == AV_AppConstants.OPP_RESOLUTION_VD && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-						o.addError('No es posible cambiar la resolución a Venta desestimada, es una resolución automática.'); //El gestor no puede cambiar la resolución a Venta desestimada.
+						o.addError(Label.AV_ValidateOppNoResoDisSalesIsAutomRes); //El gestor no puede cambiar la resolución a Venta desestimada.
 					}
 				}
 			}
 			//Insert/Update
 			if (UserInfo.getUserId() == userGFC.id || Test.isRunningTest()) {
-				if ((setRtAlerta.contains(o.RecordTypeId) || setRtIniciativa.contains(o.RecordTypeId) || setRtPropuesta.contains(o.RecordTypeId) || setRtSugerencia.contains(o.RecordTypeId)) && o.AV_FechaProximoRecordatorio__c == null && (o.StageName == AV_AppConstants.OPP_STATUS_ENGESTION || o.StageName == AV_AppConstants.OPP_STATUS_NOAPTO) && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-					o.addError('Para la etapa seleccionada es obligatorio informar fecha de próxima gestión.'); //Será obligatorio rellenar la fecha de próxima gestión cuando las etapas sean en gestión/insistir y no apto.
+				if ((setRtAlerta.contains(o.RecordTypeId) || setRtIniciativa.contains(o.RecordTypeId) || setRtPropuesta.contains(o.RecordTypeId) || setRtSugerencia.contains(o.RecordTypeId)) && o.AV_FechaProximoRecordatorio__c == null && (o.StageName == AV_AppConstants.OPP_STATUS_ENGESTION) && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
+					o.addError(Label.AV_FechaProximaGestion); //Será obligatorio rellenar la fecha de próxima gestión cuando las etapas sean en gestión/insistir y no apto.
 				}
 				if(o.AV_Resolucion__c == AV_AppConstants.OPP_RESOLUTION_OTROS && o.AV_Comentarios__c == null && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_BACK_REPORT && !AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(o.AV_OrigenApp__c) && (!hasByPassValidationRulesAv && !hasByPassValidationRulesCbk)) {
-					o.addError('Por favor, debe añadir algun comentario.'); //Validacion de cuando se elige la opcion Otros de Resolucion y el campo Coemntario esta vacio
+					o.addError(Label.AV_ValidateOppCommentReq); //Validacion de cuando se elige la opcion Otros de Resolucion y el campo Coemntario esta vacio
 				}
 			}
 		}
@@ -1819,8 +1854,9 @@ public with sharing class AV_OpportunityTriggerHelper {
 	* @param  listNew  list of new Opportunity records
 	* @param  mapOld   map of old Opportunity records.
 	*/
-	public static Map<String, Opportunity> byPassOpp(List<Opportunity> listNew, Map<Id, Opportunity> mapOld) {
+	public static ResultadoByPass byPassOpp(List<Opportunity> listNew, Map<Id, Opportunity> mapOld) {
 		Map<String, Opportunity> mapReturnToAfter = new Map<String, Opportunity>();
+		Map<String, Opportunity> mapReturnOldToAfter = new Map<String, Opportunity>();
 		for (Opportunity o : listNew) {
 			if (mapOld != null && !mapOld.isEmpty()) {
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_BACK_REPORT){
@@ -1828,25 +1864,163 @@ public with sharing class AV_OpportunityTriggerHelper {
 					o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_BACK_REPORT.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				}
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_SF_REPORT){
+					mapReturnOldToAfter.put(o.AV_ExternalID__c,o);
 					o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				}
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.CLIENT_REPORT_ORIGENAPP){
-					mapReturnToAfter.put(o.AV_ExternalID__c,o);
+				    mapReturnToAfter.put(o.AV_ExternalID__c,o);
 					o.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				}
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP){
 					o.AV_OrigenApp__c = AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				}
+				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET){
+					o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
+				}
+				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.DATAPIPELINES_ORIGENAPP){
+					o.AV_OrigenApp__c = AV_AppConstants.DATAPIPELINES_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
+				}
 			} else {
 				if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && (o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_BACK_REPORT || o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_SF_REPORT || o.AV_OrigenApp__c == AV_AppConstants.CLIENT_REPORT_ORIGENAPP || o.AV_OrigenApp__c == AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP)){
 					if (o.AV_OrigenApp__c != AV_AppConstants.BACK_REPORT_NEW_OPP_ORIGENAPP && o.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_SF_REPORT){
-						o.AV_ExternalID__c = SUFFIX_EXTERNALID+(Math.round(Math.random()*1000000) + Datetime.now().getTime());
+						if (o.AV_ExternalID__c == null) {
+							o.AV_ExternalID__c = SUFFIX_EXTERNALID+(Math.round(Math.random()*1000000) + Datetime.now().getTime());
+						}
 						mapReturnToAfter.put(o.AV_ExternalID__c,o);
 					}
 					o.AV_OrigenApp__c = '';
 				}
 			}
 		}
-		return mapReturnToAfter;
+		ResultadoByPass rbp = new ResultadoByPass();
+		rbp.mapByPass = mapReturnToAfter;
+		rbp.mapByPassOld = mapReturnOldToAfter;
+		return rbp;
 	}
+
+	public class ResultadoByPass{
+		public Map<String, Opportunity> mapByPass = new Map<String, Opportunity> ();
+		public Map<String, Opportunity> mapByPassOld = new Map<String, Opportunity> ();
+	}
+
+	/**
+	 * @param opposForRecalculateScoring opportunities that has been recalculated
+	 * @param clientsInEmptyCase clients that has been stripped of all opportunities
+	 * @param isQueuable whether has to make the update or just return the list of calculate account scoring
+	 * @param transactionType
+	 * @return List<Account>
+	 */
+	public static List<Account> calculateScoreClient(List<Opportunity> opposForRecalculateScoring,List<String> clientsInEmptyCase,Boolean isQueuable,String transactionType){
+		Map<Id,List<Opportunity>> clientToHisOpportunitys = new Map<Id,List<Opportunity>>();
+		List<Account> accountsToUpdateScore = new List<Account>();
+		if(!opposForRecalculateScoring.isEmpty()){
+			for(Opportunity oppo : opposForRecalculateScoring){
+				if(clientToHisOpportunitys.containsKey(oppo.AccountId)){
+					clientToHisOpportunitys.get(oppo.AccountId).add(oppo);
+				}else{
+					clientToHisOpportunitys.put(oppo.AccountId,new List<Opportunity>{oppo});
+				}
+			} 
+			for(Id accToUpdt : clientToHisOpportunitys.keySet()){
+				if(accToUpdt != null){
+					Decimal finalScore = 0;
+					for(Opportunity oppo : clientToHisOpportunitys.get(accToUpdt)){
+						Decimal nextScore = (oppo.AV_PotencialityOpportunityValue__c != null) ? oppo.AV_PotencialityOpportunityValue__c : 0;
+						finalScore += nextScore; 
+					}
+					accountsToUpdateScore.add(new Account(Id = accToUpdt , AV_PotencialityClientValue__c = finalScore));
+				}
+			}
+			if(!clientsInEmptyCase.isEmpty()){
+				for(String accWithoutOpp : new Set<String>(clientsInEmptyCase)){
+					if(!clientToHisOpportunitys.containsKey(accWithoutOpp) && accWithoutOpp != null ){
+						accountsToUpdateScore.add(new Account(Id = accWithoutOpp , AV_PotencialityClientValue__c = 0));
+					}
+				}
+			}
+		}else{
+			for(String clientToEmptyId : new Set<String>(clientsInEmptyCase)){
+				if(clientToEmptyId != null){
+					accountsToUpdateScore.add(new Account(Id = clientToEmptyId, AV_PotencialityClientValue__c = 0));
+				}
+			}
+		}
+		if(!isQueuable){
+			try{
+				List<Database.SaveResult> srUpdtAcc = Database.update(accountsToUpdateScore,false);
+				Set<String> failedClients = new Set<String>();
+				String errMsg;
+				for(Integer i=0;i<srUpdtAcc.size();i++){
+					if(!srUpdtAcc[i].isSuccess()){
+						failedClients.add(accountsToUpdateScore[i].Id);
+						errMsg =srUpdtAcc[i].getErrors()[0].getMessage();
+					}
+				}
+				if(!failedClients.isEmpty()){
+					throw new ClientStackTraceException(failedClients,errMsg);
+				}
+			}catch(ClientStackTraceException err){
+				Exception expToQueueable = new ClientException(err.getStackTraceString(),err.getMessage());
+				System.enqueueJob(new AV_ReTryScoringQueueable(err.failedClients,expToQueueable,0,transactionType),1);
+			}
+		}	
+		return accountsToUpdateScore;
+	}
+
+	private class ClientStackTraceException extends Exception{
+		Set<String> failedClients;
+		public String errMsg;
+		public ClientStackTraceException(Set<String> failedClients,String errMsg){
+			this.failedClients = failedClients;
+			this.errMsg = errMsg;
+		}
+		public override string getMessage(){
+			return errMsg;
+		}
+	}
+
+	private class ClientException extends Exception{
+		public String errMsg;
+		public String stackTrace;
+		public ClientException(String stackTrace,String errMsg){
+			this.errMsg = errMsg;
+			this.stackTrace = stackTrace;
+		}
+		public override string getMessage(){
+			return errMsg;
+		}
+		public override string getStackTraceString(){
+			return this.stackTrace;
+		}
+	}
+
+
+	/**
+	* @description    Fill AV_Subestado__c field with value 'Pendiente' of opportunities with stageName 'Potencial'
+	* @param  listNew  list of new Opportunities 
+	**/
+	public static void fillSubState(List<Opportunity> listNew) {
+		for (Opportunity o : listNew) {
+			if (o.StageName.equalsIgnoreCase(AV_AppConstants.OPP_STATUS_POTENCIAL) ) {
+				o.AV_Subestado__c = 'Pendiente';
+			}
+		}
+	}
+
+
+
+	/**
+	* @description    Blank AV_Subestado__c field when opportunities change from stageName 'Potencial' to another stageName
+	* @param  listNew  list of new Opportunities 
+	* @param  mapOld   map of old Opportunities 
+	**/
+	public static void blankSubState(List<Opportunity> listNew, Map<Id, Opportunity> mapOld) {
+		for (Opportunity o : listNew) {
+			if ( !(o.StageName.equalsIgnoreCase(mapOld.get(o.Id).StageName)) && ((mapOld.get(o.Id).StageName).equalsIgnoreCase(AV_AppConstants.OPP_STATUS_POTENCIAL)) ) {
+				o.AV_Subestado__c = null;
+			}
+		}
+	}
+
+
 }

@@ -12,9 +12,9 @@ Historial
    1.2            Fix IOP Diciem   Víctor Santiago  14/12/2021          Recovered old code
    1.3		      AV_Query IT	   Daniel Rodríguez    03/03/2022	    Change AV_Query to SOQL for User, Account, Contact
    1.4            US385113         Alex Cubells     30/05/2022          Remove method deleteEventQueues 
-
+   1.5		      FIX11070844	   Ángel Medina		11/07/2024			Fix error The Global modifier should be avoided.
 ***********************************************************************************************************************/
-global with sharing class AV_EventDelete {
+public with sharing class AV_EventDelete {
 
     @InvocableMethod(label='DeleteEvent')
     public static List<String> eventDeleteFromGCF(List<String> recId){

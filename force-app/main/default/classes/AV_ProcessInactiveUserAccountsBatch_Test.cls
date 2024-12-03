@@ -17,7 +17,7 @@ private class AV_ProcessInactiveUserAccountsBatch_Test {
 	static void setup() {
 		AV_TestHelper.activateLogger();
 		User u1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U01000012');
-		Contact con =  AV_TestHelper.createEmployee(null,u1);
+		Contact con =  AV_TestHelper.createEmployee(null,u1,u1.AV_ExternalId__c);
 		List<Account> accounts = new List<Account>();
 		RecordType rt = AV_AppUtilities.getRecordType('Account', 'CC_ClientePA');
 		// Insertar 10 Cuentas 

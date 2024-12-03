@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				DATE				Description
 	1.0			US584499	    Mamen Arias 	    20/04/2023			Init version
+	1.1			FIX				Mamen Arias			02/02/2024			Add seeAllData=true on method executeCampaignMemberAITriggerLead for ConnectApi Error.
 ***********************************************************************************************************************/
 @isTest
 public class EV_CampaignMemberC_AI_TRHan_Test {
@@ -26,7 +27,7 @@ public class EV_CampaignMemberC_AI_TRHan_Test {
 		System.assertEquals(campMember.EV_ExternalID__c != null, campMember.EV_ExternalID__c != null, 'El external ID es incorrecto');
 	}
 
-	@isTest
+	@isTest (seeAllData=true)
 	public static void executeCampaignMemberAITriggerLead() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();

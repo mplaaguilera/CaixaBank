@@ -14,6 +14,63 @@
 public with sharing class SIR_cls_procesoHandler {
 
     /*****************************************************************
+     Name:  tratarCamposInsert
+    Copyright © 2021  CaixaBank
+    
+    Proposito:   Informa el campo SIR_FechaInicioEstrategia__c la situación SIREC y 
+                 quita el pipe en las alertas. Este método se llama al insertar un nuevo proceso                                                                                                            
+    
+        Historial
+        -------                                                            
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US291340         atmira         28/08/2024	      Created    
+
+    *****************************************************************/
+
+    public static void tratarCamposInsert(List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
+        if (Schema.sObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){ 
+            for (SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos) {
+                proceso.SIR_FechaInicioEstrategia__c = proceso.SIREC__SIREC_fld_fechaInicio__c;
+                proceso.SIR_fld_Situacion_SF__c = proceso.SIREC__SIREC_fld_situacion__c;
+
+                if(String.isNotBlank(proceso.SIR_DescripcionesAlertas__c)){            
+                   proceso.SIR_DescripcionesAlertas__c = proceso.SIR_DescripcionesAlertas__c.replace('|',' \n ').trim();            
+                }
+            }
+        }
+    }
+
+    /*****************************************************************
+     Name:  tratarCamposUpdate
+    Copyright © 2021  CaixaBank
+    
+    Proposito:   Si ha cambiado la estrategia informa el campo SIR_FechaInicioEstrategia__c Y 
+                 quita el pipe en las alertas. Este método se llama en el before del update
+    
+        Historial
+        -------                                                            
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US291340         atmira         26/08/2024	      Created    
+
+    *****************************************************************/
+    public static void tratarCamposUpdate(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
+        if (Schema.sObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){ 
+            for (SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos) {
+
+                // si ha cambiado la estrategia actualizamos fecha inicio estategia
+                if(proceso.SIREC__SIREC_fld_estrategia__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_estrategia__c){
+                    proceso.SIR_FechaInicioEstrategia__c = Date.today();
+                }
+
+                // Si ha cambiado la alerta quita los pipes si los hubiera
+                if(proceso.SIR_DescripcionesAlertas__c != mapOldProcesos.get(proceso.Id).SIR_DescripcionesAlertas__c && String.isNotBlank(proceso.SIR_DescripcionesAlertas__c)){            
+                    proceso.SIR_DescripcionesAlertas__c = proceso.SIR_DescripcionesAlertas__c.replace('|',' \n ').trim();                               
+                }
+            }
+        }
+    }
+
+    /*****************************************************************
      Name:  finalizarProcesoRefi
     Copyright © 2021  CaixaBank
     
@@ -26,7 +83,7 @@ public with sharing class SIR_cls_procesoHandler {
 
     *****************************************************************/
     public static void finalizarProcesoRefi(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, Map<Id,SIREC__SIREC_obj_proceso__c> mapNewProcesos) {
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){  
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){  
             Set<Id> setClientIds = new Set<Id>();
             Map<Id,SIREC__SIREC_obj_proceso__c> mapProcesos = new Map<Id,SIREC__SIREC_obj_proceso__c>();
             for(SIREC__SIREC_obj_proceso__c proceso : mapNewProcesos.values()){
@@ -47,6 +104,7 @@ public with sharing class SIR_cls_procesoHandler {
                     proceso.SIREC__SIREC_fld_fechaBaja__c = mapNewProcesos.get(mapProcesos.get(proceso.SIREC__SIREC_fld_cliente__c).Id).SIREC__SIREC_fld_fechaBaja__c;
                     proceso.SIREC__SIREC_fld_motivosBaja__c = mapNewProcesos.get(mapProcesos.get(proceso.SIREC__SIREC_fld_cliente__c).Id).SIREC__SIREC_fld_motivosBaja__c;
                     proceso.SIR_fld_Situacion_SF__c = SIR_Constantes.PROCESO_SITUACION_FINALIZADO;
+                    proceso.SIREC__SIREC_fld_situacion__c  = SIR_Constantes.PROCESO_SITUACION_FINALIZADO;
                 }
                 if(!lstProcesosForUpdate.isEmpty()){
                     update lstProcesosForUpdate;
@@ -56,29 +114,7 @@ public with sharing class SIR_cls_procesoHandler {
         }
     }
 
-    /*****************************************************************
-    Name:  igualarCampoSituacion
-    Copyright © 2021  CaixaBank
-    
-    Proposito:   Metodo que copia el campo SIREC__SIREC_fld_situacion__c en el campo SIR_fld_Situacion_SF__c                                                                                                              
-    
-        Historial
-        -------                                                            
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0            US244057         atmira         03/11/2021	      Created    
-
-    *****************************************************************/
-    public static void igualarCampoSituacion(List<SIREC__SIREC_obj_proceso__c> listNewProcesos) {
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){ 
-            for(SIREC__SIREC_obj_proceso__c proceso : listNewProcesos){  
-                proceso.SIR_fld_Situacion_SF__c = proceso.SIREC__SIREC_fld_situacion__c;
-            } 
-        }
-    }
-
-
-
-    /*****************************************************************
+   /*****************************************************************
     Name:  crearHistoricoProcesoInsert
     Copyright © 2021  CaixaBank
     
@@ -93,22 +129,18 @@ public with sharing class SIR_cls_procesoHandler {
     public static List<SIR_HistoricoProceso__c> crearHistoricoProcesoInsert(list<SIREC__SIREC_obj_proceso__c> listNewProcesos) {
         
         List<SIR_HistoricoProceso__c> listHistoricoProceso = new List<SIR_HistoricoProceso__c>();  
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isCreateable()){          
-            Schema.DescribeFieldResult fieldEstrategia = SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c.getDescribe();
-            Schema.DescribeFieldResult field = SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_situacion__c.getDescribe();
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIR_HistoricoProceso__c.isCreateable()){          
+           
             for(SIREC__SIREC_obj_proceso__c proceso : listNewProcesos){   
                 if(proceso.Name != SIR_Constantes.PROCESO_NAME_REFINANCIACION){
                     SIR_HistoricoProceso__c historicoProceso = new SIR_HistoricoProceso__c();
                     historicoProceso.SIR_Proceso__c = proceso.Id;
                     historicoProceso.SIR_Cliente__c = proceso.SIREC__SIREC_fld_cliente__c;
                     historicoProceso.SIR_Tipo__c = 'Estrategia';
-                    for (Schema.PicklistEntry f : fieldEstrategia.getPicklistValues()){ 
-                        if(f.getValue() == proceso.SIREC__SIREC_fld_estrategia__c){
-                            historicoProceso.SIR_Estrategia__c = f.getLabel();
-                            historicoProceso.SIR_CodigoEstrategia__c = f.getValue();  
-                        }
-                    }						
-                    for (Schema.PicklistEntry f : field.getPicklistValues()){
+                    historicoProceso.SIR_CodigoEstrategia__c = proceso.SIREC__SIREC_fld_estrategia__c;
+                    historicoProceso.SIR_Estrategia__c = proceso.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
+                  						
+                    for (Schema.PicklistEntry f : Schema.sObjectType.SIREC__SIREC_obj_proceso__c.fields.SIREC__SIREC_fld_situacion__c.getPicklistValues()){
                         if(f.getValue() == proceso.SIREC__SIREC_fld_situacion__c){
                             historicoProceso.SIR_Situacion__c = f.getLabel();  
                         }
@@ -118,10 +150,6 @@ public with sharing class SIR_cls_procesoHandler {
                     listHistoricoProceso.add(historicoProceso);
                 }    
             }
-            /*
-            if(!listHistoricoProceso.isEmpty()){
-                insert listHistoricoProceso;
-            }   */              
         }
         return listHistoricoProceso ; 
     }
@@ -143,16 +171,17 @@ public with sharing class SIR_cls_procesoHandler {
         1.3            USXXXXXX         atmira         29/12/2022         No se debe crear registro en histórico para procesos con recordType PREVEMP (SIRE_RT_PREVEMP)
 	*****************************************************************/
         public static void crearHistoricoProceso(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, list<SIREC__SIREC_obj_proceso__c> listNewProcesos) {
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isCreateable()){ 
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIR_HistoricoProceso__c.isCreateable()){ 
             Set<Id> procesosEstrategiaCambiada = new Set<Id>();
             List<SIR_HistoricoProceso__c> listHistoricoProceso = new List<SIR_HistoricoProceso__c>();
             List<SIR_HistoricoProceso__c> listHistoricoProcesoUpdate = new List<SIR_HistoricoProceso__c>();
             List<SIREC__SIREC_obj_proceso__c> lstInsertProcesoHistorico = new List<SIREC__SIREC_obj_proceso__c>();
-            Id recordTypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId();            
+            
             Map<String, Schema.RecordTypeInfo> mapRT = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
             Set<Id> setRtIds = new Set<Id>();
             setRtIds.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL).getRecordTypeId());
             setRtIds.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId());
+            setRtIds.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_AP_PP).getRecordTypeId());
             for(SIREC__SIREC_obj_proceso__c proceso : listNewProcesos){
                 if(!setRtIds.contains(proceso.RecordTypeId) && proceso.SIR_ObjetivoProceso__c != SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO){
                     if(mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_cliente__c == null && proceso.SIREC__SIREC_fld_cliente__c != null){
@@ -172,9 +201,6 @@ public with sharing class SIR_cls_procesoHandler {
                                                                      WHERE SIR_Proceso__c IN :procesosEstrategiaCambiada
                                                                      ORDER BY CreatedDate DESC];
                 
-                Schema.DescribeFieldResult fieldEstrategia = SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c.getDescribe();
-                Schema.DescribeFieldResult field = SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_situacion__c.getDescribe();
-                
                 Set<String> idProcesos = new Set<String>();
                 for(SIREC__SIREC_obj_proceso__c proceso : listNewProcesos){
                     // Informamos la fecha Fin del ultimo registro Historico
@@ -182,7 +208,7 @@ public with sharing class SIR_cls_procesoHandler {
                         for(SIR_HistoricoProceso__c historicoSF: historicoProcesosSF){
                             if(historicoSF.SIR_proceso__c == proceso.Id && !idProcesos.contains(proceso.Id)){                                
                                 historicoSF.SIR_FechaFinEstrategia__c = proceso.SIR_FechaInicioEstrategia__c;
-                                for (Schema.PicklistEntry f : field.getPicklistValues()){
+                                for (Schema.PicklistEntry f : Schema.sObjectType.SIREC__SIREC_obj_proceso__c.fields.SIREC__SIREC_fld_situacion__c.getPicklistValues()){
                                     if(f.getValue() == mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c){
                                         historicoSF.SIR_Situacion__c = f.getLabel();
                                     }
@@ -199,13 +225,10 @@ public with sharing class SIR_cls_procesoHandler {
                         historicoProceso.SIR_Proceso__c = proceso.Id;
                         historicoProceso.SIR_Cliente__c = proceso.SIREC__SIREC_fld_cliente__c;
                         historicoProceso.SIR_Tipo__c = 'Estrategia';
-                        for (Schema.PicklistEntry f : fieldEstrategia.getPicklistValues()){
-                            if(f.getValue() == proceso.SIREC__SIREC_fld_estrategia__c){
-                                historicoProceso.SIR_Estrategia__c = f.getLabel();
-								historicoProceso.SIR_CodigoEstrategia__c = f.getValue();
-                            }
-                        }						
-                        for (Schema.PicklistEntry f : field.getPicklistValues()){
+                        historicoProceso.SIR_CodigoEstrategia__c = proceso.SIREC__SIREC_fld_estrategia__c;
+                        historicoProceso.SIR_Estrategia__c = proceso.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
+              					
+                        for (Schema.PicklistEntry f : Schema.sObjectType.SIREC__SIREC_obj_proceso__c.fields.SIREC__SIREC_fld_situacion__c.getPicklistValues()){
                             if(f.getValue() == proceso.SIREC__SIREC_fld_situacion__c){
                                 historicoProceso.SIR_Situacion__c = f.getLabel();
                             }
@@ -215,8 +238,6 @@ public with sharing class SIR_cls_procesoHandler {
                         listHistoricoProceso.add(historicoProceso);
                     } 
                 }
-                
-                
             } 
             
             if(!listHistoricoProceso.isEmpty()){
@@ -226,49 +247,6 @@ public with sharing class SIR_cls_procesoHandler {
             if(!listHistoricoProcesoUpdate.isEmpty()){
                 update listHistoricoProcesoUpdate;
              }
-        }
-    }
-
-    /*****************************************************************
-     Name:  setFechaInicioEstrategia
-    Copyright © 2021  CaixaBank
-    
-    Proposito:   Informa el campo SIR_FechaInicioEstrategia__c al crear un proceso                                                                                                              
-    
-        Historial
-        -------                                                            
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0            US291340         atmira         16/11/2021	      Created    
-
-    *****************************************************************/
-
-    public static void setFechaInicioEstrategia(List<SIREC__SIREC_obj_proceso__c> lstProcesos){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isCreateable()){
-            for (SIREC__SIREC_obj_proceso__c proceso : lstProcesos) {
-                proceso.SIR_FechaInicioEstrategia__c = proceso.SIREC__SIREC_fld_fechaInicio__c;
-            }
-        }
-    }
-
-    /*****************************************************************
-     Name:  setFechaInicioEstrategia
-    Copyright © 2021  CaixaBank
-    
-    Proposito:   Informa el campo SIR_FechaInicioEstrategia__c al actualizar un proceso                                                                                                              
-    
-        Historial
-        -------                                                            
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0            US291340         atmira         16/11/2021	      Created    
-
-    *****************************************************************/
-    public static void setFechaInicioEstrategia(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isCreateable()){
-            for (SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos) {
-                if(proceso.SIREC__SIREC_fld_estrategia__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_estrategia__c){
-                    proceso.SIR_FechaInicioEstrategia__c = Date.today();
-                }
-            }
         }
     }
 
@@ -285,8 +263,7 @@ public with sharing class SIR_cls_procesoHandler {
 
     *****************************************************************/
     public static void setEstrategiaEnProcRefi(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isCreateable()){
-            List<SIREC__SIREC_obj_proceso__c> lstProcRefi = new List<SIREC__SIREC_obj_proceso__c>();
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIR_HistoricoProceso__c.isCreateable()){
             Set<Id> setProcId = new Set<Id>();
             Map<Id,SIREC__SIREC_obj_proceso__c> mapClientes = new Map<Id,SIREC__SIREC_obj_proceso__c>();
             for(SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos){
@@ -299,14 +276,15 @@ public with sharing class SIR_cls_procesoHandler {
                 
             }
             if(!setProcId.isEmpty()){
-                List<SIREC__SIREC_obj_proceso__c> lstProcesos = [SELECT Id, SIREC__SIREC_fld_estrategia__c, SIREC__SIREC_fld_cliente__c 
+                List<SIREC__SIREC_obj_proceso__c> lstProcesos = [SELECT Id, SIREC__SIREC_fld_estrategia__c, SIREC__SIREC_fld_estrategiaCatalogo__c, SIREC__SIREC_fld_cliente__c 
                                                                     FROM SIREC__SIREC_obj_proceso__c 
                                                                     WHERE SIREC__SIREC_fld_cliente__c IN :mapClientes.keyset() 
                                                                     AND Name = :SIR_Constantes.PROCESO_NAME_REFINANCIACION
                                                                     AND SIREC__SIREC_fld_fechaBaja__c = null
                                                                     AND Id NOT IN :mapOldProcesos.keyset()];
                 for(SIREC__SIREC_obj_proceso__c proceso : lstProcesos){
-                proceso.SIREC__SIREC_fld_estrategia__c = mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).SIREC__SIREC_fld_estrategia__c;
+                    proceso.SIREC__SIREC_fld_estrategia__c = mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).SIREC__SIREC_fld_estrategia__c;
+                    proceso.SIREC__SIREC_fld_estrategiaCatalogo__c = mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).SIREC__SIREC_fld_estrategiaCatalogo__c;
                 }
                 if(!lstProcesos.isEmpty()){
                     update lstProcesos;
@@ -334,14 +312,10 @@ public with sharing class SIR_cls_procesoHandler {
         
         Set<Id> setUserPSAsigGestorId = new Set<Id>();
         Set<Id> setUserPSAsigSSMMId = new Set<Id>();
-        Set<Id> setUserPSAsigGestorImpaId = new Set<Id>();
-        Set<Id> setUserPSAsigGestorPresolId = new Set<Id>();
-        Set<Id> setUserPSAsigGestorEmpresaId = new Set<Id>();
         Set<Id> setAccountIds = new Set<Id>();
         Set<Id> setAccountIdsPREVEMP = new Set<Id>();
+        Set<Id> setUserPSAsigGestorEmpresaId = new Set<Id>();
         Set<Id> setOwnerIds = new Set<Id>();
-        Set<Id> setProcesosIds = mapNewProcesos.keyset();
-        Map<Id, SIREC__SIREC_obj_proceso__c> mapProcesos;                
         Map<String, Schema.RecordTypeInfo> mapRT = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
         Id rtPrevemp = mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId();  
 
@@ -371,7 +345,10 @@ public with sharing class SIR_cls_procesoHandler {
             //buscar los user de analista de riesgo dentro de AccountTeamMember para los clientes de los procesos PREVEMP. Si hay varios analistas de riesgos para el mismo cliente nos quedamos con uno 
             List<AggregateResult> lstAccountTeamMember = new List<AggregateResult>([SELECT AccountId,MIN(UserId) Analista
                                                                                             FROM AccountTeamMember 
-                                                                                            WHERE AccountId IN : setAccountIdsPREVEMP AND User.IsActive = True AND User.AV_tipoGestor__c  = :SIR_Constantes.TIPO_ANALISTA_RIESGOS
+                                                                                            WHERE AccountId IN : setAccountIdsPREVEMP AND User.IsActive = True 
+                                                                                              AND (User.AV_tipoGestor__c  = :SIR_Constantes.TIPO_ANALISTA_RIESGOS
+                                                                                                OR User.CIBE_FuncionEmpleado__c = :SIR_Constantes.CIBE_ANALISTA_DE_RIESGO
+                                                                                                OR User.CIBE_FuncionEmpleado__c = :SIR_Constantes.CIBE_ANALISTA_SENIOR_DE_RIESGO)
                                                                                             GROUP BY AccountId]);
             Map<Id,Id> mapAccountTeamMember= new Map<Id,Id>();                                                                                        
             for(AggregateResult team : lstAccountTeamMember){
@@ -379,10 +356,10 @@ public with sharing class SIR_cls_procesoHandler {
                  mapAccountTeamMember.put((String)team.get('AccountId'),(String)team.get('Analista'));
             }
 
-            Id imaginUserId;
-            Boolean existeIMAGIN = false;
+           // Id imaginUserId;
+           // Boolean existeIMAGIN = false;
 
-            for(Account account : mapClientes.values()){
+          /*  for(Account account : mapClientes.values()){
                 if(!(String.isEmpty(account.AV_OficinaPrincipal__c)) && account.AV_OficinaPrincipal__r.name.contains('IMAGIN')){
                     existeIMAGIN = true;
                     break;
@@ -391,7 +368,7 @@ public with sharing class SIR_cls_procesoHandler {
             if(existeIMAGIN){
                 imaginUserId = [SELECT Id FROM User WHERE AV_ExternalID__c = :SIR_Variables__mdt.getInstance('IMAGINGestor').Valor__c].Id;
                 setOwnerIds.add(imaginUserId);
-            }
+            }*/
             for( PermissionSetAssignment psAsig : [SELECT Id, PermissionSetId, PermissionSet.Name, AssigneeId, PermissionSetGroup.DeveloperName, Assignee.Profile.Name
                                         FROM PermissionSetAssignment 
                                         WHERE (PermissionSet.Name = :SIR_Constantes.PS_GESTOR_NAME
@@ -417,19 +394,21 @@ public with sharing class SIR_cls_procesoHandler {
 
             for(SIREC__SIREC_obj_proceso__c proceso : mapNewProcesos.values()){
                 
-                Boolean asgnarImagin = existeIMAGIN  
+             /*   Boolean asgnarImagin = existeIMAGIN  
                     && mapClientes.containsKey(proceso.SIREC__SIREC_fld_cliente__c)
                     && setUserPSAsigSSMMId.contains(proceso.ownerId)
                     && !(String.isEmpty(mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).AV_OficinaPrincipal__c))
                     && mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).AV_OficinaPrincipal__r.Name.contains('IMAGIN');
-
+            */
                 if(proceso.SIR_fld_Situacion_SF__c != SIR_Constantes.PROCESO_SITUACION_FINALIZADO 
                    && String.isNotBlank(proceso.SIREC__SIREC_fld_cliente__c)
                    && setUserPSAsigSSMMId.contains(mapOldProcesos.get(proceso.Id).OwnerId) 
                    && mapClientes.containsKey(proceso.SIREC__SIREC_fld_cliente__c)
                    && setRetailRTIds.contains(proceso.recordTypeId)
-                   && (setUserPSAsigGestorId.contains(mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId) || asgnarImagin)){
-                       proceso.OwnerId = asgnarImagin ? imaginUserId : mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId;
+            //       && (setUserPSAsigGestorId.contains(mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId) || asgnarImagin)){
+              //         proceso.OwnerId = asgnarImagin ? imaginUserId : mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId;
+                   && setUserPSAsigGestorId.contains(mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId) ){
+                        proceso.OwnerId = mapClientes.get(proceso.SIREC__SIREC_fld_cliente__c).OwnerId;
                    }                 
                    
                    //Controlamos los registros de empresas                 
@@ -458,10 +437,10 @@ public with sharing class SIR_cls_procesoHandler {
 
     /*****************************************************************
      Name:  setSituacionSF
-    Copyright © 2022  CaixaBank
+    Copyright © 2022 CaixaBank
     
     Proposito:   Informa el campo SIR_fld_Situacion_SF__c con el último valor de Situacion del proceso antes de finalizar
-                y actualizar el campo SIR_AccionActual__c a false cuando se finaliza el proceso                                                                                                            
+                 y actualizar el campo SIR_AccionActual__c a false cuando se finaliza el proceso                                                                                                            
     
     Historial
         -------                                                            
@@ -469,26 +448,26 @@ public with sharing class SIR_cls_procesoHandler {
         1.0                             atmira         07/06/2022	      Created    
 		1.1            USXXXXX          atmira         28/04/2023	      Se añade que el comportamiento sea igual para PREVEMP
         1.2            USXXXXX          atmira         11/10/2023	      Se añade el cambio de situación para PREVEMP
+        1.3            USXXXXX          atmira         13/11/2023	      Se añade una condición para que la Situacion_SF se quede con la situación anterior a Finalizarse.
     *****************************************************************/
     public static void setSituacionSF(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
-        Id recordTypeIdPresol = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId();
 		Map<String, Schema.RecordTypeInfo> mapRT = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
         Set<Id> setRtIds = new Set<Id>();
         Set<Id> setRtIdsPrevemp = new Set<Id>();
         setRtIds.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PRESOL).getRecordTypeId());
         setRtIds.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId());
         setRtIdsPrevemp.add(mapRT.get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId());
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             for (SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos) {
 
                 //Mantener situaciones finalistas o gestionadas de PRESOL y PREVEMP cuando viene la baja del proceso en la interfaz de baja.
                 if(setRtIds.contains(proceso.RecordTypeId)
-                && proceso.SIREC__SIREC_fld_situacion__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c 
-                && proceso.SIREC__SIREC_fld_situacion__c == SIR_Constantes.PROCESO_SITUACION_FINALIZADO 
-                && mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c != SIR_Constantes.PROCESO_SITUACION_FINALIZADO
-                ){
-                    proceso.SIR_fld_Situacion_SF__c = mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c;
-                    proceso.SIR_AccionActual__c = false;
+                && ((proceso.SIREC__SIREC_fld_situacion__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c
+                && proceso.SIREC__SIREC_fld_situacion__c == SIR_Constantes.PROCESO_SITUACION_FINALIZADO)
+                || (proceso.SIR_fld_Situacion_SF__c == SIR_Constantes.PROCESO_SITUACION_FINALIZADO
+				&&  proceso.SIREC__SIREC_fld_situacion__c == SIR_Constantes.PROCESO_SITUACION_FINALIZADO)))
+                {
+                    proceso.SIR_fld_Situacion_SF__c = mapOldProcesos.get(proceso.Id).SIR_fld_Situacion_SF__c;
                 }
 
                 //Igualar la situación SF de Preventivo cuando el batch de SIREC cambia la situación. Porque en la interfaz de procesos no viene incluida la situación SF.
@@ -498,6 +477,14 @@ public with sharing class SIR_cls_procesoHandler {
                 && proceso.SIREC__SIREC_fld_situacion__c != SIR_Constantes.PROCESO_SITUACION_FINALIZADO
                 ){
                     proceso.SIR_fld_situacion_SF__c = proceso.SIREC__SIREC_fld_situacion__c;
+                }
+
+                // IOP FEB24 En caso de que el Proceso venga como finalizado, quitar la relacion con Tarea, para luego el proceso de purga pueda borrar
+                if(proceso.SIREC__SIREC_fld_situacion__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_situacion__c && 
+                  proceso.SIREC__SIREC_fld_situacion__c == SIR_Constantes.PROCESO_SITUACION_FINALIZADO){
+                    proceso.SIR_AccionActual__c = false;
+                    proceso.SIREC__SIREC_fld_tarea__c = null;
+                    proceso.SIREC__SIREC_fld_tareaOPCPendiente__c = null;
                 }
             }
         }
@@ -521,7 +508,6 @@ public with sharing class SIR_cls_procesoHandler {
             if(proceso.SIREC__SIREC_fld_cliente__c != mapOldProcesos.get(proceso.Id).SIREC__SIREC_fld_cliente__c){
                 mapProcesos.put(proceso.Id, proceso);
             }
-            
         }
         
         if(!lstNewProcesos.isEmpty()){
@@ -551,7 +537,7 @@ public with sharing class SIR_cls_procesoHandler {
 
     *****************************************************************/
     public static void setMatricula(List<SIREC__SIREC_obj_proceso__c> lstNewProcesos, Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos){
-        Map<Id,SIREC__SIREC_obj_proceso__c> mapProcesos = new Map<Id,SIREC__SIREC_obj_proceso__c>();
+        
         Set<Id> setOwnerids = new Set<Id>();
         for(SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos){
             if(proceso.ownerId != mapOldProcesos.get(proceso.Id).ownerId){
@@ -569,46 +555,5 @@ public with sharing class SIR_cls_procesoHandler {
             }
         }
     }
-    /*****************************************************************
-     Name:  quitarPipeAlerta
-    Copyright © 2022  CaixaBank
-    
-    Proposito:   Cuando se inserta un proceso se ha de cambiar los pipes del campo Alertas por fin de linea
-    
-    Historial
-        -------                                                            
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0                             atmira         20/03/2023	      Created    
 
-    *****************************************************************/
-    public static void quitarPipeAlerta( List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
-                
-        for(SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos){
-          if(String.isNotBlank(proceso.SIR_DescripcionesAlertas__c)){            
-            proceso.SIR_DescripcionesAlertas__c = proceso.SIR_DescripcionesAlertas__c.replace('|',' \n ').trim();            
-           }
-        }   
-    }
-    
-    /*****************************************************************
-    Name:  quitarPipeAlerta
-    Copyright © 2022  CaixaBank
-    
-    Proposito:   Cuando se actualice un proceso se ha de cambiar los pipes del campo Alertas por fin de linea si se ha modificado el campo
-    
-    Historial
-        -------                                                            
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0                             atmira         20/03/2023	      Created    
-
-    *****************************************************************/
-    public static void quitarPipeAlerta(Map<Id, SIREC__SIREC_obj_proceso__c> mapOldProcesos, List<SIREC__SIREC_obj_proceso__c> lstNewProcesos){
-        Map<Id,SIREC__SIREC_obj_proceso__c> mapProcesos = new Map<Id,SIREC__SIREC_obj_proceso__c>();
-        
-        for(SIREC__SIREC_obj_proceso__c proceso : lstNewProcesos){
-            if(proceso.SIR_DescripcionesAlertas__c != mapOldProcesos.get(proceso.Id).SIR_DescripcionesAlertas__c){            
-                proceso.SIR_DescripcionesAlertas__c = proceso.SIR_DescripcionesAlertas__c.replace('|',' \n ').trim();                               
-            }
-        }
-    }
 }

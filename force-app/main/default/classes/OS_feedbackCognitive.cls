@@ -25,12 +25,9 @@ public class OS_feedbackCognitive implements Queueable, Database.AllowsCallouts{
                 oTraza.CC_FechaInicio__c = datetime.now();
             }
             SEG_fbCognitive sendFeedback = new SEG_fbCognitive();
-            System.debug('El mapa contiene esto::: ' + mapCaseName);
-            System.debug('El mapa devuelve esto::: ' + mapCaseName.get(caseNumber));
             sendFeedback.sr = caseNumber;
             sendFeedback.des_category_real = mapCaseName.get(caseNumber);  
             String jsonToCognitive = JSON.serialize(sendFeedback);
-            System.debug('Des_category_real::: ' + sendFeedback.des_category_real);
 
             try {
                 Http http = new Http();

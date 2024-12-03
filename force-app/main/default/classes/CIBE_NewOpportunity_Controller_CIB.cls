@@ -66,10 +66,10 @@ public with sharing class CIBE_NewOpportunity_Controller_CIB {
 		pickValues = picklistValues[0].AV_ListSalesProcess__c.split(';');
 		List<Map<String, String>> listPicklist = new List<Map<String, String>>();
 		// Get the describe for the object
-		DescribeSObjectResult objResult = Schema.getGlobalDescribe().get(objectName).getDescribe();
-		// Get the field dynamically
-		DescribeFieldResult fieldResult = objResult.fields.getMap().get(fieldName).getDescribe();
-		List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+		// DescribeSObjectResult objResult = Schema.getGlobalDescribe().get(objectName).getDescribe();
+		// DescribeFieldResult fieldResult = objResult.fields.getMap().get(fieldName).getDescribe();
+        Schema.DescribeFieldResult objFieldDescribe = Opportunity.StageName.getDescribe();
+		List<Schema.PicklistEntry> ple = objFieldDescribe.getPicklistValues();
 		
 		for(String val:pickValues){
 			for(Schema.PicklistEntry pickListVal : ple){
@@ -248,7 +248,7 @@ public with sharing class CIBE_NewOpportunity_Controller_CIB {
 
             if(String.isNotBlank(searchTerm)) {
                 searchTerm += '*';
-                avQuery='FIND {'+searchTerm+'} IN ALL FIELDS RETURNING Account (Id, Name WHERE RecordType.DeveloperName IN :lstRt )';
+                avQuery='FIND {'+searchTerm+'} IN ALL FIELDS RETURNING Account (Id, Name WHERE RecordType.DeveloperName IN :lstRt AND Name != :cliente)';
                 searchResults = search.query(avQuery);
             }else{
                 sinCliente = [SELECT Id, Name FROM Account WHERE Name = :cliente AND RecordType.DeveloperName IN:lstRt ];

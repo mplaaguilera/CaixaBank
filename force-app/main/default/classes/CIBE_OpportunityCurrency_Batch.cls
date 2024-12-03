@@ -10,12 +10,14 @@ Historial
     1.0            Create Batch	    Jose Maria       21/12/2022          Init version
 	2.0            DE72514          Jose Maria       17/03/2022          New version of divisas
 ***********************************************************************************************************************/
-public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObject> {
+public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObject>, Database.Stateful {
 
     public String avQuery;
     public Integer recordsProcessed = 0;
     public static final String BATCHNAME = 'CIBE_OpportunityCurrency_Batch';
     public static List<String> stagesNames = new List<String>{'Potencial', 'En curso', 'CIBE_Pendiente_Firma'};
+    private Boolean error;
+
     public static Set<Id> recordTypes = CIBE_AppUtilities.getRecordTypeIdsInSet(
         new Set<CIBE_AppUtilities.SearchRT>{
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVACIB_RT),
@@ -26,9 +28,10 @@ public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObjec
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_ALERTAEMP_RT),
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_ACCIONCIB_RT),
             new CIBE_AppUtilities.SearchRT(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_ACCIONEMP_RT)
-        });
+        }
+        );
         
-    private static List<String> listDiv = new List<String>();
+    private List<String> listDiv;
 
     public CIBE_OpportunityCurrency_Batch() {
         this.avQuery = setQuery();   
@@ -40,7 +43,7 @@ public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObjec
 
     private String setQuery() {
 		String batchLimit = AV_SchedulerBatches.getLimit(BATCHNAME);
-
+        this.listDiv = new List<String>();
         List<CIBE_Divisas__c> divUpdated = new List<CIBE_Divisas__c>();
         if(
             CIBE_Divisas__c.SObjectType.getDescribe().isAccessible() &&
@@ -52,19 +55,25 @@ public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObjec
         ) {
        		divUpdated = [SELECT Id, CIBE_CodigoDivisa__c, CIBE_DivisaBase__c, CIBE_FechaTipoCambio__c, CIBE_NombreDivisa__c, CIBE_TipoCambio__c FROM CIBE_Divisas__c WHERE CIBE_FechaTipoCambio__c >= :System.today()];
         }
+
         
-        for(CIBE_Divisas__c divisa : divUpdated) {
-            if(String.isNotBlank(divisa.CIBE_CodigoDivisa__c)) {
-                listDiv.add(divisa.CIBE_CodigoDivisa__c);
+        if(!divUpdated.isEmpty()){
+            this.error = false;
+            for(CIBE_Divisas__c divisa : divUpdated) {
+                if(String.isNotBlank(divisa.CIBE_CodigoDivisa__c)) {
+                    this.listDiv.add(divisa.CIBE_CodigoDivisa__c);
+                }
             }
+
+            if(String.isNotBlank(batchLimit)) {
+                avQuery = 'SELECT Id, Name, CIBE_Divisa__c, CIBE_AmountDivisa__c, CIBE_BalanceDivisa__c, CIBE_FechaCambioDivisa__c, CIBE_ComisionesDivisa__c, CIBE_ImpactoDIvisaBalanceCierreAnio__c, CIBE_ImpactoDivisaComisionesCierreAnio__c FROM Opportunity WHERE RecordTypeId IN :recordTypes AND Stagename IN :stagesNames AND CIBE_Divisa__c IN :listDiv LIMIT ' + batchLimit;
+            } else {
+                avQuery = 'SELECT Id, Name, CIBE_Divisa__c, CIBE_AmountDivisa__c, CIBE_BalanceDivisa__c, CIBE_FechaCambioDivisa__c, CIBE_ComisionesDivisa__c, CIBE_ImpactoDIvisaBalanceCierreAnio__c, CIBE_ImpactoDivisaComisionesCierreAnio__c FROM Opportunity WHERE RecordTypeId IN :recordTypes AND Stagename IN :stagesNames AND CIBE_Divisa__c IN :listDiv';
+            }
+        }else{
+            avQuery = 'SELECT Id FROM Opportunity WHERE RecordTypeId IN :recordTypes AND Stagename IN :stagesNames LIMIT 1';
+            this.error = true;
         }
-       
-        if(String.isNotBlank(batchLimit)) {
-            avQuery = 'SELECT Id, Name, CIBE_Divisa__c, CIBE_AmountDivisa__c, CIBE_BalanceDivisa__c, CIBE_FechaCambioDivisa__c, CIBE_ComisionesDivisa__c, CIBE_ImpactoDIvisaBalanceCierreAnio__c, CIBE_ImpactoDivisaComisionesCierreAnio__c FROM Opportunity WHERE RecordTypeId IN :recordTypes AND Stagename IN :stagesNames AND CIBE_Divisa__c IN :listDiv LIMIT ' + batchLimit;
-        } else {
-            avQuery = 'SELECT Id, Name, CIBE_Divisa__c, CIBE_AmountDivisa__c, CIBE_BalanceDivisa__c, CIBE_FechaCambioDivisa__c, CIBE_ComisionesDivisa__c, CIBE_ImpactoDIvisaBalanceCierreAnio__c, CIBE_ImpactoDivisaComisionesCierreAnio__c FROM Opportunity WHERE RecordTypeId IN :recordTypes AND Stagename IN :stagesNames AND CIBE_Divisa__c IN :listDiv';
-        }
-        
         return avQuery; 
     }
 
@@ -91,16 +100,18 @@ public class CIBE_OpportunityCurrency_Batch implements Database.Batchable<sObjec
      */
     public void execute(Database.BatchableContext bc, List<Opportunity> scope) {
 		try{
+            List<Opportunity> updateList = new List<Opportunity>();
             if(!scope.isEmpty()){
                 recordsProcessed = scope.size();
-
-                for(Opportunity opp : scope){
-                    opp.CIBE_FechaCambioDivisa__c = System.today();
+                if(!error){
+                    for(Opportunity opp : scope){
+                        opp.CIBE_FechaCambioDivisa__c = System.today();
+                    }
                 }
+               
                 
-                if(!scope.isEmpty() && Schema.Opportunity.SObjectType.getDescribe().isCreateable()){
+                if(!scope.isEmpty() && Schema.Opportunity.SObjectType.getDescribe().isCreateable() && !error){
                     Database.SaveResult[] srList = Database.update(scope, false);
-                    
                     boolean hasError = false;
                     List<Object> objs = new List<Object>();
                     Map<String, String> msjs = new Map<String, String>();

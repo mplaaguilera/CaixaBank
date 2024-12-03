@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
  Name:	  CIBE_OpportunityStateSchedulable
- Copyright © 2023  CaixaBank
+Copyright © 2023  CaixaBank
 -----------------------------------------------------------------------------------------------------------------------
 Proposito: Proceso Batch para pasar a estado 'Vencido' todas las oportunidades que tengan el closeDate inferior a TODAY
 -----------------------------------------------------------------------------------------------------------------------
@@ -18,18 +18,24 @@ public class CIBE_OpportunityStateSchedulable_Test {
     @TestSetup
     static void setup() {
         
-        List<String> listPermissionsSet = new List<String>{CIBE_AppConstants.CIBE_OPERATIVAEMP,CIBE_AppConstants.CIBE_CUSTOMMETADATA,CIBE_AppConstants.CIBE_ANALYTICS, CIBE_AppConstants.USER_AV_AvoidBulkApi };
-        CIBE_TestInitialSetup.setupInitialData(null, 'EMP', null, null, null, listPermissionsSet);
-
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
+        // CIBE_TestInitialSetup.setupInitialData(null,CIBE_AppConstants.CIBE_ROLECIB,null,null,null,new List<String>{CIBE_AppConstants.CIBE_OPERATIVACIB, CIBE_AppConstants.CIBE_CUSTOMMETADATA, CIBE_AppConstants.CIBE_OPERATIVAEMP, CIBE_AppConstants.CIBE_OPERATIVAEMP,CIBE_AppConstants.CIBE_ANALYTICS, CIBE_AppConstants.USER_AV_AvoidBulkApi});
+		List <String> ps = new list<String>{CIBE_AppConstants.CIBE_OPERATIVACIB,
+                                            CIBE_AppConstants.CIBE_CUSTOMMETADATA,
+                                            CIBE_AppConstants.CIBE_ANALYTICS,
+                                            CIBE_AppConstants.CIBE_OPERATIVAEMP, 
+                                            CIBE_AppConstants.USER_AV_AVOIDBULKAPI};
+        
+        CIBE_TestInitialSetup.setupInitialData(null, null, null, null, null, ps);
+        User admin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
+		User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
         
         ID rtOpp = Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(CIBE_AppConstants.OPP_INICIATIVAEMP_RT).getRecordTypeId();
 
-        System.runAs(usuario) {
-            Account acc = CIBE_TestHelper.createCustomer(usuario);
+        System.runAs(admin) {
+            Account acc = CIBE_TestHelper.createCustomer(admin);
             Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
             Opportunity opp = new Opportunity();
-                opp.ownerId = usuario.Id;
+                opp.ownerId = admin.Id;
                 opp.RecordTypeId = rtOpp;
                 opp.CloseDate = System.today() - 5;
                 opp.AccountId = acc.Id;
@@ -49,12 +55,11 @@ public class CIBE_OpportunityStateSchedulable_Test {
 	 */
     @isTest
     public static void validateBatch() {
-        User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
+        User admin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
 
-        System.runAs(usuario) {
-        
+        System.runAs(admin) {
 			Test.startTest();
-            	CIBE_OpportunityStateSchedulable batchPrueba = new CIBE_OpportunityStateSchedulable('SELECT Id FROM Opportunity');
+                CIBE_OpportunityStateSchedulable batchPrueba = new CIBE_OpportunityStateSchedulable('SELECT Id FROM Opportunity');
                 CIBE_OpportunityStateSchedulable batch = new CIBE_OpportunityStateSchedulable();
                 Id batchId = Database.executeBatch(batch);
             Test.stopTest();

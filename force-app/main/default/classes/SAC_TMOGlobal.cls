@@ -30,6 +30,7 @@ public without sharing class SAC_TMOGlobal {
     *****************************************************************/
 
     public static void insertarTMOs(List<Case> listaRecPretCons) { 
+        
         List<SAC_TMECaso__c> listaTMOs = new List<SAC_TMECaso__c> ();
 
         for (Case caso : listaRecPretCons) {

@@ -27,6 +27,7 @@ Historial
 	2.6         US478565                                            Oscar Moreno        09/06/2023      Add validateTreatmentData method
 	2.7         US609232                                            Oscar Moreno        13/06/2023      The call to Adobe Campaingn is commented out because it is not working
 	2.8      	Fix PMD Errors 										Humberto Vilchez 	23/10/2023 		Add WITH SECURITY_ENFORCED to queries
+	2.9			US707948											Gonzalo Ávila		16/11/2023		Add Prefix on international phones
 
 ***********************************************************************************************************************/
 public with sharing class AV_UpdateCliPremium_Controller {
@@ -170,8 +171,12 @@ public with sharing class AV_UpdateCliPremium_Controller {
             //email
             mapAccountFields.put('PersonEmail', (String)validateNull(data.email));
             //mobilePhone
-            String mobilePhone = (String)validateNull(data.mobilePhoneNumber, 'convertString');
-            mapAccountFields.put('PersonMobilePhone', mobilePhone);
+			String mobilePhone =(String)validateNull(data.mobilePhoneNumber, 'convertString');
+            String prefix = (String)validateNull(data.mobilePhonePrefix, 'convertString');
+			if(prefix != null && !prefix.equals('null') && !String.isEmpty(prefix) && mobilePhone != null && !mobilePhone.equals('null') && !String.isEmpty(mobilePhone)){
+				mobilePhone = prefix + ' ' + mobilePhone;
+			}
+			mapAccountFields.put('PersonMobilePhone', mobilePhone);
             //birthDate
 			String birthDate=(String)validateNull(data.birthDate);
 			mapAccountFields.put('PersonBirthdate', birthDate);
@@ -195,6 +200,11 @@ public with sharing class AV_UpdateCliPremium_Controller {
 		mapAccountFields.put('AV_Idioma__c', language);
         //phone
 		String phone = (String)validateNull(data.phoneNumber, 'convertString');
+		String phonePrefix = (String)validateNull(data.phonePrefix, 'convertString');
+
+		if(phonePrefix != null && !phonePrefix.equals('null') && !String.isEmpty(phonePrefix) && !String.isEmpty(phone) && phone != null && !phone.equals('null')){
+			phone = phonePrefix + ' ' + phone;
+		}
 		mapAccountFields.put('Phone', phone);
 		//interlocId
 		String interlocId = (String)validateNull(data.interlocId, 'convertString');

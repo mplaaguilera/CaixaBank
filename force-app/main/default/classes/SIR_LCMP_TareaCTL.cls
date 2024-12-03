@@ -26,10 +26,10 @@ public with sharing class SIR_LCMP_TareaCTL {
     public static SIREC__SIREC_obj_proceso__c getTarea(String procesoId){
         SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(); 
 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             proceso = [SELECT Id, SIREC__SIREC_fld_tarea__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_tipo_tarea__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_seleccion__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_tituloInfo__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_SEL_opciones_cod__c,
                     SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_SEL_opciones_desc__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_SEL_respuestas_cod__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_estado__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_fecha__c,
-                    SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_importe__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_texto__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_masterRecordId__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_codigo_tarea__c
+                    SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_importe__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_DAT_textoLargo__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_masterRecordId__c, SIREC__SIREC_fld_tarea__r.SIREC__SIREC_fld_codigo_tarea__c
                     FROM  SIREC__SIREC_obj_proceso__c 
                     WHERE Id =: procesoId LIMIT 1];
 

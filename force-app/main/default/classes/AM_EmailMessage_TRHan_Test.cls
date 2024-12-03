@@ -59,7 +59,7 @@ public class AM_EmailMessage_TRHan_Test {
         correoOrigen.Subject = 'Prueba de envío de correo';
         correoOrigen.ActivityId = actividadCorreoOrigen.Id;
         correoOrigen.CC_Grupo_Colab__c = 'Grupo';
-        correoOrigen.CC_Procedencia__c = 'Traslado Colaborador';
+        //correoOrigen.CC_Procedencia__c = 'Traslado Colaborador';
         correoOrigen.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
         correoOrigen.ToAddress = 'prueba@ibm.com';
         correoOrigen.Incoming = false;
@@ -85,7 +85,7 @@ public class AM_EmailMessage_TRHan_Test {
         correo.Subject = 'Prueba de envío de correo';
         correo.ActivityId = actividadCorreo.Id;
         correo.CC_Grupo_Colab__c = 'Grupo';
-        correo.CC_Procedencia__c = 'Traslado Colaborador';
+        //correo.CC_Procedencia__c = 'Traslado Colaborador';
         correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
         correo.ToAddress = 'prueba@ibm.com';
         correo.Incoming = false;

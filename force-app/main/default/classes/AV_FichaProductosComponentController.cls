@@ -21,6 +21,7 @@ Historial
 	1.10		US276250			Víctor Santiago		15/10/2021			Added call to dmlFichaProd in getInitData
 	1.11		Fix IOP Diciembre	Víctor Santiago		14/12/2021			Deleted call to dmlFichaProd in getInitData
 	1.12		AV_Query IT	        Daniel Rodríguez	04/02/2022	        Change AV_Query to SOQL for User and Account
+	1.13        Fix                 Elisabeth R.        18/12/2023          Changed insertOrUpdatePF method to fix deleted of AV_ProductClient__c
 ***********************************************************************************************************************/
 public with sharing class AV_FichaProductosComponentController {
 
@@ -198,7 +199,6 @@ public with sharing class AV_FichaProductosComponentController {
 			 * ---------------------------------------------
 			 */
 			List<Response> respList = getMapProducts(listExpBusiness, listPFExperiences, mapPFCustomer, mapExpMyBox, recordId);
-			system.debug('@@respList '+ respList);
 			Boolean myOneBox = hasAnyBox(respList);
 			return respList;
 		}catch (System.Exception e){
@@ -379,8 +379,6 @@ public with sharing class AV_FichaProductosComponentController {
 	private static Map<String, AV_ProductMap__mdt> configMetadataProductsToMap(){
 		/* --- Get Custom Metadata related to ProductMap --- */
 		List<AV_ProductMap__mdt> listMapProducts = [select Id, DeveloperName, MasterLabel, Language, NamespacePrefix, Label, QualifiedApiName, AV_IconoPotencialidad__c, AV_IconoTenencia__c, AV_PotencialidadSize__c, AV_TenenciaSize__c, AV_TextoPotencialidad__c, AV_TextoTenencia__c from AV_ProductMap__mdt];
-		//List<AV_ProductMap__mdt> listMapProducts = new AV_Query('AV_ProductMap__mdt').selectAllFields().run();
-		system.debug('@@listMapProducts ' +listMapProducts);
 		//The key is the developer name of the custom metadata
 		Map<String, AV_ProductMap__mdt> mapProducts = new Map<String, AV_ProductMap__mdt>();
 		for (AV_ProductMap__mdt prod : listMapProducts){
@@ -398,10 +396,6 @@ public with sharing class AV_FichaProductosComponentController {
 	private static Account getCustomer(String recordId){
 		/* --- Get the Negocio related to Account --- */
 		Account customer = [Select Id, AV_NumPerso__c, AV_Negocio__c, AV_JSONMapaProducto__c, AV_RefreshProductMapDate__c From Account Where Id = :recordId limit 1];
-		/*Account customer = (Account)new AV_Query('Account')
-							.selectFields('Id, AV_NumPerso__c, AV_Negocio__c, AV_JSONMapaProducto__c, AV_RefreshProductMapDate__c')
-							.addConditionEq('Id', recordId)
-							.fetch();*/
 		return customer;
 	}
 
@@ -415,12 +409,6 @@ public with sharing class AV_FichaProductosComponentController {
 		List<AV_ExperienceBusiness__c> listExperiences = new List<AV_ExperienceBusiness__c>();
 		if(listBusiness!=null && !listBusiness.isEmpty()) {
 			listExperiences = [Select Id, AV_CodigoTipoExperiencia__c, AV_DescTipoExperiencia__c, AV_Orden__c, AV_MyBox__c, AV_ExternalID__c from AV_ExperienceBusiness__c where AV_Negocio__c in :listBusiness and AV_Activo__c = true order by AV_Orden__c];
-			/*listExperiences = new AV_Query('AV_ExperienceBusiness__c')
-					.selectFields('Id, AV_CodigoTipoExperiencia__c, AV_DescTipoExperiencia__c, AV_Orden__c, AV_MyBox__c, AV_ExternalID__c')
-					.addConditionIn('AV_Negocio__c', listBusiness)
-					.addConditionEq('AV_Activo__c', true)
-					.orderBy('AV_Orden__c')
-					.run();*/
 		}
 		return listExperiences;
 	}
@@ -436,14 +424,6 @@ public with sharing class AV_FichaProductosComponentController {
 		if(listBusiness!=null && !listBusiness.isEmpty()) {
 			listProductExperience = [Select Id, AV_ExperienciaNegocio__r.AV_CodigoTipoExperiencia__c, AV_ExperienciaNegocio__r.AV_DescTipoExperiencia__c, AV_Orden__c, AV_ProductoFicha__r.Name,  AV_ProductoFicha__c from AV_ProductExperience__c
 			where AV_ExperienciaNegocio__r.AV_Negocio__c in :listBusiness and AV_ProductoFicha__r.AV_Activo__c = true and AV_Activo__c = true order by AV_Orden__c];
-			/*listProductExperience = new AV_Query('AV_ProductExperience__c')
-					.selectFields('Id, AV_ExperienciaNegocio__r.AV_CodigoTipoExperiencia__c, AV_ExperienciaNegocio__r.AV_DescTipoExperiencia__c, AV_Orden__c, AV_ProductoFicha__r.Name,  AV_ProductoFicha__c')
-					.addConditionIn('AV_ExperienciaNegocio__r.AV_Negocio__c', listBusiness)
-					//.addConditionEq('AV_ProductoFicha__r.AV_Profesional__c',false)
-					.addConditionEq('AV_ProductoFicha__r.AV_Activo__c', true)
-					.addConditionEq('AV_Activo__c', true)
-					.orderBy('AV_Orden__c')
-					.run();*/
 		}
 		return listProductExperience;
 	}
@@ -457,19 +437,12 @@ public with sharing class AV_FichaProductosComponentController {
 	private static Map<String, AV_ProductClient__c> getProductCustomer(List<String> listBusiness, String recordId){
 		/* --- Get all ProductoFicha-Experiencia related to the Negocio --- */
 		List<AV_ProductClient__c> listPFCustomer = new List<AV_ProductClient__c>();
+
 		if(listBusiness!=null && !listBusiness.isEmpty()) {
            listPFCustomer = [Select Id, OwnerId, IsDeleted, Name, RecordTypeId, CreatedDate, CreatedById, AV_Activo__c, AV_Cliente__c, AV_ExternalID__c, 
 		   AV_ImportePreconcedido__c, AV_IndicadorTiene__c, AV_Negocio__c, AV_Potencialidad__c, AV_ProductoFicha__c, AV_Target__c, AV_TenenciaProducto__c, 
 		   AV_TieneOportunidad__c, AV_MyBox__c, AV_MejorarPrima__c, AV_PFName__c, AV_ProductoFicha__r.Name, AV_ProductoFicha__r.AV_ProductoFicha__r.AV_Profesional__c from AV_ProductClient__c 
 		   where AV_ProductoFicha__r.AV_ExperienciaNegocio__r.AV_Negocio__c in :listBusiness and AV_Activo__c = true and Av_cliente__c = :recordId];
-			/*listPFCustomer = new AV_Query('AV_ProductClient__c')
-					.selectAllFields()
-					.selectFields('AV_ProductoFicha__r.Name, AV_ProductoFicha__r.AV_ProductoFicha__r.AV_Profesional__c')
-					.addConditionIn('AV_ProductoFicha__r.AV_ExperienciaNegocio__r.AV_Negocio__c', listBusiness)
-                    .addConditionEq('AV_Activo__c', true)
-                    .addConditionEq('AV_Cliente__c', recordId)
-					.run();*/
-			system.debug('@@listPFCustomer '+ listPFCustomer);
 		}
 		Map<String, AV_ProductClient__c> mapPFCustomer = new Map<String, AV_ProductClient__c>();
 		for (AV_ProductClient__c prodCustomer : listPFCustomer){
@@ -630,11 +603,6 @@ public with sharing class AV_FichaProductosComponentController {
 			FinServ__Household__c, FinServ__ReferredByContact__c, FinServ__ReferredByUser__c, AV_Aviso__c, AV_CentroOrigen__c, AV_Comentarios__c, AV_Concepto1__c, AV_Concepto2__c, AV_Concepto3__c, AV_Concepto4__c, AV_Concepto5__c, AV_Cuota__c, AV_EmpleadoAlta__c, AV_EmpleadoModificacion__c, AV_Entidad__c, AV_ExternalID__c, AV_Familia__c, AV_FechaAlta__c, AV_FechaAviso__c, AV_FechaModificacion__c, AV_FechaPlanificacion__c, AV_FechaProximoRecordatorio__c, AV_FechaVencimiento__c, AV_Gestor__c, AV_NoOfrecerHasta__c, AV_NumeroDias__c, AV_OfrecerHasta__c, AV_Online__c, AV_PF__c, AV_Potencial__c, AV_Producto__c, AV_Tenencia__c, AV_TipoInteres__c, AV_ToDelete__c, AV_Valor1__c, AV_Valor2__c, AV_Valor3__c, AV_Valor4__c, AV_Valor5__c, AV_ClienteConfidencial__c, AV_EstadoOportunidad__c, AV_PFExperiencia__c, AV_SemanaAlta__c, 
 			AV_ProductoMifid__c, AV_VisibleByLoggedUser__c, AV_VisibleByOfficeUser__c, AV_OrigenApp__c, AV_Operacion__c, AV_ProductoSSCC__c, AV_AreaDelContrato__c, AV_Contrato__c, AV_ModificacionTelefonica__c, AV_BatchProcessChangeStatus__c, CBK_ForbiddenWords__c, AV_Origen__c, AV_ProductName__c, AV_assignContact__c, AV_CommentLastModifiedBy__c, AV_ApiGCF_ResponseStatusCode__c, AV_ApiGCF_ResponseBody__c, AV_ApiGCF_DateSend__c, AV_NumeroDocumento__c, AV_CommentLastModifiedDate__c, AV_EmployeeCustomer__c, AV_IncludeInPrioritizingCustomers__c, AV_Center__c, AV_ClientProduct__c, AV_Product__c, AV_ALVEN__c, AV_LicensePlate__c, AV_OficinaPrincipalRelacionas__c
 			From Opportunity where AccountId = :clientId and AV_PF__c = :pfId];
-			/*listOpportunity = new AV_Query('Opportunity')
-					.selectAllFields()
-					.addConditionEq('AccountId',clientId)
-					.addConditionEq('AV_PF__c', pfId)
-					.run();*/
 		}
 		return listOpportunity;
 	}
@@ -650,10 +618,7 @@ public with sharing class AV_FichaProductosComponentController {
 		if(!String.isBlank(clientId)) {
 			
 			client = [Select Name From Account Where Id = :clientId limit 1];
-			/*client = (Account) new AV_Query('Account')
-					.selectFields('Name')
-					.addConditionEq('Id',clientId)
-					.fetch();*/
+	
 		}
 		if(!String.isBlank(client.Name)){
 			return client.Name;
@@ -675,7 +640,6 @@ public with sharing class AV_FichaProductosComponentController {
 				if(resp.anyBox){
 					myOneBox= true;
 				}
-				
 			}
 			if(myOneBox){
 				for(Response resp: responseList){
@@ -716,11 +680,6 @@ public with sharing class AV_FichaProductosComponentController {
 			mapExternalIdExperience = createMapExperience(numperso, setExternalId);
 			listPFCustomerViaIntegration = [Select Id, AV_ProductoFicha__r.Name, OwnerId, IsDeleted, Name, RecordTypeId, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, AV_Activo__c, AV_Cliente__c, AV_ExternalID__c, AV_ImportePreconcedido__c, AV_IndicadorTiene__c, 
 			AV_Negocio__c, AV_Potencialidad__c, AV_ProductoFicha__c, AV_Target__c, AV_TenenciaProducto__c, AV_TieneOportunidad__c, AV_MyBox__c, AV_MejorarPrima__c, AV_PFName__c from AV_ProductClient__c where AV_ExternalID__c in :setExternalId];
-			/*listPFCustomerViaIntegration = new AV_Query('AV_ProductClient__c')
-					.selectAllFields()
-					.selectFields('AV_ProductoFicha__r.Name')
-					.addConditionIn('AV_ExternalID__c', setExternalId)
-					.run();*/
 			
 			if(listPFCustomerViaIntegration.isEmpty()){
 				insertPF(recordId, numPerso, mapExpPFCustomer, mapExternalIdExperience);
@@ -760,15 +719,9 @@ public with sharing class AV_FichaProductosComponentController {
 			setExternalIdProduct.add(externalInicio);
 		}
 		if(!setExternalIdProduct.isEmpty()){
-			listPFCustomerViaIntegration = [Select Id, AV_ProductoFicha__r.Name, OwnerId, IsDeleted, Name, RecordTypeId, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, AV_Activo__c, AV_Cliente__c, AV_ExternalID__c, AV_ImportePreconcedido__c, AV_IndicadorTiene__c, 
+			listPFCustomerNoIntegration = [Select Id, AV_ProductoFicha__r.Name, OwnerId, IsDeleted, Name, RecordTypeId, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, SystemModstamp, AV_Activo__c, AV_Cliente__c, AV_ExternalID__c, AV_ImportePreconcedido__c, AV_IndicadorTiene__c, 
 			AV_Negocio__c, AV_Potencialidad__c, AV_ProductoFicha__c, AV_Target__c, AV_TenenciaProducto__c, AV_TieneOportunidad__c, AV_MyBox__c, AV_MejorarPrima__c, AV_PFName__c from AV_ProductClient__c where AV_ExternalID__c not in :setExternalId and Av_cliente__c = :recordId];
-			/*listPFCustomerNoIntegration = new AV_Query('AV_ProductClient__c')
-					.selectAllFields()
-					.selectFields('AV_ProductoFicha__r.Name')
-					//.addConditionEq('AV_TenenciaProducto__c', '1')
-					.addConditionNotIn('AV_ExternalID__c', setExternalId)
-					.addConditionEq('AV_Cliente__c', recordId)
-					.run();*/
+
 		}
 
 		if(!listPFCustomerNoIntegration.isEmpty()){
@@ -779,12 +732,8 @@ public with sharing class AV_FichaProductosComponentController {
 			}
 		}
 		
-		if(!listproductToUpdateInactive.isEmpty()){
-			AV_LogDebug.printLogDebug(methodName, 'List product to inactive: ' + listproductToUpdateInactive);
-			//listProdcutAll.addAll(listproductToUpdateInactive);
-			//Database.update(listproductToUpdateInactive, false);
-			Database.delete(listproductToUpdateInactive);
-		}
+
+		AV_FichaProductosControllerWithoutShare.deleteProductClient(listproductToUpdateInactive);
 
 	}
 
@@ -888,10 +837,6 @@ public with sharing class AV_FichaProductosComponentController {
 		if(!externalIdExperiencia.isEmpty()){
 			List<AV_ProductExperience__c> listProductExperience = new List<AV_ProductExperience__c>();
 			listProductExperience = [Select Id, AV_ExternalID__c, AV_ProductoFicha__r.name from AV_ProductExperience__c where AV_ExternalID__c in :externalIdExperiencia];
-			/*listProductExperience = new AV_Query('AV_ProductExperience__c')
-					.selectFields('Id, AV_ExternalID__c, AV_ProductoFicha__r.name')
-					.addConditionIn('AV_ExternalID__c', externalIdExperiencia)
-					.run();*/
 
 			if(!listProductExperience.isEmpty()){
 				for(AV_ProductExperience__c experience : listProductExperience){

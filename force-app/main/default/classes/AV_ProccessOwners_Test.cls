@@ -9,14 +9,16 @@ Historial
    VERSION        USER_STORY       AUTHOR               DATE                Description
    1.0            App FSC          Sandra Gómez         27/01/2021          Init version
    1.1			  USXXXXXX		   Daniel Rodriguez	    22/11/2021			add FWK Batches
+   2.3 			  US649249	   	   Gonzalo Ávila	  	27/11/2023		    Include system.asserts in all methods
 
 ***********************************************************************************************************************/
 @isTest
 private class AV_ProccessOwners_Test {
 	@TestSetup
 	static void setup() {
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
 		AV_TestHelper.activateLogger();
-		String MATRICULA_SAMPLE = 'U0009003';
+		 
 		String labelProfile;
 		if (String.isBlank(labelProfile)){
 			labelProfile = 'Standard User';
@@ -33,17 +35,28 @@ private class AV_ProccessOwners_Test {
 			TimeZoneSidKey = 'Europe/Berlin',
 			ProfileId = p.Id,
 			UserName = 'testdevdev@test.com.dev',
-			AV_ExternalID__c = MATRICULA_SAMPLE
+			AV_ExternalID__c = 'U0009003'
 		);
 		insert u1;
 		Contact c =  AV_TestHelper.createEmployee(null,u1);
 	}
 	@isTest
 	static void executeProccessOwnersBatch() {
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
 		User us=[SELECT id FROM USER LIMIT 1];
 		String param = (String)us.id;
+		Boolean check = true;
+		System.runAs(userGcf){ 
 		Test.startTest();
-		AV_ProccessOwners.proccess( param );
+		try {
+			AV_ProccessOwners.proccess( param );	
+		} catch (Exception e) {
+			e.getMessage();
+			check = false;
+		}	
+		System.assert(check, 'executeProccessOwnersBatch Error');
+
 		Test.stopTest();
+	}
 	}
 }

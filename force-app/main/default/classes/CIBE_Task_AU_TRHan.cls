@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		  	AUTHOR				DATE				Description
 	1.0								Mikel Lezama   		29/08/2022			Init version
+    1.1                             Lucia Muñoz         24/01/2024          Quitar la llamada a la clase CIBE_TaskTriggerHelperSharing
 ***********************************************************************************************************************/
 public class CIBE_Task_AU_TRHan extends CC_TriggerHandlerBase{
     public override void mainEntry(CC_TriggerParameters tp) {
@@ -21,7 +22,6 @@ public class CIBE_Task_AU_TRHan extends CC_TriggerHandlerBase{
         
         // Lógica de negocio a ejecutar
         if (listData!=null && !listData.isEmpty()){
-            CIBE_TaskTriggerHelperSharing.calculateScoreTask(listData,'update');
             Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
         	//AV_TaskTriggerHelper.validateTaskOnboardingPositiveClosed(listData,mapOldObj); //Doing in the component
         	if (!hasCustomPermission && !System.isbatch() || test.isRunningTest()){

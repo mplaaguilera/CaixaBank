@@ -43,7 +43,6 @@ public without sharing class SAC_Notificacion {
         List<SAC_WrapperAlerta> listaWrapperAlerta = new List<SAC_WrapperAlerta>();
 
         for(Case caso: listaCasos){
-
             //US458927 eliminar notificaciones de SLA ALTA
             /*if(caso.OS_SLA_Completado__c == 'SLAAltaEntitlement' && caso.recordTypeId==recTypeReclamacion){
                 idesCasosAlta.add(caso.id);

@@ -11,11 +11,11 @@ public without sharing class SAC_EmailServiceNew_Test {
     static void makeData(){
         //usuario a usar
         List<User> usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1);
-        Database.insert(usuario);
+        SAC_DatabaseDML.insertListDML(usuario, false);
 
         //Account
         List<Account> cuentaA = SAC_TestDataFactory.crearCuentasNoClientePA(1);
-        Database.insert(cuentaA);
+        SAC_DatabaseDML.insertListDML(cuentaA, false);
         
         //Casos
         List<Case> listaCasos = new List<Case>();
@@ -47,7 +47,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         Case casoReclamacion3 = SAC_TestDataFactory.crearCaso('Reclamacion', mapaCamposCaso);
         listaCasos.add(casoReclamacion3);
 
-        Database.insert(listaCasos);
+        SAC_DatabaseDML.insertListDML(listaCasos, false);
 
         //Consultas Interaccion
         List<SAC_Interaccion__c> listaInteracciones = SAC_TestDataFactory.crearInteraccionn(1, casoReclamacion2.id, null);
@@ -56,22 +56,22 @@ public without sharing class SAC_EmailServiceNew_Test {
         listaInteracciones[0].SAC_FechaRespuesta__c = system.now();
         listaInteracciones[0].SAC_EmailRespuesta__c = 'emailentrante@entrante.com';
         listaInteracciones[0].SAC_Estado__c = 'SAC_Resuelta';  
-        Database.insert(listaInteracciones);
+        SAC_DatabaseDML.insertListDML(listaInteracciones, false);
 
         //Grupo
         List<CC_Grupo_Colaborador__c> listaGrupoTareas = SAC_TestDataFactory.crearGrupoColaborador('ResponsableAccion', 1);
-        Database.insert(listaGrupoTareas);
+        SAC_DatabaseDML.insertListDML(listaGrupoTareas, false);
 
         //Maestro tareas
         List<SAC_MaestroAccionesReclamacion__c> listaMaestros = SAC_TestDataFactory.crearMaestroAcciones(1, listaGrupoTareas[0].Id);
         listaMaestros[0].SAC_DeveloperName__c = 'GENERAL PARA OFICINAS';
-        Database.insert(listaMaestros);
+        SAC_DatabaseDML.insertListDML(listaMaestros, false);
 
         //Tareas
         List<SAC_Accion__c> listaTareas = SAC_TestDataFactory.crearTareas(1, casoReclamacion2, true);
         listaTareas[0].SAC_MaestroAccionesReclamacion__c = listaMaestros[0].Id;
         listaTareas[0].SAC_IndexedThreadId__c = 'ref:_threadId2:ref';
-        Database.insert(listaTareas);
+        SAC_DatabaseDML.insertListDML(listaTareas, false);
 
         /*Contact cont = new Contact();
         cont.LastName = 'cARLOS';
@@ -80,14 +80,14 @@ public without sharing class SAC_EmailServiceNew_Test {
 
         //Usuario Admin
         User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
-        Database.insert(usuarioAdmin);
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);
 
         System.RunAs(usuarioAdmin) {
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario[0].Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);
         }
     }
 
@@ -146,13 +146,32 @@ public without sharing class SAC_EmailServiceNew_Test {
     }
 
     @isTest
+    static void obtenerValoresPicklistTest(){
+
+        Test.startTest();
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+
+        Map<String, String> mapaValoresPicklistStatus = new Map<String, String>();
+
+        System.runAs(usuario) {
+            
+            mapaValoresPicklistStatus = SAC_EmailServiceNew.obtenerValoresPicklist('Case', 'Status');
+
+        }
+
+        Assert.areNotEqual(0, mapaValoresPicklistStatus.size(), 'No se han obtenido los valores picklist');
+        Test.stopTest();
+
+    }
+
+    @isTest
     static void testEmailServiceThreadID(){
 
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         
         Case caso = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'TestRec' LIMIT 1];
         caso.Subject ='Modifico el Subject';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];
 
@@ -262,7 +281,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         caso.Status = 'SAC_007';
         caso.SAC_StatusAuxiliar__c = 'SAC_007';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
 
@@ -315,7 +334,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         caso.Status = 'SAC_006';
         caso.SAC_StatusAuxiliar__c = 'SAC_006';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         //Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
 
@@ -366,7 +385,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         caso.Status = 'SAC_006';
         caso.SAC_StatusAuxiliar__c = 'SAC_006';
         caso.SAC_TipoConsumidor__c = 'Sí';
-        Database.update(caso);
+        SAC_DatabaseDML.updateDML(caso, false);
 
         Case casoModificado = [SELECT id, Subject, CC_SuppliedID__c, Status, RecordTypeId FROM Case  WHERE Subject = 'Modifico el Subject' LIMIT 1];  
 
@@ -473,7 +492,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         settings.SAC_Shadow__c = false;
         settings.SAC_Porcentaje__c = 100;
             
-        Database.insert(settings);
+        SAC_DatabaseDML.insertDML(settings, false);
 
         Messaging.InboundEmail.BinaryAttachment binAttachment = new Messaging.InboundEmail.BinaryAttachment();
         binAttachment.body = blob.valueOf('my attachment text');
@@ -519,7 +538,7 @@ public without sharing class SAC_EmailServiceNew_Test {
         }
         Test.stopTest();
 
-        System.assertNotEquals([SELECT ID FROM Case].size(), 0, 'No se ha insertado el mail');  
+        System.assertNotEquals([SELECT Count() FROM Case], 0, 'No se ha insertado el mail');  
 
     }
 }

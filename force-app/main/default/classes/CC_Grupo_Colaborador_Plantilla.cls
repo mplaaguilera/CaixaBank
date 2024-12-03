@@ -42,6 +42,9 @@ public with sharing class CC_Grupo_Colaborador_Plantilla {
         else if (grupoColaborador.size() > 0 && grupoColaborador[0].OS_Negocio__c == 'SACH') { 
             carpetaNegocio = 'SACH_Operativas';  
         }       
+        else if (grupoColaborador.size() > 0 && grupoColaborador[0].OS_Negocio__c == 'GRR') { 
+           carpetaNegocio = 'GRR_Operativas';  
+        }     
         else {
             carpetaNegocio = 'CC_Operativas';            
         }

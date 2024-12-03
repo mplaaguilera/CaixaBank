@@ -27,7 +27,7 @@ public with sharing class SIR_SendFormulario_WS {
         List<String> lstResponse = new List<String>();
 
         SIR_WrapperEnviarFormulario wrapper = new SIR_WrapperEnviarFormulario();
-        if(	SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible() && SIR_IntervinienteFormulario__c.SObjectType.getDescribe().isAccessible()){
+        if(	Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible() && Schema.SObjectType.SIR_IntervinienteFormulario__c.isAccessible()){
                       
             // Recuperamos los datos del formulario
             List<SIR_FormularioRefinanciacion__c> formulario = [SELECT id , SIR_Proceso__r.SIREC__SIREC_fld_masterRecordId__c, SIR_TotalIngresosTrabajo__c, SIR_TotalIngresosBienes__c,
@@ -192,13 +192,24 @@ public with sharing class SIR_SendFormulario_WS {
             wrapper.idPersona              = listIdPersonas;
             if(SIR_WS_Configuration__mdt.getInstance('SendFormulario').SIR_fld_isActive__c ){
                 if(wrapper != null){
-                    Map<String,string> mHeaders =  new  Map<String,string>();
-                    mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+                    //Map<String,string> mHeaders =  new  Map<String,string>();
+                    //mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
                     String body = JSON.serialize(wrapper);
                     try {
                         // Framework Integration
-                        HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'updateFormRefinanciacion', 'POST', mHeaders);
-                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                      //  HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'updateFormRefinanciacion', 'POST', mHeaders);    
+                        CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+                        reqWrapper.body = body;
+                        reqWrapper.intSetting = 'updateFormRefinanciacion';
+                        reqWrapper.method = 'POST';
+              
+                        reqWrapper.mHeaders =  new  Map<String,string>();
+                        reqWrapper.mHeaders.put('Content-Type', 'application/json;charset=UTF-8');       
+                        reqWrapper.mHeaders.put('Accept-Language', 'es');
+                        reqWrapper.mUriParams = new  Map<String,string>();
+                        reqWrapper.mQueryParams = new  Map<String,string>();                    
+                        HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper); 
+                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR','updateFormRefinanciacion');
                         if(res.getStatusCode() == 200){
                             FormularioResponse resp = (FormularioResponse)JSon.deserialize(res.getBody(), FormularioResponse.class);        
                             if( resp.codigoSalida == '1'){

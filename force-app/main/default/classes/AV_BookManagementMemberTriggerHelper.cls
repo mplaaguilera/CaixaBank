@@ -13,7 +13,8 @@ Historial
 	1.3			Fix					Sandra Gómez		04/04/2022			Change to Queueable
 	1.4			DE72651				Patricia Solano		06/03/2023			Modify method insertOrUpdateAccountQueues to change the queue limit
 	1.5			US603731			Sandra Gómez		18/05/2023			Modify method updateOwnerIdFromClient to change queueables
-	
+	1.6		    Fix PMD Errors 		Daniel Rodriguez	30/10/2023	      	Modify !Test.isRunningTest in method
+	1.7			QualityCloudsFix	Luis Fernández		11/03/2024			Changed getDescribe() by his parametered version with DEFERRED option
 ***********************************************************************************************************************/
 public with sharing class AV_BookManagementMemberTriggerHelper {
 	
@@ -67,7 +68,7 @@ public with sharing class AV_BookManagementMemberTriggerHelper {
 		}
 
 		Map<String, String> mapEmpleUser = new Map<String, String>();
-		if (!employees.isEmpty() && Contact.SObjectType.getDescribe().isAccessible() && User.SObjectType.getDescribe().isAccessible()) {
+		if (!employees.isEmpty() && Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() && User.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
 			User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' LIMIT 1];
 
 			for (Contact c : [SELECT Id, AV_UsuarioAsociado__c FROM Contact WHERE Id IN :employees]) {
@@ -80,11 +81,8 @@ public with sharing class AV_BookManagementMemberTriggerHelper {
 		}
 
 		if (!mapEmpleUser.isEmpty()) {
-			Integer maxQueues = 15;
-			
-			if (!Test.isRunningTest()) {
-				maxQueues = (Integer) AV_Bypass__c.getOrgDefaults().AV_MaxQueueSize__c;
-			}
+
+			Integer maxQueues = !Test.isRunningTest() ? (Integer) AV_Bypass__c.getOrgDefaults().AV_MaxQueueSize__c : 15;
 
 			Long chunkSize = ((Decimal)(listNews.size() / maxQueues)).round(System.RoundingMode.DOWN);
 

@@ -1,6 +1,6 @@
 /*****************************************************************
  * Name: SAC_LCMP_RechazarReclamacionMasiva_Test
- * Copyright © 2021  CaixaBank
+ * Copyright © 2021  CaixaBank 
  * 
  * Proposito: Testear la clase SAC_LCMP_RechazarReclamacionMasiva
  * 
@@ -53,6 +53,7 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
         grupoColaboradorContact.SAC_Administrador__c = true;
         Database.insert(grupoColaboradorContact);
         
+        List<Case> casesToInsert = new List<Case>();
         //Reclamacion
         Map<String, Object> camposRecl = new Map<String, Object>();
         camposRecl.put('Subject', 'testRec1');
@@ -61,7 +62,7 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
         camposRecl.put('SEG_Grupo__c', grupoColaborador.Id);
         
         Case casoRechazo = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl);
-        Database.insert(casoRechazo);
+        casesToInsert.add(casoRechazo);
 
         //Reclamacion 2
         Map<String, Object> camposRecl2 = new Map<String, Object>();
@@ -72,7 +73,19 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
         camposRecl2.put('CC_Rechazar_Reabrir_Caso__c', true);
         
         Case casoFalloRechazo = SAC_TestDataFactory.crearCaso('Reclamacion', camposRecl2);
-        Database.insert(casoFalloRechazo);
+        casesToInsert.add(casoFalloRechazo);
+        
+        // Consulta COPS
+        Map<String, Object> camposConsulta = new Map<String, Object>();
+        camposConsulta.put('Subject', 'testConsulta');
+        camposConsulta.put('Status', 'SAC_003');
+        camposConsulta.put('SAC_StatusAuxiliar__c', 'SAC_001');
+        camposConsulta.put('SEG_Grupo__c', grupoColaborador.Id);
+        
+        Case consulta = SAC_TestDataFactory.crearCaso('Consulta', camposConsulta);
+        casesToInsert.add(consulta);
+		
+        insert casesToInsert;
     }
 
 	@isTest
@@ -128,5 +141,40 @@ public with sharing class SAC_LCMP_RechazarReclamacionMasiva_Test {
 		    result = SAC_LCMP_RechazarReclamacionMasiva.rechazarCasos('Otros', string.join(lstId, ','), 'Test');
         }
 		System.assertNotEquals(result, 'OK', 'No ha saltado la validacion correctamente');
+	}
+    
+    @isTest
+    private static void descartarConsultasKOOrigenTest(){
+        
+		User usr = [SELECT id FROM User WHERE LastName = 'Administrator' AND IsActive = true LIMIT 1];
+        List<Case> lstCases =  [SELECT id, recordtype.name FROM Case WHERE Subject LIKE 'testConsulta%' LIMIT 2];
+        List<string> lstId = new List<string>();
+		for(Case caso : lstCases){
+			lstId.add(caso.id);
+		}
+        String result;
+        System.runAs(usr) {
+		    result = SAC_LCMP_RechazarReclamacionMasiva.descartarCasos('SAC_Otros', string.join(lstId, ','), 'Test');
+        }
+		System.assertEquals(result, 'KO ORIGEN', 'Es necesario informar el Origen');
+	}
+
+    @isTest
+    private static void descartarConsultasCOPSAJTest(){
+        
+		User usr = [SELECT id FROM User WHERE LastName = 'COPSAJ' AND IsActive = true LIMIT 1];
+        List<Case> lstCases =  [SELECT id, recordtype.name FROM Case WHERE Subject LIKE 'testConsulta%' LIMIT 2];
+        List<string> lstId = new List<string>();
+		for(Case caso : lstCases){
+			lstId.add(caso.id);
+		}
+        String result;
+        System.runAs(usr) {
+
+		    result = SAC_LCMP_RechazarReclamacionMasiva.descartarCasos('SAC_Otros', string.join(lstId, ','), 'Test');
+
+        }
+		System.assertEquals(result, 'OK', 'Consultas descartadas correctamente');
+
 	}
 }

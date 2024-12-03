@@ -2,177 +2,197 @@
  Name:	  EV_WS_InscripcionEnEvento
  Copyright © 2023  CaixaBank
 ----------------------------------------------------------------------------------------------------------------------
-Proposito: Clase para Web service EV_WS_InscripcionEnEvento de Portal
+@Description: Clase para Web service EV_WS_InscripcionEnEvento de Portal
 ----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
 	VERSION		USER_STORY		    AUTHOR				DATE				Description
-	1.0		  	US586996			Daniel Rodriguez   08/05/2023			Modify version new Architecture with the new object EV_CampaignMemberC__c 
+	1.0		  	US586996			Daniel Rodriguez   08/05/2023			Modify version new Architecture with the new object EV_CampaignMemberC__c
+	1.1		    US737264            Carolina Lopez	   02/01/2024			Optimize the service, include new response, validations and remove getDescribe().
 ***********************************************************************************************************************/
-
-
 @RestResource(urlMapping='/EV_InscripcionEnEvento/*')
-global with sharing class EV_WS_InscripcionEnEvento {
- 
-	private static final String CAMPAIGN_MEMBER_NOT_FOUND = 'No se ha encontrado el miembro de campaña. Contacte con el administrador de Salesforce.';
-	private static final String CAMPAIGN_NOT_FOUND = 'No se ha encontrado el evento. Contacte con el administrador de Salesforce.';
-	private static final String EMAIL_FORM_EMPTY = 'El campo email es obligatorio.';
-	private static final String CONTACT_NOT_FOUND ='No se ha encontrado el contacto';
+global with sharing class EV_WS_InscripcionEnEvento extends CBK_HttpServiceIntegration_Abstract {
+	private static Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
+    private static Id rtLeadEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_Evento').getRecordTypeId();
+	private static Id rtAccEmpresa = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 	
 	@HttpPost
 	global static void inscripcionPortal() {
 		String methodName = 'inscripcionPortal';
+		List<Campaign> lstCamp = new List<Campaign>();
 		RestRequest req = RestContext.request;
-		Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
 		String bodyRequest = req.requestBody.toString();
+		String cleanedRequestBody = bodyRequest.replaceAll('\\s', '');
 		EV_LogDebug.printLogDebug(methodName, 'Body request: ' + bodyRequest);
 
-		EV_NoClienteWrapper.RequestInscripcionBody campBody = (EV_NoClienteWrapper.RequestInscripcionBody) JSON.deserialize(bodyRequest, EV_NoClienteWrapper.RequestInscripcionBody.class);
+		if(cleanedRequestBody.trim() == '{}'){
+			RestResponse res = RestContext.response;
+			res.headers.put('Content-Type', 'application/json');
+            res.responsebody = Blob.valueOf(Label.EV_NotBodyInscription); 
+            res.statusCode = 400; 
+        	returnResponse(res);
+        }else{ 
+			EV_NoClienteWrapper.RequestInscripcionBody campBody = (EV_NoClienteWrapper.RequestInscripcionBody) JSON.deserialize(bodyRequest, EV_NoClienteWrapper.RequestInscripcionBody.class);
+			if(Schema.SObjectType.Campaign.isAccessible()) {
+				lstCamp = [SELECT Id, Name, EV_NewArchitecture__c, EV_ExternalId__c FROM Campaign WHERE EV_ExternalId__c = :campBody.idEvento LIMIT 1];
+			}
+			if(!lstCamp.isEmpty()) {
+				if(campBody.datosFormulario != null){
+					if(String.isNotBlank(campBody.IdInvitacion)) {//Clientes
+						if(lstCamp[0].EV_NewArchitecture__c == false){//Antigua arquitectura
+							List<CampaignMember> lstCampMember = new List<CampaignMember>();
+							
+							if(Schema.SObjectType.CampaignMember.isAccessible()) {
+								lstCampMember = [SELECT Id, EV_Empresa__c,EV_NumeroDocumento__c, AccountId FROM CampaignMember WHERE EV_ExternalId__c = :campBody.IdInvitacion LIMIT 1];
+							}
 
-		//Clientes
-		if(String.isNotBlank(campBody.IdInvitacion)){
-            
-			Campaign camp = [SELECT Id, EV_NewArchitecture__c FROM Campaign WHERE EV_ExternalId__c = :campBody.idEvento LIMIT 1];
-			EV_LogDebug.printLogDebug('Entro idInvitacion' , 'invitacion + architecture ' + campBody.IdInvitacion +' '+ camp.EV_NewArchitecture__c);
-			if(camp.EV_NewArchitecture__c == false){
-				CampaignMember campMember = [SELECT Id, EV_Empresa__c,EV_NumeroDocumento__c, AccountId FROM CampaignMember WHERE EV_ExternalId__c = :campBody.IdInvitacion LIMIT 1];
-				//Registrar cliente dado que tiene invitacion
-				if(campMember != null && campMember.id != null && camp != null){
-					if(campMember.EV_Empresa__c && campMember.EV_NumeroDocumento__c != null) {
-						campBody.datosFormulario.NIFEmpresa = campMember.EV_NumeroDocumento__c;
-						RestResponse res = registroNoClientes(camp.Id, campBody.datosFormulario,campMember.AccountId, camp.EV_NewArchitecture__c );
-					} else {
-						RestResponse res = registroClientes(campMember.Id, camp.Id, campBody.datosFormulario.FormatoDeAsistencia, camp.EV_NewArchitecture__c );
-					}
-				}else{
-					//Error: miembro campaña no encontrado
-					RestResponse res = RestContext.response; 
-					EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-					responseToShow.Description = CAMPAIGN_MEMBER_NOT_FOUND;
-					fillRestResponse(res, responseToShow, 205);
+							if(!lstCampMember.isEmpty()) {//Registrar cliente dado que tiene invitacion
+								if(lstCampMember.get(0).EV_Empresa__c && String.isNotBlank(lstCampMember.get(0).EV_NumeroDocumento__c)) {
+									campBody.datosFormulario.NIFEmpresa = lstCampMember.get(0).EV_NumeroDocumento__c;
+									registroNoClientes(lstCamp.get(0).Id, campBody.datosFormulario, lstCampMember.get(0).AccountId, lstCamp.get(0).EV_NewArchitecture__c);
+								} else {
+									registroClientes(lstCampMember.get(0).Id, lstCamp.get(0).Id, campBody.datosFormulario.FormatoDeAsistencia, lstCamp.get(0).EV_NewArchitecture__c);
+								}
+							}else{
+								RestResponse res = RestContext.response;
+								fillRestResponse(res, Label.EV_CampaignMemberNotFound, null, 404);
+							}
+						}else{//Nueva arquitectura
+							List<EV_CampaignMemberC__c> lstCampMemberC = new List<EV_CampaignMemberC__c>();
+							if(Schema.SObjectType.EV_CampaignMemberC__c.isAccessible()) {
+								lstCampMemberC = [SELECT Id, EV_Empresa__c,EV_NumeroDocumento__c, EV_AccountId__c FROM EV_CampaignMemberC__c WHERE EV_ExternalId__c = :campBody.IdInvitacion LIMIT 1];
+							}
+
+							if(!lstCampMemberC.isEmpty()){//Registrar cliente dado que tiene invitacion en nueva arquitectura
+								if(lstCampMemberC.get(0).EV_Empresa__c && String.isNotBlank(lstCampMemberC.get(0).EV_NumeroDocumento__c)) {
+									campBody.datosFormulario.NIFEmpresa = lstCampMemberC.get(0).EV_NumeroDocumento__c;
+									registroNoClientes(lstCamp.get(0).Id, campBody.datosFormulario,lstCampMemberC.get(0).EV_AccountId__c, lstCamp.get(0).EV_NewArchitecture__c );
+								}else{
+									registroClientes(lstCampMemberC.get(0).Id, lstCamp.get(0).Id, campBody.datosFormulario.FormatoDeAsistencia, lstCamp.get(0).EV_NewArchitecture__c);
+								}
+							}else{//Error: miembro campaña no encontrado
+								RestResponse res = RestContext.response;
+								fillRestResponse(res, Label.EV_CampaignMemberNotFound, null, 404);
+							}    
+						}
+					}else if(String.isNotBlank(campBody.idEvento) && campBody.numper != null){//aqui hay que buscar el contact con el numper para poder generar un campaignMember
+						EV_LogDebug.printLogDebug('Entro idEvento y numper' , 'idEvento + numper ' + campBody.idEvento +' '+ campBody.numper);
+						List<Contact> lstConct = new List<Contact>();
+						if(Schema.SObjectType.Contact.isAccessible()) {
+							lstConct = [SELECT Id FROM Contact WHERE CC_NumPerso__c = :campBody.numper LIMIT 1];
+						}
+
+						if (!lstConct.isEmpty()) {
+							if(lstCamp.get(0).EV_NewArchitecture__c){//Genero CampaignMember custom
+								createClientCMcustom(lstCamp.get(0).Id, lstConct.get(0), campBody.datosFormulario.FormatoDeAsistencia);
+							}else{
+								createClientCM(lstCamp.get(0).Id, lstConct.get(0), campBody.datosFormulario.FormatoDeAsistencia);
+							}
+						}else {
+							RestResponse res = RestContext.response;
+							fillRestResponse(res, Label.EV_ContactNotFound, null , 404);
+						}
+					}else if(String.isNotBlank(campBody.idEvento) && campBody.numper == null){//No clientes
+						EV_LogDebug.printLogDebug('Entro idEvento, formulario no null y numper null' , 'idEvento + campBody.datosFormulario + numper ' + campBody.idEvento +' '+campBody.datosFormulario + ' '+ campBody.numper);
+						if (String.isBlank(campBody.datosFormulario.Email)){//Email vacio
+							RestResponse res = RestContext.response;
+							fillRestResponse(res, Label.EV_EmailFormEmpty, null, 400);
+						}else{//Validar que existe la campaña
+							EV_LogDebug.printLogDebug('camp Registro no clientes',String.valueof(lstCamp.get(0).Id));
+							registroNoClientes(lstCamp.get(0).Id, campBody.datosFormulario, null, lstCamp.get(0).EV_NewArchitecture__c);
+						}
+					} 
 				}
 			}else{
-				EV_CampaignMemberC__c campMemberC = [SELECT Id, EV_Empresa__c,EV_NumeroDocumento__c, EV_AccountId__c FROM EV_CampaignMemberC__c WHERE EV_ExternalId__c = :campBody.IdInvitacion LIMIT 1];
-				//Registrar cliente dado que tiene invitacion en nueva arquitectura
-				if(campMemberC != null && campMemberC.id != null && camp != null){
-					if(campMemberC.EV_Empresa__c && campMemberC.EV_NumeroDocumento__c != null) {
-						campBody.datosFormulario.NIFEmpresa = campMemberC.EV_NumeroDocumento__c;
-						RestResponse res = registroNoClientes(camp.Id, campBody.datosFormulario,campMemberC.EV_AccountId__c, camp.EV_NewArchitecture__c );
-					}else{
-						RestResponse res = registroClientes(campMemberC.Id, camp.Id, campBody.datosFormulario.FormatoDeAsistencia, camp.EV_NewArchitecture__c );
-					}
-				}else{
-					//Error: miembro campaña no encontrado
-					RestResponse res = RestContext.response; 
-					EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-					responseToShow.Description = CAMPAIGN_MEMBER_NOT_FOUND;
-					fillRestResponse(res, responseToShow, 205);
-				}     
+				RestResponse res = RestContext.response;
+				fillRestResponse(res, Label.EV_CampaignNotFound, null, 404);
+			} 
 		}
 	}
-		else if(String.isNotBlank(campBody.idEvento) && campBody.numper != null){
-			//aqui hay que buscar el contact con el numper para poder generar un campaignMember
-			EV_LogDebug.printLogDebug('Entro idEvento y numper' , 'idEvento + numper ' + campBody.idEvento +' '+ campBody.numper);
-			Contact conct = [SELECT Id FROM Contact WHERE CC_NumPerso__c = :campBody.numper ];
-			Campaign camp = [SELECT Id, EV_NewArchitecture__c FROM Campaign WHERE EV_ExternalId__c = :campBody.idEvento LIMIT 1];
-			if (conct != null) {
-				if(camp.EV_NewArchitecture__c){
-					//Genero CampaignMember custom
-					createClientCMcustom(camp.Id, conct, campBody.datosFormulario.FormatoDeAsistencia );
-				}else{
-					createClientCM(camp.Id, conct, campBody.datosFormulario.FormatoDeAsistencia );
-				}
-			} else {
-				RestResponse res = RestContext.response; 
-				EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-				responseToShow.Description = CONTACT_NOT_FOUND;
-				fillRestResponse(res, responseToShow, 205);
-			}
-		}
-		//No clientes
-		else if(String.isNotBlank(campBody.idEvento) && campBody.datosFormulario!=null && campBody.numper == null ){
-            EV_LogDebug.printLogDebug('Entro idEvento, formulario no null y numper null' , 'idEvento + campBody.datosFormulario + numper ' + campBody.idEvento +' '+campBody.datosFormulario + ' '+ campBody.numper);
-			//Email vacio
-			if (String.isBlank(campBody.datosFormulario.Email)){
-				RestResponse res = RestContext.response; 
-				EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-				responseToShow.Description = EMAIL_FORM_EMPTY;
-				fillRestResponse(res, responseToShow, 400);
-			}else{
-				//Validar que existe la campaña
-                Campaign camp = new Campaign();
-				camp = [SELECT Id, EV_NewArchitecture__c FROM Campaign WHERE EV_ExternalId__c = :campBody.idEvento LIMIT 1];
-                EV_LogDebug.printLogDebug('camp Registro no clientes',String.valueof(camp));
-				if(camp != null){
-					RestResponse res = registroNoClientes(camp.Id, campBody.datosFormulario, null, camp.EV_NewArchitecture__c);
-				}else{
-					//Campaña no encontrada
-					RestResponse res = RestContext.response; 
-					EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-					responseToShow.Description = CAMPAIGN_NOT_FOUND;
-					fillRestResponse(res, responseToShow, 205);
-				}
-			}
-		}
-		//El ID del evento es vacio o el formulario esta vacio
-		else if(String.isBlank(campBody.idEvento) || campBody.datosFormulario==null){
-            EV_LogDebug.printLogDebug('Entro idEvento vacio o formulario null' , 'idEvento + campBody.datosFormulario ' + campBody.idEvento +' '+campBody.datosFormulario);
-			RestResponse res = RestContext.response; 
-			EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-			responseToShow.Description = CAMPAIGN_NOT_FOUND;
-			fillRestResponse(res, responseToShow, 205);
-		}
-	}
-	
+
+	private static RestResponse returnResponse(RestResponse response) { 
+        return response;        
+    }
 	/**
 	 * Fill the REST response
 	 */
-	private static void fillRestResponse(RestResponse res, EV_NoClienteWrapper.CampaignMemberResponse responseToShow, Integer statusCode){
+	private static void fillRestResponse(RestResponse res, String fDescription, String fExternalId, Integer fstatusCode){
+		EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
+		responseToShow.description = fDescription;
+		if(fExternalId != null){
+			responseToShow.idInvitacion = fExternalId;
+		}
 		res.headers.put('Content-Type', 'application/json');
 		res.responsebody = Blob.valueOf(JSON.serialize(responseToShow));
-		res.statusCode = statusCode;
+		res.statusCode = fstatusCode;
 	}
-	
 	/**
 	 * Existing clients
 	 */
 	private static RestResponse registroClientes(String idInvitacion, String idCampaign, String formatoDeAsistencia, Boolean newArchitecture){
         EV_LogDebug.printLogDebug('Entro registroClientes' , 'idInvitacion + idCampaign + FormatoDeAsistencia + newArchitecture ' + idInvitacion +' '+idCampaign + ' '+ formatoDeAsistencia + ' '+ newArchitecture);
 		RestResponse res = RestContext.response;
-		EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
 		if(newArchitecture){
-			EV_CampaignMemberC__c campActualizarC = [SELECT Id, EV_Status__c, EV_ExternalId__c, EV_FormatoDeAsistencias__c FROM EV_CampaignMemberC__c WHERE Id = :IdInvitacion];
-
-			if(campActualizarC.EV_Status__c == 'Registro confirmado' || campActualizarC.EV_Status__c == 'QR enviado'){
-				responseToShow.Description = 'Ya se ha inscrito en el evento';
-				responseToShow.idInvitacion = campActualizarC.EV_ExternalId__c;
-				fillRestResponse(res, responseToShow, 202);
-			}else{
-				campActualizarC.EV_Status__c = 'Registro confirmado';
-				campActualizarC.EV_FormatoDeAsistencias__c = formatoDeAsistencia;
-				update campActualizarC;
-				responseToShow.Description = 'Registro completado';
-				responseToShow.idInvitacion = campActualizarC.EV_ExternalId__c;
-				fillRestResponse(res, responseToShow, 200);
+			list<EV_CampaignMemberC__c> lstCampActualizarC = new list<EV_CampaignMemberC__c>();
+			if(Schema.SObjectType.EV_CampaignMemberC__c.isAccessible()) {
+				lstCampActualizarC = [SELECT Id, EV_Status__c, EV_ExternalId__c, EV_CampaignId__r.Name, EV_CampaignId__r.EV_ExternalId__c, EV_CampaignId__c,  EV_FormatoDeAsistencias__c FROM EV_CampaignMemberC__c WHERE Id = :IdInvitacion];
 			}
-			return res;
+			if(!lstCampActualizarC.isEmpty()){
+				if(lstCampActualizarC[0].EV_Status__c == Label.EV_RecordConformed || lstCampActualizarC[0].EV_Status__c == Label.EV_QRSend){
+					fillRestResponse(res, Label.EV_RecordFound, lstCampActualizarC[0].EV_ExternalId__c, 202);
+					returnResponse(res);
+				}else{
+					lstCampActualizarC[0].EV_Status__c = Label.EV_RecordConformed;
+                    lstCampActualizarC[0].EV_FormatoDeAsistencias__c = formatoDeAsistencia;
+					Database.SaveResult[] resultCampMemC = Database.update(lstCampActualizarC, false);
+					Map<String, String> msjsCMC = new Map<String, String>();
+					if(resultCampMemC[0].isSuccess()){
+						String externalId = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :lstCampActualizarC[0].Id].EV_ExternalId__c;
+						fillRestResponse(res,  Label.EV_RecordCompleted, externalId, 200);
+						returnResponse(res);
+					}
+					if(!resultCampMemC[0].isSuccess()) {
+						fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''),null, 500);
+                        msjsCMC.put('500', resultCampMemC[0].getErrors()[0].getMessage());
+						returnResponse(res);
+					}
+					if(!msjsCMC.isEmpty()){                    
+						CBK_Log.error(msjsCMC);                    
+					}
+				}
+				return res;
+			}
 		}else{
-			CampaignMember campActualizar = [SELECT Id, Status, EV_ExternalId__c, EV_FormatoDeAsistencias__c FROM CampaignMember WHERE Id = :IdInvitacion];
-
-			if(campActualizar.Status == 'Registro confirmado' || campActualizar.Status == 'QR enviado'){
-				responseToShow.Description = 'Ya se ha inscrito en el evento';
-				responseToShow.idInvitacion = campActualizar.EV_ExternalId__c;
-				fillRestResponse(res, responseToShow, 202);
-			}else{
-				campActualizar.Status = 'Registro confirmado';
-				campActualizar.EV_FormatoDeAsistencias__c = formatoDeAsistencia;
-				update campActualizar;
-				responseToShow.Description = 'Registro completado';
-				responseToShow.idInvitacion = campActualizar.EV_ExternalId__c;
-				fillRestResponse(res, responseToShow, 200);
+			list<CampaignMember> lstCampActualizar = new list<CampaignMember>();
+			if(Schema.SObjectType.CampaignMember.isAccessible()) {
+				lstCampActualizar = [SELECT Id, Status, EV_ExternalId__c, EV_FormatoDeAsistencias__c FROM CampaignMember WHERE Id = :IdInvitacion];
 			}
-			return res;
+			if(!lstCampActualizar.isEmpty()){
+				if(lstCampActualizar[0].Status == Label.EV_RecordConformed || lstCampActualizar[0].Status == Label.EV_QRSend){
+					fillRestResponse(res, Label.EV_RecordFound,lstCampActualizar[0].EV_ExternalId__c,  202);
+					returnResponse(res);
+				}else{
+					lstCampActualizar[0].Status = Label.EV_RecordConformed;
+                    lstCampActualizar[0].EV_FormatoDeAsistencias__c = formatoDeAsistencia;
+					Database.SaveResult[] resultCampMem = Database.update(lstCampActualizar, false);
+					Map<String, String> msjsCM = new Map<String, String>();
+					if(resultCampMem[0].isSuccess()){
+						String externalId = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :lstCampActualizar[0].Id].EV_ExternalId__c;
+						fillRestResponse(res,Label.EV_RecordCompleted, externalId , 200);
+						returnResponse(res);
+                    }	
+                    if(!resultCampMem[0].isSuccess()) {
+						fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''),null, 500);
+						msjsCM.put('500', resultCampMem[0].getErrors()[0].getMessage());
+						returnResponse(res);
+                    }
+					if(!msjsCM.isEmpty()){                    
+						CBK_Log.error(msjsCM);                    
+					}
+				}
+			}
 		}
+		return res;
 	}
 
 	/**
@@ -180,284 +200,196 @@ global with sharing class EV_WS_InscripcionEnEvento {
 	 */
 	private static RestResponse registroNoClientes(String idEvento, EV_NoClienteWrapper datosFormulario, String accId, Boolean newArchitecture){
 		EV_LogDebug.printLogDebug('Entro registroNoClientes',String.valueof(datosFormulario) + idEvento + accId);
-		Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
 		RestResponse res = RestContext.response;
-		EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-		Id rtLeadEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_Evento').getRecordTypeId();
 		List<EV_CampaignMemberC__c> listCampMemberCustom = new List<EV_CampaignMemberC__c>();
 		List<CampaignMember> listCampMember = new List<CampaignMember>();
-		if(newArchitecture){
-			//Validar si un usuario ya se ha inscrito al evento a partir del email. (campo 'email' no puede ser filtrado)
-			listCampMemberCustom = [SELECT Id, EV_Status__c, EV_NumeroDocumento__c, EV_ExternalId__c, EV_Email__c 
-									FROM EV_CampaignMemberC__c 
-									WHERE EV_CampaignId__c = :idEvento 
-										AND EV_LeadId__c != null 
-										AND EV_LeadId__r.RecordType.DeveloperName = 'EV_Evento'
-										AND EV_LeadId__r.Email = :datosFormulario.Email
-										AND RecordtypeId = :rtCMC
-										AND EV_Status__c != 'Baja del evento'
-									LIMIT 50000
-									];
-
-		}else{
-			//Validar si un usuario ya se ha inscrito al evento a partir del email. (campo 'email' no puede ser filtrado)
-			listCampMember = [SELECT Id, Status, EV_NumeroDocumento__c, EV_ExternalId__c, Email 
-							FROM CampaignMember 
-							WHERE CampaignId = :idEvento 
-								AND LeadId != null 
-								AND Lead.RecordType.DeveloperName = 'EV_Evento'
-								AND Lead.Email = :datosFormulario.Email
-								AND Status != 'Baja del evento'
-							LIMIT 50000
-							];
+		if(newArchitecture){//Validar si un usuario ya se ha inscrito al evento a partir del email. (campo 'email' no puede ser filtrado)
+			if(Schema.SObjectType.EV_CampaignMemberC__c.isAccessible()) {
+				listCampMemberCustom = [SELECT Id, EV_Status__c, EV_NumeroDocumento__c, EV_ExternalId__c, EV_Email__c 
+										FROM EV_CampaignMemberC__c 
+										WHERE EV_CampaignId__c = :idEvento 
+											AND EV_LeadId__c != null 
+											AND EV_LeadId__r.RecordType.DeveloperName = 'EV_Evento'
+											AND EV_LeadId__r.Email = :datosFormulario.Email
+											AND RecordtypeId = :rtCMC
+											AND EV_Status__c != 'Baja del evento'
+										LIMIT 50000
+										];
+			}
+		}else{//Validar si un usuario ya se ha inscrito al evento a partir del email. (campo 'email' no puede ser filtrado)
+			if(Schema.SObjectType.CampaignMember.isAccessible()) {
+				listCampMember = [SELECT Id, Status, EV_NumeroDocumento__c, EV_ExternalId__c, Email 
+								FROM CampaignMember 
+								WHERE CampaignId = :idEvento 
+									AND LeadId != null 
+									AND Lead.RecordType.DeveloperName = 'EV_Evento'
+									AND Lead.Email = :datosFormulario.Email
+									AND Status != 'Baja del evento'
+								LIMIT 50000
+								];
+			}
 		}
 
-		if(listCampMember!=null && !listCampMember.isEmpty()){
-			responseToShow.idInvitacion = listCampMember[0].EV_ExternalId__c;
-			responseToShow.Description = 'Ya se ha inscrito en el evento';	
-			fillRestResponse(res, responseToShow, 202);
+		if((listCampMember!=null && !listCampMember.isEmpty()) || (listCampMemberCustom != null && !listCampMemberCustom.isEmpty())){
+			fillRestResponse(res, Label.EV_RecordFound, (!listCampMember.isEmpty() ? listCampMember[0].EV_ExternalId__c : listCampMemberCustom[0].EV_ExternalId__c), 202);
+			EV_LogDebug.printLogDebug('Entro EV_RecordFound', String.valueof(res));
 			return res;
 		}
-		if(listCampMemberCustom != null && !listCampMemberCustom.isEmpty()){
-			responseToShow.idInvitacion = listCampMemberCustom[0].EV_ExternalId__c;
-			responseToShow.Description = 'Ya se ha inscrito en el evento';	
-			fillRestResponse(res, responseToShow, 202);
-			return res;
+		List<EV_CampaignMemberC__c> miembroInterlocutorCustom = new List<EV_CampaignMemberC__c> ();
+		List<CampaignMember> miembroInterlocutor = new List<CampaignMember>();
+		List<Lead> interlocutor = new List<Lead> ();
+		List<Account> accEmpresa = new List<Account>();
+		if(Schema.SObjectType.Account.isAccessible()) {
+			if(datosFormulario.NIFEmpresa != null && !String.isBlank(datosFormulario.NIFEmpresa)){
+                accEmpresa = [SELECT Id,Name,CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = :datosFormulario.NIFEmpresa AND RecordtypeId =:rtAccEmpresa LIMIT 10000];
+            }
 		}
 
+		if(String.isNotEmpty(accId)) accEmpresa[0].Id = accId;
+		interlocutor.add(new Lead(
+			FirstName = datosFormulario.Nombre,
+			LastName = datosFormulario.Apellidos,
+			Phone = datosFormulario.Phone,
+			EV_Idiomas__c = datosFormulario.Idioma,
+			Company = (!accEmpresa.isEmpty() ? accEmpresa[0].Name : datosFormulario.NombreEmpresa),
+			EV_Cargo__c = datosFormulario.Cargo,
+			EV_NIFEmpresa__c = (!accEmpresa.isEmpty() ? accEmpresa[0].CC_Numero_Documento__c : datosFormulario.NIFEmpresa),
+			EV_ConsentimientoGeneral__c = datosFormulario.ConsentimientoGeneral,
+			RecordtypeId = rtLeadEvento,
+			Email = datosFormulario.Email,
+			EV_Account__c = (!accEmpresa.isEmpty() ? accEmpresa[0].Id : null),
+			EV_ConsentimientoTerceros__c = (datosFormulario.ConsentimientoTerceros!=null ? datosFormulario.ConsentimientoTerceros : false),
+			EV_Marketing__c = (datosFormulario.Marketing!=null ? datosFormulario.Marketing : false)
+			));
 
-		//Controlar si es persona juridica
-		if(String.isNotEmpty(datosFormulario.NIFEmpresa) && String.isNotEmpty(datosFormulario.NIFEmpresa)){
-			EV_CampaignMemberC__c miembroInterlocutorCustom = new EV_CampaignMemberC__c();
-			CampaignMember miembroInterlocutor = new CampaignMember();
-			Id rtAccEmpresa = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-			List<Account> accEmpresa = new List<Account> ([SELECT Id,Name,CC_Numero_Documento__c FROM Account WHERE CC_Numero_Documento__c = :datosFormulario.NIFEmpresa AND RecordtypeId =:rtAccEmpresa]);
-			
-			//Control de empresa
-			/*if(accEmpresa != null && accEmpresa.size() > 1){
-				responseToShow.Description = 'Existe más de un registro asociado a esta empresa. Consulta con el administrador de Salesforce.';
-				fillRestResponse(res, responseToShow, 203);
-				return res;
-			//La empresa del interlocutor existe
-			}else*/
-			if(accEmpresa != null && !accEmpresa.isEmpty()){
-				if(String.isNotEmpty(accId)) accEmpresa[0].Id = accId;
-				Lead interlocutor = new Lead(
-					FirstName = datosFormulario.Nombre,
-					LastName = datosFormulario.Apellidos,
-					//EV_NumeroDocumento__c = datosFormulario.Documento,
-					Phone = datosFormulario.Phone,
-					EV_Idiomas__c = datosFormulario.Idioma,
-					Company = accEmpresa[0].Name,
-					EV_Cargo__c = datosFormulario.Cargo,
-					EV_NIFEmpresa__c = accEmpresa[0].CC_Numero_Documento__c,
-					EV_ConsentimientoGeneral__c = datosFormulario.ConsentimientoGeneral,
-					RecordtypeId = rtLeadEvento,
-					Email = datosFormulario.Email,
-					EV_Account__c = accEmpresa[0].Id
-					);
-
-					if(datosFormulario.ConsentimientoTerceros!=null){
-						interlocutor.EV_ConsentimientoTerceros__c = datosFormulario.ConsentimientoTerceros;
-					}
-
-					if(datosFormulario.Marketing!=null){
-						interlocutor.EV_Marketing__c = datosFormulario.Marketing;
-					}
-
-					insert interlocutor;
+			Database.SaveResult[] resultLead = Database.insert(interlocutor);
+			Map<String, String> msjs = new Map<String, String>();
+			if(resultLead[0].isSuccess()){      
 				if(newArchitecture){
-					miembroInterlocutorCustom = new EV_CampaignMemberC__c(
+					EV_LogDebug.printLogDebug('Entro lead miembroInterlocutorCustom ',  String.valueof(resultLead));
+					miembroInterlocutorCustom.add(new EV_CampaignMemberC__c(
 						EV_CampaignId__c = idEvento,
-						EV_Status__c = 'Registro confirmado',
-						EV_CanalOrigen__c = '002',
+						EV_Status__c = Label.EV_RecordConformed,
+						EV_CanalOrigen__c = (String.isNotEmpty(datosFormulario.NIFEmpresa) ? '002' : '003'),
 						EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
 						RecordtypeId = rtCMC,
-						//ContactId = interlocutor.Id
-						EV_LeadId__c = interlocutor.Id);
-					insert miembroInterlocutorCustom;	
-
+						EV_LeadId__c = resultLead[0].getId()));
 				}else{
-					miembroInterlocutor = new CampaignMember(
+					EV_LogDebug.printLogDebug('Entro lead miembroInterlocutor ',  String.valueof(resultLead));
+					miembroInterlocutor.add(new CampaignMember(
 						CampaignId = idEvento,
-						Status = 'Registro confirmado',
-						EV_CanalOrigen__c = '002',
+						Status = Label.EV_RecordConformed,
+						EV_CanalOrigen__c = (String.isNotEmpty(datosFormulario.NIFEmpresa) ? '002' : '003'),
 						EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
-						//ContactId = interlocutor.Id
-						LeadId = interlocutor.Id);
-					insert miembroInterlocutor;
+						LeadId = resultLead[0].getId()));
 				}
-	
-				responseToShow.Description = 'Registro completado';
-				if(newArchitecture){
-					responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :miembroInterlocutorCustom.Id].EV_ExternalId__c;
-				}else{
-					responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :miembroInterlocutor.Id].EV_ExternalId__c;
-				}
-
-				fillRestResponse(res, responseToShow, 200);
-				return res;
-
-			//Control de error si está vacía la lista
-			}else if(accEmpresa == null || accEmpresa.size() < 1){
-				CampaignMember noClienteCM = new CampaignMember();
-				EV_CampaignMemberC__c noClienteCMcustom = new EV_CampaignMemberC__c();
-
-				Lead noClienteNuevo = new Lead(
-				FirstName = datosFormulario.Nombre,
-				LastName = datosFormulario.Apellidos,
-				//EV_NumeroDocumento__c = datosFormulario.Documento,
-				Phone = datosFormulario.Phone,
-				EV_Idiomas__c = datosFormulario.Idioma,
-				Company = datosFormulario.NombreEmpresa,
-				EV_Cargo__c = datosFormulario.Cargo,
-				EV_NIFEmpresa__c = datosFormulario.NIFEmpresa, 
-				EV_ConsentimientoGeneral__c = datosFormulario.ConsentimientoGeneral,
-				RecordtypeId = rtLeadEvento,
-				Email = datosFormulario.Email
-				);
-
-				if(datosFormulario.ConsentimientoTerceros!=null){
-					noClienteNuevo.EV_ConsentimientoTerceros__c = datosFormulario.ConsentimientoTerceros;
-				}
-
-				if(datosFormulario.Marketing!=null){
-					noClienteNuevo.EV_Marketing__c = datosFormulario.Marketing;
-				}
-
-
-				insert noClienteNuevo;
-
-				if(newArchitecture){
-					noClienteCMcustom = new EV_CampaignMemberC__c(
-						EV_CampaignId__c = idEvento,
-						EV_Status__c = 'Registro confirmado',
-						EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
-						EV_CanalOrigen__c = '003',
-						RecordtypeId = rtCMC,
-						EV_LeadId__c = noClienteNuevo.Id);
-					insert noClienteCMcustom;
-				}else{
-					noClienteCM = new CampaignMember(
-						CampaignId = idEvento,
-						Status = 'Registro confirmado',
-						EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
-						EV_CanalOrigen__c = '003',
-						LeadId = noClienteNuevo.Id);
-					insert noClienteCM;
-				}
-
-					
-				responseToShow.Description = 'Registro completado';
-				if(newArchitecture){
-					responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :noClienteCMcustom.Id].EV_ExternalId__c;
-				}else{
-					responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :noClienteCM.Id].EV_ExternalId__c;
-				}
-				
-				fillRestResponse(res, responseToShow, 200);
+			}
+			if(!resultLead[0].isSuccess()) {
+				EV_LogDebug.printLogDebug('Entro lead error',  String.valueof(resultLead));
+				fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''), null, 500);
+				msjs.put('500', resultLead[0].getErrors()[0].getMessage());
 				return res;
 			}
-		}
-		//Para no cliente, insertamos todos indiscriminadamente. (no se actualiza uno que ya haya)
-		else{
-			EV_CampaignMemberC__c noClienteCMcustom = new EV_CampaignMemberC__c();
-			CampaignMember noClienteCM = new CampaignMember();
-			
-			Lead noClienteNuevo = new Lead(
-				FirstName = datosFormulario.Nombre,
-				LastName = datosFormulario.Apellidos,
-				//EV_NumeroDocumento__c = datosFormulario.Documento,
-				Phone = datosFormulario.Phone,
-				EV_Idiomas__c = datosFormulario.Idioma,
-				EV_ConsentimientoGeneral__c = datosFormulario.ConsentimientoGeneral,
-				RecordtypeId = rtLeadEvento,
-				Email = datosFormulario.Email
-			);
-
-			if(datosFormulario.ConsentimientoTerceros!=null){
-				noClienteNuevo.EV_ConsentimientoTerceros__c = datosFormulario.ConsentimientoTerceros;
-			}
-			if(datosFormulario.Marketing!=null){
-				noClienteNuevo.EV_Marketing__c = datosFormulario.Marketing;
-			}
-			insert noClienteNuevo;
-
-			if(newArchitecture){
-				noClienteCMcustom = new EV_CampaignMemberC__c(
-				EV_CampaignId__c= idEvento,
-				EV_Status__c= 'Registro confirmado',
-				EV_CanalOrigen__c = '003',
-				EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
-				RecordtypeId = rtCMC,
-				EV_LeadId__c = noClienteNuevo.Id);
-
-				insert noClienteCMcustom;
-
-			}else{
-				noClienteCM = new CampaignMember(
-				CampaignId = idEvento,
-				Status = 'Registro confirmado',
-				EV_CanalOrigen__c = '003',
-				EV_FormatoDeAsistencias__c = datosFormulario.FormatoDeAsistencia,
-				LeadId = noClienteNuevo.Id);
-
-				insert noClienteCM;
-			}
-			
-			responseToShow.Description = 'Registro completado';
-			if(newArchitecture){
-				responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :noClienteCMcustom.Id].EV_ExternalId__c;
-			}else{
-				responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :noClienteCM.Id].EV_ExternalId__c;
+			if(!msjs.isEmpty()){
+				CBK_Log.error(msjs);
 			}
 
-			fillRestResponse(res, responseToShow, 200);
-		}
-
+			if(!miembroInterlocutor.isEmpty()){
+				Database.SaveResult[] resultC = Database.insert(miembroInterlocutor, false);
+				Map<String, String> msjsC = new Map<String, String>();
+				if(resultC[0].isSuccess()){
+					EV_LogDebug.printLogDebug('Entro miembro estandar' ,  String.valueof(resultC));
+					String externalId = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :miembroInterlocutor[0].Id].EV_ExternalId__c;
+					fillRestResponse(res,Label.EV_RecordCompleted, externalId , 200);
+					return res;
+				}
+				if(!resultC[0].isSuccess()) {
+					EV_LogDebug.printLogDebug('Entro error estandar',  String.valueof(resultC));
+					fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''),null, 500);
+					msjsC.put('500', resultC[0].getErrors()[0].getMessage());
+					return res;
+				}
+				if(!msjsC.isEmpty()){                
+					CBK_Log.error(msjsC);                
+				}
+			}else if(!miembroInterlocutorCustom.isEmpty()){
+				Database.SaveResult[] result = Database.insert(miembroInterlocutorCustom, false);
+				Map<String, String> msjsCM = new Map<String, String>();
+				if(result[0].isSuccess()){
+					EV_LogDebug.printLogDebug('Entro miembro' ,  String.valueof(result));
+					String externalId = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :miembroInterlocutorCustom[0].Id].EV_ExternalId__c;
+					fillRestResponse(res,Label.EV_RecordCompleted, externalId , 200);
+					return res;
+				}
+				if(!result[0].isSuccess()) {
+					EV_LogDebug.printLogDebug('Entro error',  String.valueof(result));
+					fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''),null, 500);
+					msjsCM.put('500', result[0].getErrors()[0].getMessage());
+					return res;
+				}
+				if(!msjsCM.isEmpty()){                
+					CBK_Log.error(msjsCM);                
+				}
+			}
 		return res;
 	}
 
 	public static CampaignMember createClientCM(String idEvento, Contact conc, String fAsistencias){
         EV_LogDebug.printLogDebug('Entro createClientCM' , 'idEvento + conc + fAsistencias' + idEvento +' '+conc + ' '+ fAsistencias);
 		RestResponse res = RestContext.response;
-		EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-		
-		CampaignMember contactCM = new CampaignMember(
+		List<CampaignMember> contactCM = new List<CampaignMember>();
+		contactCM.add(new CampaignMember(
 			CampaignId = idEvento,
-			Status = 'Registro confirmado',
+			Status = Label.EV_RecordConformed,
 			EV_CanalOrigen__c = '003',
 			ContactId = conc.Id,
 			EV_FormatoDeAsistencias__c = fAsistencias
-		);
-		insert contactCM;
-		responseToShow.Description = 'Registro completado';
-		responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :contactCM.Id].EV_ExternalId__c;
-		fillRestResponse(res, responseToShow, 200);
-	
-		return contactCM;
+		));
+		Database.SaveResult[] resultCM = Database.insert(contactCM, false);
+		Map<String, String> msjsCM = new Map<String, String>();
+		if(resultCM[0].isSuccess()){
+			String externalId = [SELECT EV_ExternalId__c FROM CampaignMember WHERE Id = :contactCM[0].Id].EV_ExternalId__c;
+			fillRestResponse(res,Label.EV_RecordCompleted, externalId , 200);
+			returnResponse(res);
+		}
+		if(!resultCM[0].isSuccess()) {
+			fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''),null, 500);
+			msjsCM.put('500', resultCM[0].getErrors()[0].getMessage());
+			returnResponse(res);
+		}
+		if(!msjsCM.isEmpty()){
+			CBK_Log.error(msjsCM);
+		}
+		return contactCM[0];
 	}
 	//Creamos CM custom
 	public static EV_CampaignMemberC__c createClientCMcustom(String idEvento, Contact conc, String fAsistencias){
         EV_LogDebug.printLogDebug('Entro createClientCMcustom' , 'idEvento + conc + fAsistencias' + idEvento +' '+conc + ' '+ fAsistencias);
-		Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
 		RestResponse res = RestContext.response;
-		EV_NoClienteWrapper.CampaignMemberResponse responseToShow = new EV_NoClienteWrapper.CampaignMemberResponse();
-		
-		EV_CampaignMemberC__c contactCM = new EV_CampaignMemberC__c(
+		List<EV_CampaignMemberC__c> contactCMC = new List<EV_CampaignMemberC__c>();
+		contactCMC.add(new EV_CampaignMemberC__c(
 			EV_CampaignId__c = idEvento,
-			EV_Status__c = 'Registro confirmado',
+			EV_Status__c = Label.EV_RecordConformed,
 			EV_CanalOrigen__c = '003',
 			EV_ContactId__c = conc.Id,
 			RecordtypeId = rtCMC,
 			EV_FormatoDeAsistencias__c = fAsistencias
-		);
-		insert contactCM;
-		responseToShow.Description = 'Registro completado';
-		responseToShow.idInvitacion = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :contactCM.Id].EV_ExternalId__c;
-		fillRestResponse(res, responseToShow, 200);
-	
-		return contactCM;
+		));
+		Database.SaveResult[] resultCMC = Database.insert(contactCMC, false);
+		Map<String, String> msjsCMC = new Map<String, String>();
+		if(resultCMC[0].isSuccess()){
+			String externalId = [SELECT EV_ExternalId__c FROM EV_CampaignMemberC__c WHERE Id = :contactCMC[0].Id].EV_ExternalId__c;
+			fillRestResponse(res,Label.EV_RecordCompleted, externalId , 200);
+			returnResponse(res);
+		}
+		if(!resultCMC[0].isSuccess()) {
+			fillRestResponse(res,Label.EV_EventInscriptionNotCompleted.replace('[Replace1]' , ''), null, 500);
+			msjsCMC.put('500', resultCMC[0].getErrors()[0].getMessage());
+			returnResponse(res);
+		}
+		if(!msjsCMC.isEmpty()){
+			CBK_Log.error(msjsCMC);
+		}
+		return contactCMC[0];
 	}
-
 }

@@ -12,6 +12,7 @@ Historial
 	1.2         Fix	        		Daniel Rodríguez	10/03/2022          Fix Error, add custom setting AV_LimitBook
 	1.3         Fix              	Vladislav Lityagin  08/03/2023          Fix Quality Clouds errors
     1.4         Fix                 Patricia Villacañas 03/05/2023          Modified to set run as, assertions and user creation
+    1.4          QC                 Oscar Moreno        12/06/2024       Delete UserInfo.geetUserId()
 
 ***********************************************************************************************************************/
 @isTest
@@ -19,18 +20,15 @@ public with sharing class AV_BookMemberTriggerHelper_Test {
     
     @TestSetup
     static void setup(){
-        
-        System.RunAs (new User(Id = UserInfo.getUserId())){
+      
+        User userGestor1 = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
+        userGestor1.Email = 'gestor-test@test.com';
+        User usrTest1 = AV_TestHelper.createUserSinInsert(null,'U0112345','AV_SistematicaComercial');
 
-            User userGestor = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
-			userGestor.Email = 'gestor-test@test.com';
-            User usrTest = AV_TestHelper.createUserSinInsert(null,'U0112345','AV_SistematicaComercial');
-
-            List<User> userList = new List<User>();
-            userList.add(userGestor);
-            userList.add(usrTest);
-            insert userList;
-        }
+        List<User> userList = new List<User>();
+        userList.add(userGestor1);
+        userList.add(usrTest1);
+        insert userList;
         
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true];

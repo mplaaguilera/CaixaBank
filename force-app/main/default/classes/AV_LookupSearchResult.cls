@@ -8,6 +8,7 @@ public class AV_LookupSearchResult implements Comparable {
     private String icon;
     private String title;
     private String subtitle;
+    private Boolean prodNewAction;
 
     public AV_LookupSearchResult(Id id, String sObjectType, String icon, String title, String subtitle) {
         this.id = id;
@@ -15,6 +16,14 @@ public class AV_LookupSearchResult implements Comparable {
         this.icon = icon;
         this.title = title;
         this.subtitle = subtitle;
+    }
+    public AV_LookupSearchResult(Id id, String sObjectType, String icon, String title, String subtitle,Boolean prodNewAction) {//Constructor especifico para los productos de los reportes ya que se requiere el dato adicional de AV_NewReportActions__c
+        this.id = id;
+        this.sObjectType = sObjectType;
+        this.icon = icon;
+        this.title = title;
+        this.subtitle = subtitle;
+        this.prodNewAction = prodNewAction;
     }
 
     @AuraEnabled
@@ -40,6 +49,11 @@ public class AV_LookupSearchResult implements Comparable {
     @AuraEnabled
     public String getSubtitle() {
         return subtitle;
+    }
+
+    @AuraEnabled
+    public Boolean getProdNewAction(){
+        return prodNewAction;
     }
 
     /**

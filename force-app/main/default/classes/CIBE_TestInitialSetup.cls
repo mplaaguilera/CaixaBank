@@ -88,6 +88,7 @@ public class CIBE_TestInitialSetup {
         profile = String.isNotBlank(profile) ? profile : CIBE_AppConstants.CIBE_GESTOR;
         role = String.isNotBlank(role) ? role : CIBE_AppConstants.CIBE_CIBEMPRESAS;
         externalId = String.isNotBlank(externalId) ? externalId : 'U0000001';
+        String externalIdSA = 'U0000000';
         centerName = String.isNotBlank(centerName) ? centerName : '00001 - CENTER';
         numOficina = String.isNotBlank(numOficina) ? numOficina : '00001';
         listPermissionSets = listPermissionSets != null ? listPermissionSets : new List<String>();
@@ -97,8 +98,25 @@ public class CIBE_TestInitialSetup {
             System.debug('QUERY LIMITS start: ' + Limits.getQueries() + ' / ' + Limits.getLimitQueries());
 
             Profile p = [SELECT Id FROM Profile WHERE Name = :profile LIMIT 1];
-            UserRole ur = [SELECT Id FROM UserRole WHERE DeveloperName = :role LIMIT 1];
+            Profile pSa = [SELECT Id FROM Profile WHERE Name = 'System Administrator' or Name = 'Administrador del Sistema' LIMIT 1];
 
+            UserRole ur = [SELECT Id FROM UserRole WHERE DeveloperName = :role LIMIT 1];
+            List<User> lstUser = new List<User> ();
+            User userSA = new User(
+                ProfileId = pSa.Id,
+                UserRoleId = ur.Id,
+                UserName = externalIdSA + 'U0000000@test.dev',
+                LastName = externalIdSA + '_LastName',
+                Alias = externalIdSA.abbreviate(8),
+                Email = externalIdSA + '@test.dev.sa',
+                EmailEncodingKey = 'UTF-8',
+                LanguageLocaleKey = 'es',
+                LocaleSidKey = 'es',
+                TimeZoneSidKey = 'Europe/Berlin',
+                AV_NumeroOficinaEmpresa__c = '001-' + numOficina,
+                AV_ExternalID__c = externalIdSA
+            );
+            lstUser.add(userSA);
             User user = new User(
                 ProfileId = p.Id,
                 UserRoleId = ur.Id,
@@ -113,7 +131,9 @@ public class CIBE_TestInitialSetup {
                 AV_NumeroOficinaEmpresa__c = '001-' + numOficina,
                 AV_ExternalID__c = externalId
             );
-            insert user;
+            lstUser.add(user);
+
+            insert lstUser;
             dataSet.gestor = user;
 
             System.debug('QUERY LIMITS user inserted: ' + Limits.getQueries() + ' / ' + Limits.getLimitQueries());
@@ -154,7 +174,12 @@ public class CIBE_TestInitialSetup {
             for(PermissionSet ps : perSet) {
                 permissionSetList.add(
                     new PermissionSetAssignment(
-                        AssigneeId = user.Id, 
+                        AssigneeId = lstUser[0].Id, 
+                        PermissionSetId = ps.Id
+                ));
+                permissionSetList.add(
+                    new PermissionSetAssignment(
+                        AssigneeId = lstUser[1].Id, 
                         PermissionSetId = ps.Id
                 ));
             }

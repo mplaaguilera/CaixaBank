@@ -14,14 +14,17 @@ VERSION		USER_STORY	   AUTHOR		   		DATE			Description
 1.5		    AV_Query IT	   Daniel Rodríguez	   07/02/2022	    Change AV_Query to SOQL for User and Account
 1.6         US485705       Luis Fernández      09/02/2023       Added  
 1.7         US592987		Ángel Medina		30/05/2023		Changed AV_Query to SOQL queries
+1.8          QC            Oscar Moreno        12/06/2024       Delete UserInfo.geetUserId()
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_UpdateCliPremium_Controller_Test {
 
     @TestSetup
     static void setup(){
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
         AppDefinition appDefinition = [SELECT DurableId, Label FROM AppDefinition WHERE DeveloperName = 'AV_CRM_Intouch' LIMIT 1];        
-		UserAppInfo app = new UserAppInfo(AppDefinitionId = appDefinition.DurableId, UserId = UserInfo.getUserId(), FormFactor = 'Small');
+		UserAppInfo app = new UserAppInfo(AppDefinitionId = appDefinition.DurableId, UserId = usuarioGcf.Id , FormFactor = 'Small');  
 		insert app;
         
         Account dummyAcc = AV_TestHelper.createCustomer();
@@ -39,7 +42,7 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
         cs.AV_ExpiresIn__c = 0; //Zero so cs.LastModifiedDate < now and syncCJ calls login method
         insert cs;
         
-        /*Account acc1 = 	AV_TestHelper.createCustomer2();
+        Account acc1 = 	AV_TestHelper.createCustomer2();
         acc1.AV_DataTreatment__c='3';
         acc1.AV_Rentabilidad__c = 11;				
 		acc1.AV_Preconceived__c = 23;
@@ -48,11 +51,12 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
 		acc1.AV_IngresosProfesionales__c = null;
 		acc1.AV_TargetAuto__c = 'S';
 		acc1.AV_Colectivos__c = 'S';
-        update acc1;*/
+        update acc1;
     }
 
     @isTest
     private static void retrieveCustomerDataTest(){
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         Account acc = [Select Id, AV_NumPerso__c From Account limit 1];
         acc.AV_NumPerso__c = '13550';
         Database.update(acc);
@@ -77,7 +81,10 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
 
 		Test.startTest();		
 		Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CLI_CUSTOMMERDATA','OK'));
-        String response = AV_UpdateCliPremium_Controller.retrieveCustomerData(acc.AV_NumPerso__c, null, null);
+        String response;
+        System.runAs(usuarioGcf){
+            response = AV_UpdateCliPremium_Controller.retrieveCustomerData(acc.AV_NumPerso__c, null, null);
+        }
         AV_UpdateCliPremium_Controller.updateRecordApex(response,acc.Id);
         Map<String, Object> mapClientToUpdate = (Map<String, Object>)JSON.deserializeUntyped(response);
         AV_UpdateCliPremium_Controller.updateRecordApex(response, acc.Id);
@@ -89,6 +96,7 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
     
     @isTest
     private static void retrieveCustomerDataTestNull(){
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
         RecordType rt = AV_AppUtilities.getRecordType('Account', 'CC_ClientePA');
 		Account acc = new Account(
 				FirstName = 'FirstName2',
@@ -105,7 +113,10 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
 
 		Test.startTest();		
 		Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CLI_CUSTOMMERDATA2','OK'));
-        String response = AV_UpdateCliPremium_Controller.retrieveCustomerData(acc.AV_NumPerso__c, null, null);
+        String response; 
+        System.runAs(usuarioGcf){
+            response = AV_UpdateCliPremium_Controller.retrieveCustomerData(acc.AV_NumPerso__c, null, null);
+        }
         Map<String, Object> mapClientToUpdate = (Map<String, Object>)JSON.deserializeUntyped(response);
 		Test.stopTest();
         System.assertEquals(acc.AV_NumPerso__c, mapClientToUpdate.get('AV_NumPerso__c'));
@@ -115,6 +126,8 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
     
     @isTest
     public static void testGetCustomerJourneys() {
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
         Account acc = [SELECT Id FROM Account Limit 1];
         Test.startTest();
         Map<String, HttpCalloutMock> header2TestResp =
@@ -127,7 +140,10 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
                                    new AV_MultiRequestMock_Test(header2TestResp);
  
         Test.setMock(HttpCalloutMock.class, multiCalloutMock);
-        String result = AV_UpdateCliPremium_Controller.getCustomerJourney(String.valueOf(acc.Id));
+        String result;
+        System.runAs(usuarioGcf){
+            result = AV_UpdateCliPremium_Controller.getCustomerJourney(String.valueOf(acc.Id));
+        }
         Test.stopTest();
         System.assertNotEquals('OK', result);
 
@@ -135,6 +151,8 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
 
     @isTest
     public static void testGetCliPremiumData() {
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
         //
         RecordType rt = AV_AppUtilities.getRecordType('Account', 'CC_ClientePA');
 		Account acc = new Account(
@@ -154,7 +172,11 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
         Database.update(acc);
         Test.startTest();
         Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CLI_CUSTOMMERDATA','OK'));
-        String response = AV_UpdateCliPremium_Controller.getCliPremiumData(acc.Id);
+        String response;  
+        System.runAs(usuarioGcf){
+            response = AV_UpdateCliPremium_Controller.getCliPremiumData(acc.Id);
+            
+        }
         Map<String, Object> mapClientToUpdate = (Map<String, Object>)JSON.deserializeUntyped(response);
         Test.stopTest();
         System.assertEquals(acc.AV_NumPerso__c, mapClientToUpdate.get('AV_NumPerso__c'));
@@ -162,12 +184,20 @@ public with sharing class AV_UpdateCliPremium_Controller_Test {
     
     @isTest
     public static void testValidateTreatmentData(){
-        //Account acc1= [Select id,AV_Rentabilidad__c,AV_Preconceived__c,AV_IngresosPension__c,AV_IngresosPersonales__c,AV_IngresosProfesionales__c,AV_TargetAuto__c,AV_Colectivos__c,AV_LoyaltySignals__c  from Account where AV_NumPerso__c = '1234' and RecordType.DeveloperName = 'CC_ClientePA' limit 1];
-        Account acc1= [Select id,AV_Rentabilidad__c,AV_Preconceived__c,AV_IngresosPension__c,AV_IngresosPersonales__c,AV_IngresosProfesionales__c,AV_TargetAuto__c,AV_Colectivos__c,AV_LoyaltySignals__c  from Account where AV_Negocio__c = 'BPA'  limit 1];
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
+        Account acc1= [Select id,AV_DataTreatment__c,AV_Rentabilidad__c,AV_Preconceived__c,AV_IngresosPension__c,AV_IngresosPersonales__c,AV_IngresosProfesionales__c,AV_TargetAuto__c,AV_Colectivos__c,AV_LoyaltySignals__c  from Account where AV_Negocio__c = 'BPA'  limit 1];
+        Account acc2 = [SELECT Id,AV_DataTreatment__c FROM Account WHERE AV_DataTreatment__c = '3'];
+        acc1.AV_DataTreatment__c = '2'; 
+        Database.update(acc1);  
         Test.startTest();
-        AV_UpdateCliPremium_Controller.validateTreatmentData(acc1.id);
+        System.runAs(usuarioGcf){
+            AV_UpdateCliPremium_Controller.validateTreatmentData(acc1.id);
+            AV_UpdateCliPremium_Controller.validateTreatmentData(acc2.id);
+        }
+
         Test.stopTest();
-        Database.update(acc1); 
+       
         System.assert(acc1.AV_LoyaltySignals__c == null);
         
     }

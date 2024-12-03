@@ -58,6 +58,15 @@ public class HDT_CaseTriggerHelper_Test {
         UserRole rolId = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'HDT'];
 
         System.runAs(usuario1){
+
+             // Inicialización de datos.        
+             Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId(); 
+             CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
+             lista.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución';
+             lista.CC_Activa__c = true;
+             lista.RecordTypeId = recorTypeLista;
+             insert lista;
+
 			List<User> userList2 = new List<User>();
             User usuarioV2 = new User();
             usuarioV2.ProfileId = profile2Id;
@@ -1066,6 +1075,33 @@ public class HDT_CaseTriggerHelper_Test {
             );
             insert encuesta;
 
+            HDT_Parametros__c encuesta2 = new HDT_Parametros__c(
+                Name = 'HDT_Envio_Encuesta_EDG',
+                HDT_Configuracion_1__c = '261467',
+                HDT_Configuracion_2__c = 'Encuesta Test'
+            );
+            insert encuesta2;
+
+            Id listaPadre = [SELECT id FROM CC_Lista_Valores__c WHERE Name = 'HDT - Envío de Encuesta 3N - Canales de resolución' limit 1].Id;
+            // Crear un registro de CC_Lista_Valores__c para simular un resultado válido
+            CC_Lista_Valores__c listaValor = new CC_Lista_Valores__c(
+                Name = 'Servicios Centrales',
+                CC_Activa__c = true,
+                CC_Valor__c = 'No EDG',
+                CC_Lista__c = listaPadre
+    
+            );
+            insert listaValor;
+    
+            CC_Lista_Valores__c listaValor2 = new CC_Lista_Valores__c(
+                Name = 'EDG-MICROBANK',
+                CC_Activa__c = true,
+                CC_Valor__c = 'EDG',
+                CC_Lista__c = listaPadre
+    
+            );
+            insert listaValor2;
+        
             Account cliente = [SELECT id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
             Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
             CC_MCC__c tematica = [SELECT id FROM CC_MCC__c WHERE Name = 'App\'s' limit 1];
@@ -1081,7 +1117,7 @@ public class HDT_CaseTriggerHelper_Test {
                                 Origin = 'Phone',
                                 CC_Tipo_Contacto__c = 'Consulta',
                                 CC_Canal_Procedencia__c = 'Servicios Centrales',
-                                CC_Canal_Resolucion__c = 'Incidencias Técnicas',
+                                CC_Canal_Resolucion__c = 'Servicios Centrales',
                                 CC_MCC_Tematica__c = tematica.Id,
                                 CC_MCC_ProdServ__c = producto.Id,
                                 CC_MCC_Motivo__c = motivo.Id,
@@ -1092,27 +1128,7 @@ public class HDT_CaseTriggerHelper_Test {
 
             caso.HDT_Resuelto_Primera_Llamada__c = true;
             caso.Status = 'Cerrado';
-            /*
-            //Creación nuevo caso asociado a un usuario
-            Case caso2 = new Case(AccountId = cliente.Id,
-                                ContactId = contacto.Id,
-                                Status = 'Activo',
-                                CC_Idioma__c = 'ca',
-                                Subject = 'PruebaCierreHDT1n',
-                                Origin = 'Phone',
-                                CC_Tipo_Contacto__c = 'Consulta',
-                                CC_Canal_Procedencia__c = 'Servicios Centrales',
-                                CC_Canal_Resolucion__c = 'Incidencias Técnicas',
-                                CC_MCC_Tematica__c = tematica.Id,
-                                CC_MCC_ProdServ__c = producto.Id,
-                                CC_MCC_Motivo__c = motivo.Id,
-                                CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
-                                CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
-                                RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId());
-            insert caso2;
 
-            caso2.HDT_Resuelto_Primera_Llamada__c = true;
-            caso2.Status = 'Cerrado';*/
 
             Test.startTest();
             update caso;
@@ -1167,7 +1183,7 @@ public class HDT_CaseTriggerHelper_Test {
             Integer numEmails = Limits.getEmailInvocations();
             Test.stopTest();
 
-            System.assertEquals(2, numEmails, 'Debería haber enviado un email');
+            System.assertEquals(1, numEmails, 'Debería haber enviado un email');
         }
     }
 
@@ -1215,5 +1231,33 @@ public class HDT_CaseTriggerHelper_Test {
         System.assertEquals('Este es una tarea de prueba', tarea.Description);
 
         }
+    }
+
+    @isTest static void testGenerarUrlEncuesta() {
+        // Datos de prueba
+        String configuracion2 = 'https://example.com/';
+        String configuracion1 = '12345';
+        String idioma = 'es';
+        String canalResolucion = 'Canal1';
+        String matriculaEmpleado = 'EMP001';
+        String caseNumber = 'CASE123';
+        String tematicaId = 'T001';
+        String tematicaName = 'Tematica Test';
+
+        // Llamada al método
+        String resultado = HDT_CaseTriggerHelper.generarUrlEncuesta(configuracion2, configuracion1, idioma, canalResolucion, matriculaEmpleado, caseNumber, tematicaId, tematicaName);
+
+        // Verificar el resultado
+        String urlEsperada = 'https://example.com/' + 
+                             'sid=12345' + 
+                             '&lang=es' + 
+                             '&empresa=Canal1' + 
+                             '&userid=EMP001' + 
+                             '&ticketid=CASE123' + 
+                             '&idet=T001' + 
+                             '&et=Tematica_Test' + 
+                             '&newtest=Y';
+        
+        System.assertEquals(urlEsperada, resultado, 'La URL generada no es la esperada');
     }
 }

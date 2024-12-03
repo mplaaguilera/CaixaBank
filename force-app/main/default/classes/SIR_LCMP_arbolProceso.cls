@@ -28,11 +28,10 @@ public with sharing class SIR_LCMP_arbolProceso {
 
         List<ProcesoWrapper> pro = new List<ProcesoWrapper>();
 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() &&
-            SIR_HistoricoProceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIR_HistoricoProceso__c.isAccessible()){
 
-            List<SIREC__SIREC_obj_proceso__c> procesoSF = [SELECT toLabel(SIREC__SIREC_fld_estrategia__c), SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c,
-                                                            Name, toLabel(SIREC__SIREC_fld_situacion__c), Owner.Name, SIR_FechaInicioEstrategia__c, toLabel(SIR_fld_Situacion_SF__c)
+            List<SIREC__SIREC_obj_proceso__c> procesoSF = [SELECT  SIREC__SIREC_fld_descEstrategiaCatalogo__c, SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c,
+                                                            Name, toLabel(SIREC__SIREC_fld_situacion__c), Owner.Name, SIR_FechaInicioEstrategia__c,SIR_AlertaSIREC__c, toLabel(SIR_fld_Situacion_SF__c)
                                                             FROM SIREC__SIREC_obj_proceso__c WHERE id =:idProceso ORDER BY createddate DESC];
             List<SIR_HistoricoProceso__c> historicoProcesoSF = [SELECT SIR_Proceso__c, SIR_Estrategia__c, SIR_FechaFinEstrategia__c, SIR_FechaInicioEstrategia__c,
                                                                 SIR_FechaSituacion__c, SIR_Situacion__c, SIR_Tipo__c
@@ -44,7 +43,7 @@ public with sharing class SIR_LCMP_arbolProceso {
                 ProcesoWrapper procesoWraper = new ProcesoWrapper() ; 
                 procesoWraper.name = proceso.Name;
                 procesoWraper.idProceso = URL.getSalesforceBaseUrl().toExternalForm() + '/' + proceso.Id;
-                procesoWraper.estrategia = proceso.SIREC__SIREC_fld_estrategia__c;
+                procesoWraper.estrategia = proceso.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                 if(proceso.Name == 'Proceso de Refinanciación'){
                     procesoWraper.fechaInicio = string.valueOf(proceso.SIREC__SIREC_fld_fechaInicio__c);                
                 } else {
@@ -53,7 +52,8 @@ public with sharing class SIR_LCMP_arbolProceso {
                 procesoWraper.fechaFin = '';
                 procesoWraper.fechaSituacion = string.valueOf(proceso.SIREC__SIREC_fld_fechaSituacion__c);
                 procesoWraper.situacion = proceso.SIR_fld_Situacion_SF__c;
-                procesoWraper.gestor = proceso.Owner.Name;          
+                procesoWraper.gestor = proceso.Owner.Name;
+                procesoWraper.alertaSirec = proceso.SIR_AlertaSIREC__c;          
             
                 List<Items> histProceso = new List<Items>();            
                 for(SIR_HistoricoProceso__c histPro : historicoProcesoSF){
@@ -97,6 +97,8 @@ public with sharing class SIR_LCMP_arbolProceso {
         public String situacion {get;set;}
 		@AuraEnabled
         public String gestor {get;set;}
+		@AuraEnabled
+        public String alertaSirec {get;set;}
         @AuraEnabled
         public List<Items> items {get;set;}
     }
@@ -118,6 +120,8 @@ public with sharing class SIR_LCMP_arbolProceso {
         public String situacion {get;set;}
 		@AuraEnabled
         public String gestor {get;set;}
+		@AuraEnabled
+        public String alertaSirec {get;set;}
         @AuraEnabled
         public List<Items> items {get;set;}
     }

@@ -8,20 +8,15 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				    DATE				Description
   	1.0			App FSC			Jashanpreet	   		    02/06/2021			Init version
-
+    1.1		    Fix PMD Errors	Daniel Rodriguez	    25/10/2023	        Delete if in process method
+    1.2         Deuda técnica   Ángel Medina            21/03/2024          Empty the class and delete the call    
 ***********************************************************************************************************************/
 public with sharing class AV_HeaderCustomActivity_AU_TRHan extends CC_TriggerHandlerBase {
     
     public override void mainEntry(CC_TriggerParameters tp) {
-		  process((List<AV_HeaderCustomActivity__c>)tp.newList, (Map<Id, AV_HeaderCustomActivity__c>)tp.newMap, (List<AV_HeaderCustomActivity__c>) tp.oldList, (Map<Id, AV_HeaderCustomActivity__c>) tp.oldMap);
+		 
     }
     
-    private void process(List<AV_HeaderCustomActivity__c> listNewObj, Map<Id, AV_HeaderCustomActivity__c> mapNewObj, List<AV_HeaderCustomActivity__c> listOldObj, Map<Id, AV_HeaderCustomActivity__c> mapOldObj) {
-    	//General check the Record type's for intouch project
-      	List<AV_HeaderCustomActivity__c> listData = AV_HeaderCustomActivityTriggerHelper.checkGeneralRT(listNewObj);
-        if (listData!=null && !listData.isEmpty()){
-            //AV_HeaderCustomActivityTriggerHelper.syncEvents(listData, mapOldObj);
-        }
-    }
+   
     
 }

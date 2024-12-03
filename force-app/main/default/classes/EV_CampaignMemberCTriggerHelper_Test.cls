@@ -2,7 +2,7 @@
  Name:	  EV_CampaignMemberCTriggerHelper_Test
  Copyright © 2023  CaixaBank
 -----------------------------------------------------------------------------------------------------------------------
-Proposito: Clase de test para el TriggerHelper de CampaignMember
+* @description  Clase de test para el TriggerHelper de CampaignMember
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
@@ -15,6 +15,9 @@ Historial
 	1.5         US680535            Carolina Lopez                      18/08/2023			Add method executeCampaignMemberSendEmailFisico	
 	1.6			US657362			Mamen Arias							01/09/2023			Modify method contadorCheckIn_Test with active Survey		
 	1.7			US738796			Carolina Lopez						19/10/2023			Include CC_InterfaceSettings__mdt in methods executeCampaignMemberBUTriggerGenerarQR, testEventSurvey, executeCampaignMemberSendEmail, executeCampaignMemberSendEmailFisico and contadoresTest	
+	1.8			US785364            Daniel Rodriguez    				21/12/2023 			Modify methods to new callout Adobe Campaign
+	1.9			TechSummit			Carolina Lopez						22/05/2024			Modify methods executeCampaignMemberSendEmail, executeCampaignMemberSendEmailFisico.
+	2.0			TechSummit			Carolina Lopez						05/06/2024			Modify logic of methods executeCampaignMemberSendEmail, executeCampaignMemberSendEmailFisico.
 ***********************************************************************************************************************/
 @isTest
 public with sharing class EV_CampaignMemberCTriggerHelper_Test {
@@ -34,7 +37,7 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 		
 		Test.stopTest();
 
-		System.assertEquals(true, campMember.EV_Empresa__c);
+		System.assertEquals(true, campMember.EV_Empresa__c, 'UPDATE OK');
 	}
 
 	@isTest (SeeAllData=true)
@@ -52,9 +55,9 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
 			
             if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
             } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
             }
             
 			HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
@@ -75,7 +78,7 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 
 		Test.stopTest();
 
-		System.assertEquals('Registro Confirmado', campMember.EV_Status__c);
+		System.assertEquals('Registro Confirmado', campMember.EV_Status__c, 'Se ha confirmado el registro');
 	}
 	
 	@isTest (SeeAllData=true)
@@ -91,9 +94,9 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
 			
             if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
             } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
             }
             
 			HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
@@ -116,9 +119,9 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
 			
             if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
             } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
             }
             
             HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
@@ -141,11 +144,11 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 		}
 		Test.stopTest();
 		
-		System.assertEquals('Asistió', campMember.EV_Status__c);
+		System.assertEquals('Asistió', campMember.EV_Status__c, 'Ha asistido al evento');
 	}
 
 	@isTest (SeeAllData=true)
-	public static void linkUniqueSurveyGenerationAsistio_Test() {
+	public static void linkUniqueSurveyGenerationAsistioTest() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
 
@@ -163,11 +166,11 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 		}
 		Test.stopTest();
 
-		System.assertEquals(String.isNotBlank(campMember.EV_URLEncuesta__c), true);
+		System.assertEquals(String.isNotBlank(campMember.EV_URLEncuesta__c), true, 'LINK de encuesta');
 	}
 
 	@isTest (SeeAllData=true)
-	public static void linkUniqueSurveyGenerationAsistioNew_Test() {
+	public static void linkUniqueSurveyGenerationAsistioNewTest() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
  
@@ -180,7 +183,7 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 
 		Test.stopTest();
 
-		System.assertEquals(String.isNotBlank(campMember.EV_InvitacionEncuesta__c), true);
+		System.assertEquals(String.isNotBlank(campMember.EV_InvitacionEncuesta__c), true, 'Invitación enviada');
 	}
     
     @isTest
@@ -200,10 +203,10 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 		}
 		Test.stopTest();
 
-        System.assertEquals(campH.EV_CampaignMember_Id__c, campMember.Id);
+        System.assertEquals(campH.EV_CampaignMember_Id__c, campMember.Id, 'DELETE OK');
     }
     
-    @isTest
+     @isTest (SeeAllData=true)
 	public static void inscriptionNRTCliente() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
@@ -222,7 +225,7 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 	}
     
     @isTest (SeeAllData=true)
-	public static void contadorCheckIn_Test() {
+	public static void contadorCheckInTest() {
 		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
 
@@ -243,99 +246,94 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
 		}
 		Test.stopTest();
 
-		System.assertEquals(String.isNotBlank(campMember.EV_ExternalId__c), true);
+		System.assertEquals(String.isNotBlank(campMember.EV_ExternalId__c), true, 'OK');
 	}
 
-    @isTest
+    @isTest(SeeAllData=true)
     public static void executeCampaignMemberSendEmail() {
         User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
+		Lead interlocutor = new Lead();
+		Campaign campTechSumm = new Campaign();
+		EV_CampaignMemberC__c campMember  = new EV_CampaignMemberC__c();
+		System.runAs(newUser){  
+            interlocutor = EV_TestHelper.createLeadAuxTechSummit('Tech Summit Virtual');
+            campTechSumm = EV_TestHelper.createCampaignTechSummit(true, false);
+			campMember = EV_TestHelper.createCampaignMemberLeadCampaignTechSummit(interlocutor.Id, campTechSumm.Id, 'Registro Confirmado');
 
+		}
         System.runAs(newUser){  
-            Lead interlocutor = EV_TestHelper.createLeadAux('Tech Summit Virtual');
-            Campaign campTechSumm = EV_TestHelper.createCampaignTechSummit(true, false);
- 
             Map<String, HttpCalloutMock> header2TestResp = new Map<String,HttpCalloutMock>();
             header2TestResp.put('https://qrpass-qrpass.tst.icp-1.internet.cloud.lacaixa.es/qrpass/NEMzNzU4MTg1QjM2MzcxQTAxMzYwQ0MzQTYxMjU5QzM3N0Y2OTMzMjZFREExQUYwQ0IyQzE0Q0M3ODMwNUVBOQ==',new EV_ConexionQR_Mock(200));
-            
             CC_InterfaceSettings__mdt dataInterface = AV_IntegrationUtilities.fetchMetadataInterface('EV_QRPKPASS');
 			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
-			
             if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
             } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
             }
-            
             HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
-            
-			EV_CampaignMemberC__c campMember = EV_TestHelper.createCampaignMemberLeadCampaignTechSummit(interlocutor.Id, campTechSumm.Id, 'Registro Confirmado');
-
             Test.setMock(HttpCalloutMock.class, multiCalloutMock);
-                        
             Test.startTest();
             EV_CampaignMemberC__c campMemToCheck = [SELECT id FROM EV_CampaignMemberC__c WHERE EV_LeadId__c =: interlocutor.Id];
-            System.assertEquals(campMemToCheck.Id, campMember.Id);
+            System.assertEquals(campMemToCheck.Id, campMember.Id, 'Envío de email');
             Test.stopTest();
         }
     }
 
-	@isTest
+	@isTest(SeeAllData=true)
     public static void executeCampaignMemberSendEmailFisico() {
         User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
-
+		Lead interlocutor = new Lead();
+		Campaign campTechSumm = new Campaign();
+		EV_CampaignMemberC__c campMember  = new EV_CampaignMemberC__c();
+		System.runAs(newUser){ 
+			interlocutor = EV_TestHelper.createLeadAuxTechSummit('Tech Summit Fisico');
+            campTechSumm = EV_TestHelper.createCampaignTechSummit(false, true);
+			campMember = EV_TestHelper.createCampaignMemberLeadCampaignTechSummit(interlocutor.Id, campTechSumm.Id, 'Registro Confirmado');
+		}
         System.runAs(newUser){  
-			Lead interlocutor = EV_TestHelper.createLeadAux('Tech Summit Fisico');
-            Campaign campTechSumm = EV_TestHelper.createCampaignTechSummit(false, true);
- 
             Map<String, HttpCalloutMock> header2TestResp = new Map<String,HttpCalloutMock>();
             header2TestResp.put('https://qrpass-qrpass.tst.icp-1.internet.cloud.lacaixa.es/qrpass/NEMzNzU4MTg1QjM2MzcxQTAxMzYwQ0MzQTYxMjU5QzM3N0Y2OTMzMjZFREExQUYwQ0IyQzE0Q0M3ODMwNUVBOQ==',new EV_ConexionQR_Mock(200));
-            
             CC_InterfaceSettings__mdt dataInterface = AV_IntegrationUtilities.fetchMetadataInterface('EV_QRPKPASS');
 			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
-			
             if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
             } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
+                header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
             }
-            
             HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
-            
-			EV_CampaignMemberC__c campMember = EV_TestHelper.createCampaignMemberLeadCampaignTechSummit(interlocutor.Id, campTechSumm.Id, 'Registro Confirmado');
-
-			Test.setMock(HttpCalloutMock.class, multiCalloutMock);
-                        
+			Test.setMock(HttpCalloutMock.class, multiCalloutMock);      
             Test.startTest();
             EV_CampaignMemberC__c campMemToCheck = [SELECT id FROM EV_CampaignMemberC__c WHERE EV_LeadId__c =: interlocutor.Id];
-            System.assertEquals(campMemToCheck.Id, campMember.Id);
+            System.assertEquals(campMemToCheck.Id, campMember.Id, 'Envío de email evento fisico');
             Test.stopTest();
         }
     }
     
-        @isTest
+    @isTest (SeeAllData=true)
 		public static void contadoresTest() {
-            User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+            User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
             EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
             Campaign camp = new Campaign();
-            
-            Map<String, HttpCalloutMock> header2TestResp = new Map<String,HttpCalloutMock>();
-            header2TestResp.put('https://qrpass-qrpass.tst.icp-1.internet.cloud.lacaixa.es/qrpass/NEMzNzU4MTg1QjM2MzcxQTAxMzYwQ0MzQTYxMjU5QzM3N0Y2OTMzMjZFREExQUYwQ0IyQzE0Q0M3ODMwNUVBOQ==',new EV_ConexionQR_Mock(200));
-            
-            CC_InterfaceSettings__mdt dataInterface = AV_IntegrationUtilities.fetchMetadataInterface('EV_QRPKPASS');
-			header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
-			
-            if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
-                header2TestResp.put('callout:EV_PROAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
-            } else {
-                header2TestResp.put('callout:EV_PREAdobeCampaign',new EV_AdobeCampaignInscripcion_Mock());
-            }
-            
-            HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
-            
-            Test.setMock(HttpCalloutMock.class, multiCalloutMock);
+ 
     
             Test.startTest();
             System.runAs(newUser){
+                Map<String, HttpCalloutMock> header2TestResp = new Map<String,HttpCalloutMock>();
+                header2TestResp.put('https://qrpass-qrpass.tst.icp-1.internet.cloud.lacaixa.es/qrpass/NEMzNzU4MTg1QjM2MzcxQTAxMzYwQ0MzQTYxMjU5QzM3N0Y2OTMzMjZFREExQUYwQ0IyQzE0Q0M3ODMwNUVBOQ==',new EV_ConexionQR_Mock(200));
+                
+                CC_InterfaceSettings__mdt dataInterface = AV_IntegrationUtilities.fetchMetadataInterface('EV_QRPKPASS');
+                header2TestResp.put(String.valueOf(dataInterface.CC_EndPoint__c),new EV_ConexionQR_Mock(200));
+                
+                if (DomainParser.parse(DomainCreator.getOrgMyDomainHostname()).getSandboxName() == null) {
+                    header2TestResp.put('callout:EV_AdobeCampaignPRO',new EV_AdobeCampaignInscripcion_Mock());
+                } else {
+                    header2TestResp.put('callout:EV_AdobeCampaignPRE',new EV_AdobeCampaignInscripcion_Mock());
+                }
+                
+                HttpCalloutMock multiCalloutMock = new EV_multipleRequestConexionMock_Test(header2TestResp);
+                
+                Test.setMock(HttpCalloutMock.class, multiCalloutMock);
                 campMember = EV_TestHelper.createCampaignMemberCustomContact(false, true);
             
                 camp = [SELECT Id, Status, EV_TotalInscritosC__c FROM Campaign WHERE Id = :campMember.EV_CampaignId__c LIMIT 1];
@@ -355,6 +353,6 @@ public with sharing class EV_CampaignMemberCTriggerHelper_Test {
             }
             Test.stopTest();
                 
-            System.assertEquals(2, camp.EV_TotalInscritosC__c);
+            System.assertEquals(2, camp.EV_TotalInscritosC__c, 'Total inscritos');
         }
 }

@@ -302,7 +302,7 @@ public with sharing class SACH_EmailService_Utils {
 
     public static EmailMessage respuestaRemitirColaborador(Messaging.InboundEmail email, Id whatIdTarea, String emailDestino) {
         Case caso = [SELECT Status, ContactId FROM Case WHERE Id = :whatIdTarea WITH SECURITY_ENFORCED];
-        if (caso.Status == 'Cerrado' || caso.Status == 'Pendiente Colaborador') {
+        if (caso.Status == 'Cerrado' ||  caso.Status == 'Pendiente Colaborador') {
             caso.Status = 'Activo';
             caso.CC_Fecha_Ultima_Interaccion__c = System.now();
             update caso;

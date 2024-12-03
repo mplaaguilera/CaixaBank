@@ -8,12 +8,18 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
         @AuraEnabled public String cuerpo{get;set;}
         @AuraEnabled public String header{get;set;}
         @AuraEnabled public String footer{get;set;}
+        @AuraEnabled public String encabezado{get;set;}
+        @AuraEnabled public String pieFirma{get;set;}
+        @AuraEnabled public String firma{get;set;}
         
-        public WrapperTemplate(String miCuerpo, String miHeader, String miFooter){
+        public WrapperTemplate(String miCuerpo, String miHeader, String miFooter, String miEncabezado, String miPieFirma, String miFirma){
             this.cuerpo = miCuerpo;
-            this.header = miHeader;
-            this.footer = miFooter;
-        }  
+            this.header = miHeader != null ? miHeader : '';
+            this.footer = miFooter != null ? miFooter : '';
+            this.encabezado = miEncabezado != null ? miEncabezado : '';
+            this.pieFirma = miPieFirma != null ? miPieFirma : '';
+            this.firma = miFirma != null ? miFirma : '';
+        }
     }
     
 	@AuraEnabled(cacheable=true)
@@ -66,14 +72,46 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
 
     
     @AuraEnabled
-    public static WrapperTemplate obtenerDatosTemplate(String idPlantilla, String recordId){
+    public static WrapperTemplate obtenerDatosTemplate(String idPlantilla, String recordId) {
+        String idiomaCaso = [SELECT CC_Idioma__c FROM Case WHERE Id = :recordId].CC_Idioma__c;
         EmailTemplate plantillaSeleccionada = new EmailTemplate();
         EmailTemplate plantillaHeader = new EmailTemplate();
         EmailTemplate plantillaFooter = new EmailTemplate();
+        EmailTemplate plantillaEncabezado = new EmailTemplate();
+        EmailTemplate plantillaPieFirma = new EmailTemplate();
+        EmailTemplate plantillaFirma = new EmailTemplate();
         List<EmailTemplate> lstPlantillas = new List<EmailTemplate>();
+        String encabezado;
+        String pieFirma;
+        String firma;
+        if (idiomaCaso == 'es') { // Castellano
+            encabezado = 'CC_Encabezado_Correo_Postal_CAS';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_CAS';
+            firma = 'CC_Firma_Correo_Postal_CAS';
+        } else if (idiomaCaso == 'ca') { // Catalán
+            encabezado = 'CC_Encabezado_Correo_Postal_CAT';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_CAT';
+            firma = 'CC_Firma_Correo_Postal_CAT';
+        } else if (idiomaCaso == 'eu') { // Euskera
+            encabezado = 'CC_Encabezado_Correo_Postal_EU';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_EU';
+            firma = 'CC_Firma_Correo_Postal_EU';
+        } else if (idiomaCaso == 'va') { // Valenciano
+            encabezado = 'CC_Encabezado_Correo_Postal_VA';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_VA';
+            firma = 'CC_Firma_Correo_Postal_VA';
+        } else if (idiomaCaso == 'ga') { // Gallego
+            encabezado = 'CC_Encabezado_Correo_Postal_GA';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_GA';
+            firma = 'CC_Firma_Correo_Postal_GA';
+        } else { //Inglés y otros idiomas
+            encabezado = 'CC_Encabezado_Correo_Postal_EN';
+            pieFirma = 'CC_Pie_Firma_Correo_Postal_EN';
+            firma = 'CC_Firma_Correo_Postal_EN';
+        }
 
         if (Schema.sObjectType.EmailTemplate.isAccessible()){
-            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idPlantilla OR Developername IN ('CC_Header','CC_Footer')];
+            lstPlantillas = [SELECT Id, Name, HtmlValue, DeveloperName, Folder.DeveloperName FROM EmailTemplate WHERE Id =: idPlantilla OR Developername IN ('CC_Header','CC_Footer',:encabezado,:pieFirma,:firma)];
         }
         
         if(lstPlantillas != null && !lstPlantillas.isEmpty()) {
@@ -84,9 +122,15 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
                     plantillaHeader = em;
                 } else if(em.DeveloperName == 'CC_Footer') {
                     plantillaFooter = em;
+                } else if (em.DeveloperName == encabezado) {
+                    plantillaEncabezado = em;
+                } else if (em.DeveloperName == pieFirma) {
+                    plantillaPieFirma = em;
+                } else if (em.DeveloperName == firma) {
+                    plantillaFirma = em;
                 }
             }
-        }        
+        }
        
         List<String> body = new List<String>();
         body.add(plantillaSeleccionada.HtmlValue);
@@ -96,17 +140,16 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
             String cuerpoEmail = renderStored.getHtmlBody();
             WrapperTemplate datosTemplate;
             if(!Test.isRunningTest()) {
-                if(plantillaHeader != null && plantillaFooter != null) {
-                    datosTemplate = new WrapperTemplate(cuerpoEmail, plantillaHeader.HtmlValue, plantillaFooter.HtmlValue);
-                } else if(plantillaHeader == null && plantillaFooter == null) {
-                    datosTemplate = new WrapperTemplate(cuerpoEmail, '', '');
-                } else if(plantillaHeader == null && plantillaFooter != null) {
-                    datosTemplate = new WrapperTemplate(cuerpoEmail, '', plantillaFooter.HtmlValue);
-                } else if(plantillaHeader != null && plantillaFooter == null) {
-                    datosTemplate = new WrapperTemplate(cuerpoEmail, plantillaHeader.HtmlValue, '');
-                }
+                datosTemplate = new WrapperTemplate(
+                    cuerpoEmail,
+                    plantillaHeader != null ? plantillaHeader.HtmlValue : null,
+                    plantillaFooter != null ? plantillaFooter.HtmlValue : null,
+                    plantillaEncabezado != null ? plantillaEncabezado.HtmlValue : null,
+                    plantillaPieFirma != null ? plantillaPieFirma.HtmlValue : null,
+                    plantillaFirma != null ? plantillaFirma.HtmlValue : null
+                );
             } else {
-                datosTemplate = new WrapperTemplate(cuerpoEmail, 'Header', 'Footer');
+                datosTemplate = new WrapperTemplate(cuerpoEmail, 'Header', 'Footer', '', '', '');
             }
             return datosTemplate;
         } catch (Exception e) {
@@ -161,8 +204,6 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
 		
 	}
     
-    
-
 	@AuraEnabled(cacheable=true)
 	public static List<EmailTemplate> buscarPlantillas(Id idCarpeta, String cadenaBusqueda) {
 		cadenaBusqueda = '%' + cadenaBusqueda + '%';
@@ -172,7 +213,32 @@ public with sharing class CC_GenerarDocumentoPlantilla_Apex {
 	}
 
     @AuraEnabled(cacheable=true)
-	public static void buscarPlantillasMCC(List<EmailTemplate> plantillas) {
-        System.debug('::: dentro plantillas: ' + plantillas);
+	public static List<EmailTemplate> buscarPlantillasMCC(String cadenaBusqueda) {
+        cadenaBusqueda = '%' + cadenaBusqueda + '%';
+		return [SELECT Id, Name, Subject FROM EmailTemplate
+				WHERE Name LIKE :cadenaBusqueda
+				ORDER BY NAME LIMIT 10];
 	}
+
+    // @AuraEnabled(cacheable=true)
+    // public static List<Folder> getCarpetasIdioma(String carpetaDeveloperName, String carpetaGenerica) {
+    //     List<Folder> carpetas = new List<Folder>();
+    //     Id parentId;
+    //     if (carpetaDeveloperName == null) {
+    //         parentId = [SELECT Id FROM Folder WHERE DeveloperName = 'CC_Operativas' LIMIT 1].Id;
+    //     } else {
+    //         //parentId = [SELECT Id FROM Folder WHERE DeveloperName = :carpetaDeveloperName LIMIT 1].Id;
+    //         List<Folder> carpetaPrincipal = [SELECT Id FROM Folder WHERE DeveloperName = :carpetaDeveloperName];
+    //         if (!carpetaPrincipal.isEmpty()) {
+    //             parentId = [SELECT Id FROM Folder WHERE DeveloperName = :carpetaDeveloperName LIMIT 1].Id;
+    //         } else {
+    //             parentId = [SELECT Id FROM Folder WHERE DeveloperName = :carpetaGenerica LIMIT 1].Id;
+    //         }
+    //     }
+
+    //     for (Folder carpeta : [SELECT Name, DeveloperName FROM Folder WHERE TYPE = 'EmailTemplate' AND ParentId = :parentId]) {
+    //         carpetas.add(carpeta);
+    //     }
+    //     return carpetas;
+    // }
 }

@@ -1,8 +1,104 @@
 @IsTest
 public class CC_WS_Methods_Maximo_Test {
+    
+     @TestSetup
+    static void makeData(){
+        Id profileId = [SELECT Id FROM Profile WHERE Name = 'CC_Usuario_CaixaBank'].Id;
+        Id profile3NId = [SELECT Id FROM Profile WHERE Name = 'CC_Tercer_Nivel_CBKNow_MVP2'].Id;
+        Id profileIdAdmin = [SELECT Id FROM Profile WHERE Name = 'System Administrator'].Id;
+        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CC_Operador_CCO'];
+
+        List<User> userList = new List<User>();
+        User usuario1 = new User();
+        usuario1.ProfileId = profileIdAdmin;
+        usuario1.FirstName = 'Usuario Admin Prueba';
+        usuario1.LastName = 'last211053';
+        usuario1.Email = 'aalsdna@kfsb.com';
+        usuario1.Username = 'tuser0001@amamama.com' + System.currentTimeMillis();
+        usuario1.CompanyName = 'MST';
+        usuario1.Title = 'title';
+        usuario1.Alias = 'alias';
+        usuario1.TimeZoneSidKey = 'Europe/Paris';
+        usuario1.EmailEncodingKey = 'UTF-8';
+        usuario1.LanguageLocaleKey = 'es';
+        usuario1.LocaleSidKey = 'es_ES';
+
+        userList.add(usuario1);
+       
+        UserRole rolId = [SELECT Id, DeveloperName FROM UserRole WHERE DeveloperName = 'Contact_Center'];
+        //crear usuarios CC
+
+        User usuario2 = new User();
+        usuario2.ProfileId = profileId;
+        usuario2.FirstName = 'first2';
+        usuario2.LastName = 'Usuario Prueba';
+        usuario2.Email = 'tuser000@amamama.com';
+        usuario2.Username = 'tuser002@amamama.com' + System.currentTimeMillis();
+        usuario2.CompanyName = 'DXC';
+        usuario2.Title = 'title';
+        usuario2.Alias = 'alias';
+        usuario2.TimeZoneSidKey = 'Europe/Paris';
+        usuario2.EmailEncodingKey = 'UTF-8';
+        usuario2.LanguageLocaleKey = 'es';
+        usuario2.LocaleSidKey = 'es_ES';
+        userList.add(usuario2);
+        
+        User usuario3 = new User();
+        usuario3.ProfileId = profileId;
+        usuario3.FirstName = 'first3';
+        usuario3.LastName = 'last3';
+        usuario3.Email = 'tuser0000@amamama.com';
+        usuario3.Username = 'tuser003@amamama.com' + System.currentTimeMillis();
+        usuario3.CompanyName = 'INDRA';
+        usuario3.Title = 'title';
+        usuario3.Alias = 'alias';
+        usuario3.TimeZoneSidKey = 'Europe/Paris';
+        usuario3.EmailEncodingKey = 'UTF-8';
+        usuario3.LanguageLocaleKey = 'es';
+        usuario3.LocaleSidKey = 'es_ES';
+        userList.add(usuario3);
+        
+            User usuario4 = new User();
+            usuario4.ProfileId = profile3NId;
+            usuario4.FirstName = 'first 11212';
+            usuario4.LastName = 'last1';
+            usuario4.Email = 'tuser0004@amamama.com';
+            usuario4.Username = 'tuser0004@amamama.com' + System.currentTimeMillis();
+            usuario4.CompanyName = 'MST';
+            usuario4.Title = 'title';
+            usuario4.Alias = 'alias';
+            usuario4.TimeZoneSidKey = 'Europe/Paris';
+            usuario4.EmailEncodingKey = 'UTF-8';
+            usuario4.LanguageLocaleKey = 'es';
+            usuario4.LocaleSidKey = 'es_ES';
+            usuario4.UserRoleId = rolId.Id;
+       		userList.add(usuario4);
+
+        insert userList;
+        
+         System.runAs(usuario1){
+
+            User usuario = new User();
+            usuario.ProfileId = profileId;
+            usuario.FirstName = 'first 11212';
+            usuario.LastName = 'last1';
+            usuario.Email = 'tuser000@amamama.com';
+            usuario.Username = 'tuser000@amamama.com' + System.currentTimeMillis();
+            usuario.CompanyName = 'MST';
+            usuario.Title = 'title';
+            usuario.Alias = 'alias';
+            usuario.TimeZoneSidKey = 'Europe/Paris';
+            usuario.EmailEncodingKey = 'UTF-8';
+            usuario.LanguageLocaleKey = 'es';
+            usuario.LocaleSidKey = 'es_ES';
+            usuario.UserRoleId = rolId.Id;
+             insert usuario;
+         }
+    }
 	
     @isTest
     static void enviarIncidenciaMAXIMO() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -13,7 +109,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -28,11 +124,11 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oClasif, null);
         
         EmailTemplate template1 = new EmailTemplate();
-        template1.FolderId = UserInfo.getUserId();
+        template1.FolderId = sysAdminUser.id;
         template1.Name = 'Notificacion_Agrupador_Empleado_es';
         template1.DeveloperName = 'Notificacion_Agrupador_Empleado_es';
         template1.TemplateType = 'Text';
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs(sysAdminUser) {
             insert template1;
         }
         
@@ -81,6 +177,11 @@ public class CC_WS_Methods_Maximo_Test {
     @isTest
     static void auraGestionMaximo() {
         
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
+        User normalUser = [SELECT Id FROM User WHERE LastName LIKE 'Usuario Prueba' AND IsActive=true LIMIT 1];
+        
+        System.runAs(sysAdminUser){
+        
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
         oGrupo.RecordTypeId = sRecordType3;
@@ -117,7 +218,7 @@ public class CC_WS_Methods_Maximo_Test {
         insert oAgr;
 		System.assertNotEquals(oAgr, null);
         
-        Id recordTypeAccount = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id recordTypeAccount = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
             
         Account cuenta1 = new Account();
         cuenta1.Name = 'CuentaEmpleado1';
@@ -125,14 +226,15 @@ public class CC_WS_Methods_Maximo_Test {
         cuenta1.RecordTypeId=recordTypeAccount;
         insert cuenta1;
         
-        Id recordTypeContacto = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+            
+        Id recordTypeContacto = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Contact oContacto = new Contact();
         oContacto.LastName = 'Test contacto';
         oContacto.Email = 'test@test.es';
         oContacto.RecordTypeId= recordTypeContacto;
         insert oContacto;
         
-        Id recordTypeEmpleado = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
         Case oCaso = new Case();
         oCaso.RecordTypeId = recordTypeEmpleado;
@@ -158,10 +260,12 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertEquals(sRes, '');
         
         Test.stopTest();
+            }
     }
     
     @isTest
     static void enviarIncidenciaMAXIMO_error01() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -172,7 +276,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -231,6 +335,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarIncidenciaMAXIMO_error02() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -241,7 +346,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -298,6 +403,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void auraGestionMaximo_error01() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -308,7 +414,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -367,6 +473,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarEventoMAXIMO() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -377,7 +484,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -449,6 +556,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarEventoMAXIMO_error01() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -459,7 +567,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -534,6 +642,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarEventoMAXIMO_error02() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -544,7 +653,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -616,6 +725,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarEventoMAXIMO_error03() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -626,7 +736,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -719,6 +829,7 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void enviarEventoMAXIMOFUTURE() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         String sRecordType3 = Schema.SObjectType.CC_Grupo_Colaborador__c.getRecordTypeInfosByDeveloperName().get('CC_GrupoMaximo').getRecordTypeId();
         CC_Grupo_Colaborador__c oGrupo = new CC_Grupo_Colaborador__c();
@@ -729,7 +840,7 @@ public class CC_WS_Methods_Maximo_Test {
 		System.assertNotEquals(oGrupo, null);
         
         CC_Grupo_Colaborador_Contact__c oGrupoUser = new CC_Grupo_Colaborador_Contact__c();
-        oGrupoUser.CC_Usuario__c = UserInfo.getUserId();
+        oGrupoUser.CC_Usuario__c = sysAdminUser.id;
         oGrupoUser.CC_Grupo_Colaborador__c = oGrupo.Id;
         insert oGrupoUser;
 		System.assertNotEquals(oGrupoUser, null);
@@ -801,13 +912,13 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void notificacionEmpleadoES() {
-        
+		User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];        
         EmailTemplate template1 = new EmailTemplate();
-        template1.FolderId = UserInfo.getUserId();
+        template1.FolderId = sysAdminUser.id;
         template1.Name = 'Notificacion_Agrupador_Empleado_es';
         template1.DeveloperName = 'Notificacion_Agrupador_Empleado_es';
         template1.TemplateType = 'Text';
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (sysAdminUser) {
             insert template1;
         }
         
@@ -817,8 +928,7 @@ public class CC_WS_Methods_Maximo_Test {
         agrupador.CC_Opcion_Call_Center__c = 'Opcion Call Center';
         agrupador.CC_Evento__c = true;
         insert agrupador;
-        
-        Id recordTypeCuenta = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta Test Solicitud Info Empleado';
@@ -826,7 +936,7 @@ public class CC_WS_Methods_Maximo_Test {
         cuenta.RecordTypeId = recordTypeCuenta;
         insert cuenta;
         
-        Id recordTypeEmpleado = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeEmpleado = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         
         Contact oContacto = new Contact();
         oContacto.LastName = 'Test contacto';
@@ -835,7 +945,7 @@ public class CC_WS_Methods_Maximo_Test {
         oContacto.AccountId = cuenta.Id;
         insert oContacto;
         
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         /*
         EmailTemplate plantilla = new EmailTemplate();
         plantilla.DeveloperName = 'Notificacion_Agrupador_Empleado_es';
@@ -845,6 +955,72 @@ public class CC_WS_Methods_Maximo_Test {
         
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';
+        caso.RecordTypeId = recordTypeCaso;
+        caso.Subject = 'Prueba';
+        caso.AccountId = cuenta.Id;
+        caso.ContactId = oContacto.Id;
+        caso.Status = 'Activo';
+        caso.Origin = 'Email';
+        caso.CC_Canal_Procedencia__c = 'Oficina Feedback';
+        caso.CC_Canal_Resolucion__c = 'Cajeros';
+        caso.CC_Tipo_Contacto__c = 'Consulta';
+        caso.CC_Agrupador_Id__c = agrupador.Id;  
+        insert caso;
+        
+        CC_WS_Methods_Maximo.notificacionEmpleado(agrupador.Id);
+        
+        List<Case> casos = [Select Id, AccountId From Case where AccountId =: cuenta.Id ];
+		System.assert(casos.size() > 0);
+    }
+    
+    @isTest
+    static void notificacionEmpleadoGenerico() {
+        
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
+        
+        EmailTemplate template1 = new EmailTemplate();
+        template1.FolderId = sysAdminUser.id;
+        template1.Name = 'Notificacion_Agrupador_Empleado_en';
+        template1.DeveloperName = 'Notificacion_Agrupador_Empleado_en';
+        template1.TemplateType = 'Text';
+        System.runAs(sysAdminUser) {
+            insert template1;
+        }
+        
+        CC_Agrupador__c agrupador = new CC_Agrupador__c();
+        agrupador.CC_Titulo__c = 'Test 3';
+        agrupador.CC_Descripcion__c = 'Test 3';
+        agrupador.CC_Opcion_Call_Center__c = 'Opcion Call Center';
+        agrupador.CC_Evento__c = true;
+        insert agrupador;
+        
+        Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        
+        Account cuenta = new Account();
+        cuenta.Name = 'Cuenta Test Solicitud Info Empleado';
+        cuenta.CC_Email__c = 'cuentasolinfoemp@test.com';
+        cuenta.RecordTypeId = recordTypeCuenta;
+        insert cuenta;
+        
+        Id recordTypeEmpleado = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        
+        Contact oContacto = new Contact();
+        oContacto.LastName = 'Test contacto';
+        oContacto.Email = 'test@test.es';
+        oContacto.RecordTypeId = recordTypeEmpleado;
+        oContacto.AccountId = cuenta.Id;
+        insert oContacto;
+        
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        /*
+        EmailTemplate plantilla = new EmailTemplate();
+        plantilla.DeveloperName = 'Notificacion_Agrupador_Empleado_es';
+        plantilla.Name ='Notificacion_Agrupador_Empleado_es';
+        insert plantilla;*/
+
+        
+        Case caso = new Case();
+        caso.CC_Idioma__c = 'en';
         caso.RecordTypeId = recordTypeCaso;
         caso.Subject = 'Prueba';
         caso.AccountId = cuenta.Id;
@@ -876,13 +1052,13 @@ public class CC_WS_Methods_Maximo_Test {
         params.HDT_Configuracion_2__c = owa[0].Address;
         insert params;*/
 
-        
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         EmailTemplate template1 = new EmailTemplate();
-        template1.FolderId = UserInfo.getUserId();
+        template1.FolderId = sysAdminUser.id;
         template1.Name = 'Notificacion_Agrupador_Empleado_ca';
         template1.DeveloperName = 'Notificacion_Agrupador_Empleado_ca';
         template1.TemplateType = 'Text';
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (sysAdminUser) {
             insert template1;
         }
         
@@ -893,7 +1069,7 @@ public class CC_WS_Methods_Maximo_Test {
         agrupador.CC_Evento__c = true;
         insert agrupador;
         
-        Id recordTypeCuenta = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id recordTypeCuenta = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta Test Solicitud Info Empleado';
@@ -901,7 +1077,7 @@ public class CC_WS_Methods_Maximo_Test {
         cuenta.RecordTypeId = recordTypeCuenta;
         insert cuenta;
         
-        Id recordTypeEmpleado = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeEmpleado = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         
         Contact oContacto = new Contact();
         oContacto.LastName = 'Test contacto';
@@ -910,7 +1086,7 @@ public class CC_WS_Methods_Maximo_Test {
         oContacto.AccountId = cuenta.Id;
         insert oContacto;
         
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         
         Case caso = new Case();
         caso.CC_Idioma__c = 'ca';
@@ -935,13 +1111,14 @@ public class CC_WS_Methods_Maximo_Test {
     
     @isTest
     static void notificacionEmpleadoCISBankiaES() {
+        User sysAdminUser = [SELECT Id FROM User WHERE LastName LIKE 'last211053' AND IsActive=true LIMIT 1];
         
         EmailTemplate template1 = new EmailTemplate();
-        template1.FolderId = UserInfo.getUserId();
+        template1.FolderId = sysAdminUser.id;
         template1.Name = 'Notificacion_Agrupador_Empleados_CSI_es';
         template1.DeveloperName = 'Notificacion_Agrupador_Empleados_CSI_es';
         template1.TemplateType = 'Text';
-        System.runAs ( new User(Id = UserInfo.getUserId()) ) {
+        System.runAs (sysAdminUser) {
             insert template1;
         }
         
@@ -952,7 +1129,7 @@ public class CC_WS_Methods_Maximo_Test {
         agrupador.CC_Evento__c = true;
         insert agrupador;
         
-        Id recordTypeCuenta = Schema.getGlobalDescribe().get('Account').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+        Id recordTypeCuenta =Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
         
         Account cuenta = new Account();
         cuenta.Name = 'Cuenta Test Solicitud Info Empleado';
@@ -960,7 +1137,7 @@ public class CC_WS_Methods_Maximo_Test {
         cuenta.RecordTypeId = recordTypeCuenta;
         insert cuenta;
         
-        Id recordTypeEmpleado = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        Id recordTypeEmpleado = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         
         Contact oContacto = new Contact();
         oContacto.LastName = 'Test contacto';
@@ -969,7 +1146,7 @@ public class CC_WS_Methods_Maximo_Test {
         oContacto.AccountId = cuenta.Id;
         insert oContacto;
         
-        Id recordTypeCaso = Schema.getGlobalDescribe().get('Case').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
+        Id recordTypeCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
         
         Case caso = new Case();
         caso.CC_Idioma__c = 'es';

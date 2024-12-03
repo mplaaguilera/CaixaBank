@@ -25,11 +25,13 @@ Historial
 	4.2		    AV_Query IT	        Daniel Rodríguez	02/03/2022	        Change AV_Query to SOQL for User, Account, Contact
 	4.3			OrgHealth			Carolina Alonso		17/03/2022			Change AV_Query logic to allow calling method with an external query
     4.4         US671736            Oscar Moreno        17/10/2023          Delete the content of the class
+    4.5          QC                 Oscar Moreno        05/06/2024          Return a String of deleteRecord method
 
 ***********************************************************************************************************************/
 public class AV_DeleteRecordsActivityBatch{
     
-         public static void deleteRecord(){
+         public static String deleteRecord(){
+			return 'entra en deleteRecord';
         
     }
 	

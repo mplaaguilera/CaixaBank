@@ -1,6 +1,5 @@
 public class EV_EnviarNotificaciones_Batch {
-
-	public EV_EnviarNotificaciones_Batch() {
-        System.debug('hola');
-    }
+	public static void metodoBlanco(){
+		EV_LogDebug.printLogDebug('Método blanco:', 'Blanqueo clase');
+	}
 }

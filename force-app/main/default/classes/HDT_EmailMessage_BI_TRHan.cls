@@ -206,14 +206,13 @@ public with sharing class HDT_EmailMessage_BI_TRHan extends CC_TriggerHandlerBas
         }
 
         if (!idsPadre.isEmpty()) {
-            Id idRecordTypeHdt = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('HDT_Empleado').getRecordTypeId();
             Map<Id, EmailMessage> mapaCorreos = new Map<Id, EmailMessage>();
             for (EmailMessage correo : correos) {
                 mapaCorreos.put(correo.Id, correo);
             }
 
             Set<Id> idCasosCc = new Set<Id>();
-            for (Case casoCc : [SELECT Id FROM Case WHERE Id IN :idsPadre AND RecordTypeId = :idRecordTypeHdt]) {
+            for (Case casoCc : [SELECT Id FROM Case WHERE Id IN :idsPadre AND RecordType.DeveloperName LIKE 'HDT_%' ]) {
                 idCasosCc.add(casoCc.Id);
             }
 

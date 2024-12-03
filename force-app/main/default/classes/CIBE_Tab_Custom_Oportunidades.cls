@@ -14,7 +14,6 @@ Historial
 public with sharing class CIBE_Tab_Custom_Oportunidades {
 
     // Attributes
-   
     public class Response {
     @AuraEnabled
     public List<WrapperReports> wrapperReports;
@@ -46,8 +45,6 @@ public with sharing class CIBE_Tab_Custom_Oportunidades {
     */ 
     @AuraEnabled(cacheable=true)
     public static Response getReportsUniqueName(String userId) {
-        System.debug('Start Method :  getReportsUniqueName');
-
 
         //Inicializamos las variables repotsNamesFromMDt,MapReportsNamesFromMDT y responseReports.
         List<String> reportsNamesFromMDT = new List<String>();
@@ -58,26 +55,26 @@ public with sharing class CIBE_Tab_Custom_Oportunidades {
         List<WrapperReports> responseReportTemporal = new List<WrapperReports>();
 
         //Obtenemos los reportes del MDT.
-
-        User actualUser = [SELECT Id, Name, UserRole.DeveloperName FROM User WHERE Id =:userId];
+        User actualUser = [SELECT Id, Name, UserRole.DeveloperName, LanguageLocaleKey FROM User WHERE Id =:userId];
 
         //Recorremos los reportes del MDT y los añadimos a la lista reportsNamesFromMDT.
         for(CIBE_customOpportunityReports__mdt report : [SELECT CIBE_Perfil__c, CIBE_Nombre_Objeto__c,CIBE_Report_DeveloperName__c,CIBE_Report_Cabecera__c FROM CIBE_customOpportunityReports__mdt WHERE CIBE_Report_DeveloperName__c != null AND CIBE_Nombre_Objeto__c = 'Report']){
             if(report.CIBE_Perfil__c.contains(actualUser.UserRole.DeveloperName)){
-            reportsNamesFromMDT.add(report.CIBE_Report_DeveloperName__c);
-            MapReportsNamesFromMDT.put(report.CIBE_Report_DeveloperName__c,report.CIBE_Report_Cabecera__c);
+                reportsNamesFromMDT.add(report.CIBE_Report_DeveloperName__c);
+                MapReportsNamesFromMDT.put(report.CIBE_Report_DeveloperName__c,report.CIBE_Report_Cabecera__c);
             }
         }
 
         for(CIBE_customOpportunityReports__mdt tab : [SELECT  CIBE_Perfil__c,MasterLabel, CIBE_Nombre_Objeto__c,CIBE_Report_DeveloperName__c,CIBE_Report_Cabecera__c FROM CIBE_customOpportunityReports__mdt WHERE CIBE_Report_DeveloperName__c != null AND CIBE_Nombre_Objeto__c = 'CustomTab']){
+
             if(tab.CIBE_Perfil__c.contains(actualUser.UserRole.DeveloperName)){
-            WrapperTabs newTab = new WrapperTabs();
-            newTab.label = tab.MasterLabel;
-            newTab.developerName = tab.CIBE_Report_DeveloperName__c;
-            responseTabTemporal.add(newTab);
+                String tradu =  CIBE_TranslateConfiguration__mdt.getInstance(tab.CIBE_Report_DeveloperName__c+'EN') != null && actualUser.LanguageLocaleKey =='en_US' ? CIBE_TranslateConfiguration__mdt.getInstance(tab.CIBE_Report_DeveloperName__c+'EN').CIBE_Value__c : '';
+                WrapperTabs newTab = new WrapperTabs();
+                newTab.label = String.isNotBlank(tradu) ? tradu:tab.MasterLabel;
+                newTab.developerName = tab.CIBE_Report_DeveloperName__c;
+                responseTabTemporal.add(newTab);
             }
         }
-
 
         //Obtenemos los reportes de la org.
         List <Report> reportList = [SELECT Id,Name,DeveloperName FROM Report WHERE 
@@ -85,8 +82,11 @@ public with sharing class CIBE_Tab_Custom_Oportunidades {
 
         //Recorremos los reportes de la org y los añadimos a la lista responseReports.
         for( Report report : reportList){
+            //El limite del campo de la C_MDT es 40.
+            String reportName = report.DeveloperName.length() >= 40 ? report.DeveloperName.left(40): report.DeveloperName;
+            String tradu =  CIBE_TranslateConfiguration__mdt.getInstance(reportName) != null && actualUser.LanguageLocaleKey =='en_US' ? CIBE_TranslateConfiguration__mdt.getInstance(reportName).CIBE_Value__c : '';
             WrapperReports newReport = new WrapperReports();
-            newReport.name = report.Name;
+            newReport.name = String.isNotBlank(tradu) ? tradu:report.Name;
             newReport.id = report.Id;
             newReport.header = MapReportsNamesFromMDT.get(report.DeveloperName);
             responseReportTemporal.add(newReport);
@@ -95,8 +95,6 @@ public with sharing class CIBE_Tab_Custom_Oportunidades {
         response.wrapperTabs = responseTabTemporal;
         response.wrapperReports = responseReportTemporal;
 
-        System.debug('responseReports: ' + response);
-        System.debug('End Method :  getReportsUniqueName');
 
         //Devolvemos la lista responseReports.
         return response;

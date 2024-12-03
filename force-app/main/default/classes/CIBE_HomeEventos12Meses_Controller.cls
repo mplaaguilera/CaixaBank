@@ -37,8 +37,8 @@ public with sharing class CIBE_HomeEventos12Meses_Controller {
 
                 for(Event event :  [SELECT Id, Account.Name, Subject, AV_Tipo__c, StartDateTime, toLabel(CSBD_Evento_Estado__c) 
                                     FROM Event 
-                                    WHERE RecordType.DeveloperName in ('CIBE_EventoCliente') AND (ActivityDate = LAST_N_MONTHS:12 AND ActivityDate < TODAY ) 
-                                    AND AV_VisibleByLoggedUser__c = true AND (CSBD_Evento_Estado__c = 'Pendiente' AND OwnerId =: userinfo.getUserId())
+                                    WHERE RecordType.DeveloperName in ('CIBE_EventoCliente' , 'CIBE_EventoClienteCIB') AND (ActivityDate = LAST_N_MONTHS:12 OR(ActivityDate = THIS_MONTH AND ActivityDate < TODAY ))  
+                                    AND AV_VisibleByLoggedUser__c = true AND (CSBD_Evento_Estado__c = 'Planificada' AND OwnerId =: userinfo.getUserId())
                                     ORDER BY ActivityDateTime ASC LIMIT 10 OFFSET :offSet]) {
                     listReturn.add(
                         new Wrapper(

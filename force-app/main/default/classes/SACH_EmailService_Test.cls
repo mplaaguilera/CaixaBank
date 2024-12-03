@@ -116,7 +116,7 @@ public with sharing class SACH_EmailService_Test {
         correo.plainTextBody = 'email body #@n2225256325# nTitle .';
         correo.toAddresses =  new List<String>{'devsach.test@gmail.com'};
 
-         
+        System.runAs(usuario){
 
         Test.startTest();
         SACH_EmailService emailService = new SACH_EmailService();
@@ -124,7 +124,7 @@ public with sharing class SACH_EmailService_Test {
         Test.stopTest();
 
 		System.assert(result.success, 'Resultado incorrecto');
-        
+        }
     }
 
     

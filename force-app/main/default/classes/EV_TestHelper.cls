@@ -31,6 +31,13 @@ Historial
 	1.19		US585725				Carolina Lopez		21/09/2023			Modify method createTraslationEvt for field validation EV_Claim__c
 	1.20		US633077				Mamen Arias			05/10/2023			Modify method createTraduccionesDeEvento for field validation EV_Claim__c
 	1.21		US567184				Carolina Lopez		11/10/2023			Add method createEmployeeTestPublic.
+	1.22		US487923				Carolina Lopez		16/11/2023			Add methods createCaixaCenterInvitacionMultiple, createCampaignMemberInvitacionMultiple, createEmployeeInvitacionMultiple.
+	1.23		US306439				Carolina Lopez		20/11/2023			Modify methods createWrapperJSONServicesGCF and createWrapperJSONServicesPortal include 'attended-deferred-basis'.
+	1.24		FIX						Mamen Arias			25/01/2023			Create method createCampaignAccionistaCMCustom. Modify methods: createCampaignAccionista, createChildCampaignVirtual, createChildCampaignFisica,
+																				createChildCampaignVirtualCMCustom, createChildCampaignFisicaCMCustom, createCampaignMemberCustomLeadAccionista, createUserTest
+	1.25		TechSummit				Carolina Lopez		15/04/2024			Modify methods createParentCampaignTechSummit, createCampaignMemberLeadCampaignTechSummit, createCampaignTechSummit and create methods  createContactAuxTechSummit, createLeadAuxTechSummit, createCampaignMemberCustomLeadTechSummit, createChildCampaignVirtualCMCustomTechSummit, createChildCampaignFisicaCMCustomTechSummit, createCampaignMemberCustomContactTechSummit.
+	1.26		TechSummit				Carolina Lopez		07/06/2024			Add methods  createWrapperJSONInscripcionMultipleHibrido, createParentCampaignTechSummitHibrido, createWrapperJSONInscripcionMultipleHibridoNullForm, createCampaignMemberCustomLeadTechSummitHibrido and modify createCampaignTechSummit.
+	1.27		TechSummit				Carolina Lopez		08/06/2024			Add method createWrapperJSONServicesPortalTechSummit.												
 ***********************************************************************************************************************/
 @isTest
 public with sharing class EV_TestHelper {
@@ -66,6 +73,17 @@ public with sharing class EV_TestHelper {
 		return contactAux;
 	}
 
+	public static Contact createContactAuxTechSummit(String lastName){
+		Contact contactAux;
+		if(lastName != null){
+			contactAux = new Contact(LastName = lastName, FirstName = lastName, CC_Numero_Documento__c = '48133877Y', CC_Sexo__c = 'V', Email = 'test@test.com');
+		}else{
+			contactAux = new Contact(LastName = 'TestContact', FirstName = 'TestContact', CC_Numero_Documento__c = '48133877Y', CC_Sexo__c = 'V',  Email = 'test@test.com');
+		}
+		insert contactAux;
+		return contactAux;
+	}
+
 	public static Contact createEmployee(Account center){
 		RecordType rt = AV_AppUtilities.getRecordType('Contact', 'CC_Empleado'); 
 		Contact employee = new Contact();
@@ -74,7 +92,7 @@ public with sharing class EV_TestHelper {
 		employee.LastName = '1';
 		employee.Email = getEmail();
 		employee.CC_Idioma__c = 'es';
-		employee.CC_Matricula__c = MATRICULA_SAMPLE;
+		employee.CC_Matricula__c = '';
 		if (center!=null){
 			employee.AccountId = center.Id;
 		}
@@ -106,6 +124,20 @@ public with sharing class EV_TestHelper {
 		insert lstContact;
 		return lstContact;
 	}
+
+
+	public static Lead createLeadAuxTechSummit(String lastName){
+		Id rtEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_LeadTechSummit').getRecordTypeId();
+		Lead leadAux;
+		if(lastName != null){
+			leadAux = new Lead(firstname = 'Test', lastname = lastName, phone = '123456789', email = 'test@prueba.com', status = 'New', RecordtypeId = rtEvento, EV_Idiomas__c = '001', EV_NumeroDocumento__c = '57956279I', EV_Marketing__c = true, EV_ConsentimientoGeneral__c = true, EV_ConsentimientoTerceros__c = true);
+		}else{
+			leadAux = new Lead(firstname = 'Test', lastname = 'Lead', phone = '123456789', email = 'test@prueba.com', status = 'New', RecordtypeId = rtEvento, EV_Idiomas__c = '001', EV_NumeroDocumento__c = '57956279I', EV_Marketing__c = true, EV_ConsentimientoGeneral__c = true, EV_ConsentimientoTerceros__c = true);
+		}
+		insert leadAux;
+		return leadAux;
+	}
+
 
 	public static Lead createLeadAux(String lastName){
 		Id rtEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_Evento').getRecordTypeId();
@@ -236,6 +268,85 @@ public with sharing class EV_TestHelper {
 		return centroCaixa001;
 	}
 
+	public static List<Account> createCaixaCenterInvitacionMultiple(String name){
+		RecordType rt = AV_AppUtilities.getRecordType('Account', 'CC_CentroCaixaBank');
+		List<Account> lstAccount = new List<Account>();
+		lstAccount.add(new Account(
+			Name = '09016 - SIG - TOTAL RED TERRITORIAL',
+			CC_Numero_Oficina_Empresa__c = '001-09016',
+			CC_Numero_Oficina__c = '00695',
+			AV_TipoCentroSuperior__c = 'OF',
+			AV_TipoEstructura__c = '02',
+			RecordTypeId = rt.Id
+		));
+		lstAccount.add(new Account(
+			Name = name,
+			CC_Numero_Oficina_Empresa__c = '00795',
+			CC_Numero_Oficina__c = '00795',
+			AV_TipoCentroSuperior__c = 'GC',
+			RecordTypeId = rt.Id
+		));
+		lstAccount.add(new Account(
+			Name = name,
+			CC_Numero_Oficina_Empresa__c = '00595',
+			CC_Numero_Oficina__c = '00595',
+			AV_TipoCentroSuperior__c = 'DT',
+			RecordTypeId = rt.Id
+		));
+		lstAccount.add(new Account(
+			Name = name,
+			CC_Numero_Oficina_Empresa__c = '00095',
+			CC_Numero_Oficina__c = '00095',
+			AV_TipoCentroSuperior__c = 'DG',
+			RecordTypeId = rt.Id
+		));
+		insert lstAccount;
+		Account centroCaixa001 = new Account(
+			Name = name,
+			CC_Numero_Oficina_Empresa__c = '00605',
+			CC_Numero_Oficina__c = '00605',
+			AV_TipoCentroSuperior__c = 'TT',
+			RecordTypeId = rt.Id,
+			AV_CentroSuperior__c = lstAccount[3].Id
+		);
+		insert centroCaixa001;
+		lstAccount[3].AV_CentroSuperior__c = lstAccount[2].Id;
+		lstAccount[2].AV_CentroSuperior__c = lstAccount[1].Id;
+		lstAccount[1].AV_CentroSuperior__c = lstAccount[0].Id; 
+		update lstAccount;
+		return lstAccount;
+	}
+
+	public static EV_CampaignMemberC__c createCampaignMemberInvitacionMultiple(String cuenta, String campaignId, String status){
+		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
+		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
+		campMember.RecordTypeId = rtEvento;
+		campMember.EV_AccountId__c = cuenta;
+		campMember.EV_CampaignId__c = campaignId;
+		campMember.EV_Status__c = Status;
+		insert campMember;
+		return campMember;
+	}
+
+	public static list<Contact> createEmployeeInvitacionMultiple(List<Account> lstCenter, User usuario){
+		RecordType rt = AV_AppUtilities.getRecordType('Contact', 'CC_Empleado'); 
+		List<Contact> lstContact = new List<Contact>();
+		for(Account acc : lstCenter){
+			lstContact.add(new Contact(
+				RecordTypeId = rt.Id,
+				FirstName = 'Empleado'+ getRandomValue(),
+				LastName = '1',
+				Email = getEmail(),
+				CC_Idioma__c = 'es',
+				CC_Matricula__c = 'U0'+ getRandomValue(),
+				AV_UsuarioAsociado__c = usuario.Id,
+				AccountId = acc.Id
+			));
+		}
+
+		insert lstContact;
+		return lstContact;
+	}
 	
 	public static Campaign createCampaignAccionista(){
 		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_Eventos_Accionistas').getRecordTypeId();
@@ -252,12 +363,37 @@ public with sharing class EV_TestHelper {
 			EV_HoraFin__c = Time.newInstance(19, 30, 00, 00),
 			Ev_Notification__c = '001',
 			Status = '009',
-			EV_Cartera__c = 'BPA'
+			EV_Cartera__c = 'BPA',
+			EV_NewArchitecture__c = false
 		);
 
 		insert campAccionista;
 		return campAccionista;
 	}
+
+	public static Campaign createCampaignAccionistaCMCustom(){
+		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_Eventos_Accionistas').getRecordTypeId();
+
+		Campaign campAccionista = new Campaign(
+			Name = 'TestCampaignAccionista',
+			EV_ExternalId__c = '789132456',
+			RecordTypeId = rtEvento,
+			EV_ProgramaDeEventos__c = '012',
+			EV_TipoEvento__c = '001',
+			EV_Categoria__c = '001',
+			StartDate = Date.today(),
+			EV_HoraInicio__c = Time.newInstance(16, 30, 00, 00),
+			EV_HoraFin__c = Time.newInstance(19, 30, 00, 00),
+			Ev_Notification__c = '001',
+			Status = '009',
+			EV_Cartera__c = 'BPA',
+			EV_NewArchitecture__c = true
+		);
+
+		insert campAccionista;
+		return campAccionista;
+	}
+
 
 	public static Campaign createChildCampaignVirtual(){
 		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoVirtual').getRecordTypeId();
@@ -279,8 +415,35 @@ public with sharing class EV_TestHelper {
 			Ev_Notification__c = '001',
 			Status = '009',
 			EV_Cartera__c = 'BPA',
+			EV_NewArchitecture__c = false,
 			CampaignMemberRecordTypeId = rtEventoMember
 		); 
+		insert campVirtual;
+		return campVirtual;
+	}
+
+		public static Campaign createChildCampaignVirtualCMCustomTechSummit(){
+		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitVirtual').getRecordTypeId();
+		Id rtEventoMember = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+
+		Campaign campVirtual = new Campaign(
+			Name = 'TestCampaign',
+			EV_ExternalId__c = '234567890',
+			RecordTypeId = rtEvento,
+			StartDate = Date.today(),
+			EV_DiaHora_evento__c = datetime.now().addhours(1),
+			EV_HoraInicio__c = Time.newInstance(20, 30, 00, 00),
+			EV_HoraFin__c = Time.newInstance(22, 00, 00, 00),
+			EV_ChatEvento__c = true,
+			EV_URLDelEventoVirtual__c = 'test.prueba.com',
+			EV_URLImagenVideo__c = 'test.prueba.com',
+			EV_URLChatVirtual__c = 'test.prueba.com',
+			EV_NumeroDePlazas__c = 100,
+			Ev_Notification__c = '001',
+			Status = '009',
+			EV_Cartera__c = 'BPA',
+			EV_NewArchitecture__c = true
+		);
 		insert campVirtual;
 		return campVirtual;
 	}
@@ -305,7 +468,7 @@ public with sharing class EV_TestHelper {
 			Ev_Notification__c = '001',
 			Status = '009',
 			EV_Cartera__c = 'BPA',
-            EV_NewArchitecture__c = true
+			EV_NewArchitecture__c = true
 			//CampaignMemberRecordTypeId = rtEventoMember
 		);
 		insert campVirtual;
@@ -331,7 +494,8 @@ public with sharing class EV_TestHelper {
 			Ev_Notification__c = '001',
 			Status = '009',
 			CampaignMemberRecordTypeId = rtEventoMember,
-			EV_Cartera__c = 'BPA'
+			EV_Cartera__c = 'BPA',
+			EV_NewArchitecture__c = false
 		); 
 		if (center!=null){
 			campVirtual.EV_CentroOrganizador__c= center.Id;
@@ -393,6 +557,52 @@ public with sharing class EV_TestHelper {
 			wrapperJSON.idInvitacion = idInvitacion;
 			wrapperJSON.datosFormulario = wrappernoCliente;
 		}
+		return wrapperJSON;
+	}
+
+	public static EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido createWrapperJSONInscripcionMultipleHibrido(List<EV_NoClienteWrapperHibrido.LstEventFormat> idEvento){
+		List<EV_NoClienteWrapperHibrido.LstEventFormat> lstEvt = new List<EV_NoClienteWrapperHibrido.LstEventFormat>();
+		EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido wrapperJSON = new EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido();
+		EV_NoClienteWrapperHibrido wrappernoCliente = new EV_NoClienteWrapperHibrido();
+		wrappernoCliente.Nombre = 'Test';
+		wrappernoCliente.Apellidos = 'No Cliente';
+		wrappernoCliente.Documento = '12345678H';
+		wrappernoCliente.NombreEmpresa = 'TestEmpresa';
+		wrappernoCliente.NIFEmpresa = '48133877Y';
+		wrappernoCliente.Cargo = 'Director General';
+		wrappernoCliente.Phone = '123456789';
+		wrappernoCliente.Idioma = '002';
+		wrappernoCliente.ConsentimientoTerceros = true;
+		wrappernoCliente.Marketing = true;
+		wrappernoCliente.ConsentimientoGeneral = true;
+		wrappernoCliente.Email = 'test@prueba.com';
+
+		if (!idEvento.isEmpty()) {
+			for (EV_NoClienteWrapperHibrido.LstEventFormat event : idEvento) {
+				EV_NoClienteWrapperHibrido.LstEventFormat eventCopy = new EV_NoClienteWrapperHibrido.LstEventFormat();
+				eventCopy.idEvento = event.idEvento;
+				eventCopy.formatoDeAsistencia = event.formatoDeAsistencia;
+				lstEvt.add(eventCopy);
+			}
+		}
+		wrapperJSON.lstIdEvento = lstEvt;
+		wrapperJSON.datosFormulario = wrappernoCliente;
+		return wrapperJSON;
+	}
+
+	public static EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido createWrapperJSONInscripcionMultipleHibridoNullForm(List<EV_NoClienteWrapperHibrido.LstEventFormat> idEvento){
+		List<EV_NoClienteWrapperHibrido.LstEventFormat> lstEvt = new List<EV_NoClienteWrapperHibrido.LstEventFormat>();
+		EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido wrapperJSON = new EV_NoClienteWrapperHibrido.RequestInscripcionBodyMultipleHibrido();
+		if (!idEvento.isEmpty()) {
+			for (EV_NoClienteWrapperHibrido.LstEventFormat event : idEvento) {
+				EV_NoClienteWrapperHibrido.LstEventFormat eventCopy = new EV_NoClienteWrapperHibrido.LstEventFormat();
+				eventCopy.idEvento = event.idEvento;
+				eventCopy.formatoDeAsistencia = event.formatoDeAsistencia;
+				lstEvt.add(eventCopy);
+			}
+		}
+		wrapperJSON.lstIdEvento = lstEvt;
+		wrapperJSON.datosFormulario = null;
 		return wrapperJSON;
 	}
 
@@ -568,18 +778,35 @@ public with sharing class EV_TestHelper {
         } else if (servicio.equals('client-by-externalid') || servicio.equals('client-unsubscribed-event')){
 			wrapperServices.servicio = servicio;
             wrapperServices.externalIdCM = externalIdCM;
-        }
+        }else if (servicio.equals('attended-deferred-basis')){
+			wrapperServices.servicio = servicio;
+            wrapperServices.externalIdCM = externalIdCM;
+		}
 
 		return wrapperServices;
 	}
     
-    public static EV_WS_GetEventsPortal.RequestServicesPortalBody createWrapperJSONServicesPortal(String servicio, String numperso, String idioma){
+    public static EV_WS_GetEventsPortal.RequestServicesPortalBody createWrapperJSONServicesPortal(String servicio, String numperso, String idioma, String externalIdCM){
 		EV_WS_GetEventsPortal.RequestServicesPortalBody wrapperServices = new EV_WS_GetEventsPortal.RequestServicesPortalBody();
 		if (servicio.equals('slider-home-events-by-client') || servicio.equals('future-events-by-client') || servicio.equals('past-events-by-client') || 
-           servicio.equals('most-viewed-events-by-client')){
+           servicio.equals('most-viewed-events-by-client') || servicio.equals('attended-deferred-basis')){
 			wrapperServices.servicio = servicio;
 			wrapperServices.numperso = numperso;
 			wrapperServices.idioma = idioma;
+			wrapperServices.externalIdCM = externalIdCM;
+		}
+
+		return wrapperServices;
+	}
+
+	public static EV_WS_GetEventsPortal.RequestServicesPortalBody createWrapperJSONServicesPortalTechSummit(String email, String servicio, String numperso, String idioma, String externalIdCM){
+		EV_WS_GetEventsPortal.RequestServicesPortalBody wrapperServices = new EV_WS_GetEventsPortal.RequestServicesPortalBody();
+		if (servicio.equals('events-summary')){
+			wrapperServices.servicio = servicio;
+			wrapperServices.numperso = numperso;
+			wrapperServices.idioma = idioma;
+			wrapperServices.externalIdCM = externalIdCM;
+			wrapperServices.email = email;
 		}
 
 		return wrapperServices;
@@ -596,7 +823,25 @@ public with sharing class EV_TestHelper {
 			EV_HoraInicio__c = Time.newInstance(16, 30, 00, 00),
 			EV_HoraFin__c = Time.newInstance(19, 30, 00, 00),
 			Ev_Notification__c = '001',
+			EV_NewArchitecture__c = false,
 			CampaignMemberRecordTypeId = rtEventoMember
+		); 
+		insert campVirtual;
+		return campVirtual;
+	}
+
+	public static Campaign createChildCampaignFisicaCMCustomTechSummit(){
+		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitFisico').getRecordTypeId();
+		Id rtEventoMember = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+		Campaign campVirtual = new Campaign(
+			Name = 'TestCampaign',
+			RecordTypeId = rtEvento,
+			EV_ExternalId__c = '123456789',
+			StartDate = Date.today(),
+			EV_HoraInicio__c = Time.newInstance(16, 30, 00, 00),
+			EV_HoraFin__c = Time.newInstance(19, 30, 00, 00),
+			EV_Notification__c = '001',
+			EV_NewArchitecture__c = true
 		); 
 		insert campVirtual;
 		return campVirtual;
@@ -613,7 +858,7 @@ public with sharing class EV_TestHelper {
 			EV_HoraInicio__c = Time.newInstance(16, 30, 00, 00),
 			EV_HoraFin__c = Time.newInstance(19, 30, 00, 00),
 			EV_Notification__c = '001',
-            EV_NewArchitecture__c = true
+			EV_NewArchitecture__c = true
 		); 
 		insert campVirtual;
 		return campVirtual;
@@ -651,20 +896,20 @@ public with sharing class EV_TestHelper {
 	public static List<EV_TraduccionDeEvento__c> createTraslationEvt(Campaign camp){
 		List<EV_TraduccionDeEvento__c> lstTra = new List<EV_TraduccionDeEvento__c>();
 		lstTra.add(new EV_TraduccionDeEvento__c(
-                EV_Descripcion__c = 'testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
+                EV_Descripcion__c = 'ESPtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
                 EV_Claim__c ='testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
                 EV_Idioma__c = '002',
                 EV_Evento__c = camp.Id,
-                Name = 'test',
+                Name = 'test ESP',
                 EV_URLImagenInvitacion__c = 'test',
                 EV_SinopsisInvitacion__c = 'test'
             ));
 			lstTra.add(new EV_TraduccionDeEvento__c(
-                EV_Descripcion__c = 'testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
+                EV_Descripcion__c = 'CATtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
                 EV_Claim__c ='testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest',
                 EV_Idioma__c = '001',
                 EV_Evento__c = camp.Id,
-                Name = 'test',
+                Name = 'test CAT',
                 EV_URLImagenInvitacion__c = 'test',
                 EV_SinopsisInvitacion__c = 'test'
             ));
@@ -727,11 +972,13 @@ public with sharing class EV_TestHelper {
 	}
     
     public static Campaign createCampaignTechSummit(boolean xvirtual, boolean xfisico){
-		Id rtTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoVirtual').getRecordTypeId();
-		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoFisico').getRecordTypeId();
+		Integer rng = getRandomValue();
+		Id rtTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitVirtual').getRecordTypeId();
+		Id rtEvento = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitFisico').getRecordTypeId();
 		Campaign cTech = new Campaign();
-		cTech.Name = 'TestCampaign';
+		cTech.Name = 'TestCampaign' + rng;
 		cTech.EV_TechSummit__c = true;
+		cTech.EV_ExternalID__c= String.valueOf(rng);
 		cTech.EV_NewArchitecture__c = true;
 		cTech.EV_Cartera__c= 'BPA';
 		cTech.EV_Notification__c = '001';
@@ -752,11 +999,33 @@ public with sharing class EV_TestHelper {
 	}
 
     public static Campaign createParentCampaignTechSummit(){
-		Id rtTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoVirtual').getRecordTypeId();
+		Id rtTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitFisico').getRecordTypeId();
 
 		Campaign cTech = new Campaign(
 			Name = 'TestCampaign',
 			RecordTypeId = rtTech,
+			EV_TechSummit__c = true,
+            EV_NewArchitecture__c = true,
+			EV_Cartera__c= 'BPA',
+            EV_Notification__c = '001',
+			EV_NumeroDePlazas__c = 100,
+			EV_DiaHora_evento__c = datetime.now().addhours(1),
+			EV_HoraInicio__c = Time.newInstance(14, 30, 00, 00),
+			StartDate = date.today(),
+			EV_HoraFin__c = Time.newInstance(15, 30, 00, 00)
+		); 
+		insert cTech;
+		return cTech;
+	}
+
+	
+    public static Campaign createParentCampaignTechSummitHibrido(){
+		Id rtTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitHibrido').getRecordTypeId();
+
+		Campaign cTech = new Campaign(
+			Name = 'TestCampaign',
+			RecordTypeId = rtTech,
+			EV_ExternalID__c = '45748373',
 			EV_TechSummit__c = true,
             EV_NewArchitecture__c = true,
 			EV_Cartera__c= 'BPA',
@@ -816,6 +1085,29 @@ public with sharing class EV_TestHelper {
 			campMember.EV_ExternalId__c = '123456789';
 			campMember.status = 'Pendiente';
 			
+		}
+		
+		insert campMember;
+		return campMember;
+	}
+
+
+	public static EV_CampaignMemberC__c createCampaignMemberCustomContactTechSummit(Boolean campaignFisica, Boolean campaignVirtual){
+		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
+		
+		if(campaignFisica == true && campaignVirtual == false){
+            campMember.RecordTypeId = rtEvento;
+			campMember.EV_ContactId__c = createContactAuxTechSummit('TestContact').Id;
+			campMember.EV_CampaignId__c = createChildCampaignFisicaCMCustomTechSummit().Id;
+			campMember.EV_ExternalID__c = '123456789';
+			campMember.EV_Status__c = 'Pendiente';
+		}else if(campaignVirtual == true && campaignFisica == false){
+            campMember.RecordTypeId = rtEvento;
+			campMember.EV_ContactId__c = createContactAuxTechSummit('TestContact').Id;
+			campMember.EV_CampaignId__c = createChildCampaignVirtualCMCustomTechSummit().Id;
+			campMember.EV_ExternalID__c = '123456789';
+			campMember.EV_Status__c = 'Pendiente';
 		}
 		
 		insert campMember;
@@ -950,6 +1242,41 @@ public with sharing class EV_TestHelper {
 		return campMember;
 	}
 
+
+
+	public static EV_CampaignMemberC__c createCampaignMemberCustomLeadTechSummit(Boolean campaignFisica, Boolean campaignVirtual){
+		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+
+		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
+		if(campaignFisica == true && campaignVirtual == false){
+			campMember.RecordTypeId = rtEvento;
+			campMember.EV_LeadId__c = createLeadAuxTechSummit('TestLead').Id;
+			campMember.EV_CampaignId__c = createChildCampaignFisicaCMCustomTechSummit().Id;
+			campMember.EV_ExternalID__c = '123456789';
+			
+		}else if(campaignVirtual == true && campaignFisica == false){
+			campMember.RecordTypeId = rtEvento;
+			campMember.EV_LeadId__c = createLeadAuxTechSummit('TestLead').Id;
+			campMember.EV_CampaignId__c = createChildCampaignVirtualCMCustomTechSummit().Id;
+			campMember.EV_ExternalID__c = '123456789';
+		}
+		
+		insert campMember;
+		return campMember;
+	}
+
+	public static EV_CampaignMemberC__c createCampaignMemberCustomLeadTechSummitHibrido(String camp){
+		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
+			campMember.RecordTypeId = rtEvento;
+			campMember.EV_LeadId__c = createLeadAuxTechSummit('TestLead').Id;
+			campMember.EV_CampaignId__c = camp;
+			campMember.EV_ExternalID__c = '123456789';
+
+		insert campMember;
+		return campMember;
+	}
+
 	public static EV_CampaignMemberC__c createCampaignMemberCustomLead(Boolean campaignFisica, Boolean campaignVirtual){
 		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
 
@@ -995,7 +1322,7 @@ public with sharing class EV_TestHelper {
 	}
 
 	public static EV_CampaignMemberC__c createCampaignMemberLeadCampaignTechSummit(String leadId, String campaignId, String status){
-		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
+		Id rtEvento = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
 		campMember.RecordTypeId = rtEvento;
 		campMember.EV_LeadId__c = leadId;
@@ -1072,7 +1399,7 @@ public with sharing class EV_TestHelper {
 
 		EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
 		campMember.EV_LeadId__c =l.Id;
-		campMember.EV_CampaignId__c = createCampaignAccionista().Id;
+		campMember.EV_CampaignId__c = createCampaignAccionistaCMCustom().Id;
 		campMember.EV_ExternalID__c = '123789456';
 		campMember.RecordTypeId = rtAccionista;
 		insert campMember;
@@ -1196,25 +1523,25 @@ public with sharing class EV_TestHelper {
 	}
 
 	public static User createUserTest (String psGroup, String profile, String role){
-		User userTest;
 		Profile userProfile = [SELECT Id FROM Profile WHERE Name = :profile LIMIT 1];
 		UserRole userRole = [SELECT Id FROM UserRole WHERE Name = :role LIMIT 1];
-		String username = getEmail();
-		System.runAs (new User(Id = UserInfo.getUserId())){
-			userTest = new User(
-				LastName = 'userTest',
-				Email = 'test@test.com',
-				Username = username,
-				Alias = 'test',
-				ProfileId = userProfile.Id,
-				UserRoleId = userRole.Id,
-				EmailEncodingKey = 'ISO-8859-1',
-				TimeZoneSidKey = 'Europe/Paris',
-				LocaleSidKey = 'es_ES',
-				LanguageLocaleKey = 'en_US',
-				isActive = true
-			);
-		}
+		String orgId = UserInfo.getOrganizationId();
+		String dateString = String.valueOf(Datetime.now()).replace(' ', '').replace(':', '').replace('-', '');
+		String randomInt = String.valueOf(math.rint(math.random()*1000000));
+		String uniqueName = orgId + dateString + randomInt;
+		User userTest = new User(
+			LastName = 'userTest',
+			Email = uniqueName + '@test' + orgId + '.org',
+			Username = uniqueName + '@test' + orgId + '.org',
+			Alias = uniqueName.substring(18,23),
+			ProfileId = userProfile.Id,
+			UserRoleId = userRole.Id,
+			EmailEncodingKey = 'ISO-8859-1',
+			TimeZoneSidKey = 'Europe/Paris',
+			LocaleSidKey = 'es_ES',
+			LanguageLocaleKey = 'en_US',
+			isActive = true
+		);
 		insert userTest;
 
 		List<PermissionSetAssignment> listNewPermissions = new List<PermissionSetAssignment>();

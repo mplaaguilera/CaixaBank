@@ -13,6 +13,25 @@ Proposito:   Clase DataFactory con metodos para realizar Test
 public with sharing class SIR_TestDataFactory {
 
     /*****************************************************************
+        Proposito:  crearContacto() sirve para crear un contacto asociado a una cuenta
+        Returns: Contact                                                        
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US Id            Atmira         21/04/2024     	  Created   
+    *****************************************************************/
+	public static Contact crearContacto(Account cuenta, String rtDeveloperName ){         
+        Contact contacto = new Contact(
+            LastName = 'Contacto Test',
+            AccountId = cuenta.Id,
+            RecordTypeId=  Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get(rtDeveloperName).getRecordTypeId()
+        );
+		insert contacto;
+		return contacto;
+	}
+
+    /*****************************************************************
         Proposito:  crearCuenta() sirve para crear una cuenta con el recordtype ????
         Returns: Account                                                        
         
@@ -31,7 +50,25 @@ public with sharing class SIR_TestDataFactory {
 		insert acc;
 		return acc;
 	}
-
+        /*****************************************************************
+        Proposito:  crearCuenta() sirve para crear una cuenta con el empresas
+        Returns: Account                                                        
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US Id            Atmira         21/06/2021     	  Created   
+    *****************************************************************/
+	public static Account crearCuentaEMP(){        
+        
+		Account acc = new Account(
+            Name = 'Test',
+            CC_TipoPersona__c = 'J',           	
+			RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId()
+		);
+		insert acc;
+		return acc;
+	}
     /*****************************************************************
         Proposito:  crearAccJerarquiaCaixa() sirve para crear una jerarquia de cuentas con el recordtype Caixa
         Returns: Account                                                        
@@ -240,7 +277,8 @@ public with sharing class SIR_TestDataFactory {
 				AccountId = cuenta.Id,
 				StartDate = Date.today(),
                 SIREC__SIREC_fld_deudaTotalContrato__c = 100,
-            	SIREC__SIREC_fld_importeImpagado__c = 50
+            	SIREC__SIREC_fld_importeImpagado__c = 50,
+                SIREC__SIREC_fld_fechaActualizacionSIREC__c = Date.today()
 			);
 		insert con;
 		return con;
@@ -369,7 +407,39 @@ public with sharing class SIR_TestDataFactory {
 insert proceso;
 return proceso;
 }
-    public static SIREC__SIREC_obj_proceso__c crearProceso(ProcesosTest procesoTest){
+
+public static SIREC__SIREC_obj_proceso__c crearProcesoPrevemp(Account cuenta, String mrId){
+    SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(
+    Name = 'Preventivo',
+    SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_E1,
+    SIREC__SIREC_fld_cliente__c    = cuenta.Id,
+    SIREC__SIREC_fld_fechaInicio__c  = date.today(),
+    SIREC__SIREC_fld_fechaLimite__c  = date.today(),
+    SIREC__SIREC_fld_fechaSituacion__c = date.today(),
+    SIREC__SIREC_fld_masterRecordId__c = mrId,
+    recordtypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName().get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId()
+);
+insert proceso;
+return proceso;
+}
+
+public static SIREC__SIREC_obj_proceso__c crearProcesoHijo(SIREC__SIREC_obj_proceso__c procesoPadre, String mrId){
+    SIREC__SIREC_obj_proceso__c proceso = new SIREC__SIREC_obj_proceso__c(
+    Name = 'AP-PP Hijo',
+    SIREC__SIREC_fld_estrategia__c = procesoPadre.SIREC__SIREC_fld_estrategia__c,
+    SIREC__SIREC_fld_cliente__c    = procesoPadre.SIREC__SIREC_fld_cliente__c,
+    SIREC__SIREC_fld_fechaInicio__c  = date.today(),
+    SIREC__SIREC_fld_fechaLimite__c  = date.today(),
+    SIREC__SIREC_fld_fechaSituacion__c = date.today(),
+    SIREC__SIREC_fld_masterRecordId__c = mrId,
+    SIREC__SIREC_fld_procesoSuperior__c = procesoPadre.Id,
+    recordtypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName().get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_AP_PP).getRecordTypeId()
+);
+insert proceso;
+return proceso;
+}
+
+public static SIREC__SIREC_obj_proceso__c crearProceso(ProcesosTest procesoTest){
         Account cuenta = procesoTest.getCuenta();
         String mrId = procesoTest.getMRID();
         String estrategia = procesoTest.getEstrategia();
@@ -579,27 +649,80 @@ return proceso;
     
     /*****************************************************************
         Proposito:  Creamos un registro para el catalogo CNAE
-        Returns: SIR_CatalogoSirec__c                                                        
+        Returns: SIREC__SIREC_obj_Catalogo__c                                                         
         
         Historial
         -------- 
         VERSION        USER_STORY       AUTHOR         DATE               Description
         1.0            US Id            Atmira         23/09/2021     	  Created   
     *****************************************************************/
-	public static SIR_CatalogoSirec__c crearCatalogoCNAE(){        
-        SIR_CatalogoSirec__c cat = new SIR_CatalogoSirec__c(
-				SIR_Codigo__c = '000009525',
-            	SIR_Descripcion__c = 'Reparación de relojes y joyería',
+	public static SIREC__SIREC_obj_Catalogo__c  crearCatalogoCNAE(){        
+        SIREC__SIREC_obj_Catalogo__c  cat = new SIREC__SIREC_obj_Catalogo__c (
+                SIREC__SIREC_fld_Codigo__c = '000009525',
+                SIREC__SIREC_fld_Descripcion__c = 'Reparación de relojes y joyería',
 				Name = 'CNAE'
 			);
 		insert cat;
 		return cat;
 	}
 
+    /*****************************************************************
+        Proposito:  Creamos un registro para las estrategias en el catalogo
+        Returns: SIREC__SIREC_obj_Catalogo__c                                                        
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US Id            Atmira         08/08/2024     	  Created   
+    *****************************************************************/
+	public static  SIREC__SIREC_obj_Catalogo__c  crearCatalogoEstrategia(String estrategia){        
+        SIREC__SIREC_obj_Catalogo__c cat = new SIREC__SIREC_obj_Catalogo__c(
+            SIREC__SIREC_fld_Codigo__c = estrategia,
+            SIREC__SIREC_fld_Descripcion__c = 'Descripcion estrategia ' + estrategia,
+            SIREC__SIREC_fld_CodigoActivo__c = 'S',
+			Name = 'ESTATEGIA'
+		);
+		insert cat;
+		return cat;
+	}
+
+    /*****************************************************************
+        Proposito:  Creamos N registros para las estrategias en el catalogo 
+                    para un negocio pasado por parametro
+        Returns: SIREC__SIREC_obj_Catalogo__c                                                        
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0            US Id            Atmira         08/08/2024     	  Created   
+    *****************************************************************/
+	public static  List<SIREC__SIREC_obj_Catalogo__c>  crearCatalogoEstrategiasNegocio(Integer n, String negocio){        
+        List<SIREC__SIREC_obj_Catalogo__c> listCatalogo = new List<SIREC__SIREC_obj_Catalogo__c>();
+        for(Integer i = 0; i < n; i++){
+            listCatalogo.add(new SIREC__SIREC_obj_Catalogo__c(
+                   SIREC__SIREC_fld_Codigo__c = String.valueOf(i),
+                    SIREC__SIREC_fld_Descripcion__c = 'Descripcion estrategia ' + String.valueOf(i),
+                    SIREC__SIREC_fld_CodigoActivo__c = 'S',
+                    SIREC__SIREC_fld_CodigoNegocio__c = negocio,
+                    SIREC__SIREC_fld_OrdenAgrupador__c = i,
+			        Name = SIR_Constantes.CATALOGO_PREFIJO_ESTRATEGIA 
+		    ));
+        }
+        insert listCatalogo;
+		return listCatalogo;
+	}
+
     public static void crearIntegrationSetting(String name){
         CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
             wsc.Name = name;
             wsc.NamedCredential__c = 'callout:' + name;
+            insert wsc;
+    }
+
+    public static void crearIntegrationSetting(String name, String param){
+        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
+            wsc.Name = name;
+            wsc.NamedCredential__c = 'callout:' + name + '/' + param;
             insert wsc;
     }
 
@@ -634,10 +757,47 @@ return proceso;
         insert tarea;
         return tarea;
     }
+    public static SIREC__SIREC_obj_tarea__c crearTareaTipoOPC(SIREC__SIREC_obj_proceso__c proceso){
+        SIREC__SIREC_obj_tarea__c tarea = new SIREC__SIREC_obj_tarea__c(
+            SIREC__SIREC_fld_proceso__c = proceso.Id,
+            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Integer)(Math.random() * 100000)),
+            SIREC__SIREC_fld_codigo_tarea__c = 'CódigoTareaTest',
+            Name = 'TareaTest',
+            SIREC__SIREC_fld_tipo_tarea__c = 'OPC',            
+            SIREC__SIREC_fld_tituloInfo__c = 'Titulo test',
+            SIREC__SIREC_fld_fechaLimite__c = Date.today().adddays(60),
+            SIREC__SIREC_fld_estado__c = 'En curso'
+        );
+        insert tarea;
+        return tarea;
+    }
+    public static SIREC__SIREC_obj_tarea__c crearTareaTipoOPCC(SIREC__SIREC_obj_proceso__c proceso){
+
+        Map<String, Object> mapToSerialize = new map<String, Object>();
+        List<String> lista = new List<String>{'1806511'};
+        mapToSerialize.put('idOpcSeleccionados', (Object)'122222');
+        mapToSerialize.put('idOpcNoSeleccionados', (Object)'44444');
+        string jsonstring = JSON.serialize(mapToSerialize);
+
+
+        SIREC__SIREC_obj_tarea__c tarea = new SIREC__SIREC_obj_tarea__c(
+            SIREC__SIREC_fld_proceso__c = proceso.Id,
+            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Integer)(Math.random() * 100000)),
+            SIREC__SIREC_fld_codigo_tarea__c = 'CódigoTareaTest',
+            Name = 'TareaTest OPC Contrato',
+            SIREC__SIREC_fld_tipo_tarea__c = 'OPC',            
+            SIREC__SIREC_fld_tituloInfo__c = 'Titulo test',
+            SIREC__SIREC_fld_fechaLimite__c = Date.today().adddays(60),
+            SIR_FormularioOPCResp__c = '{"idOpcSeleccionados": ["1806511","22179075"], "idOpcNoSeleccionados": ["21428723"]}',
+            SIREC__SIREC_fld_estado__c = 'En curso'
+        );
+        insert tarea;
+        return tarea;
+    }
     public static SIREC__SIREC_obj_tarea__c crearTareaTipoCTLWS(SIREC__SIREC_obj_proceso__c proceso){
         SIREC__SIREC_obj_tarea__c tarea = new SIREC__SIREC_obj_tarea__c(
             SIREC__SIREC_fld_proceso__c = proceso.Id,
-            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Math.random() * 100000)),
+            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Integer)(Math.random() * 100000)),
             SIREC__SIREC_fld_codigo_tarea__c = 'CódigoTareaTestCTL',
             Name = 'TareaTestCTL',
             SIREC__SIREC_fld_tipo_tarea__c = SIR_Constantes.CODIGO_TAREA_CTL,
@@ -650,6 +810,36 @@ return proceso;
         return tarea;
     }
 
+    public static SIREC__SIREC_obj_tarea__c crearTareaTipoBAT(SIREC__SIREC_obj_proceso__c proceso){
+        SIREC__SIREC_obj_tarea__c tarea = new SIREC__SIREC_obj_tarea__c(
+            SIREC__SIREC_fld_proceso__c = proceso.Id,
+            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Integer)(Math.random() * 100000)),
+            SIREC__SIREC_fld_codigo_tarea__c = 'CódigoTareaTest',
+            Name = 'TareaTestBAT',
+            SIREC__SIREC_fld_tipo_tarea__c = 'BAT',                        
+            SIREC__SIREC_fld_tituloInfo__c = 'Titulo test BAT',
+            SIREC__SIREC_fld_fechaLimite__c = Date.today().adddays(60),
+            SIREC__SIREC_fld_estado__c = 'En curso'
+        );
+        insert tarea;
+        return tarea;
+    }
+
+    public static SIREC__SIREC_obj_tarea__c crearTareaTipoCTLSeg(SIREC__SIREC_obj_proceso__c proceso){
+        SIREC__SIREC_obj_tarea__c tarea = new SIREC__SIREC_obj_tarea__c(
+            SIREC__SIREC_fld_proceso__c = proceso.Id,
+            SIREC__SIREC_fld_masterRecordId__c = String.valueof((Integer)(Math.random() * 100000)),
+            SIREC__SIREC_fld_codigo_tarea__c = SIR_Constantes.CODIGO_TAREA_CTL_SEGUIMIENTO,
+            Name = 'TareaTestCTLSeg',
+            SIREC__SIREC_fld_tipo_tarea__c = 'CTL',                        
+            SIREC__SIREC_fld_tituloInfo__c = 'Titulo test CTL SEGUIMIENTO',
+            SIREC__SIREC_fld_fechaLimite__c = Date.today().adddays(60),
+            SIREC__SIREC_fld_estado__c = 'En curso',
+            SIREC__SIREC_fld_insertWS__c = false
+        );
+        insert tarea;
+        return tarea;
+    }
 
      /*****************************************************************
         Proposito:  Método para crear cuentas

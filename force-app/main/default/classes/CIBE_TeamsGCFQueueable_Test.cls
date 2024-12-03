@@ -17,21 +17,40 @@ public with sharing class CIBE_TeamsGCFQueueable_Test {
 	static void setup(){
         List <String> ps = new list<String>{CIBE_AppConstants.CIBE_OPERATIVACIB,CIBE_AppConstants.CIBE_CUSTOMMETADATA,CIBE_AppConstants.CIBE_ANALYTICS,CIBE_AppConstants.CIBE_OPERATIVAEMP};
         User usrGes = CIBE_TestHelper.loginUser('CIBE_Gestor', null, 'U0009003',ps);
-        
-        System.runAs(new User(Id = UserInfo.getUserId())) {
+        Test.startTest();
+        List <String> psA = new list<String>{CIBE_AppConstants.CIBE_OPERATIVACIB,CIBE_AppConstants.CIBE_CUSTOMMETADATA,CIBE_AppConstants.CIBE_OPERATIVAEMP};
+       
+        CIBE_TestInitialSetup.setupInitialData(null, null, null, null, null, psA);
+ 
+        User usrSetup = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000' LIMIT 1];
+        User usrGes2 = [SELECT Id, UserName FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
+        usrGes2.UserName = 'gcf-integration' + usrGes2.UserName;
+        update usrGes2;
+ 		
+        System.runAs(usrSetup){
             CIBE_TestHelper.activateLogger();
-            Account centro = CIBE_TestHelper.createCaixaCenter();
             
             CBK_IntegrationSetting__c endpointConf = new CBK_IntegrationSetting__c(Name='CIBE_citaprevia_int', NamedCredential__c = 'CIBE_citaprevia_int');
             insert endpointConf;
         }
         
         System.runAs(usrGes) {
+            
             Account acc = CIBE_TestHelper.createCustomer();
             DateTime activityTime= DateTime.now();
-            Event ev = CIBE_TestHelper.createEventVideocCall(usrGes, activityTime, acc);
+            
+            Event ev = CIBE_TestHelper.createEventVideocCallNoInsert(usrGes, activityTime, acc);
+            ev.AV_ExternalID__c = 'Evt-#00001';
+            Event ev2 = CIBE_TestHelper.createEventVideocCallNoInsert(usrGes2, activityTime, acc);
+            ev2.AV_ExternalID__c = 'Evt-#00002';
+            ev2.subject = 'Call Test';
+            
+            List<Event> evtList = new List<Event>{ev, ev2};
+            insert evtList;
             Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT', 'OK'));
+            
         }
+        Test.stopTest();
     }
 
     @isTest
@@ -67,6 +86,7 @@ public with sharing class CIBE_TeamsGCFQueueable_Test {
             String jsonString = json.serialize(ev[0]);
             System.enqueueJob(new CIBE_TeamsGCFQueueable(jsonString, ev[0].Subject, ev[0].EndDateTime, ev[0].StartDateTime, ev[0].AV_Task__c,emp[0].FederationIdentifier , emp[0].AV_AzureId__c));
             System.enqueueJob(new CIBE_TeamsGCFQueueable(jsonString, ev[0].Subject, ev[0].EndDateTime, ev[0].StartDateTime, ev[0].AV_Task__c,emp[0].FederationIdentifier , emp[0].AV_AzureId__c));
+            System.enqueueJob(new CIBE_TeamsGCFQueueable(jsonString, ev[0], emp[0].FederationIdentifier , emp[0].AV_AzureId__c, null, null));
             System.assertEquals('AV_Salesforce',ev[0].AV_origenApp__c,'validateQueueable');
             Test.stopTest();
         }
@@ -113,21 +133,23 @@ public with sharing class CIBE_TeamsGCFQueueable_Test {
     @isTest
     private static void validateInsertEventGCFFuture() {        
         User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+        User runAsUser2 = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' LIMIT 1];
         Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente' LIMIT 1];
         System.runAs(runAsUser) {
             Test.startTest();
             	Contact empleado  = CIBE_TestHelper.createEmployee(null, runAsUser);
+                Contact empleado2  = CIBE_TestHelper.createEmployee(null, runAsUser2);
             
-            	Event ev1 = [SELECT Id, IsRecurrence2, AV_origenApp__c, IsRecurrence, WhatId,WhoId,Who.name, OwnerId, AV_ExternalId__c, AV_CodigoGestorAsignado__c, CreatedDate, Subject, RecordTypeId, Description, AV_Tipo__c, CSBD_Evento_Estado__c, AV_BranchPhysicalMeet__c, Location, StartDateTime, EndDateTime, isPrivate, AV_Task__c FROM Event LIMIT 1];      
+            	Event ev1 = [SELECT Id, IsRecurrence2, AV_origenApp__c, IsRecurrence, WhatId,WhoId,Who.name, OwnerId, AV_ExternalId__c, AV_CodigoGestorAsignado__c, CreatedDate, Subject, RecordTypeId, Description, AV_Tipo__c, CSBD_Evento_Estado__c, AV_BranchPhysicalMeet__c, Location, StartDateTime, EndDateTime, isPrivate, AV_Task__c FROM Event WHERE Subject = 'Call' LIMIT 1];      
                 ev1.WhoId = empleado.id;
+                ev1.OwnerId = runAsUser.id;
             	update ev1;
-	
-            	CBK_Activity_Extension__c crmTaskNew = new CBK_Activity_Extension__c();
-                crmTaskNew.AV_ActivityId__c = ev1.Id;
-            	insert crmTaskNew;
-            
-            	Event ev2 = CIBE_TestHelper.createEventConClienteRecurrente(runAsUser, acc);
-            
+
+                Event ev2 = [SELECT Id, CreatedById, IsRecurrence2, AV_origenApp__c, IsRecurrence, WhatId,WhoId,Who.name, OwnerId, AV_ExternalId__c, AV_CodigoGestorAsignado__c, CreatedDate, Subject, RecordTypeId, Description, AV_Tipo__c, CSBD_Evento_Estado__c, AV_BranchPhysicalMeet__c, Location, StartDateTime, EndDateTime, isPrivate, AV_Task__c FROM Event WHERE Subject = 'Call Test' LIMIT 1];      
+                ev2.WhoId = empleado2.id;
+                ev2.OwnerId = runAsUser2.id;
+            	update ev2;
+
             	Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
 				
                 String jsonString1 = JSON.serialize(ev1);
@@ -135,6 +157,28 @@ public with sharing class CIBE_TeamsGCFQueueable_Test {
                 CIBE_TeamsGCFQueueable.insertEventGCFFuture(jsonString1);
                 CIBE_TeamsGCFQueueable.insertEventGCFFuture(jsonString2);
             
+                System.assertEquals('AV_Salesforce', ev1.AV_origenApp__c, 'validateInsertEventGCFFuture');
+            Test.stopTest();
+        }
+    }
+
+
+    @isTest
+    private static void validateInsertEventGCFFutureError() {        
+        User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+        Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = 'CC_Cliente' LIMIT 1];
+        System.runAs(runAsUser) {
+            Test.startTest();
+            	Contact empleado  = CIBE_TestHelper.createEmployee(null, runAsUser);            
+            	Event ev1 = [SELECT Id, IsRecurrence2, AV_origenApp__c, IsRecurrence, WhatId,WhoId,Who.name, OwnerId, AV_ExternalId__c, AV_CodigoGestorAsignado__c, CreatedDate, Subject, RecordTypeId, Description, AV_Tipo__c, CSBD_Evento_Estado__c, AV_BranchPhysicalMeet__c, Location, StartDateTime, EndDateTime, isPrivate, AV_Task__c FROM Event WHERE Subject = 'Call' LIMIT 1];      
+                ev1.WhoId = empleado.id;
+            	update ev1;
+
+            	Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
+                String jsonString1 = JSON.serialize(ev1);
+
+                CIBE_TeamsGCFQueueable.insertEventGCFFuture(jsonString1);
+                CIBE_TeamsGCFQueueable.insertEventGCFFuture(null);
                 System.assertEquals('AV_Salesforce', ev1.AV_origenApp__c, 'validateInsertEventGCFFuture');
             Test.stopTest();
         }

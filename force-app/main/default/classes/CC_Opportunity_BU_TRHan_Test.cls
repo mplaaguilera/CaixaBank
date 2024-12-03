@@ -600,7 +600,7 @@ public with sharing class CC_Opportunity_BU_TRHan_Test {
         }
     }
     
-    @isTest
+     @isTest
     public static void horarioComercialSiNoTest() {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
   

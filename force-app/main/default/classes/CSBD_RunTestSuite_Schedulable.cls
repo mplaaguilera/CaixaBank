@@ -3,13 +3,11 @@ public with sharing class CSBD_RunTestSuite_Schedulable implements Schedulable {
     private String modo; //Se asigna en el constructor que se pasa como parámetro al System.schedule()
     // 'run' --> ejecutar test suite, 'report' --> enviar los resultados, 'null' --> añadir clases + ejecutar test suite
 
-    public CSBD_RunTestSuite_Schedulable() {
-        //Constructor sin parámetros dummy necesario para implementar Schedulable
+    public CSBD_RunTestSuite_Schedulable() { //Constructor sin parámetros dummy necesario para implementar Schedulable
         this.modo = null;
     }
 
     public CSBD_RunTestSuite_Schedulable(String modo) {
-        //Constructor que se usa y con el que se asigna el modo de ejecución (null, "run" o "report")
         this.modo = modo;
     }
 
@@ -56,7 +54,7 @@ public with sharing class CSBD_RunTestSuite_Schedulable implements Schedulable {
                 if (!Test.isRunningTest()) {
                     insert apexTestQueueItems;
                 }
-				programar('report', apexTestQueueItems.size() * 25); //25 segundos por cada clase de test
+				programar('report', apexTestQueueItems.size() * 25); //25 segundos por clase de test
             }
         }
     }

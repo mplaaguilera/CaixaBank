@@ -16,7 +16,7 @@ public with sharing class SIR_cls_WS_altaAccionWorkflow {
                 
         List<Object> response = new List<Object>();  
         
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible() ){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible() ){
                 
             SIREC__SIREC_obj_acciones__c[] lstAccion = [SELECT id ,SIREC__SIREC_fld_accion__c , SIREC__SIREC_fld_resultado__c , SIREC__SIREC_fld_tipo__c, 
                                                                 SIREC__SIREC_fld_comentarios__c , 
@@ -54,7 +54,7 @@ public with sharing class SIR_cls_WS_altaAccionWorkflow {
                     String prefix = SIR_cls_Utils.getActorPrefix();
 					
                     String body = JSON.serialize(wrapper);
-                    response = SIR_cls_WS_SIREC.llamar(body, prefix +  'altaAccion' , 'POST');                    
+                    response = SIR_cls_WS_SIREC.llamar(body, prefix +  'altaAccion' , 'POST');                                        
                 }else{
                     response.add('KO');
                     response.add('No se ha encontrado la accion que ha de enviarse con id = ' + accionId);
@@ -155,35 +155,23 @@ public with sharing class SIR_cls_WS_altaAccionWorkflow {
         String prefijo;
         String prefijoTipo;        
 
-        if (tipo=='A'){
-           codigo=accion.SIREC__SIREC_fld_accion__c;
-        }else{
-            codigo=accion.SIREC__SIREC_fld_resultado__c;
-        }
-        
+        codigo = tipo == 'A' ? accion.SIREC__SIREC_fld_accion__c : accion.SIREC__SIREC_fld_resultado__c;      
         // el master record del catalogo se compone del name de catalogo + el tipo de accion + el tipo de traduccion (A/R) + codigo de accion o de resultado
         // Segun el RT de la accion se monta una clave diferente para acceder a catalogo
-        
         if (accion.RecordType.DeveloperName == SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_PRESOL){
             prefijo=SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_PRESOL + '|' + accion.SIREC__SIREC_fld_tipo__c ;
         }else if (accion.RecordType.DeveloperName == SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_AMISTOSO_EMPRESA){
             // en EMPRESAS la primera parte de la clave es diferente si es accion o resultado porque hay duplicidad de codigos
-            
-            if (tipo=='A'){
-                prefijoTipo=accion.SIREC__SIREC_fld_tipo__c;
-             }else{
-                prefijoTipo=accion.SIREC__SIREC_fld_accion__c;
-             }
-             
+            prefijoTipo = tipo =='A' ? accion.SIREC__SIREC_fld_tipo__c : accion.SIREC__SIREC_fld_accion__c;
             prefijo=SIR_Constantes.CATALOGO_API_MAPEO_ACCIONES_FLUJO + '|' + prefijoTipo ;
         }        
         masterRecord=prefijo + '|' + tipo + '|' + codigo;          
         
-        SIR_CatalogoSirec__c[] lstCatalogo = [SELECT SIR_Descripcion__c
-                                                    from SIR_CatalogoSirec__c 
-                                                    where SIR_MasterRecordId__c = :masterRecord];
+        SIREC__SIREC_obj_Catalogo__c [] lstCatalogo = [SELECT SIREC__SIREC_fld_Descripcion__c
+                                                    from SIREC__SIREC_obj_Catalogo__c  
+                                                    where SIREC__SIREC_fld_MasterRecordId__c   = :masterRecord];
         if(lstCatalogo.size() > 0){
-           accionSIREC = lstCatalogo[0].SIR_Descripcion__c;
+           accionSIREC = lstCatalogo[0].SIREC__SIREC_fld_Descripcion__c;
         } else { 
             CBK_log.error('Error : SIR_cls_WS_altaAccionWorkflow.mapeoAccionSirecSF - No se ha encontrado traduccion en catalogo = ' + masterRecord);                
         }   

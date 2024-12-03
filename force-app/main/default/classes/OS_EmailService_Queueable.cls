@@ -18,10 +18,11 @@ public with sharing class OS_EmailService_Queueable implements Queueable{
             reintentos.put(String.valueOf(emailQueue.messageId), addReintento);
             OS_EmailService emailServiceCOPS = new OS_EmailService();
             emailServiceCOPS.procesarCorreoEntrante(emailQueue, envelopeQueue, reintentos);
-        } else{
-            reintentos.put(String.valueOf(emailQueue.messageId), 1);
+        }else{
+            /*reintentos.put(String.valueOf(emailQueue.messageId), 1);
             OS_EmailService emailServiceCOPS = new OS_EmailService();
-            emailServiceCOPS.procesarCorreoEntrante(emailQueue, envelopeQueue, reintentos);
+            emailServiceCOPS.procesarCorreoEntrante(emailQueue, envelopeQueue, reintentos);*/
+            CBK_Log.error(emailQueue.messageId , 'OS_EmailService_Queueable envioEmailQueueable:' + emailQueue);
         }
     }
 }

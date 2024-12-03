@@ -30,12 +30,12 @@ public static string clase = 'SIR_LCMP_GetContratosFormulario';
 		List<Contract> listContract = new List<Contract>();
         SIR_Constantes constante = new SIR_Constantes();
         try{
-            if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+            if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
                 SIR_FormularioRefinanciacion__c  formulario =[SELECT Id,SIR_Proceso__c   
                                                               FROM SIR_FormularioRefinanciacion__c 
                                                               WHERE Id=:recordId LIMIT 1];
 
-                if(SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isAccessible()){
+                if(Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isAccessible()){
                     List<SIREC__SIREC_obj_procesoContrato__c> listContratoDeuda =  [SELECT SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_numeContrato__c, SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_tipoContrato__c, tolabel(SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_sitContable__c),
                                                                         tolabel(SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_sitMorosidade__c), SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_deudaTotalContrato__c, SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_deudaPendienteVencimiento__c,
                                                                         SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_deudaVencidaImpagada__c, SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_diasImpagados__c ,SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_refinanciado__c , 
@@ -91,12 +91,12 @@ public static string clase = 'SIR_LCMP_GetContratosFormulario';
 		List<Contract> listContract = new List<Contract>();
         SIR_Constantes constante = new SIR_Constantes();
         try{
-            if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+            if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
                 SIR_FormularioRefinanciacion__c  formulario =[SELECT Id,SIR_Proceso__c   
                                                               FROM SIR_FormularioRefinanciacion__c 
                                                               WHERE Id=:recordId LIMIT 1];
                
-                if(SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isAccessible()){
+                if(Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isAccessible()){
                     List<SIREC__SIREC_obj_procesoContrato__c>  listContratoDeuda =  [SELECT SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_numeContrato__c, SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_tipoContrato__c, 
                                                                     tolabel(SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_sitContable__c), tolabel(SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_sitMorosidade__c), 
                                                                     SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_deudaTotalContrato__c, SIREC__SIREC_fld_contract__r.SIREC__SIREC_fld_deudaPendienteVencimiento__c,

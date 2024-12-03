@@ -169,19 +169,17 @@ public with sharing class AV_SetFieldsAPIOpp_SyncOpportunity {
                 if (AV_AppConstants.OPP_STATUS_ENGESTION.equalsIgnoreCase(opp.StageName)){
                 	oppGCF.potential = 'S';
                 }
-                else if (AV_AppConstants.OPP_STATUS_CERRPOST.equalsIgnoreCase(opp.StageName)){
+                else if (AV_AppConstants.OPP_STATUS_CERRPOST.equalsIgnoreCase(opp.StageName) || AV_AppConstants.OPP_STATUS_PROD_CONTR.equalsIgnoreCase(opp.StageName)){
                 	oppGCF.potential = 'B';
                 }
-                else if (AV_AppConstants.OPP_STATUS_NOINTERE.equalsIgnoreCase(opp.StageName)){
+                else if (AV_AppConstants.OPP_STATUS_NOINTERE.equalsIgnoreCase(opp.StageName) || AV_AppConstants.OPP_STATUS_PROD_RECH.equalsIgnoreCase(opp.StageName)){
                 	oppGCF.potential = 'C';
                 }
-                else if (AV_AppConstants.OPP_STATUS_NOAPTO.equalsIgnoreCase(opp.StageName)){
-                	oppGCF.potential = 'N';
-                }
+               
                 else if (AV_AppConstants.OPP_STATUS_CONVENTA.equalsIgnoreCase(opp.StageName)){
                 	oppGCF.potential = 'E';
                 }
-                else if (AV_AppConstants.OPP_STATUS_VENCIDO.equalsIgnoreCase(opp.StageName)){
+                else if (AV_AppConstants.OPP_STATUS_VENCIDO.equalsIgnoreCase(opp.StageName) || AV_AppConstants.OPP_STATUS_NO_GESTIONADA.equalsIgnoreCase(opp.StageName)){
                 	oppGCF.potential = 'F';
                 }
                 

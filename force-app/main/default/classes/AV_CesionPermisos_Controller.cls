@@ -10,6 +10,10 @@
  1.0			US428379    		Luis Fernandez		13/09/2022		Init version
  1.1			US428379    		Sandra Gómez		05/10/2022		Change sin gestor eap to null
  1.2		    US486147            Patricia Solano	    06/02/2023	    Modify method checkForPermissionGivenToMe to add field for referent agro users
+ 1.3		    PMD Errors          Humberto Vilchez	31/10/2023	    Added WITH SECURITY_ENFORCED to Querys
+ 1.4            Fix- Solve QC       Oscar Moreno        29/02/2024      Delete try-catch in notifyUsers method
+ 1.5            Fix Profile security inforced   Luis Fernández      16/04/2024      Quit off SECURITY_ENFORCED from PROFILE querys.
+
  *********************************************************************************************************************/
 public with sharing class AV_CesionPermisos_Controller {
     private final static Integer MAX_RESULTS = 10;
@@ -22,7 +26,7 @@ public with sharing class AV_CesionPermisos_Controller {
     private static void notifyUsers(AV_OfficePermission__c permiso,Boolean isDelete,Boolean isUpdate){
         String method = 'notifyUsers';
         CustomNotificationType nt= [SELECT ID,DeveloperName FROM CustomNotificationType WHERE DeveloperName = 'AV_Permiso_cedido'];
-        String cedenteName = [SELECT Name FROM User WHERE Id = :permiso.AV_Assigner__c LIMIT 1].Name;
+        String cedenteName = [SELECT Name FROM User WHERE Id = :permiso.AV_Assigner__c WITH SECURITY_ENFORCED LIMIT 1].Name;
         Messaging.CustomNotification cn = new Messaging.CustomNotification();
         cn.setNotificationTypeId(nt.Id);
         cn.setTargetId(permiso.Id);
@@ -36,11 +40,8 @@ public with sharing class AV_CesionPermisos_Controller {
             cn.setTitle(cedenteName +' ha actualizado el periodo de permiso');
             cn.setBody('El nuevo periodo es desde el ' + formatDate(permiso.AV_InicioPermiso__c) + ' hasta el ' + formatDate(permiso.AV_FinalPermiso__c));
         }
-        try { 
-            cn.send(new Set<String>{permiso.AV_UsuarioCedido__c});
-        }catch(Exception e){
-            System.debug('Problema');
-        }
+         cn.send(new Set<String>{permiso.AV_UsuarioCedido__c});
+        
     }
 
     /**
@@ -65,7 +66,7 @@ public with sharing class AV_CesionPermisos_Controller {
      */
     @AuraEnabled(cacheable=true)
     public static List<AV_LookupSearchResult> searchEmployees(String searchTerm) {
-    Profile p = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank'];
+    Profile p = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank']; //NO SE PUEDE AÑADIR SECURITY_ENFORCED A ESTA QUERY YA QUE NO SE PUEDEN DAR PERMISOS SOBRE Profile Y BLOQUEA LA FUNCIONALIDAD
     searchTerm += '*';
     List<AV_OfficePermission__c> repitedUsers = checkForPermissionGivenToUsers(UserInfo.getUserId());
     List<String> selectedIds = new List<String>{UserInfo.getUserId()};
@@ -117,7 +118,7 @@ public with sharing class AV_CesionPermisos_Controller {
             AV_InicioPermiso__c,
             AV_FinalPermiso__c,
             AV_OficinaCedida__r.CC_Numero_Oficina_Empresa__c
-            FROM AV_OfficePermission__c WHERE AV_Assigner__c = :userId AND AV_FinalPermiso__c >= :Date.Today()];
+            FROM AV_OfficePermission__c WHERE AV_Assigner__c = :userId AND AV_FinalPermiso__c >= :Date.Today() WITH SECURITY_ENFORCED];
     }
 
     /**
@@ -142,7 +143,7 @@ public with sharing class AV_CesionPermisos_Controller {
             AV_GestorPermiso__r.AV_Responsabilidad__c,
             AV_InicioPermiso__c,
             AV_FinalPermiso__c 
-            FROM AV_OfficePermission__c  WHERE AV_UsuarioCedido__c = :userId AND AV_FinalPermiso__c >= :Date.Today()];
+            FROM AV_OfficePermission__c  WHERE AV_UsuarioCedido__c = :userId AND AV_FinalPermiso__c >= :Date.Today() WITH SECURITY_ENFORCED];
     }
 
     /**
@@ -156,10 +157,10 @@ public with sharing class AV_CesionPermisos_Controller {
     String methodName = 'givePermission';
     List<String> response = new List<String>();
     List<Id> destinatarios = new List<Id>();
-    List<Contact> gestorOwnerId = [SELECT ID FROM Contact WHERE AV_UsuarioAsociado__c = :permisoInfo.get('Cedente')];
+    List<Contact> gestorOwnerId = [SELECT ID FROM Contact WHERE AV_UsuarioAsociado__c = :permisoInfo.get('Cedente') WITH SECURITY_ENFORCED];
             
     //I look up for contacts of the owners who i am giving permissions
-    List<Contact> gestoresCedidos = [SELECT ID,AV_UsuarioAsociado__c FROM Contact WHERE AV_UsuarioAsociado__c in :destinatario];
+    List<Contact> gestoresCedidos = [SELECT ID,AV_UsuarioAsociado__c FROM Contact WHERE AV_UsuarioAsociado__c in :destinatario WITH SECURITY_ENFORCED];
     
     Map<String,Contact> destinatariosContact = new Map<String,Contact>();
     //Fill the map with the user associated as a key and the contact object as value
@@ -175,10 +176,10 @@ public with sharing class AV_CesionPermisos_Controller {
             destinatariosContact.put(id,null);
         }
     }
-    User cedenteInfo = [SELECT Id,AV_OriginalOfficeNumber__c FROM User WHERE Id = :permisoInfo.get('Cedente')];
+    User cedenteInfo = [SELECT Id,AV_OriginalOfficeNumber__c FROM User WHERE Id = :permisoInfo.get('Cedente') WITH SECURITY_ENFORCED];
     String originalNumber = cedenteInfo.AV_OriginalOfficeNumber__c;
     originalNumber = (String.isNotBlank(originalNumber)) ? originalNumber.split(AV_APPConstants.SLASH)[0] : permisoInfo.get('Oficinas');
-    List<Account> ofiPermisoId = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = :originalNumber];
+    List<Account> ofiPermisoId = [SELECT Id FROM Account WHERE CC_Numero_Oficina_Empresa__c = :originalNumber WITH SECURITY_ENFORCED];
 
     for(String destino : destinatarios){
         AV_OfficePermission__c newPermiso = new AV_OfficePermission__c(
@@ -226,7 +227,7 @@ public with sharing class AV_CesionPermisos_Controller {
     public static String deletePermiso(id recordId){
     String response = 'OK';
     AV_OfficePermission__c oldPermiso = [SELECT Id,AV_Assigner__c,AV_Assigner__r.Name,AV_UsuarioCedido__c,AV_OficinaCedida__r.Name 
-                                FROM AV_OfficePermission__c WHERE ID = :recordId LIMIT 1];
+                                FROM AV_OfficePermission__c WHERE ID = :recordId WITH SECURITY_ENFORCED LIMIT 1];
     Database.DeleteResult sr = Database.delete(recordId,true);
     if(sr.isSuccess()) {
         notifyUsers(oldPermiso,true,false);
@@ -246,7 +247,7 @@ public with sharing class AV_CesionPermisos_Controller {
     public static String actualizarPermiso(Map<String,String> permisos){
         String response = 'OK';
         AV_OfficePermission__c permisoToUpdt= [SELECT AV_Assigner__c,AV_Assigner__r.Name,AV_OficinaCedida__r.Name,AV_UsuarioCedido__c,AV_FinalPermiso__c,AV_InicioPermiso__c 
-                                FROM AV_OfficePermission__c WHERE Id = :permisos.get('Id') LIMIT 1];
+                                FROM AV_OfficePermission__c WHERE Id = :permisos.get('Id') WITH SECURITY_ENFORCED LIMIT 1];
         permisoToUpdt.AV_InicioPermiso__c = Date.parse(permisos.get('Inicio'));
         permisoToUpdt.AV_FinalPermiso__c = Date.parse(permisos.get('Final'));
         Database.SaveResult sr = Database.update(permisoToUpdt,true);

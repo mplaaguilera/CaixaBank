@@ -294,5 +294,4 @@ public with sharing class SAC_LCMP_RedaccionReclamacion {
             nombrePlantilla = nombre;
         }
     }
-
 }

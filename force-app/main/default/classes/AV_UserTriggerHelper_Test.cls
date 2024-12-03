@@ -21,7 +21,10 @@ Historial
 	2.1 		US592987	   Patricia Villacañas 30/05/2023		Changed AV_Query to SOQL queries
 	2.2         US592987	   Ángel Medina		   30/05/2023		Changed AV_Query to SOQL queries
 	2.3			DE82170		   Lucia Muñoz         20/09/2023		Modified method setup
-
+    2.4          QC            Oscar Moreno        12/06/2024       Delete UserInfo.geetUserId()
+	2.5			IN1160717	   Manuel Ramos        02/07/2024       Isolate user deactivation methods in AV_UserHandlerWithoutSharing class
+    2.6			FIX040724844   Oscar Moreno        04/07/2024       Isolate updateUsuarioAsociado methods in AV_UserHandlerWithoutSharing class
+	2.7         FIX20091243    Oscar Moreno        26/09/2024       Create testGroupConfidenProfileRol method
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_UserTriggerHelper_Test {
@@ -72,8 +75,8 @@ public with sharing class AV_UserTriggerHelper_Test {
 			IsActive = true
 		);
 		users.add(u2);
-        
-        String email2 = AV_TestHelper.getEmail();
+
+		String email2 = AV_TestHelper.getEmail();
         User u3 = new User(
 			Alias = 'tsAlias3',
 			Email = 'test_3@test.dev',
@@ -90,7 +93,7 @@ public with sharing class AV_UserTriggerHelper_Test {
 			IsActive = true
 		);
         users.add(u3);
-		
+
 		User u4 = new User(
 			Alias = 'tsAlias4',
 			Email = 'test@test.dev',
@@ -106,32 +109,18 @@ public with sharing class AV_UserTriggerHelper_Test {
 			AV_Funcion__c = 'Oficina',
 			IsActive = true
 		);
+
 		users.add(u4);
 
-		User u5 = new User(
-			Alias = 'tsAlias5',
-			Email = 'test_5@test.dev',
-			EmailEncodingKey = 'UTF-8',
-			LastName = 'testLastName',
-			LanguageLocaleKey = 'es',
-			LocaleSidKey = 'es',
-			TimeZoneSidKey = 'Europe/Berlin',
-            AV_NumeroOficinaEmpresa__c = '001-03044',
-            ProfileId = profile.Id,
-			UserName = 'gestor5@emailcaixa.com',
-            AV_ExternalID__c = 'U0009008',
-			AV_Funcion__c = 'Gestor',
-			IsActive = true
-		);
-        users.add(u5);
-
+		
 		System.runAs(userGcf){
 			User oficeUser = AV_TestHelper.createUserSinInsert(null,'009090909','AV_SistematicaComercial');
 			oficeUser.AV_Funcion__c = 'Oficina';
 			users.add(oficeUser);
-
+			
 			insert users;
 		}
+		
 
 		Contact employee  = new Contact(
 			LastName = 'Alonso',
@@ -145,28 +134,11 @@ public with sharing class AV_UserTriggerHelper_Test {
 		);
 		insert employee;
 
-		Contact employeeWithoutPermission  = new Contact(
-			LastName = 'Test',
-			FirstName = 'Usuario Inactivo',
-			Email = 'usuarioInactivo@emailcaixa.com',
-			CC_Idioma__c = 'es',
-			RecordTypeId = rt.Id,
-			CC_Matricula__c = 'U0009009',
-			AV_UsuarioAsociado__c = u5.Id,
-			AV_DescFuncion__c = 'EMPLEADO'
-		);
-		insert employeeWithoutPermission;
-        
         List<Task> tasks = new List<Task>();
 		Task t1 = new Task();
         t1.OwnerId = userGcf.Id;
         tasks.add(t1);
         insert tasks;
-
-		AV_OfficePermission__c userPermission = new AV_OfficePermission__c();
-		userPermission.AV_UsuarioCedido__c = u3.Id;
-		userPermission.AV_Assigner__c = u2.Id;
-		insert userPermission;
 	}
 
 	/**
@@ -177,7 +149,7 @@ public with sharing class AV_UserTriggerHelper_Test {
 		Test.startTest();
 		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
 		System.runAs(userGcf){
-			Contact employee  = AV_TestHelper.createEmployee(null, null);
+			Contact employee  = AV_TestHelper.createEmployee(null, userGcf);
 			employee.AV_UsuarioAsociado__c = null;
 			update employee;
 		}
@@ -191,8 +163,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void executeUserAUTrigger() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			User user = [SELECT Id, AV_ExternalID__c FROM User WHERE Username = 'dianaalonso@emailcaixa.com'];
 			Contact empleado = [SELECT Id, CC_Matricula__c FROM Contact WHERE Email = 'empleadoalonso@emailcaixa.com' LIMIT 1];
 			Test.startTest();
@@ -209,8 +183,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void executeUserBITrigger() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			User user = AV_TestHelper.createUserSinInsert(null, '11111111');
 			Test.startTest();
 			insert user;
@@ -225,15 +201,17 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void validatePermissionUser() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			Test.startTest();
 			User user = [SELECT Id, AV_Funcion__c FROM User WHERE AV_ExternalID__c = 'U0100002123'];
 			Profile profile = [SELECT Id FROM Profile WHERE Name = :AV_AppConstants.AV_PROFILE LIMIT 1];
 			Account center = AV_TestHelper.createCaixaCenterSinInsert();
 			center.CC_Tipo_Oficina__C = 'I';
 			insert center;
-			Contact cnt = AV_TestHelper.createEmployeeSinInsert(center,null);
+			Contact cnt = AV_TestHelper.createEmployeeSinInsert(center,userGcf);
 			cnt.AV_UsuarioAsociado__c = null;
 			insert cnt;
 			User oficeUser = new User(
@@ -288,8 +266,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void validateAutomiticProcessOwner() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			Test.startTest();
 			User user = [SELECT Id, IsActive FROM User WHERE AV_ExternalID__c = 'U0100002123'];
 			user.IsActive = true;
@@ -300,30 +280,17 @@ public with sharing class AV_UserTriggerHelper_Test {
 		}
 	}
 
-	/**
-	 * Execute the Trigger class to validate associated user.
-	 */
-	@isTest
-	public static void updateUsuarioAsociadoFuncionTest() {
-		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-		System.runAs(userGcf){
-			Contact contact = [SELECT Id, AV_JobLevels__c, AV_TipoCentro__c, AV_UsuarioAsociado__c FROM Contact WHERE Email = 'empleadoalonso@emailcaixa.com' LIMIT 1];
-			Test.startTest();
-			contact.AV_JobLevels__c = '120'; 
-			Database.update(contact);
-			Test.stopTest();
-			User user = [SELECT Id, AV_Funcion__c FROM User WHERE AV_ExternalID__c = 'U0100002123'];
-			System.assertEquals(true, 'SSCC'.equals(user.AV_Funcion__c), 'Failed to update Contact.AV_JobLevels__c');
-		}
-	}
+	
     
 	/**
 	 * Execute the Trigger class for inactive user.
 	 */
     @isTest
 	public static void reassignmentInactiveUserTest() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			User user = [SELECT Id, AV_Funcion__c FROM User WHERE AV_ExternalID__c = 'U0100002123'];
 			Test.startTest();
 			user.IsActive = true;
@@ -339,8 +306,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
     @isTest
 	public static void userExternalIdTest() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			AdminSettings__c customSetting = new AdminSettings__c();
 			customSetting.LogDEBUG__c=true;
 			customSetting.LogERROR__c=true;
@@ -365,8 +334,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
     @isTest
 	public static void userAzureIdTest() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			Test.startTest();
 			AV_AzureTeamsToken__c azureToken = new AV_AzureTeamsToken__c();
 			azureToken.Name = 'AzureTeamToken';
@@ -393,8 +364,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void userAzureIdExpiredTest() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			Test.startTest();
 			AV_AzureTeamsToken__c azureToken = new AV_AzureTeamsToken__c();
 			azureToken.Name = 'AzureTeamToken';
@@ -421,8 +394,10 @@ public with sharing class AV_UserTriggerHelper_Test {
 	 */
 	@isTest
 	public static void visibilityUserTest() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		System.runAs(userGcf){
 			Test.startTest();
 			User user = [SELECT Id, AV_Funcion__c FROM User WHERE Alias = 'tsAlias4']; 
 			Test.stopTest();
@@ -430,41 +405,38 @@ public with sharing class AV_UserTriggerHelper_Test {
 		}
 	}
 
-	/**
-	 * Execute the Trigger class (AV_User_BU_TRHan) removes the permissions and association of the associated 
-	 * user on contact when the user is inactivated.
-	 */
 	@isTest
-	public static void prepareDeleteInactiveUserTestWithPermission() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
-			Test.startTest();
-			User assignedUser = [SELECT Id FROM User WHERE Email = 'test_2@test.dev'];
-			User assigner = [SELECT Id FROM User WHERE Email = 'test_3@test.dev'];
-			Contact contactAssignedUser = [SELECT Id FROM Contact WHERE Email = 'empleadoalonso@emailcaixa.com']; 
-			List<AV_OfficePermission__c> listUserPermissionUpdate = [SELECT Id, AV_UsuarioCedido__c, AV_Assigner__c FROM AV_OfficePermission__c WHERE AV_UsuarioCedido__c =: assignedUser.Id AND AV_Assigner__c =: assigner.Id ];
-			assignedUser.IsActive = false;
-			update assignedUser;
-			Test.stopTest();
-			System.assertNotEquals(listUserPermissionUpdate, null);
-		}
-	}
+    public static void testGroupConfidenProfileRol() {
 
-	/**
-	 * Execute the Trigger class (AV_User_BU_TRHan) removes the associated user on contact when the user is inactivated.
-	 */
-	@isTest
-	public static void prepareDeleteInactiveUserTestNotPermission() {
-		User administrator = [SELECT id FROM User WHERE Id = :UserInfo.getUserId()];
-		System.runAs(administrator){
+		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+		Profile profileId = [SELECT Id FROM Profile WHERE Name = 'AV_Usuario_CaixaBank' LIMIT 1];
+		Profile profile2Id = [SELECT Id FROM Profile WHERE Name != 'AV_Usuario_CaixaBank' LIMIT 1];
+
+		UserRole idRol = [SELECT Id FROM UserRole WHERE name ='Sistemática Comercial' LIMIT 1];
+		Group grp = [SELECT Id FROM Group WHERE DeveloperName = 'AV_Confidencial' LIMIT 1];
+		List<User> userList = [SELECT Id, ProfileId, UserRoleId FROM User WHERE ProfileId = :profileId.Id OR UserRoleId = :idRol.Id LIMIT 1];
+		
+        GroupMember groupMemberNew = new GroupMember(GroupId = grp.Id, UserOrGroupId = userList[0].Id);
+        insert groupMemberNew;
+		
+		User usOld= userList[0];
+		usOld.ProfileId = profile2Id.Id;
+		update usOld;
+		Map<Id, User> mapUsers = new Map<Id, User>();
+		mapUsers.put(usOld.Id,usOld);
+		
+		GroupMember groupMemberOld = new GroupMember(GroupId = grp.Id, UserOrGroupId = usOld.Id);
+        insert groupMemberOld;
+		
+		 
+		System.runAs(userGcf){
 			Test.startTest();
-			User assignedUser = [SELECT Id FROM User WHERE Email = 'test_5@test.dev'];
-			User assigner = [SELECT Id FROM User WHERE Email = 'test_3@test.dev'];
-			Contact contactAssignedUser = [SELECT Id FROM Contact WHERE Email = 'usuarioInactivo@emailcaixa.com']; 
-			assignedUser.IsActive = false;
-			update assignedUser;
+			AV_UserTriggerHelper.groupConfidenProfileRol(userList, mapUsers);
 			Test.stopTest();
-			System.assertNotEquals(contactAssignedUser, null);
+			List<GroupMember> deletedGroupMembers = [SELECT Id FROM GroupMember WHERE GroupId = :grp.Id];
+            System.assertNotEquals(true, deletedGroupMembers.isEmpty());
 		}
+
 	}
 }

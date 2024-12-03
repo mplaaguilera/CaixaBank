@@ -41,7 +41,23 @@ public class CC_EmailSendController_Test {
         usuario2.LanguageLocaleKey = 'es';
         usuario2.LocaleSidKey = 'es_ES';
         userList.add(usuario2);
-        
+
+        User usuario3 = new User();
+        usuario3.ProfileId = profileId;
+        usuario3.LastName = 'Sin Gestor/EAP';
+        usuario3.FirstName = '';
+        usuario3.AV_ExternalID__c = '000000';
+        usuario3.Email = 'tuser000@amamamaaaaa.com';
+        usuario3.Username = 'tuser000@amamamaaaaa.com' + System.currentTimeMillis();
+        usuario3.CompanyName = 'MST';
+        usuario3.Title = 'title';
+        usuario3.Alias = 'alias';
+        usuario3.TimeZoneSidKey = 'Europe/Paris';
+        usuario3.EmailEncodingKey = 'UTF-8';
+        usuario3.LanguageLocaleKey = 'es';
+        usuario3.LocaleSidKey = 'es_ES';
+        userList.add(usuario3);
+
         Id roleCC = [SELECT Id FROM UserRole WHERE DeveloperName = 'Contact_Center'].Id;
         User usuarioAdmin = new User();        
         usuarioAdmin.profileId = profileAdmin;
@@ -99,6 +115,20 @@ public class CC_EmailSendController_Test {
             customSetting5.CC_Configuracion_2__c = 'true';
             listCustomSetting.add(customSetting5);
 
+            CC_Settings__c  customSetting6 = new CC_Settings__c ();
+            customSetting6.Name = 'CC_Agrupador_CIC_Asignacion_Casos';
+            customSetting6.CC_Activa__c = true;
+            listCustomSetting.add(customSetting6);
+
+            CC_Settings__c  customSetting7 = new CC_Settings__c ();
+            customSetting7.Name = 'CC_Agrupador_CI_Asignacion_Casos';
+            customSetting7.CC_Activa__c = true;
+            listCustomSetting.add(customSetting7);
+
+            CC_Settings__c  customSetting8 = new CC_Settings__c ();
+            customSetting8.Name = 'CC_Agrupador_CIM_Asignacion_Casos';
+            customSetting8.CC_Activa__c = true;
+            listCustomSetting.add(customSetting8);
 
             insert listCustomSetting;
             
@@ -1510,6 +1540,7 @@ public class CC_EmailSendController_Test {
         System.assertEquals(false,  CC_EmailSendController.validarCanalAutenticacion(casoInvalido.Id));
         Test.stopTest();
     }
+    
     @isTest
     static void derivarAlSac() {
         Test.startTest();
@@ -1590,11 +1621,9 @@ public class CC_EmailSendController_Test {
         casoCC.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
             insert casoCC;
+            CC_EmailSendController.derivarCasoAlSAC(casoCC, 'Motivo derivar');
         } 
-
-
-        CC_EmailSendController.derivarCasoAlSAC(casoCC, 'Motivo derivar');
-        
+ 
         List<Case> casoSAC = [SELECT Id, CC_Motivo__c   FROM Case WHERE ParentId = :casoCC.Id];
         Test.stopTest();
         System.assertEquals(1, casoSAC.size(), 'La creación de la reclamación desde CC no ha funcionado.');
@@ -1703,10 +1732,11 @@ public class CC_EmailSendController_Test {
 
         
         System.runAs ( new User(Id = [SELECT Id FROM User Where LastName = 'Administrador de sistema' LIMIT 1].Id) ) {
-            CC_EmailSendController.devolverCasoAlSAC('Motivo devolución', casoCC);
+            Case casoCCAfter = [SELECT Id, RecordTypeId, ParentId, Status, SAC_MotivoReabrir__c, CC_Motivo__c FROM Case WHERE Subject = 'Caso de Contact Center para devolver al SAC' LIMIT 1];
+            CC_EmailSendController.devolverCasoAlSAC('Motivo devolución', casoCCafter);
         }
         
-        List<Case> casos = [SELECT Status, CC_Motivo__c FROM Case WHERE Id = :casoSac.Id];
+        List<Case> casos = [SELECT Id, Status, CC_Motivo__c FROM Case WHERE Id = :casoSac.Id];
         Test.stopTest();
         System.assertEquals('Motivo devolución', casos.get(0).CC_Motivo__c);
         System.assertEquals('SAC_001', casos.get(0).Status);
@@ -1717,7 +1747,7 @@ public class CC_EmailSendController_Test {
         Test.startTest();
         Id recordTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         Id recordTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-        
+
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c ();
         lista.Name = 'Gestor por defecto CC';
         lista.RecordTypeId = recordTypeLista;

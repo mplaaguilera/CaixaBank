@@ -1,6 +1,6 @@
 @isTest
-global with sharing class SIR_CancelarProceso_WSMock implements HttpCalloutMock{
-    global HTTPResponse respond(HTTPRequest req) {
+public with sharing class SIR_CancelarProceso_WSMock implements HttpCalloutMock{
+    public HTTPResponse respond(HTTPRequest req) {
         
         SIR_CancelarProceso_WS.CancelarRequest request = (SIR_CancelarProceso_WS.CancelarRequest)JSon.deserialize(req.getBody(), SIR_CancelarProceso_WS.CancelarRequest.class);
         SIR_CancelarProceso_WS.CancelarResponse responseJson = new SIR_CancelarProceso_WS.CancelarResponse();

@@ -1,10 +1,13 @@
 public with sharing class SAC_CaseReclamanteHandler {
 
-	public static void actualizaReclamanteCaso_AD(List<SAC_CaseReclamante__c> listOld){
-		
+	public static void actualizaReclamanteCaso_AD(List<SAC_CaseReclamante__c> listOld)
+	{
 		if (!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.Case.isUpdateable() || !Schema.sObjectType.SAC_CaseReclamante__c.isAccessible() || !Schema.sObjectType.SAC_CaseReclamante__c.isUpdateable()) {
 			return;
 		}
+		//RecordTypesIds
+		Id recTypeReclamacion = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
+		Id recTypePretension = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Pretension').getRecordTypeId();
 
 		Map<Id,Case> mapCaseUpd = new Map<Id,Case>();
 		//Obtener todos los reclamantes del caso
@@ -36,10 +39,10 @@ public with sharing class SAC_CaseReclamanteHandler {
 			}
 		}
 		if (mapCaseUpd.size() > 0) {
-			SAC_DatabaseDML.updateDML(mapCaseUpd.values(), false);
+			update mapCaseUpd.values();
 		}
 		if (lstNewRec.size() > 0) {
-			SAC_DatabaseDML.updateListDML(lstNewRec, false);
+			update lstNewRec;
 		}
 	}
 
@@ -48,6 +51,7 @@ public with sharing class SAC_CaseReclamanteHandler {
 		if (!Schema.sObjectType.Case.isAccessible() || !Schema.sObjectType.Case.isUpdateable() || !Schema.sObjectType.SAC_CaseReclamante__c.isAccessible() || !Schema.sObjectType.SAC_CaseReclamante__c.isUpdateable()) {
 			return;
 		}
+
 		Case[] updates = new Case[] { };
 		Map<Id, Case> caseMap = new Map<Id, Case> ([Select Id, AccountId, ContactId from Case where Id IN(SELECT SAC_Case__c FROM SAC_CaseReclamante__c where Id in :listNew)]);
 		Id caseId;
@@ -58,11 +62,12 @@ public with sharing class SAC_CaseReclamanteHandler {
 					updates.add(new Case(Id = c.SAC_Case__c, AccountId = c.SAC_Account__c, ContactId = c.SAC_Contact__c));
 				}
 			}
-			SAC_DatabaseDML.updateListDML(updates, false);
+			update updates;
 		}
 	}
 
-	public static void validarUpdate(List<SAC_CaseReclamante__c> listNewObj, Map<Id, SAC_CaseReclamante__c> mapOldObj){
+	public static void validarUpdate(List<SAC_CaseReclamante__c> listNewObj, Map<Id, SAC_CaseReclamante__c> mapOldObj)
+    {
 		//Obtener todos los reclamantes del caso
 		Set<Id> caseIds = new Set<Id> ();
 		Id caseId;
@@ -109,39 +114,33 @@ public with sharing class SAC_CaseReclamanteHandler {
 		
 		//Id caso vinculado al reclamante nuevo
 		Set<Id> idCasos = new Set<Id>();
-
-		List<SAC_CaseReclamante__c> reclamantesExistentes = new List<SAC_CaseReclamante__c>();
 		
 		for(SAC_CaseReclamante__c reclamante : listNewObj){
-			if(reclamante.SAC_Case__c != null){
-				idCasos.add(reclamante.SAC_Case__c);
-			}			
+			idCasos.add(reclamante.SAC_Case__c);			
 		}
 
 		//reclamantes vinculados a casos que coinciden con los casos vinculados de los reclamantes nuevos
-		if(!idCasos.isEmpty()){
-			reclamantesExistentes = [SELECT Id, SAC_Case__c,SAC_Pretension__c,SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c IN: idCasos];
-
-			if(!reclamantesExistentes.isEmpty()){
-				for(SAC_CaseReclamante__c reclamante : reclamantesExistentes){
-					if(mapDatos.containsKey(reclamante.SAC_Case__c)){
-						List<SAC_CaseReclamante__c> aux = mapDatos.get(reclamante.SAC_Case__c);
-						aux.add(reclamante);
-						mapDatos.put(reclamante.SAC_Case__c, aux);
-					}else{
-						List<SAC_CaseReclamante__c> aux = new List<SAC_CaseReclamante__c>();
-						aux.add(reclamante);
-						mapDatos.put(reclamante.SAC_Case__c, aux);
-					}
-				}
+		List<SAC_CaseReclamante__c> reclamantesExistentes = [SELECT Id, SAC_Case__c,SAC_Pretension__c,SAC_ReclamantePrincipal__c FROM SAC_CaseReclamante__c WHERE SAC_Case__c IN: idCasos];
+		
+		for(SAC_CaseReclamante__c reclamante : reclamantesExistentes){
+			if(mapDatos.containsKey(reclamante.SAC_Case__c)){
+				List<SAC_CaseReclamante__c> aux = mapDatos.get(reclamante.SAC_Case__c);
+				aux.add(reclamante);
+				mapDatos.put(reclamante.SAC_Case__c, aux);
 			}
-		} 
+			else{
+				List<SAC_CaseReclamante__c> aux = new List<SAC_CaseReclamante__c>();
+				aux.add(reclamante);
+				mapDatos.put(reclamante.SAC_Case__c, aux);
+			}
+		}
 
 		for(SAC_CaseReclamante__c reclamante : listNewObj){
 			//si el mapa contiene valor para este caso quiere decir que ya hay un reclamante principal
-			if(mapDatos != null && mapDatos.containsKey(reclamante.SAC_Case__c)){
+			if(mapDatos.containsKey(reclamante.SAC_Case__c)){
 				reclamante.SAC_ReclamantePrincipal__c = false;
-			}else{
+			}
+			else{
 				reclamante.SAC_ReclamantePrincipal__c = true;
 			}
 		}

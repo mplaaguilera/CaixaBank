@@ -30,9 +30,11 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
     public static List<ProcesoWrapper> getProcesos(String idCliente){
 
         List<ProcesoWrapper> pro = new List<ProcesoWrapper>(); 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && SIR_HistoricoProceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.SIR_HistoricoProceso__c.isAccessible()){
             // Buscamos el numero actual del Ciclo de Impago
-            List<SIREC__SIREC_obj_proceso__c> procesoMaxNumCicloImpago = [ SELECT SIR_CicloImpago__c FROM SIREC__SIREC_obj_proceso__c   WHERE SIREC__SIREC_fld_cliente__c =: idCliente AND SIREC__SIREC_fld_situacion__c != : SIR_Constantes.PROCESO_SITUACION_FINALIZADO
+            List<SIREC__SIREC_obj_proceso__c> procesoMaxNumCicloImpago = [ SELECT SIR_CicloImpago__c FROM SIREC__SIREC_obj_proceso__c WHERE SIREC__SIREC_fld_cliente__c =: idCliente 
+                                                                            AND SIREC__SIREC_fld_situacion__c != : SIR_Constantes.PROCESO_SITUACION_FINALIZADO
+                                                                            AND RecordType.DeveloperName != : SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_AP_PP
                                                                             order by SIR_CicloImpago__c NULLS LAST limit 1];                                                                            
             if(!procesoMaxNumCicloImpago.isEmpty()){
                 // Por si el ciclo esta vacio ponemos uno por defecto que nunca podria estar
@@ -41,11 +43,12 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
                     numeroCicloImpagoActual = procesoMaxNumCicloImpago[0].SIR_CicloImpago__c;
                 }   
                 // Buscamos todos los procesos Presol/Impa que no estan finalizados + procesos informativos que tienen el ciclo de impago actual
-                List<SIREC__SIREC_obj_proceso__c> procesoSF = [SELECT toLabel(SIREC__SIREC_fld_estrategia__c), SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c,
+                List<SIREC__SIREC_obj_proceso__c> procesoSF = [SELECT SIREC__SIREC_fld_descEstrategiaCatalogo__c, SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c,
                                                                 Name, toLabel(SIREC__SIREC_fld_situacion__c), Owner.Name, SIR_FechaInicioEstrategia__c, toLabel(SIR_fld_Situacion_SF__c),
-                                                                SIR_ObjetivoProceso__c, SIR_CicloImpago__c, SIREC__SIREC_fld_cliente__c, RecordType.Name, SIREC__SIREC_fld_fechaBaja__c
+                                                                SIR_ObjetivoProceso__c, SIR_CicloImpago__c, SIREC__SIREC_fld_cliente__c, SIR_AlertaSIREC__c, RecordType.Name, SIREC__SIREC_fld_fechaBaja__c
                                                                 FROM SIREC__SIREC_obj_proceso__c 
                                                                 WHERE SIREC__SIREC_fld_cliente__c =:idCliente
+                                                                AND RecordType.DeveloperName != : SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_AP_PP
                                                                 AND ( 
                                                                     (   SIREC__SIREC_fld_situacion__c !=: SIR_Constantes.PROCESO_SITUACION_FINALIZADO) 
                                                                     OR
@@ -93,10 +96,11 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
                         Items infoProWrapp = new Items();
                         infoProWrapp.name = '';
                         infoProWrapp.idProceso = '';
-                        infoProWrapp.estrategia = proInfo.SIREC__SIREC_fld_estrategia__c;
+                        infoProWrapp.estrategia = proInfo.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                         infoProWrapp.fechaInicio = string.valueOf(proInfo.SIR_FechaInicioEstrategia__c);
                         infoProWrapp.fechaFin =  string.valueOf(proInfo.SIREC__SIREC_fld_fechaBaja__c);
                         infoProWrapp.fechaSituacion = string.valueOf(proInfo.SIREC__SIREC_fld_fechaSituacion__c);	
+                        infoProWrapp.alertaSirec = proInfo.SIR_AlertaSIREC__c; //AÑADIR ALERTA SIREC
                         // Si el proceso no esta finalizado se pone en En Curso, sino se deja lo que tiene
                         if(proInfo.SIREC__SIREC_fld_situacion__c != SIR_Constantes.PROCESO_FINALIZADO && proInfo.SIR_ObjetivoProceso__c == SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO){
                             infoProWrapp.situacion = 'En Curso';
@@ -123,6 +127,7 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
                             histProWrapp.fechaFin = string.valueOf(procesoHist.SIR_FechaFinEstrategia__c);
                             histProWrapp.fechaSituacion = string.valueOf(procesoHist.SIR_FechaSituacion__c);				
                             histProWrapp.situacion = procesoHist.SIR_Situacion__c;
+                            histProWrapp.alertaSirec = '';
                             histProWrapp.gestor = procesoHist.SIR_Proceso__r.owner.name;
                             proHistYProInfor.add(histProWrapp);
                         }      
@@ -174,7 +179,7 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
                     } else {
                         procesoWraper.idProceso = URL.getSalesforceBaseUrl().toExternalForm() + '/' + proceso.Id;    
                     }                
-                    procesoWraper.estrategia = proceso.SIREC__SIREC_fld_estrategia__c;
+                    procesoWraper.estrategia = proceso.SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                     if(proceso.Name == SIR_Constantes.PROCESO_NAME_REFINANCIACION){
                         procesoWraper.fechaInicio = string.valueOf(proceso.SIREC__SIREC_fld_fechaInicio__c);                
                     } else {
@@ -189,6 +194,7 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
                         procesoWraper.situacion = proceso.SIR_fld_Situacion_SF__c;
                     }                    
                     procesoWraper.gestor = proceso.Owner.Name;      
+                    procesoWraper.alertaSirec = proceso.SIR_AlertaSIREC__c;
                 
                     //  comentamos todo el for porque informamos el gestor antes
                     /*
@@ -230,6 +236,8 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
         public String situacion {get;set;}
 		@AuraEnabled
         public String gestor {get;set;}
+		@AuraEnabled
+        public String alertaSirec {get;set;}
         @AuraEnabled
         public List<Items> items {get;set;}
     }
@@ -251,6 +259,8 @@ public with sharing class SIR_LCMP_arbolEstrategiasProceso {
         public String situacion {get;set;}
 		@AuraEnabled
         public String gestor {get;set;}
+		@AuraEnabled
+        public String alertaSirec {get;set;}
         @AuraEnabled
         public List<Items> items {get;set;}   
     }

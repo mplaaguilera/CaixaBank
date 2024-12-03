@@ -1,5 +1,5 @@
 /*****************************************************************
- Name:  SIR_TareaCTL_Test
+ Name:  SIRE_LCMP_procesosActivosGrupoEco_Test
  Copyright © 2023  CaixaBank
 ============================================================
 Proposito:   Clase Test de la clase controladora externa del LWC SIRE_LCMP_procesosActivosGrupoEconomico                                                                                                          
@@ -37,13 +37,15 @@ public class SIRE_LCMP_procesosActivosGrupoEco_Test {
             proceso.SIR_ObjetivoProceso__c = 'EN GESTION';
             proceso.SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_E6;//'E.6 – Sin prioridad';
             proceso.name  = SIR_Constantes.TIPOPROCESO_FLUJO;
-            proceso.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_PENDIENTE_INICIO_GESTION;         
+            proceso.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_PENDIENTE_INICIO_GESTION; 
+            proceso.recordTypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName().get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId();
             update proceso;
             
             SIREC__SIREC_obj_proceso__c proceso2 = SIR_TestDataFactory.crearProcesoFechaConcreta(cuenta);
             proceso2.SIREC__SIREC_fld_estrategia__c = SIR_Constantes.PROCESO_ESTRATEGIA_E0;//'E.6 – Sin prioridad';
             proceso2.name  = SIR_Constantes.TIPOPROCESO_FLUJO;
-            proceso2.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_PENDIENTE_INICIO_GESTION;      
+            proceso2.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_PENDIENTE_INICIO_GESTION;   
+            proceso2.recordTypeId = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName().get(SIR_Constantes.PROCESO_RECORDTYPE_DEVELOPER_NAME_PREVEMP).getRecordTypeId(); 
             update proceso2;  
             
             lstProcesoWrapper = SIRE_LCMP_procesosActivosGrupoEconomico.getProcesos(cuentaGrupoEconomico.id);

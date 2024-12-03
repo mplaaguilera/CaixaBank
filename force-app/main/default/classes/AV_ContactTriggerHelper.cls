@@ -20,6 +20,8 @@ Historial
     1.10        US599950        Alex Perez          21/06/2023          Added AV_TipoGestor__c    
     1.11        IN1098585       Elisabeth R.        06/03/2024          Update CC_Inactivo__c to false value  
     1.12        US912548        Oscar Moreno        10/06/2024          Add  codFuncion parameter of getupdatedFuncion
+    1.13        FIX             Gonzalo Ávila       11/06/2024          The updateContactMatriculaInvalid method is modified by changing the way nulls are controlled
+    1.14        PPM100492394    Ángel Medina        17/09/2024          New methods employeeExists and isPoolContact
 ***********************************************************************************************************************/
 public with sharing class AV_ContactTriggerHelper {
     
@@ -240,19 +242,22 @@ public with sharing class AV_ContactTriggerHelper {
     public static void updateContactMatriculaInvalid(List<Contact> contacts){
         try {
             List<String> usuariosAsociados = new List<String>();
-            for(Contact c : contacts){
-                if(!contacts.isEmpty() && c.CC_Matricula__c.containsIgnoreCase('Invalid')){
-                    if(c.AV_UsuarioAsociado__c != null){
-                        c.CC_Inactivo__c = true;
-                        usuariosAsociados.add(c.AV_UsuarioAsociado__c);
-                        c.AV_UsuarioAsociado__c = null;
-                    }else{
-                        c.CC_Inactivo__c = true;
+            if (contacts != null && !contacts.isEmpty()) {
+                for (Contact c : contacts) {
+                    if (c.CC_Matricula__c != null && c.CC_Matricula__c.containsIgnoreCase('Invalid')) {
+                        if (c.AV_UsuarioAsociado__c != null) {
+                            c.CC_Inactivo__c = true;
+                            usuariosAsociados.add(c.AV_UsuarioAsociado__c);
+                            c.AV_UsuarioAsociado__c = null;
+                        } else {
+                            c.CC_Inactivo__c = true;
+                        }
+                    } else {
+                        c.CC_Inactivo__c = false;
                     }
-                }else{
-                    c.CC_Inactivo__c = false;
                 }
-           }
+            }
+            
 
            if(!usuariosAsociados.isEmpty() && !contacts.isEmpty() && Schema.sObjectType.Contact.isUpdateable() && Schema.sObjectType.User.isUpdateable()) {
                tieneUsuario(usuariosAsociados);
@@ -335,4 +340,78 @@ public with sharing class AV_ContactTriggerHelper {
     }
 
 
+
+    public static void employeeExists(List<Contact> listNewObj){
+        Map<String, Contact> matriculaToContactMap = new Map<String, Contact>();
+
+        for(Contact contact : listNewObj){
+            if(contact != null && contact.CC_Matricula__c != null){
+                matriculaToContactMap.put(contact.CC_Matricula__c, contact);
+            }
+        }
+
+        if(!matriculaToContactMap.isEmpty()){
+            List<User> users = [SELECT Id, AV_ExternalID__c FROM User WHERE AV_ExternalID__c IN :matriculaToContactMap.keySet()];
+            if(users != null && !users.isEmpty()){
+                for(User user : users){
+                    if(user.AV_ExternalID__c != null && matriculaToContactMap.containsKey(user.AV_ExternalID__c)){
+                        matriculaToContactMap.get(user.AV_ExternalID__c).AV_UsuarioAsociado__c = user.Id;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void isPoolContact(List<Contact> listNewObj, Map<Id, Contact> mapOldObj){
+        List<User> usersToUpdate = new List<User>();
+        Map<Id, Contact> contactWithUser = new Map<Id, Contact>();
+        Set<Id> accountIds = new Set<Id>();
+    
+        for(Contact newContact : listNewObj){
+            Contact oldContact = (mapOldObj != null) ? mapOldObj.get(newContact.Id) : null;
+
+            if (oldContact == null || oldContact.AV_Pool__c != newContact.AV_Pool__c) {
+    
+                if (newContact.AV_UsuarioAsociado__c != null) {
+                    contactWithUser.put(newContact.AV_UsuarioAsociado__c, newContact);
+
+                    if (oldContact == null && newContact.AccountId != null) {
+                        accountIds.add(newContact.AccountId);
+                    }
+                }
+            }
+        }
+    
+        if (!contactWithUser.isEmpty()) {
+            Map<Id, Account> accountsMap = new Map<Id, Account>();
+            if (!accountIds.isEmpty()) {
+                accountsMap = new Map<Id, Account>([
+                    SELECT Id, CC_Numero_Oficina_Empresa__c FROM Account WHERE Id IN :accountIds
+                ]);
+            }
+            List<User> relatedUser = [SELECT Id, AV_Pool__c, AV_NumeroOficinaEmpresa__c FROM User WHERE Id IN :contactWithUser.keySet() AND AV_ProfileName__c = :AV_AppConstants.AV_PROFILE];
+    
+            if (relatedUser != null && !relatedUser.isEmpty()) {
+                for (User user : relatedUser) { 
+                    if (contactWithUser.get(user.Id) != null && user.AV_Pool__c != contactWithUser.get(user.Id).AV_Pool__c) {
+                        user.AV_Pool__c = contactWithUser.get(user.Id).AV_Pool__c;
+                    }
+                    
+                    if (mapOldObj == null || mapOldObj.get(contactWithUser.get(user.Id).Id) == null) { 
+                        if (contactWithUser.get(user.Id).AccountId != null && accountsMap.containsKey(contactWithUser.get(user.Id).AccountId)) {
+                            Account relatedAccount = accountsMap.get(contactWithUser.get(user.Id).AccountId);
+                            if (relatedAccount.CC_Numero_Oficina_Empresa__c != null) {
+                                user.AV_NumeroOficinaEmpresa__c = relatedAccount.CC_Numero_Oficina_Empresa__c;
+                            }
+                        }
+                    }
+                    usersToUpdate.add(user);
+                }
+            }
+        }
+        if (!usersToUpdate.isEmpty()) {
+            Database.update(usersToUpdate,true);
+        }
+    }
+    
 }

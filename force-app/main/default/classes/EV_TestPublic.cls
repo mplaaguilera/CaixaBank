@@ -6,16 +6,22 @@ Proposito: Clase para la creación de Lead y CampaignMember custom con informaci
 ---------------------------------------------------------------------------------------------------------------------- 
  * VERSION      USER_STORY	    AUTHOR				DATE			Description
  * 1.0		    US567184	    Carolina Lopez		06/10/2023   	Init Version
+ * 1.1          TechSummit      Carolina Lopez      17/05/2024      Add RecordType TechSummit.
 ***********************************************************************************************************************/
 public with sharing class EV_TestPublic {
     private static Id rtEvtV = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoVirtual').getRecordTypeId();
     private static Id rtEvtF = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoFisico').getRecordTypeId();
     private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_EventoHibrido').getRecordTypeId();
+    private static Id rtEvtVTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitVirtual').getRecordTypeId();
+    private static Id rtEvtFTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitFisico').getRecordTypeId();
+    private static Id rtEvtHTech = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_TechSummitHibrido').getRecordTypeId();
     private static Id rtEvtA = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get('EV_Eventos_Accionistas').getRecordTypeId();
     private static Id rtCMevt = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
+    private static Id rtCMevtTech = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
     private static Id rtCMevtA = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosAccionistas').getRecordTypeId();
     private static Id rtLeadEvt = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_Evento').getRecordTypeId();
     private static Id rtLeadA = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_LeadAccionistas').getRecordTypeId();
+    private static Id rtLeadATech = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_LeadTechSummit').getRecordTypeId();
 
     @invocableMethod(label='getTestPublic')
     public static void createCampaignMemberLead(List<InputParameters> inputParameters) {
@@ -35,7 +41,10 @@ public with sharing class EV_TestPublic {
                 Lead ld = new Lead();
                 if(xrecordTypeCamp == rtEvtV || xrecordTypeCamp == rtEvtF  || xrecordTypeCamp == rtEvtH ){
                     ld.RecordtypeId = rtLeadEvt;
-                }else if (xrecordTypeCamp == rtEvtA){
+                }else if(xrecordTypeCamp == rtEvtVTech || xrecordTypeCamp == rtEvtFTech  || xrecordTypeCamp == rtEvtHTech ){
+                    ld.RecordtypeId = rtLeadATech;
+                }
+                else if (xrecordTypeCamp == rtEvtA){
                     ld.RecordtypeId = rtLeadA;
                 }
                 ld.EV_Idiomas__c = contacto.EV_Idiomas__c;
@@ -56,6 +65,8 @@ public with sharing class EV_TestPublic {
                         cmcus.RecordTypeId = rtCMevtA;
                     }else if(xrecordTypeCamp == rtEvtV || xrecordTypeCamp == rtEvtF  || xrecordTypeCamp == rtEvtH ){
                         cmcus.RecordTypeId = rtCMevt;
+                    }else if(xrecordTypeCamp == rtEvtVTech || xrecordTypeCamp == rtEvtFTech  || xrecordTypeCamp == rtEvtHTech ){
+                        cmcus.RecordTypeId = rtCMevtTech;
                     }
                     cmcus.EV_LeadId__c = dato.getId();
                     cmcus.EV_CampaignId__c = xrecordId;

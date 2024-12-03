@@ -9,6 +9,7 @@ Historial
    VERSION        USER_STORY       AUTHOR           DATE                Description
    1.0            Integrations     Jose Maria       26/01/2023          Init version (Copy from retail)
    2.0                             Alexandre Perez  20/07/2023          Adding update object maped
+   3.0            Refactoring      Borja Lavesiera  07/05/2024          Refactoring to acomplish with QC Clouds rules
 ***********************************************************************************************************************/
 public with sharing class CIBE_IntegrationUtilities {
 
@@ -68,11 +69,12 @@ public with sharing class CIBE_IntegrationUtilities {
         else {
             String errors = '';
             // Operation failed, so get all errors                
-            for(Database.Error err : srList.getErrors()) {
-                System.debug('The following error has occurred.');                    
+            for(Database.Error err : srList.getErrors()) {                
                 System.debug(err.getStatusCode() + ': ' + err.getMessage());
-                System.debug('Account fields that affected this error: ' + err.getFields());
                 errors = errors + err.getStatusCode() + ': ' + err.getMessage() + ' Account fields that affected this error: ' + err.getFields();
+            }
+            if(!string.isBlank(errors)){
+                CBK_Log.error(errors);
             }
             return errors;
         }
@@ -89,15 +91,8 @@ public with sharing class CIBE_IntegrationUtilities {
         sObject obj = Schema.getGlobalDescribe().get(ObjectName).newSObject();
         // Modify the fields of the Account record using the map of field names and values
         for (String fieldName : mapObjectFields.keySet()) { 
-            /*if(mapObjectFields.get(fieldName) != null){
-                System.debug('fieldName: ' + fieldName);
-                System.debug('value: ' + mapObjectFields.get(fieldName));
-                obj.put(fieldName, mapObjectFields.get(fieldName));
-            }*/
             obj.put(fieldName, mapObjectFields.get(fieldName));
-        
         }
-    
         // Save the changes to the Account record in the database
         Database.saveResult srList = Database.update(obj, false);
         if (srList.isSuccess()) {
@@ -108,14 +103,15 @@ public with sharing class CIBE_IntegrationUtilities {
         else {
             String errors = '';
             // Operation failed, so get all errors                
-            for(Database.Error err : srList.getErrors()) {
-                System.debug('The following error has occurred.');                    
+            for(Database.Error err : srList.getErrors()) {             
                 System.debug(err.getStatusCode() + ': ' + err.getMessage());
-                System.debug('Account fields that affected this error: ' + err.getFields());
-                errors = errors + err.getStatusCode() + ': ' + err.getMessage() + ' Account fields that affected this error: ' + err.getFields();
+                errors = errors + err.getMessage();
+            }
+            if(!string.isBlank(errors)){
+                CBK_Log.error(errors);
+            throw new DmlException(errors);
             }
             return errors;
         }
 	}
-
 }

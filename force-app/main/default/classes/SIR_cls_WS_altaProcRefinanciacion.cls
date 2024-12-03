@@ -19,7 +19,7 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacion {
         mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
         AltaProcRefinanciacionRequest vBody =  new AltaProcRefinanciacionRequest(idProceso);
         String idProcesoSirec;
-        if(!SIR_WS_Configuration__mdt.getInstance('altaProcRefinanciacion').SIR_fld_isActive__c){
+        if(!SIR_WS_Configuration__mdt.getInstance('altaProcRefinanciacion').SIR_fld_isActive__c){            
             // MOCK TEST[START]
             String procesoJson = altaProcRefinanciacionMock(JSON.serialize(vBody));
             AltaProcRefinanciacionResponse resp = (AltaProcRefinanciacionResponse)JSon.deserialize(procesoJson, AltaProcRefinanciacionResponse.class);
@@ -27,9 +27,10 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacion {
             lstResponse.add(resp.datosResponseDto.idProcesoGestion);
             // MOCK TEST[END]
         }else{
-            try {
-                HttpRequest req = CBK_HttpServiceIntegration.getRequest(JSON.serialize(vBody), 'altaProcRefinanciacion', 'POST', mHeaders);
-                HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+            try {                
+                HttpRequest req = CBK_HttpServiceIntegration.getRequest(JSON.serialize(vBody), 'altaProcRefinanciacion', 'POST', mHeaders);                
+                HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR','altaProcRefinanciacion');                 
+                                
                 if(res.getStatusCode() == 200 || res.getStatusCode() == 201){
                     AltaProcRefinanciacionResponse resp = (AltaProcRefinanciacionResponse)JSon.deserialize(res.getBody(), AltaProcRefinanciacionResponse.class);        
                     if( resp.codigoSalida == '1'){
@@ -40,9 +41,9 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacion {
                     }
                 }
                 else{
-                    return SIR_cls_WS_Wrapper.responseError(res.getStatusCode(),null);
+                      return SIR_cls_WS_Wrapper.responseError(res.getStatusCode(),null);
                 }
-            } catch (Exception ex) {
+            } catch (Exception ex) {                
                 CBK_log.error(ex, 'Error : SIR_SendNewAction_WS - ' + ex.getTypeName() + ': ' + ex.getMessage());
             }
             
@@ -70,10 +71,10 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacion {
         public List<String> idPersonas = new List<String>();
         public AltaProcRefinanciacionRequest(String idProceso){
 
-            if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() &&
-                SIREC__SIREC_obj_personaAsociada__c.SObjectType.getDescribe().isAccessible() &&
-                SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible() &&
-                SIREC__SIREC_obj_procesoContrato__c.SObjectType.getDescribe().isAccessible()){
+            if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() &&
+                Schema.SObjectType.SIREC__SIREC_obj_personaAsociada__c.isAccessible() &&
+                Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible() &&
+                Schema.SObjectType.SIREC__SIREC_obj_procesoContrato__c.isAccessible()){
 
                 SIREC__SIREC_obj_proceso__c proceso = [SELECT Id, SIREC__SIREC_fld_codigoEmpleado__c, SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_cliente__c  
                                                             FROM SIREC__SIREC_obj_proceso__c

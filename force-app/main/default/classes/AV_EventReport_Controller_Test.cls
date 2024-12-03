@@ -8,6 +8,7 @@
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  VERSION		USER_STORY			AUTHOR				DATE			Description
  1.0			US602653         	Ángel Medina    	19/10/2023		Init version
+ 1.2                                Ángel Medina        20/02/2024      Add method unlikOpp    
  *********************************************************************************************************************/
 @isTest
 public with sharing class AV_EventReport_Controller_Test {
@@ -15,8 +16,10 @@ public with sharing class AV_EventReport_Controller_Test {
     static void setup(){
         User userCli = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'FC-TF9' AND IsActive = true LIMIT 1];
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true LIMIT 1];
+        Test.startTest();
         User userGestor = AV_TestHelper.createUser('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
         AV_TestHelper.insertNeededPermissions(userGestor);
+		AV_TestHelper.insertPermissionSet(userGestor.Id,AV_AppConstants.PS_OLDHOMETASK); 
 		List<Account> listAccounts = new List<Account>();
 		System.runAs(userCli) {
 			Account centro = AV_TestHelper.createCaixaCenterSinInsert();
@@ -29,14 +32,36 @@ public with sharing class AV_EventReport_Controller_Test {
 		}
         System.runAs(userGcf){
 			Event eventoCliente = AV_TestHelper.createEvent(userGestor, DateTime.now(), listAccounts[1]);
-            Contact contact = AV_TestHelper.createEmployee(listAccounts[0], userGestor);
-			Contact representante = AV_TestHelper.createRepresentante(listAccounts[0], null,'U016129361923698126');
+            Contact contact = AV_TestHelper.createEmployeeSinInsert(listAccounts[0], userGestor, 'U01545454');
+            contact.CC_Numero_Documento__c = '9446386T';
+            RecordType rt0 = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_CONTACT, AV_AppConstants.REPRESENTANTE_RT);
+            Contact representante = new Contact();
+		    representante.RecordTypeId = rt0.Id;
+		    representante.FirstName = 'Empleado';
+		    representante.LastName = '1';
+	     	representante.Email = 'email@email.com';
+		    representante.CC_Idioma__c = 'es';
+		    representante.CC_Matricula__c = 'U016129361923698126';
+            representante.AccountId = listAccounts[0].Id;
+            representante.AV_UsuarioAsociado__c = userCli.Id;
+            insert new List<Contact>{contact,representante};
 			RecordType rt = [SELECT ID FROM RecordType where DeveloperName = 'AV_Producto'and SobjectType = 'Product2'];
 			RecordType rtPF = [SELECT ID FROM RecordType where DeveloperName = 'AV_PF'and SobjectType = 'Product2'];
 			List<Task> listTasks = new List<Task>();
-			RecordType rtPriorizador = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKPRIORIZADOR_RT);
-			RecordType rtAvisos = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKAVISOS_RT);
-			RecordType rtTaskIniciativa = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKINICIATIVA_RT);
+            Set<String> taskRts = new Set<String>{
+                AV_AppConstants.TASKPRIORIZADOR_RT,
+                AV_AppConstants.TASKAVISOS_RT,
+                AV_AppConstants.TASKINICIATIVA_RT
+            };
+
+            Map<String,RecordType> rtDevToId = new Map<String,RecordType>();
+            for(RecordType rtIter :  [SELECT Id,DeveloperName FROM Recordtype WHERE DeveloperName IN :taskRts ]) {
+                rtDevToId.put(rtIter.DeveloperName,rtIter);
+            }
+            RecordType rtPriorizador = rtDevToId.get(AV_AppConstants.TASKPRIORIZADOR_RT);
+			RecordType rtAvisos = rtDevToId.get(AV_AppConstants.TASKAVISOS_RT);
+			RecordType rtTaskIniciativa = rtDevToId.get( AV_AppConstants.TASKINICIATIVA_RT);
+
 			Task taskPriorizador = AV_TestHelper.createTareaWithRTSinInsert(userGestor, 'ID-0001', listAccounts[1],rtPriorizador);
 			Task taskAvisos = AV_TestHelper.createTareaWithRTSinInsert(userGestor, 'ID-0002', listAccounts[1],rtAvisos);
 			Task taskIniciativa = AV_TestHelper.createTareaWithRTSinInsert(userGestor, 'ID-0003', listAccounts[1],rtTaskIniciativa);
@@ -46,7 +71,9 @@ public with sharing class AV_EventReport_Controller_Test {
 			listTasks.add(taskAvisos);
 			listTasks.add(taskIniciativa);
 			listTasks.add(taskIniciativa2);
-			Database.insert(listTasks,false);
+            System.runAs(userGestor){
+                Database.insert(listTasks,false);
+            }
 			List<Product2> prodsToInsert = new List<Product2>();
 			Product2 prodPF = AV_TestHelper.createProductSinInsert(null,null,'50112',rtPF);
 			Product2 prodPF2 = AV_TestHelper.createProductSinInsert(null,null,'50113',rtPF);
@@ -82,23 +109,36 @@ public with sharing class AV_EventReport_Controller_Test {
 			prodsToInsert10.add(prodPF310);
 			prodsToInsert10.add(prodPF410);
 			Database.insert(prodsToInsert10,false);
-			List<Opportunity> listOpps = new List<Opportunity>();
-			RecordType rtIniciativa = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
-			Opportunity opp1 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(listAccounts[1], contact, prodPF4, rtIniciativa,'12312131230', userGestor.Id);
-			Opportunity opp2 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(listAccounts[1], contact, prodPF3, rtIniciativa,'12312131231', userGestor.Id);
-			Opportunity opp3 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(listAccounts[1], contact, prodPF2, rtIniciativa,'12312131232', userGestor.Id);
-            opp3.StageName = AV_AppConstants.OPP_STATUS_POTENCIAL;
-            Opportunity opp4 = AV_TestHelper.createOpportunityIniciativaWithChecktPrioritySinInsert(listAccounts[1], contact, '123131221323','12312131233');
-			listOpps.add(opp1);
-			listOpps.add(opp2);
-			listOpps.add(opp3);
-            listOpps.add(opp4);
-			Database.insert(listOpps,false);
-          
         }
-        
+        Test.stopTest();
     }
 
+    private static void setupOpportunities(){
+        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true LIMIT 1];
+        User userGestor = [SELECT ID FROM USER WHERE AV_ExternalID__c = 'U01545454'];
+        Set<String> prodExtIds = new Set<String>{
+        '50115',
+        '50114',
+        '50113'};
+        List<Product2> prodForOpps = [Select Id,AV_ExternalID__c FROM Product2 WHERE AV_ExternalID__c IN :prodExtIds];
+        Map<String,Product2> mapProd = new Map<String,Product2>();
+        for(Product2 prod : prodForOpps){
+            mapProd.put(prod.AV_ExternalID__c,prod);
+        }
+        RecordType rtIniciativa = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
+
+        Account client = [SELECT ID FROM ACCOUNT WHERE AV_NumPerso__c = '123' LIMIT 1 ];
+        Contact contact = [SELECT ID FROM CONTACT WHERE CC_Numero_Documento__c = '9446386T'];
+        Opportunity opp1 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(client, contact, mapProd.get('50115'), rtIniciativa,'12312131230', userGestor.Id);
+        Opportunity opp2 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(client, contact, mapProd.get('50114'), rtIniciativa,'12312131231', userGestor.Id);
+        Opportunity opp3 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(client, contact, mapProd.get('50113'), rtIniciativa,'12312131232', userGestor.Id);
+        opp3.StageName = AV_AppConstants.OPP_STATUS_POTENCIAL;
+        Opportunity opp4 = AV_TestHelper.createOpportunityIniciativaWithChecktPrioritySinInsert(client, contact, null,'12312131233');
+    
+        insert new List<Opportunity>{opp1,opp2,opp3,opp4};
+         
+            
+    }
     @isTest
     public static void getEventDataTest(){
         Test.startTest();
@@ -156,6 +196,7 @@ public with sharing class AV_EventReport_Controller_Test {
     @isTest
     public static void insertOrUpdateOppInsertTest(){
         Test.startTest();
+        setupOpportunities();
         Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_PA_RT LIMIT 1];
 		User userGestor = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454' LIMIT 1];
 		Opportunity opp = [SELECT Id,Name,AV_PF__c,CloseDate FROM Opportunity LIMIT 1];
@@ -183,6 +224,7 @@ public with sharing class AV_EventReport_Controller_Test {
 		mapOpp.isVinculed = true;
 		mapOpp.agendado = false;
 		mapOpp.validable = true;
+        mapOpp.noofrecerhasta = Date.today();
 		opportunities.put('idProvisional01',mapOpp);
 		System.runAs(userGestor) {
             SObjectAccessDecision securityDecision = Security.stripInaccessible( AccessType.READABLE, [Select id, lastmodifieddate, AV_UsuarioAsociado__c From Contact Where RecordType.DeveloperName = 'CC_Empleado']);
@@ -198,6 +240,7 @@ public with sharing class AV_EventReport_Controller_Test {
 		User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true LIMIT 1];
 		Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_PA_RT LIMIT 1];
 		User userGestor = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454' LIMIT 1];
+        setupOpportunities();
 		System.runAs(userGcf) {
 			Opportunity opp = [SELECT Id,Name,AV_PF__c,AV_FechaProximoRecordatorio__c, OwnerId FROM Opportunity LIMIT 1];
 			Product2 subPro = [SELECT Id FROM Product2 WHERE AV_NombrePF__c = :opp.AV_PF__c LIMIT 1];
@@ -224,6 +267,7 @@ public with sharing class AV_EventReport_Controller_Test {
 			mapOpp.isVinculed = true;
 			mapOpp.agendado = false;
 			mapOpp.validable = true;
+            mapOpp.noofrecerhasta = Date.today();
 			opportunities.put(opp.Id,mapOpp);
 			AV_EventReport_Controller.OppResulWrap result = AV_EventReport_Controller.insertOrUpdateOpp(opportunities,acc.Id, false);
 			System.assertEquals('OK', result.results);
@@ -239,6 +283,8 @@ public with sharing class AV_EventReport_Controller_Test {
 		List<Opportunity> listOpp = [SELECT Id, Name, AV_PF__c, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c FROM Opportunity LIMIT 4];
         Account centro = [SELECT Id, CC_Numero_Oficina__c FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_CTO_RT LIMIT 1];
 		Contact gestor = [SELECT Id, Name, CC_CargoRepresentante__c FROM Contact WHERE CC_Matricula__c = 'U016129361923698126' and RecordType.DeveloperName='CIBE_Apoderado' and AccountId = :centro.Id LIMIT 1];
+        Test.startTest();
+        setupOpportunities();
         System.runAs(userGcf){
             Event event = [SELECT Id, ActivityDate, Subject, AV_Task__c FROM Event LIMIT 1];
             Opportunity opp = [SELECT Id, AV_PF__c, AV_PF__r.Name FROM Opportunity LIMIT 1];
@@ -257,7 +303,6 @@ public with sharing class AV_EventReport_Controller_Test {
             taskEvent.activityDate = listTask[0].ActivityDate;
             taskEvent.origenApp = '';
             AV_EventReport_Controller.TaskEvent taskEvent2 = new AV_EventReport_Controller.TaskEvent();
-            Test.startTest();
             taskEvent2.idTaskEvent = listTask[1].Id;
             taskEvent2.taskHeader = listTask[1].AV_Task__c;
             taskEvent2.subject = opp.AV_PF__r.Name;
@@ -315,9 +360,10 @@ public with sharing class AV_EventReport_Controller_Test {
             evento.activityDateTime = DateTime.now();
             evento.accountId = acc.Id;
             evento.memorableInterview = false;
-            evento.comercial = true;
+            //evento.comercial = true;
+            evento.comercial = false;  
             evento.comment = 'Comentario Nuevo';
-            evento.office = centro.CC_Numero_Oficina__c;
+            evento.office = centro.CC_Numero_Oficina__c;  
             evento.contactPerson = gestor.Id;
             evento.location = centro.CC_Numero_Oficina__c;
             String result = AV_EventReport_Controller.createTaskOpp(jsonSend,evento);
@@ -328,14 +374,32 @@ public with sharing class AV_EventReport_Controller_Test {
 
     @isTest
     public static void eventAndTaskProcessTest(){
-        Test.startTest();
         User userGestor = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454' LIMIT 1];
-        Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_PA_RT LIMIT 1];
+        List<Account> accs = [SELECT ID,Recordtype.DeveloperName,CC_Numero_Oficina__c FROM ACCOUNT WHERE RecordType.DeveloperName IN (:AV_AppConstants.ACCOUNT_CTO_RT,:AV_AppConstants.ACCOUNT_PA_RT)];
+        Account acc;
+        Account centro;
+        for(Account accIter : accs){
+            if(accIter.RecordType.DeveloperName.equals(AV_AppConstants.ACCOUNT_PA_RT)){
+                acc = accIter;
+            }
+            if(accIter.RecordType.DeveloperName.equals(AV_AppConstants.ACCOUNT_CTO_RT)){
+                centro = accIter;
+            }
+        }
         Event event = [SELECT Id FROM Event LIMIT 1];
-		List<Opportunity> listOpp = [SELECT Id, Name, AV_PF__c, AV_IncludeInPrioritizingCustomers__c,AV_FechaProximoRecordatorio__c, StageName, AV_Potencial__c, Amount, CloseDate, AV_Cuota__c, AV_Resolucion__c, AV_AmountEuro__c, AV_Comentarios__c, AV_Tenencia__c, AV_Entidad__c, AV_FechaVencimiento__c,AV_MarginEuro__c, AV_ByProduct__c FROM Opportunity LIMIT 4];
-		Account centro = [SELECT Id, CC_Numero_Oficina__c FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_CTO_RT LIMIT 1];
-		Contact gestor = [SELECT Id, Name, CC_CargoRepresentante__c FROM Contact WHERE CC_Matricula__c = 'U016129361923698126' and RecordType.DeveloperName='CIBE_Apoderado' and AccountId = :centro.Id LIMIT 1];
+		Contact gestor;
+        Contact contact;
+        List<Contact> listCnt = [SELECT Id, Name, CC_CargoRepresentante__c,CC_Matricula__c,CC_Numero_Documento__c FROM Contact WHERE (CC_Matricula__c = 'U016129361923698126' and RecordType.DeveloperName='CIBE_Apoderado' and AccountId = :centro.Id ) OR CC_Numero_Documento__c = '9446386T'];
+        for(Contact cnt : listCnt){
+            if(cnt.CC_Matricula__c == 'U016129361923698126'){
+                gestor = cnt;
+            }
+            if(cnt.CC_Numero_Documento__c == '9446386T'){
+                contact = cnt;
+            }
+        }
         List<Task> listTask = [SELECT Id, AV_Task__c, AccountId, AV_ExternalId__c  FROM Task WHERE AV_ExternalId__c IN ('ID-0001', 'ID-0002', 'ID-0003')];
+
 		Task tareaIni;
 		Task tareaAviso;
 		Task tareaPrio;
@@ -348,7 +412,32 @@ public with sharing class AV_EventReport_Controller_Test {
 				tareaPrio = ta;
 			}
 		}
-        update new AV_HeaderCustomActivity__c(Id = tareaIni.AV_Task__c, OwnerId = userGestor.Id);
+        
+
+        Set<String> prodExtIds = new Set<String>{
+            '50115',
+            '50114',
+            '50113'};
+            List<Product2> prodForOpps = [Select Id,AV_ExternalID__c FROM Product2 WHERE AV_ExternalID__c IN :prodExtIds];
+            Map<String,Product2> mapProd = new Map<String,Product2>();
+            for(Product2 prod : prodForOpps){
+                mapProd.put(prod.AV_ExternalID__c,prod);
+            }
+        RecordType rtIniciativa = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
+        Opportunity opp1 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(acc, contact, mapProd.get('50115'), rtIniciativa,'12312131230', userGestor.Id);
+        Opportunity opp2 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(acc, contact, mapProd.get('50114'), rtIniciativa,'12312131231', userGestor.Id);
+        Opportunity opp3 = AV_TestHelper.createOpportunityWithEmpleadoSinInsert2(acc, contact, mapProd.get('50113'), rtIniciativa,'12312131232', userGestor.Id);
+        opp3.StageName = AV_AppConstants.OPP_STATUS_POTENCIAL;
+        Opportunity opp4 = AV_TestHelper.createOpportunityIniciativaWithChecktPrioritySinInsert(acc, contact, null,'12312131233');
+        List<Opportunity> listOpp = new List<Opportunity>();
+        listOpp.add(opp1);
+        listOpp.add(opp2);
+        listOpp.add(opp3);
+        listOpp.add(opp4);
+        Test.startTest();
+
+        insert new List<Opportunity>{opp1,opp2,opp3,opp4};
+
         AV_EventReport_Controller.EventReport evento = new AV_EventReport_Controller.EventReport();
 		evento.type = 'CTO';
         evento.Id = event.Id;
@@ -395,6 +484,8 @@ public with sharing class AV_EventReport_Controller_Test {
         mapOpp.isVinculed = true;
         mapOpp.agendado = false;
 		mapOpp.validable = true;
+        mapOpp.noofrecerhasta = Date.today();
+
         opportunities.put(listOpp[0].Id,mapOpp);
         AV_EventReport_Controller.OpportunityReport mapOpp2 = new AV_EventReport_Controller.OpportunityReport();
         mapOpp2.id = 'idProvisional01';
@@ -418,6 +509,8 @@ public with sharing class AV_EventReport_Controller_Test {
         mapOpp2.isVinculed = true;
         mapOpp2.agendado = false;
 		mapOpp2.validable = true;
+        mapOpp2.noofrecerhasta = Date.today();
+
         opportunities.put('idProvisional01',mapOpp2);
         AV_EventReport_Controller.OpportunityReport mapOpp3 = new AV_EventReport_Controller.OpportunityReport();
 		mapOpp3.id = listOpp[2].Id;
@@ -441,6 +534,8 @@ public with sharing class AV_EventReport_Controller_Test {
         mapOpp3.isVinculed = true;
         mapOpp3.agendado = false;
 		mapOpp3.validable = true;
+        mapOpp3.noofrecerhasta = Date.today();
+
         opportunities.put(listOpp[2].Id,mapOpp3);
         AV_EventReport_Controller.OpportunityReport mapOpp4 = new AV_EventReport_Controller.OpportunityReport();
 		mapOpp4.id = listOpp[3].Id;
@@ -464,6 +559,8 @@ public with sharing class AV_EventReport_Controller_Test {
         mapOpp4.isVinculed = true;
         mapOpp4.agendado = false;
 		mapOpp4.validable = true;
+        mapOpp4.noofrecerhasta = Date.today();
+
         opportunities.put(listOpp[3].Id,mapOpp4);
 		List<String> opposId = new List<String>();
         opposId.add(listOpp[1].Id);
@@ -471,18 +568,21 @@ public with sharing class AV_EventReport_Controller_Test {
         mapOldOpp.put(listOpp[0].Id, listOpp[0]);
         mapOldOpp.put(listOpp[2].Id, listOpp[2]);
         mapOldOpp.put(listOpp[3].Id, listOpp[3]);
-        Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT', 'OK'));
+        
+        Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT', 'OK'));    
 		System.runAs(userGestor){
             insert new List<AV_CustomActivityOpportunity__c>{AV_TestHelper.createTareaOportunidadSinInsert(listOpp[0],tareaIni.AV_Task__c), AV_TestHelper.createTareaOportunidadSinInsert(listOpp[3],tareaIni.AV_Task__c)};
 			AV_EventReport_Controller.ResultEventTask result = AV_EventReport_Controller.eventAndTaskProcess(evento, mapTaskBlock, opportunities, mapOldOpp, opposId);
 			System.assertEquals('OK', result.result);
 		}
-		Test.stopTest();
+        Test.stopTest();
     }
+    
 
     @isTest
 	public static void createTaskOppWithOppTaskTest(){
         Test.startTest();
+        setupOpportunities();
 		User userGestor = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454' LIMIT 1];
         User userGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true LIMIT 1];
         System.runAs(userGcf) {
@@ -556,7 +656,8 @@ public with sharing class AV_EventReport_Controller_Test {
             event.duracion = 30;
             event.activityDateTime = DateTime.now();
             event.memorableInterview = false;
-            event.comercial = true;
+            event.office = null;  
+            event.comercial = false; 
             event.comment = 'Comentario Nuevo';
             String result = AV_EventReport_Controller.createTaskOpp(jsonSend,event);
             System.assertEquals('OK', result);
@@ -564,6 +665,25 @@ public with sharing class AV_EventReport_Controller_Test {
         Test.stopTest();
 	}
 
+    @isTest
+    public static void unlinkOppTest() {
+        User userGestor = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454' LIMIT 1];        
+        Account acc = [SELECT Id FROM Account WHERE RecordType.DeveloperName = :AV_AppConstants.ACCOUNT_PA_RT LIMIT 1];
+        Task tsk = [SELECT Id,AV_Task__c FROM TASK WHERE AV_ExternalId__c = 'ID-0003' LIMIT 1];
+        System.runAs(userGestor){
+            Opportunity opp = AV_TestHelper.createOpportunity(acc);
+            List<Id> oppIds= new List<Id>();
+            oppIds.add(opp.Id);
+            AV_CustomActivityOpportunity__c testCustomActivity = new AV_CustomActivityOpportunity__c(AV_Opportunity__c = opp.Id, AV_Task__c = tsk.AV_Task__c);
+            insert testCustomActivity;
+
+            Test.startTest();
+            AV_EventReport_Controller.unlinkOpp(oppIds, tsk.AV_Task__c);
+            List<AV_CustomActivityOpportunity__c> updatedOppTasks = [SELECT Id, OwnerId FROM AV_CustomActivityOpportunity__c WHERE Id = :testCustomActivity.Id];
+            System.assertEquals(0, updatedOppTasks.size());
+            Test.stopTest();
+        }
+    }
 
 
 }

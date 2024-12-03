@@ -21,13 +21,19 @@ public with sharing class CIBE_EEFFIntegrationService {
         public List<Inconsistencies> IncomeStatementInconsistencies;
         public List<Inconsistencies> Warnings;
         public List<BalanceSheets> BalanceSheets;
+        public List<BalanceSheetItems> BalanceSheetItems;
         public List<Inconsistencies> SettlementSheets;
         public List<IncomeStatements> IncomeStatements;
+        public List<IncomeStatementItems> IncomeStatementItems;
         public List<Inconsistencies> Remnants;
         public List<Ratios> Ratios;
+        public List<RatioItems> RatioItems;
         public List<RatiosSE> RatiosSE;
         @AuraEnabled
         public String responseFromService;
+        @AuraEnabled
+        public Integer responseEEFFStatus;
+        
     }
     public class summary {
         public FinancialStatement financialStatement; 
@@ -109,7 +115,13 @@ public with sharing class CIBE_EEFFIntegrationService {
         public String inconsistencyFlag;
         public String units;
         public List<BalanceSheetItems> IncomeStatementItems;
-    }    
+    }
+    public class IncomeStatementItems {
+        public String code;
+        public Integer amount; 
+        public String percentageFlag; 
+        public Integer percentage;
+    }   
     public class RatioItems {
         public String code;
         public Integer amount;
@@ -122,8 +134,7 @@ public with sharing class CIBE_EEFFIntegrationService {
     
     @AuraEnabled
     public static ResponseData getCirbeEEFFdata(Id recordId) {
-        ResponseData wrapper = new ResponseData();
-        
+        ResponseData wrapper = new ResponseData();        
         //Declaración variables 
         Account acc = new Account();
         ResponseData respData;
@@ -140,18 +151,9 @@ public with sharing class CIBE_EEFFIntegrationService {
         String documentType = '';
         string sError = '';
         List<Account> lstacc = new List<Account>();
-        //Integer financialyear = FiscalYear();
         map<string, object> fieldsToUpdate = new map<string, object>();
-        
-        //Fechas
-        Date fechaActual = Date.today();
-        String stryear = string.valueOf(fechaActual.year());
-        String strmonth = string.valueOf(fechaActual.month());
-        String stryearmonth = stryear + strmonth;
-        Integer yearmonth = integer.valueof(stryearmonth);
-        Integer year = integer.valueof(stryear);
-        
-        
+        Integer yearMonth = null;
+        Integer year = null;
         
         if (recordId != null) {
             
@@ -167,24 +169,35 @@ public with sharing class CIBE_EEFFIntegrationService {
                     try {
                         Map<String,string> mHeaders =  new  Map<String,string>();
                         CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues('CIBE_getEeFF');
-                        //CBK_IntegrationSetting__c wsc = CBK_IntegrationSetting__c.getValues('CIBE_getEeFF_Mock');
                         //si detecta que usamos la name credential del camaleon le metemos su cabecera
                         if(wsc?.NamedCredential__c.contains('CAMALEON')){
                             mHeaders.put('x-api-actor-simulated','ABSIS_GENERICO');
                         }
                         mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
                         //Rellenamos el cuerpo de la petición para EEFF
-                        string body = '{"action":"IN","numberRows":1,"customerId":"[CUSTOMERID]","customerIdType":"[DOCUMENTTYPE]","class":"LI","microBalance":"N"}';
+                        //class = "LI" Son Liquidaciones, "I7" Son EEFF individuales, "C7" Son EEFF consolidados.
+                        
+                        string body = '{"action":"IN","numberRows":1,"customerId":"[CUSTOMERID]","customerIdType":"[DOCUMENTTYPE]","class":"I7","microBalance":"N"}';
                         body = body.replace('[CUSTOMERID]', documentNumber);
                         body = body.replace('[DOCUMENTTYPE]', documentType);
-                        HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'CIBE_getEeFF', 'POST', mHeaders);
+                        
+                        CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+                        reqWrapper.body = body;
+                        reqWrapper.intSetting = 'CIBE_getEeFF';
+                        reqWrapper.method = 'POST';
+                        reqWrapper.mHeaders =  mHeaders;
+                        reqWrapper.mUriParams = new  Map<String,string>();
+                        reqWrapper.mQueryParams = new  Map<String,string>();
+                                
+       					HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper);                        
                         HttpResponse res = CBK_HttpServiceIntegration.multiCallHttpService(req, recordId, 'CIBE_getEeFF');
                         //Log Response And Body
                         CBK_Log.debug('Respuesta' + res, logginglevel.DEBUG);
                         //Si nos da un 200 obtenemos los datos necesarios para solicitar la request "Details"
                         if (res.getStatusCode() == 200) {
+                            wrapper.responseEEFFStatus = res.getStatusCode();
                             Map<String, Object> resBody = (Map<String, Object>)JSON.deserializeUntyped(res.getBody());
-                            for(Object obj: (List<Object>)resBody.get('Settlements')) {
+                            for(Object obj: (List<Object>)resBody.get('FinancialStatements')) {
                                 // the result of obj is JSON, so convert it to map
                                 Map<String, Object> objMap = (Map<String, Object>) obj;
                                 statementId = (Integer)objMap.get('stateId');
@@ -193,7 +206,8 @@ public with sharing class CIBE_EEFFIntegrationService {
                                 sourceResp = (String)objMap.get('source');
                                 state = (String)objMap.get('state');
                                 classResp = (String)objMap.get('class');
-                                
+                                yearMonth = (Integer)objMap.get('yearMonth');
+                                year = (Integer)objMap.get('financialYear');
                             }
                             switch on tipoEeff {
                                     when 'AN' {
@@ -236,12 +250,11 @@ public with sharing class CIBE_EEFFIntegrationService {
                         }
                         //Rellenamos el cuerpo de la petición para EEFF con Detalles
                         CBK_IntegrationSetting__c wsc2 = CBK_IntegrationSetting__c.getValues('CIBE_getEeFF_Details');
-                        //CBK_IntegrationSetting__c wsc2 = CBK_IntegrationSetting__c.getValues('CIBE_getEeFF_Details_Mock');
                         //si detecta que usamos la name credential del camaleon le metemos su cabecera
                         if(wsc2?.NamedCredential__c.contains('CAMALEON')) {
                             mHeaders.put('x-api-actor-simulated','ABSIS_GENERICO');
                         }
-                        string body2 = '{"class":"[CLASSRESP]","company":'+company+',"customerId":"[CUSTOMERID]","customerIdType":"[DOCUMENTTYPE]","personNumber":'+personNumberId+',"queryType":"todos","source":"[SOURCERESP]","state":"[STATE]","stateId":'+statementId+',"type":"[TIPOEEFF]","yearMonth":'+yearmonth+',"financialYear":'+year+'}';
+                        string body2 = '{"class":"[CLASSRESP]","company":'+company+',"customerId":"[CUSTOMERID]","customerIdType":"[DOCUMENTTYPE]","personNumber":'+personNumberId+',"queryType":"todos","source":"[SOURCERESP]","state":"[STATE]","stateId":'+statementId+',"type":"[TIPOEEFF]","yearMonth":'+yearMonth+',"financialYear":'+year+'}';
                         body2 = body2.replace('[CUSTOMERID]', documentNumber);
                         body2 = body2.replace('[DOCUMENTTYPE]', documentType);
                         body2 = body2.replace('[CLASSRESP]', classResp);
@@ -251,7 +264,8 @@ public with sharing class CIBE_EEFFIntegrationService {
                         HttpRequest req2 = CBK_HttpServiceIntegration.getRequest(body2, 'CIBE_getEeFF_Details', 'POST', mHeaders);
                         HttpResponse res2 = CBK_HttpServiceIntegration.multiCallHttpService(req2, recordId, 'CIBE_getEeFF_Details');
                         //Log Response And Body
-                        CBK_Log.debug('Respuesta' + res2, logginglevel.DEBUG);
+                        CBK_Log.debug('Request Detail' + req2, logginglevel.DEBUG);
+                        CBK_Log.debug('Respuesta Detail' + res2, logginglevel.DEBUG);
                         //Si nos da un 200 obtenemos los datos necesarios para solicitar la request "Details"
                         if (res2.getStatusCode() == 200) {
                             if(res2.getBody() != null) {
@@ -262,26 +276,33 @@ public with sharing class CIBE_EEFFIntegrationService {
                                 Map<String, Object> financialStatement = (Map<String, Object>)summary.get('financialStatement');
                                 List<Object> BalanceSheets = (List<Object>)root.get('BalanceSheets');
                                 List<Object> Ratios = (List<Object>)root.get('Ratios');
+                                List<Object> CuentaResultados = (List<Object>)root.get('IncomeStatements');
                                 String jsonBSItems = JSON.serialize(BalanceSheets);
-                                String jsonRatios = JSON.serialize(Ratios);                                
+                                String jsonRatios = JSON.serialize(Ratios);
+                                String jsonCuentaResult = JSON.serialize(CuentaResultados);
+                                //Target FinancialYear
+                                Integer targetFinancialYear = Integer.valueOf(financialStatement.get('financialYear'));                            
                                 //Nº Empleados
                                 String numeroEmpleados = String.valueOf(financialStatement.get('numberEmployees'));
-                                //CNAE
-                                String CNAE = String.valueOf(financialStatement.get('cnae'));
-                                //CNAE Description
+                                //cnae
+                                String cnae = String.valueOf(financialStatement.get('cnae'));
+                                //cnae Description
                                 String cnaeDesc = String.valueOf(financialStatement.get('descriptionCnae'));
                                 //YearMonth
                                 Integer yearMonthJson = Integer.valueOf(financialStatement.get('yearMonth'));
                                 string yearMonthString = string.ValueOf(yearMonthJson);
+                                //Unidad de Medida 0-unidades , 1–miles de euro o 2-millones de euro
+                                String UnitMeasure = String.valueOf(financialStatement.get('units'));
                                 //netWorh
-                                Integer netWorth = Integer.valueOf(summary.get('netWorth'));
+                                Integer networh = Integer.valueOf(summary.get('netWorth'));
+                                Decimal netWorthMult = networh*calculateunit(UnitMeasure);
                                 if (yearMonthJson != null && yearMonthString.length() == 6 ) {
                                     String yearJson = yearMonthString.substring(0, 4);
                                     String monthJson = yearMonthString.substring(4, 6);
                                     yearMonthString = monthJson+'/'+ yearJson;
                                 }
-                                //Concatenate CNAE + Description
-                                String fullCnae = CNAE+' '+cnaeDesc;
+                                //Concatenate cnae + Description
+                                String fullCnae = cnae+' '+cnaeDesc;
                                 //Source
                                 String source = tipoEeffDesc+' a '+yearMonthString;
 
@@ -291,103 +312,166 @@ public with sharing class CIBE_EEFFIntegrationService {
                                 fieldsToUpdate.put('CIBE_Fecha_EEFF__c',yearMonthString);
                                 fieldsToUpdate.put('CIBE_FechaRefrescoEEFF__c',dateTime.now());
                                 fieldsToUpdate.put('CIBE_NumeroEmpleados__c',numeroEmpleados);
-                                fieldsToUpdate.put('CIBE_CNAE__c', fullCnae);
-                                fieldsToUpdate.put('CIBE_NetWorth__c', netWorth);
+                                fieldsToUpdate.put('CIBE_cnae__c', fullCnae);
+                                fieldsToUpdate.put('CIBE_NetWorth__c', netWorthMult);
                                 
+                                //Recorremos array RatioItems
                                 List<Object> lstRatios = (List<Object>) JSON.deserializeUntyped(jsonRatios);
-                                Integer amountratio = 0;
-                                Integer NetFinDebtEbitdaValue = 0;
+                                Integer netFinDebtEbitdaValue = 0;
+                                Decimal netFinDebtEbitdaMiles = 0;
                                 for (Object obj : lstRatios) {
                                     Map<String, Object> objMap = (Map<String, Object>)obj;
-                                    List<Object> lstItems = (List<Object>) objMap.get('RatioItems');
-                                    Integer Countrat = 0;
-                                    for (Object lst : lstItems) {
-                                        Map<String, Object> auxMap = (Map<String, Object>)lst;
-                                        String code = String.valueOf(auxMap.get('code'));
-                                        if (code.contains('RAT EDF')) {                                    
-                                            NetFinDebtEbitdaValue = Integer.valueOf(auxMap.get('amount'));
-                                            fieldsToUpdate.put('CIBE_NetFinancialDebt_Ebitda__c', NetFinDebtEbitdaValue);
-                                            Countrat ++;
-                                            
-                                        } else if (code.contains('RAT SCH')) {
-                                            Integer cashFlowValue = Integer.valueOf(auxMap.get('amount'));
-                                            fieldsToUpdate.put('CIBE_CashFlow__c', cashFlowValue);
-                                            Countrat ++;
+                                    if (objMap.containsKey('financialYear') && objMap.get('financialYear') instanceof Integer &&
+                                    (Integer)objMap.get('financialYear') == targetFinancialYear) {
+                                        if (objMap.containsKey('units') && objMap.get('units') != '') {
+                                            UnitMeasure = String.valueOf(objMap.get('units'));
                                         }
-                                        if (Countrat == 2){
-                                            break;
+                                        List<Object> lstItems = (List<Object>) objMap.get('RatioItems');
+                                        Integer countrat = 0;
+                                        for (Object lst : lstItems) {
+                                            Map<String, Object> auxMap = (Map<String, Object>)lst;
+                                            String code = String.valueOf(auxMap.get('code'));
+                                            if (code.contains('RAT EDF')) {                                    
+                                                netFinDebtEbitdaValue = Integer.valueOf(auxMap.get('amount'));
+                                                netFinDebtEbitdaMiles = netFinDebtEbitdaValue*calculateunit(UnitMeasure);
+                                                fieldsToUpdate.put('CIBE_NetFinancialDebt_Ebitda__c', netFinDebtEbitdaValue);
+                                                countrat ++;
+                                                
+                                            }
+                                            if (countrat == 2){
+                                                break;
+                                            }
                                         }
                                     }
                                 }
+                                //Recorremos array BalanceSheetItems
                                 List<Object> lstBSItems = (List<Object>) JSON.deserializeUntyped(jsonBSItems);
                                 for (Object obj : lstBSItems) {
                                     Map<String, Object> objMap = (Map<String, Object>)obj;
-                                    List<Object> lstItems = (List<Object>) objMap.get('BalanceSheetItems');
-                                    //Declaramos variables Aux
-                                    //Resultado Explotación (C0491000)
-                                    Integer resExplotValue = 0;
-                                    //Resultado Post Impuesto (C0495000)
-                                    Integer resPostTaxValue= 0;
-                                    //Importe neto de la cifra de negocios (C0401000)
-                                    Integer imporNetNegoVlue = 0;
-                                    // Otros ingresos Explotación (C0405000)
-                                    Integer otrosIngExplotValue = 0;
-                                    //Ingresos Explotación (imporNetNegoVlue+otrosIngExplotValue)
-                                    Integer totalIngExplot = 0;
-                                    //Deudas a Corto Plazo (C0323000)
-                                    Integer deudaCortoPlazo = 0;
-                                    //Deuda Largo Plazo (C0312000)
-                                    Integer deudaLargoPlazo = 0;
-                                    //Efectivo y otros activos líquidos (C0127000)
-                                    Integer activosLiquidos = 0;
-                                    //Deuda financiera neta (deudaCortoPlazo + deudaLargoPlazo) - activosLiquidos
-                                    Integer deudaFinanceNeta = 0;
-                                    //EBITDA
-                                    Decimal EBITDA = 0;
-                                    for (Object lst : lstItems) {
-                                        Map<String, Object> auxMap = (Map<String, Object>)lst;
-                                        String code = String.valueOf(auxMap.get('code'));
-                                        // Resultado Explotación
-                                        if (code.contains('C0491000') && resExplotValue == 0) {
-                                            resExplotValue = Integer.valueOf(auxMap.get('amount'));
-                                            if(resExplotValue != 0) {
-                                                fieldsToUpdate.put('CIBE_ResultadoExplotacion__c', resExplotValue);
-                                            }
-                                            // Resultado Post Impuesto
-                                        } else if (code.contains('C0495000') && resPostTaxValue == 0) {
-                                            resPostTaxValue = Integer.valueOf(auxMap.get('amount'));
-                                            if(resPostTaxValue != 0) {
-                                                fieldsToUpdate.put('CIBE_ResultadoPostImpuestos__c', resPostTaxValue);
-                                            }
-                                            //Ingresos Explotación --> Importe neto de la cifra de negocios(C0401000) + Otros ingresos de explotación (C0405000)
-                                        } else if (code.contains('C0401000') && imporNetNegoVlue == 0) {
-                                            imporNetNegoVlue = Integer.valueOf(auxMap.get('amount'));
-                                        } else if (code.contains('C0405000') && otrosIngExplotValue == 0) {
-                                            otrosIngExplotValue = Integer.valueOf(auxMap.get('amount'));
-                                        }                                       
-                                        /*EBITDA = A/B 
-                                        A = (Deuda financiera neta/Ebitda= NetFinDebtEbitdaValue) / Deuda financiera neta.
-                                        B = Deuda financiera neta = (Deudas a corto plazo + deudas a largo plazo) - Efectivo y otros activos líquidos equivalentes. */                              
-                                        else if (code.contains('C0323000')) {
-                                            deudaCortoPlazo = Integer.valueOf(auxMap.get('amount'));
-                                        } else if (code.contains('C0312000')) {
-                                            deudaLargoPlazo = Integer.valueOf(auxMap.get('amount'));
-                                        } else if (code.contains('C0127000')) {
-                                            activosLiquidos = Integer.valueOf(auxMap.get('amount'));
+                                    if (objMap.containsKey('financialYear') && objMap.get('financialYear') instanceof Integer &&
+                                    (Integer)objMap.get('financialYear') == targetFinancialYear) {
+                                        if (objMap.containsKey('units') && objMap.get('units') != '') {
+                                            UnitMeasure = String.valueOf(objMap.get('units'));
                                         }
-                                    }
-                                    if (totalIngExplot == 0) {                                        
-                                            totalIngExplot = imporNetNegoVlue+otrosIngExplotValue;
-                                            fieldsToUpdate.put('CIBE_Facturacion__c', totalIngExplot);
+                                        List<Object> lstItems = (List<Object>) objMap.get('BalanceSheetItems');
+                                        //Deudas a Corto Plazo (C0323000)
+                                        Integer deudaCortoPlazo = 0;
+                                        //Deuda Largo Plazo (C0312000)
+                                        Integer deudaLargoPlazo = 0;
+                                        //Efectivo y otros activos líquidos (C0127000)
+                                        Integer activosLiquidos = 0;
+                                        //Deuda financiera neta (deudaCortoPlazo + deudaLargoPlazo) - activosLiquidos
+                                        Integer deudaFinanceNeta = 0;
+                                        //Ebitda
+                                        Decimal Ebitda = 0;
+                                        //DedudaFinanciera Multiplicada por units
+                                        Decimal deudaFinanceNetaMul;
+                                        for (Object lst : lstItems) {
+                                            Map<String, Object> auxMap = (Map<String, Object>)lst;
+                                            String code = String.valueOf(auxMap.get('code'));                                   
+                                            /*Ebitda = A/B 
+                                            A = (Deuda financiera neta/Ebitda= netFinDebtEbitdaValue) / Deuda financiera neta.
+                                            B = Deuda financiera neta = (Deudas a corto plazo + deudas a largo plazo) - Efectivo y otros activos líquidos equivalentes. */                              
+                                            if (code.contains('C0323000')) {
+                                                deudaCortoPlazo = Integer.valueOf(auxMap.get('amount'));
+                                            } else if (code.contains('C0312000')) {
+                                                deudaLargoPlazo = Integer.valueOf(auxMap.get('amount'));
+                                            } else if (code.contains('C0127000')) {
+                                                activosLiquidos = Integer.valueOf(auxMap.get('amount'));
+                                            } 
                                         }
-                                    if (deudaFinanceNeta == 0) {
-                                        deudaFinanceNeta = (deudaCortoPlazo+deudaLargoPlazo)-activosLiquidos;
+                                        if (deudaFinanceNeta == 0) {
+                                            deudaFinanceNeta = (deudaCortoPlazo+deudaLargoPlazo)-activosLiquidos;
+                                            deudaFinanceNetaMul = deudaFinanceNeta*calculateunit(UnitMeasure);
+                                        }
+                                        if(netFinDebtEbitdaMiles != 0 && deudaFinanceNeta != 0) {
+                                            Ebitda = netFinDebtEbitdaMiles/deudaFinanceNetaMul;
+                                            Decimal ebitdaRound = Ebitda.setScale(2, RoundingMode.HALF_UP);
+                                            fieldsToUpdate.put('CIBE_EBITDA__c', ebitdaRound);
+                                        }
+                                                            
+                                    }  
+                                }
+                                //Recorremos array IncomeStatements
+                                List<Object> lstCRItems = (List<Object>) JSON.deserializeUntyped(jsonCuentaResult);
+                                for (Object obj : lstCRItems) {
+                                    Map<String, Object> objMap = (Map<String, Object>)obj;
+                                    if (objMap.containsKey('financialYear') && objMap.get('financialYear') instanceof Integer &&
+                                    (Integer)objMap.get('financialYear') == targetFinancialYear) {
+                                        if (objMap.containsKey('units') && objMap.get('units') != '') {
+                                            UnitMeasure = String.valueOf(objMap.get('units'));
+                                        }
+                                        List<Object> lstItems = (List<Object>) objMap.get('IncomeStatementItems');
+                                        //Resultado Explotación (C0491000)
+                                        Decimal resExplotValue = 0;
+                                        //Resultado Post Impuesto (C0495000)
+                                        Integer resPostTaxValue= 0;
+                                        //Importe neto de la cifra de negocios (C0401000)
+                                        Integer imporNetNegoVlue = 0;
+                                        Decimal imporNetNegoVlueDec;
+                                        // Otros ingresos Explotación (C0405000)
+                                        Integer otrosIngExplotValue = 0;
+                                        Decimal otrosIngExplotValueDec;
+                                        //Ingresos Explotación (imporNetNegoVlue+otrosIngExplotValue)
+                                        Integer totalIngExplot = 0;
+                                        //Calculo Cashflow (C0495000 - C0408000 - C0999401) && if C0419000 > 0 se resta tb.
+                                        //Amortización inmovilizado (C0408000)
+                                        Integer amortInmov = 0;
+                                        //Dividendos (C0999401 )
+                                        Integer dividendos = 0;
+                                        //Impuesto Sobre beneficios (C0419000)
+                                        Integer taxOverBen = 0;
+                                        //CashFlow neto de dividendos
+                                        Decimal cashFlowNeto = 0;
+                                        //Resultado Explotación (C0495000)
+                                        Decimal resulConso = 0;
+
+                                        for (Object lst : lstItems) {
+                                            Map<String, Object> auxMap = (Map<String, Object>)lst;
+                                            String code = String.valueOf(auxMap.get('code'));
+                                            if (code.contains('C0491000') && resExplotValue == 0) {
+                                                resExplotValue = Integer.valueOf(auxMap.get('amount')) * calculateunit(UnitMeasure);
+                                                if(resExplotValue != 0) {
+                                                    fieldsToUpdate.put('CIBE_ResultadoExplotacion__c', resExplotValue);
+                                                }
+                                                // Resultado Post Impuesto
+                                            } else if (code.contains('C0495000') && resPostTaxValue == 0) {
+                                                resulConso = Integer.valueOf(auxMap.get('amount'));
+                                                if(resPostTaxValue != 0) {
+                                                    fieldsToUpdate.put('CIBE_ResultadoPostImpuestos__c', resPostTaxValue);
+                                                }
+                                                // Resultado Explotación
+                                            } else if (code.contains('C0401000') && imporNetNegoVlue == 0) {
+                                                imporNetNegoVlue = Integer.valueOf(auxMap.get('amount'));
+                                                imporNetNegoVlueDec = imporNetNegoVlue*calculateunit(UnitMeasure);
+                                            } else if (code.contains('C0405000') && otrosIngExplotValue == 0) {
+                                                otrosIngExplotValue = Integer.valueOf(auxMap.get('amount'));
+                                                otrosIngExplotValueDec = otrosIngExplotValue*calculateunit(UnitMeasure);
+                                            } else if (code.contains('C0408000') && amortInmov == 0) {
+                                                amortInmov = Integer.valueOf(auxMap.get('amount'));
+
+                                            } else if (code.contains('C0999401') && dividendos == 0) {
+                                                dividendos = Integer.valueOf(auxMap.get('amount'));
+        
+                                            } 
+                                            else if (code.contains('C0419000') && taxOverBen == 0) {
+                                                taxOverBen = Integer.valueOf(auxMap.get('amount'));
+                                                
+                                            }
+                                        }
+                                        if (totalIngExplot == 0) {                                        
+                                            Decimal totalIngExplotDecimal = imporNetNegoVlue + otrosIngExplotValue;
+                                            Decimal totalIngExplotMiles = totalIngExplotDecimal * calculateunit(UnitMeasure);
+                                            fieldsToUpdate.put('CIBE_Facturacion__c', totalIngExplotMiles);
+                                        }
+                                        if(taxOverBen>=0) {
+                                            cashFlowNeto = (resulConso - amortInmov - dividendos -taxOverBen)*calculateunit(UnitMeasure);
+                                        } else {
+                                            cashFlowNeto = (resulConso - amortInmov - dividendos)*calculateunit(UnitMeasure);
+                                        }
+                                        Decimal cashFlowNetoMiles = cashFlowNeto;
+                                        fieldsToUpdate.put('CIBE_CashFlow__c', cashFlowNetoMiles);       
                                     }
-                                    if(NetFinDebtEbitdaValue != 0 && deudaFinanceNeta != 0) {
-                                        EBITDA = NetFinDebtEbitdaValue/deudaFinanceNeta;
-                                        Decimal ebitdaRound = EBITDA.setscale(2);
-                                        fieldsToUpdate.put('CIBE_EBITDA__c', ebitdaRound);
-                                    }   
                                 }
                             }
                             sError = CIBE_IntegrationUtilities.updateObject(fieldsToUpdate, 'Account');
@@ -406,21 +490,38 @@ public with sharing class CIBE_EEFFIntegrationService {
                         sError = 'Error al procesar los datos de la integración. Contacte con el administrador';
                         cbk_log.error(e);
                     }
-                    if(!string.isBlank(sError)){
-                        throw new AuraHandledException(sError);
-                    }
+                    CBK_HttpServiceIntegration.registroTrazaIntegracion();
                 } else {
                     sError = 'Han pasado menos de 24H desde el último refresco ' + acc.CIBE_FechaRefrescoEEFF__c.format('d/M/y H:m');
                     cbk_log.error(sError);
-                    throw new AuraHandledException(sError);  
                 }
             }
             else {
                 sError = '¡Error!, Falta información a nivel de cliente para procesar la petición. NumPerso:'+personNumberId+'Nº Documento:'+documentNumber+'Tipo de Documento:'+documentType+'.';
-                cbk_log.error(sError);
-                throw new AuraHandledException(sError);                
+                cbk_log.error(sError);             
+            }
+            if(!string.isBlank(sError)){
+                system.debug('sError ' + sError);
+                throw new AuraHandledException(sError);
             }
         }
         return respData;
+    }
+    public static Decimal calculateunit (String unitMeasure) {
+        Decimal unitsToMultiply;
+        if (unitMeasure != '') {
+            if (unitMeasure.equals('0')) {
+                unitsToMultiply = 0.001;
+            } else if (unitMeasure.equals('1')) {
+                unitsToMultiply = 1;
+            } else if (unitMeasure.equals('2')) {
+                unitsToMultiply = 1000;
+            } else {
+                 unitsToMultiply = 1;
+            }
+         } else {
+             unitsToMultiply = 1;
+         }
+         return unitsToMultiply;
     }
 }

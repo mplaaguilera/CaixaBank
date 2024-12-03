@@ -18,12 +18,13 @@ Historial
 	1.6			US384943		Víctor Santiago		27/05/2022			Query optimized
 	1.7			US534659		Vladislav Lityagin	22/02/2022			Added new RT CallMe and rest of RTs
 	1.8			US582623		Luis Fernández		10/05/2023			Modified batch query 
+	1.8         FIX28080841     Oscar Moreno        27/08/2024          Fix error The Global modifier should be avoided.
 ***********************************************************************************************************************/
-global class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 	
-	global Integer recordsProcessed = 0;
+	public Integer recordsProcessed = 0;
     private static final String STATUS_DEFEAT 	= 'Vencido';
-	global static final String BATCHNAME = 'AV_OpportunityStatusBatch';
+	public static final String BATCHNAME = 'AV_OpportunityStatusBatch';
     private String avQuery;
 	
     public AV_OpportunityStatusBatch(){
@@ -73,7 +74,7 @@ global class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, D
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
         if(avQuery==null){
             avQuery = setQuery();
@@ -89,7 +90,7 @@ global class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, D
 	 * @param bc		Database.BatchableContext param that contains the batch job ID
 	 * @param listTask 	List<Task> param with the list of Task to update.
 	 */
-	global void execute(Database.BatchableContext bc, List<Opportunity> listOpp){
+	public void execute(Database.BatchableContext bc, List<Opportunity> listOpp){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -118,7 +119,7 @@ global class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, D
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_OpportunityStatusBatch());
 	}
 
@@ -127,7 +128,7 @@ global class AV_OpportunityStatusBatch implements Database.Batchable<sObject>, D
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}

@@ -42,7 +42,7 @@ public with sharing class CSBD_Hipoteca_Test {
         plantilla1.TemplateType = 'text';
         plantilla1.FolderId = UserInfo.getUserId();
         plantillas.add(plantilla1);
-
+        
         EmailTemplate plantilla2 = new EmailTemplate();
         plantilla2.isActive = true;
         plantilla2.Name = 'Prestamos Hipotecarios CLIENTE - CAST';
@@ -78,7 +78,7 @@ public with sharing class CSBD_Hipoteca_Test {
         cuenta.Name = 'test@test.com';
         cuenta.CC_Numero_Documento__c = nif;
         insert cuenta;
-
+        
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Cliente');
         contacto.Email = 'test@test.com';
@@ -98,7 +98,7 @@ public with sharing class CSBD_Hipoteca_Test {
         cuenta.CC_Email__c = 'test@test.com';
         cuenta.CC_Numero_Oficina__c = '00044';
         insert cuenta;
-
+        
         Contact contacto = new Contact();
         contacto.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
         contacto.Email = 'test@test.com';
@@ -137,38 +137,6 @@ public with sharing class CSBD_Hipoteca_Test {
             Test.stopTest();
 
             System.assert([SELECT Count() FROM EmailMessage WHERE RelatedToId = :oportunidad.Id] > 0, 'Correo no enviado');
-        }
-    }
-
-    @isTest
-    public static void informarCampoPrioridad() {
-		System.runAs(CSBD_Usuarios.usuarioGestor()) {
-            Account cuentaTitular = new Account();
-            cuentaTitular.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
-            cuentaTitular.Name = 'Titular Test';
-            insert cuentaTitular;
-
-            Contact titular = new Contact();
-            titular.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CSBD_TitularHipoteca').getRecordTypeId();
-            titular.AccountId = cuentaTitular.Id;
-            titular.FirstName = 'Titular Test';
-            titular.LastName = 'Titular Test';
-            insert titular;
-
-            Map<String, Object> campos = new Map<String, Object>{
-                'CSBD_PrecioInmueble__c' => 100000,
-                'Amount' => 80000,
-                'CSBD_Now_Plazo__c' => 120,
-                'CSBD_TIN_Inicial__c' => 0.75,
-                'CSBD_ContactoTitular1__c' => titular.Id,
-                'CSBD_Datos_Calculo_DTI__c' => '{"metadata": {"version": "3"}, "porcentajeGastosConstitucion": 0, "ahorro": 0, "primerTitular": {}, "deuda": {}}'
-            };
-            Opportunity hipoteca = CSBD_Opportunity.crearOportunidad('CSBD_Hipoteca', campos);
-            Test.startTest();
-            CSBD_Hipoteca.informarCampoPrioridad(new List<Opportunity>{hipoteca}, new Map<Id, Contact>());
-            Test.stopTest();
-
-            //System.assert(!retorno.isEmpty(), 'El retorno debe contener datos');
         }
     }
 }

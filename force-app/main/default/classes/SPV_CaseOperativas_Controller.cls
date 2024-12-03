@@ -391,9 +391,7 @@ public with sharing class SPV_CaseOperativas_Controller {
         if(caso.SPV_Complementaria_Entidad__c == true){
             caso.SPV_Complementaria_Entidad__c = false;
         }else{
-            //Añadido: Al activar la complementaria entidad, se almacena la fecha en el campo correspondiente
             caso.SPV_Complementaria_Entidad__c = true;
-            caso.SPV_FechaComplementariaEntidad__c = System.now();
         } 
         SPV_DatabaseDML.updateDML(caso, true);
         }else{
@@ -422,7 +420,7 @@ public with sharing class SPV_CaseOperativas_Controller {
     public static void prorrogarReclamacion(String idCaso){
         if (Schema.sObjectType.Case.isAccessible()) {
             Case casoActual = recuperarCaso(idCaso); 
-            List<ContentVersion> cv = [SELECT Id, ContentDocumentId, Title, CreatedDate, SAC_TipoAdjunto__c, SAC_TipoAdjunto__r.Name, SAC_Bloque__c, SAC_ValidadoCV__c, SAC_TipoAdjunto__r.SAC_DeveloperName__c  FROM ContentVersion WHERE FirstPublishLocationId =: idCaso];
+            List<ContentVersion> cv = [SELECT Id, SAC_TipoAdjunto__r.SAC_DeveloperName__c, ContentDocument.Id FROM ContentVersion WHERE FirstPublishLocationId =: idCaso];
             ContentVersion[] listaAdjuntos =  new List<ContentVersion>();
 
             for(ContentVersion record : cv){
@@ -600,8 +598,6 @@ public with sharing class SPV_CaseOperativas_Controller {
             casoActual.SEG_Subestado__c = 'SPV_AnalisisComplementaria';
             casoActual.SPV_ComplementariaOrganismo__c = true;
             casoActual.SPV_MotivoComplementariaOrganismo__c = motivoComplementaria;
-            //Añadido: Al activar la complementaria organismo, se rellena la fecha en su campo correspondiente
-            casoActual.SPV_FechaComplementariaOrganismo__c = System.now();
 
             SPV_DatabaseDML.updateDML(casoActual, true);
         }else{

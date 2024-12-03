@@ -10,6 +10,8 @@ Proposito: Clase controller para la creación masiva de eventos
  * 1.2 		US704873	Carolina Lopez		08/09/2023		Add Custom Label EV_AltaMasivaSize
  * 1.3		US704873    Carolina Lopez		28/09/2023		Add methods generarTraduccionesEventoHijo, shareCampaign, sharingCampaignApex
  * 1.4		US704873    Carolina Lopez		09/10/2023		Modify methods sharingCampaignApex, generarTraduccionesEventoHijo, saveRecords.
+ * 1.5		fix			Carolina Lopez		12/01/2024		Modify the value of EV_Provincia__c by BillingState.
+ * 1.6		ALTA_MASIVA	Carolina Lopez		18/01/2024		Modify method saveRecords generate centro objetivo to the marked user and associate it with the EV_CentroOrganizador__c.
 ***********************************************************************************************************************/
 public without sharing class EV_ImportMassEvent_Controller {
 
@@ -162,7 +164,7 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
 					newCampaign.EV_HoraFin__c = Time.newInstance(00, 15, 00, 00);
 					if(campana.RecordtypeId == rtC || campana.RecordtypeId == rtH){
 						newCampaign.EV_LugarDeCelebracion__c = contacto.Account.name;
-						newCampaign.EV_Provincia__c = getProvinceValue(contacto.Account.BillingCity);
+						newCampaign.EV_Provincia__c = getProvinceValue(contacto.Account.BillingState);
 						newCampaign.EV_Street__c = contacto.Account.BillingStreet;
 						newCampaign.EV_CP__c = contacto.Account.BillingPostalCode;
 						newCampaign.EV_City__c = contacto.Account.BillingCity;                   
@@ -174,7 +176,7 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
 					newCampaign.EV_FechaHoraFin__c = DateTime.newInstance(newCampaign.StartDate, newCampaign.EV_HoraFin__c);
 					newCampaign.EV_CentroPromotor__c = campana.EV_CentroPromotor__c;
 					newCampaign.EV_CentroAdminstrador__c = campana.EV_CentroAdminstrador__c;
-					newCampaign.EV_CentroOrganizador__c = contacto.AccountId;
+					newCampaign.EV_CentroOrganizador__c = contacto.AccountId;			
 					newCampaign.EV_ProgramaDeEventos__c = campana.EV_ProgramaDeEventos__c;
 					newCampaign.Type = campana.Type;
 					newCampaign.EV_Categoria__c = campana.EV_Categoria__c;
@@ -202,9 +204,9 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
         EV_LogDebug.printLogDebug('generarTraduccionesEventoHijo ',String.valueof(idsHijos)+ ' cmpParent' + String.valueof(cmpParent));
         if(cmpParent != null && !idsHijos.isEmpty()){
             List<EV_TraduccionDeEvento__c> traducciones = [select EV_AntetituloCategoria__c, Name,EV_Descripcion__c, EV_Evento__c, EV_Idioma__c, EV_ImagenCabecera__c, EV_SinopsisInvitacion__c,EV_URLDeImagen__c, EV_URLImagenInvitacion__c, EV_URLVideoTeaser__c, EV_Claim__c, EV_TextoBoton__c, EV_TextoDebajoBoton__c, 
-                                                  EV_TextoDescriptivoBoton__c, EV_TextoOnClick__c, EV_URLImagenCarrusel__c, EV_URLImagenGrande__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLNegocioPromotor__c, EV_URLLogoPie__c, 
-                                                  EV_TituloVideoTeaser__c, EV_DescripcionVideoTeaser__c from EV_TraduccionDeEvento__c where EV_Evento__c = :cmpParent];
-        
+                                                           EV_TextoDescriptivoBoton__c, EV_TextoOnClick__c, EV_URLImagenCarrusel__c, EV_URLImagenGrande__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLNegocioPromotor__c, EV_URLLogoPie__c, 
+                                                           EV_TituloVideoTeaser__c, EV_DescripcionVideoTeaser__c from EV_TraduccionDeEvento__c where EV_Evento__c = :cmpParent];
+            
             if(!traducciones.isEmpty()){
                 List<EV_TraduccionDeEvento__c> lstTraduccionesInsert = new List<EV_TraduccionDeEvento__c>();
                 for(EV_TraduccionDeEvento__c trad : traducciones){
@@ -275,15 +277,15 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
 				for(String camp : campaignCentros.keySet()){
 					for (String centroAccountId : campaignCentros.get(camp)) {
                         if (mapCons.containsKey(centroAccountId)) {
-						for (String usuario : mapCons.get(centroAccountId)) {
-							if(!campaignEmployees.containsKey(camp)){
-								campaignEmployees.put(camp, new Set<String>{usuario});
-							}else{
-								campaignEmployees.get(camp).add(usuario);
-							}
-						}
-					}
-				}
+                            for (String usuario : mapCons.get(centroAccountId)) {
+                                if(!campaignEmployees.containsKey(camp)){
+                                    campaignEmployees.put(camp, new Set<String>{usuario});
+                                }else{
+                                    campaignEmployees.get(camp).add(usuario);
+                                }
+                            }
+                        }
+                    }
 				}
 
 				List<CampaignShare> lstShare = new List<CampaignShare>();
@@ -316,7 +318,7 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
 		if (!listCampaign.isEmpty()) {
 			List<Centro_Objetivo__c> centroObj = new List<Centro_Objetivo__c>();
 			Integer exito = 1;
-			Integer err = 0;
+			Integer err = 0; 
 
 			Database.SaveResult[] saveResults = Database.insert(listCampaign, false);
 			Map<String, String> msgError = new Map<String, String>();
@@ -326,15 +328,7 @@ private static Id rtEvtH = Schema.SObjectType.Campaign.getRecordTypeInfosByDevel
 			for (Database.SaveResult result : saveResults) {
 				if (result.isSuccess()) {
 					campInsertados.add(result.getId());
-					for(Id valor :centrosAdd){
-						idCmpInsert.add(result.getId());
-
-						Centro_Objetivo__c customObject = new Centro_Objetivo__c(
-						EV_Centro__c = valor, 
-						EV_Campaign__c = result.getId()
-						);
-						centroObj.add(customObject);
-					}
+					idCmpInsert.add(result.getId());
 					resultado = exito++; 
 				} 
 				else {

@@ -17,6 +17,12 @@ Historial
 	8.0			US616750		Alex Campos 	    27/07/2023			setOpportunityUsers
 	9.0        	US674811      	Lucía Muñoz         15/09/2023			modificar stateOpportunity;
 	10.0        US643353      	Ali y Bea	       	21/09/2023			crear el metodo insertOppTM()
+	11.0	    US717936        Bea                 04/12/2023      	Método updateStageName
+	12.0	    US732988        Ali                 05/12/2023      	Método createCommentsHistory(), updateCommentsHistory() y deleteCommentsHistory()
+	13.0		US812745		Luis				14/03/2023			Mod Método insertTaskWithOpp() para excluir RT Alerta Comercial EMP
+	14.0		US733917		Lucia				18/03/2023			Modificar los metodos insertTaskWithOpp y updateTaskWithOpp
+	15.0		US872914		Lucia				06/05/2024			Nuevo metodo deleteRelations
+	16.0		IN1216697		Luis				14/10/2024			Mod Método updateCommentsHistory() por error en la visualización 360 de registros no relacionados a la Oportunidad
 
 ------------------------------------------------------------------------------------------------
 ***********************************************************************************************************************/
@@ -44,7 +50,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
     private static Set<Id> setRtAll = getAllRT();
 
 	private static Set<Id> setRtOppCIB   = getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtINICIATIVACIB, rtSUGERENCIACIB, rtALERTACOMERCIALCIB, rtACCIONCOMERCIALCIB});
-    
+    private static Set<Id> setRtOppEMP   = getIdsRT(new Set<CIBE_AppUtilities.SearchRT>{rtINICIATIVAEMP, rtSUGERENCIAEMP, rtALERTACOMERCIALEMP, rtACCIONCOMERCIALEMP});
     /**
 	 * @description		 	Check the record types
 	 * @param listNews  	list of new records
@@ -86,13 +92,16 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 	 * @param  mapOldObj  map with old Opportunity records
 	 */
 	public static void fillFieldsFromOpp(List<Opportunity> listNews,Map<Id, Opportunity> mapOldObj){
-		
-
 		Date createdFormatDate = System.today();
 		for(Opportunity opp: listNews){
             if(mapOldObj == null || (mapOldObj != null && mapOldObj.get(opp.id).StageName != opp.StageName)){
 				opp.CIBE_LastStageModifiedDate__c = createdFormatDate;
+				//US807446
+				if(opp.StageName == 'CIBE_Vencido' && setRtOppEMP.contains(opp.RecordTypeId) && mapOldObj != null){
+					opp.CIBE_LastUpdatedCerradoNegativo__c = createdFormatDate;
+				}
             }
+			
 		}
 	}
     
@@ -104,7 +113,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 	public static void asignAltaValues(List<Opportunity> listNews,Map<Id, Opportunity> mapOldObj){
 		List<Contact> listContactOfUsers = new List<Contact> ();
 		if(
-			Contact.SObjectType.getDescribe().isAccessible()
+			Schema.SObjectType.Contact.fields.Id.isAccessible()
 		) {
 			listContactOfUsers=[SELECT Id FROM Contact WHERE AV_UsuarioAsociado__c = :UserInfo.getUserId()];
 		}
@@ -136,7 +145,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
         //Get the list of task-opp related with the opps
 		List<AV_CustomActivityOpportunity__c> listTaskAndOpp = new List<AV_CustomActivityOpportunity__c>();
 		if(
-			AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
 			Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible()
 		) {
 			listTaskAndOpp= [SELECT Id, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c=: mapOpps.keySet()];
@@ -183,7 +191,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		}
 		List<Contact> listCont =new List<Contact>();
 		if(
-			Contact.SObjectType.getDescribe().isAccessible() &&
 			Schema.SObjectType.Contact.fields.LastModifiedDate.isAccessible() &&
 			Schema.SObjectType.Contact.fields.AV_UsuarioAsociado__c.isAccessible()
 		) {
@@ -218,9 +225,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 	* @param mapOlds map of old Opportunity records
 	*/
 	public static void retrieveComercialGroup(List<Opportunity> news, Map<Id, Opportunity> mapOlds) {
-		String methodName = 'retrieveComercialGroup';
-		AV_LogDebug.printLogDebug(methodName, '');
-        
+		String methodName = 'retrieveComercialGroup';        
 		Map<Id, List<Opportunity>> accountIds = new Map<Id, List<Opportunity>>();
 		if(mapOlds == null) {
 			for(Opportunity opp : news) {
@@ -245,15 +250,14 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		}
 
 		List<FinServ__AccountAccountRelation__c> relations = new List<FinServ__AccountAccountRelation__c>();
-		if(FinServ__AccountAccountRelation__c.SObjectType.getDescribe().isAccessible() 
-			&& Schema.SObjectType.FinServ__AccountAccountRelation__c.fields.Id.isAccessible()
+		if( Schema.SObjectType.FinServ__AccountAccountRelation__c.fields.Id.isAccessible()
 			&& Schema.SObjectType.FinServ__AccountAccountRelation__c.fields.RecordTypeId.isAccessible()
 			&& Schema.SObjectType.FinServ__AccountAccountRelation__c.fields.FinServ__Account__c.isAccessible()
 			&& Schema.SObjectType.FinServ__AccountAccountRelation__c.fields.FinServ__RelatedAccount__c.isAccessible()) {
 				relations = [SELECT Id, FinServ__Account__c, FinServ__RelatedAccount__c FROM FinServ__AccountAccountRelation__c WHERE RecordType.DeveloperName = 'CIBE_GrupoComercial' AND FinServ__Account__r.RecordType.DeveloperName = 'CIBE_GrupoComercial' AND FinServ__RelatedAccount__c IN :accountIds.keySet()];
 		}
 
-		if(!relations.isEmpty()) {
+		if(relations!=null && !relations.isEmpty()) {
 			for(FinServ__AccountAccountRelation__c relation : relations) {
 				if(accountIds.containsKey(relation.FinServ__RelatedAccount__c)) {
 					for(Opportunity opp : accountIds.get(relation.FinServ__RelatedAccount__c)) {
@@ -324,8 +328,8 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		}
         
 		List<User> userGFC= new List<User>();
-		if(	USER.SObjectType.getDescribe().isAccessible() ) {
-			userGFC = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' and IsActive = TRUE LIMIT 1];
+		if(	Schema.SObjectType.User.fields.Id.isAccessible()) {
+			userGFC = [SELECT ID FROM User WHERE Alias = 'AV-TF9' and IsActive = TRUE LIMIT 1];
 		}
 		if(listOppSinEap!=null && !listOppSinEap.isEmpty()){
 			for(Opportunity opp : listOppSinEap){
@@ -379,7 +383,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		}
         
 		List<User> userGFC= new List<User>();
-		if(	USER.SObjectType.getDescribe().isAccessible() ) {
+		if(	Schema.SObjectType.User.fields.Id.isAccessible() ) {
 			userGFC = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' and IsActive = TRUE LIMIT 1];
 		}
 
@@ -389,7 +393,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 			List<Contact> listCont = new List<Contact>();
 
 			if(
-				Contact.SObjectType.getDescribe().isAccessible() &&
 				Schema.SObjectType.Contact.fields.lastmodifieddate.isAccessible() &&
 				Schema.SObjectType.Contact.fields.CIBE_Sector__c.isAccessible()&&
 				Schema.SObjectType.Contact.fields.CIBE_Cartera__c.isAccessible()&&
@@ -453,7 +456,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		if(!lstToProcess.isEmpty()) {
 			List<User> currentUser = new List<User>();
 			if(
-				User.SObjectType.getDescribe().isAccessible() &&
 				Schema.SObjectType.User.fields.AV_NumeroOficinaEmpresa__c.isAccessible() &&
 				Schema.SObjectType.User.fields.Name.isAccessible()
 			) {
@@ -476,7 +478,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 	*/
 	public static void opportunityValueNumeroDocumento(List<Opportunity> listNews) {
 		
-
 		List<Opportunity> lstToProcess = new List<Opportunity>();
 		Map<Id,Opportunity> mapAccOpp = new Map<Id,Opportunity>();
 		for(Opportunity opp : listNews) {
@@ -486,10 +487,8 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		if(!lstToProcess.isEmpty()) {
 			List<Account> listAcc= new List<Account>();
 			if(
-				Account.SObjectType.getDescribe().isAccessible() &&
 				Schema.SObjectType.Account.fields.CC_Numero_Documento__c.isAccessible()
 			) {
-
 				listAcc = [Select Id, CC_Numero_Documento__c From Account Where Id = :mapAccOpp.keySet()];
 			}
 
@@ -523,7 +522,6 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 			Map<String, String> mapClientProds = new Map<String, String>();
 			List<AV_ProductClient__c> listClientProds = new List<AV_ProductClient__c>();
 			if(
-				AV_ProductClient__c.SObjectType.getDescribe().isAccessible() &&
 				Schema.SObjectType.AV_ProductClient__c.fields.AV_ProductoFicha__c.isAccessible() &&
 				Schema.SObjectType.AV_ProductClient__c.fields.AV_Cliente__c.isAccessible()
 			) {
@@ -547,24 +545,23 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 	* @description    Updates opp's confidentiality according to its related account.
 	*/
 	public static void setConfidentiality(List<Opportunity> listNew) {
-		
 
 		Set<Id> cliIds = new Set<Id>();
 		Map<Id, Boolean> cliConfidentiality = new Map<Id, Boolean>();
 		
 		for (Opportunity opp : listNew) {
-			cliIds.add(opp.AccountId);
+			if(opp.AccountId !=null){
+				cliIds.add(opp.AccountId);
+			}
 		}
 
 		List<Account> clients= new List<Account>();
 		if(
-			Account.SObjectType.getDescribe().isAccessible() &&
 			Schema.SObjectType.Account.fields.AV_Confidencial__c.isAccessible() &&
 			Schema.SObjectType.Account.fields.AV_Empleado__c.isAccessible()
 		) {
 			clients = [Select Id, AV_Confidencial__c, AV_Empleado__c From Account Where Id in :cliIds];
 		}
-
 
 		if (!clients.isEmpty()) {
 			for (Account client : clients) {
@@ -574,9 +571,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 			}
 			
             for (Opportunity opp : listNew) {
-			
                 if(opp.AccountId!=null){
-				
                     if(cliConfidentiality.containsKey(opp.AccountId) && cliConfidentiality.get(opp.AccountId)){
                         opp.AV_ClienteConfidencial__c = cliConfidentiality.get(opp.AccountId);
                     }
@@ -618,14 +613,14 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		}
 
 		List<User> userGFC= new List<User>();
-		if(	USER.SObjectType.getDescribe().isAccessible() ) {
+		if(	Schema.SObjectType.User.fields.Id.isAccessible()) {
 			userGFC = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' AND IsActive = TRUE LIMIT 1];
 		}
 
 		if (owners != null && oppToProcess != null) {
 			List<User> ownerOffice= new List<User>();
 			if(
-				USER.SObjectType.getDescribe().isAccessible() &&
+				Schema.SObjectType.User.fields.Id.isAccessible() &&
 				Schema.SObjectType.USER.fields.AV_NumeroOficinaEmpresa__c.isAccessible()
 			) {
 				ownerOffice = [SELECT ID,AV_NumeroOficinaEmpresa__c FROM USER WHERE ID in :owners];
@@ -655,7 +650,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 		Set<String> stageOpen = new Set<String>{CIBE_AppConstants.OPPORTUNITY_STATUS_POTENCIAL, CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO, CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA};
 		Set<String> stageClose = new Set<String>{CIBE_AppConstants.OPPORTUNITY_STATUS_CERRPOSI, CIBE_AppConstants.OPPORTUNITY_STATUS_CERRNEGA, CIBE_AppConstants.OPPORTUNITY_STATUS_VENCIDO, CIBE_AppConstants.OPPORTUNITY_STATUS_CONVENTA, CIBE_AppConstants.OPPORTUNITY_STATUS_NOAPTO, CIBE_AppConstants.OPPORTUNITY_STATUS_NOINTERE};
 		List<User> userApiOnly= new List<User>();
-		if(	User.SObjectType.getDescribe().isAccessible() ) {
+		if(	Schema.SObjectType.User.fields.Id.isAccessible() ) {
 			userApiOnly = [SELECT id FROM User WHERE Id = :UserInfo.getUserId() AND Profile.Name='API Only'];
 		}
 
@@ -707,7 +702,7 @@ public with sharing class CIBE_OpportunityTriggerHelper {
 					mapOldObj.get(opp.id).StageName.equals(CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA)) 
 					&& (
 					opp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_CERRPOSI || 
-					opp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_CERRNEGA)){
+					opp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_CERRNEGA) && ( opp.CIBE_Visto__c == 'NO' || String.isBlank(opp.CIBE_Visto__c))){
 					
 						opp.closeDate = System.today();
 				}
@@ -767,7 +762,6 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 
 		List<AV_CustomActivityOpportunity__c> listOppTask= new List<AV_CustomActivityOpportunity__c>();
 		if(
-			AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible() &&
 			Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Opportunity__c.isAccessible() &&
 			Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.Name.isAccessible()&&
 			Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Product__c.isAccessible() &&
@@ -840,7 +834,7 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 			}
 		}
 
-		if(AV_CustomActivityOpportunity__c.sObjectType.getDescribe().isUpdateable()){
+		if(Schema.sObjectType.AV_CustomActivityOpportunity__c.isUpdateable()){
 			Database.update(listOppTaskToProcess, false);
 		}
 	}
@@ -877,7 +871,13 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 							CIBE_AppConstants.OPPORTUNITY_STATUS_VENCIDO.equals(opp.StageName))
 						){
 							oppDivisa.add(opp);
+						}else if(
+							(mapOlds.get(opp.id).CIBE_RenewModificationAmount__c != opp.CIBE_RenewModificationAmount__c || mapOlds.get(opp.id).CIBE_OperationTotalAmount__c != opp.CIBE_OperationTotalAmount__c) && (CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA.equals(opp.StageName) ||
+							CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO.equals(opp.StageName))
+						){
+							oppDivisa.add(opp);
 						}
+
 					}else{//insert
 						opp.CIBE_FechaCambioDivisa__c = System.today();
 						oppDivisa.add(opp);
@@ -887,7 +887,6 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 			if(!oppDivisa.isEmpty()){
 				List<CIBE_Divisas__c> listDivisa = new List<CIBE_Divisas__c>();
 				if(
-					Schema.sObjectType.CIBE_Divisas__c.isAccessible()&&
 					Schema.SObjectType.CIBE_Divisas__c.fields.CIBE_DivisaBase__c.isAccessible() &&
 					Schema.SObjectType.CIBE_Divisas__c.fields.CIBE_CodigoDivisa__c.isAccessible()&&
 					Schema.SObjectType.CIBE_Divisas__c.fields.CIBE_NombreDivisa__c.isAccessible()&&
@@ -912,54 +911,16 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 								opp.CIBE_Impacto_Comisiones_Cierre_Anio__c = (opp.CIBE_ImpactoDivisaComisionesCierreAnio__c!=null)?(opp.CIBE_ImpactoDivisaComisionesCierreAnio__c / Decimal.valueOf(mapDivisas.get(opp.CIBE_Divisa__c).CIBE_DivisaBase__c)):0;
 								opp.CIBE_TipoCambioDivisa__c = (mapDivisas.get(opp.CIBE_Divisa__c)!=null && mapDivisas.get(opp.CIBE_Divisa__c).CIBE_DivisaBase__c!=null)?(mapDivisas.get(opp.CIBE_Divisa__c).CIBE_DivisaBase__c):null;
 								opp.CIBE_FechaCambioDivisa__c = (mapDivisas.get(opp.CIBE_Divisa__c)!=null && mapDivisas.get(opp.CIBE_Divisa__c).CIBE_FechaTipoCambio__c!=null)?(mapDivisas.get(opp.CIBE_Divisa__c).CIBE_FechaTipoCambio__c):null;
+								opp.CIBE_OperationTotalAmountEUR__c = (opp.CIBE_OperationTotalAmount__c!=null)?(opp.CIBE_OperationTotalAmount__c / Decimal.valueOf(mapDivisas.get(opp.CIBE_Divisa__c).CIBE_DivisaBase__c)):0;
+								opp.CIBE_RenewModificationAmountEUR__c = (opp.CIBE_RenewModificationAmount__c!=null)?(opp.CIBE_RenewModificationAmount__c / Decimal.valueOf(mapDivisas.get(opp.CIBE_Divisa__c).CIBE_DivisaBase__c)):0;
+
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	* @description       Crear gestores principales en una oportunidad 
-	* @param listOpp 	 List of Opportunities
-	* @param  
-	*/
-	public static void addRelationshipManager(List<Opportunity> listOpp) {
-		Set<Id> listAccIds =  new Set<Id>();
-		for(Opportunity opp : listOpp) {
-			listAccIds.add(opp.AccountId);
-		}
-
-		Map<Id, Account> mapEAPGestor = new Map<Id, Account>();
-		if(Schema.sObjectType.Account.isAccessible()
-			&& Schema.SObjectType.Account.fields.AV_EAPGestor__c .isAccessible()) {
-			mapEAPGestor =  new Map<Id, Account>([SELECT Id, name, AV_EAPGestor__r.AV_UsuarioAsociado__c 
-			FROM Account 
-			WHERE Id IN :listAccIds AND AV_EAPGestor__r.AV_UsuarioAsociado__c != null AND
-			AV_EAPGestor__r.AV_UsuarioAsociado__r.IsActive = true]);
-		}			
-
-		List<OpportunityTeamMember> newAccTMs = new List<OpportunityTeamMember>();
-		for(Opportunity opp : listOpp) {
-			if(mapEAPGestor.containsKey(opp.AccountId) 
-				&& mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c != null 
-				&& mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c != opp.OwnerId
-				&& !mapEAPGestor.get(opp.AccountId).name.equalsIgnoreCase(CIBE_AppConstants.ACC_SINCLIENTE) ) {
-				OpportunityTeamMember newAccTM = new OpportunityTeamMember();
-				newAccTM.OpportunityId = opp.Id;
-				newAccTM.UserId = mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c;
-				newAccTM.TeamMemberRole = CIBE_AppConstants.PARTICIPANTE;
-				newAccTM.OpportunityAccessLevel = 'Edit';
-				newAccTMs.add(newAccTM);
-			}
-		}
-
-		if(Schema.sObjectType.OpportunityTeamMember.isCreateable() && !newAccTMs.isEmpty()) {
-			Database.insert(newAccTMs,false);
-		}
-		
-	}
+	}	
 
 	/**
 	* @description     	Delete AV_CustomActivityOpportunity related with Opportunity
@@ -1001,58 +962,57 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 	*/
 	public static void setOpportunityUsers(List<Opportunity> listNews, Map<Id, Opportunity> mapOlds) {
 		List<Opportunity> process = new List<Opportunity>();
+		Set<Id> opportunityIds = new Set<Id>();
 		for(Opportunity opp : listNews) {
 			if(opp.OwnerId != mapOlds.get(opp.Id).OwnerId) {
 				process.add(opp);
+				opportunityIds.add(opp.Id);
 			}
 		}
-        
-		Set<Id> opportunityIds = new Set<Id>();
-        for(Opportunity opp : process) {
-            opportunityIds.add(opp.Id);
-        }
-
-        Map<Id, Set<Id>> userIds = new Map<Id, Set<Id>>();
-        if(OpportunityTeamMember.sObjectType.getDescribe().isAccessible()) {
-            for(OpportunityTeamMember opportunityTM : [SELECT Id, OpportunityId, UserId FROM OpportunityTeamMember WHERE OpportunityId IN :opportunityIds]) {
-                if(!userIds.containsKey(opportunityTM.OpportunityId)) {
-                    userIds.put(opportunityTM.OpportunityId, new Set<Id>());
-                }
-                userIds.get(opportunityTM.OpportunityId).add(opportunityTM.UserId);
-            }
-        }
-
-        for(Opportunity opportunity : process) {
-            if(!userIds.containsKey(opportunity.Id)) {
-                userIds.put(opportunity.Id, new Set<Id>());
-            }
-            userIds.get(opportunity.Id).add(opportunity.OwnerId);
-        }
-        List<Opportunity> toUpdate = new List<Opportunity>();
-        for(Id opportunityId : userIds.keySet()) {
-            toUpdate.add(
-                new Opportunity(
-                    Id = opportunityId,
-                    CIBE_OpportunityTeam__c = String.join(new List<Id>(userIds.get(opportunityId)), ',')
-                ));
-        }
-
-        Database.SaveResult[] updates = Database.update(toUpdate, false);
-
-		boolean hasError = false;
-		List<Object> objs = new List<Object>();
-		Map<String, String> msjs = new Map<String, String>();
-		for (Integer i = 0; i < toUpdate.size(); i++) {
-			Database.SaveResult dr = updates[i];
-			if(!dr.isSuccess() && !dr.getErrors().isEmpty()) {
-				msjs.put(toUpdate[i].Id, ((String)dr.getErrors()[0].getMessage()));
-				objs.add(toUpdate[i]);
-				hasError = true;
+		if(process!=null && !process.IsEmpty()){
+			Map<Id, Set<Id>> userIds = new Map<Id, Set<Id>>();
+			if(Schema.SObjectType.OpportunityTeamMember.fields.OpportunityId.isAccessible()) {
+				for(OpportunityTeamMember opportunityTM : [SELECT Id, OpportunityId, UserId FROM OpportunityTeamMember WHERE OpportunityId IN :opportunityIds]) {
+					if(!userIds.containsKey(opportunityTM.OpportunityId)) {
+						userIds.put(opportunityTM.OpportunityId, new Set<Id>());
+					}
+					userIds.get(opportunityTM.OpportunityId).add(opportunityTM.UserId);
+				}
 			}
-		}
 
-		if(hasError) {
-			CBK_Log.error(msjs, objs);
+			for(Opportunity opportunity : process) {
+				if(!userIds.containsKey(opportunity.Id)) {
+					userIds.put(opportunity.Id, new Set<Id>());
+				}
+				userIds.get(opportunity.Id).add(opportunity.OwnerId);
+			}
+
+			List<Opportunity> toUpdate = new List<Opportunity>();
+			for(Id opportunityId : userIds.keySet()) {
+
+				toUpdate.add(
+					new Opportunity(
+						Id = opportunityId,
+						CIBE_OpportunityTeam__c = String.join(new List<Id>(userIds.get(opportunityId)), ',')
+					));
+			}
+
+			Database.SaveResult[] updates = Database.update(toUpdate, false);
+			boolean hasError = false;
+			List<Object> objs = new List<Object>();
+			Map<String, String> msjs = new Map<String, String>();
+			for (Integer i = 0; i < toUpdate.size(); i++) {
+				Database.SaveResult dr = updates[i];
+				if(!dr.isSuccess() && !dr.getErrors().isEmpty()) {
+					msjs.put(toUpdate[i].Id, ((String)dr.getErrors()[0].getMessage()));
+					objs.add(toUpdate[i]);
+					hasError = true;
+				}
+			}
+
+			if(hasError) {
+				CBK_Log.error(msjs, objs);
+			}
 		}
     }
     
@@ -1078,30 +1038,6 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 	}
     
     /**
-	* @description     Create a Map with the Account Id and Account Name
-	* @param  listOpp  List of Opportunities.
-	*/
-	private static Map<Id, String> getMapAccountNames(List<Opportunity> listOpp){
-		Set<Id> accId = new Set<Id>();
-		for(Opportunity opp : listOpp){
-			if(String.isNotBlank(opp.AccountId)){
-				accId.add(opp.AccountId);
-			}
-		}
-		List<Account> listAcc = new List<Account>();
-		if(accId != null && !accId.isEmpty()) {
-			listAcc	= [Select Id, Name From Account Where Id in :accId];
-		}
-		Map<Id, String> mapAccNames = new Map<Id,String>();
-		if(listAcc != null && !listAcc.isEmpty()) {
-			for(Account acc : listAcc){
-				mapAccNames.put(acc.Id, acc.Name);
-			}
-		}
-		return mapAccNames;
-	}
-    
-    /**
 	* @description     insert Task associated with a Opportunity when check on/off 
 	* @param  newListOpp  new list of Opportunities
 	*/
@@ -1110,6 +1046,10 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 		Id rtTaskIniEMP   	= (new List<Id>(setRtTaskIniciativa)).get(1);        
         Id rtOppIniCIB     	= (new List<Id>(setRtIniciativa)).get(0);
 		Id rtOppIniEMP   	= (new List<Id>(setRtIniciativa)).get(1);
+		//US812745
+		Id rtOppAlertEMP 	= (new List<Id>(setRtOppEMP)).get(2);
+		Set<Id> setRTBypass = new Set<Id>{rtOppAlertEMP};
+
 		Id rtTaskIni;
 		Map<Id, Contact> mapGestor;
 		Set<String> oppStageNotClosed = new Set<String>{'Potencial','En gestión/insistir'};
@@ -1122,7 +1062,8 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 		Set<String> setListIdPF = new Set<String>();
 		List<Opportunity> listOppFil = new List<Opportunity>();
 		for(Opportunity opp : newListOpp){
-			if(opp.AV_OrigenApp__c != AV_AppConstants.CLIENT_REPORT_ORIGENAPP && opp.AV_IncludeInPrioritizingCustomers__c){
+			if(opp.AV_OrigenApp__c != AV_AppConstants.CLIENT_REPORT_ORIGENAPP && opp.AV_IncludeInPrioritizingCustomers__c &&
+			!setRTBypass.contains(opp.RecordTypeId)){
 				setListIdPF.add(opp.AV_PF__c);
 				listOppFil.add(opp);
 			}
@@ -1134,21 +1075,20 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 		}
 		//Create task if check is on and "fecha-proximo-recordatorio" is not null
 		if (listOppFil != null && !listOppFil.isEmpty()) {
-			for(Opportunity opp : listOppFil){
-				//if(opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() && oppStageNotClosed.contains(opp.StageName)){
-                if(opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() && opp.StageName != 'CIBE_Vencido'){
+			for(Opportunity opp : listOppFil){					
+			if(!setRtOppEMP.contains(opp.RecordTypeId)){
+				if(opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() && opp.StageName != 'CIBE_Vencido'){
 					Date activityDate = opp.AV_FechaProximoRecordatorio__c;
 					rtTaskIni = opp.RecordTypeId == rtOppIniCIB ? rtTaskIniCIB : rtTaskIniEMP;
-                    Task tarea = createTareaWithCheckClient(opp, activityDate, rtTaskIni, mapGestor, mapProducts);
+					Task tarea = createTareaWithCheckClient(opp, activityDate, rtTaskIni, mapGestor, mapProducts);
 					listTask.add(tarea);
 					listUsedOpp.add(opp);
 					mapTask.put(tarea.AV_ExternalID__c, tarea);
-				} /*else if(!oppStageNotClosed.contains(opp.StageName)){
-					opp.addError(Label.AV_checkStatusClientePriorizador);
-				} */else if(opp.AV_FechaProximoRecordatorio__c < System.today()){
+				} else if(opp.AV_FechaProximoRecordatorio__c < System.today()){
 					opp.addError(Label.AV_controlFechaRecordatorio);
 				}
 			}
+		}
 		}
 		if(!listTask.isEmpty()){
 			System.enqueueJob(new AV_CheckOnOff_Queueable(listTask, mapTask, listUsedOpp, dateExternalId));
@@ -1166,28 +1106,30 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 	*/
 	private static Task createTareaWithCheckClient(Opportunity opp, Date activityDate, Id rt, Map<Id, Contact> mapGestores, Map<String, Product2> mapProduct) {
 		Task tarea = new Task();
+		Product2 p2 = new Product2 ();
 		dateExternalId = DateTime.now();
-		if(String.isNotBlank(opp.AV_ExternalID__c)){
+		if(opp!=null && String.isNotBlank(opp.AV_ExternalID__c)){
 			tarea.AV_ExternalID__c = SUFFIX_EXTERNALID + opp.AV_ExternalID__c + dateExternalId;
 		}else{
 			tarea.AV_ExternalID__c = SUFFIX_EXTERNALID + opp.Id + dateExternalId;
 		}
-		tarea.ActivityDate = activityDate;
-		if(String.isNotBlank(opp.AccountId)){
+		if(opp!=null && String.isNotBlank(opp.AccountId)){
 			tarea.WhatId = opp.AccountId;
 		}
-		String updateNewFormateDate = activityDate.format();
-		Product2 p2 = mapProduct.get(opp.AV_PF__c);
-		if (p2!=null){
-			tarea.Subject = updateNewFormateDate + ' - ' + p2.Name;
-		}else{
-			tarea.Subject = updateNewFormateDate;
+		if(opp!=null && String.isNotBlank(opp.AV_PF__c)){
+			p2 = mapProduct.get(opp.AV_PF__c);
 		}
+
+		if(activityDate !=null){
+			tarea.ActivityDate = activityDate;
+			String updateNewFormateDate = activityDate.format();
+			tarea.Subject =  p2.Name!=null ? updateNewFormateDate + ' - ' + p2.Name :updateNewFormateDate;
+		}
+
 		tarea.Status = 'Open';
 		tarea.Priority = 'A';
 		tarea.RecordTypeId = rt;
 		tarea.AV_OrigenApp__c = 'AV_SalesforceTaskOpp';
-		// tarea.OwnerId = opp.OwnerId;
 		tarea.OwnerId = UserInfo.getUserId();
 		tarea.AV_Center__c = opp.AV_Center__c;
 		return tarea;
@@ -1310,15 +1252,17 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 				}
 				//No exist task -> create task + task-opp if check change OFF to ON
 				//if (extIdTask.isEmpty() && opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() && opp.AV_IncludeInPrioritizingCustomers__c && !mapOldObj.get(opp.Id).AV_IncludeInPrioritizingCustomers__c && oppStageNotClosed.contains(opp.StageName)){
-				if (extIdTask.isEmpty() && opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() &&
+
+				if(!setRtOppEMP.contains(opp.RecordTypeId)){
+					if (extIdTask.isEmpty() && opp.AV_FechaProximoRecordatorio__c != null && opp.AV_FechaProximoRecordatorio__c >= System.today() &&
                     opp.AV_IncludeInPrioritizingCustomers__c && !mapOldObj.get(opp.Id).AV_IncludeInPrioritizingCustomers__c && opp.StageName != 'CIBE_Vencido'){
+						
 					Date activityDate = opp.AV_FechaProximoRecordatorio__c;
 					Task tarea = createTareaWithCheckClient(opp, activityDate, rtTaskIni, mapGestor, mapProducts);
 					newTask.add(tarea);
 					listUsedOpp.add(opp);
 					mapNewTask.put(tarea.AV_ExternalID__c, tarea);
 				} else if (!extIdTask.isEmpty()){ //Exist task
-					AV_LogDebug.printLogDebug(methodName, 'mapExistTask: ' + mapExistTask);
 					List<Task> listTask= new List<Task>();
 					Task taskNotClosed;
 					Integer contTaskClosed=0;
@@ -1335,7 +1279,6 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 							taskNotClosed = ta;
 						}
 					}
-					AV_LogDebug.printLogDebug(methodName, 'listTask: ' + listTask);
 					if (!listTask.isEmpty()){
 						//Check OFF - ON and related tasks is Closed
 						boolean newTaskOK = false;
@@ -1405,6 +1348,9 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 						mapNewTask.put(tarea.AV_ExternalID__c, tarea);
 					}
 				}
+				}
+
+				
 			}
 		}
 		
@@ -1414,7 +1360,6 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 		}
 		//Update Task's
 		if (updateTask!=null && !updateTask.isEmpty()){
-			AV_LogDebug.printLogDebug(methodName, 'updateTask: ' + updateTask);
 			System.enqueueJob(new AV_CheckOnOff_Queueable(updateTask));
 		}
 		//Delete Task-Opp, Header-Task and Task
@@ -1431,16 +1376,27 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
     *  	@param description: Method that insert opportunityTeamMember when AV_Book__c = INT
 	* 	@param  listOpp   old list of Opportunities
     */
-    public static void insertOppTM(List<Opportunity> listOpp) {
-
+    public static void insertOppTM(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj) {
 		String userlog = UserInfo.getUserId();
 		User user;
 		String tipoCartera;
 		String carteraCIB;
 		String carteraEMP;
 		List<String> listaTipoCartera;
+        List<OpportunityTeamMember> lstOTMyGest = new List<OpportunityTeamMember>();
+		List<OpportunityTeamMember> otraListaDeOTM = new List<OpportunityTeamMember>();
+		Account sinCliente = new Account();
+		String cliente = CIBE_AppConstants.ACC_SINCLIENTE;
 
-        if(Schema.sObjectType.User.isAccessible()){
+		if(!listOpp.isEmpty() && Schema.SObjectType.Account.fields.Id.isAccessible()){
+			try {
+				sinCliente = [SELECT Id FROM Account WHERE Name = :cliente AND AV_InterlocName__c = :cliente AND RecordType.DeveloperName =:CIBE_AppConstants.ACCOUNT_CLIENTE_RT LIMIT 1];
+			}catch(Exception e) {
+				CBK_Log.error(e);
+			}
+		}
+
+        if(Schema.SObjectType.User.fields.Id.isAccessible()){
             user = [SELECT Id, CIBE_RoleName__c FROM User WHERE Id = :userlog LIMIT 1];
         }
 		if (user.CIBE_RoleName__c == 'EMP' ) {
@@ -1458,39 +1414,477 @@ public static void setFieldsFromOppTask(List<Opportunity> listNews, Map<Id, Oppo
 		Map<Id, AV_BookMember__c> mapBookMembers = new Map<Id, AV_BookMember__c>();
 		// Mapa Cartera Gestor (IdBookMM, bookMM)
 		Map<Id, AV_BookManagementMember__c> mapBookManagementMembers = new Map<Id, AV_BookManagementMember__c>();
+		Map<Id, AV_BookManagementMember__c> gestores = new Map<Id, AV_BookManagementMember__c>();
+		List<Opportunity> listOppEMP = new List<Opportunity>();
 		
-		if (!listOpp.isEmpty() && Schema.Opportunity.SObjectType.getDescribe().isAccessible()) {
+		if (!listOpp.isEmpty() && Schema.SObjectType.Opportunity.fields.AccountId.isAccessible()) {
 			for (Opportunity opp : listOpp) {
-				mapOpps.put(opp.AccountId, opp);
-			}
-		
-			if (!mapOpps.isEmpty() && Schema.AV_BookMember__c.SObjectType.getDescribe().isAccessible()) {
-				for (AV_BookMember__c bookM : [SELECT Id, AV_Cliente__c, AV_Cartera__c, AV_Cartera__r.AV_TipoCartera__c FROM AV_BookMember__c WHERE AV_Cliente__c = :mapOpps.keySet() AND AV_Cartera__r.AV_TipoCartera__c IN :listaTipoCartera]) {
-					mapBookMembers.put(bookM.AV_Cartera__c, bookM);
-					
+
+				if(mapOldObj == null || ( sinCliente != null && mapOldObj.get(opp.Id).AccountId == sinCliente.Id && mapOldObj.get(opp.Id).AccountId != opp.AccountId && user.CIBE_RoleName__c != 'EMP')){
+					mapOpps.put(opp.AccountId, opp);
+				} else if (sinCliente != null && mapOldObj.get(opp.Id).AccountId == sinCliente.Id && mapOldObj.get(opp.Id).AccountId != opp.AccountId && user.CIBE_RoleName__c == 'EMP'){
+					listOppEMP.add(opp);
 				}
-				if (!mapBookMembers.isEmpty() && Schema.AV_BookManagementMember__c.SObjectType.getDescribe().isAccessible()) {
-					// String cartera = mapBookMembers.values().AV_Cartera__c;
-					for (AV_BookManagementMember__c bookMM : [SELECT Id, AV_Cartera__c, AV_EmpleadoGestor__c, AV_EmpleadoGestor__r.AV_UsuarioAsociado__c FROM AV_BookManagementMember__c WHERE AV_Cartera__c IN :mapBookMembers.keySet()]) {
-						mapBookManagementMembers.put(bookMM.Id, bookMM);
+			}
+			if (!mapOpps.isEmpty() && Schema.SObjectType.AV_BookMember__c.fields.AV_Cartera__c.isAccessible()) {
+				for (AV_BookMember__c bookM : [SELECT Id, AV_Cliente__c, AV_Cartera__c, AV_Cartera__r.AV_TipoCartera__c 
+												FROM AV_BookMember__c 
+												WHERE AV_Cliente__c = :mapOpps.keySet() AND AV_Cartera__r.AV_TipoCartera__c IN :listaTipoCartera 
+												AND AV_Cartera__r.AV_ToDelete__c = false AND AV_ToDelete__c = false
+												]) {
+					mapBookMembers.put(bookM.AV_Cartera__c, bookM);
+				}
+				if (!mapBookMembers.isEmpty() && Schema.SObjectType.AV_BookManagementMember__c.fields.AV_Cartera__c.isAccessible()) {
+					for (AV_BookManagementMember__c bookMM : 	[SELECT Id, AV_Cartera__c, AV_EmpleadoGestor__c, AV_EmpleadoGestor__r.AV_UsuarioAsociado__c 
+																FROM AV_BookManagementMember__c 
+																WHERE AV_Cartera__c IN :mapBookMembers.keySet() AND AV_ToDelete__c = false]) {
+						if (mapBookMembers.get(bookMM.AV_Cartera__c).AV_Cartera__r.AV_TipoCartera__c == 'INT') {
+							gestores.put(bookMM.AV_EmpleadoGestor__c, bookMM);
+						} else if (mapBookMembers.get(bookMM.AV_Cartera__c).AV_Cartera__r.AV_TipoCartera__c != 'INT'){
+							mapBookManagementMembers.put(bookMM.Id, bookMM);
+						}
+					}
+					List<CIBE_Hierarchy__c> listHierarchy = [SELECT Id, CIBE_Contact__c, CIBE_RedesSegmentos__r.Name, CIBE_Contact__r.AV_UsuarioAsociado__c
+															FROM CIBE_Hierarchy__c 
+															WHERE CIBE_RedesSegmentos__r.Name = 'Sucursales' and CIBE_Contact__c IN :gestores.keySet()];
+					if (!listHierarchy.isEmpty()) {
+						for (CIBE_Hierarchy__c hierarchy : listHierarchy) {
+							if(gestores.containsKey(hierarchy.CIBE_Contact__c)){
+								mapBookManagementMembers.put(gestores.get(hierarchy.CIBE_Contact__c).Id, gestores.get(hierarchy.CIBE_Contact__c));
+							}
+						}
 					}
 				}
 			}
 		}
 
+
 		List<OpportunityTeamMember> newOppTMs = new List<OpportunityTeamMember>();
+		Set<Id> setUserTM = new Set<Id>();
 		if (!mapBookManagementMembers.isEmpty()) {
 			for(AV_BookManagementMember__c value  : mapBookManagementMembers.values()) {
-				OpportunityTeamMember newOppTM = new OpportunityTeamMember();
-				newOppTM.OpportunityId = mapOpps.get(mapBookMembers.get(value.AV_Cartera__c).AV_Cliente__c).Id;
-				newOppTM.UserId = value.AV_EmpleadoGestor__r.AV_UsuarioAsociado__c;
-				newOppTM.TeamMemberRole = CIBE_AppConstants.PARTICIPANTE;
-				newOppTM.OpportunityAccessLevel = 'Edit';
-				newOppTMs.add(newOppTM);
+                if (value.AV_EmpleadoGestor__r?.AV_UsuarioAsociado__c != null ) {
+                    OpportunityTeamMember newOppTM = new OpportunityTeamMember();
+                    newOppTM.OpportunityId = mapOpps.get(mapBookMembers.get(value.AV_Cartera__c).AV_Cliente__c).Id;
+                    newOppTM.UserId = value.AV_EmpleadoGestor__r?.AV_UsuarioAsociado__c;
+                    newOppTM.TeamMemberRole = CIBE_AppConstants.PARTICIPANTE;
+                    newOppTM.OpportunityAccessLevel = 'Edit';
+                    newOppTMs.add(newOppTM);
+                    setUserTM.add(value.AV_EmpleadoGestor__r.AV_UsuarioAsociado__c);
+                }
 			}
 		}
-		if(Schema.sObjectType.OpportunityTeamMember.isCreateable() && !newOppTMs.isEmpty()) {
-			Database.insert(newOppTMs,false);
+		 //Busca e incluye al EAPGestor      
+		if (!mapOpps.values().isEmpty()) {
+            lstOTMyGest = addRelationshipManager(mapOpps.values(),newOppTMs,setUserTM);
+        }
+        if (!listOppEMP.isEmpty()) {
+            otraListaDeOTM = addRelationshipManager(listOppEMP,newOppTMs,setUserTM);
+            for(OpportunityTeamMember otm: otraListaDeOTM){
+                if(!lstOTMyGest.contains(otm)){
+                    lstOTMyGest.add(otm);
+                }
+            }
+        }
+		if(lstOTMyGest != null && lstOTMyGest.isEmpty() && !newOppTMs.isEmpty() ){
+			lstOTMyGest = newOppTMs;
+		}
+		
+		boolean hasError = false;
+        List<Object> objs = new List<Object>();
+        Map<String, String> msjs = new Map<String, String>();
+        Database.SaveResult[] lsr = null;
+        if(Schema.sObjectType.OpportunityTeamMember.isCreateable() && lstOTMyGest != null && !lstOTMyGest.isEmpty()) {
+            lsr = Database.insert(lstOTMyGest, false);
+        }
+
+		if(lsr!=null){
+            for (Integer i = 0; i < lsr.size(); i++) {
+                if(!lsr[i].isSuccess() && !lsr[i].getErrors().isEmpty()) {
+                    msjs.put(lstOTMyGest[i].UserId, ((String)lsr[i].getErrors()[0].getMessage()));
+                    objs.add(lstOTMyGest[i]);
+                    hasError = true;
+                }
+            }
+            if(hasError) {
+                CBK_Log.error(msjs, objs);
+            }
+        }
+	}
+
+	/**
+	* @description       Crear gestores principales en una oportunidad 
+	* @param listOpp 	 List of Opportunities
+	* @param  newOppTMs  List of OpportunityTeamMembers
+	* @param  setUserTM  Set of Ids of OpportunityTeamMembers 
+	*/
+
+	public static List<OpportunityTeamMember> addRelationshipManager(List<Opportunity> listOpp,List<OpportunityTeamMember> newOppTMs,Set<Id> setUserTM) {
+
+		Set<Id> listAccIds =  new Set<Id>();
+		for(Opportunity opp : listOpp) {
+			listAccIds.add(opp.AccountId);
+		}
+
+		Map<Id, Account> mapEAPGestor = new Map<Id, Account>();
+		if( Schema.SObjectType.Account.fields.AV_EAPGestor__c.isAccessible()) {
+			mapEAPGestor =  new Map<Id, Account>([SELECT Id, name, AV_EAPGestor__r.AV_UsuarioAsociado__c 
+			FROM Account 
+			WHERE Id IN :listAccIds AND AV_EAPGestor__r.AV_UsuarioAsociado__r.IsActive = true AND AV_EAPGestor__r.AV_UsuarioAsociado__c NOT IN:setUserTM
+            ]);
+		}			
+
+		for(Opportunity opp : listOpp) {
+			if(mapEAPGestor.containsKey(opp.AccountId) && mapEAPGestor.get(opp.AccountId).AV_EAPGestor__c !=null &&
+			mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c != null &&
+			mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c != opp.OwnerId &&
+			!mapEAPGestor.get(opp.AccountId).name.equalsIgnoreCase(CIBE_AppConstants.ACC_SINCLIENTE)) {
+				OpportunityTeamMember newAccTM = new OpportunityTeamMember();
+				newAccTM.OpportunityId = opp.Id;
+				newAccTM.UserId = mapEAPGestor.get(opp.AccountId).AV_EAPGestor__r.AV_UsuarioAsociado__c;
+				newAccTM.TeamMemberRole = CIBE_AppConstants.PARTICIPANTE;
+				newAccTM.OpportunityAccessLevel = 'Edit';
+				newOppTMs.add(newAccTM);
+			}
+		}
+		return newOppTMs;
+	}
+	
+	/**
+    *  	@param description: Method that update related Task, Event when AccountId change
+	* 	@param  listOpp   list of new Opportunities
+	* 	@param  mapOldObj  map old of Opportunities
+    */
+    public static void updateRelaSobjSinClient(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj) {
+		Account sinCliente = new Account();
+		String cliente = CIBE_AppConstants.ACC_SINCLIENTE;
+		Map <Id,AV_CustomActivityOpportunity__c> mapCAO = new Map <Id,AV_CustomActivityOpportunity__c>();
+		Map<Id, Opportunity> mapOppU = new Map<Id, Opportunity>();
+		Set <Id> setIDTask = new Set<Id>();
+		Set <String> setExt = new Set<String>();
+		Set <String> setExtUp = new Set<String>();
+		String sOppo = null;
+		List<SObject> lsTask = new List<SObject> ();
+		Map <Id,AV_CustomActivityOpportunity__c> mapTaskCAO = new Map <Id,AV_CustomActivityOpportunity__c>();
+
+		if(!listOpp.isEmpty() && Schema.SObjectType.Account.fields.Id.isAccessible() && !System.isFuture() && !System.isBatch()){
+			try{
+				sinCliente = [SELECT Id FROM Account WHERE Name = :cliente AND AV_InterlocName__c = :cliente AND RecordType.DeveloperName =:CIBE_AppConstants.ACCOUNT_CLIENTE_RT LIMIT 1];
+			}catch(Exception e) {
+				CBK_Log.error(e);
+			}
+
+			for(Opportunity opp: listOpp){
+				if( mapOldObj != null && sinCliente != null && mapOldObj.get(opp.Id).AccountId == sinCliente.Id && opp.AccountId != mapOldObj.get(opp.Id).AccountId){
+					mapOppU.put(opp.Id,opp);
+				}
+			}
+		}
+
+		if(mapOppU != null && Schema.SObjectType.AV_CustomActivityOpportunity__c.fields.AV_Task__c.isAccessible() ){
+			for(AV_CustomActivityOpportunity__c cao:[SELECT Id,AV_Opportunity__c, AV_Task__c , AV_Task__r.IDTask__c, AV_Task__r.AV_ExternalID__c  FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c IN: mapOppU.values()]){
+				if(cao.AV_Task__c !=null){
+					mapTaskCAO.put(cao.AV_Task__c,cao);
+				}
+				if(cao.AV_Task__c !=null && cao.AV_Task__r.IDTask__c !=null ){
+					setIDTask.add(cao.AV_Task__r.IDTask__c);
+					mapCAO.put(cao.AV_Task__r.IDTask__c,cao);
+				}
+				if(cao.AV_Task__c !=null && cao.AV_Task__r.AV_ExternalID__c !=null ){
+					setExt.add(cao.AV_Task__r.AV_ExternalID__c);
+				}
+			}
+
+			//IDTask__c
+			if(!setIDTask.isEmpty()){
+				for(Id seTa:setIDTask){
+					if(mapCAO.containsKey(seTa) && mapCAO.get(seTa).AV_Task__r?.AV_ExternalID__c !=null){
+						sOppo = mapCAO.get(seTa).AV_Task__r.AV_ExternalID__c.substring(4,22);
+					}
+
+					if(seTa !=null && String.valueOf(seTa).startsWith('00T') && mapOppU.get(sOppo).AccountID!=null){
+						Task tarea = new Task();
+						tarea.Id = seTa;
+						tarea.WhatId = mapOppU.get(sOppo).AccountID;
+						if(!lsTask.contains(tarea)){
+							lsTask.add(tarea);
+						}					}
+					if(seTa !=null && String.valueOf(seTa).startsWith('00U') && mapOppU.get(sOppo).AccountID!=null){
+						Event evento = new Event();
+						evento.Id = seTa;
+						evento.WhatId = mapOppU.get(sOppo).AccountID;
+						if(!lsTask.contains(evento)){
+							lsTask.add(evento);
+						}
+					}
+				}
+			}
+
+			//AV_ExternalID__c y AV_Task__c
+			if(!setExt.isEmpty()){
+				for(String seTa:setExt){
+					if(seTa.contains('006')){
+						sOppo = seTa.substring(5,23);
+						setExtUp.add(sOppo);
+					}
+				}
+
+				for(Task tsk :[SELECT Id, accountId, AV_ExternalID__c,AV_Task__c FROM Task WHERE AV_ExternalID__c IN: setExtUp OR AV_Task__c IN:mapTaskCAO.keySet()]){
+					Task tarea = new Task();
+					tarea.Id = tsk.id;
+					if(mapOppU.containsKey(listOpp[0].Id) && mapOppU.get(listOpp[0].Id).AccountId !=null){
+						tarea.WhatId = mapOppU.get(listOpp[0].Id).AccountID;
+						if(!lsTask.contains(tarea)){
+							lsTask.add(tarea);
+						}
+					}
+				}
+
+				for(Event evt :[SELECT Id,accountId,AV_ExternalID__c,AV_Task__c FROM Event WHERE AV_ExternalID__c IN: setExtUp OR AV_Task__c IN:mapTaskCAO.keySet()]){
+					Event evento = new Event();
+					evento.Id = evt.Id;
+					if(mapOppU.containsKey(mapTaskCAO.get(evt.AV_Task__c).AV_Opportunity__c) && mapOppU.get(mapTaskCAO.get(evt.AV_Task__c).AV_Opportunity__c).AccountId !=null){
+						evento.WhatId = mapOppU.get(listOpp[0].Id).AccountID;
+						if(!lsTask.contains(evento)){
+							lsTask.add(evento);
+						}					
+					}
+				}
+			}
+		}
+		Database.Update(lsTask,false);
+	}
+
+	/**
+	*  	@param description: Method that update stageName when CloseDate change
+	* 	@param  listOpp   list of new Opportunities
+	* 	@param  mapOldObj  map old of Opportunities
+	*/
+	public static void updateStageName(List<Opportunity> listOpp, Map<Id, Opportunity> mapOldObj) {
+		
+		Set<String> setEstadosCerrados = new Set <String> {CIBE_AppConstants.OPPORTUNITY_STATUS_CERRPOSI,CIBE_AppConstants.OPPORTUNITY_STATUS_CERRNEGA};
+		Set<String> setOtrosEstados = new Set <String> {CIBE_AppConstants.OPPORTUNITY_STATUS_POTENCIAL,CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO,CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA};
+		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
+
+		for (Opportunity opp : listOpp) {
+
+			Opportunity oldOpp = mapOldObj.get(opp.Id);
+			
+			if (oldOpp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_VENCIDO && opp.CloseDate >= Date.today() && oldOpp.CloseDate != opp.CloseDate ) {
+				opp.StageName = 'En curso';
+
+			}else if (setRtOppEMP.contains(opp.RecordTypeId) && oldOpp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_VENCIDO && setEstadosCerrados.contains(opp.StageName) && ( opp.CIBE_Visto__c == 'NO' || String.isBlank(opp.CIBE_Visto__c)) ) {
+				opp.CloseDate = Date.today();
+				
+			}else if (!hasCustomPermission && oldOpp.StageName == CIBE_AppConstants.OPPORTUNITY_STATUS_VENCIDO && setOtrosEstados.contains(opp.StageName) && setRtOppCIB.contains(opp.RecordTypeId)) {
+				opp.addError(Label.CIBE_CambioEstadoNoPermitido);
+			}
 		}
 	}
-}
+
+	/**
+	* @description   object AV_CommentsHistory is updated when a Opportunity with the AV_Comentarios__ field informed is updated
+	* @param  listNew  list of new Opportunities 
+	* @param  mapOld   map of old Opportunities 
+	*/
+	public static void updateCommentsHistory(List<Opportunity> listNew, Map<Id, Opportunity> mapOld){
+		Map<Id, Opportunity> mapOppEmp = new Map<Id, Opportunity>();
+		List<AV_CommentsHistory__c> lstCommHist = new List<AV_CommentsHistory__c>();
+
+		for(Opportunity opp: listNew){
+			if(setRtOppEMP.contains(opp.RecordTypeId) ){
+				mapOppEmp.put(opp.Id,opp);
+			}
+		}
+
+		//recuperamos los campos de oportunidad en la query para no recorrer cada Oportunidad por cada CAO 
+		List<AV_CustomActivityOpportunity__c> relacionado = [SELECT Id, AV_Task__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c IN :mapOppEmp.keySet()];
+
+		if(relacionado.isEmpty()){
+			DateTime ahora = System.now();
+			for(Opportunity opp : mapOppEmp.Values()){
+				if(opp.AV_Comentarios__c != null && String.isNotBlank(opp.AV_Comentarios__c) && !opp.AV_Comentarios__c.equals(mapOld.get(opp.Id).AV_Comentarios__c)){
+					AV_CommentsHistory__c commHist = new AV_CommentsHistory__c();
+					commHist.OwnerId = opp.LastModifiedById;
+					commHist.AV_ModificationDate__c = ahora;
+					commHist.AV_OldComment__c = mapOld.get(opp.Id).AV_Comentarios__c;
+					commHist.AV_NewComment__c = opp.AV_Comentarios__c;
+					commHist.AV_OpportunityStatus__c = opp.StageName;
+					commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+					commHist.AV_Opportunity__c = opp.Id;
+					lstCommHist.add(commHist);
+				}
+				
+				if(opp.StageName != null && String.isNotBlank(opp.StageName) && !opp.StageName.equals(mapOld.get(opp.Id).StageName)){
+					AV_CommentsHistory__c commHist2 = new AV_CommentsHistory__c();
+					commHist2.OwnerId = opp.LastModifiedById;
+					commHist2.AV_OldStatus__c = mapOld.get(opp.Id).StageName;
+					commHist2.AV_NewStatus__c = opp.StageName;
+					commHist2.AV_OpportunityStatus__c = opp.StageName;
+					commHist2.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+					commHist2.AV_Opportunity__c = opp.Id;
+					commHist2.AV_ModificationDate__c = ahora;
+					commHist2.AV_NewComment__c = opp.AV_Comentarios__c;
+					lstCommHist.add(commHist2);
+				}
+			}
+		}else{
+			Set<String> setIdsAvTask = new Set<String>();
+			Set<Id> setTasks = new Set<Id>();
+			Set<Id> setEvents = new Set<Id>();
+
+			for (AV_CustomActivityOpportunity__c cao : relacionado) {
+				if(cao.AV_Task__c!=null){
+					setIdsAvTask.add(cao.AV_Task__c);
+				}
+		}
+		
+			if(!setIdsAvTask.isEmpty()){
+				//buscamos el AV_Task para diferenciar el objeto al que pertenece y rellenamos los sets 
+				for(Event evt: [SELECT AV_Task__c FROM Event WHERE AV_Task__c IN :setIdsAvTask]){
+					setEvents.add(evt.AV_Task__c);
+				}
+				for(Task tsk: [SELECT AV_Task__c FROM Task WHERE AV_Task__c IN :setIdsAvTask]){
+					setTasks.add(tsk.AV_Task__c);
+				}
+			}
+			DateTime ahora = System.now();
+			//recorremos los relacionados para crear su registro de AV_CommentsHistory__c relacionado.
+			for (AV_CustomActivityOpportunity__c cao : relacionado) {
+						AV_CommentsHistory__c commHist3 = new AV_CommentsHistory__c();
+				commHist3.OwnerId = mapOppEmp.get(cao.AV_Opportunity__c).OwnerId;
+				commHist3.AV_ModificationDate__c = ahora;
+				commHist3.AV_AssignedEmployee__c = mapOppEmp.get(cao.AV_Opportunity__c).AV_Gestor__c;
+				commHist3.AV_Opportunity__c = cao.AV_Opportunity__c;
+				commHist3.AV_NewComment__c = mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c;
+
+				if(setEvents !=null && setEvents.contains(cao.AV_Task__c)){
+					commHist3.AV_Event__c = cao.AV_Task__c;
+				}else if(setTasks !=null && setTasks.contains(cao.AV_Task__c)){
+					commHist3.AV_Task__c = cao.AV_Task__c;
+						}
+
+				if(mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c != null && String.isNotBlank(mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c) && !mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c.equals(mapOld.get(cao.AV_Opportunity__c).AV_Comentarios__c)){
+					commHist3.AV_NewComment__c = mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c;
+					commHist3.AV_OldComment__c = mapOld.get(cao.AV_Opportunity__c).AV_Comentarios__c;
+						}
+
+				if(mapOppEmp.get(cao.AV_Opportunity__c).StageName != null && String.isNotBlank(mapOppEmp.get(cao.AV_Opportunity__c).StageName) && !mapOppEmp.get(cao.AV_Opportunity__c).StageName.equals(mapOld.get(cao.AV_Opportunity__c).StageName)){
+					commHist3.AV_OldStatus__c = mapOld.get(cao.AV_Opportunity__c).StageName;
+					commHist3.AV_NewStatus__c = mapOppEmp.get(cao.AV_Opportunity__c).StageName;
+					commHist3.AV_OpportunityStatus__c = mapOppEmp.get(cao.AV_Opportunity__c).StageName;
+				}
+
+				if(((mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c != null && !mapOppEmp.get(cao.AV_Opportunity__c).AV_Comentarios__c.equals(mapOld.get(cao.AV_Opportunity__c).AV_Comentarios__c)) || (mapOppEmp.get(cao.AV_Opportunity__c).StageName != null && !mapOppEmp.get(cao.AV_Opportunity__c).StageName.equals(mapOld.get(cao.AV_Opportunity__c).StageName)))  ){
+							lstCommHist.add(commHist3);
+						}
+					}
+				}
+
+		if(Schema.sObjectType.AV_CommentsHistory__c.isCreateable()){
+			try{
+				Database.insert(lstCommHist);
+			}catch(Exception e) {
+				CBK_Log.error(e);
+			}
+		}
+	}
+
+	/**
+	* @description   object AV_CommentsHistory is created when a new Opportunity with the AV_Comentarios__ field informed is inserted
+	* @param  listNew  list of new Opportunities 
+	*/
+	public static void createCommentsHistory(List<Opportunity> listNew){
+		
+		List<Opportunity> oppList =  new List<Opportunity>();
+		for(Opportunity opp: listNew){
+			if(setRtOppEMP.contains(opp.RecordTypeId) ){
+				oppList.add(opp);
+			}
+		}
+
+		List<AV_CommentsHistory__c> lstCommHist = new List<AV_CommentsHistory__c>();
+		for(Opportunity opp: oppList){
+			if(oppList != null && String.isNotBlank(opp.AV_Comentarios__c)  ){
+				AV_CommentsHistory__c commHist = new AV_CommentsHistory__c();
+				commHist.OwnerId = opp.LastModifiedById;
+				commHist.AV_ModificationDate__c = opp.AV_CommentLastModifiedDate__c;
+				commHist.AV_NewComment__c = opp.AV_Comentarios__c;
+				commHist.AV_OpportunityStatus__c = opp.StageName;
+				commHist.AV_AssignedEmployee__c = opp.AV_Gestor__c;
+				commHist.AV_Opportunity__c = opp.Id;
+				lstCommHist.add(commHist);
+			}
+		}
+		if(Schema.sObjectType.AV_CommentsHistory__c.isCreateable()){
+			try{
+				Database.insert(lstCommHist);
+			}catch(Exception e) {
+				CBK_Log.error(e);
+			}
+		}
+	}
+
+		/**
+	* @description     	Delete AV_CommentsHistory objects related With Opportunity
+	* @param  deletedOpportunityList  list of delete Opportunity records
+	*/
+	public static void deleteCommentsHistory(List<Opportunity> deletedOpportunityList){
+		List<Opportunity> oppList =  new List<Opportunity>();
+		for(Opportunity opp: deletedOpportunityList){
+			if(setRtOppEMP.contains(opp.RecordTypeId) ){
+				oppList.add(opp);
+			}
+		}
+		List<AV_CommentsHistory__c> commHistList = [SELECT Id FROM AV_CommentsHistory__c WHERE AV_Opportunity__c IN : oppList WITH SECURITY_ENFORCED];
+		if(commHistList.size()>0){
+			if(Schema.sObjectType.AV_CommentsHistory__c.isDeletable()){
+				Database.delete(commHistList,false);			
+			}
+		}
+	}
+
+
+
+	/**
+	* @description     	Delete deleteRelations objects related With Opportunity
+	* @param  deletedOpportunityList  list of delete Opportunity records
+	*/
+	public static void deleteRelations(List<Opportunity> deletedOpportunityList){
+		User currentUser  = [SELECT Name, AV_ProfileName__c FROM User WHERE Id = :UserInfo.getUserId()];
+		String profileCu = currentUser.AV_ProfileName__c;
+		List<String> oppSet =  new List<String>();
+		if(!deletedOpportunityList.isEmpty() && profileCu == 'CIBE_Gestor'){
+			List<Opportunity> oppListCIB =  new List<Opportunity>();
+			for(Opportunity opp: deletedOpportunityList){
+				if(setRtOppEMP.contains(opp.RecordTypeId)){
+					oppSet.add(opp.Id);
+				}else if(setRtOppCIB.contains(opp.RecordTypeId)){
+					oppListCIB.add(opp);
+				}
+			}
+
+			if(!oppSet.isEmpty()){
+				List<AV_CustomActivityOpportunity__c> customActi = [SELECT Id, AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Opportunity__c IN : oppSet];
+				
+				if(!customActi.isEmpty()){
+					if(Schema.sObjectType.AV_CommentsHistory__c.isDeletable()){
+						List<Database.DeleteResult> srList = Database.delete(customActi,false);
+						for(Database.deleteResult res : srList) {
+							if(!res.isSuccess()) {
+								for(Database.Error err : res.getErrors()) {
+									CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+								}
+							}
+						}
+						
+					}
+				}
+			}else if(!oppListCIB.isEmpty()){
+				CIBE_OpportunityTriggerHelper.validateDeleteOpportunity(oppListCIB);
+			}
+		}
+
+	}
+		
+	}

@@ -82,6 +82,8 @@ public with sharing class CC_Configuracion_Reclamaciones_Auto {
         
         //En función de la configuración de reclamaciones automáticas, se informan en la Task las fechas en que se reclamará el traslado a colaborador, si aplica
         if (!configRecAuto.isEmpty()) {           
+            
+            if(configRecAuto[0].CC_Calendario__c != null) {
             //Si la configuración de la reclamación tiene activada la primera reclamación, la fecha de activación es inferior a hoy y 
             //la de desactivación es superior a hoy o nula, entonces se deberá realizar la primera reclamación
             if (configRecAuto[0].CC_1a_Reclamacion_Activa__c == true && hoy >= configRecAuto[0].CC_Fecha_Activacion_1a_Rec__c && 
@@ -121,6 +123,7 @@ public with sharing class CC_Configuracion_Reclamaciones_Auto {
                 Long horasFinRecLong = Long.valueof(horasFinRec) * 60 * 60 * 1000;                
                 actividad.OS_Fecha_Fin_Reclamacion_Auto__c = BusinessHours.add(configRecAuto[0].CC_Calendario__c, System.now(), horasFinRecLong);
             }
+            }else{CBK_log.debug('El campo calendario del grupo colaborador está vacio: ' + grupoColab.id);}
         }
     }
     

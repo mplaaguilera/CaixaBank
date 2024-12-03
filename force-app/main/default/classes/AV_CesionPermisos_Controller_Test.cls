@@ -11,6 +11,7 @@
  1.1            US486147            Patricia Solano     07/02/2023      Modified method to validate quality clouds
  1.4								Vladislav Lityagin  10/03/2023	    Fixed Quality Clouds errors
  1.5            Fix                 Patricia Villacañas 16/05/2023      Modified to set run as
+ 1.6            PMD Errors 			Humberto Vilchez    07/11/2023      Fix CPU Limit exceed 
  *********************************************************************************************************************/
 @isTest
 public with sharing class AV_CesionPermisos_Controller_Test {
@@ -22,9 +23,12 @@ public with sharing class AV_CesionPermisos_Controller_Test {
         userGestor.Email = 'gestor-test@test.com';
         userGestor.IsActive = true;
         insert userGestor;
-
+        
         System.runAs(userGcf){
+            
+            AV_TestHelper.insertNeededPermissions(userGestor);
             User cedente = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank',null,'AV_SistematicaComercial');
+            cedente.Alias = 'cedente';
             Account centro = AV_TestHelper.createCaixaCenter();
             Contact cedenteContact = AV_TestHelper.createEmployee(centro,cedente);
             User cedido = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','99999','AV_SistematicaComercial');
@@ -32,38 +36,53 @@ public with sharing class AV_CesionPermisos_Controller_Test {
             cedido.LastName = 'cedidoSurname';
             cedido.AV_NumeroOficinaEmpresa__c = '001-9999';
             List<Database.SaveResult> ids = Database.insert(new List<User>{cedente,cedido});
-            Id cedenteId = ids[0].getId();
-            Id cedidoId = ids[1].getId();
-            Account centroCedido = AV_TestHelper.createCaixaCenterSinInsert();
-            centroCedido.Name = 'office';
-            centroCedido.CC_Numero_Oficina_Empresa__c = '09615';
-            centroCedido.CC_Numero_Oficina__c = '09615';   
-            insert centroCedido;
-            Contact cedidoContact = AV_TestHelper.createEmployee(centroCedido,cedido);
-            Map<String,String> jsonPermisos = new Map<String,String>();
-            jsonPermisos.put('Cedente',cedenteId);
-            jsonPermisos.put('Inicio','22/10/2022');
-            jsonPermisos.put('Final',System.today().format());
-            AV_CesionPermisos_Controller.givePermission(jsonPermisos,new List<String>{cedidoId});
+            
         }
     }
 
     @isTest
     public static void setLabelTest(){
         User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
-       Test.startTest();
-       System.runAs(userGestor){
-           String label =  AV_CesionPermisos_Controller.setLabel();
-           Test.stopTest();
-           System.assert(label.equals('Permisos'));
-       }
+        Test.startTest();
+        System.runAs(userGestor){
+            String label =  AV_CesionPermisos_Controller.setLabel();
+            Test.stopTest();
+            System.assert(label.equals('Permisos'));
+        }
     }
 
     @isTest 
     public static void searchEmployeesTest(){
         Test.startTest();
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-        System.runAs(userGcf){
+        System.runAs(userGcf){                    
+            
+            User cedido;
+            User cedente;            
+            
+            for(User usr: [SELECT Id, Alias FROM User WHERE Alias IN ('cedente', 'cedido') ]){
+                System.debug('actualizarPermisoTest FOR usr:: ' + usr);
+                if(usr.Alias.contains('cedente')){
+                    cedente = usr;
+                }    
+                if(usr.Alias.contains('cedido')){
+                    cedido = usr;
+                }    
+            }            
+            
+            Account centroCedido = AV_TestHelper.createCaixaCenterSinInsert();
+            centroCedido.Name = 'office';
+            centroCedido.CC_Numero_Oficina_Empresa__c = '09615';
+            centroCedido.CC_Numero_Oficina__c = '09615';   
+            insert centroCedido;  
+            
+            Contact cedidoContact = AV_TestHelper.createEmployee(centroCedido,cedido);
+            Map<String,String> jsonPermisos = new Map<String,String>();
+            jsonPermisos.put('Cedente',cedente.Id);
+            jsonPermisos.put('Inicio','22/10/2022');
+            jsonPermisos.put('Final',System.today().format());
+            AV_CesionPermisos_Controller.givePermission(jsonPermisos,new List<String>{cedido.Id});              
+                            
             Contact retrieveCedido = [SELECT ID,AV_UsuarioAsociado__c FROM CONTACT Where AV_UsuarioAsociado__r.Alias = 'cedido' LIMIT 1 ];        
             Id [] fixedSearchResults= new Id[1];
             fixedSearchResults[0] = retrieveCedido.AV_UsuarioAsociado__c;
@@ -78,8 +97,41 @@ public with sharing class AV_CesionPermisos_Controller_Test {
     @isTest 
     public static void actualizarPermisoTest(){
         User userGestor = [SELECT Id FROM User WHERE Profile.Name = 'AV_Usuario_CaixaBank' AND IsActive = true AND Email = 'gestor-test@test.com'];
+        User cedido;
+        User cedente;
+
+        User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+
+        System.runAs(userGcf){            
+
+            for(User usr: [SELECT Id, Alias FROM User WHERE Alias IN ('cedente', 'cedido') ]){
+                System.debug('actualizarPermisoTest FOR usr:: ' + usr);
+                if(usr.Alias.contains('cedente')){
+                    cedente = usr;
+                }    
+                if(usr.Alias.contains('cedido')){
+                    cedido = usr;
+                }    
+            }            
+            
+            Account centroCedido = AV_TestHelper.createCaixaCenterSinInsert();
+            centroCedido.Name = 'office';
+            centroCedido.CC_Numero_Oficina_Empresa__c = '09615';
+            centroCedido.CC_Numero_Oficina__c = '09615';   
+            insert centroCedido;  
+            
+            Contact cedidoContact = AV_TestHelper.createEmployee(centroCedido,cedido);
+            Map<String,String> jsonPermisos = new Map<String,String>();
+            jsonPermisos.put('Cedente',cedente.Id);
+            jsonPermisos.put('Inicio','22/10/2022');
+            jsonPermisos.put('Final',System.today().format());
+            AV_CesionPermisos_Controller.givePermission(jsonPermisos,new List<String>{cedido.Id});
+        
+        }
+        
         System.runAs(userGestor){
-            Test.startTest();
+            Test.startTest();                   
+        
             AV_OfficePermission__c permisoToUpdt= [SELECT Id FROM AV_OfficePermission__c  LIMIT 1];
             Map<String,String> testUpdtMap = new Map<String,String>();
             testUpdtMap.put('Id',permisoToUpdt.Id);
@@ -99,18 +151,74 @@ public with sharing class AV_CesionPermisos_Controller_Test {
     public static void checkForPermissionGivenToMeTest(){
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         System.runAs(userGcf){
+            
+            User cedido;
+            User cedente;            
+            
+            for(User usr: [SELECT Id, Alias FROM User WHERE Alias IN ('cedente', 'cedido') ]){
+                System.debug('actualizarPermisoTest FOR usr:: ' + usr);
+                if(usr.Alias.contains('cedente')){
+                    cedente = usr;
+                }    
+                if(usr.Alias.contains('cedido')){
+                    cedido = usr;
+                }    
+            }            
+            
+            Account centroCedido = AV_TestHelper.createCaixaCenterSinInsert();
+            centroCedido.Name = 'office';
+            centroCedido.CC_Numero_Oficina_Empresa__c = '09615';
+            centroCedido.CC_Numero_Oficina__c = '09615';   
+            insert centroCedido;  
+            
+            Contact cedidoContact = AV_TestHelper.createEmployee(centroCedido,cedido);
+            Map<String,String> jsonPermisos = new Map<String,String>();
+            jsonPermisos.put('Cedente',cedente.Id);
+            jsonPermisos.put('Inicio','22/10/2022');
+            jsonPermisos.put('Final',System.today().format());
+            AV_CesionPermisos_Controller.givePermission(jsonPermisos,new List<String>{cedido.Id});
+            
             Test.startTest();
             Contact cntToLookUp = [SELECT AV_UsuarioAsociado__c FROM CONTACT Where AV_UsuarioAsociado__r.Alias = 'cedido' LIMIT 1 ];
             List<AV_OfficePermission__c> retrievedPerms = AV_CesionPermisos_Controller.checkForPermissionGivenToMe(cntToLookUp.AV_UsuarioAsociado__c);
             Test.stopTest();
             System.assert(!retrievedPerms.isEmpty());
         }
+        
+
     }
-    
+
     @isTest
     public static void deletePermisoTest(){
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         System.runAs(userGcf){
+            
+            User cedido;
+            User cedente;            
+            
+            for(User usr: [SELECT Id, Alias FROM User WHERE Alias IN ('cedente', 'cedido') ]){
+                System.debug('actualizarPermisoTest FOR usr:: ' + usr);
+                if(usr.Alias.contains('cedente')){
+                    cedente = usr;
+                }    
+                if(usr.Alias.contains('cedido')){
+                    cedido = usr;
+                }    
+            }            
+            
+            Account centroCedido = AV_TestHelper.createCaixaCenterSinInsert();
+            centroCedido.Name = 'office';
+            centroCedido.CC_Numero_Oficina_Empresa__c = '09615';
+            centroCedido.CC_Numero_Oficina__c = '09615';   
+            insert centroCedido;  
+            
+            Contact cedidoContact = AV_TestHelper.createEmployee(centroCedido,cedido);
+            Map<String,String> jsonPermisos = new Map<String,String>();
+            jsonPermisos.put('Cedente',cedente.Id);
+            jsonPermisos.put('Inicio','22/10/2022');
+            jsonPermisos.put('Final',System.today().format());
+            AV_CesionPermisos_Controller.givePermission(jsonPermisos,new List<String>{cedido.Id});
+            
             Test.startTest();
             AV_OfficePermission__c permisoToDelete= [SELECT Id FROM AV_OfficePermission__c LIMIT 1];
             AV_CesionPermisos_Controller.deletePermiso(permisoToDelete.Id);
@@ -119,4 +227,5 @@ public with sharing class AV_CesionPermisos_Controller_Test {
             System.assert(emptyList.isEmpty());
         }
     }
+    
 }

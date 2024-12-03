@@ -257,4 +257,5 @@ public with sharing class AV_SchedulerBatches {
         return Integer.valueOf(scheduler.AV_NumDays__c);
     }
     
+	//FlagToAvoidNonDetectionCommitChanges
 }

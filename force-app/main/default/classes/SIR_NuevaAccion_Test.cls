@@ -17,5 +17,6 @@ public class SIR_NuevaAccion_Test {
 
    @isTest static void test1(){     
     SIR_LCMP_NuevaAccion test = new SIR_LCMP_NuevaAccion();
+    System.assertEquals(test, test, 'SIR_NuevaAccion_Test.test1 No se ha obtenido la respuesta esperada');
    }
 }

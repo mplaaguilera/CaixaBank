@@ -8,6 +8,7 @@ Historial
 ---------------------
 VERSION		USER_STORY	   AUTHOR		   		DATE			Description
 1.0			Fix      	   Patricia Solano	    07/08/2022		Init version
+1.1			Fix      	   Sandra Gómez	    	21/11/2023		Change profile of user
 ***********************************************************************************************************************/
 @isTest
 public without sharing class AV_TaskTriggerHelperSharing_Test {
@@ -17,7 +18,7 @@ public without sharing class AV_TaskTriggerHelperSharing_Test {
 		final String MATRICULA_SAMPLE = 'U0009003';
 		String labelProfile;
 		if (String.isBlank(labelProfile)){
-			labelProfile = 'Standard User';
+			labelProfile = 'AV_Usuario_CaixaBank';
 		}
 		List<sObject> result = Database.query('SELECT Id FROM Profile WHERE Name = \'' + labelProfile + '\' LIMIT 1');
 		Profile p = (Profile)result.get(0);
@@ -35,7 +36,7 @@ public without sharing class AV_TaskTriggerHelperSharing_Test {
 			AV_NumeroOficinaEmpresa__c = '001-10101'
 		);
 		
-		User userTest = AV_TestHelper.createUserSinInsert('Standard User','U013213981238');
+		User userTest = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U013213981238');
 		List<User> users = new List<User>{u1,userTest};
 		insert users;
 		System.runAs(userTest){

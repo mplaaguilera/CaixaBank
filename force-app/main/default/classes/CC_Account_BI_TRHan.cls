@@ -1,15 +1,15 @@
 public with sharing class CC_Account_BI_TRHan extends CC_TriggerHandlerBase {
     
-  public override void mainEntry(CC_TriggerParameters tp) {
+	public override void mainEntry(CC_TriggerParameters tp) {
         process((List<Account>)tp.newList, (Map<Id, Account>)tp.newMap);
-  }
+	}
 
     private void process(List<Account> listNewObj, Map<Id, Account> mapNewObj) {
         encryptNumper(listNewObj); //Funcion para encryptar el campo NumPerso en hexadecimal
         if(FeatureManagement.checkPermission('OS_CP_Responsable')){
             evitarDuplicadosCOPS(listNewObj, mapNewObj);
         }
-  }
+	}
     
     //Funcion para encryptar el campo NumPerso en hexadecimal
     private void encryptNumper(List<Account> listNewObj) {
@@ -18,8 +18,8 @@ public with sharing class CC_Account_BI_TRHan extends CC_TriggerHandlerBase {
             // Campo "Numperso"
             if (!String.isEmpty(acc.CC_NumPerso__c)) {
                 if (String.isEmpty(acc.CC_Numperso_HEX__c)){
-                  String replaceNumper = acc.CC_NumPerso__c.replaceAll('[^0-9]', '');
-                  String encryptedNumper = CC_MetodosUtiles.decimalToHex(decimal.valueOf(replaceNumper));
+                	String replaceNumper = acc.CC_NumPerso__c.replaceAll('[^0-9]', '');
+                	String encryptedNumper = CC_MetodosUtiles.decimalToHex(decimal.valueOf(replaceNumper));
                     String numperHex = String.valueOf(encryptedNumper).leftPad(8, '0');
                     acc.CC_Numperso_HEX__c = numperHex.touppercase();                    
                 }
@@ -38,7 +38,7 @@ public with sharing class CC_Account_BI_TRHan extends CC_TriggerHandlerBase {
 
         for(Account cuenta : newAccounts){
             if(cuenta.RecordTypeId == buzonRT && String.isNotBlank(cuenta.CC_Email__c))
-              emails.add(cuenta.CC_Email__c);
+            	emails.add(cuenta.CC_Email__c);
         }
         if (emails.size() == 0) return;
 

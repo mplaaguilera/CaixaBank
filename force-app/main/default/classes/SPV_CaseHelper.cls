@@ -2,7 +2,7 @@ public with sharing class SPV_CaseHelper {
     
     public class SPVException extends Exception {}
 
-    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account', 'SAC_ImagenDocumento__c'};
+    private static Set<String> objetos = new Set<String>{'Case', 'SAC_Accion__c', 'CC_Grupo_Colaborador__c','SAC_Interaccion__c', 'Account'};
     private static Map<String, Map<String,Schema.RecordTypeInfo>> mapRTsObjects = SPV_Utils.getRecordTypesObjects(objetos);
 
     private static final Id RECTYPERECLAMACION = mapRTsObjects.get('Case').get('SPV_Reclamacion').getRecordTypeId();
@@ -18,7 +18,7 @@ public with sharing class SPV_CaseHelper {
     private static final Id RECTYPENOCLIENTE = mapRTsObjects.get('Account').get('SAC_NoCliente_PA').getRecordTypeId();
 
     //RT del objeto intermedio reclamación-oficinas afectadas
-    private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
+    //private static final Id RECTYPEOFICINAS = mapRTsObjects.get('SAC_ImagenDocumento__c').get('SPV_OficinaAfectada').getRecordTypeId();
 
     private static final String ORIGEN_CNMV = 'SPV_CNMV';
     private static final String ORIGEN_DGS = 'SPV_DGS';
@@ -1242,33 +1242,6 @@ public with sharing class SPV_CaseHelper {
     }
 
 
-    /*****************************************************************
-     * Proposito: Cuando la reclamación recibe un cambio en el sentido de resolución, se actualiza 
-     * la fecha en la que se ha obtenido la resolución
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0             US1037919      Álex Polo     30/10/2024        Creación
-     *****************************************************************/
-    public static void rellenarFechaRecepcionResolucion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
-
-        List<Case> listaCambiarFechaRecepcionResolucion = new List<Case>();
-
-        for(Case caso : listCasosSPV){
-            //Se cambiará la fecha de aquellas reclamaciones cuyo sentido de resolución haya cambiado
-            if(caso.recordTypeId == RECTYPERECLAMACION && mapOldObj.containsKey(caso.Id) && caso.SAC_SentidoResolucion__c != mapOldObj.get(caso.Id).SAC_SentidoResolucion__c){
-                listaCambiarFechaRecepcionResolucion.add(caso);
-            }
-        }
-
-        if(!listaCambiarFechaRecepcionResolucion.isEmpty()){
-            for(Case reclamacion : listaCambiarFechaRecepcionResolucion){
-                reclamacion.SPV_FechaRecepcionResolucion__c = date.today();
-            }
-        }
-    }
-
 
     /*****************************************************************
      * Proposito: Al actualizar la fecha de recepción de una reclamacón, se actualizará la
@@ -2025,7 +1998,6 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     17/07/24        Creación
-     * 1.1             US1037919    Álex Polo         24/10/2024      Añadido para tener en cuenta la fase de rectificación
     *****************************************************************/
     public static void comprobarResultadoNegociacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
         List<Case> listaCambioResultadoNegociacion = new List<Case>();
@@ -2033,37 +2005,27 @@ public with sharing class SPV_CaseHelper {
         Set<Id> setIdsCaso = new Set<Id>();
 
         for (case caso : listCasosSPV) {
-            if (mapOldObj.containsKey(caso.Id) && (mapOldObj.get(caso.Id).SAC_ResultadoNegociacion__c != caso.SAC_ResultadoNegociacion__c || mapOldObj.get(caso.Id).SAC_NegociacionFinalizada__c != caso.SAC_NegociacionFinalizada__c)) {
+            if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SAC_ResultadoNegociacion__c != caso.SAC_ResultadoNegociacion__c) {
                 listaCambioResultadoNegociacion.add(caso);
                 setIdsCaso.add(caso.SAC_Reclamacion__c);
             }   
         }
         if(!listaCambioResultadoNegociacion.isEmpty()) {
             if(!setIdsCaso.isEmpty() && Schema.sObjectType.Case.isAccessible()){
-                listaCasosSelect = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_ResultadoNegociacion__c, SAC_NegociacionFinalizada__c, SPV_Rectificado__c
+                listaCasosSelect = [SELECT Id, OwnerId, recordTypeId, SAC_Reclamacion__c, SAC_ResultadoNegociacion__c
                                     FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION OR RecordTypeId = :RECTYPEPRETENSION) 
                                     AND ((RecordTypeId = :RECTYPERECLAMACION AND Id IN :setIdsCaso) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN :setIdsCaso))];
             }
 
             Set<String> resultados = new Set<String>();
-            Set<String> resultadosNegociacionFinalizada = new Set<String>();
-            Boolean reclamacionNegociacionFnalizada = false;
-
             String resultadoReclamacion; 
             Id idReclamacion;
-            Boolean casoRectificado;    //Añadido --v.1.1
         
             for (Case caso : listaCasosSelect) {
                 if(caso.recordTypeId == RECTYPERECLAMACION) {
                     idReclamacion = caso.id;
-                    casoRectificado = caso.SPV_Rectificado__c;  //Añadido --v.1.1
                 } else if(caso.recordTypeId == RECTYPEPRETENSION && caso.SAC_ResultadoNegociacion__c != null) {
                     resultados.add(caso.SAC_ResultadoNegociacion__c);
-                    //Añadido --v.1.1
-                    //Se añade a resultadosNegociacionFinalizada para comprobar si todas las pretensiones tienen negociación finalizada
-                    if(caso.SAC_NegociacionFinalizada__c != null){      
-                        resultadosNegociacionFinalizada.add(String.valueOf(caso.SAC_NegociacionFinalizada__c));
-                    }
                 }
             }
 
@@ -2088,26 +2050,11 @@ public with sharing class SPV_CaseHelper {
             } else if(resultados.contains('Acuerdo revocado') && resultados.contains('Sin acuerdo')) { // Si hay una pretension acuerdo revocado y otra sin acuerdo -> sin acuerdo
                 resultadoReclamacion = 'Sin acuerdo';
             }
-           
-            ////Añadido --v.1.1
-            //Comprobar sialguna pretensión NO ha finalizado la negociación. Si es así, la reclamación no ha finalizado la negociación
-            if(resultadosNegociacionFinalizada.contains('false')){
-                reclamacionNegociacionFnalizada = false;
-            }else{
-                reclamacionNegociacionFnalizada = true;
-            }
 
             if(Schema.sObjectType.Case.isUpdateable()) { 
                 Case rec = new Case();
                 rec.Id = idReclamacion;
-                if(casoRectificado == true){    //Añadido --v.1.1
-                    rec.SPV_ResultadoNegociacionRectificacion__c = resultadoReclamacion;
-                    rec.SPV_NegociacionFinalizadaRectificacion__c = reclamacionNegociacionFnalizada;
-                }else{
-                    rec.SAC_ResultadoNegociacion__c = resultadoReclamacion;
-                    rec.SAC_NegociacionFinalizada__c = reclamacionNegociacionFnalizada;
-                }
-                
+                rec.SAC_ResultadoNegociacion__c = resultadoReclamacion;
                 SPV_DatabaseDML.updateDML(rec, false);
             }
         }
@@ -2248,15 +2195,12 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US974485     Sergio Martín     30/07/24        Creación
-     * 1.1             US1037919      Álex Polo       28/10/2024      Añadidas fechas de envío organismos
     *******************************************************************************************/
     public static void rellenarCampos(List<Case> listCasosSPV, Map<Id, Case> mapOldObj) {
         List<Case> listaEntradaNegociacion = new List<Case>();
         List<Case> listaEntradaAllanamiento = new List<Case>();
         List<Case> listaEntradaAlegaciones = new List<Case>();
         List<Case> listaEntradaDesistimiento = new List<Case>();
-        List<Case> listaEntraEnvioOrganismos = new List<Case>();
-        List<Case> listaEntraPteRespuestaOrganismos = new List<Case>();
 
         for (case caso : listCasosSPV) {
             //Si el caso pasa a subestado negociación y no habia estado nunca en subestado negociación (el check caso negociado no esta marcado)
@@ -2274,15 +2218,7 @@ public with sharing class SPV_CaseHelper {
             //Si el caso pasa a subestado desistimiento y no habia estado nunca en subestado desistimiento (el check caso allanado no esta marcado)
             if (mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).SEG_Subestado__c != caso.SEG_Subestado__c && (caso.SEG_Subestado__c == 'Desistimiento' && !caso.SPV_CasoDesistido__c)) {
                 listaEntradaDesistimiento.add(caso);
-            }
-            //Añadido: Al pasar a envío organismos, se rellena el campo de fecha correspondiente
-            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_EnvioOrganismos'){
-                listaEntraEnvioOrganismos.add(caso);
-            }
-            //Añadido: Al pasar a Pendiente respuesta organismos, se rellena el campo de fecha correspondiente
-            if(mapOldObj.containsKey(caso.Id) && mapOldObj.get(caso.Id).Status != caso.Status && caso.Status == 'SPV_PendienteRespuestaOrganismos'){
-                listaEntraPteRespuestaOrganismos.add(caso);
-            }
+            } 
         }
         if(!listaEntradaNegociacion.isEmpty()) {
             rellenarCasoNegociado(listaEntradaNegociacion);
@@ -2296,43 +2232,6 @@ public with sharing class SPV_CaseHelper {
         if(!listaEntradaDesistimiento.isEmpty()) {
             rellenarCasoDesistido(listaEntradaDesistimiento);
         } 
-        //Añadido:
-        if(!listaEntraEnvioOrganismos.isEmpty()) {
-            rellenarFechaEnvioOrganismos(listaEntraEnvioOrganismos);
-        }
-        if(!listaEntraPteRespuestaOrganismos.isEmpty()) {
-            rellenarFechaPteRespuestaOrganismos(listaEntraPteRespuestaOrganismos);
-        } 
-    }
-
-
-
-    /***********************************************************************************************
-     * Proposito: Al pasar al estado "Envío Organismos", se rellena la fecha en la que esto ocurre
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0             US1037919      Álex Polo     28/10/24        Creación
-     ***********************************************************************************************/
-    public static void rellenarFechaEnvioOrganismos(List<Case> listaCasoNegociacion) {
-        for (Case caso : listaCasoNegociacion) {
-            caso.SPV_FechaEnvioOrganismos__c = System.now();
-        }
-    }
-
-    /***********************************************************************************************
-     * Proposito: Al pasar al estado "Pendiente Respuesta Organismos", se rellena la fecha en la que esto ocurre
-     * 
-     * Historial
-     * -------
-     * VERSION        USER_STORY       AUTHOR         DATE         Description
-     * 1.0             US1037919      Álex Polo     28/10/24        Creación
-     ***********************************************************************************************/
-    public static void rellenarFechaPteRespuestaOrganismos(List<Case> listaCasoNegociacion) {
-        for (Case caso : listaCasoNegociacion) {
-            caso.SPV_FechaPteRespuestaOrganismo__c = System.now();
-        }
     }
 
 
@@ -2439,7 +2338,6 @@ public with sharing class SPV_CaseHelper {
      * -------
      * VERSION        USER_STORY       AUTHOR           DATE         Description
      * 1.0             US1013904      Álex Polo       10/09/2024     Creación
-     * 1.1             US1037919      Álex Polo       23/10/2024     Cambio la forma de tratar las oficinas afectadas    
      ***********************************************************************************************/
     public static void validarCamposEntraAnalisisReclamacion(List<Case> listaCasos, Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj){
 
@@ -2450,7 +2348,7 @@ public with sharing class SPV_CaseHelper {
         Set<Id> setIdsAccounts = new Set<Id>();
         List<Account> listaAccounts = new List<Account>();
         Integer contadorPrets = 0;
-        List<SAC_ImagenDocumento__c> listaOficinasAfectadas = new List<SAC_ImagenDocumento__c>();
+
 
         for(Case caso : listaCasos){
             setIdsReclamaciones.add(caso.Id);
@@ -2459,33 +2357,14 @@ public with sharing class SPV_CaseHelper {
 
         if(!setIdsReclamaciones.isEmpty()){
             listaPretensiones = [SELECT Id, SAC_Reclamacion__c, Status, SAC_EntidadProductora__c, SPV_ObservacionesReclamacion__c, SAC_EsPrincipal__c FROM Case WHERE SAC_Reclamacion__c IN :setIdsReclamaciones AND Status <> 'SAC_009'];
-     
-            //Obtener las oficinas afectadas relacionadas  -- v. 1.1
-            listaOficinasAfectadas = [SELECT Id, SAC_Caso__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :setIdsReclamaciones];
-
-
         }
-
+       
         //Se obtienen las cuentas que están asociadas a los casos
         if(!setIdsAccounts.isEmpty()){
             listaAccounts = [SELECT Id, RecordTypeId FROM Account WHERE Id IN :setIdsAccounts];
         }
 
-    
-
-        //-- v. 1.1
-        //Se crea un mapa en el que se relaciona una reclamación con su oficina afectada (aunque tenga más de una), para controlar que tenga AL MENOS una oficina afectada
-        Map<Id, SAC_ImagenDocumento__c> mapaReclamacionOficinasAfectadas = new Map<Id, SAC_ImagenDocumento__c>();
-        if(!listaOficinasAfectadas.isEmpty()){
-            for(SAC_ImagenDocumento__c oficina : listaOficinasAfectadas){
-                if(!mapaReclamacionOficinasAfectadas.containsKey(oficina.SAC_Caso__c)){
-                    mapaReclamacionOficinasAfectadas.put(oficina.SAC_Caso__c, oficina);     //Con añadir la primera oficina es suficiente para las comprobaciones
-                }
-            }
-        }
-
-
-        //Ahora se construirá un mapa con las Account para poder acceder directamente a través de su Id 
+        //Ahora se construirá un mapa con las Account para poder acceder directamente a través de su Id
         if(!listaAccounts.isEmpty()){
             for(Account cuenta : listaAccounts){
                 if(!mapaAccount.containsKey(cuenta.Id)){
@@ -2538,18 +2417,12 @@ public with sharing class SPV_CaseHelper {
                     caso.addError('No se puede pasar al estado de Análisis sin haber establecido el número de expediente de la reclamación.');
                 }
 
-                /*ANTES:
                 if(caso.CC_Oficina_Afectada_Lookup__c == null || String.isBlank(String.valueOf(caso.CC_Oficina_Afectada_Lookup__c))){
                     caso.addError('No se puede pasar al estado de Análisis sin haber establecido la oficina afectada de la reclamación.');
-                }*/
-
-                //-- v. 1.1
-                //Si el mapa no tiene una entrada con eset caso, es porque no tiene oficina afectada
-                if(!mapaReclamacionOficinasAfectadas.containsKey(caso.Id)){
-                    caso.addError('No se puede pasar al estado de Análisis sin haber establecido la oficina afectada de la reclamación.');
                 }
-                
 
+                
+                
                 if(caso.SPV_FechaIniRegulador__c == null || String.isBlank(String.valueOf(caso.SPV_FechaIniRegulador__c ))){
                     caso.addError('No se puede pasar al estado de Análisis sin tener informado el campo Fecha Ini Regulador.');
                 }
@@ -3436,144 +3309,57 @@ public with sharing class SPV_CaseHelper {
     * VERSION        USER_STORY       AUTHOR         DATE         Description
     * 1.0            US1037919       Álex Polo      17/10/24         Creacion
     *****************************************************************/
-    public static void addOficinaAfectada(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
+    /*public static void addOficinaAfectada(List<Case> listCasosSPV, Map<Id, Case> mapOldObj, Map<Id, Case> mapaDatosCasosActualizar){
 
         Set<Id> listaIdsReclamaciones = new Set<Id>();
         List<Case> listaReclamacionesAddOficina = new List<Case>();
         Map<Id, Case> mapaReclamacionesAddOficina = new Map<Id, Case>();
 
-        Map<Id, List<Account>> mapaRecalmacionAccounts = new Map<Id, List<Account>>();
-        Set<Id> idsAccounts = new Set<Id>();
-
         
         //Obtener aquellas reclamaciones a las que se le hayan añadido una oficina afectada
         for(Case reclamacion : listCasosSPV){
             if(mapOldObj.containsKey(reclamacion.Id) && mapOldObj.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c == null && reclamacion.CC_Oficina_Afectada_Lookup__c != null){
+                System.debug('entra a oficina ' + reclamacion.CC_Oficina_Afectada_Lookup__c);
                 listaReclamacionesAddOficina.add(reclamacion);
-                listaIdsReclamaciones.add(reclamacion.Id);
                 if(!mapaReclamacionesAddOficina.containsKey(reclamacion.Id)){
                     mapaReclamacionesAddOficina.put(reclamacion.Id, reclamacion);
                 }
-                idsAccounts.add(reclamacion.CC_Oficina_Afectada_Lookup__c);
             }
         }
 
-        //Buscar todas las oficinas afectadas que ya tiene la reclamación para no añadir repetidos
-        Map<Id, Map<Id, Id>> mapaReclamacionOficinasYaExistentes = new Map<Id, Map<Id, Id>>();    //Mapa en el que cada id de reclamación se relaciona con los id de oficinas que tiene añadidas
-        List<SAC_ImagenDocumento__c> listaOficinasYaExistentes = [SELECT Id, SAC_Caso__c, SPV_OficinaAfectada_Lookup__c FROM SAC_ImagenDocumento__c WHERE SAC_Caso__c IN :listaIdsReclamaciones];
-
-        //Se rellena un mapa en el que a cada reclamación se le relacciona con los ids de oficinas que tiene añadidas
-        if(!listaOficinasYaExistentes.isEmpty()){
-            for(SAC_ImagenDocumento__c objIntermedio : listaOficinasYaExistentes){
-                if(!mapaReclamacionOficinasYaExistentes.containsKey(objIntermedio.SAC_Caso__c)){
-                    mapaReclamacionOficinasYaExistentes.put(objIntermedio.SAC_Caso__c, new Map<Id, Id>());
-                    mapaReclamacionOficinasYaExistentes.get(objIntermedio.SAC_Caso__c).put(objIntermedio.SPV_OficinaAfectada_Lookup__c, objIntermedio.SPV_OficinaAfectada_Lookup__c);   //Se añade el id de Account como un Map para poder acceder haciendo .get y comprobar si está haciendo .containsKey
-                }else{
-                    mapaReclamacionOficinasYaExistentes.get(objIntermedio.SAC_Caso__c).put(objIntermedio.SPV_OficinaAfectada_Lookup__c, objIntermedio.SPV_OficinaAfectada_Lookup__c);
-                }
-            }
-        }
-
-        //Se recuperan los datos de las Account que se van a añadir como oficinas afectadas
-        Map<Id,Account> mapAccount = new Map<Id, Account>();
-        if(!idsAccounts.isEmpty()){
-            mapAccount = new Map<Id, Account>([SELECT Id, CC_Email__c,Name, CC_Tipo_Centro__c, ParentId, Parent.CC_Tipo_Centro__c, Parent.ParentId, 
-            Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.ParentId, Parent.Parent.Parent.CC_Tipo_Centro__c, Parent.Parent.Parent.ParentId
-            FROM Account WHERE Id IN :idsAccounts]);
-        }
-
-        //Se rellena un mapa en el que se relacciona cada reclamación con un listado de las oficinas afectadas que se le van a añadir a ella
-        if(!listaReclamacionesAddOficina.isEmpty()){
-
-            for(Case reclamacion : listaReclamacionesAddOficina){
-
-                if(mapAccount.containsKey(reclamacion.CC_Oficina_Afectada_Lookup__c)){
-                    Account oficina = mapAccount.get(reclamacion.CC_Oficina_Afectada_Lookup__c);            //Se obtiene la oficina cuyo id se tiene en la reclamación, que se obtuvo en la query de Accounts
-    
-                    if(!mapaRecalmacionAccounts.containsKey(reclamacion.Id)){
-                        List<Account> listaOficinasRecla = new List<Account>();
-                        listaOficinasRecla.add(oficina);
-                        mapaRecalmacionAccounts.put(reclamacion.Id, listaOficinasRecla);
-                    }else{
-                        mapaRecalmacionAccounts.get(reclamacion.Id).add(oficina);
-                    }
-                }
-            }
-        }
-
- 
         List<SAC_ImagenDocumento__c> listaReclaOficina = new List<SAC_ImagenDocumento__c>();
 
         //Para cada reclamación que haya añadido una oficina, se crea un objeto intermedio que indique la relación de esa oficina con la reclamación
-        if(!listaReclamacionesAddOficina.isEmpty()){
-            for(Case reclamacion : listaReclamacionesAddOficina){
+        for(Case reclamacion : listaReclamacionesAddOficina){
 
-                //Entra si va a añadir al menos una oficina, es decir, si la lista de oficinas a añadir para esa reclamación no está vacía 
-                if(mapaRecalmacionAccounts.containsKey(reclamacion.Id) && !mapaRecalmacionAccounts.get(reclamacion.Id).isEmpty()){
-    
-                    List<Account> listaOficinasAfectadasReclamacion = mapaRecalmacionAccounts.get(reclamacion.Id);
-                    
-                    for(Account oficina : listaOficinasAfectadasReclamacion){
-        
-                        //Comprobar si la reclamación ya tiene esta oficina añadida:
-                        Boolean esRepetida = false;
-                        //Si la reclamación está en el siguiente mapa, es que tiene oficinas añadidas. Ver si la que se quiere añadir no es repetida
-                        if(mapaReclamacionOficinasYaExistentes.containsKey(reclamacion.Id) && mapaReclamacionOficinasYaExistentes.get(reclamacion.Id).containsKey(oficina.Id)){
-                            esRepetida = true;  //Si es repetida, no se añadirá
-                        }
-        
-                        if(esRepetida == false){
-        
-                            SAC_ImagenDocumento__c nuevoObjIntermedio = new SAC_ImagenDocumento__c();
-                            nuevoObjIntermedio.SAC_Caso__c = reclamacion.Id;
-                            //nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = reclamacion.CC_Oficina_Afectada_Lookup__c;
-                            nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = oficina.Id;
-                            nuevoObjIntermedio.RecordTypeId = RECTYPEOFICINAS;
-                
-            
-                            //Añadirle el DAN de la oficina afectada
-                           
-                             if(oficina.Parent.CC_Tipo_Centro__c == 'GC'){
-                                    nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.ParentId;
-                                }else if(oficina.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
-                                        nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.ParentId;
-                                }else if(oficina.Parent.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
-                                            nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.Parent.ParentId;
-                                } else if(oficina.Parent.Parent.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
-                                                nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = oficina.Parent.Parent.Parent.ParentId;
-                                }else{
-                                    nuevoObjIntermedio.SPV_DAN_OficinaAfectada__c = null;
-                                }
-            
-            
-                            listaReclaOficina.add(nuevoObjIntermedio);
-                
-                            //Al crear el correspondiente objeto intermedio, vaciar de nuevo el campo oficina afectada de la reclamación para que si se desea puedan añadir más oficinas
-                            if(!mapaDatosCasosActualizar.containskey(reclamacion.Id)){
-                                Case nuevaReclamacion = new Case();
-                                nuevaReclamacion.Id = reclamacion.Id;
-                                nuevaReclamacion.CC_Oficina_Afectada_Lookup__c =null;
-                                mapaDatosCasosActualizar.put(nuevaReclamacion.Id, nuevaReclamacion);
-                            }else{
-                                mapaDatosCasosActualizar.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c = null;
-                            }
-                        }else{
-                            reclamacion.addError('La oficina que se intenta añadir ya fue añadida.');
-                        }
-        
-                    }
-    
-                }
-    
+            SAC_ImagenDocumento__c nuevoObjIntermedio = new SAC_ImagenDocumento__c();
+            nuevoObjIntermedio.SAC_Caso__c = reclamacion.Id;
+            nuevoObjIntermedio.SPV_OficinaAfectada_Lookup__c = reclamacion.CC_Oficina_Afectada_Lookup__c;
+            nuevoObjIntermedio.RecordTypeId = RECTYPEOFICINAS;
+
+            listaReclaOficina.add(nuevoObjIntermedio);
+
+            //Al crear el correspondiente objeto intermedio, vaciar de nuevo el campo oficina afectada de la reclamación para que si se desea puedan añadir más oficinas
+            if(!mapaDatosCasosActualizar.containskey(reclamacion.Id)){
+                Case nuevaReclamacion = new Case();
+                nuevaReclamacion.Id = reclamacion.Id;
+                nuevaReclamacion.CC_Oficina_Afectada_Lookup__c =null;
+                mapaDatosCasosActualizar.put(nuevaReclamacion.Id, nuevaReclamacion);
+            }else{
+                mapaDatosCasosActualizar.get(reclamacion.Id).CC_Oficina_Afectada_Lookup__c = null;
             }
+
+
         }
 
-
-
+       
         if(!listaReclaOficina.isEmpty()){
             SPV_DatabaseDML.insertListDML(listaReclaOficina, false);
         }
-    }
+        System.debug('oficinas añadidas ' + listaReclaOficina);
+
+
+    }*/
 
 
 
@@ -3905,7 +3691,6 @@ public with sharing class SPV_CaseHelper {
     * 1.0            US942879     Sergio Martín    16/10/24         Creacion
     ***********************************************************************************/
     public static void cerrarSLAReclamacion(List<Case> listCasosSPV, Map<Id, Case> mapOldObj){
-        System.debug('Entra en cerrarSLAReclamacion ' );
 
         Set<Id> listaIdsReclamaciones = new Set<Id>();
         List<Case> listaCerrarSLAFases = new List<Case>();
@@ -3979,13 +3764,11 @@ public with sharing class SPV_CaseHelper {
      * 1.0             US942879     Sergio Martín     16/10/24         Creacion
      ***********************************************************************************************/
     public static void cerrarSLAFasesReclamacion(Set<Id> setIdReclamaciones) {
-        System.debug('Entra en cerrarSLAFasesReclamacion ' );
         if(!setIdReclamaciones.isEmpty() && Schema.sObjectType.CaseMilestone.isAccessible()){
             List<CaseMilestone> listaCaseMilestone = [SELECT caseid, startdate, IsCompleted, CompletionDate, MilestoneType.Name FROM CaseMilestone WHERE caseId IN :setIdReclamaciones];
             List<CaseMilestone> listaCaseMilestoneUpdatear = new List<CaseMilestone>();
             for (CaseMilestone caseMil : listaCaseMilestone) {
                 if (String.isBlank(String.valueOf(caseMil.CompletionDate)) && caseMil.MilestoneType.Name != 'Plazo Regulatorio Supervisor' && caseMil.MilestoneType.Name != 'SLA Alta y Asignación Letrado') {
-                    System.debug('caseMil ' + caseMil);
                     caseMil.CompletionDate = system.now();
                     listaCaseMilestoneUpdatear.add(caseMil);
                 }

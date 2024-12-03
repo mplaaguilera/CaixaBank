@@ -19,7 +19,7 @@ Historial
     1.9			FIX		        Alex 			    16/11/2022			Dispatcher Previo Events
 	2.0         US453532        Elisabeth Rodríguez 14/12/2022          Added call to changeSubjectToCanceled method
 	2.1			DE70392			Sandra Gómez		08/02/2023			Add AV_AvoidBulkApi in method updateCentro
-
+	2.2			Ejec. Lentas	Sandra Gómez		22/02/2024			Add method fieldSubjectStartDateTime
 ***********************************************************************************************************************/
 public class AV_Event_BU_TRHan extends CC_TriggerHandlerBase{
 	
@@ -34,50 +34,40 @@ public class AV_Event_BU_TRHan extends CC_TriggerHandlerBase{
 		List<Event> listDataWhitoutOutlook = AV_EventTriggerHelper.checkGeneralRTWithoutOutlook(listNewObj); //No tiene los eventos de Outlook
 		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if (listData!=null && !listData.isEmpty()){
+			AV_EventTriggerHelper.fieldSubjectStartDateTime(listData);
 			AV_EventTriggerHelper.checkOutlookEvent(listData);
 		}
-
 		if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()) {
 			AV_EventTriggerHelper.processOwnerGestores(listDataWhitoutOutlook, mapOldObj);
 			/*if (!hasCustomPermission && AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c && !System.isbatch()) {
 				AV_EventTriggerHelper.validateForbiddenWords(listDataWhitoutOutlook, mapOldObj);
 			}*/
 		}
-
 		if (listData!=null && !listData.isEmpty()){
 			AV_EventTriggerHelper.changeOwner(listData, mapOldObj);
 		}
-
 		if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()) {
 			AV_EventTriggerHelper.createCRMTask(listDataWhitoutOutlook, mapOldObj);
 		}
-
 		if (listData!=null && !listData.isEmpty()){
 			AV_EventTriggerHelper.insertOrUpdateCodigoGestorAsignado(listData, mapOldObj);
 		}
-		
 		if (listDataWhitoutOutlook!=null && !listDataWhitoutOutlook.isEmpty()) {
 			AV_EventTriggerHelper.setMeetingLocation(listDataWhitoutOutlook, mapOldObj, true);
 			if (!hasCustomPermission) {
-			AV_EventTriggerHelper.updateCentro(listDataWhitoutOutlook, mapOldObj);
+				AV_EventTriggerHelper.updateCentro(listDataWhitoutOutlook, mapOldObj);
+			}
+			if (listData!=null && !listData.isEmpty()){
+				AV_EventTriggerHelper.changeSubjectToCanceled(listNewObj, mapOldObj);
+			}
 		}
-
 		if (listData!=null && !listData.isEmpty()){
 			AV_EventTriggerHelper.changeSubjectToCanceled(listNewObj, mapOldObj);
-		}
-		
-	}
-
-		if (listData!=null && !listData.isEmpty()){
-			AV_EventTriggerHelper.changeSubjectToCanceled(listNewObj, mapOldObj);
+			
 		}
 		/*if(listDataNonRecurrentEvents!=null && !listDataNonRecurrentEvents.isEmpty()){ //Envio Eventos Datapool
-
 			AV_SendEvents_Integration sendEvents = new AV_SendEvents_Integration(listDataNonRecurrentEvents, 'M');
   			System.enqueueJob(sendEvents);  
-
 		}*/
-
-		
 	}
 }

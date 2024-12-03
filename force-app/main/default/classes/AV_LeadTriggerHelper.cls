@@ -12,6 +12,7 @@ Historial
 	1.2			US-379346 Campos Fecha Cierre Gestion Y fecha conversion	Alex Cubells			11/07/2022
 	1.3			US336956  Logica Fecha Vencimiento y marca Cliente			Vladislav Lityagin		07/10/2022				Added checkDueDate, checkLeadOpportunityHolders
 	1.4			US378818 - Incorporar Tarea automática 						Vladislav Lityagin		14/10/2022				Added checkIfOfferIsSent
+    1.5                                                                     Oscar Moreno            12/02/2024              Modify checkStatus
 
 ***************************************************************************************************************************************************/
 public with sharing class AV_LeadTriggerHelper {
@@ -68,18 +69,23 @@ public with sharing class AV_LeadTriggerHelper {
     */
     public static void checkStatus(List<Lead> listNew, Map<Id, Lead> mapOld) {
         Id profileId = UserInfo.getProfileId();
-        String profileName = [SELECT Name FROM Profile WHERE Id =: profileId LIMIT 1].Name;
-        if(profileName.equals('AV_Usuario_CaixaBank')){
-            for (Lead l : listNew) {
-                if (!l.Status.equalsIgnoreCase(mapOld.get(l.Id).Status)) {
-                    if (!l.AV_ByPass_VR__c) {
-                        l.addError('No se puede modificar el estado del Lead.');
+        List<Profile> profiles = [SELECT Name FROM Profile WHERE Id =: profileId LIMIT 1];
+        
+        if (!profiles.isEmpty()) {  
+            Profile profile = profiles[0];
+            if (profile.Name.equals('AV_Usuario_CaixaBank')) {
+                for (Lead l : listNew) {
+                    if (!l.Status.equalsIgnoreCase(mapOld.get(l.Id).Status)) {
+                        if (!l.AV_ByPass_VR__c) {
+                            l.addError('No se puede modificar el estado del Lead.');
+                        }
+                        l.AV_ByPass_VR__c = mapOld.get(l.Id).AV_ByPass_VR__c ? false : mapOld.get(l.Id).AV_ByPass_VR__c;
                     }
-                    l.AV_ByPass_VR__c = mapOld.get(l.Id).AV_ByPass_VR__c ? false : mapOld.get(l.Id).AV_ByPass_VR__c;
                 }
-		    }
+            }
         }
-	}
+    }
+    
     
       /**
     * @description		 	Check due date used for insert and update

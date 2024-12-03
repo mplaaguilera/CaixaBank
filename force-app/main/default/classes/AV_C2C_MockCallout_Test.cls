@@ -8,10 +8,12 @@ Historial
 ---------------------
    VERSION		USER_STORY	   AUTHOR		   		DATE			Description
    1.0			Test Class	   David Rufo	   	    21/07/2020		Init version
+   1.1		    FIX11070844	    Oscar Moreno		   22/07/2024			Fix error The Global modifier should be avoided.
+
 
 ***********************************************************************************************************************/
 @isTest
-global class AV_C2C_MockCallout_Test implements HttpCalloutMock {
+public class AV_C2C_MockCallout_Test implements HttpCalloutMock {
 
     /**
      * Option 1: normal execution
@@ -49,7 +51,7 @@ global class AV_C2C_MockCallout_Test implements HttpCalloutMock {
      * @param req       request
      * @return          response OK
      **/
-    global HTTPResponse respond(HTTPRequest req) {
+    public HTTPResponse respond(HTTPRequest req) {
         System.debug(LoggingLevel.DEBUG, 'AV_C2C_MockCallout_Test - Option: ' + this.option);
         System.debug(LoggingLevel.DEBUG, 'AV_C2C_MockCallout_Test: ' + req.getEndPoint());
         HttpResponse res = new HttpResponse();

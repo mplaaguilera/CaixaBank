@@ -1,32 +1,41 @@
 /*****************************************************************
-    Name:  SIR_cls_WS_altaProcRefinanciacionMock
-    Copyright © 2021  CaixaBank
+    Name: SIR_cls_WS_altaProcRefinanciacionMock
+    Copyright © 2021 CaixaBank
 
-    Proposito:   Clase de test de la clase SIR_cls_WS_altaProcRefinanciacio                                                                                               
+    Proposito: Clase de test de la clase SIR_cls_WS_altaProcRefinanciacio                                                                                               
         Historial
         -------                                                            
         VERSION        USER_STORY       AUTHOR         DATE               Description
         1.0            US258825         Atmira         17/09/2021     	  Created    
 
-    *****************************************************************/
-
-
-@istest
+*****************************************************************/
+@isTest
 public with sharing class SIR_cls_WS_altaProcRefinanciacionTest {
 
-    @testSetup static void setupMethod(){ 
+    @testSetup 
+    static void setupMethod() { 
         SIR_TestDataFactory.CrearIntegrationSetting('altaProcRefinanciacion');
     }
 
-    @istest
-    public static void correcto() {
+    /*****************************************************************                                                  
+        Parameters: No
+        Returns: No
+        Throws [Exceptions]: No                                                          
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0                             Atmira       
+        
+	*****************************************************************/  
+    @isTest
+    public static void correctoTest() {
         UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
         insert rol;
         User usuario = SIR_TestDataFactory.createTestUser('primero',rol,'AV_Usuario_CaixaBank');
         List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
         insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
-        
    		System.runAs(usuario){
             SIR_Constantes constantes = new SIR_Constantes();
             Account cuenta = SIR_TestDataFactory.crearCuenta();
@@ -45,15 +54,25 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacionTest {
         }
     }
 
-    @istest
-    public static void incorrecto() {
+    /*****************************************************************                                                  
+        Parameters: No
+        Returns: No
+        Throws [Exceptions]: No                                                          
+        
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0                             Atmira       
+        
+	*****************************************************************/  
+    @isTest
+    public static void incorrectoTest() {
         UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
         insert rol;
         User usuario = SIR_TestDataFactory.createTestUser('primero',rol,'AV_Usuario_CaixaBank');
         List<SIREC__SIREC_obj_acciones__c> listAccion = new List<SIREC__SIREC_obj_acciones__c>();
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
         insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
-        
    		System.runAs(usuario){
             SIR_Constantes constantes = new SIR_Constantes();
             Account cuenta = SIR_TestDataFactory.crearCuenta();
@@ -71,23 +90,37 @@ public with sharing class SIR_cls_WS_altaProcRefinanciacionTest {
         }
     }
 
-    @istest
-    public static void altaProcRefinanciacionMockTest(){
-        SIR_Constantes constantes = new SIR_Constantes();
-        Account cuenta = SIR_TestDataFactory.crearCuenta();
-        SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
-        SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionRequest vBody =  new SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionRequest(proceso.Id);
-        SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionResponse responseJson = new SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionResponse();
-        String idProcesoSirec = 'idProcesoSirec' + Integer.valueof((Math.random() * 100));
-        SIR_cls_WS_altaProcRefinanciacion.DatosResponseDto datosResponseDto = new SIR_cls_WS_altaProcRefinanciacion.DatosResponseDto();
-        datosResponseDto.idProcesoGestion = idProcesoSirec;
-        responseJson.datosResponseDto = datosResponseDto;
-        responseJson.codigoSalida = '1';
+    /*****************************************************************                                                  
+        Parameters: No
+        Returns: No
+        Throws [Exceptions]: No                                                          
         
-        test.startTest();
-        String procesoJson = SIR_cls_WS_altaProcRefinanciacion.altaProcRefinanciacionMock(JSON.serialize(vBody));
-        test.stopTest();
-        system.assertNotEquals(Json.serializePretty(responseJson), procesoJson, 'Test');
+        Historial
+        -------- 
+        VERSION        USER_STORY       AUTHOR         DATE               Description
+        1.0                             Atmira       
+        
+	*****************************************************************/  
+    @isTest
+    public static void altaProcRefinanciacionMockTest(){
+        UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
+        insert rol;
+        User usuario = SIR_TestDataFactory.createTestUser('usuarioTest', rol, 'System Administrator', 'U0111111', '001-09999');
+        System.runAs(usuario){
+            SIR_Constantes constantes = new SIR_Constantes();
+            Account cuenta = SIR_TestDataFactory.crearCuenta();
+            SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(cuenta);
+            SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionRequest vBody =  new SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionRequest(proceso.Id);
+            SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionResponse responseJson = new SIR_cls_WS_altaProcRefinanciacion.AltaProcRefinanciacionResponse();
+            String idProcesoSirec = 'idProcesoSirec' + Integer.valueof((Math.random() * 100));
+            SIR_cls_WS_altaProcRefinanciacion.DatosResponseDto datosResponseDto = new SIR_cls_WS_altaProcRefinanciacion.DatosResponseDto();
+            datosResponseDto.idProcesoGestion = idProcesoSirec;
+            responseJson.datosResponseDto = datosResponseDto;
+            responseJson.codigoSalida = '1';
+            test.startTest();
+            String procesoJson = SIR_cls_WS_altaProcRefinanciacion.altaProcRefinanciacionMock(JSON.serialize(vBody));
+            test.stopTest();
+            system.assertNotEquals(Json.serializePretty(responseJson), procesoJson, 'Test');
+        }
     }
-
 }

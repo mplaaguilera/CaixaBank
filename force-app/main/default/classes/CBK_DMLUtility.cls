@@ -9,8 +9,8 @@ public without sharing class CBK_DMLUtility {
      * @description Esta función proporciona utilidades para operaciones inserción de registros DML.
      * @return Lista de Database.SaveResult que contiene el resultado de la operación.
      */
-    public static List<Database.SaveResult> insertRecords(List<sObject> sObjectList) {
-        List<Database.SaveResult> results = Database.insert(sObjectList, false);
+    public static List<Database.SaveResult> insertRecords(List<sObject> sObjectList, Boolean allOrNone) {
+        List<Database.SaveResult> results = Database.insert(sObjectList, allOrNone);
 
         // Manejo de errores específicos de cada operación
         for (Database.SaveResult sr : results) {
@@ -33,14 +33,24 @@ public without sharing class CBK_DMLUtility {
         return results;
     }
 
+       /**
+     * Inserta una lista de sObjects y captura cualquier error que ocurra.
+     * @param sObjectList Lista de sObjects a insertar.
+     * @description Esta función proporciona utilidades para operaciones inserción de registros DML.
+     * @return Lista de Database.SaveResult que contiene el resultado de la operación.
+     */
+    public static void insertRecords(List<sObject> sObjectList) {
+        Database.insert(sObjectList);
+    }
+
 
 
      /**
      * Método para actualizar registros.
      * @description Esta función proporciona utilidades para operaciones actualización de registros DML.
      */
-    public static List<Database.SaveResult> updateRecords(List<sObject> sObjectList) {
-        List<Database.SaveResult> results = Database.update(sObjectList, false);
+    public static List<Database.SaveResult> updateRecords(List<sObject> sObjectList, Boolean allOrNone) {
+        List<Database.SaveResult> results = Database.update(sObjectList, allOrNone);
 
         // Manejo de errores específicos de cada operación
         for (Database.SaveResult sr : results) {
@@ -51,7 +61,7 @@ public without sharing class CBK_DMLUtility {
                         'Message: ' + err.getMessage(),
                         'Fields: ' + err.getFields()
                     };
-                    CBK_Log.addError(null, new CustomException('Update Error: ' + err.getMessage()), 'Error en operación de Actualizar', detalle, null);
+                    CBK_Log.addError(sr.getId(), new CustomException('Update Error: ' + err.getMessage()), 'Error en operación de Actualizar', detalle, null);
                 }
             }
         }
@@ -63,11 +73,19 @@ public without sharing class CBK_DMLUtility {
     }
 
     /**
+     * Método para actualizar registros.
+     * @description Esta función proporciona utilidades para operaciones actualización de registros DML.
+     */
+    public static void updateRecords(List<sObject> sObjectList) {
+        Database.update(sObjectList);
+    }
+
+    /**
      * @description Esta función proporciona utilidades para operaciones borrado de registros DML.
      * Método para eliminar registros.
      */
-    public static List<Database.DeleteResult> deleteRecords(List<sObject> sObjectList) {
-        List<Database.DeleteResult> results = Database.delete(sObjectList, false);
+    public static List<Database.DeleteResult> deleteRecords(List<sObject> sObjectList, Boolean allOrNone) {
+        List<Database.DeleteResult> results = Database.delete(sObjectList, allOrNone);
 
         // Manejo de errores específicos de cada operación
         for (Database.DeleteResult dr : results) {
@@ -78,7 +96,7 @@ public without sharing class CBK_DMLUtility {
                         'Message: ' + err.getMessage(),
                         'Fields: ' + err.getFields()
                     };
-                    CBK_Log.addError(null, new CustomException('Delete Error: ' + err.getMessage()), 'Error en operación de Borrar', detalle, null);
+                    CBK_Log.addError(dr.getId(), new CustomException('Delete Error: ' + err.getMessage()), 'Error en operación de Borrar', detalle, null);
                 }
             }
         }
@@ -87,6 +105,15 @@ public without sharing class CBK_DMLUtility {
         CBK_Log.insertDML();
 
         return results;
+    }
+
+
+    /**
+     * @description Esta función proporciona utilidades para operaciones borrado de registros DML.
+     * Método para eliminar registros.
+     */
+    public static void deleteRecords(List<sObject> sObjectList) {
+        Database.delete(sObjectList);
     }
 
      // Excepción personalizada

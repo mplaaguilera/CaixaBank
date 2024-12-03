@@ -32,6 +32,11 @@ public class CIBE_Task_BU_TRHan extends CC_TriggerHandlerBase{
 			CIBE_TaskTriggerHelper.insertOrUpdateCenterAndRt(listData, mapOldObj);
 			CIBE_TaskTriggerHelper.setConfidentiality(listData, false);
 			CIBE_TaskTriggerHelper.updateGCF(listData, mapOldObj);
+			
+			if ((!hasCustomPermission && !System.isbatch() )) {
+				CIBE_TaskTriggerHelper.createManagementHistory(listData, mapOldObj);
+			}
+
 
 		}
 	}

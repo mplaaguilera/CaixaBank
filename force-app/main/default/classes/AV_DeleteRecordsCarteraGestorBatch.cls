@@ -18,12 +18,13 @@ Historial
 	2.7			FIX					David Rufo			31/05/2021			Use the Query FWK
 	2.8			FIX					David Rufo			22/06/2021			Use the number of days via Custom Metadata
 	2.9		    AV_Query IT	        Daniel Rodríguez    03/03/2022	        Change AV_Query to SOQL for User, Account, Contact
+	3.0         FIX28080841     Oscar Moreno        28/08/2024          Fix error The Global modifier should be avoided.
 
 ***********************************************************************************************************************/
-global class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 	
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_DeleteCarteraGestor';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_DeleteCarteraGestor';
 	
     /*private AV_Query avQuery;
 	
@@ -58,7 +59,7 @@ global class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sO
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 
 		String avQuery = '';
@@ -103,7 +104,7 @@ global class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sO
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<AV_BookManagementMember__c> param with the list of AV_BookManagementMember__c to delete
 	 */
-	global void execute(Database.BatchableContext bc, List<AV_BookManagementMember__c> scope){
+	public void execute(Database.BatchableContext bc, List<AV_BookManagementMember__c> scope){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -120,7 +121,7 @@ global class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sO
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */	
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_DeleteRecordsCarteraGestorBatch());
 	}
 
@@ -129,7 +130,7 @@ global class AV_DeleteRecordsCarteraGestorBatch implements Database.Batchable<sO
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 		//Database.executeBatch(new AV_DeleteRecordsCarteraBatch ());

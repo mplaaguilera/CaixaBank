@@ -10,17 +10,22 @@ Historial
 	1.0			Confidencialidad clientes		        Luis Martínez	   	03/11/2022		    Init version
 	2.0			US425471								Jose Maria			21/11/2022			updateRatingPD
 	3.0			Mejora de querys						Jose Maria			21/11/2022			Se han implementado mejoras en las querys	
+	4.0													Lucia				21/05/2024			Add retrieveComercialGroup	
+
 ***********************************************************************************************************************/
 public with sharing class CIBE_AccountTriggerHelper {
 
 private static AV_AppUtilities.SearchRT cliente 	= new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_ACCOUNT, 'CC_Cliente');
+private static AV_AppUtilities.SearchRT grupoC 	= new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_ACCOUNT, 'CIBE_GrupoComercial');
+
 private static Set<Id> setRtAll 		= getAllRT();
 private static Set<Id> setRtCliente 	= getIdsRT(new Set<AV_AppUtilities.SearchRT>{cliente});
+private static Set<Id> setRtCGC			= getIdsRT(new Set<AV_AppUtilities.SearchRT>{grupoC});
 
-    /**
-     * @description		 	Check the record types
-     * @param listNews  	list of new records
-     */
+/**
+ * @description		 	Check the record types
+ * @param listNews  	list of new records
+ */
     public static List<Account> checkGeneralRT(List<Account> listNews){
         List<Account> listData = new List<Account>();
         for(Account dataNew : listNews){
@@ -31,9 +36,19 @@ private static Set<Id> setRtCliente 	= getIdsRT(new Set<AV_AppUtilities.SearchRT
         return listData;
     }
 
-	/**
-	 * @description		 	Get all the ID's of the RT
-	 */
+	public static List<Account> checkGeneralRTGC(List<Account> listNews){
+        List<Account> listData2 = new List<Account>();
+        for(Account dataNew : listNews){
+            if((setRtCGC).contains(dataNew.RecordTypeId)){
+                listData2.add(dataNew);
+            }
+        }
+        return listData2;
+    }
+
+/**
+ * @description		 	Get all the ID's of the RT
+ */
 	public static Set<Id> getAllRT(){
 		Set<AV_AppUtilities.SearchRT> setLabelsRt = new Set<AV_AppUtilities.SearchRT>{cliente};
 		return AV_AppUtilities.getRecordTypeIdsInSet(setLabelsRt);
@@ -47,12 +62,11 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 	return AV_AppUtilities.getRecordTypeIdsInSet(setRT);
 }
 
-
 /**
-	 * @description     Updates the customer's related opportunity confidentiality
-	 * @param listNews  list of new account records
-	 * @param mapOlds   map of old account records
-	 */
+ * @description     Updates the customer's related opportunity confidentiality
+ * @param listNews  list of new account records
+ * @param mapOlds   map of old account records
+ */
 
 	public static void updateRatingPD(List<Account> listNews) {
 		//comprobar acceso a query
@@ -63,15 +77,11 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 
         if(!listPDAcc.isEmpty()){
             List<CIBE_PD__c> listPD = new List<CIBE_PD__c>();
-            if(
-                CIBE_PD__c.SObjectType.getDescribe().isAccessible()&&
-                Schema.SObjectType.CIBE_PD__c.fields.CIBE_PDRating__c.isAccessible()&&
+            if(	Schema.SObjectType.CIBE_PD__c.fields.CIBE_PDRating__c.isAccessible()&&
                 Schema.SObjectType.CIBE_PD__c.fields.CIBE_FechaCarga__c.isAccessible()&&
                 Schema.SObjectType.CIBE_PD__c.fields.CIBE_PDMax__c.isAccessible()&&
-                Schema.SObjectType.CIBE_PD__c.fields.CIBE_PDMin__c.isAccessible()
-            ) {
-                
-                listPD = [select id, CIBE_PDRating__c,CIBE_FechaCarga__c, CIBE_PDMin__c, CIBE_PDMax__c from CIBE_PD__c where CIBE_PDMin__c<= :listPDAcc and CIBE_PDMax__c>= :listPDAcc order by CIBE_PDMax__c desc];
+                Schema.SObjectType.CIBE_PD__c.fields.CIBE_PDMin__c.isAccessible()) {  
+					listPD = [select id, CIBE_PDRating__c,CIBE_FechaCarga__c, CIBE_PDMin__c, CIBE_PDMax__c from CIBE_PD__c where CIBE_PDMin__c<= :listPDAcc and CIBE_PDMax__c>= :listPDAcc order by CIBE_PDMax__c desc];
             }
     
             if(!listPD.isEmpty()){
@@ -100,16 +110,15 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 	public static void updateOppConfidentiality(List<Account> listNews, Map<Id, Account> mapOlds) {
 		Map<Id, Boolean> cliConfidentiality = new Map<Id, Boolean>();
 		Map<Id, Boolean> cliEmployee= new Map<Id, Boolean>();
-		List<Account> listNewsVal = getNegocio(listNews);
 		List<Opportunity> allOpps = new List<Opportunity>();
-        String methodName = 'updateOppConfidentiality';
-        Integer successfulUr = 0;
-		if(listNewsVal.size()>0){
-			listNewsVal=listNews.clone();
-		}
+		List<Opportunity> updateOpps = new List<Opportunity>();
+		boolean hasError = false;
+		List<Object> objs = new List<Object>();
+		Map<String, String> msjs = new Map<String, String>();
+		Set <String> setStatOpp = new Set <String>{CIBE_AppConstants.OPPORTUNITY_STATUS_POTENCIAL,CIBE_AppConstants.OPPORTUNITY_STATUS_ENCURSO,CIBE_AppConstants.OPPORTUNITY_STATUS_PENDFIRMA};
 
 		if(mapOlds != null && !mapOlds.isEmpty()) {
-			for (Account cli : listNewsVal) {
+			for (Account cli : listNews) {
 				if (((cli.AV_Confidencial__c != mapOlds.get(cli.Id).AV_Confidencial__c) && cli.AV_Confidencial__c) ||
                 (cli.AV_Empleado__c != mapOlds.get(cli.Id).AV_Empleado__c)) {
 					cliConfidentiality.put(cli.Id, cli.AV_Confidencial__c);
@@ -117,30 +126,35 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 				}
 			}
 			if (!cliConfidentiality.isEmpty()) {
-				if(
-					Opportunity.SObjectType.getDescribe().isAccessible()&&
-					Schema.SObjectType.Opportunity.fields.AV_ClienteConfidencial__c.isAccessible()&&
+				if(	Schema.SObjectType.Opportunity.fields.AV_ClienteConfidencial__c.isAccessible()&&
 					Schema.SObjectType.Opportunity.fields.AccountId.isAccessible()&&
-					Schema.SObjectType.Opportunity.fields.AV_EmployeeCustomer__c.isAccessible()
-				) {
-                   
-					allOpps = [Select Id, AV_ClienteConfidencial__c, AccountId, AV_EmployeeCustomer__c 
-                	FROM Opportunity 
-                	WHERE AccountId in :cliConfidentiality.keySet() AND RecordType.DeveloperName LIKE '%CIBE%' ];
+					Schema.SObjectType.Opportunity.fields.AV_EmployeeCustomer__c.isAccessible()) {				
+						allOpps = [Select Id, AV_ClienteConfidencial__c, AccountId, AV_EmployeeCustomer__c,StageName 
+						FROM Opportunity 
+						WHERE AccountId in :cliConfidentiality.keySet() AND RecordType.DeveloperName LIKE 'CIBE_%' AND closeDate > TODAY];
 				}
 			}
 			if(!allOpps.isEmpty()){
 				for (Opportunity opp : allOpps) {
-					opp.AV_ClienteConfidencial__c = cliConfidentiality.get(opp.AccountId);
-					opp.AV_EmployeeCustomer__c = cliEmployee.get(opp.AccountId);
-				}
-				List<Database.SaveResult> sr = Database.update(allOpps, false);
-				for (Database.SaveResult res : sr) {
-					if (res.isSuccess()) {                                                                                                                                                                                                                                                                                                                                                                          
-						successfulUr++;
+					if(setStatOpp.contains(opp.StageName)){
+						opp.AV_ClienteConfidencial__c = cliConfidentiality.get(opp.AccountId);
+						opp.AV_EmployeeCustomer__c = cliEmployee.get(opp.AccountId);
+						updateOpps.add(opp);
 					}
 				}
-				AV_LogDebug.printLogDebug(methodName, 'Opportunities updated: ' + successfulUr + ' out of ' + sr.size());
+				if(!allOpps.isEmpty()){
+					Database.SaveResult[] lsr = Database.update(updateOpps, false);
+					for (Integer i = 0; i < lsr.size(); i++) {
+						if(!lsr[i].isSuccess() && !lsr[i].getErrors().isEmpty()) {
+							msjs.put(updateOpps[i].Id, ((String)lsr[i].getErrors()[0].getMessage()));
+							objs.add(updateOpps[i]);
+							hasError = true;
+						}
+					}
+					if(hasError) {
+						CBK_Log.error(msjs, objs);
+					}
+				}
 			}			
 		}
 	}
@@ -154,35 +168,27 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 	public static void updateEvntConfidentiality(List<Account> listNews, Map<Id, Account> mapOlds) {
 		Map<Id, Boolean> cliConfidentiality = new Map<Id, Boolean>();
 		Map<Id, Boolean> cliEmployee = new Map<Id, Boolean>();
-		List<Account> listNewsVal = new List<Account>();
 		List<Event> allEvent = new List<Event>();
 		List<Event> toUpdateEvent = new List<Event>();
         String methodName = 'updateEvntConfidentiality';
         Integer successfulUr = 0;
-		listNewsVal = getNegocio(listNews);
-		if(listNewsVal.size()>0){
-			listNewsVal=listNews.clone();
-		}
 
 		if(mapOlds != null && !mapOlds.isEmpty()) {
-				for (Account cli : listNewsVal) {
+				for (Account cli : listNews) {
 					if (((cli.AV_Confidencial__c != mapOlds.get(cli.Id).AV_Confidencial__c) && cli.AV_Confidencial__c) ||
 					(cli.AV_Empleado__c != mapOlds.get(cli.Id).AV_Empleado__c)) {
-					cliConfidentiality.put(cli.Id, cli.AV_Confidencial__c);
-					cliEmployee.put(cli.Id, cli.AV_Empleado__c);
+						cliConfidentiality.put(cli.Id, cli.AV_Confidencial__c);
+						cliEmployee.put(cli.Id, cli.AV_Empleado__c);
 				}
 			}
 			if (!cliConfidentiality.isEmpty()) {
-				if(
-					Event.SObjectType.getDescribe().isAccessible()&&
-					Schema.SObjectType.Event.fields.CIBE_Confidential__c.isAccessible()&&
+				if(	Schema.SObjectType.Event.fields.CIBE_Confidential__c.isAccessible()&&
 					Schema.SObjectType.Event.fields.AccountId.isAccessible()&&
-					Schema.SObjectType.Event.fields.AV_CodigoGestorAsignado__c.isAccessible()
-				) {
-				allEvent = [Select Id, CIBE_Confidential__c, AccountId, AV_CodigoGestorAsignado__c 
-							FROM Event 
-							WHERE (AccountId in :cliConfidentiality.keySet() OR WhatId in :cliConfidentiality.keySet()) AND
-							RecordType.DeveloperName LIKE '%CIBE%' ];	
+					Schema.SObjectType.Event.fields.AV_CodigoGestorAsignado__c.isAccessible()) {
+						allEvent = [Select Id, CIBE_Confidential__c, AccountId, AV_CodigoGestorAsignado__c 
+									FROM Event 
+									WHERE (AccountId in :cliConfidentiality.keySet() OR WhatId in :cliConfidentiality.keySet()) AND
+									RecordType.DeveloperName LIKE '%CIBE%' ];	
 				}
 			}
 			if(!allEvent.isEmpty()){
@@ -215,30 +221,22 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 		List<Task> allTask = new List<Task>();
         String methodName = 'updateTaskConfidentiality';
         Integer successfulUr = 0;
-		List<Account> listNewsVal = getNegocio(listNews);
-
-		if(listNewsVal.size()>0){
-			listNewsVal=listNews.clone();
-		}
 
 		if(mapOlds != null && !mapOlds.isEmpty()) {
-			for (Account cli : listNewsVal) {
+			for (Account cli : listNews) {
 				if (((cli.AV_Confidencial__c != mapOlds.get(cli.Id).AV_Confidencial__c) && cli.AV_Confidencial__c) ||
-                (cli.AV_Empleado__c != mapOlds.get(cli.Id).AV_Empleado__c)) {
-					cliConfidentiality.put(cli.Id, cli.AV_Confidencial__c);
-					cliEmployee.put(cli.Id, cli.AV_Empleado__c);
+					(cli.AV_Empleado__c != mapOlds.get(cli.Id).AV_Empleado__c)) {
+						cliConfidentiality.put(cli.Id, cli.AV_Confidencial__c);
+						cliEmployee.put(cli.Id, cli.AV_Empleado__c);
 				}
 			}
 			if (!cliConfidentiality.isEmpty()) {
-				if(
-					Task.SObjectType.getDescribe().isAccessible()&&
-					Schema.SObjectType.Task.fields.CIBE_Confidential__c.isAccessible()&&
+				if(	Schema.SObjectType.Task.fields.CIBE_Confidential__c.isAccessible()&&
 					Schema.SObjectType.Task.fields.AccountId.isAccessible()&&
-					Schema.SObjectType.Task.fields.AV_CodigoGestorAsignado__c.isAccessible()
-				) {
-				allTask = [Select Id, CIBE_Confidential__c, AccountId, AV_CodigoGestorAsignado__c 
-							FROM Task 
-							WHERE (AccountId in :cliConfidentiality.keySet() OR WhatId in :cliConfidentiality.keySet()) AND RecordType.DeveloperName LIKE '%CIBE%'];	
+					Schema.SObjectType.Task.fields.AV_CodigoGestorAsignado__c.isAccessible()) {
+					allTask = [SELECT Id, CIBE_Confidential__c, AccountId, AV_CodigoGestorAsignado__c 
+								FROM Task 
+								WHERE (AccountId in :cliConfidentiality.keySet() OR WhatId in :cliConfidentiality.keySet()) AND RecordType.DeveloperName LIKE '%CIBE%'];	
 				}
 			}
 			if(!allTask.isEmpty()){
@@ -273,14 +271,11 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 			for(Account acc:  lstCliente){
 				setIdsCliente.add(acc.Id);
 			}
-			if(
-				AV_BookMember__c.SObjectType.getDescribe().isAccessible()&&
-				Schema.SObjectType.AV_BookMember__c.fields.AV_Cliente__c.isAccessible()
-			) {
-			lstLibros   = 	[SELECT AV_Cliente__c
-				FROM AV_BookMember__c 
-				WHERE  AV_Cliente__c in :setIdsCliente AND AV_Cartera__r.AV_Activa__c=:ese AND RecordType.developername =:carteraCliente
-				AND  AV_Cartera__r.AV_Negocio__c in :negocioValues];
+			if(Schema.SObjectType.AV_BookMember__c.fields.AV_Cliente__c.isAccessible()) {
+				lstLibros   = 	[SELECT AV_Cliente__c
+								FROM AV_BookMember__c 
+								WHERE  AV_Cliente__c in :setIdsCliente AND AV_Cartera__r.AV_Activa__c=:ese AND RecordType.developername =:carteraCliente
+								AND  AV_Cartera__r.AV_Negocio__c in :negocioValues];
 			}
 			if(!lstLibros.isEmpty()){
 				for(AV_BookMember__c bkm:lstLibros){
@@ -293,7 +288,6 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 				}
 			}
 		}
-
 		return lstClienteVal;
     }
 
@@ -303,14 +297,14 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 	 * @param mapOlds    map of old account records
 	 */
 	public static void processEAPGestorUser(List<Account> listNews, Map<Id, Account> mapOlds) {
-		if(!System.isBatch() && !System.isQueueable()) {
+        if(!System.isBatch() && !System.isQueueable()) {
 			Set<Id> eapGestorsIds = new Set<Id>();
 			List<Account> lstClientes = new List<Account>();
 			Set<Id> eapGestorsIdsOld = new Set<Id>();
 			List<Account> lstClientesOld = new List<Account>();
 			if(mapOlds != null && !mapOlds.isEmpty()) {
 				for(Account cli : listNews) {
-					if((setRtAll).contains(cli.RecordTypeId) && String.isNotBlank(cli.AV_EAPGestor__c) && cli.AV_EAPGestor__c != mapOlds.get(cli.Id).AV_EAPGestor__c){
+                    if((setRtAll).contains(cli.RecordTypeId) && String.isNotBlank(cli.AV_EAPGestor__c) && cli.AV_EAPGestor__c != mapOlds.get(cli.Id).AV_EAPGestor__c){
 						lstClientes.add(cli);
 						eapGestorsIds.add(cli.AV_EAPGestor__c);
 						lstClientesOld.add(mapOlds.get(cli.Id));
@@ -338,6 +332,17 @@ public static Set<Id> getIdsRT(Set<AV_AppUtilities.SearchRT> setRT){
 					JSON.serialize(lstClientesOld), 
 					eapGestorsIdsOld, 
 					true);
+			}
+		}
+	}
+
+
+	public static void retrieveComercialGroup(List<Account> news) {
+		String methodName = 'retrieveComercialGroup';    
+		System.debug('retrieveComercialGroup');
+		for(Account acc : news) {
+			if(acc.CIBE_GrupoComercial__c != acc.Name){
+				acc.CIBE_GrupoComercial__c = acc.Name;
 			}
 		}
 	}

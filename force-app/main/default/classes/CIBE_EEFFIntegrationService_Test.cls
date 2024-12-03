@@ -14,13 +14,9 @@ Historial
 public with sharing class CIBE_EEFFIntegrationService_Test {
     @TestSetup
     static void makeData(){
-       
+        
+        User usrTest = CIBE_TestHelper.createUser('CIBE_Gestor');
         RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
-        user cIBUser;
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-           cIBUser = CIBE_TestHelper.loginUser('CIBE_Gestor', 'CIBE_CIBEmpresas', '1234', new List<String>{'CIBE_OperativaCIB', 'CIBE_OperativaEMP', 'CIBE_Integracion'});
-        }
-
         RecordType rtCenter = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CENTROCAIXABANK_RT);
         Account centroCaixa = new Account();
         centroCaixa.Name = 'Prueba Test';
@@ -28,7 +24,7 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
         centroCaixa.RecordTypeId = rtCenter.Id;
         centroCaixa.CC_Numero_Oficina_Empresa__c = '001-02615';
         centroCaixa.CC_Numero_Empresa__c = '001';
-        centroCaixa.OwnerId = cIBUser.id;
+        centroCaixa.OwnerId = usrTest.id;
         insert centroCaixa;
         Account acc = new Account(
             Name = 'NameTest',
@@ -38,37 +34,37 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
             CC_Numero_Documento__c = 'P0301400H',
             CC_TipoDocumento__c = 'NIF',
             AV_OficinaPrincipal__c = centroCaixa.Id,
-            OwnerId = cIBUser.Id
+            OwnerId = usrTest.Id
         );
         insert acc;
+        
         //Without Document and CIBE_FechaRefrescoEEFF__c
         Account acc2 = new Account(
             Name = 'NameTest',
             RecordTypeId = rt.Id,
             AV_NumPerso__c = '654321',
             AV_Negocio__c = 'BPA',
-            CC_Numero_Documento__c = 'P0301400H',
+            CC_Numero_Documento__c = '',
             CC_TipoDocumento__c = 'NIF',
             AV_OficinaPrincipal__c = centroCaixa.Id,
-            OwnerId = cIBUser.Id,
-            CIBE_FechaRefrescoEEFF__c = dateTime.now() + 12
+            OwnerId = usrTest.Id,
+            CIBE_FechaRefrescoEEFF__c = null
         );
         insert acc2;
         
-        System.runAs(cIBUser) {
-            CIBE_TestHelper.createCustomer();
-        }
         CBK_IntegrationSetting__c endpointConfReq = new CBK_IntegrationSetting__c(Name='CIBE_getEeFF', NamedCredential__c = 'CIBE_getEeFF');
         insert endpointConfReq;
         CBK_IntegrationSetting__c endpointConfDet = new CBK_IntegrationSetting__c(Name='CIBE_getEeFF_Details', NamedCredential__c = 'CIBE_getEeFF_Details');
         insert endpointConfDet;
+        test.setCreatedDate(endpointConfDet.id, dateTime.newInstance(2023, 5, 1));
+        update endpointConfDet;
 
     }
 
     @isTest
     private static void CustomerWithoutDoc(){
 
-        User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = '1234']; 
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
         CIBE_EEFFIntegrationService.ResponseData eventResponse = new CIBE_EEFFIntegrationService.ResponseData();
         Test.setMock(HttpCalloutMock.class, new CIBE_MockMultiCallout_Test('EEFF','request','EEFF_DETAILS','detail', 'OK'));
         boolean bError = false;
@@ -93,7 +89,7 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
      @isTest
     private static void CustomerFechaCirbe(){
 
-        User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = '1234']; 
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
         CIBE_EEFFIntegrationService.ResponseData eventResponse = new CIBE_EEFFIntegrationService.ResponseData();
         Test.setMock(HttpCalloutMock.class, new CIBE_MockMultiCallout_Test('EEFF','request','EEFF_DETAILS','detail', 'OK'));
         boolean bError = false;
@@ -108,14 +104,14 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
             } catch (Exception e) {
                 bError = true;
             }
-            system.assert(bError);
+            system.assertEquals(true, bError);
         }
     }
 
     @isTest
     private static void KOResponse(){
 
-        User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = '1234'];
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
         CIBE_EEFFIntegrationService.ResponseData eventResponse = new CIBE_EEFFIntegrationService.ResponseData();
         Test.setMock(HttpCalloutMock.class, new CIBE_MockMultiCallout_Test('EEFF','request','EEFF_DETAILS','detail', 'KO'));
         boolean bError = false;
@@ -130,7 +126,7 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
             } catch (Exception e) {
                 bError = true;
             }
-            system.assert(bError);
+            system.assertEquals(true, bError);
         }
 
     }
@@ -138,7 +134,7 @@ public with sharing class CIBE_EEFFIntegrationService_Test {
     @isTest
     private static void responseOk(){
 
-        User usrTest = [SELECT Id FROM User WHERE AV_ExternalID__c = '1234'];
+        User usrTest = [SELECT ID FROM USER LIMIT 1];
         CIBE_EEFFIntegrationService.ResponseData eventResponse = new CIBE_EEFFIntegrationService.ResponseData();
         Test.setMock(HttpCalloutMock.class, new CIBE_MockMultiCallout_Test('EEFF','request','EEFF_DETAILS','detail', 'OK'));
         boolean bError = false;

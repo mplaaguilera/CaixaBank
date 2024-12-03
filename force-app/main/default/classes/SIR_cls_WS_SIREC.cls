@@ -1,21 +1,33 @@
 public with sharing class SIR_cls_WS_SIREC{
 
     public static List<Object> llamar(String body, String destino, string metodo){
+        CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+        reqWrapper.body = body;
+        reqWrapper.intSetting = destino;
+        reqWrapper.method = metodo;
+
+        reqWrapper.mHeaders =  new  Map<String,string>();
+        reqWrapper.mHeaders.put('Content-Type', 'application/json;charset=UTF-8');       
+        reqWrapper.mHeaders.put('Accept-Language', 'es');
+        reqWrapper.mUriParams = new  Map<String,string>();
+        reqWrapper.mQueryParams = new  Map<String,string>();
+        return llamar(reqWrapper);
+    }
+    public static List<Object> llamar(CBK_HttpServiceIntegration.RequestWapper reqWrapper){
         List<Object> response = new List<Object>();
         HttpRequest req;
         HttpResponse res;
         try {
-            Map<String,string> mHeaders =  new  Map<String,string>();
-            mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-            mHeaders.put('Accept-Language', 'es');
-                        
-            req = CBK_HttpServiceIntegration.getRequest(body, destino, metodo, mHeaders);    
-            res = CBK_HttpServiceIntegration.callHttpService(req, 'SIR', destino);
-                    
+    	      		
+            req = CBK_HttpServiceIntegration.getRequest(reqWrapper);              
+            res = CBK_HttpServiceIntegration.callHttpService(req, 'SIR', reqWrapper.intSetting);             
+
             Map<String, Object> desearilazedItem = (Map<String, Object>)JSON.deserializeUntyped(res.getbody());
             Map<String, Object> respuesta= (Map<String, Object>)desearilazedItem.get('respuesta') ;
+              
+            
             Map<String, Object> info = (Map<String, Object>)desearilazedItem.get('info');
-            //Las siguientes líne existe porque nos están pasando una lista, habría que ver porque esto es así
+            //La estructura de error llega en un array
             Map<String, Object> error;
             String errormsg = '';
             String descripcionError = '';
@@ -44,7 +56,7 @@ public with sharing class SIR_cls_WS_SIREC{
                    response.add('Error: ' + mapHttpMsg.get(res.getStatusCode()) + errormsg);
                 }                
 
-                CBK_log.error('Error : SIR_cls_WS_SIREC.llamar -  '+ destino + ' el request ' + body + ' y response ' + res.getStatusCode() + ' - ' +  res.getBody());                
+                CBK_log.error('Error : SIR_cls_WS_SIREC.llamar -  '+ reqWrapper.intSetting + ' el request ' + reqWrapper.body + ' y response ' + res.getStatusCode() + ' - ' +  res.getBody());                
             }                       
             return response;
             
@@ -52,7 +64,7 @@ public with sharing class SIR_cls_WS_SIREC{
             response.add('KO');
             response.add('Se ha producido un error, contacte con el administrador.');
             response.add(res.getStatusCode() + ' - ' +  mapHttpMsg.get(res.getStatusCode()));
-            CBK_log.error(ex, 'Error : SIR_cls_WS_SIREC.llamar -  '+ destino + ' con request ' + body + ' y response ' + res.getStatusCode() + ' - ' +  res.getBody() + ' ' + ex.getTypeName() + ': ' + ex.getMessage());
+            CBK_log.error(ex, 'Error : SIR_cls_WS_SIREC.llamar -  '+ reqWrapper.intSetting + ' con request ' + reqWrapper.body + ' y response ' + res.getStatusCode() + ' - ' +  res.getBody() + ' ' + ex.getTypeName() + ': ' + ex.getMessage());
             return response;
         }
     }

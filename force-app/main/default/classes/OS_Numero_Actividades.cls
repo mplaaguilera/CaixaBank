@@ -4,7 +4,7 @@ public with sharing class OS_Numero_Actividades {
     @InvocableMethod
     public static void sumarTask(List<Id> idCasos) {
         try{
-            //Al crear una nueva actividad el PB OS_Task invoca este método con el WhatId como entrada.
+            //Al crear una nueva actividad el PB OS_Task invoca este método con el WhatId como entrada
             List<Case> casos = [SELECT Status FROM Case WHERE Id IN :idCasos];
             List<Case> casosCerrados = new List<Case>();
 

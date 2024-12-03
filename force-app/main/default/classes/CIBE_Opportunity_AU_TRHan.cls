@@ -1,9 +1,9 @@
 /**********************************************************************************************************************
-Name:	  CIBE_Opportunity_BD_TRHan
+Name:	  CIBE_Opportunity_AU_TRHan
 Copyright © 2022  CaixaBank
-=======================================================================================================================
+------------------------------------------------------------------------------------------------------------------------
 Proposito: Clase para Trigger de Opportunity AfterUpdate funcionalidad para CIBE 
-=======================================================================================================================
+------------------------------------------------------------------------------------------------------------------------
 Historial 
 ---------------------
 VERSION		USER_STORY			AUTHOR				DATE				Description
@@ -18,12 +18,22 @@ public with sharing class CIBE_Opportunity_AU_TRHan extends CC_TriggerHandlerBas
     private void process(List<Opportunity> listNewObj, Map<Id, Opportunity> mapNewObj, List<Opportunity> listOldObj, Map<Id, Opportunity> mapOldObj) {
         //General check the Record type's for intouch project
         List<Opportunity> listData = CIBE_OpportunityTriggerHelper.checkGeneralRT(listNewObj);
-        
+        boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
+
         // Lógica de negocio a ejecutar
         if (listData!=null && !listData.isEmpty()){
             CIBE_OpportunityTriggerHelper.setFieldsFromOppTask(listData, mapOldObj);
             CIBE_OpportunityTriggerHelper.setOpportunityUsers(listData, mapOldObj);
             CIBE_OpportunityTriggerHelper.updateTaskWithOpp(listData, mapOldObj);
+            CIBE_OpportunityTriggerHelper.updateRelaSobjSinClient(listData, mapOldObj);
+            CIBE_OpportunityEmail.emailStageName(listData, mapOldObj);
+            CIBE_OpportunityTriggerHelper.updateCommentsHistory(listData,mapOldObj);
+            CIBE_OpportunityEmail.emailRequerimiento(listData, mapOldObj);
+
+            if(!hasCustomPermission){
+                CIBE_OpportunityEmail.emailConfidential(listData, mapOldObj);
+                CIBE_OpportunityEmail.emailoppOwnerChange(listData, mapOldObj);
+            }
         }
     }
 }

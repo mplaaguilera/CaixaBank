@@ -8,6 +8,10 @@ Historial
 ---------------------
 	VERSION		USER_STORY		    AUTHOR				DATE				Description
 	1.0		  	US602112			Mamen Arias         11/07/2023          Init Version
+    1.1         US306439            Carolina Lopez      21/11/2023          Add methods attendeddeferredbasisEmptyList, attendeddeferredbasisEventCustom.
+    1.2         TechSummit          Carolina Lopez      04/06/2024          Add methods eventssummaryEventCustom, eventssummaryEventCustomEmptyEmail.
+    1.3         TechSummit          Carolina Lopez      04/09/2024          Modify method eventssummaryEventCustom with the registration status confirmed.
+    1.4         TechSummit          Carolina Lopez      06/09/2024          Modify method makeData.
 ***********************************************************************************************************************/
 @isTest
 public class EV_GetEventsPortal_Test {
@@ -19,7 +23,9 @@ public class EV_GetEventsPortal_Test {
     
     @TestSetup
 	static void makeData(){
-        EV_TestHelper.createCampaignMemberCustomContact(true, false);
+        EV_CampaignMemberC__c cmp = EV_TestHelper.createCampaignMemberCustomContact(true, false);
+        cmp.EV_ExternalID__c = '99998888990';
+        update cmp;
         EV_CampaignMemberC__c cm = [SELECT Id, EV_ContactId__r.CC_Numperso__c, EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_Numero_Documento__c = '48133877Y'];
         
         Campaign camp = [SELECT Id, EV_EventoVisibleNOW__c, Status FROM Campaign WHERE Id = :cm.EV_CampaignId__c];
@@ -49,7 +55,7 @@ public class EV_GetEventsPortal_Test {
         
         System.runAs(newUser){
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('8', '123', idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('8', '123', idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();
@@ -80,7 +86,7 @@ public class EV_GetEventsPortal_Test {
         
         System.runAs(newUser){
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('slider-home-events-by-client', '123', idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('slider-home-events-by-client', '123', idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();
@@ -124,7 +130,7 @@ public class EV_GetEventsPortal_Test {
             orderList.sort();
             
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('future-events-by-client', '123', idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('future-events-by-client', '123', idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();
@@ -141,6 +147,119 @@ public class EV_GetEventsPortal_Test {
         
         EV_LogDebug.printLogDebug('@@Limit queries futureEnd: ', String.valueOf(Limits.getQueries()));
         System.assertEquals(HTTP_STATUS_200, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
+
+
+    @isTest
+    public static void attendeddeferredbasisEmptyList() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');     
+        
+        System.runAs(newUser){
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('attended-deferred-basis', null, null, '1234567890');
+
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEventsPortal.getResultsEvents();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_400, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
+
+    @isTest
+    public static void attendeddeferredbasisEventCustom() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');     
+        
+        System.runAs(newUser){
+            EV_CampaignMemberC__c cm = [SELECT Id, EV_ExternalID__c, EV_Status__c, EV_ContactId__r.CC_Numperso__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_Numero_Documento__c = '48133877Y'];
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('attended-deferred-basis', null, null, cm.EV_ExternalID__c);
+            
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEventsPortal.getResultsEvents();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_200, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
+
+    @isTest
+    public static void eventssummaryEventCustom() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');  
+        Campaign campTechFisico;
+        EV_CampaignMemberC__c campMemberFisico;
+        System.runAs(newUser){
+            campTechFisico = EV_TestHelper.createCampaignTechSummit(false,true);
+            List<EV_TraduccionDeEvento__c> traduccionesFisico = EV_TestHelper.createTraslationEvt(campTechFisico);
+            campMemberFisico = EV_TestHelper.createCampaignMemberCustomLeadTechSummitHibrido(campTechFisico.Id);
+        }   
+        
+        System.runAs(newUser){
+            EV_CampaignMemberC__c cm = [SELECT Id, EV_ExternalID__c, EV_Status__c, EV_ContactId__r.CC_Numperso__c, EV_Email__c FROM EV_CampaignMemberC__c WHERE id =: campMemberFisico.Id LIMIT 1];
+            cm.EV_Status__c = 'Registro confirmado';
+            update cm;
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortalTechSummit(cm.EV_Email__c, 'events-summary', null, null, null);
+            
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEventsPortal.getResultsEvents();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_200, RestContext.response.statusCode, 'La llamada no ha sido correcta');
+    }
+
+    @isTest
+    public static void eventssummaryEventCustomEmptyEmail() {
+        User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');  
+        EV_CampaignMemberC__c campMember = new EV_CampaignMemberC__c();
+        System.runAs(newUser){
+            campMember = EV_TestHelper.createCampaignMemberCustomLeadTechSummit(false, true);
+        }   
+        
+        System.runAs(newUser){
+            EV_CampaignMemberC__c cm = [SELECT Id, EV_ExternalID__c, EV_Status__c, EV_ContactId__r.CC_Numperso__c, EV_Email__c FROM EV_CampaignMemberC__c WHERE id =: campMember.Id];
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortalTechSummit('test', 'events-summary', null, null, null);
+            
+            RestRequest req = new RestRequest(); 
+            RestResponse res = new RestResponse();
+            req.requestURI = WS_PATH; 
+            req.addHeader('Content-Type', 'application/json');
+            req.httpMethod = HTTP_METHOD;
+            req.requestBody = Blob.valueof(JSON.serialize(wrapper));  
+            RestContext.request = req;
+            RestContext.response = res;
+        }    
+        Test.startTest();
+        System.runAs(newUser){
+        	EV_WS_GetEventsPortal.getResultsEvents();
+        }
+        Test.stopTest();
+        System.assertEquals(HTTP_STATUS_400, RestContext.response.statusCode, 'La llamada no ha sido correcta');
     }
     
     @isTest
@@ -162,7 +281,7 @@ public class EV_GetEventsPortal_Test {
             orderList.sort();
             
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('past-events-by-client', '123', idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('past-events-by-client', '123', idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();
@@ -200,7 +319,7 @@ public class EV_GetEventsPortal_Test {
             orderList.sort();
             
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('most-viewed-events-by-client', '123', idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('most-viewed-events-by-client', '123', idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();
@@ -226,7 +345,7 @@ public class EV_GetEventsPortal_Test {
         
         System.runAs(newUser){
             String idioma = '002';
-            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('slider-home-events-by-client', null, idioma);
+            EV_WS_GetEventsPortal.RequestServicesPortalBody wrapper = EV_TestHelper.createWrapperJSONServicesPortal('slider-home-events-by-client', null, idioma, null);
 
             RestRequest req = new RestRequest(); 
             RestResponse res = new RestResponse();

@@ -6,8 +6,9 @@ public with sharing class SAC_LCMP_GeneracionDocumento_Test {
         Test.startTest();
         UserRole uRole = [SELECT Id FROM userRole WHERE DeveloperName = 'SAC_General'];
 
-        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];     
-        Database.insert(usuarioAdmin);
+        User usuarioAdmin = SAC_TestDataFactory.crearUsuarioAdministrador(1)[0];
+        SAC_DatabaseDML.insertDML(usuarioAdmin, false);     
+        //Database.insert(usuarioAdmin);
 
         User usuario;
         System.runAs(usuarioAdmin) {
@@ -15,13 +16,15 @@ public with sharing class SAC_LCMP_GeneracionDocumento_Test {
             usuario = SAC_TestDataFactory.crearUsuarioSACGeneral(1)[0];
             usuario.Username = 'ustestesteo@test.com';  
             usuario.UserRoleId = uRole.id;    
-            Database.insert(usuario);
+            SAC_DatabaseDML.insertDML(usuario, false);   
+            //Database.insert(usuario);
 
             PermissionSet permiSet = [SELECT Id FROM PermissionSet WHERE Name = 'SAC_General'];
             PermissionSetAssignment permiSetAssi = new PermissionSetAssignment();
             permiSetAssi.AssigneeId = usuario.Id;
             permiSetAssi.PermissionSetId = permiSet.Id;
-            Database.insert(permiSetAssi);
+            SAC_DatabaseDML.insertDML(permiSetAssi, false);  
+            //Database.insert(permiSetAssi);
         }
         Test.stopTest();
 
@@ -48,32 +51,38 @@ public with sharing class SAC_LCMP_GeneracionDocumento_Test {
         Case casoReclamacion2 = SAC_TestDataFactory.crearCaso('Reclamacion',camposRecl2);
         listaReclamaciones.add(casoReclamacion2);
 
-        Database.insert(listaReclamaciones);  
+        SAC_DatabaseDML.insertListDML(listaReclamaciones, false); 
+        //Database.insert(listaReclamaciones);  
 
 
         List<SAC_DocumentoEnvio__c> listDocumentoEnvio = SAC_TestDataFactory.crearDocumentoEnvio(1, casoReclamacion);
         listDocumentoEnvio[0].SAC_TipoDocumento__c = 'redaccion';
-        Database.insert(listDocumentoEnvio);  
+        SAC_DatabaseDML.insertListDML(listDocumentoEnvio, false); 
+        //Database.insert(listDocumentoEnvio);  
 
         List<SAC_DocumentoEnvio__c> listDocumentoEnvio2 = SAC_TestDataFactory.crearDocumentoEnvio(1, casoReclamacion2);
         listDocumentoEnvio2[0].Name = 'TestDocumentoEnvio';
         listDocumentoEnvio2[0].SAC_Documento__c = null;
         listDocumentoEnvio2[0].SAC_TipoDocumento__c = 'redaccion';
-        Database.insert(listDocumentoEnvio2);  
+        SAC_DatabaseDML.insertListDML(listDocumentoEnvio2, false); 
+        //Database.insert(listDocumentoEnvio2);  
 		
         List<SAC_DocumentoEnvio__c> listDocumentoEnvio3 = SAC_TestDataFactory.crearDocumentoEnvio(1, casoReclamacion2);
         listDocumentoEnvio3[0].Name = 'TestDocumentoEnvioInadmision';
         listDocumentoEnvio3[0].SAC_Documento__c = null;
         listDocumentoEnvio3[0].SAC_TipoDocumento__c = 'inadmision - prestamo';
-        Database.insert(listDocumentoEnvio3); 
+        SAC_DatabaseDML.insertListDML(listDocumentoEnvio3, false);
+        //Database.insert(listDocumentoEnvio3); 
         
         List<SAC_MaestroTemas__c> listaMaestro = SAC_TestDataFactory.crearMaestroTemas(1, 'SAC_TipoAdjuntos');
         listaMaestro[0].SAC_DeveloperName__c = 'RESOLUCION';
-        Database.insert(listaMaestro);
+        SAC_DatabaseDML.insertListDML(listaMaestro, false);
+        //Database.insert(listaMaestro);
 
         ContentVersion cv = SAC_TestDataFactory.crearContentVersion(casoReclamacion2);
         cv.OwnerId = usuario.Id;
-        Database.insert(cv);
+        SAC_DatabaseDML.insertDML(cv, false);
+        //Database.insert(cv);
     }
 
     @isTest

@@ -24,6 +24,7 @@ Historial
 	2.4		 	US610044		Luis Fernández		19/06/2023			Add checkOfficeTaskUpdate method call
 	2.5			US546892		Sandra Gómez		12/09/2023			Add method checkReportClient
 	2.6			Fix				Sandra Gómez		13/11/2023			Add mapToByPassTask given checkReportClient to bypass
+	2.7			US756725		Luis Fernández		17/11/2023			Added  new method validationTaskRules call
 ***********************************************************************************************************************/
 public class AV_Task_BU_TRHan extends CC_TriggerHandlerBase{
 	
@@ -34,9 +35,9 @@ public class AV_Task_BU_TRHan extends CC_TriggerHandlerBase{
 	private void process(List<Task> listNewObj, Map<Id, Task> mapNewObj, List<Task> listOldObj, Map<Id, Task> mapOldObj) {
 		//General check the Record type's for intouch project
 		List<Task> listData = AV_TaskTriggerHelper.checkGeneralRT(listNewObj);
+		Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
 		if (listData!=null && !listData.isEmpty()){
 			AV_TaskTriggerHelper.updateGCF(listData, mapOldObj);
-			Boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
             AV_TaskTriggerHelper.updateSinGestor(listData, mapOldObj);
 			/*-- Palabras prohhibidas --
 			if (!hasCustomPermission && AV_Bypass__c.getOrgDefaults().AV_ForbiddenWords__c && !System.isbatch()) {
@@ -49,6 +50,9 @@ public class AV_Task_BU_TRHan extends CC_TriggerHandlerBase{
 			if (!hasCustomPermission) {
 				AV_TaskTriggerHelper.updateCentro(listData,mapOldObj);
 				AV_TaskTriggerHelper.checkOfficeTaskUpdate(listData,mapOldObj);
+				if (!System.isbatch()) {
+					AV_TaskTriggerHelper.validationRulesTask(listData,mapOldObj);
+				}
 				mapToByPassTask = AV_TaskTriggerHelper.checkReportClient(listData,mapOldObj);
 			}
 			AV_TaskTriggerHelper.insertOrUpdateCenterAndRt(listData, mapOldObj);

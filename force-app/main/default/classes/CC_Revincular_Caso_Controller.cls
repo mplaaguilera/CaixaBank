@@ -156,6 +156,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             update mergeClosedTasklst;
             delete mergeClosedTasklst;
             
+           
             //insert masterClosedTasklst;
             CC_Activity.crearActividades(masterClosedTasklst);
 
@@ -228,13 +229,6 @@ public without sharing class CC_Revincular_Caso_Controller {
            
         
         } catch (Exception e) {
-            System.Debug('Mensaje '+e.getMessage());
-            System.Debug('Causa '+e.getCause());
-            System.Debug('StrackTraceString '+e.getStackTraceString());
-            //System.debug('Account fields that affected this error: ' + e.getFields());
-
-           
-
             throw new AuraHandledException(e.getMessage());
         }
     }
@@ -424,7 +418,11 @@ public without sharing class CC_Revincular_Caso_Controller {
             SAC_Notificacion.enviarNotificacion(casoSAC.OwnerId, casoSAC.Id, 'Reclamación reabierta', 'La reclamación ' + casoSAC.CaseNumber + ' ha sido reabierta desde CC.');
              
         } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
+            AuraHandledException a = new AuraHandledException(e.getMessage());
+            a.setMessage(e.getMessage());
+            system.debug(a);
+            throw a;
+            //throw new AuraHandledException(e.getMessage());
         }
     }
 
@@ -488,6 +486,7 @@ public without sharing class CC_Revincular_Caso_Controller {
             casoCC.CC_Motivo__c = motivo;
             casoCC.Status = 'Cerrado';
             casoCC.CC_Cerrado_Operativa__c = System.now();
+            System.debug('CASO CC ' + JSON.serialize(casoCC));
             update casoCC;
 
             addAdjuntos(casoSac, adjuntosParaSAC/*, emailsParaSAC*/);

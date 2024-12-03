@@ -6,6 +6,8 @@ public with sharing class SIR_cls_UtilsTest {
         UserRole rol = new UserRole(DeveloperName = 'testRole', Name = 'testRole');
         insert rol;
         User usuario = SIR_TestDataFactory.createTestUser('HomeImpaAutoRefreshTestUser',rol,'AV_Usuario_CaixaBank','U012222');  
+        PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'SIR_gestorSolutions'];
+        insert new PermissionSetAssignment(AssigneeId = usuario.id, PermissionSetId = ps.Id);
     }
     @isTest
     public static void getAppRtIdsTest() {
@@ -53,6 +55,58 @@ public with sharing class SIR_cls_UtilsTest {
             Test.stopTest();            
             Assert.areEqual(SIR_Constantes.APP_ACT_MCSOL_PREFIX, prefixmcsol, 'SIR_cls_UtilsTest.getActorPrefixTest() No se ha obtenido el prefijo de mcsol correctamente');
             Assert.areEqual(SIR_Constantes.APP_ACT_MCSOLEMP_PREFIX, prefixmcsolemp, 'SIR_cls_UtilsTest.getActorPrefixTest() No se ha obtenido el prefijo de mcsol correctamente');
+        }
+    }
+
+
+    public static void crearIntegrationSetting(String name){
+        CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
+            wsc.Name = name;
+            wsc.NamedCredential__c = 'callout:' + name;
+            insert wsc;
+    }
+
+    @isTest
+    public static void getUsersAPITest(){
+
+        SIR_Parametros__c param = new SIR_Parametros__c();
+            param.Name = 'maxUserIntegration';
+            param.SIR_Parametro__c = 'numberUsersIntegration';
+            param.SIR_Valor__c = '1';
+            param.SIR_Tipo__c = 'userApi';
+            param.SIR_Activo__c = true;
+            insert param;
+
+            
+        SIR_Parametros__c param1 = new SIR_Parametros__c();
+            param1.Name = 'userIntegration_00';
+            param1.SIR_Parametro__c = 'CambioGestorUser00';
+            param1.SIR_Valor__c = 'SIR_SSMM';
+            param1.SIR_Tipo__c = 'userApi';
+            param1.SIR_Activo__c = true;
+        insert param1;
+
+        User usuario = [SELECT Id FROM User LIMIT 1];
+
+        System.runAs(usuario){
+            
+            Test.startTest();
+                List<String> usersAPI = SIR_cls_Utils.getUsersAPI();            
+            Test.stopTest();            
+            Assert.areEqual(usersAPI[0], 'SIR_SSMM', 'SIR_cls_UtilsTest.getUsersAPITest() No se ha obtenido el usuario API correctamente');
+        }
+    }
+
+    @isTest
+    public static void getEstrategiasNegocioTest(){
+        User usuario = [SELECT Id FROM User LIMIT 1];
+        List<SIREC__SIREC_obj_Catalogo__c> estrategias = SIR_TestDataFactory.crearCatalogoEstrategiasNegocio(2,'PRESOL');
+        System.runAs(usuario){
+           
+            Test.startTest();
+            List<SIREC__SIREC_obj_Catalogo__c> estrategiasPRESOL= SIR_cls_Utils.getEstrategiasNegocio('PRESOL');
+            Test.stopTest();            
+            Assert.areEqual( 2, estrategiasPRESOL.size(), 'SIR_cls_UtilsTest.getEstrategiasNegocioTest() No se ha obtenido el numero de estrategias esperada');
         }
     }
 }

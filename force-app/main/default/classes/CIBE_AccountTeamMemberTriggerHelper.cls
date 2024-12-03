@@ -1,9 +1,9 @@
 /**********************************************************************************************************************
 Name:	  CIBE_AccountTeamMemberTriggerHelper
 Copyright © 2022  CaixaBank
-=======================================================================================================================
+----------------------------------------------------------------------------------------------------------------------
 Proposito: Clase para Trigger de AccountTeamMember
-=======================================================================================================================
+----------------------------------------------------------------------------------------------------------------------
 Historial 
 ---------------------
 VERSION		USER_STORY			AUTHOR				DATE				Description
@@ -11,7 +11,6 @@ VERSION		USER_STORY			AUTHOR				DATE				Description
 
 ***********************************************************************************************************************/
 public with sharing class CIBE_AccountTeamMemberTriggerHelper {
-
     /**
      *  @param description: Check the record types, de field delete and if is active
      *  @param listNews: list of new records
@@ -39,7 +38,7 @@ public with sharing class CIBE_AccountTeamMemberTriggerHelper {
 
         Map<Id, Set<Id>> userIds = new Map<Id, Set<Id>>();
         if(AccountTeamMember.sObjectType.getDescribe().isAccessible()) {
-            for(AccountTeamMember accountTM : [SELECT Id, AccountId, UserId FROM AccountTeamMember WHERE AccountId IN :accountIds]) {
+            for(AccountTeamMember accountTM : [SELECT Id, AccountId, UserId FROM AccountTeamMember WHERE AccountId IN :accountIds AND CIBE_IsAutomatic__c = false]) {
                 if(!userIds.containsKey(accountTM.accountId)) {
                     userIds.put(accountTM.accountId, new Set<Id>());
                 }

@@ -9,19 +9,20 @@ Historial
 	VERSION		USER_STORY		AUTHOR				DATE				Description
 	1.0			App FSC			Carolina Alonso		30/06/2020			Init version
 	1.1			App FSC		  	David Rufo			01/12/2020			Improve the limit query: dynamic limit query 
+    1.2         FIX28080841     Oscar Moreno        02/09/2024          Fix error The Global modifier should be avoided.
 
 ***********************************************************************************************************************/
-global class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
 
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_PreconcedidoBatch';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_PreconcedidoBatch';
 	
 	/**
 	 * Create a list of Account that the Fecha última modificación preconcedido is null or less than 7 days.
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
         Datetime filterDate = Date.today() - 7;
 		String query = 'SELECT Id, AV_NumPerso__c, AV_Preconcedidos__c,AV_FechaUltimaModifPreconcedido__c ' +
@@ -45,7 +46,7 @@ global class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Databa
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param listAccounts List<Account> param with the list of Accounts.
 	 */
-	global void execute(Database.BatchableContext bc, List<Account> listAccounts){
+	public void execute(Database.BatchableContext bc, List<Account> listAccounts){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -101,7 +102,7 @@ global class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Databa
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_PreconcedidoBatch());
 	}
 
@@ -110,7 +111,7 @@ global class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Databa
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}
@@ -136,7 +137,7 @@ global class AV_PreconcedidoBatch implements Database.Batchable<sObject>, Databa
 		// 												.run();
 		List<AV_ProductClient__c> listPFCliente = [SELECT Id,AV_Cliente__r.AV_NumPerso__c,AV_ImportePreconcedido__c,AV_ProductoFicha__r.AV_ProductoFicha__r.Name 
 		FROM AV_ProductClient__c WHERE AV_Cliente__c IN :setIdsAccount AND AV_ImportePreconcedido__c != NULL];   
-
+		
 		Map<String, Map<String, Decimal>> mapPreconcedidos = new Map<String, Map<String, Decimal>>();
 		Map<String, Decimal> mapPreconcedidosProduct = new Map<String, Decimal>();
 		

@@ -10,6 +10,7 @@ Historial
    	1.0            	US306420         Sandra Gómez        20/12/2021         Init version
 	1.1		        AV_Query IT	     Daniel Rodríguez	 7/02/2022	        Change AV_Query to SOQL for User and Account
     1.2        		US592987		 Ángel Medina		 30/05/2023			Changed AV_Query to SOQL queries
+    1.3             QC                Oscar Moreno        12/06/2024       Delete UserInfo.geetUserId()
 	
 ***********************************************************************************************************************/
 @isTest
@@ -19,9 +20,11 @@ private class AV_ProcessInactiveUsNotifyBatch_Test {
 	 */
 	@TestSetup
 	static void setup() {
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
+
 		AV_TestHelper.activateLogger();
 		User u1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U01000012');
-		Contact con =  AV_TestHelper.createEmployee(null,u1);
+		Contact con =  AV_TestHelper.createEmployee(null,u1,u1.AV_ExternalId__c);
 		
 		RecordType rt = AV_AppUtilities.getRecordType('AV_NotifyMe__c', 'AV_NotifyMe');
 		AV_NotifyMe__c noti = new AV_NotifyMe__c();
@@ -34,7 +37,7 @@ private class AV_ProcessInactiveUsNotifyBatch_Test {
 		noti.OwnerId = u1.Id;
 		insert noti;
 		
-		System.runAs([SELECT Id FROM User WHERE Id = :UserInfo.getUserId()][0]) {
+		System.runAs(usuarioGcf) {
 			AV_TestHelper.insertPermissionSet(u1.id, 'AV_GestorOperativa');
 		}
 	}
@@ -52,8 +55,10 @@ private class AV_ProcessInactiveUsNotifyBatch_Test {
 		
 		Test.startTest();
 		User userCli = [Select Id From User Where Profile.Name = 'API Only' and Alias = 'AV-TF9' limit 1];
+		System.runAs(u1){
+			Database.executeBatch(b);
+		}
         
-		Database.executeBatch(b);
 		Test.stopTest();
 		AV_NotifyMe__c notichange = [SELECT Id, OwnerId FROM AV_NotifyMe__c];
         

@@ -1,12 +1,11 @@
-public without sharing class FRA_Case_Gestion_Controller {
+public with sharing class FRA_Case_Gestion_Controller {
 
     @AuraEnabled
     public static Map<String, Object> init(Id recordId) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - init (recordId: ' + recordId + ')');
         Map<String, Object> retorno = new Map<String, Object>();
         Case caso = [SELECT RecordType.Name,
                         CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name, CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name,
-                        CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name
+                        CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name, FRA_CampanaFraude__c
                         FROM Case WHERE Id = :recordId];
 
         retorno.put('RecordTypeName', caso.RecordType.Name);
@@ -20,13 +19,18 @@ public without sharing class FRA_Case_Gestion_Controller {
         retorno.put('Causa_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Causa__r.Name), 'NULL'));
         retorno.put('Solucion_Caso', nullValue(String.valueOf(caso.CC_MCC_Solucion__c), 'NULL'));
         retorno.put('Solucion_Caso_Name', nullValue(String.valueOf(caso.CC_MCC_Solucion__r.Name), 'NULL'));
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - init');
-        return retorno;
+        retorno.put('FRA_CampanaFraude__c', caso.FRA_CampanaFraude__c);
+        CBK_log.debug('Fin FRA_Case_Gestion_Controller - init'); 
+        return retorno; 
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<CBK_CustomPicklist_Controller.PicklistItems> getPicklistValuesFMW(){
+        return CBK_CustomPicklist_Controller.picklistValues('FRA_CampanaFraude__c', 'Case');
     }
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getTematicas(String tipoCliente, Id recordId) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - getTematicas (tipoCliente: ' + tipoCliente + ', recordId: ' + recordId + ')');
         List<OT_Picklist.Item> tematicas = new List<OT_Picklist.Item>();
 
         String buzonOrigen;
@@ -53,15 +57,12 @@ public without sharing class FRA_Case_Gestion_Controller {
                 tematicas.add(wrap);
             }
         }
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - getTematicas');
         return tematicas;
     }
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getProductos(String tipoCliente, String tematica) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - getProductos (tipoCliente: ' + tipoCliente + ', tematica: ' + tematica + ')');
         if (String.isBlank(tematica)) {
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getProductos');
             return new List<OT_Picklist.Item>();
         } else {
             List<OT_Picklist.Item> productos = new List<OT_Picklist.Item>();
@@ -71,17 +72,14 @@ public without sharing class FRA_Case_Gestion_Controller {
                                        AND CC_Activo__c = true ORDER BY Name ASC]) {
                 OT_Picklist.Item wrap = new OT_Picklist.Item( producto.Id,producto.Name);
                 productos.add(wrap);
-            }
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getProductos');                    
+            }               
             return productos;
         }
     }
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getMotivos(String tipoCliente, String producto) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - getMotivos (tipoCliente: ' + tipoCliente + ', producto: ' + producto + ')');
         if (String.isBlank(producto)) {
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getMotivos');
             return new List<OT_Picklist.Item>();
         } else {
             List<OT_Picklist.Item> motivos = new List<OT_Picklist.Item>();
@@ -92,16 +90,13 @@ public without sharing class FRA_Case_Gestion_Controller {
                 OT_Picklist.Item wrap = new OT_Picklist.Item(motivo.Id, motivo.Name);
                 motivos.add(wrap);
             }
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getMotivos');
             return motivos;
         }
     }
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getCausas(String tipoCliente, String motivo) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - getCausas (tipoCliente: ' + tipoCliente + ', motivo: ' + motivo + ')');
         if (String.isBlank(motivo)) {
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getCausas');
             return new List<OT_Picklist.Item>();
         } else {
             List<OT_Picklist.Item> causas = new List<OT_Picklist.Item>();             
@@ -112,16 +107,13 @@ public without sharing class FRA_Case_Gestion_Controller {
                 OT_Picklist.Item wrap = new OT_Picklist.Item(causa.Id, causa.Name);
                 causas.add(wrap);
             }
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getCausas');
             return causas;
         }
     }
 
     @AuraEnabled(cacheable=true)
     public static List<OT_Picklist.Item> getSoluciones(String tipoCliente, String causa) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - getSoluciones (tipoCliente: ' + tipoCliente + ', causa: ' + causa + ')');
         if (String.isBlank(causa)) {
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getSoluciones');
             return new List<OT_Picklist.Item>();
         } else {
             List<OT_Picklist.Item> soluciones = new List<OT_Picklist.Item>();
@@ -132,15 +124,12 @@ public without sharing class FRA_Case_Gestion_Controller {
                 OT_Picklist.Item wrap = new OT_Picklist.Item(solucion.Id, solucion.Name);
                 soluciones.add(wrap);
             }
-            CBK_log.debug('Fin FRA_Case_Gestion_Controller - getSoluciones');
             return soluciones;
         }
     }
 
     private static String nullValue(String valor, String valorSiNulo) {
-        CBK_log.debug('Inicio FRA_Case_Gestion_Controller - nullValue (valor: ' + valor + ', valorSiNulo: ' + valorSiNulo + ')');
         //Si la cadena es nula se retorna valorSiNulo (si éste es nulo se retorna una cadena vacía)
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - nullValue');
         return valor != null ? valor : valorSiNulo != null ? valorSiNulo : '';
     }
 
@@ -183,8 +172,7 @@ public without sharing class FRA_Case_Gestion_Controller {
                 throw new AuraHandledException(erroresCierre.removeEnd('\n'));
             }
         }
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - validarGuardar');
-        return resultado;
+        return resultado; 
     }
 
     // Creación de actividades
@@ -200,6 +188,5 @@ public without sharing class FRA_Case_Gestion_Controller {
             Description = motivo,
             ActivityDate = System.today()
         );
-        CBK_log.debug('Fin FRA_Case_Gestion_Controller - crearActividad');
     }
 }

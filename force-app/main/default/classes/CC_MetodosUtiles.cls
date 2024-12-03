@@ -4,7 +4,7 @@ public with sharing class CC_MetodosUtiles {
     public static CC_Settings__c getCustomSetting(String name){
         CC_Settings__c mcs = new CC_Settings__c();
 
-        mcs = [SELECT Id, Name, CC_Configuracion_1__c, CC_Configuracion_2__c, CC_Configuracion_3__c,
+        mcs = [SELECT Id, Name, CC_Configuracion_1__c, CC_Configuracion_2__c, CC_Configuracion_3__c, 
                 CC_Configuracion_4__c,CC_Configuracion_5__c, CC_Descripcion__c
                 FROM CC_Settings__c
                 WHERE Name = :name];
@@ -24,7 +24,7 @@ public with sharing class CC_MetodosUtiles {
             ((Map<String, String>)oData.get(oVal.CC_Lista__c)).put(oVal.CC_Valor__c, oVal.CC_Valor_SFDC__c);
         }
         return oData;
-    }
+    }    
 
     //Método para recuperar un valor SFDC configurado en META de una LOV
     public static String getValueLOVMeta(String sLista, String sValor) {
@@ -438,8 +438,8 @@ public with sharing class CC_MetodosUtiles {
     public static List<String> listaCampo(List<SObject> registros, String campo, Boolean quitarDuplicados) {
         /* Marc Pla, 19/8/2020: Dada una lista de SObject, retorna una lista con los valores del campo indicado.
             Ejemplo:
-                List<String> nombresCuentas = listaCampo([SELECT Status, Account.Name FROM Case LIMIT 3], 'Account.Name', false);
-                retorna ['JOAN MERCADER OBIOLS', 'PERE CRUZ', 'RAMON MESSEGUER'] */
+                List<String> nombresCuentas = listaCampo([SELECT Name FROM Account LIMIT 3], 'Name', false);
+                retorna {'JOAN MERCADER OBIOLS', 'PERE CRUZ', 'RAMON MESSEGUER'} */
 
         List<String> retorno = new List<String>();
         if (registros != null) {
@@ -519,7 +519,7 @@ public with sharing class CC_MetodosUtiles {
 
         return appDef;
     }
-
+    
     static public Double restarHoras (Time fecha1, Time fecha2){
         Datetime fechaA = Datetime.newInstance(Date.today(), fecha1);
 
@@ -529,7 +529,7 @@ public with sharing class CC_MetodosUtiles {
 
         return (horaResultadoResta);
     }
-
+    
      //Método para restar horas
     //hora1:minuto1 - hora2:minuto2
     static public Double restarHoras (DateTime fecha1, DateTime fecha2){
@@ -548,7 +548,7 @@ public with sharing class CC_MetodosUtiles {
 
         return (horaResultadoResta);
     }
-
+   
 	static public Time horarioDiaTurno (Map<String, List <Time>> horario, String diaSemana, String entradaOsalida){
         Time horarioDiaTurno;
         if (Integer.valueOf(diaSemana) == 5){
@@ -597,7 +597,7 @@ public with sharing class CC_MetodosUtiles {
 
         return (isWeekend);
     }
-
+    
     //Método para saber si el día que se pasa por parámetro con la lista de valores pasada por parámetro es festivo o no
     static public Boolean isFestive (Datetime fecha, Map <Integer, List <Integer>> listaFestivos){
         Boolean isFestivo = false;
@@ -611,7 +611,7 @@ public with sharing class CC_MetodosUtiles {
 
         return (isFestivo);
     }
-
+    
     //Metodo para sacar el horario de toda la semana a partir de una Lista de valores
     static public Map<String, Map<String, List <Time>>> horariosPorCanalProcedencia (){
     List <CC_Lista_Valores__c> listaHorarios = new List < CC_Lista_Valores__c>();
@@ -653,24 +653,24 @@ public with sharing class CC_MetodosUtiles {
             System.debug('Nombre ' + nombre);
             Map<String, List <Time>> horarioSemanaCanalProcedencia = new Map<String, List <Time>>();
 
-
+           
             while (i < listaHorarios.size() && nombre == listaHorarios.get(i).Name){
                 //Sacar horas y ponerlas en formato Time horariosDiaList -> List<Time> -> 8:30:0:0; 20:30:0:0
-
+                
                 List<Time> horariosDiaList = new List<Time>();
                 horariosDiaList = pasarHorasListaValores(listaHorarios.get(i));
                 horarioSemanaCanalProcedencia.put(listaHorarios.get(i).CC_Valor_SFDC__c, horariosDiaList);
                 System.debug('horarioSemanaCanalProcedencia 1) ' + horarioSemanaCanalProcedencia);
                 i++;
             }
-
+           
             System.debug('horarioSemanaCanalProcedencia 2 ' + horarioSemanaCanalProcedencia);
              */
-
+           
         }
         return horarioPorCanalProcedenciaMap;
     }
-
+    
     //Metodo para obtener los festivos a partir de una lista de valores
     static public Map<Integer, List<Integer>> sacarFestivosPorMes (){
     List <CC_Lista_Valores__c> listaFestivos = new List < CC_Lista_Valores__c>();
@@ -696,7 +696,7 @@ public with sharing class CC_MetodosUtiles {
 
     return festivos;
     }
-
+    
     static public List<Time> pasarHorasListaValores (CC_Lista_Valores__c listaHorarios){
         List<Time> horarioDia = new List<Time>();
 

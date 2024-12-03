@@ -20,6 +20,12 @@ Historial
 	1.9			US310702								Luis Fernández		19/02/2022			Modify method processOwnerEapGestores to assign GFC user to accounts with no EAP and Book
 	2.0													Vladislav Lityagin	01/03/2023			Modify relatedAccountAndLead reducing code
 	2.1			US603731								Sandra Gómez		18/05/2023			Modify proccessEAPGestorUser include not isQueueable
+	2.2		    Fix PMD Errors 							Daniel Rodriguez	06/11/2023	      	Parameters not empty in queries and add queries WITH SECURITY_ENFORCED 
+	2.3			Fix										Sandra Gómez		16/11/2023			Change method relatedAccountAndLead duplicity correction
+	2.4			Fix										Ángel Medina		15/12/2023			Remove WITH SECURITY_ENFORCED from queries
+	2.5			Fix										Luis Martínez		16/02/2024			Refactor methods descriptionLastModifiedDateAndUser, processOwnerEAPGestor, accountValueOficinaPrincipalRelacionas
+	2.6			IN1112575								Sandra Gómez		28/02/2024			Add method updateIsPreconceived
+	2.7			Deuda Técnica							Gonzalo Ávila		04/04/2024			Modify method accountValueOficinaPrincipalRelacionas
 ***********************************************************************************************************************/
 
 public with sharing class AV_AccountTriggerHelper {
@@ -127,8 +133,8 @@ public with sharing class AV_AccountTriggerHelper {
 		}
 		//Get the default user for the clients without EAP Gestor
 		// User userCli = [Select Id From User Where Profile.Name = 'API Only' and Alias = 'FC-TF9' limit 1];
-		User userCli = [Select Id From User Where Profile.Name = 'API Only' and Alias = 'AV-TF9' limit 1];
-		List<Contact> sinGestorEap = [SELECT Id FROM CONTACT WHERE AV_UsuarioAsociado__r.Alias = 'AV-TF9' LIMIT 1];
+		//User userCli = [Select Id From User Where Profile.Name = 'API Only' and Alias = 'AV-TF9'  limit 1];
+		List<Contact> sinGestorEap = [SELECT Id, AV_UsuarioAsociado__c FROM CONTACT WHERE AV_UsuarioAsociado__r.Alias = 'AV-TF9' LIMIT 1];
 		//Iteramos la lista de clientes a los que se le has quitado el EAP o han sido creados sin uno.
 		if (lstClientesSinEap!=null && !lstClientesSinEap.isEmpty() && !sinGestorEap.isEmpty()) {
 			accountsWithNoBook= [SELECT AV_Cliente__c FROM AV_BookMember__c WHERE AV_Cliente__c IN :lstClientesSinEap];
@@ -136,8 +142,8 @@ public with sharing class AV_AccountTriggerHelper {
 				accountsWithNoBookIds.add(bm.AV_Cliente__c);
 			}
 			for(Account acc : lstClientesSinEap) {
-				if (userCli != null){
-					acc.OwnerId = userCli.Id;			
+				if (!sinGestorEap.isEmpty() && sinGestorEap[0].AV_UsuarioAsociado__c !=null){
+					acc.OwnerId = sinGestorEap[0].AV_UsuarioAsociado__c;			
 					if(!accountsWithNoBookIds.contains(acc.Id)){
 						acc.AV_EAPGestor__c = sinGestorEap[0].Id;
 					}
@@ -155,17 +161,15 @@ public with sharing class AV_AccountTriggerHelper {
 					if(mapEAPGestorUser.get(acc.AV_EAPGestor__c) != null){
 						acc.OwnerId = mapEAPGestorUser.get(acc.AV_EAPGestor__c);
 					} 
-					else if (userCli != null){
-						acc.OwnerId = userCli.Id;
+					else if (!sinGestorEap.isEmpty() && sinGestorEap[0].AV_UsuarioAsociado__c !=null){
+						acc.OwnerId = sinGestorEap[0].AV_UsuarioAsociado__c;
 					}
 				}
 			} else {
 				for(Account acc : lstClientes) {
-					if (userCli != null){
-						acc.OwnerId = userCli.Id;
-						if (!sinGestorEap.isEmpty()) {
-							acc.AV_EAPGestor__c = sinGestorEap[0].Id;
-						}
+					if (!sinGestorEap.isEmpty() && sinGestorEap[0].AV_UsuarioAsociado__c !=null){
+						acc.OwnerId = sinGestorEap[0].AV_UsuarioAsociado__c;
+						acc.AV_EAPGestor__c = sinGestorEap[0].Id;
 					}
 				}
 			}
@@ -191,22 +195,27 @@ public with sharing class AV_AccountTriggerHelper {
 	 */
 	public static void descriptionLastModifiedDateAndUser(List<Account> listNews, Map<Id, Account> mapOlds){
 		//Get current user modify description
-		User user = [Select Id,AV_ExternalID__c From User where Id = :UserInfo.getUserId() limit 1];
+		List<Account> listUpdate = new List<Account>();
 		if(mapOlds != null && !mapOlds.isEmpty()){
 			for(Account cliente : listNews){
 				if((setRtAll).contains(cliente.RecordTypeId) && String.isNotBlank(cliente.Description) 
 						&& !(cliente.Description).equalsIgnoreCase(mapOlds.get(cliente.Id).Description)){
-					cliente.AV_FechaUltimaActualizacion__c = datetime.now();
-					cliente.AV_ModifyByUser__c = user.AV_ExternalId__c;
+							listUpdate.add(cliente);
 				}
 				else if((setRtAll).contains(cliente.RecordTypeId) && String.isNotBlank(cliente.Description) 
 						&& (((cliente.AV_FechaUltimaActualizacion__c) < (mapOlds.get(cliente.Id).AV_FechaUltimaActualizacion__c))
 						|| ((cliente.AV_FechaUltimaActualizacion__c) > (mapOlds.get(cliente.Id).AV_FechaUltimaActualizacion__c)))
 						&& (cliente.Description).equalsIgnoreCase(mapOlds.get(cliente.Id).Description)){
-					cliente.AV_FechaUltimaActualizacion__c = datetime.now();
-					cliente.AV_ModifyByUser__c = user.AV_ExternalId__c;
+							listUpdate.add(cliente);
 				}                
 			}    
+		}
+		if(!listUpdate.isEmpty()){
+			User user = [Select Id,AV_ExternalID__c From User where Id = :UserInfo.getUserId() limit 1];
+			for(Account cliente : listUpdate){
+				cliente.AV_FechaUltimaActualizacion__c = datetime.now();
+				cliente.AV_ModifyByUser__c = user.AV_ExternalId__c;
+			}
 		}	
 	}
 
@@ -262,13 +271,13 @@ public with sharing class AV_AccountTriggerHelper {
 	public static void accountValueOficinaPrincipalRelacionas(List<Account> listNews) {
 		List<Account> lstToProcess = new List<Account>();
 		Map<Id,Account> mapAcc = new Map<Id,Account>();
-
 		for(Account acc : listNews) {
-			lstToProcess.add(acc);
-			mapAcc.put(acc.AV_OficinaPrincipal__c, acc);
-		}
+				lstToProcess.add(acc);
+				mapAcc.put(acc.AV_OficinaPrincipal__c, acc);
+			}
 
 		if(!lstToProcess.isEmpty()) {
+			Id accRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
 			List<Account> listAcc = [Select Id, CC_Numero_Oficina_Empresa__c From Account where Id = :mapAcc.keySet()];
 			Map<Id,Account> mapAcc2 = new Map<Id,Account>();
 			for(Account acc : listAcc){
@@ -276,17 +285,19 @@ public with sharing class AV_AccountTriggerHelper {
 			}
 			for(Account acc : lstToProcess){
 				if (!String.isEmpty(acc.AV_OficinaPrincipal__c)) {
-					Id accRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
-					if(mapAcc2.containsKey(acc.AV_OficinaPrincipal__c) && acc.RecordTypeId != accRecordTypeId) {
+					if(mapAcc2.containsKey(acc.AV_OficinaPrincipal__c) && acc.RecordTypeId != accRecordTypeId && String.isNotBlank(mapAcc2.get(acc.AV_OficinaPrincipal__c).CC_Numero_Oficina_Empresa__c)) {
 						if (String.isEmpty(acc.AV_OficinasRelacionadas__c)) {
-							acc.AV_OficinaPrincipalRelacionas__c=mapAcc2.get(acc.AV_OficinaPrincipal__c).CC_Numero_Oficina_Empresa__c.substring(4,9);
+					acc.AV_OficinaPrincipalRelacionas__c=mapAcc2.get(acc.AV_OficinaPrincipal__c).CC_Numero_Oficina_Empresa__c.substring(4,9);
 						} else {
-							acc.AV_OficinaPrincipalRelacionas__c=mapAcc2.get(acc.AV_OficinaPrincipal__c).CC_Numero_Oficina_Empresa__c.substring(4,9)+', '+acc.AV_OficinasRelacionadas__c;
-						}
-					}
+					acc.AV_OficinaPrincipalRelacionas__c=mapAcc2.get(acc.AV_OficinaPrincipal__c).CC_Numero_Oficina_Empresa__c.substring(4,9)+', '+acc.AV_OficinasRelacionadas__c;
 				}
+					}else{
+						acc.AV_OficinaPrincipalRelacionas__c = '';
 			}
 		}
+	}
+		}
+				
 	}
 
 	
@@ -329,12 +340,13 @@ public with sharing class AV_AccountTriggerHelper {
 	 * @param identifications  set of string with AV_CustomerId__c
 	 */
 	public static Map<String, Lead> getLeads(Set<String> identifications){
-		String methodName = 'getLeads';
 		List<Lead> leadsList = new List<Lead>();
-		leadsList = [SELECT AV_CustomerId__c, AV_Birthdate__c, AV_IsClient__c FROM Lead WHERE AV_CustomerId__c in :identifications AND RecordType.DeveloperName =: AV_AppConstants.LEAD_PPHH_RT];
 		Map<String, Lead> mapLeads = new Map<String, Lead>();
-		for(Lead l : leadsList){
-			mapLeads.put(l.AV_CustomerId__c, l);
+		if(!identifications.isEmpty() && AV_AppConstants.LEAD_PPHH_RT != null){
+			leadsList = [SELECT AV_CustomerId__c, AV_Birthdate__c, AV_IsClient__c FROM Lead WHERE AV_CustomerId__c in :identifications AND RecordType.DeveloperName =: AV_AppConstants.LEAD_PPHH_RT];
+			for(Lead l : leadsList){
+				mapLeads.put(l.AV_CustomerId__c, l);
+			}
 		}
 		return mapLeads;
 	}
@@ -344,12 +356,13 @@ public with sharing class AV_AccountTriggerHelper {
 	 * @param identifications  set of string with AV_Lead__r.AV_CustomerId__c
 	 */
 	public static Map<String, AV_LeadOpportunity__c> getLeadOpps(Set<String> identifications){
-		String methodName = 'getLeadOpps';
 		List<AV_LeadOpportunity__c> leadOppList = new List<AV_LeadOpportunity__c>();
-		leadOppList = [SELECT Id, AV_DueDate__c, AV_Status__c, AV_Lead__r.AV_CustomerId__c FROM AV_LeadOpportunity__c WHERE AV_Lead__r.AV_CustomerId__c in :identifications AND (AV_Status__c='Nuevo' OR AV_Status__c='Enviada oferta comercial' OR AV_Status__c='Activo') AND RecordType.DeveloperName =: AV_AppConstants.LEAD_PPHH_RT];
 		Map<String, AV_LeadOpportunity__c> mapLeadOpps = new Map<String, AV_LeadOpportunity__c>();
-		for(AV_LeadOpportunity__c lo : leadOppList){
-			mapLeadOpps.put(lo.AV_Lead__r.AV_CustomerId__c, lo);
+		if(!identifications.isEmpty() && AV_AppConstants.LEAD_PPHH_RT != null){
+			leadOppList = [SELECT Id, AV_DueDate__c, AV_Status__c, AV_Lead__r.AV_CustomerId__c FROM AV_LeadOpportunity__c WHERE AV_Lead__r.AV_CustomerId__c in :identifications AND (AV_Status__c='Nuevo' OR AV_Status__c='Enviada oferta comercial' OR AV_Status__c='Activo') AND RecordType.DeveloperName =: AV_AppConstants.LEAD_PPHH_RT];
+			for(AV_LeadOpportunity__c lo : leadOppList){
+				mapLeadOpps.put(lo.AV_Lead__r.AV_CustomerId__c, lo);
+			}
 		}
 		return mapLeadOpps;
 	}
@@ -361,13 +374,12 @@ public with sharing class AV_AccountTriggerHelper {
 	public static void relatedAccountAndLead(List<Account> listAccs){
 		String methodName = 'relatedAccountAndLead';
 		//Nos insertan muchos accounts en el proceso nocturno, de estos accounts podemos obtener el DNI y Fecha Nacimiento --> Usarlas para buscar los leads
-		Map<String, Account> accMap = new Map<String, Account>();
 		Map<String, Lead> mapLeads = new Map<String, Lead>();
 		//El ID del Mapa hace referencia al ID del Lead, no del Lead Oportunidad.        
 		Map<String, AV_LeadOpportunity__c> mapLeadOpps = new Map<String, AV_LeadOpportunity__c>();
 		RecordType rtPAccount = AV_AppUtilities.getRecordType('Account', 'CC_ClientePA');
-		List<Lead> leadsToUpdate = new List<Lead>();
-		List<AV_LeadOpportunity__c> leadOppsToUpdate = new List<AV_LeadOpportunity__c>();
+		Map<Id,Lead> mapLeadUpdate = new Map<Id,Lead>();
+		Map<Id,AV_LeadOpportunity__c> mapLeadOppUpdate = new Map<Id,AV_LeadOpportunity__c>();
 		Set<String> identifications = new Set<String>();
 		for(Account a : listAccs){
 			//Como sabemos que es un cliente particular y va a tener los campos informados lo metemos en el mapa
@@ -385,26 +397,19 @@ public with sharing class AV_AccountTriggerHelper {
 			for(Account a : listAccs){
 				if(mapLeads.get(a.CC_Identificador__c)!=null){
 					Lead l = mapLeads.get(a.CC_Identificador__c);
-					if(l != null){
-						if(l.AV_Birthdate__c==a.PersonBirthdate){
-							//Aqui tenemos el cruce ya hecho, es decir, tenemos el lead con el mismo DNI y fecha nac que el account
-							//Si el isclient de account == true, el valor del Lead lo tenemos que poner también a true
-							if(a.AV_Cliente__c){
-								//Si ha sido marcado como cliente tenemos que blanquear la fecha vencimiento del lead oportunidad.
-								if(mapLeadOpps.get(a.CC_Identificador__c)!=null){
-									AV_LeadOpportunity__c lo = mapLeadOpps.get(a.CC_Identificador__c);
-									lo.AV_DueDate__c = null;
-									leadOppsToUpdate.add(lo);
-									l.AV_IsClient__c=true;
-									//El lead hay que vincularlo con el account, rellenandole el numperso
-									l.AV_numperso__c = a.Id;
-									leadsToUpdate.add(l);
-								}
-							}else{
-								l.AV_IsClient__c=false;
-								leadsToUpdate.add(l);
-							}
-						}
+					//Aqui tenemos el cruce ya hecho, es decir, tenemos el lead con el mismo DNI y fecha nac que el account
+					if(l != null && mapLeadOpps.get(a.CC_Identificador__c)!=null && l.AV_Birthdate__c==a.PersonBirthdate && a.AV_Cliente__c){//Si el isclient de account == true, el valor del Lead lo tenemos que poner también a true
+						//Si ha sido marcado como cliente tenemos que blanquear la fecha vencimiento del lead oportunidad.
+						AV_LeadOpportunity__c lo = mapLeadOpps.get(a.CC_Identificador__c);
+						lo.AV_DueDate__c = null;
+						mapLeadOppUpdate.put(lo.Id,lo);
+						l.AV_IsClient__c=true;
+						//El lead hay que vincularlo con el account, rellenandole el numperso
+						l.AV_numperso__c = a.Id;
+						mapLeadUpdate.put(l.Id,l);
+					}else if (l != null && l.AV_Birthdate__c==a.PersonBirthdate && !a.AV_Cliente__c) {
+						l.AV_IsClient__c=false;
+						mapLeadUpdate.put(l.Id,l);
 					}
 				}
 			}
@@ -412,13 +417,38 @@ public with sharing class AV_AccountTriggerHelper {
 		Database.DMLOptions dmlOptions = new Database.DMLOptions();
 		dmlOptions.OptAllOrNone = false;
 		dmlOptions.EmailHeader.triggerUserEmail = false;
-		if(leadsToUpdate.size()>0){
-			Database.SaveResult[] srList = Database.update(leadsToUpdate, dmlOptions);
-			AV_AppUtilities.displayErrors('relatedAccountAndLead', srList);
+		if(mapLeadUpdate != null && !mapLeadUpdate.isEmpty()){
+			Database.SaveResult[] srList = Database.update(mapLeadUpdate.values(), dmlOptions);
+			AV_AppUtilities.displayErrors(methodName, srList);
 		}
-		if(leadOppsToUpdate.size()>0){
-			Database.SaveResult[] srList = Database.update(leadOppsToUpdate, dmlOptions);
-			AV_AppUtilities.displayErrors('relatedAccountAndLead', srList);
+		if(mapLeadOppUpdate != null && !mapLeadOppUpdate.isEmpty()){
+			Database.SaveResult[] srList = Database.update(mapLeadOppUpdate.values(), dmlOptions);
+			AV_AppUtilities.displayErrors(methodName, srList);
+		}
+	}
+
+	/**
+	 * @description     Update field AV_IsPreconceived__c
+	 * @param listNews  list of new account records
+	 * @param mapOlds   map of old account records
+	 */
+	public static void updateIsPreconceived(List<Account> listNews, Map<Id, Account> mapOlds) {
+		if(mapOlds != null && !mapOlds.isEmpty()) {
+			for (Account cli : listNews) {
+				if (cli.AV_Preconceived__c != null && cli.AV_Preconceived__c > 0 && cli.AV_Preconceived__c != mapOlds.get(cli.Id).AV_Preconceived__c) {
+					cli.AV_IsPreconceived__c = true;
+				} else if (cli.AV_Preconceived__c != mapOlds.get(cli.Id).AV_Preconceived__c && (cli.AV_Preconceived__c == null || (cli.AV_Preconceived__c != null && cli.AV_Preconceived__c == 0))) {
+					cli.AV_IsPreconceived__c = false;
+				}
+			}
+		} else {
+			for (Account cli : listNews) {
+				if (cli.AV_Preconceived__c != null && cli.AV_Preconceived__c > 0) {
+					cli.AV_IsPreconceived__c = true;
+				} else if (cli.AV_Preconceived__c == null || (cli.AV_Preconceived__c != null && cli.AV_Preconceived__c == 0)) {
+					cli.AV_IsPreconceived__c = false;
+				}
+			}
 		}
 	}
 }

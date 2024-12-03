@@ -271,6 +271,23 @@ global with sharing class CSBD_WS_AltaOportunidad_Input {
         global String messageProfileId {get;set;}
 
         //MAC
+        global String caseNumber {get;set;}
+        global String propietario {get;set;}
+        global String fechaInicio {get;set;}
+        global String fechaFin {get;set;}
+        global String estadoAutenticacion {get;set;}
+        global String caseStatus {get;set;}
+        global String canalEntrada {get;set;}
+        global String canalProcedencia {get;set;}
+        global String canalOperativo {get;set;}
+        global String tematica {get;set;}
+        global String producto {get;set;}
+        global String motivo {get;set;}
+        global String causa {get;set;}
+        global String solucion {get;set;}
+        global String detallesConsulta {get;set;}
+        global String detallesSolucion {get;set;}
+
         global String casoOrigen {get;set;}
         global String accountId {get;set;}
         global String contactId {get;set;}

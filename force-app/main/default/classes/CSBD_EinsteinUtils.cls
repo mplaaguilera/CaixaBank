@@ -96,7 +96,7 @@ public with sharing class CSBD_EinsteinUtils {
                 oportunidadNueva.CSBD_ResumenCierre__c = generationsOutput.generations[0].text;
 
                 //añadir la comprobación de si ha utilizado prompts
-                if(!oportunidadNueva.CSBD_HaUsadoIA__c
+                if(!oportunidad.CSBD_HaUsadoIA__c
                     && (oportunidad.CSBD_GptResumenInicialRich__c != null 
                         || oportunidad.CSBD_GptResumenProducto__c != null
                         || oportunidad.CSBD_CondicionesPromos__c != null)){
@@ -107,7 +107,7 @@ public with sharing class CSBD_EinsteinUtils {
            }
            //para ver si antes del momento de cierre se habia usado los resumenes generados por IA en algun momento,
            //aprovechando que el usuario actual tiene permisos
-           else if (!oportunidadNueva.CSBD_HaUsadoIA__c
+           else if (!oportunidad.CSBD_HaUsadoIA__c
                 && (oportunidad.CSBD_GptResumenInicialRich__c != null 
                     || oportunidad.CSBD_GptResumenProducto__c != null
                     || oportunidad.CSBD_CondicionesPromos__c != null)){

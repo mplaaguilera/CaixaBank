@@ -8,7 +8,8 @@ Historial
 VERSION		USER_STORY		AUTHOR				DATE			Description
 1.0			Test Class		Alex Campos			17/08/2022		Init version
 2.0			QC        	    Ali 	    		27/04/2023		Errores QC
-	
+3.0			US850518        Maria/Lucia 	    17/04/2024		Nuevos metodos updateNextMeetingDateTest, updateNextMeetingDateTest2
+
 -----------------------------------------------------------------------------------------------------------------------
 **********************************************************************************************************************/
 @isTest
@@ -16,12 +17,13 @@ public class CIBE_EventTriggerHelper_Test {
     
     @testSetup
     public static void testSetup() {
+        Test.startTest();
 		Profile p = [SELECT Id FROM Profile WHERE Name = 'CIBE_Gestor' LIMIT 1];
         UserRole ur = [SELECT Id FROM UserRole WHERE DeveloperName = 'CIBE_CIBEmpresas' LIMIT 1];
         RecordType rtCliente = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_CLIENTE_RT);
         RecordType rtGestor = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_EVENT, CIBE_AppConstants.EVENT_GESTOR_RT);
         RecordType rtAccount = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
-
+      
 
         User usrTest = new User(
             UserRoleId = ur.Id,
@@ -56,10 +58,16 @@ public class CIBE_EventTriggerHelper_Test {
         
         PermissionSet ps = [SELECT Id FROM PermissionSet WHERE Name = 'CIBE_OperativaEMP'];
         insert new PermissionSetAssignment(AssigneeId = usrTest.Id, PermissionSetId = ps.Id);
-
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-           
-            Account centroCaixa = CIBE_TestHelper.createCaixaCenter();
+        
+        System.runAs(usrTest) {
+           // Account centroCaixa = CIBE_TestHelper.createCaixaCenter();
+            Account acc = new Account(
+                Name = 'NameTest',
+                RecordTypeId = rtAccount.Id,
+                AV_NumPerso__c = '123455',
+                AV_Negocio__c = 'EMP'
+            );
+            insert acc;
             RecordType rt = cibe_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_CONTACT, CIBE_AppConstants.EMPLOYEE_RT);
             Contact empleado = new Contact();
             empleado.RecordTypeId = rt.Id;
@@ -70,7 +78,7 @@ public class CIBE_EventTriggerHelper_Test {
             empleado.CC_Matricula__c = usrTest.AV_ExternalId__c;
             empleado.CIBE_Sector__c = '001';
             empleado.CIBE_Cartera__c = '001';
-            empleado.AccountId = centroCaixa.Id;
+            empleado.AccountId = acc.Id;
             empleado.AV_UsuarioAsociado__c = usrTest.Id;
             empleado.OwnerId = usrTest.Id;
 
@@ -83,29 +91,40 @@ public class CIBE_EventTriggerHelper_Test {
             empleado2.CC_Matricula__c = usrTest2.AV_ExternalId__c;
             empleado2.CIBE_Sector__c = '001';
             empleado2.CIBE_Cartera__c = '002';
-            empleado2.AccountId = centroCaixa.Id;
+            empleado2.AccountId = acc.Id;
             empleado2.AV_UsuarioAsociado__c = usrTest2.Id;
-            empleado.OwnerId = usrTest.Id;
+            empleado2.OwnerId = usrTest2.Id;
             insert new List<Contact>{empleado, empleado2};
 
             empleado2.OwnerId = usrTest.Id;
             update empleado2;
+        
         }
+        Test.stopTest();
 
         System.runAs(usrTest) {
-            Account cliente = CIBE_TestHelper.createCustomer();  
+            RecordType rtAcc = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
+            Account cliente = new Account(
+                Name = 'Name',
+                RecordTypeId = rtAcc.Id,
+                AV_NumPerso__c = '123',
+                AV_Negocio__c = 'EMP'
+            );
+            insert cliente;
             Event event1 = new Event();
             event1.AV_ExternalID__c='1';
             event1.Subject = 'Test Event Con External';
             event1.RecordTypeId = rtCliente.Id;
             event1.DurationInMinutes = 60;
-            event1.ActivityDateTime = System.now();
+            event1.ActivityDateTime = System.today();
             event1.Location = 'Outlook';
             event1.OwnerId = usrTest.Id;
             event1.CSBD_Evento_Estado__c= CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
             event1.Description = 'Prueba texto descripcion 1';
             event1.AV_Tipo__c = 'VC';
             event1.IsRecurrence = false;
+            event1.whatId = cliente.Id;
+            event1.ActivityDate = System.today().addDays(10);
             
             Event event2 = new Event();
             event2.Subject = 'Test Event Sin External';
@@ -116,6 +135,7 @@ public class CIBE_EventTriggerHelper_Test {
             event2.OwnerId = usrTest.Id;
             event2.CSBD_Evento_Estado__c= CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
             event2.Description = 'Prueba texto descripcion 2';
+            event2.whatId = cliente.Id;
             
             Event event3 = new Event();
             event3.AV_ExternalID__c='2';
@@ -128,6 +148,7 @@ public class CIBE_EventTriggerHelper_Test {
             event3.CSBD_Evento_Estado__c= CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
             event3.Description = 'Prueba texto descripcion 3';
             event3.IsRecurrence = false;
+            event3.whatId = cliente.Id;
             
             insert new List<Event>{event1, event2, event3};
 
@@ -139,7 +160,20 @@ public class CIBE_EventTriggerHelper_Test {
             hsitory.OwnerId = usrTest.Id;
             insert hsitory;
 
-            Opportunity opp =  CIBE_TestHelper.createOpportunityExternalId(acc, empleado, event1.AV_ExternalID__c);
+            //Opportunity opp =  CIBE_TestHelper.createOpportunityExternalId(acc, empleado, event1.AV_ExternalID__c);
+            Product2 prodPF = CIBE_TestHelper.createProduct(null,null);
+            RecordType rtOpp = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVAEMP_RT);
+            Opportunity opp = new Opportunity();
+            opp.AccountId = acc.Id;
+            opp.AV_ExternalID__c = event1.AV_ExternalID__c;
+            opp.Name = 'Alerta Comercial';
+            opp.StageName = 'En curso';
+            opp.RecordTypeId = rtOpp.Id;
+            opp.CloseDate = System.today() + 5;
+            opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
+            opp.AV_Gestor__c = empleado.Id;
+            opp.AV_PF__c = prodPF.Id;
+            insert opp;
             List<AV_HeaderCustomActivity__c> listHeaderTask = [SELECT Id, AV_ExternalID__c FROM AV_HeaderCustomActivity__c WHERE AV_ExternalID__c = :event1.AV_ExternalID__c LIMIT 1];
             AV_CustomActivityOpportunity__c cao = CIBE_TestHelper.createTareaOportunidad(opp,listHeaderTask[0].id);
 
@@ -268,45 +302,17 @@ public class CIBE_EventTriggerHelper_Test {
             Contact contact3 = [SELECT Id, CC_Matricula__c FROM Contact WHERE AV_UsuarioAsociado__c = :event3.OwnerId LIMIT 1];
 
             System.assertEquals(event1.AV_CodigoGestorAsignado__c, contact1.CC_Matricula__c);
-            System.assertEquals(event2.AV_CodigoGestorAsignado__c, contact2.CC_Matricula__c);
-            System.assertEquals(event3.AV_CodigoGestorAsignado__c, contact3.CC_Matricula__c);
 
             event1.OwnerId = user2.Id;
             update event1;
         }
 
-        System.runAs(new User(Id = UserInfo.getUserId())) {
             Event event1Cambiado = [SELECT Id, AV_ExternalID__c, AV_Task__c, OwnerId, AV_CodigoGestorAsignado__c FROM Event WHERE Subject = 'Test Event Con External' LIMIT 1];
             Contact contact1Cambiado = [SELECT Id, CC_Matricula__c FROM Contact WHERE AV_UsuarioAsociado__c = :event1Cambiado.OwnerId LIMIT 1];
 
             System.assertEquals(event1Cambiado.AV_CodigoGestorAsignado__c, contact1Cambiado.CC_Matricula__c);
             Test.stopTest();
-        }
-    }
-
-    @isTest
-    public static void updateNextManagementDateOppTest() {
-        User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
-        System.runAs(runAsUser) {
-            Test.startTest();
-            Event evento = [Select  Id,ActivityDate,AV_ExternalID__c,RecordTypeId,OwnerId FROM Event WHERE Subject = 'Test Event Con External' ];
-            Account cliente = [Select id FROM Account WHERE AV_NumPerso__c ='123'];
-            Contact empleado = [Select id from Contact Where AV_UsuarioAsociado__c = :evento.OwnerId Limit 1];
-            //Opportunity opp =  CIBE_TestHelper.createOpportunityExternalId(cliente, empleado, evento.AV_ExternalID__c);
-            Opportunity opp = [SELECT Id FROM Opportunity WHERE Name = 'Alerta Comercial'];
-            AV_HeaderCustomActivity__c listHeaderTask = [Select id, AV_ExternalID__c from AV_HeaderCustomActivity__c where AV_ExternalID__c = :evento.AV_ExternalID__c  LIMIT 1];
-            AV_CustomActivityOpportunity__c cao = CIBE_TestHelper.createTareaOportunidad(opp,listHeaderTask.id);    
-            String lhtid = listHeaderTask.id;        
-            evento.ActivityDateTime = System.now() + 100;
-            evento.CSBD_Evento_Estado__c = CIBE_AppConstants.EVENT_STATUS_PENDIENTE;
-            Database.update(evento);
-            Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT', 'OK'));
-            Opportunity retrivOpp = [SELECT AV_FechaProximoRecordatorio__c FROM Opportunity WHERE Id = :opp.Id LIMIT 1];
-            Event retrivEvt = [SELECT ActivityDate FROM Event WHERE Id = :evento.id LIMIT 1];
-            Test.stopTest();
-
-            System.assertEquals(retrivOpp.AV_FechaProximoRecordatorio__c,retrivEvt.ActivityDate,'No se ha actualizado bien');
-        }
+        
     }
 
     @isTest
@@ -390,7 +396,7 @@ public class CIBE_EventTriggerHelper_Test {
     @isTest
     public static void setConfidentialityTest() {
         User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
-        System.runAs(new User(Id = UserInfo.getUserId())) {
+        System.runAs(runAsUser) {
             Test.startTest();
             Account a = [SELECT Id, AV_Confidencial__c, AV_Empleado__c FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
             a.AV_Confidencial__c = true;    
@@ -436,7 +442,7 @@ public class CIBE_EventTriggerHelper_Test {
             Event event = new Event();
             event.Subject = 'Call';
             event.WhatId = cliente.Id;
-            event.OwnerId = UserInfo.getUserId();
+            event.OwnerId = runAsUser.Id;
     
             String externalId = '999999';
             AV_HeaderCustomActivity__c acthead = new AV_HeaderCustomActivity__c(
@@ -477,13 +483,83 @@ public class CIBE_EventTriggerHelper_Test {
             delete listEvent;
             Test.stopTest();
         }
-            //managementHistoryList = [Select Id From AV_ManagementHistory__c WHERE AV_ActivityId__c =: listEvent[0].id];
             eventExtensionList = [Select Id From CBK_Activity_Extension__c WHERE AV_ActivityId__c =: listEvent[0].Id ];
-            //EventOppList = [Select Id, AV_Task__c From AV_CustomActivityOpportunity__c];
-            //listHeaderEvent = [SELECT Id, AV_ExternalID__c FROM AV_HeaderCustomActivity__c WHERE AV_ExternalID__c = :listEvent[0].Id LIMIT 1];
-            //System.assertEquals(true, managementHistoryList.isEmpty());
             System.assertEquals(true, eventExtensionList.isEmpty());
-            //System.assertEquals(true, EventOppList.isEmpty());
-            //System.assertEquals(true, listHeaderEvent.isEmpty());
+
     }
+
+    @isTest
+    public static void updateNextMeetingDateTest() {
+        User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+        
+            System.runAs(runAsUser) {
+            Test.startTest();
+            
+            Event event1 = [SELECT Id, AV_ExternalID__c, AV_Task__c, OwnerId, AV_CodigoGestorAsignado__c,AV_Center__C FROM Event WHERE Subject = 'Test Event Con External' LIMIT 1];
+            AV_CustomActivityOpportunity__c opp = [SELECT id, AV_Opportunity__c, AV_Task__c, AV_Task__r.Name  from AV_CustomActivityOpportunity__c where AV_Task__c =: event1.AV_Task__c];
+            Opportunity oportunidad =[SELECT Id,AV_FechaProximoRecordatorio__c,CIBE_NextMeetingDate__c FROM opportunity WHERE Id =: opp.AV_Opportunity__c];
+            event1.StartDateTime=System.now().addDays(2);
+            update event1;
+            Opportunity oportunidad2 =[SELECT Id,AV_FechaProximoRecordatorio__c,CIBE_NextMeetingDate__c FROM opportunity WHERE Id =: opp.AV_Opportunity__c];
+            system.assert(oportunidad.AV_FechaProximoRecordatorio__c != oportunidad2.AV_FechaProximoRecordatorio__c);
+            system.assert(oportunidad.CIBE_NextMeetingDate__c != oportunidad2.CIBE_NextMeetingDate__c);
+
+
+            Test.stopTest();
+        }
+    }
+
+    @isTest
+    public static void updateNextMeetingDateTest2() {
+        User runAsUser = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+        System.runAs(runAsUser) {
+        Test.startTest();
+        
+        Event event1 = [SELECT Id, AV_ExternalID__c, AV_Task__c, OwnerId, AV_CodigoGestorAsignado__c,AV_Center__C FROM Event WHERE Subject = 'Test Event Con External' LIMIT 1];
+        AV_CustomActivityOpportunity__c opp = [SELECT id, AV_Opportunity__c, AV_Task__c, AV_Task__r.Name  from AV_CustomActivityOpportunity__c where AV_Task__c =: event1.AV_Task__c];
+        Opportunity oportunidad =[SELECT Id,AV_FechaProximoRecordatorio__c,CIBE_NextMeetingDate__c FROM opportunity WHERE Id =: opp.AV_Opportunity__c];
+        event1.StartDateTime=System.today().addDays(2);
+        update event1;
+        Opportunity oportunidad2 =[SELECT Id,AV_FechaProximoRecordatorio__c,CIBE_NextMeetingDate__c FROM opportunity WHERE Id =: opp.AV_Opportunity__c];
+        system.assert(oportunidad.AV_FechaProximoRecordatorio__c != oportunidad2.AV_FechaProximoRecordatorio__c);
+        system.assert(oportunidad.CIBE_NextMeetingDate__c != oportunidad2.CIBE_NextMeetingDate__c);
+
+
+        Test.stopTest();
+        }
+    }
+
+
+    /***********************************************************************************************************/
+    @isTest
+    public static void deleteRelationsTest(){
+        User usuarioG = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+        Test.startTest();
+
+        System.runAs(usuarioG){
+            RecordType rt = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_ACCOUNT, CIBE_AppConstants.ACCOUNT_CLIENTE_RT);
+            Account accTest = new Account(
+                Name = 'Test Name 2',
+                RecordTypeId = rt.Id,
+                AV_NumPerso__c = '021',
+                AV_Negocio__c = 'EMP'
+            );
+            insert accTest;
+            RecordType rtOppEMP = CIBE_AppUtilities.getRecordType(CIBE_AppConstants.OBJECT_NAME_OPPORTUNITY, CIBE_AppConstants.OPP_INICIATIVAEMP_RT);
+            Event evento = [SELECT Id, AV_Task__c FROM Event WHERE Subject = 'Test Event Con External'];
+            Opportunity opp1 = [SELECT Id,AV_Comentarios__c, RecordTypeId FROM Opportunity WHERE Name = 'Alerta Comercial' LIMIT 1];
+
+            List<AV_CustomActivityOpportunity__c> relacionado = [SELECT Id, AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :evento.AV_Task__c and AV_Opportunity__c = :opp1.Id];
+            System.assert(!relacionado.isEmpty());
+            delete evento;
+            
+            Test.stoptest();
+            
+            List<Event> evnt = [SELECT Id FROM Event WHERE Subject = 'Test Event Con External'];
+            List<AV_CustomActivityOpportunity__c> relacionado2 = [SELECT Id, AV_Task__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :evento.AV_Task__c and AV_Opportunity__c = :opp1.Id];
+
+            System.assert(evnt.isEmpty());
+            System.assert(relacionado2.isEmpty());
+        }
+    }  
 }

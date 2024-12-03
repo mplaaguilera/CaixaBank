@@ -26,5 +26,6 @@ public without sharing class AV_QueryTest {
 	@isTest
 	public static void paraBlanquearLaClase() {
 		AV_Query.metodoBlanco();
+		System.assertEquals(AV_Query.metodoBlanco(),'entra en metodoBlanco');
 	}
 }

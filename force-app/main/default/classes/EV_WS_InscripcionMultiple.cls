@@ -10,13 +10,16 @@ Proposito: Clase para Web service EV_WS_InscripcionMultiple de Portal
  * 1.2			  US680535			 Daniel Rodriguez	 31/07/2023	  Modify creation lead, addition campaignId related with lead and remove search Account related with record
  * 1.3            US680535           Mamen Arias         10/08/2023   Add method handleCMDuplicate() for controle response duplicated emails in CMs
  * 1.4			  US680535			 Daniel Rodriguez 	 17/08/2023   Add check body null
- * 1.5			  US680535			 Carolina Lopez 	 18/08/2023   Modify error code of duplicate elements 204 by 202 
+ * 1.5			  US680535			 Carolina Lopez 	 18/08/2023   Modify error code of duplicate elements 204 by 202
+ * 1.6								 Mamen Arias		 21/02/2024	  Add extends CBK_HttpServiceIntegration_Abstract
+ * 1.7            TechSummit         Carolina Lopez      14/05/2024   Modify the logic include the new Recordtypes TechSummit.
 ***********************************************************************************************************************/
 @RestResource(urlMapping='/EV_InscripcionMultiple/*') 
-global with sharing class EV_WS_InscripcionMultiple {
-    private static Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_Eventos').getRecordTypeId();
-    private static Id rtLeadEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_Evento').getRecordTypeId();
+global with sharing class EV_WS_InscripcionMultiple extends CBK_HttpServiceIntegration_Abstract {
+    private static Id rtCMC = Schema.SObjectType.EV_CampaignMemberC__c.getRecordTypeInfosByDeveloperName().get('EV_EventosTechSummit').getRecordTypeId();
+    private static Id rtLeadEvento = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('EV_LeadTechSummit').getRecordTypeId();
     private static Id rtAccEmpresa = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+
     
     @HttpPost
     global static void inscripcionPortal() {
@@ -192,7 +195,7 @@ global with sharing class EV_WS_InscripcionMultiple {
                                     FROM EV_CampaignMemberC__c 
                                     WHERE EV_CampaignId__r.EV_ExternalId__c IN:fmapcmName.keySet() 
                                     AND EV_LeadId__c != null 
-                                    AND EV_LeadId__r.RecordType.DeveloperName ='EV_Evento'
+                                    AND EV_LeadId__r.RecordType.DeveloperName ='EV_LeadTechSummit'
                                     AND EV_LeadId__r.Email =:datosFormulario.Email
                                     AND RecordtypeId =:rtCMC
                                     AND EV_Status__c != 'Baja del evento'
@@ -226,7 +229,6 @@ global with sharing class EV_WS_InscripcionMultiple {
                     EV_Marketing__c = (datosFormulario.Marketing!=null ? datosFormulario.Marketing : false)
                 ));
             }
-            
             Database.SaveResult[] resultLead = Database.insert(lstInterlocutores);
             Map<String, String> msjs = new Map<String, String>();
             List<Campaign> lstCm = new List<Campaign>();

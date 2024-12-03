@@ -12,6 +12,7 @@ Historial
 	1.2			US336956  Actualizar fecha vencimiento	Vladislav Lityagin		27/09/2022			Added updateLeadOppDueDate
     1.3			US-449777 Campo Comentario	            Elisabeth Rodríguez		28/09/2022			Added validateForbiddenWords method
 	1.4			US378818 - Incorporar Tarea automática 	Vladislav Lityagin		14/10/2022			Added createTaskIfOfferIsSent
+    1.5                                                 Oscar Moreno            06/02/2024          Control null for the oldStage and oldStatus in the checkLeadOppStage method
 ***********************************************************************************************************************/
 public with sharing class AV_LeadOpportunityTriggerHelper {
     private static AV_AppUtilities.SearchRT rtPPHH   = new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_LEADOPP, AV_AppConstants.LEAD_PPHH_RT);
@@ -175,6 +176,8 @@ public with sharing class AV_LeadOpportunityTriggerHelper {
             newStatus = leadOpp.AV_Status__c;
             oldStatus = mapOldObj.get(leadOpp.Id).AV_Status__c;
 
+            
+
             if(oldStage != newStage){
                 if(newStage!=null){
                     if(!newStage.equals(AV_AppConstants.LEADOPP_STAGE_NEGATIVA) /*&& !oldStage.equals(newStage)*/){
@@ -183,14 +186,15 @@ public with sharing class AV_LeadOpportunityTriggerHelper {
 
             /*•	Al seleccionar manualmente o automáticamente las etapas de No apto o Vencida se debe informar el campo Fecha cierre gestión con
             la fecha de cuando se ha seleccionado la etapa. */
-                if(newStage.equals(AV_AppConstants.LEADOPP_STAGE_NO_APTO) || newStage.equals(AV_AppConstants.LEADOPP_STAGE_VENCIDA)){
+                if(oldStage == null || (newStage.equals(AV_AppConstants.LEADOPP_STAGE_NO_APTO) || newStage.equals(AV_AppConstants.LEADOPP_STAGE_VENCIDA))){  
                     if(!hasBulkApi){
                     	leadOpp.AV_FechaCierreGestion__c = Date.today();
                     }
                 }
             //Informar Fecha Cierre Gestion si no viene de Cerrado Positivo a Con venta.
-                    if(!oldStage.equals(AV_AppConstants.LEADOPP_STAGE_POSITIVA) && newStage.equals(AV_AppConstants.LEADOPP_STAGE_VENTA) && mapOldObj.get(leadOpp.Id).AV_FechaCierreGestion__c==null){
-                    if(!hasBulkApi){
+                    if(oldStage== null || (!oldStage.equals(AV_AppConstants.LEADOPP_STAGE_POSITIVA) && newStage.equals(AV_AppConstants.LEADOPP_STAGE_VENTA) && mapOldObj.get(leadOpp.Id).AV_FechaCierreGestion__c==null)){  
+                       
+                        if(!hasBulkApi){
                     	leadOpp.AV_FechaCierreGestion__c = Date.today();
                     }
             	} 
@@ -199,7 +203,7 @@ public with sharing class AV_LeadOpportunityTriggerHelper {
             
             if(oldStatus != newStatus){
                 /*•	Si se activa un Lead Oportunidad cerrado o rechazado se debería eliminar la información de este campo  */
-                if((oldStatus.equals(AV_AppConstants.LEADOPP_STATUS_CERRADO) || oldStatus.equals('02')) && newStatus.equals(AV_AppConstants.LEADOPP_STATUS_ACTIVO)){
+                if((oldStatus == null || oldStatus.equals(AV_AppConstants.LEADOPP_STATUS_CERRADO) || oldStatus.equals('02')) && newStatus.equals(AV_AppConstants.LEADOPP_STATUS_ACTIVO)){  
                     leadOpp.AV_FechaCierreGestion__c = null;
                 }
             }
@@ -503,7 +507,7 @@ public with sharing class AV_LeadOpportunityTriggerHelper {
             }
         }
         if(!taskToInsert.isEmpty()){
-            System.debug('Insertando task');
+            
             insert taskToInsert;
         }
     }

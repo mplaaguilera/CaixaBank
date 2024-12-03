@@ -12,9 +12,9 @@
     *****************************************************************/
     
 @isTest  
-global with sharing class SIR_cls_WS_llamadaMotorMock implements HttpCalloutMock {
+public with sharing class SIR_cls_WS_llamadaMotorMock implements HttpCalloutMock {
 
-    global HTTPResponse respond(HTTPRequest req) {
+    public HTTPResponse respond(HTTPRequest req) {
         SIR_cls_WS_llamadaMotor.LLamadaMotorRequest request = (SIR_cls_WS_llamadaMotor.LLamadaMotorRequest)JSON.deserialize(req.getBody(), SIR_cls_WS_llamadaMotor.LLamadaMotorRequest.class);
         HttpResponse response = new HttpResponse();
         response.setHeader('Content-Type', 'application/json');

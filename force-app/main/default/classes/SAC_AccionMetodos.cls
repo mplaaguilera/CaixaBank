@@ -345,7 +345,8 @@ public without sharing class SAC_AccionMetodos {
             }
         }
 
-        if(!casosUpdate.isEmpty()){            
+        if(!casosUpdate.isEmpty()){  
+            SAC_AsignarTMEs.closeTPE(casosUpdate);          
             Database.update(casosUpdate);
         }
         

@@ -25,7 +25,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
     @AuraEnabled(Cacheable=true)
     public static List<String> getQueryRecordTypeProceso(){
         List<String> procesos = new List<String>();
-        if(RecordType.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.RecordType.isAccessible()){
             Map<String,Schema.RecordTypeInfo> mapRTsObjectsProceso = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByDeveloperName();
             Id rtProcesoPreventivo = mapRTsObjectsProceso.get('SIRE_RT_PREVEMP').getRecordTypeId();
             Id rtProcesoFlujo = mapRTsObjectsProceso.get('SIRE_RT_Amistoso').getRecordTypeId();           
@@ -47,7 +47,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
     @AuraEnabled(Cacheable=true)
 	public static String getOficinaGestorActual(){	
         String oficina = '';
-        if(User.SObjectType.getDescribe().isAccessible() && Account.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.User.isAccessible() && Schema.SObjectType.Account.isAccessible()){
             List<User> emp = [Select Id, AV_NumeroOficinaEmpresa__c, AV_Funcion__c From User Where Id = :UserInfo.getUserId() LIMIT 1];       
             List<Account> cuenta = [SELECT Id FROM Account Where CC_Numero_Oficina_Empresa__c = :emp[0].AV_NumeroOficinaEmpresa__c LIMIT 1];
             if(!cuenta.isEmpty()){
@@ -70,7 +70,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
     @AuraEnabled(Cacheable=true)
 	public static String getOficinaString(Id oficina){	
         String oficinaId = '';
-        if(Account.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.Account.isAccessible()){
             List<Account> cuenta = [SELECT CC_Numero_Oficina_Empresa__c FROM Account Where Id = :oficina LIMIT 1];
             oficinaId = cuenta[0].CC_Numero_Oficina_Empresa__c;
         }
@@ -94,7 +94,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
 		List<optionsEmployee> oficinasSorted = new List<optionsEmployee>();
 		List<Id> oficinasId = new List<Id>();		
 		List<Account> ofi = new List<Account>();								
-		if(Account.SObjectType.getDescribe().isAccessible() && User.SObjectType.getDescribe().isAccessible()){
+		if(Schema.SObjectType.Account.isAccessible() && Schema.SObjectType.User.isAccessible()){
             ofi = [SELECT Id, Name FROM Account WHERE Id = :idOficina AND RecordType.DeveloperName ='CC_CentroCaixaBank'];
             if(!ofi.isEmpty() && ofi != null){
                 for(Account oficinaQuery : ofi){
@@ -124,7 +124,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
         List<optionsEmployee> employees = new List<optionsEmployee>();
         List<optionsEmployee> employeesSorted = new List<optionsEmployee>();
         List<Id> employeesId = new List<Id>();	
-        if(Contact.SObjectType.getDescribe().isAccessible() && User.SObjectType.getDescribe().isAccessible() && Account.SObjectType.getDescribe().isAccessible()){                  
+        if(Schema.SObjectType.Contact.isAccessible() && Schema.SObjectType.User.isAccessible() && Schema.SObjectType.Account.isAccessible()){                  
             List<Contact> contactOficinas = [SELECT Id, AV_UsuarioAsociado__c, AV_UsuarioAsociado__r.Name, Account.CC_Numero_Oficina_Empresa__c FROM Contact WHERE AccountId =: idOficina AND AV_UsuarioAsociado__c !=''];
             if(!contactOficinas.isEmpty()){
                 for(contact contacto : contactOficinas){
@@ -175,32 +175,34 @@ public with sharing class SIRE_LCMP_ReassignOwner {
         VERSION        USER_STORY       AUTHOR         DATE               Description
 		1.0                             Atmira         06/04/2023    	  Created    
     *****************************************************************/    
-    @AuraEnabled(Cacheable=true)
+    @AuraEnabled
     public static List<SIREC__SIREC_obj_proceso__c> buscarProcesos(Id clienteId, Date fechaInicio, String valueSituacion, String valueEstrategia, String valueTipoProceso, String valueEmpleado, String oficina) {
         List<SIREC__SIREC_obj_proceso__c> procesos = new List<SIREC__SIREC_obj_proceso__c>(); 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible() && User.SObjectType.getDescribe().isAccessible() && Account.SObjectType.getDescribe().isAccessible()){  
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible() && Schema.SObjectType.User.isAccessible() && Schema.SObjectType.Account.isAccessible()){  
             String soqlQuery = 'SELECT Id, Name, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.CC_Numero_Documento__c ,';
             soqlQuery += 'SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c, SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__r.Name,'; 
-            soqlQuery += 'toLabel(SIREC__SIREC_fld_estrategia__c), SIREC__SIREC_fld_fechaInicio__c, toLabel(SIR_fld_Situacion_SF__c), SIR_DeudaTotal__c,';                             
+            soqlQuery += 'SIREC__SIREC_fld_descEstrategiaCatalogo__c, SIREC__SIREC_fld_fechaInicio__c, toLabel(SIR_fld_Situacion_SF__c), SIR_DeudaTotal__c,';                             
             soqlQuery += 'OwnerId, SIREC__SIREC_fld_cliente__r.AV_EAPGestor__r.Name,';
             soqlQuery += 'TYPEOF Owner WHEN User THEN Name, AV_NumeroOficinaEmpresa__c ELSE Name END ';                        
             soqlQuery += 'FROM SIREC__SIREC_obj_proceso__c WHERE ';
             Set<Id> setIdUser = new Set<Id>();   
-            Set<Id> setIdUserIntegracion = new Set<Id>(); 
+            Set<Id> setIdUserIntegracion = new Set<Id>();             
+            List<String> lstUserApiName = new List<String>();
             if(valueEmpleado == 'UserIntegracion' || valueEmpleado.startsWith('Todos')){
-                List<User> userIntegracion = [SELECT id, Profile.Name, Name FROM User WHERE Profile.Name LIKE '%API%' ];
+                lstUserApiName = SIR_cls_Utils.getUsersAPI();
+                List<User> userIntegracion = [SELECT id FROM User WHERE Name in :lstUserApiName ];
                 for (User usuario : userIntegracion) {
-                    setIdUserIntegracion.add(usuario.Id);
+                    setIdUserIntegracion.add(usuario.Id);   
                 }
             }
             if(valueEmpleado == 'UserIntegracion'){ 
-                soqlQuery += ' OwnerId in :setIdUserIntegracion AND SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c =: oficina AND '; 
+                 soqlQuery += ' OwnerId in :setIdUserIntegracion AND SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c =: oficina AND ';                 
             } else if(valueEmpleado.startsWith('Todos')){                 
                 List<String> idsEmpleado = valueEmpleado.split(',');
                 for (Integer i = 1; i < idsEmpleado.size(); ++i) {                       
                     setIdUser.add(idsEmpleado[i]);
                 }                 
-                soqlQuery += ' (OwnerId in :setIdUser OR (OwnerId in :setIdUserIntegracion AND SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c =: oficina )) AND ';
+                soqlQuery += ' (OwnerId in :setIdUser OR (OwnerId in :setIdUserIntegracion AND SIREC__SIREC_fld_cliente__r.AV_OficinaPrincipal__c =: oficina )) AND ';                
             } else {
                 setIdUser.add(valueEmpleado);
                 soqlQuery += ' OwnerId in :setIdUser AND ';
@@ -213,7 +215,12 @@ public with sharing class SIRE_LCMP_ReassignOwner {
                 soqlQuery += 'SIREC__SIREC_fld_fechaInicio__c =: fechaInicio AND ';
             }
             if(valueSituacion != null){
-                soqlQuery += 'SIR_fld_Situacion_SF__c =: valueSituacion AND ';
+                Set<String> setSituaciones = new Set<String>();
+                List<String> situaciones = valueSituacion.split(',');
+                for (Integer i = 0; i < situaciones.size(); ++i) {                       
+                    setSituaciones.add(situaciones[i]);
+                }
+                soqlQuery += 'SIREC__SIREC_fld_situacion__c in : setSituaciones AND ';
             }
             if(valueEstrategia != null){
                 soqlQuery += 'SIREC__SIREC_fld_estrategia__c =: valueEstrategia AND ';
@@ -227,9 +234,10 @@ public with sharing class SIRE_LCMP_ReassignOwner {
                 soqlQuery += 'RecordTypeId in : setIdProceso AND ';
             }             
             
-            String sitFinalizado = 'SF_FINALIZ';
+            //String sitFinalizado = 'SF_FINALIZ';
             String procesoObjetivoInformativo = SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO;
-            soqlQuery += 'SIR_fld_Situacion_SF__c !=: sitFinalizado AND SIR_ObjetivoProceso__c !=:procesoObjetivoInformativo ';             
+            //soqlQuery += 'SIR_fld_Situacion_SF__c !=: sitFinalizado AND SIR_AccionActual__c = true AND SIR_ObjetivoProceso__c !=:procesoObjetivoInformativo ';             
+            soqlQuery += ' SIR_AccionActual__c = true AND SIR_ObjetivoProceso__c !=:procesoObjetivoInformativo ';             
             soqlQuery += 'LIMIT 49900';
             List<SObject> resultProcesosFiltro = Database.query(soqlQuery);  
                
@@ -272,7 +280,7 @@ public with sharing class SIRE_LCMP_ReassignOwner {
     @AuraEnabled
     public static String changeGestor(Id nuevoGestor, List<String> procesos) {
         String resultado = '';
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){        
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){        
             List<SIREC__SIREC_obj_proceso__c> procesosQuery = [SELECT Id, OwnerId FROM SIREC__SIREC_obj_proceso__c WHERE Id in : procesos];
             for(SIREC__SIREC_obj_proceso__c proceso : procesosQuery){           
                 proceso.OwnerId = nuevoGestor;

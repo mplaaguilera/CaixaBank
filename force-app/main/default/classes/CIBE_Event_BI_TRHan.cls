@@ -28,7 +28,10 @@ public class CIBE_Event_BI_TRHan { //extends CC_TriggerHandlerBase {
 			CIBE_EventTriggerHelper.changeOwner(listData, mapOldObj);
 			
 			CIBE_EventTriggerHelper.insertOrUpdateCodigoGestorAsignado(listData, mapOldObj);
+			CIBE_EventTriggerHelper.updateRelacionadoGC(listData);
 			//CIBE_EventTriggerHelper.setConfidentiality(listData, true);
+			
+			
 		}
 		
 		if (listDataWhitoutOutlook != null && !listDataWhitoutOutlook.isEmpty()){

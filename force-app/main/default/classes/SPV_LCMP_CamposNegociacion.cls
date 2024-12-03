@@ -20,7 +20,7 @@ public with sharing class SPV_LCMP_CamposNegociacion {
         List<Case> pretensionesMostrar = new List<Case>();
 
         try {
-            pretensionesCaso = [SELECT Id, Status, SAC_Reclamacion__r.SEG_Subestado__c, SPV_IdPretension__c, SAC_CasoNegociado__c, SAC_ResultadoNegociacion__c, SAC_NegociacionFinalizada__c, CC_MCC_Tematica__r.name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.name, SEG_Detalle__r.Name FROM Case 
+            pretensionesCaso = [SELECT Id, Status, SAC_Reclamacion__r.SEG_Subestado__c, SAC_CasoNegociado__c, CC_MCC_Tematica__r.name, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__r.name, SEG_Detalle__r.Name FROM Case 
                                 WHERE RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c =: casoId AND (Status = 'SAC_007' OR SAC_CasoNegociado__c = true)];
 
             for(Case pretension : pretensionesCaso) {

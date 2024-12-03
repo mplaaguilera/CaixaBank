@@ -34,7 +34,7 @@ public with sharing class SIR_cls_WS_procOtrasUdsGest {
         }else{
             try {
                 HttpRequest req = CBK_HttpServiceIntegration.getRequest(JSON.serialize(vBody), 'consProcOtrasUdsGest', 'POST', mHeaders);
-                HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR','consProcOtrasUdsGest');
                 if(res.getStatusCode() == 200){
                     ProcOtrasUdsGestResponse resp = (ProcOtrasUdsGestResponse)JSon.deserialize(res.getBody(), ProcOtrasUdsGestResponse.class);        
                     if( resp.codigoSalida == '1'){

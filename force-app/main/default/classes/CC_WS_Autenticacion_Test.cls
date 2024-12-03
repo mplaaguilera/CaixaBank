@@ -20,11 +20,11 @@ public with sharing class CC_WS_Autenticacion_Test {
 
         CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
         customSetting.Name = 'CC_Autenticacion_Robusta';
-        customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
+        customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
         customSetting.RegistroTrazaIntegracion__c = true;
         CBK_IntegrationSetting__c customSetting2 = new CBK_IntegrationSetting__c();
         customSetting2.Name = 'CC_Autenticacion_Robusta_Estado';
-        customSetting2.NamedCredential__c = 'callout:API_GWT_TST_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
+        customSetting2.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
         customSetting2.RegistroTrazaIntegracion__c = true;
         insert new List<CBK_IntegrationSetting__c>{customSetting, customSetting2};
 

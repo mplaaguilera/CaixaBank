@@ -72,7 +72,7 @@ public without sharing class SAC_CaseCalcularImporte {
      * 1.1                   US356803    Alex Perez             25/10/2022         añadir a los sumatorios las tareas directas en la reclamacion
      * *********************************************************************************************************/
 
-    private static List<Case> calcularImporte(Map<Id,List<Case>> mapListPretensiones){
+    public static List<Case> calcularImporte(Map<Id,List<Case>> mapListPretensiones){
 
         Map<Id, Decimal> mapaReclImporteParaActualizar = new Map<Id, Decimal>();
         Map<Id, Decimal> mapaReclQuebrantoParaActualizar = new Map<Id, Decimal>();

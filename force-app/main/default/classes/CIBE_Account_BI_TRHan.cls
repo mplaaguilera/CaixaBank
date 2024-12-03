@@ -9,6 +9,8 @@ Historial
 	VERSION		USER_STORY		AUTHOR				  DATE				Description
 	1.0			Init version	Jose Maria	   	      16/11/2022	    Init version
     2.0         US425471        Jose Maria            16/11/2022        Add Rating PD calc
+    3.0						    Lucia				  21/05/2024		Add retrieveComercialGroup
+
 ***********************************************************************************************************************/
 
 public with sharing class CIBE_Account_BI_TRHan  extends CC_TriggerHandlerBase{
@@ -19,12 +21,18 @@ public with sharing class CIBE_Account_BI_TRHan  extends CC_TriggerHandlerBase{
     private void process(List<Account> listNewObj, Map<Id, Account> mapNewObj, List<Account> listOldObj, Map<Id, Account> mapOldObj) {
         //General check the Record type's for intouch project
         List<Account> listData = CIBE_AccountTriggerHelper.checkGeneralRT(listNewObj);
+        List<Account> listData2 = CIBE_AccountTriggerHelper.checkGeneralRTGC(listNewObj);
+
 
         if (listData != null && !listData.isEmpty()) {
             AV_AccountTriggerHelper.descriptionLastModifiedDate(listData);
 			AV_AccountTriggerHelper.processOwnerEAPGestor(listData, mapOldObj);
 			AV_AccountTriggerHelper.accountValueOficinaPrincipalRelacionas(listData);
             CIBE_AccountTriggerHelper.updateRatingPD(listData);
+        }
+
+        if(listData2 != null && !listData2.isEmpty()){
+            CIBE_AccountTriggerHelper.retrieveComercialGroup(listData2); 
         }
 	}
 }

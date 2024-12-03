@@ -24,31 +24,12 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
         
 	*****************************************************************/
     @AuraEnabled
-    public static Id buscarIdsProceso(){
-        if(RecordType.SObjectType.getDescribe().isAccessible()){
-            RecordType proceso = [SELECT id FROM RecordType WHERE SobjectType ='SIREC__SIREC_obj_proceso__c' AND name = 'PRESOL' LIMIT 1];
-            Id procesoPresol = proceso.Id; 
-            return procesoPresol      ;
-        } 
-        return null; 
-    }
+    public static Id buscarIdsAccion(){
+        if(Schema.SObjectType.RecordType.isAccessible()){
+            /*List<RecordType> recordIdAcciones = [SELECT id, name FROM RecordType WHERE SobjectType ='SIREC__SIREC_obj_acciones__c' AND (name = 'Acción Amistoso' OR name = 'Acción Preventivo')];
+            return recordIdAcciones;*/
 
-    /*****************************************************************
-        Proposito:  Se comprueba que el usuario actual sea el propietario del proceso, sino no puede crear/modificar accion                                                    
-        Parameters: String idProceso
-        Returns: String                                                       
-        
-        Historial
-        -------- 
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0                             Atmira         31/05/2022     	  Created    
-        
-	*****************************************************************/
-    @AuraEnabled
-    public static List<RecordType> buscarIdsAccion(){
-        if(RecordType.SObjectType.getDescribe().isAccessible()){
-            List<RecordType> recordIdAcciones = [SELECT id, name FROM RecordType WHERE SobjectType ='SIREC__SIREC_obj_acciones__c' AND (name = 'Acción Amistoso' OR name = 'Acción Preventivo')];
-            return recordIdAcciones;
+            return Schema.SObjectType.SIREC__SIREC_obj_acciones__c.getRecordTypeInfosByDeveloperName().get(SIR_Constantes.ACCION_RECORDTYPE_DEVELOPER_NAME_AMISTOSO).getRecordTypeId();
         } 
         return null; 
     }
@@ -66,7 +47,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/
     @AuraEnabled
     public static String comprobarPropietarioProceso(String idProceso){
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             SIREC__SIREC_obj_proceso__c proceso = [SELECT Id, OwnerId FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso LIMIT 1];
             if(proceso.OwnerId == UserInfo.getUserId()){
                 return 'OK';
@@ -90,7 +71,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/
     @AuraEnabled
     public static String comprobarPropietarioAccion(String idAccion){        
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){
             SIREC__SIREC_obj_acciones__c accion = [SELECT Id, SIREC__SIREC_fld_proceso__r.OwnerId FROM SIREC__SIREC_obj_acciones__c WHERE id=:idAccion LIMIT 1];
             if(accion.SIREC__SIREC_fld_proceso__r.OwnerId == UserInfo.getUserId()){
                 return 'OK';
@@ -114,7 +95,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/
     @AuraEnabled(Cacheable=true)
     public static String comprobarPropietarioAccionReenvio(String idAccion){        
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){
             SIREC__SIREC_obj_acciones__c accion = [SELECT Id, SIREC__SIREC_fld_proceso__r.OwnerId FROM SIREC__SIREC_obj_acciones__c WHERE id=:idAccion LIMIT 1];            
             if(accion.SIREC__SIREC_fld_proceso__r.OwnerId == UserInfo.getUserId()){
                 return 'OK';
@@ -136,21 +117,13 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
         
 	*****************************************************************/                              
     @AuraEnabled(Cacheable=true)
-    public static List<SIREC__SIREC_obj_proceso__c> getProceso(String idProceso, Object accionesMetadata) {         
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
-            List<SIREC__SIREC_obj_proceso__c> proceso = [SELECT Name, SIREC__SIREC_fld_fechaInicio__c, SIR_fechaCarga__c, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_estrategia__c, recordTypeId FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso];
+    public static List<SIREC__SIREC_obj_proceso__c> getProceso(String idProceso) {         
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
+            List<SIREC__SIREC_obj_proceso__c> proceso = [SELECT Name, SIREC__SIREC_fld_fechaInicio__c, SIR_fechaCarga__c, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_estrategia__c, SIREC__SIREC_fld_descEstrategiaCatalogo__c, recordTypeId FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso];
             return proceso;
         }
         return null;
     } 
-    /*@AuraEnabled(Cacheable=true)
-    public static List<SIREC__SIREC_obj_proceso__c> getProceso(String idProceso) {         
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
-            List<SIREC__SIREC_obj_proceso__c> proceso = [SELECT Name, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_estrategia__c, recordTypeId FROM SIREC__SIREC_obj_proceso__c WHERE id=:idProceso];
-            return proceso;
-        }
-        return null;
-    } */
     
     /*****************************************************************
         Proposito: Realizamos query para obtener la accion                                                      
@@ -165,7 +138,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/                              
     @AuraEnabled(Cacheable=true)
     public static List<SIREC__SIREC_obj_acciones__c> getAccion(String idAccion) {  
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){
+      if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){
             List<SIREC__SIREC_obj_acciones__c> accion = [SELECT Id, SIREC__SIREC_fld_responsable__c,SIREC__SIREC_fld_proceso__c,SIREC__SIREC_fld_proceso__r.RecordTypeId,
                                                         SIREC__SIREC_fld_fechaContacto__c, SIREC__SIREC_fld_tipo__c, SIREC__SIREC_fld_accion__c,
                                                         SIREC__SIREC_fld_interviniente__c, SIREC__SIREC_fld_comentarios__c,
@@ -190,7 +163,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/                              
     @AuraEnabled
     public static List<SelectOption> getPicklistIntervinientes(String idProceso) {
-        if(SIREC__SIREC_obj_personaAsociada__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_personaAsociada__c.isAccessible()){
             List<SIREC__SIREC_obj_personaAsociada__c> personAsociadas = [SELECT id, SIREC__SIREC_fld_persona__c, SIREC__SIREC_fld_persona__r.Name 
                                                                         FROM SIREC__SIREC_obj_personaAsociada__c 
                                                                         WHERE SIREC__SIREC_fld_proceso__c =: idProceso AND SIR_estadoCarga__c != 'B'];            
@@ -241,15 +214,11 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
     @AuraEnabled
     public static String getValuePicklistAccion(String valor) {
         String resultado = null;
-        Schema.DescribeFieldResult fieldResult = SIREC__SIREC_obj_acciones__c.SIREC__SIREC_fld_accion__c.getDescribe();
-        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();       
-        
-        for (Schema.PicklistEntry f: ple) {   
+        for (Schema.PicklistEntry f : Schema.sObjectType.SIREC__SIREC_obj_acciones__c.fields.SIREC__SIREC_fld_accion__c.getPicklistValues()){
             if( valor == f.getValue()){ 
                 resultado = f.getLabel();  
-            }              
-        }
-        
+            }                 
+        } 
         return resultado;
     } 
     
@@ -266,14 +235,14 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/  
     @AuraEnabled
     public static String insertAccion(List<String> data) { 
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isCreateable() && SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){
-            try {  
-                Schema.DescribeFieldResult field = SIREC__SIREC_obj_proceso__c.SIREC__SIREC_fld_estrategia__c.getDescribe();              
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isCreateable() && Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){
+            try {             
                 SIREC__SIREC_obj_acciones__c insertForm = new SIREC__SIREC_obj_acciones__c();  
                 Boolean resultadoInformado = false;      
                 insertForm.SIREC__SIREC_fld_fechaContacto__c = date.valueof(data[0]);
                 insertForm.SIREC__SIREC_fld_tipo__c = data[1];
-                insertForm.SIREC__SIREC_fld_accion__c = data[2];               
+                insertForm.SIREC__SIREC_fld_accion__c = data[2];    
+                insertForm.SIR_valorAccion__c = getValuePicklistAccion(data[2]);           
                 Integer countAcciones = [SELECT Id FROM SIREC__SIREC_obj_acciones__c WHERE SIREC__SIREC_fld_proceso__c =: data[7] AND SIREC__SIREC_fld_resultado__c = : SIR_Constantes.ACCION_RESULTADO_NO_LOCALIZADO].size();            
                 if (data[3] == SIR_Constantes.ACCION_RESULTADO_NO_LOCALIZADO && countAcciones >=2){
                     insertForm.SIREC__SIREC_fld_resultado__c = SIR_Constantes.ACCION_RESULTADO_ILOCALIZADO;
@@ -292,18 +261,12 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
                 insertForm.SIREC__SIREC_fld_persona__c = data[6];
                 insertForm.SIREC__SIREC_fld_proceso__c = data[7];
                 insertForm.SIR_CodigoEstrategia__c = data[8];                
-                
-                for (Schema.PicklistEntry f : field.getPicklistValues()){
-                    if(f.getValue() == data[8]){
-                        insertForm.SIR_estrategia__c= f.getLabel();
-                        break;
-                    }
-                }
-                insertForm.SIR_valorAccion__c = getValuePicklistAccion(data[2]);
+                insertForm.SIR_estrategia__c = data[10];    
+
                 if(data[9] != null && data[9] != ''){
                     insertForm.SIR_FechaCompromisoPago__c = date.valueof(data[9]);
                 }     
-                insertForm.RecordTypeId = data[10];          	
+                insertForm.RecordTypeId = data[11];          	
                 insert insertForm;	
                 if(insertForm.SIR_FechaCompromisoPago__c != null){	
                     SIREC__SIREC_obj_proceso__c proceso = [SELECT id, SIR_FechaCompromisoPago__c FROM SIREC__SIREC_obj_proceso__c WHERE id =: insertForm.SIREC__SIREC_fld_proceso__c LIMIT 1];	
@@ -334,7 +297,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/                             
     @AuraEnabled
     public static String updateAccion(List<String> data, String idAccion) {
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isUpdateable() && SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isUpdateable()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isUpdateable() && Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isUpdateable()){
             try {    
                 SIREC__SIREC_obj_acciones__c updateForm = [SELECT id, SIREC__SIREC_fld_fechaContacto__c, SIREC__SIREC_fld_tipo__c, SIR_FechaCompromisoPago__c,
                                                             SIREC__SIREC_fld_accion__c, SIREC__SIREC_fld_resultado__c, SIREC__SIREC_fld_estado__c, SIREC__SIREC_fld_comentarios__c,
@@ -379,68 +342,6 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
         }
         return '';
     }  
-
-
-    /*****************************************************************
-        Proposito: Saber la depencia de la picklist de acciones                                                   
-        Parameters: No
-        Returns: Map<String, List<String>>                                                    
-        
-        Historial
-        -------- 
-        VERSION        USER_STORY       AUTHOR         DATE               Description
-        1.0            US244045         Atmira         02/08/2021     	  Created    
-        
-	*****************************************************************/
-   /* public static Map<String, List<String>> getDependentPicklistValues(String nombreCampo) {
-        Schema.DescribeFieldResult depend = SIREC__SIREC_obj_acciones__c.SIREC__SIREC_fld_accion__c.getDescribe();
-        if(nombreCampo == 'Accion'){
-           depend = SIREC__SIREC_obj_acciones__c.SIREC__SIREC_fld_accion__c.getDescribe();
-        } else if(nombreCampo == 'Resultado'){
-            depend = SIREC__SIREC_obj_acciones__c.SIREC__SIREC_fld_resultado__c.getDescribe();
-        }
-        
-        Schema.sObjectField controlToken = depend.getController();
-        if (controlToken == null) {
-            return new Map<String, List<String>>();
-        }
-     
-        Schema.DescribeFieldResult control = controlToken.getDescribe();
-        List<Schema.PicklistEntry> controlEntries;
-        if(control.getType() != Schema.DisplayType.Boolean) {
-            controlEntries = control.getPicklistValues();
-        }
-        
-        String base64map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-        Map<String,List<String>> dependentPicklistValues = new Map<String,List<String>>();
-        for (Schema.PicklistEntry entry : depend.getPicklistValues()) {
-            if (entry.isActive() && String.isNotEmpty(String.valueOf(((Map<String,Object>) JSON.deserializeUntyped(JSON.serialize(entry))).get('validFor')))) {
-                List<String> base64chars =
-                        String.valueOf(((Map<String,Object>) JSON.deserializeUntyped(JSON.serialize(entry))).get('validFor')).split('');
-                for (Integer index = 0; index < (controlEntries != null ? controlEntries.size() : 2); index++) {
-                    Object controlValue =
-                            (controlEntries == null
-                                    ?   (Object) (index == 1)
-                                    :   (Object) (controlEntries[index].isActive() ? controlEntries[index].getValue() : null)
-                            );
-                    Integer bitIndex = index / 6;
-                    if (bitIndex > base64chars.size() - 1) {
-                        break;
-                    }
-                    Integer bitShift = 5 - Math.mod(index, 6);
-                    if  (controlValue == null || (base64map.indexOf( base64chars[ bitIndex ] ) & (1 << bitShift)) == 0){
-                        continue;
-                    }
-                    if (!dependentPicklistValues.containsKey((String) controlValue)) {
-                        dependentPicklistValues.put((String) controlValue, new List<String>());
-                    }
-                    dependentPicklistValues.get((String) controlValue).add(entry.getValue());
-                }
-            }
-        }
-        return dependentPicklistValues;
-    }*/
-       
     
     /*****************************************************************
         Proposito: Enviamos la Accion a Sirec                                                   
@@ -456,7 +357,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
     @AuraEnabled
     public static String[] enviarAccion(String idAccion) {
         String[] resultado = new String[]{''}; 
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){                 
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){                 
             // Llamar al WS de Enviar Accion            
             String[] resultadoWS;           
             resultadoWS = SIR_SendNewAction_WS.sendAction(idAccion);
@@ -481,7 +382,7 @@ public with sharing class SIR_LCMP_accionSinWorkflow {
 	*****************************************************************/                              
     @AuraEnabled
     public static void updateAccionWS(String idAccion) {
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isUpdateable()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isUpdateable()){
             try {    
                 SIREC__SIREC_obj_acciones__c updateForm = [SELECT id, SIREC__SIREC_fld_estado__c, SIR_accionEnviada__c
                												FROM SIREC__SIREC_obj_acciones__c WHERE Id =: idAccion];    

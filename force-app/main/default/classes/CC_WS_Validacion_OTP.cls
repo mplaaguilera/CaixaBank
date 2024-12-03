@@ -97,8 +97,8 @@ public with sharing class CC_WS_Validacion_OTP {
 	private static String getRequestBody(CC_InterfaceSettings__mdt cfgIntegracion, CC_Comunicaciones__c autenticacion, String numperso, String codigoOtp) {
 		String requestBody = cfgIntegracion.CC_Body__c;
 		requestBody = requestBody.replace('##dateTime##', getTimestamp());
-		//requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
-		requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
+		requestBody = requestBody.replace('##ticket##', autenticacion.CC_Ticket__c);
+		//requestBody = requestBody.replace('##ticket##', '0BCC00000353000'); //Comentar ////////////////////////////////////////////////////////
 		requestBody = requestBody.replace('##otpEncrypt##', codigoOtp); //autenticacion.CC_Codigo_OTPSMS__c);
 		requestBody = requestBody.replace('##personId##', numperso);
 		return requestBody;

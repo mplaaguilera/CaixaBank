@@ -11,8 +11,8 @@
 
     *****************************************************************/
 @isTest
-global with sharing class SIR_SendNewAction_WSMock implements HttpCalloutMock{
-    global HTTPResponse respond(HTTPRequest req) {
+public with sharing class SIR_SendNewAction_WSMock implements HttpCalloutMock{
+    public HTTPResponse respond(HTTPRequest req) {
         SIR_SendNewAction_WS.WrapperclassAction request = (SIR_SendNewAction_WS.WrapperclassAction)JSon.deserialize(req.getBody(), SIR_SendNewAction_WS.WrapperclassAction.class);
         SIR_SendNewAction_WS.AccionResponse responseJson = new SIR_SendNewAction_WS.AccionResponse();
         HttpResponse response = new HttpResponse();

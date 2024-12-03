@@ -17,7 +17,9 @@ Historial
 	1.8			US534621		Vladislav Lityagin	20/02/2023			Modified getMapOppToUpdate adding new RT CallMe and getMapEventToUpdate adding RT EventosConClientes
 	1.9			Fix-US534621	Sandra Gómez		29/03/2023			Fix RT Propuesta and add AV_AppConstants
 	2.0			US603731		Sandra Gómez		22/05/2022			New parameter in method processRelatedToAccount callQueueable and new estructure ListsOppTaskEvent
-
+	2.1			Fix null error	Humberto Vilchez	24/11/2023			Fix Null in get Map
+	2.2			US839366		Ángel Medina		27/02/2024			Add StageName Vencido in method getMapOppToUpdate
+	2.3			PPM100205278    Luis Fernández		28/05/2024			Added No gestionada to getMapOppToUpdate set stages
 ***********************************************************************************************************************/
 public with sharing class AV_GestorReassignmentFuture {
 	
@@ -50,8 +52,6 @@ public with sharing class AV_GestorReassignmentFuture {
 		Map<Id,Boolean> mapEAPGestorIntouch = new Map<Id,Boolean>();
 		RecordType eventClientRT = AV_AppUtilities.getRecordType('Event','AV_EventosConCliente');
 		List<Contact> listEmployees= [Select Id, CC_Matricula__c, AV_UsuarioAsociado__c,AV_EmpleadoIntouch__c From Contact Where Id in :eapGestorsIds and AV_UsuarioAsociado__r.IsActive = true];      		
-		AV_LogDebug.printLogDebug(methodName, 'listEmployees: ' + listEmployees);
-		AV_LogDebug.printLogDebug(methodName, 'eapGestorsIds: ' + eapGestorsIds);
 		if(listEmployees != null && !listEmployees.isEmpty()){
 			for(Contact c : listEmployees){
 				mapEAPGestorUser.put(c.Id, c.CC_Matricula__c);
@@ -65,8 +65,6 @@ public with sharing class AV_GestorReassignmentFuture {
 		}
 		Map<Id,String> mapEAPGestorUserOld = new Map<Id,String>(); 
 		List<Contact> listEmployeesOld= [Select Id, CC_Matricula__c, AV_UsuarioAsociado__c,AV_EmpleadoIntouch__c From Contact Where Id in :eapGestorsIdsOld and AV_UsuarioAsociado__r.IsActive = true];               
-		AV_LogDebug.printLogDebug(methodName, 'listEmployeesOld: ' + listEmployeesOld);
-		AV_LogDebug.printLogDebug(methodName, 'eapGestorsIdsOld: ' + eapGestorsIdsOld);
 		if(listEmployeesOld != null && !listEmployeesOld.isEmpty()){
 			for(Contact c : listEmployeesOld){
 				mapEAPGestorUserOld.put(c.Id, c.CC_Matricula__c);
@@ -99,13 +97,14 @@ public with sharing class AV_GestorReassignmentFuture {
 						} else {
 							if (mapEAPGestorUserOld.get(mapOld.get(acc.Id).AV_EAPGestor__c) == t.AV_CodigoGestorAsignado__c) {
 								t.AV_CodigoGestorAsignado__c = mapEAPGestorUser.get(acc.AV_EAPGestor__c);
+								t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET;
 								listTaskToUpdate.add(t);
 							}
 						}
 					}
 				}
 				//Fill the list of the events to update
-				if (mapEvents!=null && !mapEvents.isEmpty() && mapEvents.containsKey(acc.Id)){
+				if (mapEvents!=null && !mapEvents.isEmpty() && mapEvents.containsKey(acc.Id)){								
 					for (Event e : mapEvents.get(acc.Id)) {
 						if (mapOld.get(acc.Id) == null) {
 							e.AV_CodigoGestorAsignado__c = mapEAPGestorUser.get(acc.AV_EAPGestor__c);
@@ -115,8 +114,9 @@ public with sharing class AV_GestorReassignmentFuture {
 								if(e.RecordTypeId != eventClientRT.Id){
 									e.AV_CodigoGestorAsignado__c = mapEAPGestorUser.get(acc.AV_EAPGestor__c);
 									listEventToUpdate.add(e);
-								}else{
-									if(!(!mapEAPGestorIntouchOld.get(mapOld.get(acc.Id).AV_EAPGestor__c) && mapEAPGestorIntouch.get(acc.AV_EAPGestor__c) )){
+								}else{								
+									if(mapEAPGestorIntouchOld.get(mapOld.get(acc.Id).AV_EAPGestor__c) != null && mapEAPGestorIntouch.get(acc.AV_EAPGestor__c) != null &&
+									!(!mapEAPGestorIntouchOld.get(mapOld.get(acc.Id).AV_EAPGestor__c) && mapEAPGestorIntouch.get(acc.AV_EAPGestor__c) )){
 										e.AV_CodigoGestorAsignado__c = mapEAPGestorUser.get(acc.AV_EAPGestor__c);
 										listEventToUpdate.add(e);
 									}
@@ -127,12 +127,13 @@ public with sharing class AV_GestorReassignmentFuture {
 				}
 				//Fill the list of the opps to update
 				if (mapOpps!=null && !mapOpps.isEmpty() && mapOpps.containsKey(acc.Id)) {
-					for (Opportunity o : mapOpps.get(acc.Id)) {
+					for (Opportunity o : mapOpps.get(acc.Id)) {	
 						if (mapOld.get(acc.Id) == null) {
 							o.AV_Gestor__c = acc.AV_EAPGestor__c;
 							listOppToUpdate.add(o);
 						} else {
 							if (mapOld.get(acc.Id).AV_EAPGestor__c == o.AV_Gestor__c) {
+								o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET;
 								o.AV_Gestor__c = acc.AV_EAPGestor__c;
 								listOppToUpdate.add(o);
 							}
@@ -144,6 +145,7 @@ public with sharing class AV_GestorReassignmentFuture {
 					for (Task t : mapTasks.get(acc.Id)) {
 						if (mapEAPGestorUserOld.get(mapOld.get(acc.Id).AV_EAPGestor__c) == t.AV_CodigoGestorAsignado__c) {
 							t.AV_CodigoGestorAsignado__c = null;
+							t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET;
 							listTaskToUpdate.add(t);
 						}
 					}
@@ -159,30 +161,26 @@ public with sharing class AV_GestorReassignmentFuture {
 				}
 				//Fill the list of the opps to update
 				if (mapOpps!=null && !mapOpps.isEmpty() && mapOpps.containsKey(acc.Id)){
-					for (Opportunity o : mapOpps.get(acc.Id)) {
+					for (Opportunity o : mapOpps.get(acc.Id)) {								
 						if (mapOld.get(acc.Id).AV_EAPGestor__c == o.AV_Gestor__c) {
 							o.AV_Gestor__c = null;
+							o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET;
 							listOppToUpdate.add(o);
-						}
+						}							
 					}
 				}
 			}
 		}
+		
 		if (callQueueable != null && callQueueable) {
 			if (listOppToUpdate != null && !listOppToUpdate.isEmpty()){
-				AV_LogDebug.printLogDebug(methodName, 'listOppToUpdate: ' + listOppToUpdate.size());
-				AV_LogDebug.printLogDebug(methodName, 'listTaskToUpdate: ' + listTaskToUpdate.size());
-				AV_LogDebug.printLogDebug(methodName, 'listEventToUpdate: ' + listEventToUpdate.size());
 				System.enqueueJob(new AV_GestorReassignmentQueueable(listOppToUpdate,listTaskToUpdate, listEventToUpdate));
 			} else if (listTaskToUpdate != null && !listTaskToUpdate.isEmpty()) {
-				AV_LogDebug.printLogDebug(methodName, 'listTaskToUpdate: ' + listTaskToUpdate.size());
-				AV_LogDebug.printLogDebug(methodName, 'listEventToUpdate: ' + listEventToUpdate.size());
 				System.enqueueJob(new AV_GestorReassignmentTaskQueueable(listTaskToUpdate,listEventToUpdate));
 			} else if (listEventToUpdate != null && !listEventToUpdate.isEmpty()) {
-				AV_LogDebug.printLogDebug(methodName, 'listEventToUpdate: ' + listEventToUpdate.size());
 				System.enqueueJob(new AV_GestorReassignmentEventsQueueable(listEventToUpdate));
 			}
-		}
+		}								
 
 		return new ListsOppTaskEvent(listOppToUpdate,listTaskToUpdate, listEventToUpdate);
 	}
@@ -207,7 +205,6 @@ public with sharing class AV_GestorReassignmentFuture {
 		Set<Id> setIdsRt = getAllRT();
 		Set<String> setStatus = new Set<String>{AV_AppConstants.TASK_STATUS_PENDIENTE,AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL};
 		List<Task> listTareasAsociadas = [SELECT AccountId,AV_CodigoGestorAsignado__c FROM Task WHERE AccountId IN :setClientesIds AND RecordTypeId IN :setIdsRt AND Status IN :setStatus];
-		AV_LogDebug.printLogDebug(methodName, 'listTareasAsociadas: ' + listTareasAsociadas.size());
 		Map<Id,List<Task>> mapTasks = new Map<Id,List<Task>>();
 		for(Task t : listTareasAsociadas){
 			List<Task> listTasks = new List<Task>();
@@ -232,7 +229,6 @@ public with sharing class AV_GestorReassignmentFuture {
 		Set<String> setStatus = new Set<String>{AV_AppConstants.EVENT_STATUS_PENDIENTE};
 		Set<String> setRecordTypeEvent = new Set<String>{AV_AppConstants.EVENTCLIENTE_RT};
 		List<Event> listEventosAsociados = [SELECT AccountId,AV_CodigoGestorAsignado__c,RecordTypeId FROM Event WHERE AccountId IN :setClientesIds AND CSBD_Evento_Estado__c IN :setStatus AND isRecurrence = false AND isRecurrence2 = false AND StartDateTime > :System.now() AND RecordType.DeveloperName IN: setRecordTypeEvent];
-		AV_LogDebug.printLogDebug(methodName, 'listEventosAsociados: ' + listEventosAsociados.size());
 		Map<Id,List<Event>> mapEvents = new Map<Id,List<Event>>();
 		for(Event e : listEventosAsociados){
 			List<Event> listEvents = new List<Event>();
@@ -254,10 +250,9 @@ public with sharing class AV_GestorReassignmentFuture {
 	 */
 	private static Map<Id,List<Opportunity>> getMapOppToUpdate(Set<Id> setClientesIds){
 		String methodName = 'getMapOppToUpdate';
-		Set<String> setStages = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL,AV_AppConstants.OPP_STATUS_ENGESTION};
+		Set<String> setStages = new Set<String>{AV_AppConstants.OPP_STATUS_POTENCIAL,AV_AppConstants.OPP_STATUS_ENGESTION, AV_AppConstants.OPP_STATUS_VENCIDO,AV_AppConstants.OPP_STATUS_NO_GESTIONADA};
 		Set<String> setRecordType = new Set<String>{AV_AppConstants.OPPALERTACOM_RT,AV_AppConstants.OPPINICIATIVA_RT,AV_AppConstants.OPPSUGERENCIA_RT,AV_AppConstants.OPPLLAMADA_RT,AV_AppConstants.OPPPROPUESTA_RT};
-		List<Opportunity> listOportunidadesAsociadas = [SELECT AccountId,AV_Gestor__c FROM Opportunity WHERE AccountId IN :setClientesIds AND StageName IN :setStages AND RecordType.DeveloperName IN: setRecordType];							
-		AV_LogDebug.printLogDebug(methodName, 'listOportunidadesAsociadas: ' + listOportunidadesAsociadas.size());
+		List<Opportunity> listOportunidadesAsociadas = [SELECT AccountId,AV_Gestor__c FROM Opportunity WHERE AccountId IN :setClientesIds AND StageName IN :setStages AND RecordType.DeveloperName IN: setRecordType WITH SECURITY_ENFORCED ];							
 		Map<Id,List<Opportunity>> mapOpps = new Map<Id,List<Opportunity>>();
 		for(Opportunity o : listOportunidadesAsociadas){
 			List<Opportunity> listOpps = new List<Opportunity>();

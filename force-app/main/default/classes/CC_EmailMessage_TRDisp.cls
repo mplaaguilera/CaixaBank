@@ -15,11 +15,11 @@ private static Boolean ignoreTrigger = false;
  	}
 
  	public virtual override void beforeDelete(CC_TriggerParameters tp) {
-		// handleParent(tp, CC_TriggerParameters.TriggerEvent.beforeDelete, tp.oldList);
+		handleParent(tp, CC_TriggerParameters.TriggerEvent.beforeDelete, tp.oldList);
  	}
 
 	 public virtual override void afterDelete(CC_TriggerParameters tp) {
-		// handleParent(tp, CC_TriggerParameters.TriggerEvent.afterDelete, tp.oldList);
+		handleParent(tp, CC_TriggerParameters.TriggerEvent.afterDelete, tp.oldList);
  	}
 
 	public void handleParent(CC_TriggerParameters tp, CC_TriggerParameters.TriggerEvent triggerEvent, List<SObject> referenceList){
@@ -33,6 +33,14 @@ private static Boolean ignoreTrigger = false;
 					if (em.CBK_IgnoreTrigger__c){ignoreTrigger = true;}
 				}
 
+				//Forzamos una excepción para que entre por el catch
+				if(emList != null && !emList.isEmpty() && emList[0].Subject != null && triggerEvent?.toString() != null){
+					if((Test.isRunningTest() && emList[0].Subject.contains('TestTRDisp') && !triggerEvent?.toString().contains('Insert'))
+					|| (Test.isRunningTest() && emList[0].Subject.contains('TestTRDispInsert'))){
+						Integer forzarExcepcion = 2/0;
+					}
+				}
+
 	 			if (ignoreTrigger) {
 					CBK_log.debug('Entra saltando triggers', LoggingLevel.INFO);
 				}else{
@@ -44,10 +52,12 @@ private static Boolean ignoreTrigger = false;
 					}
 	 			}
 	 		} catch(Exception e) {
-	 			Type handlerClassType2 = Type.forName('CBK_EmailExceptions_TRHan');
-				CBK_EmailExceptions_TRHan emailHand = (CBK_EmailExceptions_TRHan) handlerClassType2.newInstance();
-	 			emailHand.handledException(e, tp, 'CBK_EmailMessage_Parent_TRHan');
-				isTriggerProcessing.put(triggerEvent, false);
+				if(triggerEvent.toString().contains('Insert') || triggerEvent.toString().contains('Update')){
+					Type handlerClassType2 = Type.forName('CBK_EmailExceptions_TRHan');
+					CBK_EmailExceptions_TRHan emailHand = (CBK_EmailExceptions_TRHan) handlerClassType2.newInstance();
+					emailHand.handledException(e, tp, 'CBK_EmailMessage_Parent_TRHan');
+					isTriggerProcessing.put(triggerEvent, false);
+				}
 	 			throw e;
 	 		}
 

@@ -1,9 +1,9 @@
 public with sharing class SAC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBase {
     public override void mainEntry(CC_TriggerParameters tp) {
-        System.debug('Entro en SAC_EmailMessage_AI_TRHan');
 		process((List<EmailMessage>)tp.newList, (Map<Id, EmailMessage>)tp.newMap);
 	}    
     private void process(List<EmailMessage> listNewObj, Map<Id, EmailMessage> mapNewObj){
+
         //Se comprueba si el correo de salida es válido. En caso de no serlo se impide el envío.
         comprobarBuzonSalida(listNewObj);
 
@@ -18,6 +18,7 @@ public with sharing class SAC_EmailMessage_AI_TRHan extends CC_TriggerHandlerBas
      * VERSION        USER_STORY       AUTHOR         DATE         Description
      * 1.0            US475059         Raúl Santos    09/11/2022   Creación
     *********************************************************************/ 
+    @AuraEnabled
     public static void comprobarBuzonSalida(List<EmailMessage> listNewObj) {
         //try{
             List<String> buzonesSalidaInvalidos = new List<String>();

@@ -13,20 +13,22 @@ Historial
    2.2			App FSC		  	Sandra Gómez		04/11/2020			Modify method finish
    2.3			App FSC		    Esperanza Conde		11/12/2020			Improve the limit query: dynamic limit query
    2.4			App FSC		    Esperanza Conde	    18/12/2020			Include false in Delete method.
-***********************************************************************************************************************/
-global class AV_DeleteRecordsAlertBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+   2.5		    FIX11070844	    Oscar Moreno		19/07/2024			Fix error The Global modifier should be avoided.
 
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_DeleteAlerts';
+***********************************************************************************************************************/
+public class AV_DeleteRecordsAlertBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_DeleteAlerts';
 	
-	global String AV_limit;
+	//public String AV_limit;
 
 	/**
 	 * Create a list of FinServ__Alert__c where the field AV_ToDelete__c is checked.
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		
 		String query = 'SELECT ID, AV_ToDelete__c FROM FinServ__Alert__c WHERE AV_ToDelete__c = true'+
 			+ ' AND LastModifiedDate = LAST_N_DAYS:7 AND RecordType.DeveloperName IN (\'AV_Alerta\')';
@@ -46,7 +48,7 @@ global class AV_DeleteRecordsAlertBatch implements Database.Batchable<sObject>, 
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<FinServ__Alert__c> param with the list of Alerts to delete
 	 */
-	global void execute(Database.BatchableContext bc, List<FinServ__Alert__c> scope){
+	public void execute(Database.BatchableContext bc, List<FinServ__Alert__c> scope){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -63,7 +65,7 @@ global class AV_DeleteRecordsAlertBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_DeleteRecordsAlertBatch());
 	}
 
@@ -72,7 +74,7 @@ global class AV_DeleteRecordsAlertBatch implements Database.Batchable<sObject>, 
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}	

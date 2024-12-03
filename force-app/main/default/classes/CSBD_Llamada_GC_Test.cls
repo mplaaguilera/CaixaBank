@@ -86,7 +86,7 @@ public class CSBD_Llamada_GC_Test {
             svcEncuesta.CC_Canal_Procedencia__c = 'CaixabankNow';
             svcEncuesta.CC_Fecha_Inicio_Salesforce__c = Date.newInstance(2023, 11, 3);
 			insert svcEncuesta;
-            
+
             CC_Lista_Valores__c listaValores4 = new CC_Lista_Valores__c();
         	listaValores4.RecordTypeId = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
         	listaValores4.Name = 'CSBD: Horarios comerciales por tipología';

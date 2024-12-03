@@ -11,12 +11,12 @@ Historial
 	1.1			Fix CBK				Sandra Gómez		07/07/2023			Change Error to list without for
 	
 ***********************************************************************************************************************/
-global with sharing class AV_DeleteRelatedTaskQueueable implements Queueable {
+public with sharing class AV_DeleteRelatedTaskQueueable implements Queueable {
 	
-	global List<AV_ManagementHistory__c> listManagementHistory = new List<AV_ManagementHistory__c>();
-	global List<CBK_Activity_Extension__c> listTaskExtension= new List<CBK_Activity_Extension__c>();
-	global List<AV_CustomActivityOpportunity__c> listTaskOpp = new List<AV_CustomActivityOpportunity__c>();
-	global List<AV_HeaderCustomActivity__c> listHeaderTask = new List<AV_HeaderCustomActivity__c>();
+	public List<AV_ManagementHistory__c> listManagementHistory = new List<AV_ManagementHistory__c>();
+	public List<CBK_Activity_Extension__c> listTaskExtension= new List<CBK_Activity_Extension__c>();
+	public List<AV_CustomActivityOpportunity__c> listTaskOpp = new List<AV_CustomActivityOpportunity__c>();
+	public List<AV_HeaderCustomActivity__c> listHeaderTask = new List<AV_HeaderCustomActivity__c>();
 
 	
 	public AV_DeleteRelatedTaskQueueable(List<AV_ManagementHistory__c> listManagementHistory, List<CBK_Activity_Extension__c> listTaskExtension, List<AV_CustomActivityOpportunity__c> listTaskOpp,list<AV_HeaderCustomActivity__c> listHeaderTask) {
@@ -26,7 +26,7 @@ global with sharing class AV_DeleteRelatedTaskQueueable implements Queueable {
 		this.listHeaderTask = listHeaderTask;
 	}
 
-	global void execute(System.QueueableContext qc){
+	public void execute(System.QueueableContext qc){
 		String methodName = 'executeDeleteRelatedTask';
 		if(listManagementHistory != null && !listManagementHistory.isEmpty()){
 			List<String> listErrorsManagementHistory = new List<String>();

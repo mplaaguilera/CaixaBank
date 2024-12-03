@@ -15,6 +15,7 @@ Historial
 	1.5			DE52465			Daniel Rodríguez	20/10/2021		Fix method processRelatedToAccount
     1.6		    AV_Query IT	    Daniel Rodríguez	04/02/2022	    Change AV_Query to SOQL for User, Account, Contact
     1.7         Fix             Patricia Villacañas 17/05/2023      Modified to set run as
+    1.8         Fix             Humberto Vilchez    15/01/2024      Modified processRelatedToAccountOK 
 
 ***********************************************************************************************************************/
 @isTest
@@ -93,7 +94,6 @@ public class AV_GestorReassignmentFuture_Test {
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
         
         Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_MOCNT', 'OK'));
-		String oppExternalId = '00000002';
         Set<Id> gestorId = new Set<Id>();
         Set<Id> gestorId2 = new Set<Id>();
         List<Opportunity> listOppTest = new List<Opportunity>();
@@ -119,7 +119,9 @@ public class AV_GestorReassignmentFuture_Test {
             AV_GestorReassignmentFuture.processRelatedToAccount(JSON.serialize(customers), gestorId2, JSON.serialize(customers2), gestorId, true );
             customers.get(0).AV_EAPGestor__c = null;
             evtTst.AV_CodigoGestorAsignado__c = gestores.get(0).CC_Matricula__c;
+
             Database.update(evtTst);
+
             AV_GestorReassignmentFuture.processRelatedToAccount(JSON.serialize(customers), gestorId2, JSON.serialize(customers2), gestorId, true );
         }
         Test.stopTest();
@@ -127,8 +129,8 @@ public class AV_GestorReassignmentFuture_Test {
         List<Task> tareas = [SELECT AV_CodigoGestorAsignado__c FROM Task WHERE (AV_ExternalID__c = '12345' OR AV_ExternalID__c = '12346')];
 
         List<Opportunity> oportunidades = [SELECT AV_ExternalID__c,AV_Gestor__c FROM Opportunity
-        WHERE (AV_ExternalID__c = '00000001' OR AV_ExternalID__c = :oppExternalId)];
-        
+        WHERE AccountId =: customers.get(0).Id AND StageName =: AV_AppConstants.OPP_STATUS_POTENCIAL];        
+
         List<Event> eventos = [SELECT AV_CodigoGestorAsignado__c FROM Event WHERE AV_CodigoGestorAsignado__c = :gestores.get(0).CC_Matricula__c ];
         // Task Status = Open    
         System.assertNotEquals(true, gestores.get(0).CC_Matricula__c == tareas.get(0).AV_CodigoGestorAsignado__c, 'Tarea no asignada a nuevo gestor.');

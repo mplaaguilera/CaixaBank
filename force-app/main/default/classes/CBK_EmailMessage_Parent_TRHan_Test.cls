@@ -7,6 +7,12 @@ private class CBK_EmailMessage_Parent_TRHan_Test{
 		CBK_ActivateParenHan_Test__c conf = new CBK_ActivateParenHan_Test__c(name = 'ActivarHandlerTest', Active__c = true);
 		insert conf;
 
+		List<EmailServicesAddress> headerValue = [SELECT LocalPart, EmailDomainName FROM EmailServicesAddress WHERE DeveloperName LIKE 'AM_%' LIMIT 1];
+		String headerValueStr = 'test@p-18nbt53xompbolkephezu961v8dyxkay8s2tvjsaow1i4i5stv.0q-1vnyua2.cs109.apex.sandbox.salesforce.com';
+        if (headerValue != null && headerValue.size() > 0){
+			headerValueStr = headerValue[0].LocalPart +'@'+ headerValue[0].EmailDomainName;
+		}
+
 		List<EmailMessage> lst = new List<EmailMessage> ();
 		Set<string> sIds = new Set<string> ();
 		EmailMessage correo = new EmailMessage();
@@ -16,7 +22,8 @@ private class CBK_EmailMessage_Parent_TRHan_Test{
 		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
 		correo.CC_Procedencia__c = 'Remitir Colaboradorfdasdfa';
 		correo.ToAddress = 'test@p-18nbt53xompbolkephezu961v8dyxkay8s2tvjsaow1i4i5stv.0q-1vnyua2.cs109.apex.sandbox.salesforce.com';
-		correo.Headers = '[{"value": "test@p-18nbt53xompbolkephezu961v8dyxkay8s2tvjsaow1i4i5stv.0q-1vnyua2.cs109.apex.sandbox.salesforce.com","name": "X-SFDC-Original-RCPT"}]';
+		//correo.Headers = '[{"value": "test@p-18nbt53xompbolkephezu961v8dyxkay8s2tvjsaow1i4i5stv.0q-1vnyua2.cs109.apex.sandbox.salesforce.com","name": "X-SFDC-Original-RCPT"}]';
+		correo.Headers = '[{"value": "' + headerValueStr + '","name": "X-SFDC-Original-RCPT"}]';
 		lst.add(correo);
 		sIds.add(correo.Id);
 
@@ -347,6 +354,135 @@ private class CBK_EmailMessage_Parent_TRHan_Test{
 			lstemails.add('email@test.com;email2@test.com');
 		}
 		CBK_EmailMessage_Parent_TRHan.getToAddresHeader('', lstemails[0], lstemails);
+	}
+	@isTest
+	private static void testSalidaSACObjects(){
+		Case caso = new Case();
+		caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();  
+		caso.SAC_Naturaleza__c = 'SAC_004';
+		caso.Subject = 'Test';
+		Insert caso ;
+
+		SAC_Accion__c tarea = new SAC_Accion__c();
+		tarea.SAC_Estado__c = 'SAC_PendienteEnviar';
+		tarea.SAC_Reclamacion__c = caso.Id;
+		tarea.recordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_MaestroDeTareas').getRecordTypeId();
+		Insert tarea;
+
+		SAC_Accion__c tarea2 = new SAC_Accion__c();
+		tarea2.SAC_Estado__c = 'SAC_PendienteEnviar';
+		tarea2.SAC_Reclamacion__c = caso.Id;
+		tarea2.recordTypeId = Schema.SObjectType.SAC_Accion__c.getRecordTypeInfosByDeveloperName().get('SAC_OtrasTareas').getRecordTypeId();
+		Insert tarea2;
+
+		SAC_Alerta__c alerta = new SAC_Alerta__c();
+		alerta.SAC_Reclamacion__c = caso.Id;
+		alerta.RecordTypeId = Schema.SObjectType.SAC_Alerta__c.getRecordTypeInfosByDeveloperName().get('SAC_Alerta').getRecordTypeId();
+		insert alerta;
+
+
+		SAC_Interaccion__c iteraccion = new SAC_Interaccion__c();
+		iteraccion.SAC_Propuesta__c = 'propuesta test';
+		iteraccion.recordTypeId = Schema.SObjectType.SAC_Interaccion__c.getRecordTypeInfosByDeveloperName().get('SAC_Escalado').getRecordTypeId();
+		iteraccion.SAC_Estado__c = 'SAC_PendienteRespuesta';
+		iteraccion.SAC_Email1__c = 'testingcorreo@test.test';
+		insert iteraccion;
+
+
+
+
+		//Accion
+		List<EmailMessage> lstMsg = new List<EmailMessage>();
+		EmailMessage correo = new EmailMessage();
+		correo.RelatedToId = tarea.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ACCION SAC_MaestroDeTareas';
+		correo.TextBody = 'EMAIL ACCION SAC_MaestroDeTareas';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+		correo = new EmailMessage();
+		correo.RelatedToId = tarea.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ACCION SAC_MaestroDeTareas 2';
+		correo.TextBody = 'EMAIL ACCION SAC_MaestroDeTareas 2';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+		correo = new EmailMessage();
+		correo.RelatedToId = tarea2.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL OTROS SAC_OtrasTareas';
+		correo.TextBody = 'EMAIL OTROS SAC_OtrasTareas';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+		correo = new EmailMessage();
+		correo.RelatedToId = tarea2.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL OTROS SAC_OtrasTareas 2';
+		correo.TextBody = 'EMAIL OTROS SAC_OtrasTareas 2';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+
+		///Alert
+		correo = new EmailMessage();
+		correo.RelatedToId = alerta.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ALERTA SAC_Alerta';
+		correo.TextBody = 'EMAIL ALERTA SAC_Alerta';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+		correo = new EmailMessage();
+		correo.RelatedToId = alerta.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ALERTA SAC_Alerta 2';
+		correo.TextBody = 'EMAIL ALERTA SAC_Alerta 2';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+
+
+		// Iteraccion 
+		correo = new EmailMessage();
+		correo.RelatedToId = iteraccion.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ITERACCION SAC_Escalado';
+		correo.TextBody = 'EMAIL ITERACCION SAC_Escalado';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+		correo = new EmailMessage();
+		correo.RelatedToId = iteraccion.Id;
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ITERACCION SAC_Escalado 2';
+		correo.TextBody = 'EMAIL ITERACCION SAC_Escalado 2';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+		insert lstMsg;
+
+	}
+
+	@isTest
+	private static void testGenerateOldlist(){
+		List<EmailMessage> lstMsg = new List<EmailMessage>();
+		EmailMessage correo = new EmailMessage();
+		correo.Incoming = false;
+		correo.Subject = 'EMAIL ACCION SAC_MaestroDeTareas';
+		correo.TextBody = 'EMAIL ACCION SAC_MaestroDeTareas';
+		correo.FromAddress = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt LIMIT 1].CC_Direccion_Correo__c;
+		correo.ToAddress = 'prueba@ibm.com';
+		lstMsg.add(correo);
+
+		//CBK_EmailMessage_Parent_TRHan.generateOldList(lstMsg, mapaCorreosOld);
 	}
 		
 }

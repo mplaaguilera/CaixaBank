@@ -54,17 +54,6 @@ public with sharing class CC_PushTopic {
         //}
         return user3N;
     }
-
-    @AuraEnabled(cacheable=true)
-    public static Boolean getCCUser() {
-
-        Boolean userCC =false;
-			List<User> usuarios = [SELECT Id, UserRole.name FROM User WHERE (UserRole.name= 'Contact Center' OR UserRole.name = 'Contact Center sin acceso a Directorio') AND Id =:UserInfo.getUserId()];
-            if (!usuarios.isEmpty()){
-                userCC = true;
-            }
-        return userCC;
-    }
     
     @AuraEnabled
     public static void saveNotification(String message, String type) {

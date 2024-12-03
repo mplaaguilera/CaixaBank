@@ -8,12 +8,34 @@ Historial
 ---------------------
   VERSION	USER_STORY		AUTHOR				DATE			Description
   1.0		US633077		Mamen Arias			29/09/2023		Init version
+  1.1		US854993		Carolina Lopez		10/04/2024		Add method transferDateVisibilityTest.
 ***********************************************************************************************************************/
 @isTest
 public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 	@isTest
-	public static voId  checkExistDestacadosTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+	public static void transferDateVisibilityTest(){
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
+		Campaign campTest = new Campaign();
+		EV_PortalCaixaBankTalks__c qportal = new EV_PortalCaixaBankTalks__c();
+		System.runAs(newUser){
+			campTest = EV_TestHelper.createChildCampaignVirtualCMCustom();
+			campTest.EV_Fechadespublicacion__c = Date.newInstance(2024, 4, 4);
+			update campTest;
+		}
+		Test.startTest();
+		System.runAs(newUser){
+			EV_PortalCaixaBankTalks__c portal = new EV_PortalCaixaBankTalks__c(EV_Posicionamiento__c = '001', EV_Orden__c= '1' , EV_Evento__c = campTest.Id);
+			insert portal;
+
+			qportal = [SELECT Id, EV_Orden__c, EV_Fechadespublicacion__c, EV_Evento__c FROM EV_PortalCaixaBankTalks__c WHERE EV_Evento__c = :campTest.Id];	
+		}
+		Test.stopTest();
+		System.assertEquals(qportal.EV_Fechadespublicacion__c, Date.valueOf('2024-04-04'));
+	}
+
+	@isTest
+	public static void  checkExistDestacadosTest(){
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 		Campaign campTest2 = new Campaign();
 		EV_PortalCaixaBankTalks__c qportal = new EV_PortalCaixaBankTalks__c();
@@ -36,8 +58,8 @@ public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 	}
 
 	@isTest
-	public static voId  checkExistUltimosTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+	public static void  checkExistUltimosTest(){
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 		Campaign campTest2 = new Campaign();
 		EV_PortalCaixaBankTalks__c qportal = new EV_PortalCaixaBankTalks__c();
@@ -60,8 +82,8 @@ public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 	}
 
 	@isTest
-	public static voId  checkExistMayorDiezTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+	public static void  checkExistMayorDiezTest(){
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 		Campaign campTest2 = new Campaign();
 		EV_PortalCaixaBankTalks__c qportal = new EV_PortalCaixaBankTalks__c();
@@ -90,7 +112,7 @@ public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 
 	@isTest
 	public static void checkDuplicateDestacadosTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 
 		System.runAs(newUser){
@@ -113,7 +135,7 @@ public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 
 	@isTest
 	public static void checkDuplicateUltimosTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 
 		System.runAs(newUser){
@@ -136,7 +158,7 @@ public with sharing class EV_PortalCaixaBankTriggerHelper_Test {
 
 	@isTest
 	public static void checkValueOrderTest(){
-		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','System Administrator','Eventos');
 		Campaign campTest = new Campaign();
 
 		System.runAs(newUser){

@@ -346,6 +346,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
         regla1.SEG_Producto__c = mccProducto.Id;
         regla1.SEG_Motivo__c = mccMotivo.Id;
         regla1.SEG_Detalle__c = mccDetalle.Id;
+        regla1.SEG_TPMV__c = String.valueOf(mccTematica.Id).right(15)+String.valueOf(mccProducto.Id).right(15)+String.valueOf(mccMotivo.Id).right(15)+String.valueOf(mccDetalle.Id).right(15);
         regla1.CBK_Negocio__c = 'Segmentos';
         lstReglas.add(regla1);
 
@@ -355,6 +356,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
         regla2.SEG_Producto__c = mccProducto2.Id;
         regla2.SEG_Motivo__c = mccMotivo2.Id;
         regla2.SEG_Detalle__c = mccDetalle2.Id;
+        regla2.SEG_TPMV__c = String.valueOf(mccTematica2.Id).right(15)+String.valueOf(mccProducto2.Id).right(15)+String.valueOf(mccMotivo2.Id).right(15)+String.valueOf(mccDetalle2.Id).right(15);
         regla2.CBK_Negocio__c = 'Segmentos';
         lstReglas.add(regla2);
         insert lstReglas;
@@ -698,7 +700,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
                 update caso;
             Test.stopTest();
 
-            Case casoRes = [SELECT Id, SEG_ClasificacionRapida__c, CC_MCC_Motivo__c FROM Case WHERE Subject = 'test 1'];
+            Case casoRes = [SELECT Id, SEG_ClasificacionRapida__c, CC_MCC_Motivo__c FROM Case WHERE Subject = 'test 2'];
             System.assert(casoRes.SEG_ClasificacionRapida__c != null);
             System.assert(casoRes.CC_MCC_Motivo__c != null);
         }
@@ -717,6 +719,7 @@ public with sharing class SEG_Case_BU_TRHan_Test {
                 caso.CC_MCC_Tematica__c = tematica.Id;
                 caso.CC_MCC_ProdServ__c = producto.Id;
                 caso.CC_MCC_Motivo__c = motivo.Id;
+                caso.SEG_Detalle__c = detalle.Id;
                 update caso;
 
             Test.stopTest();

@@ -10,7 +10,7 @@ public with sharing class FRA_Revincular_Caso_Controller_Test {
             User usuario = new User();
             usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'FRA_Usuario_Caixabank'].Id;
             usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'FRA'].Id;
-            usuario.FirstName = 'Fraude';
+            usuario.FirstName = 'FraudeTSTFRA';
             usuario.LastName = 'Prueba';
             usuario.Alias = uniqueName.substring(18, 23);
             usuario.Email = uniqueName + '@test' + orgId + '.org';
@@ -34,7 +34,7 @@ public with sharing class FRA_Revincular_Caso_Controller_Test {
 
     @isTest
     public static void testgetCaso() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        User usuario = [SELECT Id FROM User WHERE FirstName = 'FraudeTSTFRA' LIMIT 1];
         System.runAs(usuario) {
             Case caso = new Case();
             caso.Subject = 'CASO INICIAL';
@@ -50,8 +50,8 @@ public with sharing class FRA_Revincular_Caso_Controller_Test {
     }
     
     @isTest
-    static void testEmailMessageTriggerTraslado() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+    static void testMergeCase() {
+        User usuario = [SELECT Id FROM User WHERE FirstName = 'FraudeTSTFRA' LIMIT 1];
         System.runAs(usuario) {
             Case caso1 = new Case();
             caso1.Subject = 'CASO INICIAL';
@@ -76,7 +76,15 @@ public with sharing class FRA_Revincular_Caso_Controller_Test {
             caso2.Origin = 'Phone';
             caso2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'FRA_Cliente');
             caso2.CC_Canal_Procedencia__c='Teléfono FRAUDE Banca Internacional';
+            caso2.FRA_Id_Expediente_CGF__c = '12345678A000100';
             insert caso2;
+            
+            FRA_Alerta_CGF__c alertaCGF = new FRA_Alerta_CGF__c (
+                Name = 'ALT-00001',
+                FRA_Id_Operacion_CGF__c = 'ALT-00001',
+                FRA_Caso_Relacionado__c = caso2.Id
+            );
+            insert alertaCGF;
             
             Task tarea2 = new Task();
             tarea2.WhatId=caso2.Id;
@@ -86,14 +94,17 @@ public with sharing class FRA_Revincular_Caso_Controller_Test {
             insert tarea2;
             Test.setCreatedDate(tarea2.Id, oneMinuteAgo);
 
-            FRA_Revincular_Caso_Controller.mergeCase(caso1.Id,Caso2.Id);
+            FRA_Revincular_Caso_Controller.mergeCase(caso1.Id,caso2.Id);
             //Comprobación de resultados
             Case caso = [SELECT Id,CC_Ultima_Interaccion__c,Status,CC_Fecha_Ultima_Interaccion__c,CC_Canal_Procedencia__c
                         FROM Case WHERE Id=:caso1.Id LIMIT 1];
 		    Task tarea = [SELECT Id,Status from Task where Id= :tarea1.Id LIMIT 1];
+            Task tareaFusionado = [SELECT Id,Status,WhatId from Task where WhatId= :caso.Id AND Type='Fusionado' AND Status = 'Completed' LIMIT 1];
+
             Test.startTest();
             System.assertEquals('Pendiente Cliente', caso.Status);
             System.assertEquals('Open', tarea.Status);
+            System.assertEquals(caso.Id, tareaFusionado.WhatId);
             Test.stopTest();
         }
 	}

@@ -29,11 +29,11 @@ public with sharing class CSBD_AutenticacionOtp_Apex_Test {
 
         CBK_IntegrationSetting__c csIntAutRobusta = new CBK_IntegrationSetting__c();
         csIntAutRobusta.Name = 'CC_Autenticacion_Robusta';
-        csIntAutRobusta.NamedCredential__c = 'callout:API_GWT_TST_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
+        csIntAutRobusta.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations';
         csIntAutRobusta.RegistroTrazaIntegracion__c = true;
         CBK_IntegrationSetting__c csIntAutRobustaEstado = new CBK_IntegrationSetting__c();
         csIntAutRobustaEstado.Name = 'CC_Autenticacion_Robusta_Estado';
-        csIntAutRobustaEstado.NamedCredential__c = 'callout:API_GWT_TST_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
+        csIntAutRobustaEstado.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/crossChannel/transactionAuthorization/v2/authorizations/{authorizationId}/approver/status';
         csIntAutRobustaEstado.RegistroTrazaIntegracion__c = true;
         insert new List<CBK_IntegrationSetting__c>{csIntAutRobusta, csIntAutRobustaEstado};
 

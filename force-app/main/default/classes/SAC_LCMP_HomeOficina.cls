@@ -202,7 +202,7 @@ public without sharing class SAC_LCMP_HomeOficina {
     }
 
     @AuraEnabled
-    public static void ShareAccion(Id accionId)
+    public static void shareAccion(Id accionId)
     {
         List<SAC_Accion__Share> accionesShare = new List<SAC_Accion__Share>();
         accionesShare.add(new SAC_Accion__Share(
@@ -214,7 +214,7 @@ public without sharing class SAC_LCMP_HomeOficina {
     }
 
     @AuraEnabled
-    public static void ShareInteraccion (Id interaccionId)
+    public static void shareInteraccion (Id interaccionId)
     {
         List<SAC_Interaccion__Share> interaccionesShare = new List<SAC_Interaccion__Share>();
         interaccionesShare.add(new SAC_Interaccion__Share(

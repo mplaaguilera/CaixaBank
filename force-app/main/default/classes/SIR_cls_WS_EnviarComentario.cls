@@ -17,7 +17,7 @@ public with sharing class SIR_cls_WS_EnviarComentario {
         Map<String,string> mHeaders =  new  Map<String,string>();
         mHeaders.put('Content-Type', 'application/json;charset=UTF-8');        
 
-        if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
 
             for (SIREC__SIREC_obj_informacionCliente__c informacionCliente : [SELECT Id, SIREC__SIREC_fld_codigoEmpleado__c, SIREC__SIREC_fld_fechaModificacion__c, SIREC__SIREC_fld_masterRecordId__c, SIREC__SIREC_fld_comentariosRecuperaciones__c
                                                                                     FROM SIREC__SIREC_obj_informacionCliente__c
@@ -35,7 +35,8 @@ public with sharing class SIR_cls_WS_EnviarComentario {
                 } else {
                     try {
                         HttpRequest req = CBK_HttpServiceIntegration.getRequest(JSON.serialize(vBody), 'altaComentarioGestor', 'POST', mHeaders);
-                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                        //HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                        HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR', 'altaComentarioGestor');
                         if(res.getStatusCode() == 200){
                             resp = (ComentarioGestorResponse)JSon.deserialize(res.getBody(), ComentarioGestorResponse.class);        
                             if( resp.codigoSalida != '1'){

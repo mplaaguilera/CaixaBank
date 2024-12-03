@@ -10,11 +10,12 @@ Historial
 	1.0			    	        									Init version
     1.1         US493757       Alex Perez        28/03/2023      	Añadiendo al recálculo el cambio de oficina principal
 	1.2			US632725	   Alex Perez		 26/06/2023			Excluir negocio CIBE del recálculo por cambio de oficina
+	1.3			US632725	   Luis Martínez	 16/01/2024			Cambio para recuperar el error en la creación 
+
 ************************************************************************************************************************/
 public without sharing class CIBE_AccountTriggerHelperWS {
     
     public static Map<Id, List<AccountTeamMember>> teamMembersPerClient = new Map<Id, List<AccountTeamMember>>();
-	//public static Map<Id, List<AccountTeamMember>> teamMembersToDelete = new Map<Id, List<AccountTeamMember>>();
 
 	/**
 	 * @description		 Save AccountTeamMembers if owner changes
@@ -47,7 +48,7 @@ public without sharing class CIBE_AccountTriggerHelperWS {
 			if(bNegocioCIB){
 				continue;
 			}
-			
+
 			if(mapOlds == null || client.AV_OficinaPrincipal__c != mapOlds.get(client.Id).AV_OficinaPrincipal__c){
 				processOfficeTeamMembers.add(client.Id);
 				if(client.AV_OficinaPrincipal__c != null){
@@ -81,13 +82,16 @@ public without sharing class CIBE_AccountTriggerHelperWS {
 
 
 		for(Contact con : [SELECT Id, AV_UsuarioAsociado__c FROM Contact WHERE recordType.developerName = 'CC_Empleado' AND Id IN : OfficesContact.keySet()]){
-			usuarioRegistradoMap.put(con.Id, con.AV_UsuarioAsociado__c);
-			contactURmap.put(con.AV_UsuarioAsociado__c, con.Id);
+			if(con.AV_UsuarioAsociado__c!=null){
+				usuarioRegistradoMap.put(con.Id, con.AV_UsuarioAsociado__c);
+				contactURmap.put(con.AV_UsuarioAsociado__c, con.Id);
+			}
 		}
 
 		if(!processOwnerTeamMembers.isEmpty() || !processOfficeTeamMembers.isEmpty()) {
 			List<AccountTeamMember> accountTeamMembers = new List<AccountTeamMember>();
-			if(AccountTeamMember.SObjectType.getDescribe().isAccessible()) {
+			
+			if(Schema.SObjectType.AccountTeamMember.isAccessible()) {
 				accountTeamMembers = [SELECT AccountId, UserId, TeamMemberRole, AccountAccessLevel, OpportunityAccessLevel, 
 										CaseAccessLevel, ContactAccessLevel, CIBE_IsAutomatic__c, AV_Tipo__c
 										FROM AccountTeamMember WHERE AccountId = :processOwnerTeamMembers.keySet() 
@@ -95,7 +99,6 @@ public without sharing class CIBE_AccountTriggerHelperWS {
 			}
 
 			for(AccountTeamMember teamMember : accountTeamMembers) {
-                
 				if(processOfficeTeamMembers.contains(teamMember.AccountId)){
 					boolean eliminate = false;
 					if(contactURmap.containsKey(teamMember.UserId) && OfficesContact.containsKey(contactURmap.get(teamMember.UserId)) && teamMember.CIBE_IsAutomatic__c){
@@ -117,16 +120,21 @@ public without sharing class CIBE_AccountTriggerHelperWS {
 				}	
 			}
 
-			if(!teamMemberToDelete.isEmpty()) {
-				Database.deleteResult[] deleteResult = Database.delete(teamMemberToDelete, false);
-				for(Database.deleteResult res : deleteResult) {
-					if(!res.isSuccess()) {
-						for(Database.Error err : res.getErrors()) {
-							CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
-						}
+			boolean hasError = false;
+			List<Object> objs = new List<Object>();
+			Map<String, String> msjs = new Map<String, String>();
+			if(!teamMemberToDelete.isEmpty() && AccountTeamMember.SObjectType.getDescribe().isDeletable()) {
+                Database.DeleteResult[] lsr = Database.delete(teamMemberToDelete, false);
+				for (Integer i = 0; i < lsr.size(); i++) {
+					if(!lsr[i].isSuccess() && !lsr[i].getErrors().isEmpty()) {
+						msjs.put(teamMemberToDelete[i].Id, ((String)lsr[i].getErrors()[0].getMessage()));
+						objs.add(teamMemberToDelete[i]);
+						hasError = true;
 					}
-				}
-				
+                }
+			}
+			if(hasError) {
+				CBK_Log.error(msjs, objs);
 			}
 
 			if(!newAccountsOffice.isEmpty() && !contactsOffice.isEmpty()){
@@ -142,8 +150,8 @@ public without sharing class CIBE_AccountTriggerHelperWS {
 										CIBE_isAutomatic__c = true,
 										AccountAccessLevel = 'Read',
 										OpportunityAccessLevel = CIBE_AppConstants.NONE,
-                            			CaseAccessLevel = 'Read',
-                            			ContactAccessLevel = 'Edit',
+										CaseAccessLevel = 'Read',
+										ContactAccessLevel = 'Edit',
 										TeamMemberRole = 'Participante'
 									);
 									addTeamMembers(accMember, accountId);
@@ -167,16 +175,21 @@ public without sharing class CIBE_AccountTriggerHelperWS {
             for(List<AccountTeamMember> tMs : teamMembersPerClient.values()) {
                 teamMembers.addAll(tMs);
             }
-            
-			if(AccountTeamMember.SObjectType.getDescribe().isCreateable()) {
+			boolean hasError = false;
+			List<Object> objs = new List<Object>();
+			Map<String, String> msjs = new Map<String, String>();
+			if(Schema.SObjectType.AccountTeamMember.isCreateable()) {
                 Database.SaveResult[] lsr = Database.insert(teamMembers, false);
-                for(Database.SaveResult sr : lsr) {
-                    if(!sr.isSuccess()) {
-                        for(Database.Error err : sr.getErrors()) {
-                            CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
-                        }
-                    }
+				for (Integer i = 0; i < lsr.size(); i++) {
+					if(!lsr[i].isSuccess() && !lsr[i].getErrors().isEmpty() && teamMembers[i].userId!=null) {
+						msjs.put(teamMembers[i].userId, ((String)lsr[i].getErrors()[0].getMessage()));
+						objs.add(teamMembers[i]);
+						hasError = true;
+					}
                 }
+			}
+			if(hasError) {
+				CBK_Log.error(msjs, objs);
 			}
 		}
 	}

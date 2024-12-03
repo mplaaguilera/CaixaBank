@@ -15,7 +15,7 @@ Historial
 	1.5      DE79573             Oscar Moreno       07/07/2023  Change searchOffice method to show the assigned office and lower offices
 	1.6      US587408        	Ángel Medina        14/07/2023  Added AV_Group__c and AV_InterlocName__c to retrieved fields
    	1.7		 US692335			Elisabeth R.		16/10/2023	Added hasCustomPermission method
-
+	1.8		 Revisar queries 	Ángel Medina		12/02/2024	Modify query from sosl to soql
 ***********************************************************************************************************************/
 public without sharing class AV_MassReassignOwnerOpps_Controller {
 
@@ -115,15 +115,14 @@ public without sharing class AV_MassReassignOwnerOpps_Controller {
 					}
 				}
 			} else if (data.size() == 1) {
-				List<List<SObject>> searchResults = [
-					FIND :officeFilterData
-					IN ALL FIELDS
-					RETURNING User(Id, Name, AV_NumeroOficinaEmpresa__c WHERE IsActive = true)
-					LIMIT :MAX_LIMIT
+				List<User> searchResults = [
+					SELECT Id, Name, AV_NumeroOficinaEmpresa__c
+                  	FROM User
+                  	WHERE AV_NumeroOficinaEmpresa__c LIKE :('%' + officeFilterData + '%') AND IsActive = true
+                  	LIMIT :MAX_LIMIT
 				];
-				List<User> emps = (List<User>) searchResults[0];
-				if(!emps.isEmpty() && emps != null){
-					for(User u : emps){
+				if(!searchResults.isEmpty() && searchResults != null){
+					for(User u : searchResults){
 						employeesId.add(u.Id);
 						employeesSorted.add(new OptionsEmployee(u.Id,u.Name));
 					}
@@ -134,7 +133,7 @@ public without sharing class AV_MassReassignOwnerOpps_Controller {
 		if(employeesId.size()>1 ) {
 			employees.add(new OptionsEmployee(ID_GCF+','+employeesAlls,'TODOS - CENTRO ' + officeFilterData.split('\\{\\|}')[0]));
 		}
-		employees.add(new OptionsEmployee(ID_GCF,'Sin Gestor / Eap - CENTRO ' + officeFilterData.split('\\{\\|}')[0]));
+		employees.add(new OptionsEmployee(ID_GCF, AV_AppConstants.SINGESTOR_EAP_CENTRO + officeFilterData.split('\\{\\|}')[0]));
 		employeesSorted.sort();
 		employees.addAll(employeesSorted);
 		return employees;		
@@ -347,7 +346,6 @@ public without sharing class AV_MassReassignOwnerOpps_Controller {
 		searchTerm += '*';
 		List<AV_LookupSearchResult> results = new List<AV_LookupSearchResult>();
 		List<List<SObject>> searchResults = new List<List<SObject>>();
-		
 		if (Boolean.valueOf(myOffice)) {
 			if(!selectedIds.isEmpty()){
 				searchResults = [

@@ -25,8 +25,9 @@ public with sharing class CIBE_GruposComerciales_Controller_Test {
         
         CIBE_TestInitialSetup.setupInitialDataEMP();
         User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001'];
+        User userAdmin = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000000'];
         
-        System.runAs(new User(Id = UserInfo.getUserId())){
+        System.runAs(userAdmin){
             List<Account> lstAccounts = new  List<Account>();
             Account acc = new Account(
                 Name = 'Grupo Comercial',
@@ -83,7 +84,7 @@ public with sharing class CIBE_GruposComerciales_Controller_Test {
             lstAccounts.add(accTest3);
             Insert lstAccounts;
     
-            Contact conTest = CIBE_TestHelper.createEmployee(accTest, null);
+            Contact conTest = CIBE_TestHelper.createEmployee(accTest, usuario);
     
             FinServ__ReciprocalRole__c role = new FinServ__ReciprocalRole__c(
                 Name = 'Parent',

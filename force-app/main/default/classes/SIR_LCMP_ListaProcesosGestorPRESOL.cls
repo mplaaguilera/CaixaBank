@@ -30,9 +30,9 @@ public with sharing class SIR_LCMP_ListaProcesosGestorPRESOL {
         Id recordTypeIdPRESOL = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_PRESOL).getRecordTypeId();
         List<SIREC__SIREC_obj_proceso__c> procesos = new List<SIREC__SIREC_obj_proceso__c>();
 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             // 02/01/2023 Modificacion -- P2253-997  --  Se retrocede el cambio realizado. Se muestran solo los procesos Pendientes
-            procesos = [SELECT id, SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.Id, Name, toLabel(SIREC__SIREC_fld_estrategia__c), toLabel(SIR_fld_Situacion_SF__c), 
+            procesos = [SELECT id, SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.Id, Name, SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIR_fld_Situacion_SF__c), 
                         SIREC__SIREC_fld_fechaSituacion__c, SIREC__SIREC_fld_fechaInicio__c, Owner.Name, SIR_agrupacionSituacion__c, SIR_AccionActual__c
                         FROM SIREC__SIREC_obj_proceso__c 
                         WHERE SIR_fld_Situacion_SF__c IN :setSituaciones

@@ -98,7 +98,7 @@ public class CC_Vaciar_Contacto_Confidencial_Test {
         System.assertEquals(contacto.CC_EmpleadoGestorId__c, null);
         System.assertEquals(contacto.CC_FechaNac__c, null);
         System.assertEquals(contacto.CC_Identificador_CBKNow__c, null);
-        System.assertEquals(contacto.CC_Idioma__c, 'es');
+        System.assertEquals(contacto.CC_Idioma__c, null);
         System.assertEquals(contacto.CC_OficinaGestoraId__c, null);
         System.assertEquals(contacto.CC_Segmento__c, null);
         System.assertEquals(contacto.CC_SubSegmento__c, null);

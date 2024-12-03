@@ -12,17 +12,22 @@ Historial
     1.2                         Bea y Ali           24/11/2022      Modify 'createTeamMember()' 
     1.3                         Ali                 10/05/2023      Create 'getUserRole()', 'updateTeamMember()', 'deleteTeamMember()' and edit 'getRecords()'
     1.4         US567788        Ali                 26/10/2023      Modificar el campo responsabilidad para getRecodsCIB()
+    1.5         US776107    	Alicia				08/01/2024      Move 'deleteTeamMember()' to CIBE_UtilitiesWOS
+    1.6         IN1184391    	Lucia				12/07/2024      Move 'updateTeamMember()', 'createTeamMember()' to CIBE_UtilitiesWOS
+    1.7         FIX20241386		Lucía     		    30/10/2024      Update method getUserRole
+
+
 */
-public without sharing class CIBE_CXBVisualizacionGC_Controller {
+public with sharing class CIBE_CXBVisualizacionGC_Controller {
     
     private final static Integer MAX_RESULTS 	= 10;
 
     public static List<Wrapper> getRecodsCIB(Integer offSet, List<String> recordIds){
+        
         List<Wrapper> listReturn = new List<Wrapper>();
         List<AccountTeamMember> listAccMembers;
 
-        if(AccountTeamMember.SObjectType.getDescribe().isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible() 
+        if(Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible() 
             && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()
@@ -46,7 +51,7 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
             }
 
             Map<Id, Contact> mapContact = new Map<Id, Contact>();
-            if(!listUserId.isEmpty() && Contact.SObjectType.getDescribe().isAccessible() 
+            if(!listUserId.isEmpty() 
                 && Schema.SObjectType.Contact.fields.Id.isAccessible() 
                 && Schema.SObjectType.Contact.fields.Name.isAccessible()
                 && Schema.SObjectType.Contact.fields.AV_UsuarioAsociado__c.isAccessible()
@@ -63,7 +68,7 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
                 
             }
             List<AV_BookManagementMember__c> mapBookManager = new List<AV_BookManagementMember__c>();
-            if(!mapContact.isEmpty() && AV_BookManagementMember__c.SObjectType.getDescribe().isAccessible() 
+            if(!mapContact.isEmpty() 
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.Id.isAccessible() 
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.AV_CarteraName__c.isAccessible()
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.AV_EmpleadoGestor__c.isAccessible()){
@@ -107,12 +112,10 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
     }
 
     public static List<Wrapper> getRecodsEMP(Integer offSet, List<String> recordIds){
-        
         List<Wrapper> listReturn = new List<Wrapper>();
         List<AccountTeamMember> listAccMembers;
         offSet = offSet+10;
-        if(AccountTeamMember.SObjectType.getDescribe().isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible() 
+        if(Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible() 
             && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()
@@ -138,7 +141,7 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
             }
 
             Map<Id, Contact> mapContact = new Map<Id, Contact>();
-            if(!listUserId.isEmpty() && Contact.SObjectType.getDescribe().isAccessible() 
+            if(!listUserId.isEmpty() 
                 && Schema.SObjectType.Contact.fields.Id.isAccessible() 
                 && Schema.SObjectType.Contact.fields.Name.isAccessible()
                 && Schema.SObjectType.Contact.fields.AV_UsuarioAsociado__c.isAccessible()
@@ -153,7 +156,7 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
             }
 
             List<AV_BookManagementMember__c> mapBookManager = new List<AV_BookManagementMember__c>();
-            if(!mapContact.isEmpty() && AV_BookManagementMember__c.SObjectType.getDescribe().isAccessible() 
+            if(!mapContact.isEmpty() 
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.Id.isAccessible() 
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.AV_CarteraName__c.isAccessible()
                 && Schema.SObjectType.AV_BookManagementMember__c.fields.AV_EmpleadoGestor__c.isAccessible()){
@@ -199,7 +202,6 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
 
     @AuraEnabled(cacheable = true) 
     public static List<Wrapper> getRecords(Integer offSet, List<String> recordIds, Boolean isCIB) {
-        
         List<Wrapper> listReturn = new List<Wrapper>();
 
         if(isCIB){
@@ -213,16 +215,14 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
 
     @AuraEnabled(cacheable = true) 
     public static String getUserRole(String userId) {
-
         List<User> userRole = new List<User>();
-        if(User.SObjectType.getDescribe().isAccessible()
-            && Schema.SObjectType.User.fields.Id.isAccessible()) {
-                userRole = [SELECT Id, UserRole.Name FROM User WHERE Id =:userId ];
+        if(Schema.SObjectType.User.fields.Id.isAccessible()) {
+                userRole = [SELECT Id, UserRole.Name, UserRole.DeveloperName FROM User WHERE Id =:userId ];
         }
         String userRoleName;
         if(!userRole.isEmpty()){
             for(User user : userRole){
-                userRoleName = user.UserRole.Name;
+                userRoleName = user.UserRole.DeveloperName;
             }
         }
         return userRoleName;
@@ -272,148 +272,14 @@ public without sharing class CIBE_CXBVisualizacionGC_Controller {
     @AuraEnabled(cacheable = true)
     public static Boolean showAddMemberButton(List<String> accountIds){
         List<AccountTeamMember> teamMembers = new  List<AccountTeamMember>();
-        if(AccountTeamMember.SObjectType.getDescribe().isAccessible() 
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
+        if(Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
             && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()) {
                 teamMembers = [SELECT Id FROM AccountTeamMember WHERE AccountId = :accountIds AND UserId = :UserInfo.getUserId()];
         } else {
             throw new IllegalArgumentException('showAddMemberButton - El usuario no tiene permisos para acceder a los miembros.');
         }
-
         return !teamMembers.isEmpty();
-    }
-
-    @AuraEnabled
-    public static void createTeamMember(List<String> accountIds, String userId, String rol) {
-        if(String.isBlank(rol)) {
-            throw new IllegalArgumentException('Error');
-        }
-
-        Map<String,AccountTeamMember> teamMembers = new   Map<String,AccountTeamMember>();
-        if(AccountTeamMember.SObjectType.getDescribe().isAccessible() 
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()) {
-                for(AccountTeamMember act : [SELECT AccountId, TeamMemberRole, Id  FROM AccountTeamMember WHERE AccountId = :accountIds AND UserId = :userId]){
-                    teamMembers.put(act.AccountId, act);
-                }
-        } else {
-            throw new IllegalArgumentException('createTeamMember - El usuario no tiene permisos para acceder a los miembros.');
-        }
-
-        if(rol == CIBE_AppConstants.GESTOR_PRINCIPAL || rol == CIBE_AppConstants.CONTACTO_CAIXABANK_RETAIL) {
-            for (String accId : teamMembers.keySet()){
-                teamMembers.get(accId).TeamMemberRole = rol;
-            }
-
-            List<AccountTeamMember> gestoresPrincipales = new List<AccountTeamMember>();
-            if(AccountTeamMember.SObjectType.getDescribe().isAccessible() 
-                && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
-                && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
-                && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
-                && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()) {
-                    for(AccountTeamMember act : [SELECT AccountId, TeamMemberRole, Id  FROM AccountTeamMember WHERE AccountId = :accountIds AND UserId != :userId AND TeamMemberRole = :rol]){
-                        act.TeamMemberRole = CIBE_AppConstants.PARTICIPANTE;
-                        gestoresPrincipales.add(act); 
-                    }
-
-                    if(AccountTeamMember.SObjectType.getDescribe().isUpdateable() 
-                        && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
-                        && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()) {
-                            update gestoresPrincipales;
-                            update teamMembers.values();
-                    }
-            } else {
-                throw new IllegalArgumentException('createTeamMember - El usuario no tiene permisos para acceder a los miembros.');
-            }
-        }
-
-        List<AccountTeamMember> toInsert = new List<AccountTeamMember>();
-        for (String accId : accountIds) {
-            if(teamMembers.isEmpty() || (!teamMembers.isEmpty() && !teamMembers.containsKey(accId))){
-                AccountTeamMember teamMember = new AccountTeamMember();
-                teamMember.AccountId = accId;
-                teamMember.UserId = userId;
-                teamMember.TeamMemberRole = rol;
-                teamMember.AccountAccessLevel = CIBE_AppConstants.EDIT;
-                teamMember.OpportunityAccessLevel = CIBE_AppConstants.NONE;
-                teamMember.CaseAccessLevel = CIBE_AppConstants.READ;
-                teamMember.ContactAccessLevel = CIBE_AppConstants.EDIT;
-                teamMember.CIBE_IsAutomatic__c = false;
-                toInsert.add(teamMember);
-            }
-        }
-
-        if(AccountTeamMember.SObjectType.getDescribe().isCreateable() 
-            && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.AccountAccessLevel.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.OpportunityAccessLevel.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.CaseAccessLevel.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.CIBE_IsAutomatic__c.isAccessible()) {
-                insert toInsert;
-        } else {
-            throw new IllegalArgumentException('createTeamMember - El usuario no tiene permisos para insertar el miembro.');
-        }
-    }
-
-    @AuraEnabled
-    public static void updateTeamMember(String memberId, List<String> accountIds, String rol, String userId) {
-
-        List<AccountTeamMember> changeTMRoles = new  List<AccountTeamMember>();
-        if(AccountTeamMember.SObjectType.getDescribe().isAccessible() 
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.AccountId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.UserId.isAccessible()
-            && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()
-            && rol != 'Participante') {
-                // changeTMRoles -> los accTMs con un account expecificos y un role diferente a Participante expecifico tb
-                changeTMRoles = [SELECT Id, TeamMemberRole FROM AccountTeamMember WHERE AccountId IN :accountIds AND TeamMemberRole = :rol AND UserId != :memberId];
-        } else {
-            throw new IllegalArgumentException('updateTeamMember - El usuario no tiene permisos para acceder a los AccountTeamMember.');
-        }
-
-        if(AccountTeamMember.SObjectType.getDescribe().isUpdateable() 
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()) {
-                List<AccountTeamMember> updateAccTeamMember = new List<AccountTeamMember>();
-                updateAccTeamMember = [SELECT Id,UserId FROM AccountTeamMember WHERE UserId = :userId AND AccountId IN :accountIds];
-                for(AccountTeamMember aTM : updateAccTeamMember) {               
-                    aTM.TeamMemberRole = rol;
-                }
-                update updateAccTeamMember;
-            
-
-            if(AccountTeamMember.SObjectType.getDescribe().isUpdateable() 
-                && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()
-                && Schema.SObjectType.AccountTeamMember.fields.TeamMemberRole.isAccessible()
-                && !changeTMRoles.isEmpty()) {
-                    for(AccountTeamMember aTM : changeTMRoles) {
-                        aTM.TeamMemberRole = 'Participante';
-                    }
-                    update changeTMRoles;
-            }
-        } else {
-            throw new IllegalArgumentException('updateTeamMember - El usuario no tiene permisos para actualizar el miembro.');
-        }
-    }
-
-    @AuraEnabled
-    public static void deleteTeamMember(String userId, List<String> accountIds) {
-
-        if(AccountTeamMember.SObjectType.getDescribe().isDeletable() 
-            && Schema.SObjectType.AccountTeamMember.fields.Id.isAccessible()) {
-
-                List<AccountTeamMember> deleteAccTeamMember = new List<AccountTeamMember>();
-                deleteAccTeamMember = [SELECT Id,UserId FROM AccountTeamMember WHERE UserId = :userId AND AccountId IN :accountIds];
-                if(deleteAccTeamMember.size() > 0){
-                    delete deleteAccTeamMember;
-                }
-        } else {           
-            throw new IllegalArgumentException('deleteTeamMember - El usuario no tiene permisos para eliminar el miembro.');
-        }
     }
 
     public class Wrapper implements Comparable{

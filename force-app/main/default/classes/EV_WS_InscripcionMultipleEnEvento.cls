@@ -9,9 +9,10 @@ Historial
 	VERSION		USER_STORY		    AUTHOR				DATE				Description
 	1.0		    US297853    	    Daniel Rodriguez	29/03/2023			Init version
 	1.1			US586996			Daniel Rodriguez	15/05/2023			Modify version new Architecture with the new object EV_CampaignMemberC__c
+	1.2								Mamen Arias			21/02/2024			Add extends CBK_HttpServiceIntegration_Abstract
 ***********************************************************************************************************************/
 @RestResource(urlMapping='/EV_InscripcionMultipleEnEvento/*')
-global with sharing class EV_WS_InscripcionMultipleEnEvento {
+global with sharing class EV_WS_InscripcionMultipleEnEvento extends CBK_HttpServiceIntegration_Abstract {
     
     private static final String CAMPAIGN_MEMBER_NOT_FOUND = 'No se ha encontrado el miembro de campaña. Contacte con el administrador de Salesforce.';
     private static final String CAMPAIGN_NOT_FOUND = 'No se ha encontrado el evento. Contacte con el administrador de Salesforce.';

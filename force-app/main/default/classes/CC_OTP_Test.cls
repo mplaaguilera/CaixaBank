@@ -13,7 +13,7 @@ public with sharing class CC_OTP_Test {
         List<Account> lstAccounts = new List<Account>();
         List<Contact> lstContacts = new List<Contact>();
 
-        User usuarioAdmin = new User();
+        User usuarioAdmin = new User();        
         usuarioAdmin.profileId = profileAdmin;
         usuarioAdmin.UserRoleId = rolCC.Id;
         usuarioAdmin.FirstName = '';
@@ -47,7 +47,7 @@ public with sharing class CC_OTP_Test {
             supervisor.LanguageLocaleKey = 'es';
             supervisor.LocaleSidKey = 'es_ES';
             supervisor.UserRoleId = rolCC.Id;
-
+            
             User operador = new User();
             operador.ProfileId = profileId;
             operador.FirstName = 'Operador';
@@ -74,7 +74,7 @@ public with sharing class CC_OTP_Test {
                 new PermissionSetAssignment(AssigneeId = operador.id, PermissionSetId = psClasses.Id)
             };
 
-
+        
             Account cuenta = new Account(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
             FirstName = 'Cuenta',
@@ -103,7 +103,7 @@ public with sharing class CC_OTP_Test {
             CC_Email__c = 'cuenta2@test.com'
             );
             lstAccounts.add(cuentaSinDatos);
-
+            
             Account cuentaMenor = new Account(
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
                 FirstName = 'Cuenta',
@@ -151,7 +151,7 @@ public with sharing class CC_OTP_Test {
                 CC_Representante__c = cuenta.Id
             );
             insert representante;
-
+            
 
             List<Case> caseInsertLst = new List<Case>();
 
@@ -168,7 +168,7 @@ public with sharing class CC_OTP_Test {
             caso1.ContactId = contacto.Id;
             caso1.CC_MailTelfNotif__c  = 'contacto@test.com';
             caseInsertLst.add(caso1);
-
+            
             Case caso2 = new Case();
             caso2.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'CC_Cliente');
             caso2.Subject = 'Caso Test 2';
@@ -239,20 +239,20 @@ public with sharing class CC_OTP_Test {
             caseInsertLst.add(casoOperador);
 
             insert caseInsertLst;
-
+            
             caseInsertLst[1].CC_Canal_Respuesta__c = 'Email';
             update caseInsertLst[1];
 
-            // Inicialización de datos.
-            Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-            Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-
+            // Inicialización de datos.        
+            Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
+            Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
+            
             CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
             lista.Name = 'Preguntas Básicas OTPSMS';
             lista.CC_Activa__c = true;
             lista.RecordTypeId = recorTypeLista;
             insert lista;
-
+            
             CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c();
             valor1.Name = 'Nombre completo';
             valor1.CC_Activa__c = true;
@@ -260,7 +260,7 @@ public with sharing class CC_OTP_Test {
             valor1.CC_Lista__c = lista.Id;
             valor1.CC_Valor__c = 'Nombre completo';
             insert valor1;
-
+            
             CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c();
             valor2.Name = 'Número de identificación';
             valor2.CC_Activa__c = true;
@@ -362,7 +362,7 @@ public with sharing class CC_OTP_Test {
                 CC_Tipo__c = 'Entrante',
                 CC_DNIS__c = '+34 123456789',
                 CC_Asunto__c = 'llamadaEntranteOKAccount'
-            );
+            );            
             listadoLlamadas.add(llamadaEntranteOKAccount);
             CC_Llamada__c llamadaSalienteOKAccount = new CC_Llamada__c(
                 CC_Tipo__c = 'Saliente',
@@ -409,7 +409,7 @@ public with sharing class CC_OTP_Test {
             taskList.add(task5);
             insert taskList;
 
-
+                            
             List<CC_Settings__c> settings = new List<CC_Settings__c>();
             CC_Settings__c parametrosIntegracion = new CC_Settings__c(
                 Name = 'CC_Integracion_Autenticacion',
@@ -423,7 +423,7 @@ public with sharing class CC_OTP_Test {
                 CC_Configuracion_7__c = ''
             );
             settings.add(parametrosIntegracion);
-
+            
             CC_Settings__c parametrosPerfiles = new CC_Settings__c(
                 Name = 'CC_PerfilesAutentication',
                 CC_Activa__c = true,
@@ -473,11 +473,11 @@ public with sharing class CC_OTP_Test {
 
             CBK_IntegrationSetting__c customSetting = new CBK_IntegrationSetting__c();
             customSetting.Name = 'CC_Recuperar_Tarjetas';
-            customSetting.NamedCredential__c = 'callout:API_GWT_TST_CCSF/cards/creditCard/bis/cards/customers/id/request';
+            customSetting.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/cards/creditCard/bis/cards/customers/id/request';
             customSetting.RegistroTrazaIntegracion__c = true;
             insert customSetting;
 
-
+            
             // AccountShare acshare = new AccountShare();
             // acshare.AccountId = cuenta.Id;
             // acshare.UserOrGroupId = supervisor.Id;
@@ -504,7 +504,7 @@ public with sharing class CC_OTP_Test {
             // CaseShare conshare = new CaseShare();
             // conshare.CaseAccessLevel = 'Read';
             // conshare.CaseId = caso1.Id;
-            // conshare.UserOrGroupId = supervisor.Id;
+            // conshare.UserOrGroupId = supervisor.Id; 
             // insert conshare;
 
             // CaseShare conshare3 = new CaseShare();
@@ -540,15 +540,15 @@ public with sharing class CC_OTP_Test {
         if (!acctLst.isEmpty()) {
             cuenta = acctLst[0];
         }
-
+        
         Contact contacto = new Contact(
         //RecordTypeId = recordTypeContacto,
         RecordTypeId = Schema.getGlobalDescribe().get('Contact').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId(),
         FirstName = 'Contacto',
-        LastName = 'Test',
+        LastName = 'Test',      
         AccountId = cuenta.Id,
         CC_Idioma__c = 'es',
-        Email = 'contacto@test.com'
+        Email = 'contacto@test.com'   
         );
         insert contacto;
         */
@@ -564,7 +564,7 @@ public with sharing class CC_OTP_Test {
         insert caso;*/
 
 
-        //Obtenemos los datos del caso
+        //Obtenemos los datos del caso 
         //List<Case> datosCaso = CC_OTP.datosCaso(caso.Id);
 
         //System.assertEquals(caso.Id, datosCaso[0].Id);
@@ -573,32 +573,32 @@ public with sharing class CC_OTP_Test {
         //System.assertEquals('es', datosCaso[0].CC_Idioma__c);
         //System.assertEquals('Email', datosCaso[0].CC_Canal_Respuesta__c);
         //System.assertEquals(caso.AccountId, datosCaso[0].AccountId);
-
+        
         //Funcionalidades de OTP - ¿existe OTP?
-
+        
         //Boolean resultado = CC_OTP.existeOTPCaso(caso.Id);
         //System.assertEquals(false, resultado);
         //Map<String,Object>  resultadoNuevo = CC_OTP.existeBloqueoNuevo(caso.Id);
         //System.assertEquals(true,  !resultadoNuevo.isEmpty());
-
+        
         /* SELECT Id FROM CC_Comunicaciones__c
-
+        
         CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
         comunicacion.*/
-
+        
         //Obtenemos valores de una picklist
         //List<String> valoresPickList = CC_OTP.getPicklistValues('CC_Comunicaciones__c','CC_Nivel__c');
-
-        // Inicialización de datos.
-        /*Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();
-        Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();
-
+        
+        // Inicialización de datos.        
+        /*Id recorTypeLista = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Lista_Valores').getRecordTypeId();        
+        Id recorTypeValor = Schema.SObjectType.CC_Lista_Valores__c.getRecordTypeInfosByDeveloperName().get('CC_Valor').getRecordTypeId();        
+        
         CC_Lista_Valores__c lista = new CC_Lista_Valores__c();
         lista.Name = 'Preguntas Básicas OTPSMS';
         lista.CC_Activa__c = true;
         lista.RecordTypeId = recorTypeLista;
         insert lista;
-
+        
         CC_Lista_Valores__c valor1 = new CC_Lista_Valores__c();
         valor1.Name = 'Nombre completo';
         valor1.CC_Activa__c = true;
@@ -606,7 +606,7 @@ public with sharing class CC_OTP_Test {
         valor1.CC_Lista__c = lista.Id;
         valor1.CC_Valor__c = 'Nombre completo';
         insert valor1;
-
+        
         CC_Lista_Valores__c valor2 = new CC_Lista_Valores__c();
         valor2.Name = 'Número de identificación';
         valor2.CC_Activa__c = true;
@@ -614,16 +614,16 @@ public with sharing class CC_OTP_Test {
         valor2.CC_Lista__c = lista.Id;
         valor2.CC_Valor__c = 'Número de identificación (DNI, NIE, pasaporte,…)';
         insert valor2;*/
-
+        
         //Devuelve las preguntas que se le hacen al cliente
 
-            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');
+            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
             System.assert(preguntas.size() >=2 );
-
-
+        
+        
         // List<CC_OTP.OTPWrapper> wrapperOTP = new List<CC_OTP.OTPWrapper>();
 
-
+        
         /*Id recordTypeIdOTP = Schema.getGlobalDescribe().get('CC_Comunicaciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_OTPSMS').getRecordTypeId();
         CC_Comunicaciones__c comunicacion =  new CC_Comunicaciones__c();
         comunicacion.CC_Case__c = caso.Id;
@@ -636,9 +636,9 @@ public with sharing class CC_OTP_Test {
         if (!comLst.isEmpty()) {
             comunicacion = comLst[0];
         }
-        String  clienteId = caso.AccountId;
+        String  clienteId = caso.AccountId;   
         List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, clienteId);
-        //system.assert(wrapperOTP.size()>1);
+        //system.assert(wrapperOTP.size()>1);  
         //
         //
         String resultadoOTPValido = CC_OTP.gestionesSegunNivel(caso.Id, true, 'Nivel 1');
@@ -648,41 +648,41 @@ public with sharing class CC_OTP_Test {
             Map<string, string> resultadoSegundoNivelKO = CC_OTP.segundoNivel(caso.Id, false, 'Nivel 2', 'Edad del cliente', 'Teléfono asociado a CaixaBank del cliente', '20', '123456789', 'OK', 'OK', true, true);
         }
         List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, clienteId);
-        system.assert(wrapperOTPHistorico.size()>1);
-
+        system.assert(wrapperOTPHistorico.size()>1);  
+                    
         string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, clienteId);
         system.assertEquals('OK', resultadoIntentos);
-
+        
         String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
         CC_OTP.enviarRegistro(comunicacion.Id);
         Test.stopTest();
     }
-
+    
     @isTest
     public static void testOTP2()
     {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
-
+        
         List<Case> casesLst = [SELECT Id, Origin, Status, CC_Idioma__c, CC_Canal_Respuesta__c, OwnerId, AccountId FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         Case caso = new Case();
         if (!casesLst.isEmpty()) {
             caso = casesLst[0];
         }
-   //String casoId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS
+        //String casoId, Boolean valido, String nivel, String pregunta1, String pregunta2, String respuesta1, String respuesta2, String validacion1, String validacion2, Boolean enviarSMS
         Test.startTest();
         Map<String, String> resultadoSegundoNivelClienteDigital = CC_OTP.segundoNivel(caso.Id, false, 'Cliente Digital', caso.AccountId, caso.CC_Idioma__c, caso.OwnerId, null, null, null, false, false);
         //Devuelve las preguntas que se le hacen al cliente
         System.runAs(supervisor) {
-            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');
+            List<CC_Lista_Valores__c> preguntas = CC_OTP.preguntasOTP('Preguntas Básicas OTPSMS');    
             System.assert(preguntas.size() >=2 );
         }
-
+        
         List<CC_Comunicaciones__c> comLst = [SELECT Id FROM CC_Comunicaciones__c WHERE CC_Case__c=:caso.Id LIMIT 1];
         CC_Comunicaciones__c comunicacion = new CC_Comunicaciones__c();
         if (!comLst.isEmpty()) {
             comunicacion = comLst[0];
         }
-
+            
         List<CC_OTP.OTPWrapper> wrapperOTP = CC_OTP.obtenerOTPCliente(caso.Id, caso.AccountId);
         String resultadoOTPValido = CC_OTP.gestionesSegunNivel(caso.Id, true, 'Nivel 1');
         System.runAs(supervisor){
@@ -732,19 +732,19 @@ public with sharing class CC_OTP_Test {
         }
         List<CC_OTP.OTPWrapper> wrapperOTPHistorico = CC_OTP.obtenerHistoricoOTPCliente(caso.Id, caso.AccountId);
         system.assert(wrapperOTPHistorico.size()>1);
-
+                    
         string resultadoIntentos = CC_OTP.comprobarIntentos(caso.Id, caso.AccountId);
         system.assertEquals('OK', resultadoIntentos);
-
+        
         String resultadoValidacion = CC_OTP.validarRegistro(caso.Id, comunicacion.Id, '1234');
         CC_OTP.enviarRegistro(comunicacion.Id);
 
         String resultadoValidacionPruebaNull = CC_OTP.validarRegistro(caso.Id, null, '1234');
         CC_OTP.enviarRegistro(comunicacion.Id);
-
+        
         Test.stopTest();
     }
-
+    
     @isTest
     public static void noRecibidoTest(){
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
@@ -753,7 +753,7 @@ public with sharing class CC_OTP_Test {
             CC_Email__c = 'cuenta@test.com'
         );
         insert cuenta;
-
+        
         Case caso = new Case();
         caso.Subject = 'Caso Test ';
         caso.CC_Canal_Procedencia__c= 'Formulario web';
@@ -769,7 +769,7 @@ public with sharing class CC_OTP_Test {
         if (!casesLst.isEmpty()) {
             caso = casesLst[0];
         }
-
+        
         /*Id recordTypeIdOTP = Schema.getGlobalDescribe().get('CC_Comunicaciones__c').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_OTPSMS').getRecordTypeId();
         CC_Comunicaciones__c comunicacion =  new CC_Comunicaciones__c();
         comunicacion.CC_Case__c = caso.Id;
@@ -792,14 +792,14 @@ public with sharing class CC_OTP_Test {
 
     // @isTest
     // public static void testExisteBloqueo(){
-    //     User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
+    //     User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1]; 
 
     //     Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
 
-    //     //Obtenemos los datos del caso
+    //     //Obtenemos los datos del caso 
     //     //List<Case> datosCaso = CC_OTP.datosCaso(caso.Id);
 
-
+        
 
     //     //Devuelve las preguntas que se le hacen al cliente
     //    /* System.runAs(supervisor)
@@ -809,7 +809,7 @@ public with sharing class CC_OTP_Test {
     //         Boolean  resultadoNuevo = CC_OTP.existeBloqueo(caso.Id);
     //         System.assertEquals(true,  resultadoNuevo);
     //     }*/
-
+        
     // }
 
     @isTest
@@ -821,7 +821,7 @@ public with sharing class CC_OTP_Test {
         listaAutenticacionCliente.CC_Activa__c = true;
         listaAutenticacionCliente.Name = 'CC_Autenticacion_Cliente';
         insert listaAutenticacionCliente;
-
+        
         CC_Lista_Valores__c valorTelefono = new CC_Lista_Valores__c();
         valorTelefono.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
         valorTelefono.CC_Activa__c = true;
@@ -829,7 +829,7 @@ public with sharing class CC_OTP_Test {
         valorTelefono.Name = 'Teléfono';
         valorTelefono.CC_Valor__c = 'Teléfono';
         insert valorTelefono;
-
+        
         /*CC_Lista_Valores__c valorDesactivado = new CC_Lista_Valores__c();
         valorDesactivado.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Valor');
         valorDesactivado.CC_Activa__c = false;
@@ -837,7 +837,7 @@ public with sharing class CC_OTP_Test {
         valorDesactivado.Name = 'Twitter';
         valorDesactivado.CC_Valor__c = 'Twitter';
         insert valorDesactivado;*/
-
+        
         Case caso = new Case(
             Status = 'Activo',
             Origin = 'Phone',
@@ -861,7 +861,7 @@ public with sharing class CC_OTP_Test {
             System.assertEquals(true,  CC_OTP.validarCanalAutenticacion(caso.Id));
             System.assertEquals(false,  CC_OTP.validarCanalAutenticacion(casoInvalido.Id));
             Test.stopTest();
-        }
+        }   
     }
 
     @isTest
@@ -888,12 +888,12 @@ public with sharing class CC_OTP_Test {
         Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
         wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRE_CCSF/accountingServices/positionKeeping/accounts/request';
+        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
         insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
@@ -908,19 +908,19 @@ public with sharing class CC_OTP_Test {
             Test.stopTest();
         }
     }
-
+    
     @isTest
     public static void validacionPreguntasTestDos() {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
         wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRE_CCSF/accountingServices/positionKeeping/accounts/request';
+        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
         insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
         Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(false);
@@ -943,12 +943,12 @@ public with sharing class CC_OTP_Test {
         Id rtContactClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         CBK_IntegrationSetting__c wsc = new CBK_IntegrationSetting__c();
         wsc.Name = 'CC_Autenticacion_Cuenta';
-        wsc.NamedCredential__c = 'callout:API_GWT_PRE_CCSF/accountingServices/positionKeeping/accounts/request';
+        wsc.NamedCredential__c = 'callout:API_GWT_PRO_CCSF/accountingServices/positionKeeping/accounts/request';
         insert wsc;
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
         Account cuenta = [SELECT Id FROM Account WHERE CC_NumPerso__c = '206'];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
@@ -968,7 +968,7 @@ public with sharing class CC_OTP_Test {
     public static void validacionPreguntasTestCuatro() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
@@ -988,7 +988,7 @@ public with sharing class CC_OTP_Test {
     public static void validacionPreguntasTestCinco() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 1' LIMIT 1];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(true);
         validaciones.add(true);
@@ -1008,7 +1008,7 @@ public with sharing class CC_OTP_Test {
     public static void validacionPreguntasTestSeis() {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
-
+        
         List<Boolean> validaciones = new List<Boolean>();
         validaciones.add(false);
         validaciones.add(false);
@@ -1041,7 +1041,7 @@ public with sharing class CC_OTP_Test {
             Test.stopTest();
         }
     }
-
+    
     @isTest
     public static void autenticacionCanceladaTest(){
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
@@ -1107,7 +1107,7 @@ public with sharing class CC_OTP_Test {
             Test.stopTest();
         }
     }
-
+    
     @isTest
     public static void comprobarDatos2NivelMenor() {
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 3' LIMIT 1];
@@ -1145,7 +1145,7 @@ public with sharing class CC_OTP_Test {
 
     @isTest
     public static void comprobarDatosNOKTask1(){
-
+        
         Case caso = [SELECT Id FROM Case WHERE Subject = 'Caso Test 4' LIMIT 1];
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
         Task task = [SELECT Id FROM Task WHERE WhatId = :caso.Id];
@@ -1191,7 +1191,7 @@ public with sharing class CC_OTP_Test {
             Test.startTest();
             Map<String,Object> resultado = CC_OTP.existeBloqueoNuevo(caso.Id);
             System.assertEquals(false, resultado.get('Resultado'));
-            Test.stopTest();
+            Test.stopTest(); 
         }
     }
 

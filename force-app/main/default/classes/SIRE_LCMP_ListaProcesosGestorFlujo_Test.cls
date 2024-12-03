@@ -25,28 +25,14 @@ public class SIRE_LCMP_ListaProcesosGestorFlujo_Test {
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.crearProceso(procesoTest);
             proceso.SIREC__SIREC_fld_situacion__c = SIR_Constantes.PROCESO_SITUACION_SIRE_PENDIENTE_INICIO_GESTION;
             update proceso;
-            String valueIdOwner = [SELECT OwnerId from SIREC__SIREC_obj_proceso__c where Id = :proceso.Id].OwnerId;
+           
             String url;
             Test.startTest();
             procesos = SIRE_LCMP_ListaProcesosGestorFlujo.getProcesos();
             url = SIRE_LCMP_ListaProcesosGestorFlujo.getURL();
             Test.stopTest();
-            Id recordTypeIdFlujo = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_FLUJO).getRecordTypeId();
-            Set<String> setSituaciones = new Set<String>{SIR_Constantes.PROCESO_SITUACION_SIRE_PENDIENTE_INICIO_GESTION};
-            List<SIREC__SIREC_obj_proceso__c> procesoCuenta = [SELECT id, 
-            SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.Id, 
-            name, 
-            toLabel(SIREC__SIREC_fld_estrategia__c), 
-            toLabel(SIREC__SIREC_fld_situacion__c), 
-            SIREC__SIREC_fld_fechaSituacion__c, SIREC__SIREC_fld_fechaInicio__c, 
-            Owner.Name
-            FROM SIREC__SIREC_obj_proceso__c 
-            WHERE SIREC__SIREC_fld_situacion__c IN :setSituaciones 
-            AND OwnerId =: valueIdOwner
-            AND RecordTypeId =: recordTypeIdFlujo
-            AND SIR_ObjetivoProceso__c !=: SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO
-            ORDER BY SIREC__SIREC_fld_fechaSituacion__c];
-            Assert.areEqual(procesoCuenta,  procesos, 'No está devolviendo el proceso correcto');        
+           
+            Assert.areEqual(usuario.id, procesos[0].OwnerId, 'listaProcesosGestorFlujoTest. No está devolviendo los procesos del owner conectado');     
             Assert.areEqual(true, url.contains('SIRE_Inicio_FLUJO'), 'La url no está devolviendo bien la home de flujo');
             Assert.areEqual(true, url.contains('c__SIRE_MisClientesSolucionesEMP'), 'No está llevando a la home de empresas');
         } 

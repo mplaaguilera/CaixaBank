@@ -11,6 +11,7 @@ Historial
 	1.1			FIX				David Rufo			18/05/2021			Improve query execution
 	1.2			US384943		Víctor Santiago		30/05/2022			Test adapted to framework batch
 	1.3         Fix             Patricia Villacañas 18/05/2023      	Modified to set run as
+	1.4         FIX11070844     Oscar Moreno        27/08/2024          Change value of CloseDate field of opportunity in setup to System.today() - 3
 
 ***********************************************************************************************************************/
 @isTest
@@ -29,11 +30,12 @@ public class AV_OpportunityStatusBatch_Test {
 			AV_TestHelper.createPricebook2();
 			User usrTest = AV_TestHelper.createUser(null);
 			Account accTest = AV_TestHelper.createCustomer();
+			
 			RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPINICIATIVA_RT);
-			Opportunity op = AV_TestHelper.createOpportunity(accTest,System.today() - 10);
-			//op.CloseDate = System.today() - 10;
+			Opportunity op = AV_TestHelper.createOpportunity(accTest,System.today() - 3);
 			op.RecordTypeId = rt.Id;
 			update op;
+
 		}
     }
     

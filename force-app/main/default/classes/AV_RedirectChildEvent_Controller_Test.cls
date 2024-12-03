@@ -9,18 +9,16 @@ Historial
     VERSION		USER_STORY			AUTHOR				DATE			Description
     1.0			Test Class		Vladislav Lityagin		24/03/2023		Init version
     1.1         Fix             Patricia Villacañas     18/05/2023      Modified to set run as
+	1.2			Ejec. Lentas	Sandra Gómez			22/02/2024		Coverage
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_RedirectChildEvent_Controller_Test {
-    //createEventExternalIdSinInsert(User user, Datetime activityDate, String externalId, Account acc){
+
 	@TestSetup
     static void setup(){
-
         User userGcf = [SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
-        
         System.runAs(userGcf){
             AV_TestHelper.activateLogger();
-            List<Event> evtList = new List<Event>();
             List<User> usrList = new List<User>();
             Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
             Account acc = AV_TestHelper.createCustomer();
@@ -33,11 +31,19 @@ public with sharing class AV_RedirectChildEvent_Controller_Test {
             AV_TestHelper.insertNeededPermissions(u);
             AV_TestHelper.insertNeededPermissions(u2);
             DateTime dt = System.now();
-            Event evtParent = AV_TestHelper.createEventExternalIdSinInsert(u,dt,'12345',acc);
-            evtParent.AV_CodigoGestorAsignado__c='U012345';
-            evtList.add(evtParent);
-            insert evtList;
-            EventRelation invitee = new EventRelation(EventId = evtParent.Id, RelationId = u2.Id, IsInvitee = true);
+            RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_EVENT, AV_AppConstants.EVENTCLIENTE_RT);
+            Event event = new Event();
+            event.Subject = 'Call';
+            event.OwnerId = u.Id;
+           	event.AV_ExternalID__c = '12345';
+            event.RecordTypeId = rt.Id;
+            event.DurationInMinutes= 60;
+            event.ActivityDateTime = dt;
+            event.StartDateTime = dt;
+            event.WhatId = acc.Id;
+            event.AV_CodigoGestorAsignado__c='U012345';
+            insert event;
+            EventRelation invitee = new EventRelation(EventId = event.Id, RelationId = u2.Id, IsInvitee = true);
             insert invitee;
         }
     }
@@ -53,7 +59,4 @@ public with sharing class AV_RedirectChildEvent_Controller_Test {
             system.assertEquals(true, parentId.length()>0);
         }
     }
-    
-    
-    
 }

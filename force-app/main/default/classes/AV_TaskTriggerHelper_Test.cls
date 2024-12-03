@@ -27,20 +27,19 @@ VERSION		USER_STORY	   AUTHOR		   		DATE			Description
 4.4			US481618		Ángel Medina		18/01/2023		Add new method validateRecordChannel()			
 4.5 		US464358		Luis Fernández		15/02/2023		Addes new method validateNotifyExperienciaClienteTasks	
 4.6 		US592987	   	Laura Marrero		30/05/2023		Changed AV_Query to SOQL queries
-4.7			US610044		Luis Fernández		26/06/2023		Added checkOftTypeValidate method					
+4.7			US610044		Luis Fernández		26/06/2023		Added checkOftTypeValidate method	
+4.8			PPM100265161	Ángel Medina		18/10/2024		Delete methods updateTareaOpp and validateRecordChannel				
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_TaskTriggerHelper_Test {
 	
 	@TestSetup
 	static void setup(){
+	
         AV_TestHelper.activateLogger();
-		
 		Pricebook2 pb = new Pricebook2();
 		pb.Name = 'Standard Price Book';
 		insert pb;
-
-		// User usuSup = [Select Id from User where Profile.Name = 'CC_Supervisor' and Alias = 'Bluewolf' and IsActive = true limit 1];
         User usuInte = [Select Id from User where Profile.Name = 'API Only' and Alias = 'inte' and IsActive = true limit 1];
 		Account center;
 		System.runAs(usuInte){
@@ -53,24 +52,23 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		System.runAs(usuCli){
         	Account cliente = AV_TestHelper.createCustomer();     
         }
-		
-		Account accTest = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
-
-        //Account cliente = AV_TestHelper.createCustomerSinInsert();
-		//Account centroCaixa = AV_TestHelper.createCaixaCenterSinInsert();
-        //List<Account> accs = new List<Account>{cliente, centroCaixa};
-		//insert accs;
-		// System.runAs(usuGcf){
-		// 	// User usuCaixa2 = AV_TestHelper.createUser(null,'9898','AV_Sist');
-		// }
-		//insert users;
+		Test.startTest();
 		System.runAs(usuGcf){
-			User usuCaixa = AV_TestHelper.createUser(null);
-			Contact cnt = AV_TestHelper.createEmployee(center,usuCaixa);
+			User userGestor = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01545454', 'AV_SistematicaComercial');
+			userGestor.Email = 'gestor-test@test.com';
+			User usrTest = AV_TestHelper.createUserSinInsert('AV_Usuario_CaixaBank','U01543678');
+			List<User> listUserInsert = new List<User>();
+			listUserInsert.add(userGestor);
+			listUserInsert.add(usrTest);
+			insert listUserInsert;
+
+			Contact cnt = AV_TestHelper.createEmployee(center,userGestor,'U01545454');
 			Account centro = [SELECT Id FROM Account WHERE RecordType.DeveloperName = 'CC_CentroCaixaBank' LIMIT 1];
-			Contact cont = AV_TestHelper.createEmployee(centro,usuCaixa);
-			AV_TestHelper.insertNeededPermissions(usuCaixa);
+			Contact cont = AV_TestHelper.createEmployee(centro,usrTest,'U01543678');
+			AV_TestHelper.insertNeededPermissions(userGestor);
+			AV_TestHelper.insertNeededPermissions(usrTest);
 			AV_TestHelper.createTarea(usuGcf, System.today());
+			
 			
 			List<CBK_ForbiddenWord__c> listDummyWords = new List<CBK_ForbiddenWord__c>();
 			CBK_ForbiddenWord__c word = new CBK_ForbiddenWord__c(CBK_EXPRES__c = 'ABELLOTS', CBK_TIPAVI__c = 'E', CBK_IsActive__c = true);
@@ -78,9 +76,8 @@ public with sharing class AV_TaskTriggerHelper_Test {
 			CBK_ForbiddenWord__c word2 = new CBK_ForbiddenWord__c(CBK_EXPRES__c = 'CAUCASIC', CBK_TIPAVI__c = 'A', CBK_IsActive__c = true);
 			listDummyWords.add(word2);
 			Database.insert(listDummyWords, false);
-            //Contact empleado  = AV_TestHelper.createEmployee(centroCaixa, usuGcf);
-        	//Contact empleado2  = AV_TestHelper.createEmployee(null, null);
 		}
+		Test.stopTest();
 	}
 
 	/**
@@ -109,12 +106,86 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		System.runAs(usuGcf){
 			tarea.AV_CodigoGestorAsignado__c = 'U0009006';
 			Database.update(tarea);
-			Test.stopTest();
 			Task cienteUpdated = [select AV_CodigoGestorAsignado__c from Task where Id = :tarea.Id];
 			System.assertNotEquals(null, cienteUpdated.AV_CodigoGestorAsignado__c);
 		}
+		Test.stopTest();
 	}
 	
+	@isTest
+	public static void updateTaskToEnterNotifyExperienciaCliTask() {
+		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+		User userGestor = [Select Id FROM User WHERE AV_ExternalID__c = 'U01545454'];
+		Task tarea =[SELECT Id, RecordTypeId,OwnerId, ActivityDate FROM Task WHERE AV_ExternalID__c = '01928374'];
+		CBK_SCH_PendingProcess__c sch = new CBK_SCH_PendingProcess__c();
+		sch.ClassName__c = 'AV_NotifyExpCliTaskSchedulable';
+		sch.RecordId__c = tarea.id;
+		sch.OwnerId = userGestor.id;
+		insert sch;
+		RecordType rtExpTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKEXPCLIENT_RT);
+		CBK_ScheduleControls__c scs = new CBK_ScheduleControls__c();
+			scs.Name = 'ScheduleInfo';
+			scs.Retries__c =3;
+			scs.ExecutionPeriod__c = 1;
+			insert scs;
+		
+		RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKEXPCLIENT_RT);
+		List<Task> listTask = new List<Task>();
+		Map<Id, Task> mapTaskOld = new Map<Id, task>();
+		
+		
+		mapTaskOld.put(tarea.id, tarea);
+
+		tarea.ownerId = userGestor.id;
+		tarea.activityDate = System.today();
+		tarea.recordTypeId = rtExpTask.id;
+		listTask.add(tarea);
+		update listTask;
+		Test.startTest();
+		System.runAs(userGestor){			
+			AV_TaskTriggerHelper.notifyExperienciaCliTask(listTask, mapTaskOld, true);
+		}
+		Test.stopTest();
+		List<Task> tareaUpdate= [SELECT Id FROM Task WHERE OwnerId =:UserGestor.id];
+		System.assertNotEquals(tareaUpdate,null,'No se ha encontrado el Id de la tarea');
+		
+	}
+
+	@isTest
+	public static void updateTaskToEnterNotifyExperienciaCliTask2() {
+		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+		User userGestor = [Select Id FROM User WHERE AV_ExternalID__c = 'U01545454'];
+		Task tarea =[SELECT Id, RecordTypeId,OwnerId, ActivityDate FROM Task WHERE AV_ExternalID__c = '01928374'];
+		
+		RecordType rtExpTask = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKEXPCLIENT_RT);
+		CBK_ScheduleControls__c scs = new CBK_ScheduleControls__c();
+			scs.Name = 'ScheduleInfo';
+			scs.Retries__c =3;
+			scs.ExecutionPeriod__c = 1;
+			insert scs;
+		
+		RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKEXPCLIENT_RT);
+		List<Task> listTask = new List<Task>();
+		Map<Id, Task> mapTaskOld = new Map<Id, task>();
+		
+		
+		mapTaskOld.put(tarea.id, tarea);
+
+		tarea.ownerId = userGestor.id;
+		tarea.activityDate = System.today();
+		tarea.recordTypeId = rtExpTask.id;
+		listTask.add(tarea);
+		update listTask;
+		Test.startTest();
+		System.runAs(userGestor){
+			AV_TaskTriggerHelper.notifyExperienciaCliTask(listTask, mapTaskOld, true);
+		}
+		Test.stopTest();
+		List<Task> tareaUpdate= [SELECT Id FROM Task WHERE OwnerId =:UserGestor.id];
+		System.assertNotEquals(tareaUpdate,null,'No se ha encontrado el Id de la tarea');
+		
+	}
+
 	 /**
 	 * Execute the Trigger class (AV_Task_AU_TRHan, AV_Task_AI_TRHan) and check if task is Positive closed.
 	 */
@@ -144,7 +215,7 @@ public with sharing class AV_TaskTriggerHelper_Test {
 				insert usuario;
 		Test.startTest();
 		System.runAs(usuGcf){
-				Contact empleado = AV_TestHelper.createEmployee(acc,usuario);
+				Contact empleado = AV_TestHelper.createEmployee(acc,usuario,'U0009006');
 				AV_Book__c cartera= new AV_Book__c();
 				cartera.Name='100368827';
 				cartera.AV_ExternalID__c='U0009006';
@@ -178,7 +249,7 @@ public with sharing class AV_TaskTriggerHelper_Test {
 	@isTest
 	private static void validateDeleteTaskTest() {
 		Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT','OK'));
-		User userGestor = [SELECT Id FROM User WHERE Alias = 'tsAlias' AND AV_ExternalId__c = 'U0009003' LIMIT 1];
+		User userGestor = [SELECT Id FROM User WHERE Alias = 'tsAlias' AND AV_ExternalId__c = 'U01545454' LIMIT 1];
 
 		Task task = [SELECT id,  AV_ExternalID__c, ActivityDate FROM Task LIMIT 1];
 		task.OwnerId = userGestor.Id;
@@ -190,22 +261,6 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		Test.stopTest();
         List<Task> taskDeleted = [SELECT id, AV_ExternalID__c, ActivityDate FROM Task LIMIT 1];
         System.assertEquals(0 , taskDeleted.size());
-		// User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-		// Test.startTest();
-		// System.runAs(usuGcf){
-		// 	Set<String> setOppFields = new Set<String>{'Id'};
-		// 	Task taskCreadoOld = [SELECT Id FROM Task];
-		// 	//Task taskCreadoOld = (Task) new AV_Query('Task').selectFields(setOppFields).fetch();
-		// 	AV_HeaderCustomActivity__c cabTest = new AV_HeaderCustomActivity__c();
-		// 	cabTest.IDTask__c = taskCreadoOld.Id;
-		// 	Database.insert(cabTest);
-		// 	AV_CustomActivityOpportunity__c tareaOppOld = new AV_CustomActivityOpportunity__c();
-		// 	tareaOppOld.AV_Task__c = cabTest.Id;
-		// 	Database.insert(tareaOppOld);
-		// 	Database.delete(taskCreadoOld);
-		// 	System.assertNotEquals(null, cabTest.IDTask__c);
-		// }
-		// Test.stopTest();	
 	}
     
     @isTest
@@ -232,25 +287,23 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		DateTime activityDate = Datetime.newInstance(2020, 6, 4);
 		Test.startTest();
 		System.runAs(usuGcf){
-			Account cliente = new Account(
-				AV_NumPerso__c = '123',
-				AV_Negocio__c = 'BPA'
-			);
+
+			Account cliente = [SELECT Id FROM Account WHERE AV_NumPerso__c = '123' LIMIT 1];
+
+
 			Account centroCaixa = new Account(
 				Name = '00615 STORE DOS DE MAIG-ROSSELLO' , CC_Numero_Oficina_Empresa__c = '00615'
 			);
+
 			Contact empleado = new Contact(FirstName = 'Empleado',LastName = '1');
-			Opportunity opp = AV_TestHelper.createOpportunityExternalId(cliente, empleado, '01928374');
+            Opportunity opp = AV_TestHelper.createOpportunityExternalId(cliente, empleado, '01928374');
+            
 			AV_CustomActivityOpportunity__c cusActOpp = AV_TestHelper.createTareaOportunidadExt(opp, '01928374');
 			Task tarea  = [Select id from task limit 1];
 			tarea.ActivityDate = Date.today();
 			Database.update(tarea);
 			Test.stopTest();   
 			Task tareaUpdate = [SELECT id, ActivityDate FROM Task WHERE id = :tarea.Id];
-			// Task tareaUpdate = (Task) new AV_Query('Task')
-			// 						.selectField('ActivityDate')
-			// 						.addConditionEq('Id', tarea.Id)
-			// 						.fetch();
 			System.assertEquals(tarea.ActivityDate, tareaUpdate.ActivityDate);
 		}
 	}
@@ -258,7 +311,7 @@ public with sharing class AV_TaskTriggerHelper_Test {
 	@isTest
 	public static void validateCreateManagementHistory() {
 		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-		User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0009003' LIMIT 1];
+		User u = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U01545454' LIMIT 1];
 		RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK, AV_AppConstants.TASKINICIATIVA_RT);
 		Test.startTest();
 		System.runAs(usuGcf){
@@ -299,7 +352,6 @@ public with sharing class AV_TaskTriggerHelper_Test {
 			String tskId = task.Id;
 			Task newCenter = [SELECT AV_Center__c FROM Task WHERE Subject = 'TestUpdate' and Id = :tskId limit 1];
 			String newOwnerCenter = newOwner.AV_NumeroOficinaEmpresa__c;
-			//newOwnerCenter = newOwnerCenter.substring(newOwnerCenter.length()-5);
 			System.AssertEquals(newCenter.AV_Center__c,newOwnerCenter,'No se ha actualizado el centro');
 		}
 	}
@@ -308,7 +360,6 @@ public with sharing class AV_TaskTriggerHelper_Test {
 	public static void validateChangeOwner(){
 		User userGFc = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' AND IsActive= true LIMIT 1];
 		User userWithNoEap = [SELECT ID FROM USER WHERE ID NOT IN (SELECT AV_UsuarioAsociado__c FROM Contact) LIMIT 1];
-		// User userWithEap = [SELECT ID FROM USER WHERE ID  IN (SELECT AV_UsuarioAsociado__c FROM Contact) LIMIT 1];
 		String userGFcId = userGFc.Id;
 		Task existentTask = [SELECT ID,OwnerId FROM TASK  LIMIT 1];
 		String taskId = existentTask.Id;
@@ -331,108 +382,25 @@ public with sharing class AV_TaskTriggerHelper_Test {
 			System.assertEquals(userGFc.Id,resultUpdate.OwnerId,'No se ha actualizado el owner en la update');
 		}
 	}
-    
-    @isTest
-    public static void validateUpdateTareaOpp() {
-			User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-		Account acc = [SELECT Id FROM Account WHERE FirstName = 'FirstName' AND AV_NumPerso__c = '123' LIMIT 1];
-			Task tarea = [SELECT Id, ActivityDate, Status, AV_Task__c, AV_ExternalID__c FROM Task WHERE AV_ExternalID__c = '01928374' AND ActivityDate = TODAY LIMIT 1];
-			User user = [SELECT Id FROM User WHERE Alias = 'tsAlias' AND AV_ExternalId__c = 'U0009003' LIMIT 1];
-
-			// Opportunity opp = AV_TestHelper.createOpportunity(acc);
-			Product2 prodPF = AV_TestHelper.createProduct(null,null);
-			RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_OPPORTUNITY, AV_AppConstants.OPPALERTACOM_RT);
-			Opportunity opp = new Opportunity();
-			opp.AccountId = acc.Id;
-			opp.Name = 'Alerta Comercial';
-			opp.StageName = 'En gestión/insistir';
-			opp.RecordTypeId = rt.Id;
-			opp.CloseDate = System.today() + 5;
-			opp.AV_Comentarios__c = 'Nueva Oportunidad tipo Alerta Comercial';
-			opp.AV_PF__c = prodPF.Id;
-			opp.OwnerId = user.Id;
-			insert opp;
-				Test.startTest();
-				opp.OwnerId = user.Id;
-				AV_HeaderCustomActivity__c hca;
-				AV_CustomActivityOpportunity__c tareaOpp;
-				System.runAs(usuGcf){
-				tarea.OwnerId = user.Id;
-				update tarea;
-
-				// AV_CustomActivityOpportunity__c cao = AV_TestHelper.createTareaOportunidad(opp, tarea);
-				hca = [SELECT Id FROM AV_HeaderCustomActivity__c WHERE AV_ExternalId__c = :tarea.AV_ExternalID__c LIMIT 1];
-				tareaOpp= new AV_CustomActivityOpportunity__c();
-				tareaOpp.Name = 'Llamada Saliente - Alerta Comercial 2';
-				tareaOpp.AV_Opportunity__c = opp.Id;
-				tareaOpp.AV_Task__c = hca.Id;
-				tareaOpp.AV_ActivityDate__c = tarea.ActivityDate;
-				tareaOpp.AV_Status__c = tarea.Status;
-				tareaOpp.OwnerId = user.Id;
-				insert tareaOpp;
-				hca.OwnerId = user.Id;
-				update hca;
-				// cao.OwnerId = user.Id;
-				// update cao;
-
-			}
-			System.runAs(user){
-				Date newDate = tarea.ActivityDate.addDays(10);
-				tarea.ActivityDate = newDate;
-				update tarea;
-				}
-				
-				AV_CustomActivityOpportunity__c cao = [
-				SELECT Id, AV_ActivityDate__c,OwnerId,Owner.Name,AV_Task__c
-				FROM AV_CustomActivityOpportunity__c
-				WHERE AV_Task__c = :tarea.AV_Task__c and Id = :tareaOpp.Id
-				];
-				List<AV_CustomActivityOpportunity__c> debugList = [SELECT ID FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :hca.Id];
-				Test.stopTest();
-				System.assertEquals(true, tarea.ActivityDate == cao.AV_ActivityDate__c, 'Error updating Activity Date');
-				//}
-		}
 		
-		@isTest
-		public static void insertOrUpdateCenterAndRtTest(){
-			User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-			Test.startTest();
-			System.runAs(usuGcf){
-				//User user1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank');
-				List<sObject> result = [SELECT ID FROM Profile WHERE NAME = 'AV_Usuario_CaixaBank' LIMIT 1];
-				String username = AV_TestHelper.getEmail();
-				Profile p = (Profile)result.get(0);
-				/*User user2 = new User(
-					Alias = 'tsAlias2',
-					Email = 'test2@test.dev',
-					EmailEncodingKey = 'UTF-8',
-					LastName = 'testLastName',
-					LanguageLocaleKey = 'es',
-					LocaleSidKey = 'es',
-					TimeZoneSidKey = 'Europe/Berlin',
-				AV_NumeroOficinaEmpresa__c = '001-99999',
-				ProfileId = p.Id,
-				UserName = username,
-				AV_ExternalID__c = 'U0009003',
-				IsActive = true
-				);
-				insert user2;*/
-				
-				//Contact cntUser1 = AV_TestHelper.createEmployee(null,user1);
-				//Contact cntUser2 = AV_TestHelper.createEmployee(null,user2);
-				User user = [SELECT Id FROM User LIMIT 1];
-				Task tskTest = AV_TestHelper.createTareaOtherExternalID(user);
-				Task tskTestRetrieve = [SELECT AV_CenterRtIndex__c,AV_Center__C FROM Task WHERE AV_ExternalId__c = '01928363' LIMIT 1];
-				String tskTestCenterRT = tskTestRetrieve.AV_CenterRtIndex__c;
-				tskTestRetrieve.AV_Center__c = '04135';
-				
-				//System.assertNotEquals(tskTestCenterRT,null,'El campo no se ha cargado correctamente');
-				//tskTest.OwnerId = user2.Id;
-				Database.update(tskTestRetrieve);
-				String tskTestCenterRTAfterUdt = [SELECT AV_CenterRtIndex__c FROM Task WHERE AV_ExternalId__c = '01928363' LIMIT 1].AV_CenterRtIndex__c;
-				System.assertNotEquals(tskTestCenterRT,tskTestCenterRTAfterUdt,'El campo no se ha actualizado bien');
-			}
-        Test.stopTest();
+	@isTest
+	public static void insertOrUpdateCenterAndRtTest(){
+		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
+		Test.startTest();
+		System.runAs(usuGcf){
+			List<sObject> result = [SELECT ID FROM Profile WHERE NAME = 'AV_Usuario_CaixaBank' LIMIT 1];
+			String username = AV_TestHelper.getEmail();
+			Profile p = (Profile)result.get(0);
+			User user = [SELECT Id FROM User LIMIT 1];
+			Task tskTest = AV_TestHelper.createTareaOtherExternalID(user);
+			Task tskTestRetrieve = [SELECT AV_CenterRtIndex__c,AV_Center__C FROM Task WHERE AV_ExternalId__c = '01928363' LIMIT 1];
+			String tskTestCenterRT = tskTestRetrieve.AV_CenterRtIndex__c;
+			tskTestRetrieve.AV_Center__c = '04135';
+			Database.update(tskTestRetrieve);
+			String tskTestCenterRTAfterUdt = [SELECT AV_CenterRtIndex__c FROM Task WHERE AV_ExternalId__c = '01928363' LIMIT 1].AV_CenterRtIndex__c;
+			System.assertNotEquals(tskTestCenterRT,tskTestCenterRTAfterUdt,'El campo no se ha actualizado bien');
+		}
+		Test.stopTest();
 	}
     
     @isTest
@@ -440,8 +408,6 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
 		Test.startTest();
 		System.runAs(usuGcf){
-			//User userApiOnly = [SELECT ID FROM USER WHERE Alias = 'AV-TF9' AND Profile.Name = 'API Only' and isActive = true LIMIT 1];
-			// TAsk tareaAntes = AV_TestHelper.createTarea(userApiOnly);
 			Task tareaAntes =[Select Id, Status, AV_ToDelete__c, AV_Tipo__c, Description, AV_Center__c, AV_CodigoGestorAsignado__c, LastModifiedById from Task ];
 			Task tareaCambio = tareaAntes;
 			tareaCambio.Status = AV_AppConstants.GESTIONADO_POSITIVO_ESTADO;
@@ -464,7 +430,7 @@ public with sharing class AV_TaskTriggerHelper_Test {
 		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
 		Test.startTest();
 		System.runAs(usuGcf){
-			List <Contact> cntactUser = [SELECT Id, CC_Matricula__c FROM Contact WHERE AV_Usuarioasociado__c = :UserInfo.getUserId() LIMIT 1];
+			List <Contact> cntactUser = [SELECT Id, CC_Matricula__c FROM Contact WHERE AV_Usuarioasociado__c = :usuGcf.Id LIMIT 1];
 			User userSinGestor = [SELECT Id FROM USER WHERE Alias = 'AV-TF9' AND Profile.Name = 'API Only' and isActive = true LIMIT 1];        
 			List<Task> listTask = [SELECT Id, AV_ExternalID__c, OwnerId,Status FROM Task WHERE OwnerId = :userSinGestor.Id ];
 			List<Task> listTaskAux = [SELECT Id, AV_ExternalID__c, OwnerId,Status FROM Task WHERE OwnerId = :userSinGestor.Id ];
@@ -481,43 +447,9 @@ public with sharing class AV_TaskTriggerHelper_Test {
 	}
 
 	@isTest
-	public static void validateRecordChannel(){
-		User usuGcf = [Select Id from User where Profile.Name = 'API Only' and Alias = 'AV-TF9' and IsActive = true limit 1];
-		User userGestor = [SELECT Id FROM User WHERE Alias = 'tsAlias' AND AV_ExternalId__c = 'U0009003' LIMIT 1];
-		   
-		Account acc = AV_TestHelper.createCustomerSinInsert();
-		//User user1 = AV_TestHelper.createUser('Standard User');
-        Test.startTest();
-		Task tarea;
-		System.runAs(usuGcf){
-
-		Opportunity opp = AV_TestHelper.createOpportunity(acc);
-			opp.OwnerId = userGestor.Id;
-			update opp;
-			tarea = AV_TestHelper.createTareaWithOpp(opp);
-			// tarea = AV_TestHelper.createTareaExternalIdCustomStatusWithCustomerSinInsert(userGestor,'12345',null,'Open');
-			// insert tarea;
-		AV_CustomActivityOpportunity__c tareaOpp = AV_TestHelper.createTareaOportunidad(opp, tarea);
-			tareaOpp.OwnerId = userGestor.Id;
-			tarea.ownerId = userGestor.Id;
-			update tareaOpp;
-			update tarea;
-
-		}
-		Opportunity oppUpdated;
-		System.runAs(userGestor){
-		tarea.AV_Tipo__c = 'VLD';
-			Database.update(tarea);
-			oppUpdated = [SELECT AV_Channel__c FROM Opportunity WHERE AV_Channel__c = 'VLD'];
-		}
-		Test.stopTest();
-        System.assertEquals(tarea.AV_Tipo__c, oppUpdated.AV_Channel__c);
-	}
-
-	@isTest
 	public static void validateNotifyExperienciaClienteTask(){
 		RecordType rtExp = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_TASK,AV_AppConstants.TASKEXPCLIENT_RT);
-		User us = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U0009003'];
+		User us = [SELECT Id FROM User WHERE AV_ExternalId__c = 'U01545454'];
 		User us2 = AV_TestHelper.createUser('','9898','AV_SistematicaComercial');
 		//Esto tiene que ser ejecutado por un usuario Administrador porque tiene que tener permisos para lanzar CBK_ScheduleProcess_Controller
 		User usuAdmin = [Select Id from User where Email = 'oficinatecnica.salesforce@caixabanktech.com' and Alias = 'Admin 1' and IsActive = true limit 1]; 
@@ -552,30 +484,77 @@ public with sharing class AV_TaskTriggerHelper_Test {
 	}
 
 	@isTest 
-	public static void checkOftTypeValidate(){
-	User user = [SELECT Id FROM User WHERE Alias = 'tsAlias' LIMIT 1];
-	Task t = AV_TestHelper.createTareaExternalIdSinInsert(user,'123457');
-	Task t2 = AV_TestHelper.createTareaExternalIdSinInsert(user,'123458');
-	Task t3 = AV_TestHelper.createTareaExternalIdSinInsert(user,'123459');
-	insert new List<Task>{t,t2,t3};
-	// insert t;
-	Test.startTest();
-	System.runAs(user){
-		// t.AV_Tipo__c = AV_AppConstants.TASKOFFICETYPE;
-		t.AV_OrigenApp__c = '';
-		t2.AV_Tipo__c = AV_AppConstants.TASKOFFICETYPE;
-		t2.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT;
-		t3.AV_Tipo__c = AV_AppConstants.TASKOFFICETYPE;
-		try{
+    public static void checkOftTypeValidate(){
+        User user = [SELECT Id FROM User WHERE Alias = 'tsAlias' LIMIT 1];
+        Task t = AV_TestHelper.createTareaExternalIdSinInsert(user,'123457');
+        Task t2 = AV_TestHelper.createTareaExternalIdSinInsert(user,'123458');
+        Task t3 = AV_TestHelper.createTareaExternalIdSinInsert(user,'123459');
+        insert new List<Task>{t,t2,t3};
+            Test.startTest();
+        System.runAs(user){
+            t.AV_OrigenApp__c = '';
+            t2.AV_Tipo__c = AV_AppConstants.TASKOFFICETYPE;
+            t2.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT;
+            t3.AV_Tipo__c = AV_AppConstants.TASKOFFICETYPE;
+            try{
+                update new List<Task>{t,t2,t3};
+                    }catch(Exception err){
+                        AV_LogDebug.printLogDebug('Error', 'Something went wrong');
+                    }
+        }
+        Test.stopTest();
+        Task tRetri = [SELECT Id,AV_OrigenApp__c FROM Task WHERE AV_ExternalID__c = '123457' and Id = :t.Id];
+        System.assert(String.isBlank(tRetri.AV_OrigenApp__c));
+    }
+    
+    @isTest 
+    public static void updateNextManagementDateOppTest(){
+        User user = [SELECT Id FROM User WHERE Alias = 'tsAlias' LIMIT 1];
+		Task t1;
+        
+        Test.startTest();
+        System.runAs(user){
 
-			update new List<Task>{t,t2,t3};
-		}catch(Exception err){
-			AV_LogDebug.printLogDebug('Error', 'Something went wrong');
-		}
-	}
-	Test.stopTest();
-	Task tRetri = [SELECT Id,AV_OrigenApp__c FROM Task WHERE AV_ExternalID__c = '123457' and Id = :t.Id];
-	System.assert(String.isBlank(tRetri.AV_OrigenApp__c));
-	}
+			RecordType rt = AV_AppUtilities.getRecordType(AV_AppConstants.OBJECT_NAME_ACCOUNT, AV_AppConstants.ACCOUNT_PA_RT);
+			Account cliente = new Account(
+					FirstName = 'FirstNameTest',
+					LastName = 'LastNameTest',
+					RecordTypeId = rt.Id,
+					AV_NumPerso__c = '1234',
+					AV_Negocio__c = 'BPA',
+					CC_Numero_Documento__c = '9446387T'
+				);
+
+			Account centroCaixa = new Account(
+				Name = '00615 STORE DOS DE MAIG-ROSSELLO' , CC_Numero_Oficina_Empresa__c = '00615'
+			);
+
+			Contact empleado = new Contact(FirstName = 'Empleado',LastName = '1');
+            Opportunity opp = AV_TestHelper.createOpportunityExternalId(cliente, empleado, '01928374');
+
+			t1 = AV_TestHelper.createTareaExternalIdSinInsert(user,'123457');
+			insert t1;
+
+			AV_CustomActivityOpportunity__c oppTask = AV_TestHelper.createTareaOportunidad(opp, t1);
+
+
+			Task t2 = t1.clone(false, true, false, false);
+			t2.Id = t1.Id;
+			t2.ActivityDate = date.newInstance(2024, 01, 15);
+			Map<Id, Task> mapOlds = new Map<Id, Task> ();
+			mapOlds.put(t2.Id, t2);
+			Map<String, Task> mapToByPassTask = new Map<String, Task>();
+			List<Task> listNews = new List<Task>();
+			t1.ActivityDate = System.today();
+			listNews.add(t1);
+
+
+
+			AV_TaskTriggerHelper.updateNextManagementDateOpp(listNews, mapOlds, mapToByPassTask);		
+        }
+        Test.stopTest();
+        Task tRetri = [SELECT Id,AV_OrigenApp__c FROM Task WHERE AV_ExternalID__c = '123457' and Id = :t1.Id];
+        System.assert(String.isBlank(tRetri.AV_OrigenApp__c));
+    }
 
 }

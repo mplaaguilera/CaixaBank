@@ -40,7 +40,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
                     opp.Id, 
                     this.taskType, //La definida en el setting,
                     'Completed', 
-                    'Envio de mensaje RCS', 
+                    'Envio de mensaje RCS - Enviado (Pendiente Entregar)', 
                     bodyResponse, 
                     new Map<String , String> {
                         'CSBD_Evento_Estado__c' => STATUS_ENVIADO,
@@ -52,7 +52,7 @@ public with sharing class CSBD_InfobipSender implements Queueable, Database.Allo
                 taskToInsert.add(CSBD_Activity.crearActividadReturn(
                     new Task(), 
                     opp.Id, 
-                    this.taskType, //La definida en el setting,
+                    this.taskType, //La definida en el setting,p
                     'Completed', 
                     'Envío de mensaje RCS - Intento Fallido', 
                     errorMessage,  

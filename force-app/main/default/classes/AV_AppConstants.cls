@@ -24,7 +24,14 @@ Historial
 	2.3			   US610044		    Luis Fernández	 19/06/2023			 Added new OFT constant for task type
 	2.3			   Fix				Sandra Gómez	 17/08/2023			 Add new value OPP_ORIGEN_BACK_REPORT, OPP_ORIGEN_CHECK_ON_OFF, Activity Type and status Event and change REPRESENTANTE_RT and add BACK_REPORT_NEW_OPP_ORIGENAPP
 	2.4            US609339         Oscar Moreno     16/10/2023          Add CONTACT_REPRESENT_RT
-
+	2.5            US769122         Oscar Moreno     04/12/2023          Add OUTSTANDING_OPP,PS_OPPSRCHV2  and 	TASK_CG 
+	2.6			   FE144643			Luis Fernández	 27/12/2023			 Addes new AV_Score__c RecordTypes constants
+	2.7			   US839366			Ángel Medina	 06/03/2024			 Add new value 	OPP_ORIGEN_UPDATE_WALLET
+	2.8            US796361          Oscar Moreno     14/03/2024         Add OPP_STATUS_PERDIDA OPP_STATUS_FORMALIZADA 
+	2.9            US913185         Oscar Moreno     04/06/2024          Add PS_CHECKONOFF 
+	3.0            PPM100130465     Oscar Moreno     05/07/2024          Replace PS_CHECKONOFF with PS_OLDHOMETASK
+	3.1			   PM100492394		Ángel Medina	09/10/2024			 Change label  SINGESTOR_EAP_CENTRO
+	3.2			   PPM100265161		Sandra Gómez	11/10/2024			 Add DATAPIPELINES_ORIGENAPP
 ***********************************************************************************************************************/
 public with sharing class AV_AppConstants {
 
@@ -51,6 +58,7 @@ public with sharing class AV_AppConstants {
 	public static final String OBJECT_NAME_TAREA_OPOR	   = 'AV_CustomActivityOpportunity__c';
 	public static final String OBJECT_NAME_PRODUCT 		   = 'Product2';
 	public static final String OBJECT_NAME_USER 		   = 'User';
+	public static final String OBJECT_NAME_CALL 		   = 'CC_Llamada__c';
 
 
 	/*
@@ -138,7 +146,7 @@ public with sharing class AV_AppConstants {
 	public static final String BIGDOT       = '•';
     public static final String AV_PREFIX    = 'AV_%';
 	public static final String ALL_CENTER = 'TODOS - CENTRO';
-	public static final String SINGESTOR_EAP_CENTRO = 'Sin Gestor / Eap - CENTRO';
+	public static final String SINGESTOR_EAP_CENTRO = 'No asignado - CENTRO ';
 	public static final String ALL_MANAGER = 'TODAS - GESTOR';
 
 
@@ -170,6 +178,7 @@ public with sharing class AV_AppConstants {
     public static final String OPPPROPUESTA_RT 	= 'AV_Propuesta';
     public static final String OPPSUGERENCIA_RT	= 'AV_Sugerencia';
 	public static final String OPPLLAMADA_RT	= 'AV_CallMe';
+    public static final Set<String> RETAIL_OPPO_RTS = new Set<String>{OPPINICIATIVA_RT,OPPALERTACOM_RT,OPPPROPUESTA_RT,OPPSUGERENCIA_RT,OPPLLAMADA_RT};
 
 	public static final String CSBD_ACCIONCOM_RT = 'CSBD_Accion_Comercial';
 	public static final String CSBD_CHAT_RT = 'CSBD_Chat';
@@ -182,6 +191,8 @@ public with sharing class AV_AppConstants {
 	public static final String CSBD_PRESTAMO_RT = 'CSBD_Prestamo';
 	public static final String CSBD_RENTING_RT = 'CSBD_Renting';
 	public static final String CSBD_TPV_RT = 'CSBD_TPV';
+
+	public static final String CALL_LOG_RT = 'AV_CallLog';
 
 	public static final Set<String> CSBD_RTS_SET = new Set<String>{
 
@@ -244,6 +255,13 @@ public with sharing class AV_AppConstants {
     public static final String OPP_STATUS_NOAPTO 		= 'No apto';
     public static final String OPP_STATUS_CONVENTA 		= 'Con venta';
     public static final String OPP_STATUS_VENCIDO 		= 'Vencido';
+    public static final String OPP_STATUS_FORMALIZADA	= 'Formalizada';
+    public static final String OPP_STATUS_PERDIDA		= 'Perdida';
+	public static final String OPP_STATUS_PROD_CONTR	= 'Producto Contratado';
+    public static final String OPP_STATUS_PROD_RECH		= 'Producto Rechazado';
+    public static final String OPP_STATUS_NO_GESTIONADA	= 'No Gestionada';
+
+
 
 	//Opportunity Resolucion
 	public static final String OPP_RESOLUTION_OTROS		= 'O';
@@ -262,6 +280,7 @@ public with sharing class AV_AppConstants {
 	public static final String CERRADO_ESTADO   				= 'Gestionada positiva';
 	public static final String NO_GESTIONADA					= 'No gestionada';
     public static final String GESTIONADO_NO_LOCALIZADO			= 'Gestionado no localizado';
+    public static final String TASK_DESACTIVADA			        = 'Desactivada';
 
 	//Lead Opportunity Stages
 	public static final String LEADOPP_STAGE_POTENCIAL 			= 'Potencial';
@@ -299,6 +318,9 @@ public with sharing class AV_AppConstants {
 	public static final String OPP_ORIGEN_BACK_REPORT 			= 'AV_BackReport';
 	public static final String OPP_ORIGEN_CHECK_ON_OFF 			= 'AV_SalesforceTaskOpp';
 	public static final String BACK_REPORT_NEW_OPP_ORIGENAPP 	= 'AV_BackReportNewOpp';
+	public static final String OPP_ORIGEN_UPDATE_WALLET			= 'AV_UpdateWallet'	;
+	public static final String OPP_ORIGEN_BYPASSCANCELEVENTVR	= 'AV_ComesFromFlow'	;
+	public static final String DATAPIPELINES_ORIGENAPP			= 'AV_DataPipelines';
 
 	public static final String TODAYS_TASKS = 'AV_Home_Gestor_Tareas_para_Hoy';
 	public static final String PENDING_TASKS = 'AV_HomeGestorTareasPendientes';
@@ -361,6 +383,7 @@ public with sharing class AV_AppConstants {
 	public static final String PERMISSION_RT = 'AV_Permiso';
 
 	public static final String PS_PRIVATEBANKING = 'AV_PrivateBanking'; 
+	public static final String PS_OLDHOMETASK = 'AV_OldHomeTask';
 
 	public static final String BPRROL = 'BPR';
 
@@ -372,6 +395,14 @@ public with sharing class AV_AppConstants {
 	public static final String 	PENDING_CONVERSATION_BANCAPRIVADA = 'AV_PendingConversationBancaPrivada';
 	public static final String 	REPORT_TODAYS_APPOINTMENTS = 'AV_TodaysAppointments';
 	public static final String 	TODAYS_APPOINTMENTS_BANCAPRIVADA = 'AV_TodaysAppointmentsBancaPrivada';
+	public static final String 	OUTSTANDING_OPP = 'AV_OutstandingOpportunities';
+	public static final String 	TASK_CG = 'AV_Task';
+	public static final String 	WARNINGS_MANAGE = 'AV_WarningsToManage';
+	public static final String 	AVISOSAGESTIONARREPORT = 'AV_AvisosAGestionar_RT';
+	public static final String 	AVISOSAGESTIONARREPORTPOOL = 'AV_AvisosAGestionarPoolUsers';
+	
+
+	
 	//Boolean
 	public static final String NOT_SELECTED = 'N';
 
@@ -385,8 +416,40 @@ public with sharing class AV_AppConstants {
 	public static final String ACT_TYPE_TASK_OFFI = 'OFT';
 
 	//Icons 
-
 	public static final String ICON_ACCOUNT = 'standard:account';
 	public static final String ICON_USER = 'standard:user';
 	public static final String ICON_CONTACT = 'standard:contact';
+
+	//Task priority
+	public static final String TASK_PRIORITY_HIGH = 'A';
+
+	//AV_ContactGenerateAppointment
+	public static final String GENERATE_APPOINTMENT = 'Cita generada';
+	public static final String NO_GENERATE = 'Sin cita';
+
+	//AV_Score
+	
+	public static final String OPPORTUNITY_RT_SCORING = 'AV_ScoringOpportunity';
+	public static final String TASK_RT_SCORING        = 'AV_ScoringTask';
+	public static final String EXPECTANCY_SCORING     = 'AV_SalesExpectancy';
+
+	//Expectancy Sales Constants 
+
+	public static final String EXPECTANCY_VENTA_P  = 'VP';
+	public static final String EXPECTANCY_MUY_ALTA = 'S';
+	public static final String EXPECTANCY_ALTA     = 'A';
+	public static final String EXPECTANCY_MEDIA    = 'M';
+	public static final String EXPECTANCY_BAJA     = 'B';
+
+	//DNI Integration Constants
+
+	public static final String DOCUMENT_PARAM      = 'DOCUMENT';
+	public static final String SIGNATURE_PARAM     = 'SIGNATURE';
+	public static final String DOCUMENT_ANVERS     = 'ANVERS';
+	public static final String DOCUMENT_REVERS     = 'REVERS';
+	
+	//Multigestor alias
+	public static final String MULTIGENAME     = 'Banca de Particulares';
+	public static final String BPA_EVENT_USER  = 'citaBPA';
+
 }

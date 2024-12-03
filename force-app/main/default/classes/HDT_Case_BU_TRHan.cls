@@ -672,33 +672,7 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
         }
     }
 
-    /*
-    @Testvisible
-    private static String obtenerBuzon(String canalProcedencia, String idioma) {
-        if (idioma == 'ca') {
-            idioma = 'Català';
-        } else if (idioma == 'en') {
-            idioma = 'Inglés';
-        } else {
-            idioma = 'Castellano';
-        }
-        List<CC_Buzones_Por_Defecto__mdt> buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                                                        WHERE CC_Canal_Procedencia__c = :canalProcedencia AND CC_Idioma__c = :idioma];
-        if (buzones.isEmpty()) { //Si no se ha encontrado  ningún buzón se usa el por defecto en el idioma del caso
-            buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                        WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = :idioma AND CC_Activo__c = TRUE];
-        }
-        if (buzones.isEmpty()) { //Si no se ha encontrado  ningún buzón se usa el por defecto en castellano
-            buzones = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt
-                        WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = TRUE];
-        }
-        if (!buzones.isEmpty()) {
-            return buzones[0].CC_Direccion_Correo__c;
-        } else {
-            return null;
-        }
-    }*/
-
+   
     @Testvisible
     private static String obtenerBuzon(String canalProcedencia, String idioma) {
 		idioma = idioma == 'ca' ? 'Català' : idioma == 'en' ? 'Inglés' : 'Castellano';
@@ -718,6 +692,7 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
 
     @Testvisible
     private static void agrupadoresInactivos(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
+
         if (!listNewObj.isEmpty()) {
             Map<Id, List<Case>> casoIdCaso = new Map<Id, List<Case>>();
             Set<Id> idsAgrupadores = new Set<Id>();
@@ -773,25 +748,93 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
 
     @Testvisible
     private static void generarURLLimeSurvey(List<Case> listNewObj, Set<Id> setIdsCasos){
+        //Crear un nuevo Custom Setting para las encuestas de 3Nivel solo de HDT
+        //Obtenemos el custom setting de HDT Parametros para obtener el Id y la URL de la encuesta (Configuracion_1: Id Encuesta, Configuracion_2: URL)
+        List<HDT_Parametros__c> linkEncuestaEmpleado3N = [SELECT HDT_Configuracion_1__c, HDT_Configuracion_2__c FROM HDT_Parametros__c WHERE Name = 'HDT_Envio_Encuesta_3N'];
+        List<HDT_Parametros__c> linkEncuestaEmpleado3NEDG = [SELECT HDT_Configuracion_1__c, HDT_Configuracion_2__c FROM HDT_Parametros__c WHERE Name = 'HDT_Envio_Encuesta_3N_EDG'];
+
+        List<CC_Lista_Valores__c> listaCanalResolucion = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución'];
+        
+		Set<String> canalesResolucionEDG = new Set<String>();
+        for (CC_Lista_Valores__c resolucion : listaCanalResolucion) {
+            if(resolucion.CC_Activa__c){
+                canalesResolucionEDG.add(resolucion.Name);
+            }
+        }
+
+        List<CC_Lista_Valores__c> listaCanalResolucion2 = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'No EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución'];
+        
+		Set<String> canalesResolucion = new Set<String>();
+        for (CC_Lista_Valores__c resolucion2 : listaCanalResolucion2) {
+            if(resolucion2.CC_Activa__c){
+                canalesResolucion.add(resolucion2.Name);
+            }
+        }
+
+        //Añadimos los canales de resolución a una lista para luego comprobar que es uno de los que aplica
+        //Set<String> canalesResolucion = new Set<String>{'Incidencias Técnicas', 'Servicios Centrales', 'SmartPhones'};
+
+
          //Traigo la base del link LimeSurvey para usar con Empleado
-        List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c FROM CC_Envio_Encuesta__c WHERE Name = 'CC_URL_Encuesta'];
+        //List<CC_Envio_Encuesta__c> linkEncuestaEmpleado = [SELECT CC_Link_LimeSurvey__c, CC_Id_Encuesta__c FROM CC_Envio_Encuesta__c WHERE Name = 'CC_URL_Encuesta'];
         Map<Id, Case> mapInfoCasos = new Map<Id, Case>([SELECT Origin, CaseNumber, CC_Idioma__c, CC_URL_Encuesta_3N__c,CC_Matricula_Empleado__c, CC_MCC_Tematica__r.name, CC_MCC_Tematica__r.CC_idCognitivo__c, CC_MCC_Tematica__c FROM Case WHERE Id IN :setIdsCasos]);
 
         for(Case caso :listNewObj){
-            if(mapInfoCasos.get(caso.Id) != null && caso.CC_Idioma__c != null && caso.CC_Matricula_Empleado__c != null &&
-            caso.CC_MCC_Tematica__c != null && mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name != null && !linkEncuestaEmpleado.isEmpty()){
-                if(caso.Origin != 'Chat'){
-                    caso.CC_URL_Encuesta_3N__c = (String)linkEncuestaEmpleado[0].CC_Link_LimeSurvey__c+'sid='+mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.CC_IdCognitivo__c+'&lang='+
-                    caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_MCC_Tematica__c+'&et='+ mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name.replace(' ', '_')+'&newtest=Y';
-                }
-                else if(caso.Origin == 'Chat'){
-                    caso.CC_URL_Encuesta_3N__c = (String)linkEncuestaEmpleado[0].CC_Link_LimeSurvey__c+'sid='+(String)linkEncuestaEmpleado[0].CC_Id_Encuesta__c+'&lang='+
-                    caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_MCC_Tematica__c+'&et='+ mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name.replace(' ', '_')+'&newtest=Y';
-                }
+            if(mapInfoCasos.get(caso.Id) != null && caso.CC_Idioma__c != null && caso.CC_Matricula_Empleado__c != null && caso.CC_MCC_Tematica__c != null && mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name != null && !linkEncuestaEmpleado3N.isEmpty()){
+                if(caso.Origin != 'Chat'){                    
+                    //Para casos de teléfono
+                    /*
+                    //Caso en el canal de procedencia SI ES uno de las edgs
+                    if(canalesResolucionEDG.contains(caso.CC_Canal_Resolucion__c)){ 
+                        caso.CC_URL_Encuesta_3N__c = (String)linkEncuestaEmpleado3NEDG[0].HDT_Configuracion_2__c+'sid='+linkEncuestaEmpleado3NEDG[0].HDT_Configuracion_1__c+'&lang='+caso.CC_Idioma__c+'&empresa='+caso.CC_Canal_Resolucion__c+
+                        '&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_MCC_Tematica__c+'&et='+ mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name.replace(' ', '_')+'&newtest=Y';
+                    }*/
+
+                    if (canalesResolucionEDG.contains(caso.CC_Canal_Resolucion__c)) {
+                        caso.CC_URL_Encuesta_3N__c = HDT_CaseTriggerHelper.generarUrlEncuesta(
+                            (String)linkEncuestaEmpleado3NEDG[0].HDT_Configuracion_2__c,
+                            (String)linkEncuestaEmpleado3NEDG[0].HDT_Configuracion_1__c,
+                            caso.CC_Idioma__c,
+                            caso.CC_Canal_Resolucion__c,
+                            caso.CC_Matricula_Empleado__c,
+                            caso.CaseNumber,
+                            caso.CC_MCC_Tematica__c,
+                            mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name
+                        );
+                    }
+                    
+                    /*
+                    if(canalesResolucion.contains(caso.CC_Canal_Resolucion__c)){         
+                        caso.CC_URL_Encuesta_3N__c = (String)linkEncuestaEmpleado3N[0].HDT_Configuracion_2__c+'sid='+linkEncuestaEmpleado3N[0].HDT_Configuracion_1__c+'&lang='+
+                        caso.CC_Idioma__c+'&userid='+caso.CC_Matricula_Empleado__c+'&ticketid='+caso.CaseNumber+'&idet='+caso.CC_MCC_Tematica__c+'&et='+ mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name.replace(' ', '_')+'&newtest=Y';    
+                    }*/
+
+                    if (canalesResolucion.contains(caso.CC_Canal_Resolucion__c)) {         
+                        caso.CC_URL_Encuesta_3N__c = HDT_CaseTriggerHelper.generarUrlEncuesta(
+                            (String)linkEncuestaEmpleado3N[0].HDT_Configuracion_2__c,
+                            (String)linkEncuestaEmpleado3N[0].HDT_Configuracion_1__c,
+                            caso.CC_Idioma__c,
+                            null, // No se usa 'empresa' en esta condición
+                            caso.CC_Matricula_Empleado__c,
+                            caso.CaseNumber,
+                            caso.CC_MCC_Tematica__c,
+                            mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name
+                        );    
+                    }         
+                }else if(caso.Origin == 'Chat'){
+                    caso.CC_URL_Encuesta_3N__c = HDT_CaseTriggerHelper.generarUrlEncuesta(
+                        linkEncuestaEmpleado3N[0].HDT_Configuracion_2__c,
+                        (String)linkEncuestaEmpleado3N[0].HDT_Configuracion_1__c,
+                        caso.CC_Idioma__c,
+                        null, // No se usa 'empresa' para Chat
+                        caso.CC_Matricula_Empleado__c,
+                        caso.CaseNumber,
+                        caso.CC_MCC_Tematica__c,
+                        mapInfoCasos.get(caso.Id).CC_MCC_Tematica__r.name
+                    );               
+                 }
             }
-
         }
-
     }
 
 
@@ -840,24 +883,6 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
         }
     }
 
-    /*
-    @Testvisible
-    private static void vincularCasoOrigen(Map<Id, Case> mapOldObj, List<Case> listNewObj) {
-        List<Id> idCasosEvaluar = new List<Id>();
-        for (Case casoNew : listNewObj) {
-            if ((casoNew.CC_MCC_Tematica__c != mapOldObj.get(casoNew.Id).CC_MCC_Tematica__c || casoNew.ContactId != mapOldObj.get(casoNew.Id).ContactId)
-            && String.isNotBlank(casoNew.ContactId)
-            && String.isNotBlank(casoNew.CC_MCC_Tematica__c)
-            && String.isBlank(mapOldObj.get(casoNew.Id).CC_Caso_Origen__c)
-            && !casoNew.CC_No_Identificado__c) {
-                idCasosEvaluar.add(casoNew.Id);
-            }
-        }
-        if (!idCasosEvaluar.isEmpty()) {
-            HDT_Case.vincularCasoOrigen(idCasosEvaluar);
-        }
-    }*/
-
     // Desarrollo para la implementación de Historial de modificación de casos
     // Desarrollado por Moisés Cano Ortiz
     // Fecha : 09/10/2023
@@ -897,6 +922,28 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
         BusinessHours bh = [SELECT Id FROM BusinessHours WHERE Name = :businessHoursName LIMIT 1];
         Id businessHoursId = bh.Id;
 
+        // Recopilar todos los IDs de los nuevos casos
+        Set<Id> caseIds = new Set<Id>();
+        for (Case newCase : listNewCases) {
+            caseIds.add(newCase.Id);
+        }
+
+        // Obtener el historial de estado de todos los casos en una sola consulta
+        Map<Id, CaseHistory> caseHistoryMap = new Map<Id, CaseHistory>();
+        if (!caseIds.isEmpty()) {
+            List<CaseHistory> historyList = [
+                SELECT CaseId, CreatedDate, Field, OldValue, NewValue
+                FROM CaseHistory 
+                WHERE CaseId IN :caseIds AND Field = 'Status'
+                ORDER BY CreatedDate DESC
+            ];
+            for (CaseHistory history : historyList) {
+                if (!caseHistoryMap.containsKey(history.CaseId)) {
+                    caseHistoryMap.put(history.CaseId, history);
+                }
+            }
+        }
+
         // Iterar sobre cada caso en la lista de nuevos casos
         for (Case newCase : listNewCases) {
             Case oldCase = mapOldCases.get(newCase.Id); 
@@ -907,18 +954,22 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 Long pendingReviewTimeMs = (newCase.CC_Tiempo_Empleado__c != 0 ? (newCase.CC_Tiempo_Empleado__c * 60000).longValue() : 0);
                 DateTime stateChangeTime = DateTime.now();
 
+                /*
                  // Obtener los cambios de estado del historial del caso
                 List<CaseHistory> historyList = [SELECT CreatedDate, Field, OldValue, NewValue 
                 FROM CaseHistory 
                 WHERE CaseId = :newCase.Id AND Field = 'Status'
-                ORDER BY CreatedDate DESC limit 1];
-                
+                ORDER BY CreatedDate DESC limit 1];*/
+
+                // Obtener el historial del caso desde el mapa
+                CaseHistory history = caseHistoryMap.get(newCase.Id);
+
                 // Si la lista de historia está vacía, continuar con la lógica pero sin basarse en los datos de historia
-                if (!historyList.isEmpty()) {
+                if (history != null) {
 
                     // Asegurarse de que se usa una fecha de inicio válida
                     //DateTime startTime = oldCase.LastModifiedDate != null ? oldCase.LastModifiedDate : DateTime.now();
-                    DateTime startTime = historyList[0].CreatedDate != null ? historyList[0].CreatedDate : DateTime.now();
+                    DateTime startTime = history.CreatedDate != null ? history.CreatedDate : DateTime.now();
                     // Calcular tiempo efectivo en milisegundos para el estado anterior
                     Long milliseconds = BusinessHours.diff(businessHoursId, startTime, stateChangeTime);
 
@@ -957,9 +1008,7 @@ public without sharing class HDT_Case_BU_TRHan extends CC_TriggerHandlerBase {
                 continue;
             }
         }
+
     }
-
-    
-
 
 }

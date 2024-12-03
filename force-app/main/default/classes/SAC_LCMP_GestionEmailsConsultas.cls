@@ -18,9 +18,7 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas {
                                     FROM SAC_Interaccion__c
                                     WHERE Id =: record];
 
-        EmailTemplate et = [SELECT Id, Name, TimesUsed, Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName ='SAC_PlantillaReclamacionConsulta' LIMIT 1]; //Obtener asunto y cuerpo del mail, aparece sin formatear y hay que hacerlo por codigo
-
-        CC_Grupo_Colaborador__c grupo = [SELECT Id, SAC_Email__c, SAC_Email2__c, SAC_Email3__c, SAC_DeveloperName__c FROM CC_Grupo_Colaborador__c WHERE Id =: interaccion.SAC_GrupoColaborador__c];  //Obtener el para del email
+        CC_Grupo_Colaborador__c grupo = [SELECT Id, SAC_Email__c, SAC_Email2__c, SAC_Email3__c, SAC_DeveloperName__c, SAC_PlantillaInteraccionId__c FROM CC_Grupo_Colaborador__c WHERE Id =: interaccion.SAC_GrupoColaborador__c];  //Obtener el para del email
 
         Case reclamacion = [SELECT Id, Origin, OS_Email__c, SAC_DireccionPostal__c, CC_Canal_Respuesta__c, SuppliedEmail, Account.CC_Email__c, RecordTypeId,
                              Status, CaseNumber, RecordType.Name, AccountId, CC_Idioma__c, Account.RecordTypeId, SAC_Reclamacion__c, SAC_Reclamacion__r.CC_Canal_Respuesta__c
@@ -48,10 +46,23 @@ public with sharing class SAC_LCMP_GestionEmailsConsultas {
         cuerpo = cuerpo.replace(']]>','');*/
 
         List<String> body = new List<String>();
-        body.add(et.HtmlValue);
-        String whoId = UserInfo.getUserId();
-        String whatId = record;
-        String cuerpo = '';
+        EmailTemplate et = new EmailTemplate();
+        String whoId;
+        String whatId;
+        String cuerpo;
+        if(grupo.SAC_PlantillaInteraccionId__c != null) {
+            et = [SELECT Id, Name, TimesUsed, Subject, HtmlValue FROM EmailTemplate WHERE Id =: grupo.SAC_PlantillaInteraccionId__c LIMIT 1]; //Obtener asunto y cuerpo del mail, aparece sin formatear y hay que hacerlo por codigo
+            body.add(et.HtmlValue);
+            whoId = UserInfo.getUserId();
+            whatId = record;
+            cuerpo = '';
+        } else {
+            et = [SELECT Id, Name, TimesUsed, Subject, HtmlValue FROM EmailTemplate WHERE DeveloperName ='SAC_PlantillaReclamacionConsulta' LIMIT 1]; //Obtener asunto y cuerpo del mail, aparece sin formatear y hay que hacerlo por codigo
+            body.add(et.HtmlValue);
+            whoId = UserInfo.getUserId();
+            whatId = record;
+            cuerpo = '';
+        }
 
         // List<Messaging.RenderEmailTemplateBodyResult> resList = Messaging.renderEmailTemplate(whoId, whatId, body);
         // if(!resList.isEmpty()){

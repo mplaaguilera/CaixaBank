@@ -380,7 +380,6 @@ public with sharing class CC_Metodos_EmailServices {
         } else if(caso.RecordTypeId == recordTypeCasoEmpl) {
             if (caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas') {
                 List<Messaging.SingleEmailMessage> allmsg = new List<Messaging.SingleEmailMessage>();
-                CC_Formulario_Consultas_Operativas.crearEmailMessage(correo, emailDestino, caso.Id, null, myPlainText, null);
                 if (caso.Status == 'Cerrado') {
                     List<CC_Buzones_Por_Defecto__mdt> owaPorDefecto = [SELECT CC_Direccion_Correo__c FROM CC_Buzones_Por_Defecto__mdt WHERE CC_Canal_Procedencia__c = 'Por defecto' AND CC_Idioma__c = 'Castellano' AND CC_Activo__c = true LIMIT 1];
                     Map <String,OrgWideEmailAddress> owasMap = new Map<String,OrgWideEmailAddress>();
@@ -409,7 +408,7 @@ public with sharing class CC_Metodos_EmailServices {
                                 caso.CC_Fecha_Reapertura__c = System.now();
                                 update caso;
                 
-                                // CC_Formulario_Consultas_Operativas.crearEmailMessage(correo, emailDestino, caso.Id, null, myPlainText, null);
+                                CC_Formulario_Consultas_Operativas.crearEmailMessage(correo, emailDestino, caso.Id, null, myPlainText, null);
                 
                                 Task actividadReapertura = new Task();
                                 actividadReapertura.Type = 'Reapertura automatica';

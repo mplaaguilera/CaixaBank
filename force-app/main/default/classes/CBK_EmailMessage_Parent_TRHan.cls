@@ -1,6 +1,8 @@
 public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDispatcherBase {
 	private static String objectApiName = 'EmailMessage';
 	private final static String HEADER_PARAMS = 'X-SFDC-Original-RCPT';
+	private static Map<Id, String> mapRTInfo = new Map <Id, String>();
+	private static Set<String> checkRTExistsSet = new Set<String>();
 	public void executeParent(CC_TriggerParameters tp, CC_TriggerParameters.TriggerEvent eventype) {
 		process((List<EmailMessage>) tp.newList, (Map<Id, EmailMessage>) tp.newMap, (List<EmailMessage>) tp.oldList, (Map<Id, EmailMessage>) tp.oldMap, eventype);
 	}
@@ -13,6 +15,13 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		List<SObject> lstEntrOld = new List<SObject> ();
 		List<SObject> lstSalOld = new List<SObject> ();
 
+		if(mapRTInfo.isEmpty()){
+			for(RecordType rtInfo : [SELECT Id, DeveloperName, SobjectType FROM RecordType]){
+				mapRTInfo.put(rtInfo.Id, rtInfo.DeveloperName );
+				checkRTExistsSet.add(rtInfo.SobjectType);
+			}
+		}
+		
 		Request reqInfo = Request.getCurrent();
 		Quiddity currentType = reqInfo.getQuiddity();  
 		String result = String.valueOf(currentType);
@@ -74,11 +83,13 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		Map<String, Map<Id, SObject>> sObjectMapsBySObjectType = new Map<String, Map<Id, SObject>>();
 
 		for(String sObjectName : sObjectsIdsBySObjectType.keySet()){
-			Set<String> idSet = SObjectsIdsBySObjectType.get(sObjectName);
-			Map<Id, SObject> newSObjectMap = new Map<Id, SObject>(Database.query(String.format('SELECT Id, RecordType.Name, RecordTypeId, RecordType.DeveloperName FROM {0} WHERE Id IN : idSet', new List<String>{sObjectName})));
-
-			if(!newSObjectMap.isEmpty()){
-				sObjectMapsBySObjectType.put(sObjectName, newSObjectMap);
+			if(checkRTExistsSet.contains(sObjectName)){
+				Set<String> idSet = SObjectsIdsBySObjectType.get(sObjectName);
+				Map<Id, SObject> newSObjectMap = new Map<Id, SObject>(Database.query(String.format('SELECT Id, RecordTypeId FROM {0} WHERE Id IN : idSet', new List<String>{sObjectName})));
+				
+				if(!newSObjectMap.isEmpty()){
+					sObjectMapsBySObjectType.put(sObjectName, newSObjectMap);
+				}
 			}
 		}
 
@@ -90,8 +101,6 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 		Boolean result;
 
 		mSobjectInfo = relatedSObjectSegmentation(correos, mapInfoMdt, sObjectMapsBySObjectType);
-
-		CBK_log.debug('Salida Map Objetos --> RT: ' + JSON.serialize(mSobjectInfo), LoggingLevel.INFO);
 
 		string objetoMT;
 		String className;
@@ -132,13 +141,9 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 					if (((tp.newList != null && tp.newList.size() > 0) || (tp.oldList != null && tp.oldList.size() > 0 ))  && active){
 						Type handlerClassType = Type.forName(className);
 						if(handlerClassType != null){
-						CBK_log.debug('Salida objeto MdT: ' + objetoMT + ' RT Mdt:' + rt, LoggingLevel.INFO);
-						CBK_log.debug('Salida Lst Emails: ' + JSON.serialize(tp.newList), LoggingLevel.INFO);
-						CBK_log.debug('Salida Map Emails: ' + JSON.serialize(tp.newMap), LoggingLevel.INFO);
-						CBK_log.debug('Salida Parent - Exec Class: ' + className, LoggingLevel.INFO);
-						execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
+							execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
 						}else{
-							CBK_Log.error('Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype);
+							CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype, new List <Object>(), null);
 						}
 					}
 				}
@@ -162,14 +167,17 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 					tp.oldList =  generateOldList(tp.newList, mapaCorreosOld);
 					tp.oldMap = generateMap(tp.oldList, eventype);
 				}
-				CBK_log.debug('\n Emails Salida - Fuera del FWK: '+ eventype + ' ' + JSON.serialize(tp.newList), LoggingLevel.INFO);
-
+				if(tp.newList != null && !tp.newList.isEmpty()){
+					CBK_log.debug('\n Emails Salida - Fuera del FWK: '+ eventype + ' ' + JSON.serialize(tp.newList), LoggingLevel.INFO);
+				}
 				if (mc.CBK_Active__c){
 					if(handlerClassType != null){
-					CBK_log.debug('\n Emails Salida Ejecucion normal: '+ eventype + ' - Objeto: Otros - Recordtype: Otros -  ClassName: '+ handlerClassName + JSON.serialize(tp.newList), LoggingLevel.INFO);
-					execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
+						if(tp.newList != null && !tp.newList.isEmpty()){
+							CBK_log.debug('\n Emails Salida Ejecucion normal: '+ eventype + ' - Objeto: Otros - Recordtype: Otros -  ClassName: '+ handlerClassName + JSON.serialize(tp.newList), LoggingLevel.INFO);
+						}
+						execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
 					}else{
-						CBK_Log.error('Trigger Handler Associations - No existe la clase: ' + handlerClassName + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype);
+						CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + handlerClassName + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype, new List <Object>(), null);
 					}
 				}
 			}
@@ -262,7 +270,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 						CBK_log.debug('Entrada Map Emails: ' + JSON.serialize(tp.newMap), LoggingLevel.INFO);
 						execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
 						}else{
-							CBK_Log.error('Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventtrigger);
+							CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + className + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventtrigger, new List <Object>(), null);
 						}
 					}
 				}
@@ -284,7 +292,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 					CBK_log.debug('\n Emails Entrada Ejecucion normal: '+ eventype + ' - EmailService: Otros - ClassName: '+ handlerClassName + JSON.serialize(tp.newList), LoggingLevel.INFO);
 					execute((CC_ITriggerHandler) handlerClassType.newInstance(), tp, eventype);
 					}else{
-						CBK_Log.error('Trigger Handler Associations - No existe la clase: ' + handlerClassName + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype);
+						CBK_Log.addError(null, null, 'Trigger Handler Associations - No existe la clase: ' + handlerClassName + ' - Para el Objeto: ' + objectApiName + ', Evento: ' + eventype, new List <Object>(), null);
 					}
 				}
 			}
@@ -400,7 +408,7 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 					}	
 				}
 			}else{
-				CBK_Log.error(e, 'Error Header Vacio');		
+				CBK_Log.addError(null, e, 'Error Header Vacio', new List<Object>() , null);		
 			}
 		}
 		Map<String, String> mheaderInfo = new Map<String, String> ();
@@ -455,32 +463,29 @@ public without sharing class CBK_EmailMessage_Parent_TRHan extends CC_TriggerDis
 	public static Map<string, Map<String, List<EmailMessage>>> relatedSObjectSegmentation(List<EmailMessage> correos, Map<String, set<String>> configMdtSalida, Map<String, Map<Id, SObject>> sObjectMapsBySObjectType ){
 		String sObjName;
 		String rt;
-		List<EmailMessage> lstem;
 		Map<String, Map<String, List<EmailMessage>>> mSobjectInfo = new Map<String, Map<String, List<EmailMessage>>>();
-		Map<Id, String> mapRTInfo = new Map <Id, String>();
-
-		for(RecordType rtInfo : [SELECT Id, DeveloperName FROM RecordType]){
-			mapRTInfo.put(rtInfo.Id, rtInfo.DeveloperName );
-		}
 
 		for (EmailMessage cs : correos){
+			List<EmailMessage> lstem = new List<EmailMessage>();
 		//Inicializar la información con ParentId
 			if (String.isNotBlank(cs.ParentId)) {
 				sObjName = cs.ParentId.getSObjectType().getDescribe().getName();
-				Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName).get(cs.ParentId).get('RecordtypeId');
-				rt = mapRTInfo.get(rtId);
-				lstem = new List<EmailMessage> ();
-				lstem.add(cs);
+				if(checkRTExistsSet.contains(sObjName)){
+					Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName).get(cs.ParentId).get('RecordtypeId');
+					rt = mapRTInfo.get(rtId);
+					lstem.add(cs);
+				}
 			}else if(String.isNotBlank(cs.RelatedToId)){
 				sObjName = cs.RelatedToId.getSObjectType().getDescribe().getName();
-				Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName).get(cs.RelatedToId).get('RecordtypeId');
-				rt = mapRTInfo.get(rtId);
-				lstem = new List<EmailMessage> ();
-				lstem.add(cs);
+				if(checkRTExistsSet.contains(sObjName)){
+					Id rtId = (Id) sObjectMapsBySObjectType.get(sObjName).get(cs.RelatedToId).get('RecordtypeId');
+					rt = mapRTInfo.get(rtId);
+					lstem.add(cs);
+				}
 			}
 
 			//En su defecto inicializar la información con RelatedId
-			if((configMdtSalida != null && !configMdtSalida.containsKey(sObjName)) || (!configMdtSalida.get(sObjName).contains(rt))){
+			if(configMdtSalida != null && (!configMdtSalida.containsKey(sObjName) || !configMdtSalida.get(sObjName).contains(rt))){
 				sObjName = 'Otros';
 				rt = 'Otros';
 			}

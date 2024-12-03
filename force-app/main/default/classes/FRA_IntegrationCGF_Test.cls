@@ -1,36 +1,6 @@
 @isTest
 public with sharing class FRA_IntegrationCGF_Test {
-    @TestSetup
-    public static void testSetup() {
-        String orgId = UserInfo.getOrganizationId();
-        String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
-        Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
-        String uniqueName = orgId + dateString + randomInt;
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            User usuario = new User();
-            usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'FRA_Usuario_Caixabank'].Id;
-            usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'FRA'].Id;
-            usuario.FirstName = 'Fraude';
-            usuario.LastName = 'Prueba';
-            usuario.Alias = uniqueName.substring(18, 23);
-            usuario.Email = uniqueName + '@test' + orgId + '.org';
-            usuario.Username = uniqueName + '@test' + orgId + '.org';
-            usuario.EmailEncodingKey = 'UTF-8';
-            usuario.LanguageLocaleKey = 'es';
-            usuario.LocaleSidKey = 'es_ES';
-            usuario.TimezonesIdKey = 'Europe/Madrid';
-            insert usuario;
     
-            List<PermissionSetAssignment> psAssignments = new List<PermissionSetAssignment>();
-            for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN ('FRA_PS_Operador','FRA_PS_Integracion')]) {
-                PermissionSetAssignment psAssignment = new PermissionSetAssignment();
-                psAssignment.AssigneeId = usuario.Id;
-                psAssignment.PermissionSetId = ps.Id;
-                psAssignments.add(psAssignment);
-            }
-            insert psAssignments;
-        }
-    }
 
     private static Account crearCuenta() {
         Account cuenta = new Account (
@@ -100,7 +70,7 @@ public with sharing class FRA_IntegrationCGF_Test {
     private static CC_MCC__c crearMCCTematica() {
         CC_MCC__c mccTematica = new CC_MCC__c (
             Name = 'MCC Tematica',
-            CC_Tipo_Cliente__c = 'Empleado',
+            CC_Tipo_Cliente__c = 'Cliente (FRA)',
             CC_Fecha_Vigencia_Inicio__c = Date.today(),
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Tematica'),
             CC_Codigo_Externo__c = 'TE-000001'
@@ -112,7 +82,7 @@ public with sharing class FRA_IntegrationCGF_Test {
     private static CC_MCC__c crearMCCProdServ() {
         CC_MCC__c mccProducto = new CC_MCC__c (
             Name = 'MCC Producto',
-            CC_Tipo_Cliente__c = 'Empleado',
+            CC_Tipo_Cliente__c = 'Cliente (FRA)',
             CC_Fecha_Vigencia_Inicio__c = Date.today(),
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Producto_Servicio'),
             CC_Codigo_Externo__c = 'PR-000001'
@@ -124,7 +94,7 @@ public with sharing class FRA_IntegrationCGF_Test {
     private static CC_MCC__c crearMCCMotivo() {
         CC_MCC__c mccMotivo = new CC_MCC__c (
             Name = 'MCC Motivo',
-            CC_Tipo_Cliente__c = 'Empleado',
+            CC_Tipo_Cliente__c = 'Cliente (FRA)',
             CC_Fecha_Vigencia_Inicio__c = Date.today(),
             RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Motivo'),
             CC_Codigo_Externo__c = 'MO-000001'       
@@ -135,18 +105,19 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC1() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        usuario.EmployeeNumber = 'U0199999';
-        update usuario;
+        
+        
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Account cuenta = crearCuenta();
         Contact contacto = crearContacto();
         contacto.AccountId = cuenta.Id;
         contacto.CC_Numero_Documento__c = '12345678Z';
         update contacto;
+            
         Case caso = crearCaso();
         caso.FRA_Id_Expediente_CGF__c = 'EXP-000001';
         caso.Status = 'Activo';
-        caso.OwnerId = [SELECT Id FROM User LIMIT 1].Id;
         caso.Description = 'Test busqueda caso cliente';
         caso.AccountId = cuenta.Id;
         caso.ContactId = contacto.Id;
@@ -161,7 +132,6 @@ public with sharing class FRA_IntegrationCGF_Test {
 
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -169,9 +139,10 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC2() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        usuario.EmployeeNumber = 'U0199999';
-        update usuario;
+        
+        
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Account cuenta = crearCuenta();
         cuenta.CC_NumPerso__c = '666';
         update cuenta;
@@ -207,7 +178,6 @@ public with sharing class FRA_IntegrationCGF_Test {
 
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }          
@@ -215,9 +185,8 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC3() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        usuario.EmployeeNumber = 'U0199999';
-        update usuario;
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntSupFRA()) {
         CC_MCC__c mccTematica = crearMCCTematica();
         CC_MCC__c mccProducto = crearMCCProdServ();
         mccProducto.CC_Tematica__c = mccTematica.Id;
@@ -225,6 +194,7 @@ public with sharing class FRA_IntegrationCGF_Test {
         CC_MCC__c mccMotivo = crearMCCMotivo();
         mccMotivo.CC_Producto_Servicio__c = mccProducto.Id;
         update mccMotivo;
+            
         Case caso = crearCaso();
         caso.FRA_Id_Expediente_CGF__c = 'EXP-000001';
         caso.Status = 'Activo';
@@ -243,7 +213,6 @@ public with sharing class FRA_IntegrationCGF_Test {
 
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -251,9 +220,7 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC4() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        usuario.EmployeeNumber = 'U0199999';
-        update usuario;
+        
         String jsonReq = '{"userId_CGF":"U0199999","tipoOperacion_CGF":"cierreCGF","idExpediente_CGF":"EXP-000001"}';
         RestRequest req = new RestRequest();
 		req.requestBody =  Blob.valueOf(jsonReq);
@@ -261,9 +228,10 @@ public with sharing class FRA_IntegrationCGF_Test {
 		RestResponse res = new RestResponse();
 		RestContext.response = res;
 
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -271,9 +239,7 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC5() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        usuario.EmployeeNumber = 'U0199999';
-        update usuario;
+        //User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
         String jsonReq = '{"userId_CGF":"U0199999","tipoOperacion_CGF":"Tipo de operación no válido"}';
         RestRequest req = new RestRequest();
 		req.requestBody =  Blob.valueOf(jsonReq);
@@ -281,9 +247,10 @@ public with sharing class FRA_IntegrationCGF_Test {
 		RestResponse res = new RestResponse();
 		RestContext.response = res;
 
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -291,7 +258,7 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC6() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        
         String jsonReq = '';
         RestRequest req = new RestRequest();
 		req.requestBody =  Blob.valueOf(jsonReq);
@@ -299,9 +266,10 @@ public with sharing class FRA_IntegrationCGF_Test {
 		RestResponse res = new RestResponse();
 		RestContext.response = res;
 
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -309,8 +277,7 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testTraspasoInfoSFC7() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        update usuario;
+        
         String jsonReq = '{"userId_CGF":"U0199999"}';
         RestRequest req = new RestRequest();
 		req.requestBody =  Blob.valueOf(jsonReq);
@@ -318,9 +285,10 @@ public with sharing class FRA_IntegrationCGF_Test {
 		RestResponse res = new RestResponse();
 		RestContext.response = res;
 
+        
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Test.startTest();
         FRA_IntegrationCGF.traspasoInfoSFC();
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -328,7 +296,9 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testBusquedaCasoCliente() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        
+		System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
+           
         Account cuenta1 = crearCuenta();
         cuenta1.CC_NumPerso__c = '666';
         update cuenta1;
@@ -368,7 +338,6 @@ public with sharing class FRA_IntegrationCGF_Test {
         Test.startTest();
         Case caso1 = FRA_IntegrationCGF.busquedaCasoCliente(rw1);
         Case caso2 = FRA_IntegrationCGF.busquedaCasoCliente(rw2);
-		System.runAs(usuario) {     
             System.assertEquals(casoPrueba1.FRA_Id_Expediente_CGF__c, caso1.FRA_Id_Expediente_CGF__c);
             System.assertEquals(casoPrueba2.AccountId, caso2.AccountId);
             Test.stopTest();
@@ -377,7 +346,8 @@ public with sharing class FRA_IntegrationCGF_Test {
     
     @isTest
     public static void testIdentificarCliente() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        
+		System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) { 
         Account cuenta = crearCuenta();
         cuenta.CC_NumPerso__c = '666';
         cuenta.CC_Numero_Documento__c = '666';
@@ -390,7 +360,6 @@ public with sharing class FRA_IntegrationCGF_Test {
         Test.startTest();
         Account account1 = FRA_IntegrationCGF.identificarCliente(rw1);
         Account account2 = FRA_IntegrationCGF.identificarCliente(rw2);
-		System.runAs(usuario) {  
             System.assertEquals(rw1.numPerso_CGF, account1.CC_NumPerso__c);
             System.assertEquals(rw2.numDoc_CGF, account2.CC_Numero_Documento__c);
             Test.stopTest();
@@ -399,7 +368,11 @@ public with sharing class FRA_IntegrationCGF_Test {
     
     @isTest
     public static void testActualizarCrearCaso() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        
+        User usuario = FRA_TestDataFactory.usuarioPruebasIntFRA();
+        System.runAs(usuario) {
+            
+            
         Case caso = crearCaso();
         FRA_RequestWrapperCGF rw1 = new FRA_RequestWrapperCGF();
         rw1.idExpediente_CGF = 'EXP-000001';
@@ -419,7 +392,6 @@ public with sharing class FRA_IntegrationCGF_Test {
         Case caso1 = FRA_IntegrationCGF.actualizarCrearCaso(caso, usuario, rw1, false);
         Case caso2 = FRA_IntegrationCGF.actualizarCrearCaso(caso, usuario, rw2, true);
         Case caso3 = FRA_IntegrationCGF.actualizarCrearCaso(caso, usuario, rw3, false);
-        System.runAs(usuario) {
             System.assert(caso1 != null);
             System.assert(caso2 != null);
             System.assert(caso3 != null);
@@ -429,14 +401,17 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testCrearAlertasCGF() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+
+        User usuario=FRA_TestDataFactory.usuarioPruebasIntFRA(); 
+         
+        System.runAs(usuario) {
         Account cuenta1 = crearCuenta();
        	Account cuenta2 = new Account(
         	RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Account', 'CC_ClientePA'),
         	FirstName = 'Cuenta',
 			LastName = 'PA',
         	CC_NumPerso__c = '777',
-            CC_Numero_Documento__c = '87654321A'
+            CC_Numero_Documento__c = '40746398N'
         );
         insert cuenta2;
         Contact contacto = crearContacto();
@@ -497,7 +472,6 @@ public with sharing class FRA_IntegrationCGF_Test {
         Test.startTest();
         FRA_IntegrationCGF.crearAlertasCGF(rw1, caso1, usuario, true);
         FRA_IntegrationCGF.crearAlertasCGF(rw2, caso2, usuario, false); 
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }
@@ -505,12 +479,14 @@ public with sharing class FRA_IntegrationCGF_Test {
 
     @isTest
     public static void testCrearTarea() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+        
+		User usuario=FRA_TestDataFactory.usuarioPruebasIntFRA();
+        
+        System.runAs(usuario) {
         Case caso = crearCaso();
 
         Test.startTest();
         FRA_IntegrationCGF.crearTarea(caso, usuario, 'FRA_Traslado_Información_CGF', false, '');
-        System.runAs(usuario) {    
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }  
@@ -518,8 +494,8 @@ public with sharing class FRA_IntegrationCGF_Test {
     
     @isTest
     public static void testIdentificarPorNumBusqueda() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
-        Case caso = crearCaso();
+
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Account cuenta1 = crearCuenta();
         cuenta1.CC_NumPerso__c = '666';
         update cuenta1;
@@ -555,13 +531,13 @@ public with sharing class FRA_IntegrationCGF_Test {
         update representante2;
 
         Test.startTest();
+        	Case caso = crearCaso();
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '333', true);
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '444', true);
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '555', true);
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '666', true);
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '777', true);
         FRA_IntegrationCGF.identificarPorNumBusqueda(caso, '888', true);
-        System.runAs(usuario) {
             System.assertEquals(true, true, 'PENDIENTE');
             Test.stopTest();
         }  
@@ -569,7 +545,8 @@ public with sharing class FRA_IntegrationCGF_Test {
     
     @isTest
     public static void testIdentificarPersSFC() {
-        User usuario = [SELECT Id FROM User WHERE FirstName = 'Fraude' LIMIT 1];
+
+        System.runAs(FRA_TestDataFactory.usuarioPruebasIntFRA()) {
         Account cuenta1 = crearCuenta();
         cuenta1.CC_NumPerso__c = '666';
         update cuenta1;
@@ -586,7 +563,6 @@ public with sharing class FRA_IntegrationCGF_Test {
         Test.startTest();
         Map<String, Object> mapa1 = FRA_IntegrationCGF.IdentificarPersSFC('666', true);
         Map<String, Object> mapa2 = FRA_IntegrationCGF.IdentificarPersSFC('666', false);
-        System.runAs(usuario) {
             System.assert(mapa1.get('CONTACTOS') != null);
             System.assert(mapa2.get('REPRESENTANTES') != null);
             Test.stopTest();

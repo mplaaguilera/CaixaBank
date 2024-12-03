@@ -5,7 +5,7 @@
 Proposito: Before Insert sobre el objeto Campaign
 -----------------------------------------------------------------------------------------------------------------------
 Historial
----------------------
+------------------
   VERSION    USER_STORY      	AUTHOR        		DATE        		Description
   1.0                          	Eric Vázquez    	23/03/2021      	Init version
   1.1         	US388331        Daniel Rodriguez    22/06/2022          Modify method changestatus and create methods createRecordSchProcess and dmloperations
@@ -25,7 +25,13 @@ Historial
   2.2           DE75856         Daniel Rodriguez    04/10/2023          Remove method creationSchedule, evaluateJob to new class EV_CreateScheduleChangeStatus whith whithout sharing                                   
   2.3           DE75856         Carolina Lopez      05/10/2023          Modify method sharingCampaignApex
   2.4           US585725        Mamen Arias         06/10/2023          Modify method crearCampaignEstados adding spanish language to CM label
-***********************************************************************************************************************/
+  2.5           DE88146         Carolina Lopez      28/11/2023          Modify error condition in method validateEventToTranslations. 
+  2.6           US854993        Carolina Lopez      09/04/2024          Create method visiblePortalInformation.
+  2.7           FIX             Carolina Lopez      07/05/2024          Delete WITH SECURITY_ENFORCED.
+  2.8           TechSummit      Carolina Lopez      14/05/2024          Add new RecordType TechSummit (EV_CampTechSummitFisico,EV_CampTechSummitVirtual, EV_CampTechSummitHibrido) in all methods new architecture, create method setTechSummitCampaign.
+  2.9           FIX             Carolina Lopez      12/07/2024          Modify logic method updateRollUpEventChangeStatus.
+  3.0           IN1191612       Manuel Ramos        15/07/2024          Modify method generarTraduccionesEventoHijo.
+  ***********************************************************************************************************************/
 public with sharing class EV_CampaignTriggerHelper {
 	static final String EV_PLACE_OF_CELEBRATION = 'Online';
     static final String ALTA_MASIVA = 'Alta masiva';
@@ -38,6 +44,9 @@ public with sharing class EV_CampaignTriggerHelper {
     private static EV_Utilities.SearchRT rtCatFisico	= new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CatalogoEventoFisico);
     private static EV_Utilities.SearchRT rtCatHibrido	= new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CatalogoEventoHibrido);
     private static EV_Utilities.SearchRT rtFestivalesEx	= new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_FestivalesYexperiencias);
+    private static EV_Utilities.SearchRT rtFisicoTech   = new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitFisico);
+    private static EV_Utilities.SearchRT rtVirtualTech	= new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitVirtual);
+    private static EV_Utilities.SearchRT rtHibridoTech	= new EV_Utilities.SearchRT(EV_Utilities.OBJECT_NAME_CAMPAIGN, Label.EV_CampTechSummitHibrido);
 	private static Set<Id> setRtFisico					= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFisico});
 	private static Set<Id> setRtVirtual					= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtVirtual});
     private static Set<Id> setRtHibrido					= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtHibrido});
@@ -46,6 +55,9 @@ public with sharing class EV_CampaignTriggerHelper {
     private static Set<Id> setRtCatVirtual				= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtCatVirtual});
     private static Set<Id> setRtCatHibrido				= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtCatHibrido});
     private static Set<Id> setRtFestivales				= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFestivalesEx});
+    private static Set<Id> setRtFisicoTech			    = getIdsRTN(new Set<EV_Utilities.SearchRT>{rtFisicoTech});
+    private static Set<Id> setRtVirtualTech				= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtVirtualTech});
+    private static Set<Id> setRtHibridoTech				= getIdsRTN(new Set<EV_Utilities.SearchRT>{rtHibridoTech});
     private static Id rtEventoVirtual                   = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_EventoVirtual).getRecordTypeId();
     private static Id rtEventoHibrido                   = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_EventoHibrido).getRecordTypeId();
     private static Id rtEventoAccionista                = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_EventosAccionistas).getRecordTypeId();
@@ -54,6 +66,9 @@ public with sharing class EV_CampaignTriggerHelper {
     private static Id rtEventoCatVirtual                = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CatalogoEventoVirtual).getRecordTypeId();
     private static Id rtEventoCatFisico                 = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CatalogoEventoFisico).getRecordTypeId();
     private static Id rtEventoCatHibrido                = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CatalogoEventoHibrido).getRecordTypeId();
+    private static Id rtEventoFisicoTechSummit         = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CampTechSummitFisico).getRecordTypeId();
+    private static Id rtEventoVirtualTechSummit         = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CampTechSummitVirtual).getRecordTypeId();
+    private static Id rtEventoHibridoTechSummit         = Schema.SObjectType.Campaign.getRecordTypeInfosByDeveloperName().get(Label.EV_CampTechSummitHibrido).getRecordTypeId();
 
   
 	/**
@@ -89,6 +104,9 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTCatVirtual);
         setIdsRts.addAll(setRTCatHibrido);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         Set<String> campignStatusConfirmed = new Set<String>{'009'};
             
             for(Campaign c : mapNewCampaign.values()){
@@ -98,6 +116,66 @@ public with sharing class EV_CampaignTriggerHelper {
                 }
             }
 	}
+
+
+	/**
+	* @description  update visibility information
+	* @param listNews    List to Campaign
+    * @param mapOldCampaign Map to old Campaign
+	*/
+    public static void visiblePortalInformation(List<Campaign> listNews,Map<Id, Campaign> mapOldCampaign){
+        EV_LogDebug.printLogDebug('visiblePortalInformation ',String.valueof(listNews) + ' '+ String.valueof(mapOldCampaign));
+        Set<Id> setIdsRts = new Set<Id>();
+        setIdsRts.addAll(setRTFisico);
+        setIdsRts.addAll(setRTVirtual);
+        setIdsRts.addAll(setRTHibrido);
+        setIdsRts.addAll(setRTAccionista);
+        setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
+        List<EV_PortalCaixaBankTalks__c> lstPortal = new List<EV_PortalCaixaBankTalks__c>();
+        Map<Id, List<EV_PortalCaixaBankTalks__c>> campaignIdToPortalsMap = new Map<Id, List<EV_PortalCaixaBankTalks__c>>();
+        List<EV_PortalCaixaBankTalks__c> lstToUpdate = new List<EV_PortalCaixaBankTalks__c>();
+
+        if(Schema.sObjectType.EV_PortalCaixaBankTalks__c.isAccessible()){
+            lstPortal = [SELECT id, name, EV_Posicionamiento__c, EV_Fechadespublicacion__c, EV_Evento__r.RecordTypeId 
+                FROM EV_PortalCaixaBankTalks__c WHERE EV_Evento__c IN:listNews AND EV_Evento__r.RecordTypeId IN:setIdsRts AND EV_Posicionamiento__c != '008'];
+
+            for (EV_PortalCaixaBankTalks__c evtPortal : lstPortal) {
+                if (!campaignIdToPortalsMap.containsKey(evtPortal.EV_Evento__c)) {
+                    campaignIdToPortalsMap.put(evtPortal.EV_Evento__c, new List<EV_PortalCaixaBankTalks__c>());
+                }
+                campaignIdToPortalsMap.get(evtPortal.EV_Evento__c).add(evtPortal);
+            }
+        }
+        EV_LogDebug.printLogDebug('@@campaignIdToPortalsMap ',String.valueof(campaignIdToPortalsMap));
+
+        if(!lstPortal.isEmpty()){
+            if(mapOldCampaign != null || !mapOldCampaign.isEmpty()){
+                for (Campaign newCampaign : listNews) {
+                    if (newCampaign.EV_Fechadespublicacion__c != null && newCampaign.EV_Fechadespublicacion__c != mapOldCampaign.get(newCampaign.Id).EV_Fechadespublicacion__c && campaignIdToPortalsMap.containsKey(newCampaign.Id)) {
+                        for (EV_PortalCaixaBankTalks__c portal : campaignIdToPortalsMap.get(newCampaign.Id)) {
+                            portal.EV_Fechadespublicacion__c = newCampaign.EV_Fechadespublicacion__c;
+                            lstToUpdate.add(portal);
+                        }
+                    }
+                }
+                EV_LogDebug.printLogDebug('@@lstToUpdate ',String.valueof(lstToUpdate));
+            }
+            if(!lstToUpdate.isEmpty()){
+                Database.SaveResult[] updateResults = Database.update(lstToUpdate, false);
+                for(Database.SaveResult result : updateResults){
+                    if(!result.isSuccess()){
+                        for(Database.Error error : result.getErrors()){
+                            EV_LogDebug.printLogDebug('@@Error al actualizar ',String.valueof(error.getMessage()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 				
 	/**
@@ -114,6 +192,8 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTCatHibrido);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         Set<String> setIdsCampaign = new Set<String>();
         Set<String> campignStatusConfirmed = new Set<String>{'009'};
             
@@ -144,8 +224,11 @@ public with sharing class EV_CampaignTriggerHelper {
                 List<EV_TraduccionDeEvento__c> trad = mapTranslations.get(c.id);
                 for(EV_TraduccionDeEvento__c t : trad){
                     if(c.recordtypeId == rtFestivales && campignStatusConfirmed.contains(c.Status) && oldMapCampaign.get(c.Id).Status != c.Status && 
-                    (t.EV_BeAgroBankMIC__c==null && t.EV_BancaNegocios__c==null && t.EV_BancaPremier__c ==null && t.EV_BancaPrivada__c == null && t.EV_BancaRetail__c == null && t.EV_CodigoBeAgroBankMIC__c == null && t.EV_CodigoBancaNegocios__c == null && t.EV_CodigoBancaPremier__c == null && t.EV_CodigoBancaPrivada__c == null && t.EV_CodigoBancaRetail__c == null) 
-                    || (t.EV_TextoCTANL__c == null && t.EV_URLCTALanding__c == null && t.EV_TextoCTALanding__c == null)){
+                    ((t.EV_BeAgroBankMIC__c==null && t.EV_BancaNegocios__c==null && t.EV_BancaPremier__c ==null &&
+                     t.EV_BancaPrivada__c == null && t.EV_BancaRetail__c == null && t.EV_CodigoBeAgroBankMIC__c == null &&
+                     t.EV_CodigoBancaNegocios__c == null && t.EV_CodigoBancaPremier__c == null &&
+                     t.EV_CodigoBancaPrivada__c == null && t.EV_CodigoBancaRetail__c == null) 
+                    || (t.EV_TextoCTANL__c == null && t.EV_URLCTALanding__c == null && t.EV_TextoCTALanding__c == null))){
                         c.addError('Necesitas informar el espacio Festivales y otras experiencias de las traducciones');
                     }
                     if(c.recordtypeId != rtFestivales && campignStatusConfirmed.contains(c.Status) && oldMapCampaign.get(c.Id).Status != c.Status && (c.EV_URLDelEventoVirtual__c==null || t.EV_URLImagenEsperaStreaming__c==null)){
@@ -168,6 +251,7 @@ public with sharing class EV_CampaignTriggerHelper {
         Set<Id> setIdsRts = new Set<Id>();
         setIdsRts.addAll(setRTCatVirtual);
         setIdsRts.addAll(setRTVirtual);
+        setIdsRts.addAll(setRtVirtualTech);
         
         for(Campaign c : listNews){
             if((setIdsRts).contains(c.RecordTypeId)){
@@ -186,6 +270,9 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTCatVirtual);
         setIdsRts.addAll(setRTCatHibrido);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         List<Campaign> updateCampaign = new List<Campaign>();
         List<Campaign> lstCamp = [SELECT id, ParentId, EV_Cartera__c,EV_CentroPromotor__c, EV_Categoria__c, Parent.EV_Cartera__c, Parent.EV_CentroPromotor__c, Parent.EV_Categoria__c,  RecordTypeId  FROM Campaign Where Id IN: listNews AND ParentId != null AND RecordTypeId IN:setIdsRts];
         if(!lstCamp.isEmpty()){
@@ -198,7 +285,7 @@ public with sharing class EV_CampaignTriggerHelper {
                    }
             }
         }
-        if(!updateCampaign.isEmpty()){
+        if(!updateCampaign.isEmpty() && Schema.sObjectType.Campaign.isUpdateable()){
             update updateCampaign;
         }                                                      
 	}
@@ -221,6 +308,9 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTAccionista);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         Set<String> setIdsCampaign = new Set<String>();
         
         for(Campaign c : newMapCampaign.values()){
@@ -326,7 +416,7 @@ public with sharing class EV_CampaignTriggerHelper {
 		  }               
 		}
 	  }
-	  if (listCPOToProcess != null && !listCPOToProcess.isEmpty()) {
+	  if (listCPOToProcess != null && !listCPOToProcess.isEmpty() && Schema.sObjectType.EV_CriterioPublicoObjetivo__c.isUpdateable()) {
 		Database.update(listCPOToProcess, false);          
 	  }
 	}
@@ -357,6 +447,7 @@ public with sharing class EV_CampaignTriggerHelper {
 				}
 				Map<String, Set<String>> campaignEmployees= new Map<String, Set<String>>();
 				for(String camp : campaignCentros.keySet()){
+
 					for (String centroAccountId : campaignCentros.get(camp)) {
 						for (String usuario : mapCons.get(centroAccountId)) {
 							if(!campaignEmployees.containsKey(camp)){
@@ -421,6 +512,9 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTAccionista);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
 
         for(Campaign camp : listNewObj){
             
@@ -447,39 +541,15 @@ public with sharing class EV_CampaignTriggerHelper {
         update lstAux;
     }
 
-    /*@future
-    public static void generarIdSeguro(Set<Id> recordIds) {
-		EV_LogDebug.printLogDebug('generarIdSeguro ',String.valueof(recordIds));
-        List<Campaign> lstCamp = [SELECT Id, CreatedDate, Name, EV_ExternalID__c from Campaign WHERE Id in : recordIds AND EV_ExternalID__c = null FOR UPDATE];
-        system.debug('@@lstCamp ' + lstCamp);
-        if(!lstCamp.isEmpty()){
-            List<Campaign> lstAux = new List<Campaign>();
-            for(Campaign camp : lstCamp){
-                camp.EV_ExternalID__c = EV_Utilities.generateSecureId(camp.Id + String.valueOf(camp.CreatedDate) + camp.Name).replace('%','').replace('&','');
-                lstAux.add(camp);
-            }
-            system.debug('@@lstAux ' + lstAux);
-            if(!lstAux.isEmpty()){
-                system.debug('@@ENTRA UPDATE ' + lstAux);
-                Database.SaveResult[] result =  Database.update(lstAux, false);
-                for(Database.SaveResult datos : result){
-                    if(!datos.isSuccess()){
-                        for (Database.Error error : datos.getErrors()) {
-                            EV_LogDebug.printLogDebug('ERROR generarIdSeguro: ', String.valueof(error.getMessage()));
-                        }
-                    }
-                }
-            }
-        }
-    }*/
-
     public static void generarTraduccionesEventoHijo(List<Campaign> listNewObj) {
         EV_LogDebug.printLogDebug('generarTraduccionesEventoHijo ',String.valueof(listNewObj));
         Set<Id> setIdsRts = new Set<Id>();
         setIdsRts.addAll(setRTFisico);
         setIdsRts.addAll(setRTVirtual);
         setIdsRts.addAll(setRTHibrido);
-        
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
         
         Map<Id, List<EV_TraduccionDeEvento__c>> mapTraducciones = new Map<Id, List<EV_TraduccionDeEvento__c>>();
         Map<Id, List<Id>> mapTraduccionesHijo = new Map<Id,List<Id>>();
@@ -513,10 +583,10 @@ public with sharing class EV_CampaignTriggerHelper {
                     }
                     
                 }
+            }                                         
+            if(Schema.sObjectType.EV_TraduccionDeEvento__c.isCreateable()){
+                insert lstTraduccionesInsert;
             }
-                                                         
-            
-            insert lstTraduccionesInsert;
         }
     }
 
@@ -530,7 +600,7 @@ public with sharing class EV_CampaignTriggerHelper {
 
         for(Campaign camp : listNewObj) {
             setCamps.add(camp.Id);
-            if(camp.RecordTypeId == rtEventoVirtual || camp.RecordTypeId == rtEventoFisico || camp.RecordTypeId == rtEventoHibrido || camp.RecordTypeId == rtFestivales) {
+            if(camp.RecordTypeId == rtEventoVirtual || camp.RecordTypeId == rtEventoFisico || camp.RecordTypeId == rtEventoHibrido || camp.RecordTypeId == rtFestivales || camp.RecordTypeId == rtEventoFisicoTechSummit ||  camp.RecordTypeId == rtEventoVirtualTechSummit  ||  camp.RecordTypeId == rtEventoHibridoTechSummit ) {
                 if(camp.ParentId != null) {
                     listChildCamps.add(camp);
                     setParentCamps.add(camp.ParentId);
@@ -599,7 +669,7 @@ public with sharing class EV_CampaignTriggerHelper {
             }
         }
 
-        if(!listCPOToProcess.isEmpty()) {
+        if(!listCPOToProcess.isEmpty() && Schema.sObjectType.EV_CriterioPublicoObjetivo__c.isCreateable()) {
             Database.insert(listCPOToProcess, false);
         }
     }
@@ -657,8 +727,7 @@ public with sharing class EV_CampaignTriggerHelper {
             }
             statusToAdd.addAll(statusToDelete);
             EV_LogDebug.printLogDebug('statusToAdd ',String.valueof(statusToAdd));
-            if(!statusToAdd.isEmpty())
-            {
+            if(!statusToAdd.isEmpty() && Schema.sObjectType.CampaignMemberStatus.isCreateable() && Schema.sObjectType.CampaignMemberStatus.isUpdateable()){
                 upsert statusToAdd;
             }
         }
@@ -680,6 +749,24 @@ public with sharing class EV_CampaignTriggerHelper {
             }
         }
     }
+
+    /**
+	* @description   include techSummit in new campaigns.
+	* @param List<Campaign> listNewObj   List to New Campaign
+	*/
+	public static void setTechSummitCampaign(List<Campaign> listNewObj){
+		EV_LogDebug.printLogDebug('setTechSummitCampaign ',String.valueof(listNewObj));
+        Set<Id> setIdsRts = new Set<Id>();
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
+        for(Campaign camp : listNewObj){
+            if(setIdsRts.contains(camp.RecordtypeId) && camp.EV_NewArchitecture__c == true){
+                camp.EV_TechSummit__c = true;
+            }
+        }
+    }
+
     /**
 	* @description       Check active survey
 	* @param List<Campaign> listNewObj           List to New Campaign
@@ -697,6 +784,9 @@ public with sharing class EV_CampaignTriggerHelper {
         setIdsRts.addAll(setRTHibrido);
         setIdsRts.addAll(setRTAccionista);
         setIdsRts.addAll(setRtFestivales);
+        setIdsRts.addAll(setRtFisicoTech);
+        setIdsRts.addAll(setRtVirtualTech);
+        setIdsRts.addAll(setRtHibridoTech);
 
         Map<Id,Survey> surveyActive = new Map<Id,Survey>([Select id from Survey  where ActiveVersion.SurveyStatus = 'Active']);
 	  
@@ -735,30 +825,30 @@ public with sharing class EV_CampaignTriggerHelper {
 		}
         EV_LogDebug.printLogDebug('setCampaign ',String.valueof(setCampaign));
         if(!setCampaign.isEmpty()){
-            List<AggregateResult> agrr = [SELECT count(id) t, EV_Status__c,  EV_CampaignId__c,EV_FormatoDeAsistencias__c,EV_Empresa__c FROM EV_CampaignMemberC__c where EV_CampaignId__c in : setCampaign GROUP BY EV_CampaignId__c, EV_Status__c,EV_FormatoDeAsistencias__c,EV_Empresa__c ];
+            List<AggregateResult> agrr = [SELECT count(id) t, EV_Status__c,  EV_CampaignId__c, EV_FormatoDeAsistencias__c, EV_Empresa__c FROM EV_CampaignMemberC__c where EV_CampaignId__c in : setCampaign GROUP BY EV_CampaignId__c, EV_Status__c, EV_FormatoDeAsistencias__c, EV_Empresa__c];
             
             EV_LogDebug.printLogDebug('ids Campaign rollup ',String.valueof(agrr));
             for(AggregateResult arr : agrr){
                 String idC = (String)arr.get('EV_CampaignId__c');
                 if(aggAsisVir.containsKey(idC)){
-                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && ((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
+                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && (Boolean)arr.get('EV_Empresa__c') == false && ((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
                         Integer asis = aggAsisVir.get(idC);
                         Integer totalAsis = (Integer)arr.get('t') + asis;
                         aggAsisVir.put(idC, totalAsis);
                     }
                 }else{
-                        if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && (String)arr.get('EV_Status__c') == 'Asistió'){
+                        if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' &&  (Boolean)arr.get('EV_Empresa__c') == false && ((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
                             Integer totalAsis = (Integer)arr.get('t');
                             aggAsisVir.put(idC, totalAsis); 
                         }  
                 }if(aggInscriVir.containsKey(idC)){
-                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && ((String)arr.get('EV_Status__c') == 'QR Enviado' || (String)arr.get('EV_Status__c') == 'Registro confirmado' ||  (String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
+                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && (Boolean)arr.get('EV_Empresa__c') == false  && ((String)arr.get('EV_Status__c') == 'QR Enviado' || (String)arr.get('EV_Status__c') == 'Asistió en diferido' || (String)arr.get('EV_Status__c') == 'Registro confirmado' ||  (String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
                         Integer inscri = aggInscriVir.get(idC);
                         Integer totalInscri = (Integer)arr.get('t') + inscri;
                         aggInscriVir.put(idC, totalInscri);
                     }
                 }else{
-                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && ((String)arr.get('EV_Status__c') == 'QR Enviado' || (String)arr.get('EV_Status__c') == 'Registro confirmado' || (String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
+                    if((String)arr.get('EV_FormatoDeAsistencias__c') == '002' && (Boolean)arr.get('EV_Empresa__c') == false  && ((String)arr.get('EV_Status__c') == 'QR Enviado' || (String)arr.get('EV_Status__c') == 'Asistió en diferido' || (String)arr.get('EV_Status__c') == 'Registro confirmado' || (String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta')){
                         Integer totalInscri = (Integer)arr.get('t');
                         aggInscriVir.put(idC, totalInscri);
                     }
@@ -771,20 +861,18 @@ public with sharing class EV_CampaignTriggerHelper {
                         aggTotal.put(idC, total);
                     
                 }if(aggTotalAsis.containsKey(idC)){
-                    if(((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta') && (Boolean)arr.get('EV_Empresa__c') == false){
+                    if(((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta' ||  (String)arr.get('EV_Status__c') == 'Asistió en diferido') && (Boolean)arr.get('EV_Empresa__c') == false){
                         Integer count = aggTotalAsis.get(idC);
                         Integer total = (Integer)arr.get('t') + count;
                         aggTotalAsis.put(idC, total);
                     }
                 }else{
-                    if(((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta') && (Boolean)arr.get('EV_Empresa__c') == false){
+                    if(((String)arr.get('EV_Status__c') == 'Asistió' || (String)arr.get('EV_Status__c') == 'Accedio a la oferta' ||  (String)arr.get('EV_Status__c') == 'Asistió en diferido') && (Boolean)arr.get('EV_Empresa__c') == false){
                         Integer total = (Integer)arr.get('t');
                         aggTotalAsis.put(idC, total);
                     }
-                    
                 }
             }
-       
         
             EV_LogDebug.printLogDebug('aggAsisVir ',String.valueof(aggAsisVir) + ' ' +aggAsisVir.values() );
             EV_LogDebug.printLogDebug('aggInscriVir ',String.valueof(aggInscriVir) + ' ' +aggInscriVir.values() );
@@ -821,11 +909,9 @@ public with sharing class EV_CampaignTriggerHelper {
                 }else{
                     campaignUpdate.put(camp.id, camp);
                 }
-    
             }
             EV_LogDebug.printLogDebug('campaignUpdate ',String.valueof(campaignUpdate));
             Database.update(campaignUpdate.values(), false);
         }
-    }
-         
-  }
+    }     
+}

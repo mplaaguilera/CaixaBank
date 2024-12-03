@@ -10,7 +10,10 @@ Historial
 	1.0		  	US587006			Mamen Arias         31/05/2023          Init Version
 	1.1			US606503			Mamen Arias			13/07/2023			Modify services future-registered-list-by-client, future-list-by-client and pass-and-future-list-by-client. Adapt to COE FWK.
 	1.2			US714516			Mamen Arias			27/09/2023			Fix status in queries. Badly written
-	1.3			US624265			Daniel Rodriguez	26/09/2023			Modify all service to add new field EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c  
+	1.3			US624265			Daniel Rodriguez	26/09/2023			Modify all service to add new field EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c 
+	1.4         US306439            Carolina Lopez      17/11/2023          Modify custom CampaignMember service to add new field EV_URLVolverEvento__c, value 'Asistió en diferido' in EV_Status__c and Add service 'attended-deferred-basis'.
+	1.5			US854993			Carolina Lopez		04/04/2024			Modified the portal visibility filter in 'past-list-by-client'.
+	1.6         FIX             	Carolina Lopez      07/05/2024          Delete WITH SECURITY_ENFORCED.
 ***********************************************************************************************************************/
 @RestResource(urlMapping='/EV_GetEvents/*')
 global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abstract {
@@ -18,7 +21,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 	@HttpPost
 	global static void getResults() {
 
-		String servicio = '';
+		String servicio = ''; 
 		String numperso = '';
 		List<String> idioma = new List<String>();
 		String numOficina = '';
@@ -68,7 +71,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 								EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 								EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c    
 								FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-								(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c 
+								(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c 
 								FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso) 
 								FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso) 
 								AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true AND Status != '009' AND Status != '002'];
@@ -93,7 +96,8 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									FROM CampaignMembers WHERE Contact.CC_NumPerso__c = :numperso)  
 									FROM Campaign WHERE ID IN (SELECT CampaignId FROM CampaignMember WHERE Contact.CC_NumPerso__c = :numperso) 
 									AND Status = '005' AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
-									AND Id IN (SELECT EV_Evento__c FROM EV_PortalCaixaBankTalks__c WHERE EV_Posicionamiento__c = '008' AND EV_VisiblePortal__c = true AND EV_URLeventoCompleto__c != null) 
+									AND Id IN (SELECT EV_Evento__c FROM EV_PortalCaixaBankTalks__c WHERE ((EV_Posicionamiento__c='008')  OR
+                    				((EV_Posicionamiento__c!='008' AND (EV_VisiblePortal__c = true OR EV_VisibleFormula__c = true)))) AND EV_URLeventoCompleto__c != null)
 									ORDER BY EV_FechaHoraFin__c DESC];
 					listaResultados.addAll(campaignList);
 
@@ -103,11 +107,12 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c   
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c
 									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso)  
 									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso) 
 									AND Status = '005' AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
-									AND Id IN (SELECT EV_Evento__c FROM EV_PortalCaixaBankTalks__c WHERE EV_Posicionamiento__c = '008' AND EV_VisiblePortal__c = true AND EV_URLeventoCompleto__c != null) 
+									AND Id IN (SELECT EV_Evento__c FROM EV_PortalCaixaBankTalks__c WHERE ((EV_Posicionamiento__c='008')  OR
+                    				((EV_Posicionamiento__c!='008' AND (EV_VisiblePortal__c = true OR EV_VisibleFormula__c = true)))) AND EV_URLeventoCompleto__c != null)
 									ORDER BY EV_FechaHoraFin__c DESC];
 					listaResultados.addAll(campaignList);
 
@@ -139,9 +144,9 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c   
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
-									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND (EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió'))) 
-									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND (EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta'))) 
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
+									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND (EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió', 'Asistió en diferido'))) 
+									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND (EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta', 'Asistió en diferido'))) 
 									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
 									ORDER BY EV_FechaHoraFin__c];
 					listaResultados.addAll(campaignList);
@@ -164,7 +169,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									(SELECT Id, Contact.CC_NumPerso__c, Status, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
 									FROM CampaignMembers WHERE Contact.CC_NumPerso__c = :numperso AND (Status = 'Pendiente' OR Status = 'Invitacion enviada')) 
 									FROM Campaign WHERE ID IN (SELECT CampaignId FROM CampaignMember where Contact.CC_NumPerso__c = :numperso AND(Status = 'Pendiente'  OR Status = 'Invitacion enviada')) 
-									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
+									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true
 									ORDER BY EV_FechaHoraFin__c];
 					listaResultados.addAll(campaignList);
 
@@ -174,10 +179,10 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c    
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
 									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND (EV_Status__c = 'Pendiente' OR EV_Status__c = 'Invitación enviada')) 
 									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c where EV_ContactId__r.CC_NumPerso__c = :numperso AND(EV_Status__c = 'Pendiente'  OR EV_Status__c = 'Invitación enviada')) 
-									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
+									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true
 									ORDER BY EV_FechaHoraFin__c];
 					listaResultados.addAll(campaignList);
 
@@ -209,9 +214,9 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c  
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c 
-									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió')) 
-									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta')) 
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c
+									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió', 'Asistió en diferido')) 
+									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta', 'Asistió en diferido')) 
 									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
 									ORDER BY EV_FechaHoraFin__c];
 					listaResultados.addAll(campaignList);
@@ -243,9 +248,9 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c   
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma), 
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c 
-									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió')) 
-									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta')) 
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c, EV_URLVolverEvento__c
+									FROM CampaignMembers__r WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió', 'Asistió en diferido')) 
+									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ContactId__r.CC_NumPerso__c = :numperso AND EV_Status__c IN ('Pendiente', 'Invitación enviada', 'Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta', 'Asistió en diferido')) 
 									AND (Status = '008' OR Status = '003' OR Status = '004' OR  Status = '005' OR  Status = '012') AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true];
 					listaResultados.addAll(campaignList);
 
@@ -290,7 +295,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 						campaignMemberListCustom = [SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_CampaignId__c, EV_CampaignId__r.EV_NewArchitecture__c, EV_CampaignId__r.EV_ExternalID__c, EV_CampaignId__r.Name, EV_CampaignId__r.EV_NombrePonente__c, 
 											EV_CampaignId__r.StartDate, EV_CampaignId__r.EV_HoraInicio__c, EV_CampaignId__r.Status, EV_CampaignId__r.RecordType.DeveloperName, EV_ExternalID__c, EV_Status__c, 
 											EV_FormatoDeAsistencias__c, EV_CampaignId__r.EV_Categoria__c , EV_CampaignId__r.EV_URLDelEventoVirtual__c, EV_CampaignId__r.EV_URLRegistro__c, EV_URLRegistro__c, 
-											EV_URLStreamingEvento__c, EV_CampaignId__r.EV_Duracion__c, EV_CampaignId__r.EV_Idioma__c, EV_CampaignId__r.EV_aforoCompletoC__c, EV_CampaignId__r.EV_aforoFisicoCompletoC__c 
+											EV_URLStreamingEvento__c, EV_URLVolverEvento__c, EV_CampaignId__r.EV_Duracion__c, EV_CampaignId__r.EV_Idioma__c, EV_CampaignId__r.EV_aforoCompletoC__c, EV_CampaignId__r.EV_aforoFisicoCompletoC__c 
 											FROM EV_CampaignMemberC__c WHERE EV_CampaignId__r.StartDate = :fecha AND EV_CampaignId__r.Recordtype.DeveloperName != :Label.EV_EventosAccionistas 
 											AND EV_CampaignId__r.EV_EventoVisibleNOW__c = true AND EV_CampaignId__r.Status != '009' AND EV_CampaignId__r.Status != '002'];
 					
@@ -344,7 +349,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c   
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c in :idioma),  
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c  
 									FROM CampaignMembers__r WHERE EV_ExternalID__c = :externalIdCM) 
 									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_ExternalID__c = :externalIdCM) AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true 
 									AND Status != '009' and Status != '002'];
@@ -379,7 +384,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 									EV_URLImagenInvitacion__c, EV_URLImagenMedia__c, EV_URLImagenMovil__c, EV_URLImagenOriginal__c, EV_URLImagenPequena__c, EV_URLVideoTeaser__c, EV_URLEventVideo__c,
 									EV_BeAgroBankMIC__c, EV_BancaNegocios__c,EV_BancaPremier__c,EV_BancaPrivada__c,EV_BancaRetail__c,EV_CodigoBeAgroBankMIC__c,EV_CodigoBancaNegocios__c,EV_CodigoBancaPremier__c,EV_CodigoBancaPrivada__c,EV_CodigoBancaRetail__c,EV_TextoCTANL__c, EV_URLCTALanding__c,EV_TextoCTALanding__c   
 									FROM Idiomas_de_Eventos__r WHERE EV_Idioma__c IN :idioma),  
-									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLPDFQR__c, EV_URLQRPKPASS__c 
+									(SELECT Id, EV_ContactId__r.CC_NumPerso__c, EV_Status__c, EV_ExternalID__c, EV_FormatoDeAsistencias__c, EV_URLRegistro__c, EV_URLStreamingEvento__c, EV_URLVolverEvento__c,EV_URLPDFQR__c, EV_URLQRPKPASS__c 
 									FROM CampaignMembers__r WHERE EV_CampaignId__r.EV_ExternalID__c = :externalIdCampaign AND EV_ContactId__r.CC_NumPerso__c = :numperso) 
 									FROM Campaign WHERE ID IN (SELECT EV_CampaignId__c FROM EV_CampaignMemberC__c WHERE EV_CampaignId__r.EV_ExternalID__c = :externalIdCampaign AND EV_ContactId__r.CC_NumPerso__c = :numperso) 
 									AND Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_EventoVisibleNOW__c = true AND Status != '009' AND Status != '002'];
@@ -420,7 +425,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 					campaignMemberListCustom = [SELECT Id, EV_CampaignId__r.EV_NewArchitecture__c, EV_CampaignId__r.EV_Aforo_espacio_fisico__c, EV_CampaignId__r.EV_TotalInscritosC__c, EV_CampaignId__r.EV_Description__c, EV_CampaignId__r.EV_ExternalID__c, 
 											EV_CampaignId__r.EV_Categoria__c, EV_CampaignId__r.RecordType.DeveloperName, EV_Numperso__c, Name, EV_ExternalID__c, EV_Status__c, EV_FormatoDeAsistencias__c, 
 											EV_CampaignId__r.EV_Duracion__c, EV_CampaignId__r.EV_Idioma__c, EV_CampaignId__r.EV_aforoFisicoCompletoC__c 
-											FROM EV_CampaignMemberC__c WHERE EV_CampaignId__r.EV_ExternalId__c = :externalIdCampaign AND EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta') 
+											FROM EV_CampaignMemberC__c WHERE EV_CampaignId__r.EV_ExternalId__c = :externalIdCampaign AND EV_Status__c IN ('Registro confirmado', 'QR enviado', 'Asistió','Accedio a la oferta', 'Asistió en diferido') 
 											AND EV_CampaignId__r.Recordtype.DeveloperName != :Label.EV_EventosAccionistas AND EV_CampaignId__r.EV_EventoVisibleNOW__c = true AND EV_CampaignId__r.Status != '009' AND EV_CampaignId__r.Status != '002'];
 					listaResultados.addAll(campaignMemberListCustom);
 
@@ -440,7 +445,7 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 
 					campaignMemberListCustom = [SELECT Id, EV_FirstName__c, EV_NumeroDocumento__c, EV_LastName__c, EV_Status__c, EV_Phone__c, EV_ContadorCheckInVirtual__c, EV_ContactId__r.AccountId, EV_Empresa__c, EV_Email__c, EV_AccountId__r.Name, 
                                                 EV_AccountId__r.CC_Numero_Documento__c, EV_AccountId__r.CC_Cargo__pc, EV_URLStreamingEvento__c, EV_FormatoDeAsistencias__c, EV_CampaignId__r.EV_Aforo_espacio_fisico__c, EV_CampaignId__r.EV_InscritosFisicosC__c, EV_CampaignId__r.EV_NewArchitecture__c 
-                                                FROM EV_CampaignMemberC__c WHERE EV_ExternalID__c= :externalIdCM];
+                                                FROM EV_CampaignMemberC__c WHERE EV_ExternalID__c= :externalIdCM ];
 					listaResultados.addAll(campaignMemberListCustom);
 
 					fillRestResponse(res, listaResultados, 200, req, start);
@@ -495,6 +500,40 @@ global with sharing class EV_WS_GetEvents extends CBK_HttpServiceIntegration_Abs
 					fillRestResponse(res, error, 400, req, start);
 				}
             }
+
+			when 'attended-deferred-basis' {
+				if (String.isNotBlank(externalIdCM)){
+
+                    campaignMemberListCustom = [SELECT Id, EV_Status__c FROM EV_CampaignMemberC__c WHERE EV_ExternalID__c= :externalIdCM];
+					
+					if (!campaignMemberListCustom.isEmpty()){
+						if(campaignMemberListCustom[0].EV_Status__c != 'Asistió'){
+							EV_CampaignMemberC__c cmCustom = new EV_CampaignMemberC__c();
+							cmCustom.Id = campaignMemberListCustom[0].Id;
+							cmCustom.EV_Status__c = 'Asistió en diferido';
+
+							Database.SaveResult resultAD = Database.update(cmCustom, false);
+							if (resultAD.isSuccess()){
+								listaResultados.add(resultAD);
+								fillRestResponse(res, listaResultados, 200, req, start);
+							}else {
+								listaResultados.add(resultAD);
+								fillRestResponse(res, listaResultados, 400, req, start);
+							}
+						}else{
+							listaResultados.add(Label.EV_DeferredBasis);
+							fillRestResponse(res, listaResultados, 400, req, start);
+						}
+					} 
+                    if (campaignMemberListCustom.isEmpty()) {
+                        listaResultados.add(Label.EV_CMNotFound);
+                        fillRestResponse(res, listaResultados, 400, req, start);
+                    }
+				}else {
+					error.add(Label.EV_ParameterError);
+					fillRestResponse(res, error, 400, req, start);
+				}
+			}
 
 			when else {
 				error.add(Label.EV_ServiceError);

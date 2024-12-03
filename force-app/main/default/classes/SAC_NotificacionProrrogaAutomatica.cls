@@ -1,5 +1,5 @@
 /***************************************************************************
- * Name: SAC_NotificacionesProrrogaAutomatica
+ * @description Name: SAC_NotificacionesProrrogaAutomatica
  * Copyright © 2021  CaixaBank
  * =========================================================================
  * Proposito: Lanzar las notificaciones (campanita) de 
@@ -10,9 +10,9 @@
  * VERSION        USER_STORY       AUTHOR           DATE         Description
  * 1.0            US254503         Esteve Llaó      23/08/2021   Creación
 ***************************************************************************/
-public without sharing class SAC_NotificacionProrrogaAutomatica {
+public with sharing class SAC_NotificacionProrrogaAutomatica {
     /***************************************************************************  
-     * Proposito: Mandar notificaciones a los letrados(pretensión) 
+     * @description Proposito: Mandar notificaciones a los letrados(pretensión) 
      * de la reclamación padre en la que se encuentra el escalado
      * =========================================================================
      * Historial
@@ -47,11 +47,10 @@ public without sharing class SAC_NotificacionProrrogaAutomatica {
             }
         }
         enviarNotificaciones(mapaCasos);
-        system.debug('mapa casos '+mapaCasos);
     }
 
     /******************************************************************************
-     * Proposito: Mandar notificaciones a los propietarios de las pretensiones
+     * @description Proposito: Mandar notificaciones a los propietarios de las pretensiones
      * prorrogadas
      * ============================================================================
      * Historial
@@ -60,9 +59,13 @@ public without sharing class SAC_NotificacionProrrogaAutomatica {
      * 1.0            US254503         Esteve Llaó    23/08/2021   Creación
     ******************************************************************************/
     public static void enviarNotificaciones(Map<Id, set<String>> data) {
-        CustomNotificationType notificationType = [SELECT Id, DeveloperName 
+        CustomNotificationType notificationType = new CustomNotificationType();
+        if(Schema.sObjectType.CustomNotificationType.isAccessible()) {
+            notificationType = [SELECT Id, DeveloperName 
                                                     FROM CustomNotificationType 
                                                     WHERE DeveloperName='SAC_NotificacionProrrogaAutomatica'];  
+        }
+        
 
         for(Id key : data.keySet()){ 
             set<String> casos = data.get(key);
@@ -81,7 +84,9 @@ public without sharing class SAC_NotificacionProrrogaAutomatica {
                     notification.send(setIds);
                 }
                 catch (Exception e) {
-                    CBK_log.error(e);
+                    List<Object> detalle = new List<Object>();
+                    detalle.add((Object)notification);
+                    CBK_Log.error(e, detalle);
                 }
 
             }

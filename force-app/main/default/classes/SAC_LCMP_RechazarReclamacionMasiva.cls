@@ -13,6 +13,7 @@
 public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
 
     private static final Id RECTYPERECLAMACION = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Reclamacion').getRecordTypeId();
+    private static final Id RECTYPECONSULTACOPS = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('SAC_Consulta').getRecordTypeId();
 
     /*************************************************************************
      * Proposito: Rechazar los casos seleccionados en las list view
@@ -91,7 +92,7 @@ public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
 
             // Se updatean las reclamaciones y sus pretensiones
             if(Case.SObjectType.getDescribe().isUpdateable() && !casosActualizar.isEmpty()) {
-                Database.SaveResult[] lstResp = Database.update(casosActualizar, false);
+                Database.SaveResult[] lstResp = actualizar(casosActualizar);
                 for(Database.SaveResult res : lstResp) {
                     if (res.success) {
                         result = 'OK';
@@ -115,6 +116,102 @@ public without sharing class SAC_LCMP_RechazarReclamacionMasiva {
         return result;
     }
 
+
+	@AuraEnabled
+    public static string descartarCasos(String motivo, String recordId, String mensaje) {
+        List<String> lstRecordsId = recordId.split(',');
+        String result;
+
+        List<Case> casosDescartar = new List<Case>();
+        List<Case> casosSeleccionados = new List<Case>();
+        List<Id> listaCasosId = new List<id>();
+        Boolean esCopsAj = esCopsAj();
+		Boolean groupHasPermission = false;
+        List<String> permissionGroupList = new List<String>();
+        String gruposLabel = System.Label.SAC_GruposDescartarConsultas;
+        if(gruposLabel.contains(',')){
+            permissionGroupList = (System.Label.SAC_GruposDescartarConsultas).split('\\s*,\\s*');
+        }else{
+            permissionGroupList.add(System.Label.SAC_GruposDescartarConsultas);
+        }
+        List<CC_Grupo_Colaborador_Contact__c> colaboradorList = [SELECT Id, CC_Grupo_Colaborador__c FROM CC_Grupo_Colaborador_Contact__c WHERE CC_Usuario__c =: userInfo.getUserId() AND CC_Grupo_Colaborador__r.SAC_DeveloperName__c IN: permissionGroupList LIMIT 1];
+        if(!colaboradorList.isEmpty()){
+            groupHasPermission = true;
+        }
+        if(esCopsAj || groupHasPermission) {
+            // Recuperar la lista de casos de los que se han seleccionado
+            if(!Schema.sObjectType.Case.isAccessible()){ throw new AuraHandledException( 'No tienes permisos para realizar esta acción.' ); }
+            casosSeleccionados = [SELECT Id, status, SAC_StatusAuxiliar__c, SAC_MotivoDescarte__c, CC_Rechazar_Reabrir_Caso__c FROM Case WHERE Id IN :lstRecordsId AND RecordTypeId =: RECTYPECONSULTACOPS];
+            if(!casosSeleccionados.isEmpty()) {
+                for(Case caso : casosSeleccionados) {
+                    casosDescartar.add(caso);
+                    listaCasosId.add(caso.Id);
+                }
+            }  
+        } else {
+            List<Id> lstGruposId = obtenerGruposAdmin();
+            if(lstGruposId.size() == 0) {
+                result =  'KO';
+                return result;
+            }
+            // Recuperar la lista de casos de los que se han seleccionado que pertencen a los grupos del usuario
+            if(!Schema.sObjectType.Case.isAccessible()){throw new AuraHandledException( 'No tienes permisos para realizar esta acción.' ); }
+            casosSeleccionados = [SELECT Id, status, SAC_StatusAuxiliar__c, SAC_MotivoDescarte__c, CC_Rechazar_Reabrir_Caso__c, SAC_OrigenConsulta__c FROM Case WHERE Id IN :lstRecordsId AND SEG_Grupo__c IN :lstGruposId AND RecordTypeId =: RECTYPECONSULTACOPS];
+            if(!casosSeleccionados.isEmpty()) {
+                for(Case caso : casosSeleccionados) {
+                    if(caso.SAC_OrigenConsulta__c == null || caso.SAC_OrigenConsulta__c == ''){
+                        result =  'KO ORIGEN';
+                		return result;
+                    }
+                    casosDescartar.add(caso);
+                    listaCasosId.add(caso.Id);
+                }
+            }  
+        }
+        List<Case> casosActualizar = new List<Case>();
+
+        // Comprobar que hay reclamaciones que tienen permiso para ser rechazadas
+        if (casosDescartar.size() == 0 || lstRecordsId.size() != listaCasosId.size()) {
+            result =  'KO';
+            return result;
+        } else {
+            // Se recorren los casos a actualizar y se actualizan los campos
+            for(Case caso : casosDescartar) {
+                caso.Status = 'SAC_013';
+                caso.SAC_StatusAuxiliar__c = 'SAC_013';
+                caso.SAC_MotivoDescarte__c = motivo;
+                casosActualizar.add(caso); 
+            }
+            // Se updatean las consultas
+            if(Case.SObjectType.getDescribe().isUpdateable() && !casosActualizar.isEmpty()) {
+                Database.SaveResult[] lstResp = actualizar(casosActualizar);
+                for(Database.SaveResult res : lstResp) {
+                    if (res.success) {
+                        result = 'OK';
+
+                        // Si hay un mensaje se llama a la función insertarComentario para crear los post de chatter
+                        if(mensaje != '' && mensaje != null) {
+                            insertarComentario(listaCasosId, mensaje);
+                        }
+                    }else{
+                        CBK_Log.error('Error Descartar consultas masivas < 10 - Update KO - Response: ' + json.serialize(res.getErrors()));
+                        for(Database.Error err : res.getErrors()) {
+                            CBK_Log.error('Ha ocurrido el siguiente error: ');                    
+                            CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                            return err.getMessage();
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Database.SaveResult[] actualizar(List<Case> casosActualizar) {
+        Database.SaveResult[] lstResp = Database.update(casosActualizar, false);
+
+        return lstResp;
+    }
 
 
     /***********************************************************************************************

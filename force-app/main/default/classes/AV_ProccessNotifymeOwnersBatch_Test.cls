@@ -21,12 +21,9 @@ private class AV_ProccessNotifymeOwnersBatch_Test {
 	@TestSetup
 	static void setup() {
 		AV_TestHelper.activateLogger();
-		User u1 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U0100001');
-        User u2 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'U0100002');
-        //AV_LogDebug.printLogDebug('setup', 'User1: ' + u1);
-        //AV_LogDebug.printLogDebug('setup', 'User2: ' + u2);
-        Contact con =  AV_TestHelper.createEmployee(null,u1);
-        //AV_LogDebug.printLogDebug('setup', 'Contact: ' + con);
+        User u2 = AV_TestHelper.createUser('AV_Usuario_CaixaBank', 'CPid');
+       
+        Contact con =  AV_TestHelper.createEmployee(null,u2,u2.AV_ExternalId__c);
 		
 		RecordType rt = AV_AppUtilities.getRecordType('AV_NotifyMe__c', 'AV_NotifyMe');
 		AV_NotifyMe__c noti = new AV_NotifyMe__c();
@@ -36,14 +33,14 @@ private class AV_ProccessNotifymeOwnersBatch_Test {
 		noti.RecordTypeId = rt.Id;
 		noti.AV_Description__c = 'Nueva Notificación tipo NotifyMe';
 		noti.AV_Employee__c = con.Id;
-		noti.OwnerId = u1.Id;
+		noti.OwnerId = u2.Id;
 		insert noti;
 		
         con.AV_UsuarioAsociado__c = u2.Id;
+        con.CC_Matricula__c = u2.AV_ExternalId__c;
         update con;
         
-        System.runAs([SELECT Id FROM User WHERE Id = :UserInfo.getUserId()][0]) {
-            AV_TestHelper.insertPermissionSet(u1.id, 'AV_GestorOperativa');
+        System.runAs(u2) {
             AV_TestHelper.insertPermissionSet(u2.id, 'AV_GestorOperativa');
         }
 	}
@@ -53,16 +50,15 @@ private class AV_ProccessNotifymeOwnersBatch_Test {
 	 */
 	@isTest
 	static void executeProccessNotifymeOwnersBatch() {
-		User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'U0100002'];
+		User u2 = [SELECT Id FROM User where AV_ExternalID__c = 'CPid' LIMIT 1];
         Set<String> setUserIds = new Set<String>{u2.Id};
-        AV_LogDebug.printLogDebug('executeProccessNotifymeOwnersBatch', 'User2: ' + u2);
         AV_ProccessNotifymeOwnersBatch b = new AV_ProccessNotifymeOwnersBatch('300', setUserIds);
-        
+        AV_ProccessNotifymeOwnersBatch c = new AV_ProccessNotifymeOwnersBatch();
 		Test.startTest();	
 		Database.executeBatch(b);
 		Test.stopTest();
         
-        List<AV_NotifyMe__c> listNotifyme = [SELECT id, OwnerId FROM AV_NotifyMe__c];
+        List<AV_NotifyMe__c> listNotifyme = [SELECT id, OwnerId FROM AV_NotifyMe__c LIMIT 1];
         for (AV_NotifyMe__c nm : listNotifyme) {
             System.assertEquals(u2.id, nm.OwnerId);
         }

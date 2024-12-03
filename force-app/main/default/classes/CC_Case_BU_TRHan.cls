@@ -630,7 +630,7 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
     
     
     private static void cierreCasos(Map<Id, Case> mapOldObj, List<Case> listNewObj, List<Id> idsCAM) {
-        Id idRtCasoEmpleado =CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case','CC_Empleado');
+        Id idRtCasoEmpleado = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case','CC_Empleado');
         Set<Id> setIdsCasos = new Set<Id>();
         List<Case> casos = new List<Case>();
         List<Case> casosTelefonia = new List<Case>();
@@ -641,7 +641,7 @@ public with sharing class CC_Case_BU_TRHan extends CC_TriggerHandlerBase {
             && caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'
             && caso.RecordTypeId == idRtCasoEmpleado) {
                 casos.add(caso);
-            } else if(mapOldObj.get(caso.Id).Status != 'Cerrado' && caso.Status == 'Cerrado' && caso.Origin == 'Phone' && caso.Account.CC_Tipo_Centro__c == 'OF' && caso.Account.CC_SubTipo_Centro__c == 'BP' && caso.RecordTypeId == idRtCasoEmpleado) {
+            } else if(mapOldObj.get(caso.Id).Status != 'Cerrado' && caso.Status == 'Cerrado' && caso.Origin == 'Phone' /*&& caso.Account.CC_Tipo_Centro__c == 'OF' && caso.Account.CC_SubTipo_Centro__c == 'BP'*/ && caso.RecordTypeId == idRtCasoEmpleado) {
                 setIdsCasos.add(caso.Id);
                 casosTelefonia.add(caso);
             }

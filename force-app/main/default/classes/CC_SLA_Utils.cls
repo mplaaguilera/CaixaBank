@@ -56,7 +56,6 @@ public class CC_SLA_Utils {
                 }
             } catch(DmlException e) {
                 //Ante cualquier error, devolvemos null, para evitar la cancelación del proceso y perder el mail
-                CBK_Log.error('Error calculo_Fecha_Activo_Accionistas Dml exception: ' + e.getMessage());
             }
         }
         return resultado;

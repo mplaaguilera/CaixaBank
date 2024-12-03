@@ -58,7 +58,7 @@ public with sharing class CIBE_CallReportControllerTest {
         User usuario = [SELECT Id FROM User WHERE AV_ExternalID__c = 'U0000001' AND UserRole.DeveloperName = 'EMP'];
         Test.StartTest();
         System.runAs(usuario){
-            List<Event> evento = [SELECT Id FROM Event WHERE AV_Tipo__c = 'EC'];
+            List<Event> evento = [SELECT Id FROM Event WHERE AV_Tipo__c = 'VLD'];
             List<CBK_Activity_Extension__c> eventoExtension = [SELECT Id FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c =: evento[0].Id];
             CIBE_callReportController.getRecords(evento[0].Id);
             System.assertEquals(1, evento.size());

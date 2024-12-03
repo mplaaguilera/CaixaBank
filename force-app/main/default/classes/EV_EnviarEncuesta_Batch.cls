@@ -1,25 +1,7 @@
-public class EV_EnviarEncuesta_Batch implements Database.Batchable<sObject>, Database.AllowsCallouts {
+public with sharing class  EV_EnviarEncuesta_Batch {
 
-	public EV_EnviarEncuesta_Batch() {
-        System.debug('hola');
+    public static void metodoBlanco(){
+        EV_LogDebug.printLogDebug('Método blanco:', 'Blanqueo clase');
     }
-    
-    public EV_EnviarEncuesta_Batch(Id v1, Id v2) {
-        System.debug('hola');
-    }
-
-    public Database.QueryLocator start(Database.BatchableContext bc) { 
-		String query = 'Select Id from Campaign limit 1';
-        return Database.getQueryLocator(query);
-    }
-    
-    public void execute(Database.BatchableContext bc, List<Campaign> scope) {
-
-    }
-
-    public void finish(Database.BatchableContext bc) {
-     
-    }
-    
     
 }

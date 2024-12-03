@@ -16,12 +16,14 @@ Historial
    1.6			Fix bug		  David Rufo		09/03/2021		The date field is not filling in all the cases
    1.6			Fix		 	  David Rufo		31/05/2021		Update query to user Query FWK
    1.7        	US592987	  Ángel Medina		30/05/2023		Changed AV_Query to SOQL queries
+   1.8			Deuda Técnica Luis Fernández	14/03/2024		Optimización del código
+   1.9         FIX28080841     Oscar Moreno     02/09/2024          Fix error The Global modifier should be avoided.
    
 ***********************************************************************************************************************/
-global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+public class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
    
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_RegularizeHeaderCustomActivity';
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_RegularizeHeaderCustomActivity';
 	 
     
 	/**
@@ -29,7 +31,7 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 
 		Set<String> setRt = new Set<String>{AV_AppConstants.TASKINICIATIVA_RT, AV_AppConstants.TASKALERTACOM_RT,
@@ -58,25 +60,26 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param listEvents List<Task> param with the list of Task to upsert
 	 */
-	global void execute(Database.BatchableContext bc, List<Task> listTask){
+	public void execute(Database.BatchableContext bc, List<Task> listTask){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
-		try{
-			recordsProcessed= listTask.size();
-			AV_LogDebug.printLogDebug(methodName,'Data that does not have an associated AV_HeaderCustomActivity__c (TASKs): ' + listTask.size());
-			List<Task> listTaskToUpdate = getListTaskToUpdate(listTask);
-			if (listTaskToUpdate!=null && !listTaskToUpdate.isEmpty()){
-				try{
-					AV_LogDebug.printLogDebug(methodName, 'upsert Tasks: ' + listTaskToUpdate.size());
-					Database.upsert(listTaskToUpdate, false);
-				}catch(Exception e){
-					AV_LogDebug.printException(methodName, e);
+		recordsProcessed= listTask.size();
+		AV_LogDebug.printLogDebug(methodName,'Data that does not have an associated AV_HeaderCustomActivity__c (TASKs): ' + listTask.size());
+		List<Task> listTaskToUpdate = getListTaskToUpdate(listTask);
+		if (listTaskToUpdate!=null && !listTaskToUpdate.isEmpty()){
+				AV_LogDebug.printLogDebug(methodName, 'upsert Tasks: ' + listTaskToUpdate.size());
+				List<Database.UpsertResult> srUps = Database.upsert(listTaskToUpdate, false);
+				for(Database.UpsertResult sr : srUps){
+					if(!sr.isSuccess()){
+						for(Database.Error err : sr.getErrors()){
+
+							AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getMessage()+'\n'+err.getStatusCode()+'\Following fields are affected: '+err.getFields());
+						}
+					}
 				}
-			}
-			
-		}catch(System.Exception e){
-			AV_LogDebug.printException(methodName, e);
 		}
+			
+		
 	}	
 
 	/**
@@ -84,7 +87,7 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	global void execute(SchedulableContext sc) {
+	public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_RegularizeHeaderCustomActivity());
 	}
 
@@ -93,7 +96,7 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 	}
@@ -131,11 +134,11 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
         List<AV_HeaderCustomActivity__c> listHeaderTask = new List<AV_HeaderCustomActivity__c>();
         
 		//Obtengo todas las cabecera-tareas asociadas a la lista de Tareas
+		Map<String, AV_HeaderCustomActivity__c> mapHeaderTask = new Map<String, AV_HeaderCustomActivity__c>();
 		Map<String,Id> mapCabeceraTarea = getMapCabeceraTareaAsociada(listTask);
-		
 		for(Task tarea : listTask){
             String recordTypeDeveloperName = tarea.RecordType.DeveloperName;
-            if(recordTypeDeveloperName.startsWithIgnoreCase('AV_') && tarea.AV_Task__c==null){
+            if(tarea.AV_Task__c==null){
 				//Si existe una cabecera-tarea con ese ExternalId se lo asocio
                 if(mapCabeceraTarea != null && mapCabeceraTarea.containsKey(tarea.AV_ExternalID__c)){
 					tarea.AV_Task__c = mapCabeceraTarea.get(tarea.AV_ExternalID__c);
@@ -152,24 +155,24 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 					headerCustomAct.AV_ExternalID__c = tarea.AV_ExternalID__c;
                     headerCustomAct.IDTask__c = tarea.Id;
 					listHeaderTask.add(headerCustomAct);
+					mapHeaderTask.put(headerCustomAct.AV_ExternalID__c, headerCustomAct);
 				}
             }
 		}
 
 		//Insert data && update the field "AV_Task__c"
 		if (listHeaderTask!=null && !listHeaderTask.isEmpty()){
-			try{
 				AV_LogDebug.printLogDebug(methodName, 'insert listHeaderTask: ' + listHeaderTask.size());
-				Database.insert(listHeaderTask, false);
-			}catch(Exception e){
-				AV_LogDebug.printException(methodName + ' - listHeaderTask', e);
-			}
-			try{
-				//Map where the key is the external ID
-				Map<String, AV_HeaderCustomActivity__c> mapHeaderTask = new Map<String, AV_HeaderCustomActivity__c>();
-				for(AV_HeaderCustomActivity__c auxHeaderTask : listHeaderTask){
-					mapHeaderTask.put(auxHeaderTask.AV_ExternalID__c, auxHeaderTask);
+				List<Database.SaveResult> srList = Database.insert(listHeaderTask, false);
+
+				for(Database.SaveResult sr : srList){
+					if(!sr.isSuccess()){
+						for(Database.Error err : sr.getErrors()){
+							AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getMessage()+'\n'+err.getStatusCode()+'\Following fields are affected: '+err.getFields());
+						}
+					}
 				}
+				
 				//Update field "AV_Task__c"
 				for(Task tarea : listTask){
 					AV_HeaderCustomActivity__c auxHeaderTask = mapHeaderTask.get(tarea.AV_ExternalID__c);
@@ -178,9 +181,6 @@ global class AV_RegularizeHeaderCustomActivity implements Database.Batchable<sOb
 						listTaskToUpdate.add(tarea);
 					}
 				}
-			}catch(Exception e){
-				AV_LogDebug.printException(methodName + ' - listTaskToUpdate', e);
-			}
 		}
 
 		return listTaskToUpdate;

@@ -52,39 +52,42 @@ public with sharing class FRA_Revincular_Caso_Controller {
     @AuraEnabled
     public static String mergeCase(Id masterCaseId, Id mergeCaseId) {
         CBK_log.debug('Inicio FRA_Revincular_Caso_Controller - mergeCase (masterCaseId: ' + masterCaseId + ', mergeCaseId: ' + mergeCaseId + ')');
-        CBK_Log.error('Prueba error');
         try {
-            Case masterCase = [SELECT CC_Ultima_Interaccion__c, Status, CC_Fecha_Ultima_Interaccion__c, CC_Canal_Procedencia__c,
-                                      Origin, CC_MailTelfNotif__c, CC_MCC_Tematica__c, CC_MCC_ProdServ__c, CC_MCC_Motivo__c
-                                FROM Case WHERE Id = :masterCaseId];
-
-            Case mergeCase = [SELECT CC_Ultima_Interaccion__c, Status, CC_Fecha_Ultima_Interaccion__c, CC_Canal_Procedencia__c,
-                                     Origin, CC_MailTelfNotif__c, CreatedDate, RecordType.DeveloperName
-                                FROM Case WHERE Id = :mergeCaseId];
-
+            Case masterCase = [SELECT Id, CaseNumber, FRA_Id_Expediente_CGF__c FROM Case WHERE Id = :masterCaseId];
+            Case mergeCase = [SELECT Id, CaseNumber, FRA_Id_Expediente_CGF__c FROM Case WHERE Id = :mergeCaseId];
             String resultado;
 
-            //Clonado previo de tareas cerradas --> Workarround para el Merge
-            Id recordtypeIdTask = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Task', 'FRA_Task');
-            List<Task> mergeClosedTasklst = Database.query('SELECT ' + String.join(new List<String>(Schema.getGlobalDescribe().get('Task').getDescribe().fields.getMap().keySet()), ',') + ' FROM Task WHERE WhatId = :mergeCaseId AND RecordTypeId = :recordtypeIdTask');
-            List<Task> masterClosedTasklst = new List<Task>();
-            
-            //Recuperamos los IDs de las tareas a hacer merge/eliminar
-            Set<Id> mergeClosedTasklstIds = (new Map<Id,Task>(mergeClosedTasklst)).keySet();               
-            
-            for (Task tk: mergeClosedTasklst) {
-                Task newRecord = tk.clone(false);
-                newRecord.WhatId = masterCaseId;
-                masterClosedTasklst.add(newRecord);
+            //Buscamos las tareas completadas asociadas al caso origen para asociarlas al caso destino 
+            List<Task> listaTareasCerradas = [SELECT Type FROM Task WHERE WhatId = :mergeCase.Id
+                                                WITH SECURITY_ENFORCED ORDER BY CreatedDate ASC];
+            if (!listaTareasCerradas.isEmpty()) {
+                for (Task tarea : listaTareasCerradas) {
+                    tarea.WhatId = masterCase.Id;
+                }
+                if (!Schema.sObjectType.Task.fields.WhatId.isUpdateable()) {
+                    return null;
+                }
+                Database.update(listaTareasCerradas, false);
             }
-            
-            //Update para poder realizar el delete
-            update mergeClosedTasklst;
-            delete mergeClosedTasklst; 
-           
-            CC_Activity.crearActividades(masterClosedTasklst, 'FRA_Task');
 
-            merge masterCase mergeCase;
+            //Buscamos las Alertas CGF asociadas al caso origen para asociarlas al caso destino
+            Boolean updateCaso = false;
+            List<FRA_Alerta_CGF__c> listaAlertasCGF = [SELECT Id, FRA_Caso_Relacionado__c FROM FRA_Alerta_CGF__c WHERE FRA_Caso_Relacionado__c = :mergeCase.Id WITH SECURITY_ENFORCED];
+            if (!listaAlertasCGF.isEmpty()) {
+                for (FRA_Alerta_CGF__c alerta : listaAlertasCGF) {
+                    alerta.FRA_Caso_Relacionado__c = masterCase.Id;
+                }
+                if (!Schema.sObjectType.FRA_Alerta_CGF__c.fields.FRA_Caso_Relacionado__c.isUpdateable()) {
+                    return null;
+                }
+                Database.update(listaAlertasCGF, false);
+
+                if (String.valueOf(masterCase.FRA_Id_Expediente_CGF__c) == null) {
+                    masterCase.FRA_Id_Expediente_CGF__c = mergeCase.FRA_Id_Expediente_CGF__c;
+                    updateCaso = true;
+                }
+            }
+
             resultado = 'Ok';
 		
             //Tarea para el mastercase
@@ -95,7 +98,14 @@ public with sharing class FRA_Revincular_Caso_Controller {
             task.ActivityDate = System.today();
             task.Status = 'Completed';
             task.WhatId = masterCase.Id;
+            task.Description = 'Fusión del caso ' + mergeCase.CaseNumber + ' con el caso ' + masterCase.CaseNumber;
             insert task;
+    
+            Database.delete(mergeCase, false);
+
+            if (updateCaso) {
+                Database.update(masterCase, false);
+            }
     
             CBK_log.debug('Fin FRA_Revincular_Caso_Controller - mergeCase');
             return resultado; 

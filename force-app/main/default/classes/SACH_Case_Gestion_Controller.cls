@@ -51,23 +51,4 @@ public with sharing class SACH_Case_Gestion_Controller {
         SACH_Activity.reabrirTareaTrasladoColab(idCaso);
     }
 
-    
-    @AuraEnabled
-    public static void validarOperativaPromor(Case caso) {
-        String nombreSolucion = '';
-        Id sachCaseTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Case', 'SACH_Cliente');
-        Id rtsolucionCaso = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_MCC__c', 'CC_Solucion');
-        List<CC_MCC__c> mccSolucion = [SELECT Id,Name from CC_MCC__c WHERE RecordTypeId = :rtsolucionCaso AND CC_Tipo_Cliente__c = 'Cliente (SACH)' AND CC_Activo__c = true];
-
-        for(CC_MCC__c mcc : mccSolucion) {
-            if(mcc.Id == caso.CC_MCC_Solucion__c) {
-                nombreSolucion = mcc.Name;
-            }
-        }
-
-        
-
-        SACH_Activity.reabrirTareaTrasladoColab(caso.Id);
-    }
-
 }

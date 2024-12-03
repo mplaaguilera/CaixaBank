@@ -1,7 +1,7 @@
 /**
  * Clase de la aplicacion Gestor de Eventos
  */
-global with sharing class AV_SendInvitationCampaignFilter {
+public with sharing class AV_SendInvitationCampaignFilter {
 
 
     @invocableMethod(label='getFilteredCampaignCentros')

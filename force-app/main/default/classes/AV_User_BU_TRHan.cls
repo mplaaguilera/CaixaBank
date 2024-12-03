@@ -13,6 +13,8 @@ Historial
 	1.3			Fix Azure		Sandra Gómez		09/03/2022			Add method userAzureId
     1.4         US423397        Patricia Solano     02/11/2022          Add method visibilityUser
 	1.5         US448874        Patricia Solano     20/12/2022          Add method prepareDeleteInactiveUser to remove permissions granted when users become inactive
+	1.6         IN1160717       Manuel Ramos		02/07/2024          Replace prepareDeleteInactiveUser to be called from WithoutSharing class
+	1.7			FIX20091243		Sandra Gómez		25/09/2024			Add method groupConfidenProfileRol
 ***********************************************************************************************************************/
 public class AV_User_BU_TRHan extends CC_TriggerHandlerBase {
 	
@@ -29,7 +31,8 @@ public class AV_User_BU_TRHan extends CC_TriggerHandlerBase {
             AV_UserTriggerHelper.updateFuncion(listData, mapOldObj);
 			AV_UserTriggerHelper.userAzureId(listData, mapOldObj);
 			AV_UserTriggerHelper.visibilityUser(listData, mapOldObj);
-			AV_UserTriggerHelper.prepareDeleteInactiveUser(listData, mapOldObj);
+			AV_UserHandlerWithoutSharingMethods.prepareDeleteInactiveUser(listData, mapOldObj);
         }
+		AV_UserTriggerHelper.groupConfidenProfileRol(listNewObj, mapOldObj);
 	}
 }

@@ -22,16 +22,17 @@ Historial
 	1.3			Test Class		Sandra Gómez		21/03/2022		Added method validategetListFromSet to get a List from a set os strings
 	1.4			Fix				Sandra Gómez		06/04/2022		Added method validateListToStringIn
 	1.5			QualityClouds	Luis Fernández		17/08/2022		Added an assertion line to methods that dont have**
-
+	1.6         QC              Oscar Moreno        07/06/2024      Delete UserInfo.getUserId() of setup
+	
 ***********************************************************************************************************************/
 @isTest
 public class AV_AppUtilities_Test {
 	
     @TestSetup
     static void setup(){
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true]; 
         AV_TestHelper.activateLogger();
 		AppDefinition appDefinition = [SELECT DurableId, Label FROM AppDefinition WHERE DeveloperName = 'AV_CRM_Intouch' LIMIT 1];        
-		UserAppInfo app = new UserAppInfo(AppDefinitionId = appDefinition.DurableId, UserId = UserInfo.getUserId(), FormFactor = 'Small');
         Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('GCF_ALTAOPP','OK'));
         Test.setMock(HttpCalloutMock.class, new AV_MockCallout_Test('CP_INSCNT', 'OK'));
         AV_TestHelper.createPricebook2();
@@ -40,9 +41,11 @@ public class AV_AppUtilities_Test {
         Contact cont = AV_TestHelper.createEmployee(centro,us);
         Account acc = AV_TestHelper.createCustomer();
         Event evt = AV_TestHelper.createEvent(us, System.now(), acc);
-        Task tsk = AV_TestHelper.createTareaExternalIdWithCustomer(null, 'XXX-0001', acc);
-        Opportunity opp = AV_TestHelper.createOpportunity(acc);
-        insert app;
+        Task tsk = AV_TestHelper.createTareaExternalIdWithCustomer(us, 'XXX-0001', acc);
+		System.runAs(usuarioGcf){
+		     UserAppInfo app = new UserAppInfo(AppDefinitionId = appDefinition.DurableId, UserId = usuarioGcf.Id, FormFactor = 'Small');
+			 insert app;
+		}
     }
 
 	@isTest 
@@ -55,9 +58,10 @@ public class AV_AppUtilities_Test {
 
 	@isTest
 	public static void testGetRecordType() {
-		test.startTest();
+		Test.startTest();
+		User u = AV_TestHelper.createUser('AV_Usuario_CaixaBank');
+		Contact empleado  = AV_TestHelper.createEmployee(null, u);
 		RecordType rt = AV_AppUtilities.getRecordType('Contact', 'CC_Empleado');
-		Contact empleado  = AV_TestHelper.createEmployee(null, null);
         Test.stopTest();
         System.assertEquals(empleado.RecordTypeId, rt.Id,'NOK');
 	}
@@ -233,9 +237,17 @@ public class AV_AppUtilities_Test {
 
 	@isTest
 	public static void testGetCurrentSFApplication() {
+        User usuarioGcf =[SELECT Id FROM User WHERE Profile.Name = 'API Only' AND Alias = 'AV-TF9' AND IsActive = true];
+		UserAppInfo us1 = [SELECT Id from UserAppInfo LIMIT 1];
+
 		Test.startTest();
-		String appName = AV_AppUtilities.getCurrentSFApplication();
-        Test.stopTest();
-        System.assert(String.isNotBlank(appName),'NOK');
+		System.runAs(usuarioGcf) {
+			String appName = AV_AppUtilities.getCurrentSFApplication();
+			System.assert(String.isNotBlank(appName), 'El nombre de la aplicación no debe estar en blanco');
+			System.assertEquals('AV_CRM_Intouch', appName, 'El nombre de la aplicación debe coincidir con el esperado');
+		}
+		Test.stopTest();
 	}
+
+
 }

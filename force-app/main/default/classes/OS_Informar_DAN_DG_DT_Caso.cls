@@ -22,26 +22,26 @@ public with sharing class OS_Informar_DAN_DG_DT_Caso {
                 setCuentas.add(caso.Account.Parent.Parent.ParentId);
                 setCuentas.add(caso.Account.CC_OficinaGestoraId__r.Parent.Parent.ParentId);
             }
-            Map<Id,Account> mapOficinas = new Map<Id,Account>([SELECT Id, CC_Tipo_Centro__c, 
+            List<Account> listaOficinas = [SELECT Id, CC_Tipo_Centro__c, 
                                 ParentId, Parent.CC_Tipo_Centro__c,
                                 Parent.ParentId, Parent.Parent.CC_Tipo_Centro__c, 
                                 Parent.Parent.ParentId, Parent.Parent.Parent.CC_Tipo_Centro__c,
                                 Parent.Parent.Parent.ParentId, Parent.Parent.Parent.Parent.CC_Tipo_Centro__c
-                                FROM Account WHERE Id = :setCuentas]);
+                                FROM Account WHERE Id = :setCuentas];
 
             for (Case caso : listaCase) {
-                Boolean casoActualizar = false;
                 if (caso.AccountId != null){
                     if(caso.RecordType.DeveloperName == 'OS_Empleado'){
                         if (caso.Account.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.AccountId;
-                            casoActualizar = true;
+
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.ParentId;
                             if (caso.Account.CC_Tipo_Centro__c == 'DG'){
                                 caso.CC_DG__c = caso.AccountId;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.Parent.ParentId;
                             if (caso.Account.Parent.CC_Tipo_Centro__c == 'DG'){
@@ -50,7 +50,7 @@ public with sharing class OS_Informar_DAN_DG_DT_Caso {
                             if (caso.Account.CC_Tipo_Centro__c == 'GC'){
                                 caso.CC_DAN__c = caso.AccountId;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.Parent.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.Parent.Parent.ParentId;
                             if (caso.Account.Parent.Parent.CC_Tipo_Centro__c == 'DG'){
@@ -59,20 +59,20 @@ public with sharing class OS_Informar_DAN_DG_DT_Caso {
                             if (caso.Account.Parent.CC_Tipo_Centro__c == 'GC'){
                                 caso.CC_DAN__c = caso.Account.ParentId;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } 
                     }
                     if(caso.RecordType.DeveloperName == 'OS_Cliente'){
                         if (caso.Account.CC_OficinaGestoraId__r.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.CC_OficinaGestoraId__c;
 
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.CC_OficinaGestoraId__r.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.CC_OficinaGestoraId__r.ParentId;
                             if (caso.Account.CC_OficinaGestoraId__r.CC_Tipo_Centro__c == 'DG'){
                                 caso.CC_DG__c = caso.Account.CC_OficinaGestoraId__c;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.CC_OficinaGestoraId__r.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.CC_OficinaGestoraId__r.Parent.ParentId;
                             if (caso.Account.CC_OficinaGestoraId__r.Parent.CC_Tipo_Centro__c == 'DG'){
@@ -81,7 +81,7 @@ public with sharing class OS_Informar_DAN_DG_DT_Caso {
                             if (caso.Account.CC_OficinaGestoraId__r.CC_Tipo_Centro__c == 'GC'){
                                 caso.CC_DAN__c = caso.Account.CC_OficinaGestoraId__c;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } else if (caso.Account.CC_OficinaGestoraId__r.Parent.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
                             caso.CC_Direccion_Territorial__c = caso.Account.CC_OficinaGestoraId__r.Parent.Parent.ParentId;
                             if (caso.Account.CC_OficinaGestoraId__r.Parent.Parent.CC_Tipo_Centro__c == 'DG'){
@@ -90,48 +90,40 @@ public with sharing class OS_Informar_DAN_DG_DT_Caso {
                             if (caso.Account.CC_OficinaGestoraId__r.Parent.CC_Tipo_Centro__c == 'GC'){
                                 caso.CC_DAN__c = caso.Account.CC_OficinaGestoraId__r.ParentId;
                             }
-                            casoActualizar = true;
+                            listaCasosUpd.add(caso);
                         } 
                     }                          
-                    if(!mapOficinas.isEmpty() && (caso?.Account?.Parent?.Parent?.ParentId != null && mapOficinas.containsKey(caso?.Account?.Parent?.Parent?.ParentId) || caso?.Account?.CC_OficinaGestoraId__r?.Parent?.Parent?.ParentId != null && mapOficinas.containsKey(caso?.Account?.CC_OficinaGestoraId__r?.Parent?.Parent?.ParentId))){
-                        Account cuenta = new Account();
-                        if(caso?.Account?.Parent?.Parent?.ParentId != null && mapOficinas.containsKey(caso.Account.Parent.Parent.ParentId)){
-                            cuenta = mapOficinas.get(caso.Account.Parent.Parent.ParentId);
-                        } else if(caso?.Account?.CC_OficinaGestoraId__r?.Parent?.Parent?.ParentId != null && mapOficinas.containsKey(caso.Account.CC_OficinaGestoraId__r.Parent.Parent.ParentId)){
-                            cuenta = mapOficinas.get(caso.Account.CC_OficinaGestoraId__r.Parent.Parent.ParentId);
+                    if(!listaOficinas.isEmpty()){
+                        for (Account cuenta : listaOficinas){ 
+                            if(cuenta.Parent.CC_Tipo_Centro__c == 'DT'){
+                                caso.CC_Direccion_Territorial__c = cuenta.ParentId;
+                                if (cuenta.CC_Tipo_Centro__c == 'DG'){
+                                    caso.CC_DG__c = cuenta.Id;
+                                }
+                                if (caso.Account.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
+                                    caso.CC_DAN__c = caso.Account.Parent.ParentId;
+                                }
+                                listaCasosUpd.add(caso);
+                            } else if(cuenta.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
+                                caso.CC_Direccion_Territorial__c = cuenta.Parent.ParentId;
+                                if (cuenta.Parent.CC_Tipo_Centro__c == 'DG'){
+                                    caso.CC_DG__c = cuenta.ParentId;
+                                }
+                                if (cuenta.CC_Tipo_Centro__c == 'GC'){
+                                    caso.CC_DAN__c = cuenta.Id;
+                                }
+                                listaCasosUpd.add(caso);
+                            } else if(cuenta.Parent.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
+                                caso.CC_Direccion_Territorial__c = cuenta.Parent.Parent.ParentId;
+                                if (cuenta.Parent.Parent.CC_Tipo_Centro__c == 'DG'){
+                                    caso.CC_DG__c = cuenta.Parent.ParentId;
+                                }
+                                if (cuenta.Parent.CC_Tipo_Centro__c == 'GC'){
+                                    caso.CC_DAN__c = cuenta.ParentId;
+                                }
+                                listaCasosUpd.add(caso);
+                            }
                         }
-                        
-                        if(cuenta.Parent.CC_Tipo_Centro__c == 'DT'){
-                            caso.CC_Direccion_Territorial__c = cuenta.ParentId;
-                            if (cuenta.CC_Tipo_Centro__c == 'DG'){
-                                caso.CC_DG__c = cuenta.Id;
-                            }
-                            if (caso.Account.Parent.Parent.CC_Tipo_Centro__c == 'GC'){
-                                caso.CC_DAN__c = caso.Account.Parent.ParentId;
-                            }
-                            casoActualizar = true;
-                        } else if(cuenta.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
-                            caso.CC_Direccion_Territorial__c = cuenta.Parent.ParentId;
-                            if (cuenta.Parent.CC_Tipo_Centro__c == 'DG'){
-                                caso.CC_DG__c = cuenta.ParentId;
-                            }
-                            if (cuenta.CC_Tipo_Centro__c == 'GC'){
-                                caso.CC_DAN__c = cuenta.Id;
-                            }
-                            casoActualizar = true;
-                        } else if(cuenta.Parent.Parent.Parent.CC_Tipo_Centro__c == 'DT'){
-                            caso.CC_Direccion_Territorial__c = cuenta.Parent.Parent.ParentId;
-                            if (cuenta.Parent.Parent.CC_Tipo_Centro__c == 'DG'){
-                                caso.CC_DG__c = cuenta.Parent.ParentId;
-                            }
-                            if (cuenta.Parent.CC_Tipo_Centro__c == 'GC'){
-                                caso.CC_DAN__c = cuenta.ParentId;
-                            }
-                            casoActualizar = true;
-                        }
-                    }
-                    if (casoActualizar) {
-                        listaCasosUpd.add(caso);
                     }
                 }
             }

@@ -8,6 +8,7 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				DATE				Description
 	1.0			US373676		Víctor Santiago	    26/05/2022			Init version
+	1.1			Fix				Sandra Gómez		28/02/2024			delete updateProductoPFField and add productoPFField
 ***********************************************************************************************************************/
 public class AV_Sales_BU_TRHan extends CC_TriggerHandlerBase{
 	
@@ -21,6 +22,7 @@ public class AV_Sales_BU_TRHan extends CC_TriggerHandlerBase{
         
 		if (listData!=null && !listData.isEmpty()){
 			AV_SalesTriggerHelper.setCancellation(listData, mapOldObj);
+			AV_SalesTriggerHelper.productoPFField(listData);
 		}
 	}
 }

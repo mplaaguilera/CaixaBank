@@ -46,9 +46,6 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 	global static List<CC_WS_Maximo_Ret.CC_WS_Maximo_Output> updMaximo(List<CC_WS_Maximo_Ret.CC_WS_Maximo_Input> oDataIn) {
 		List<CC_WS_Maximo_Ret.CC_WS_Maximo_Output> oRes = new List<CC_WS_Maximo_Ret.CC_WS_Maximo_Output>();
 		Map<String, CC_WS_Maximo_Ret.CC_WS_Maximo_Input> oMapMaximo = new Map<String, CC_WS_Maximo_Ret.CC_WS_Maximo_Input>();
-		List<CC_Agrupador__c> agrupadorUpdate = new List<CC_Agrupador__c>();
-		List<Case> casoUpdate = new List<Case>();
-		CC_TrazaInt__c traza = null;
 		if (oDataIn != null) {
 			for (CC_WS_Maximo_Ret.CC_WS_Maximo_Input oForm : oDataIn) {
 				if (validarDatosEntrada(oForm) == 'OK') {
@@ -94,7 +91,8 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 				}
 			}
 
-
+			List<CC_Agrupador__c> agrupadorUpdate = new List<CC_Agrupador__c>();
+			List<Case> casoUpdate = new List<Case>();
 			String sCodErr = '';
 			String sDescError = '';
 			for (String codMaximo : oMapMaximo.keySet()) {
@@ -147,6 +145,9 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 							agrupadorUpdate.add(agrupador);
 						}
 
+						update agrupadorUpdate;
+						update casoUpdate;
+
 						//Envío de notificaciones por correo para casos de agrupador que pasa a Pendiente Revisión Solución
 						if (!idCasos.isEmpty()) {
 							enviarNotificacionesCasosPendRevSolucion(idCasos);
@@ -161,7 +162,7 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 						oRes.add(oAux);
 					}
 
-					traza = new CC_TrazaInt__c();
+					CC_TrazaInt__c traza = new CC_TrazaInt__c();
 					traza.Name = 'MAXIMO_RETORNO';
 					traza.CC_Identificador__c = codMaximo;
 					traza.CC_FechaInicio__c = datetime.now();
@@ -170,6 +171,7 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 					traza.CC_FinOK__c = false;
 					traza.CC_TipoError__c = sCodErr;
 					traza.CC_DetalleError__c = sDescError;
+					insert traza;
 
 				} catch(Exception e) {
 					sCodErr = '9';
@@ -181,11 +183,6 @@ global with sharing class CC_WS_Maximo_Ret extends CBK_HttpServiceIntegration_Ab
 					oRes.add(oAux);
 				}
 			}
-		}
-		update agrupadorUpdate;
-		update casoUpdate;
-		if(traza != null){
-			insert traza;
 		}
 		return oRes;
 	}

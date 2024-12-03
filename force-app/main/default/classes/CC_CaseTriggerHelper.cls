@@ -1013,7 +1013,7 @@ public with sharing class CC_CaseTriggerHelper {
             }
         }
     }
-
+    
     public static void informarOficinaAfectadaBU(List<Case> lstCasos, Map<Id, Case> mapOldObj, List<Id> idsCAM) {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
         Id rtBankia = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_CSI_Bankia').getRecordTypeId();
@@ -1540,7 +1540,7 @@ public with sharing class CC_CaseTriggerHelper {
             Map<Id,CC_Agrupador__c> mapAgrupador = new Map<Id,CC_Agrupador__c>([SELECT Id FROM CC_Agrupador__c WHERE Id IN :setIdContacto AND CC_Record_Type_Name__c != 'Incidencia']);
 
             for (Case caso : casosEncuesta) {
-                if (mapAgrupador.containsKey(caso.CC_Agrupador_Id__c) || caso.CC_Agrupador_Id__c == null || (caso.Origin == 'Phone' && caso.Account.CC_Tipo_Centro__c == 'OF' && caso.Account.CC_SubTipo_Centro__c == 'BP' && caso.RecordTypeId == rtEmpleado)) {
+                if (mapAgrupador.containsKey(caso.CC_Agrupador_Id__c) || caso.CC_Agrupador_Id__c == null || (caso.Origin == 'Phone' /*&& caso.Account.CC_Tipo_Centro__c == 'OF' && caso.Account.CC_SubTipo_Centro__c == 'BP'*/ && caso.RecordTypeId == rtEmpleado)) {
                     idsCasos.add(caso.Id);
                 }
             }

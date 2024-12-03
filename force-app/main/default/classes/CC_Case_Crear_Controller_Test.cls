@@ -74,56 +74,6 @@ public with sharing class CC_Case_Crear_Controller_Test {
     }
 
     @isTest
-    public static void esRolTMS(){
-        User usuario = new User();
-        usuario.FirstName = 'Usuario';
-        usuario.LastName = '1';    
-        usuario.IsActive = true; 	
-        usuario.Alias = 'us';
-        usuario.Email = 'usuario_test@test.com';
-        usuario.EmailEncodingKey = 'ISO-8859-1';
-        usuario.LanguageLocaleKey = 'es';
-        usuario.LocaleSidKey = 'es_ES';
-        usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'Testamentarías'].Id;
-        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'TMS_UsuarioCaixabank'].Id;
-        usuario.TimeZoneSidKey = 'Europe/Madrid';
-        usuario.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com'; 	
-        insert usuario;
-
-        System.runAs(usuario){
-            Test.startTest();
-            CC_Case_Crear_Controller.RetornoComprobarRol resultado = CC_Case_Crear_Controller.comprobarRol();
-            System.assertEquals('Testamentarías', resultado.nombreRol);
-            Test.stopTest();
-        }
-    }
-
-    @isTest
-    public static void esRolSACH(){
-        User usuario2 = new User();
-        usuario2.FirstName = 'Usuario';
-        usuario2.LastName = '1';    
-        usuario2.IsActive = true; 	
-        usuario2.Alias = 'us';
-        usuario2.Email = 'usuario_test@test.com';
-        usuario2.EmailEncodingKey = 'ISO-8859-1';
-        usuario2.LanguageLocaleKey = 'es';
-        usuario2.LocaleSidKey = 'es_ES';
-        usuario2.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'SACH'].Id;
-        usuario2.ProfileId = [SELECT Id FROM Profile WHERE Name = 'SACH_Usuario_CaixaBank'].Id;
-        usuario2.TimeZoneSidKey = 'Europe/Madrid';
-        usuario2.UserName = 'usuariotest_' + UserInfo.getOrganizationId() + '_' + System.currentTimeMillis() + '@test.com'; 	
-        insert usuario2;
-
-        System.runAs(usuario2){
-            Test.startTest();
-            CC_Case_Crear_Controller.RetornoComprobarRol resultado = CC_Case_Crear_Controller.comprobarRol();
-            System.assertEquals('SACH', resultado.nombreRol);
-            Test.stopTest();
-        }
-    }
-
-    @isTest
     private static void obtenerTipoContacto() {
         CC_Case_Crear_Controller.obtenerTipoContacto('');
     }
@@ -265,4 +215,49 @@ public with sharing class CC_Case_Crear_Controller_Test {
             System.assertEquals('error' , nif[0],'Se ha encontrado el nif');
         }
     }
+
+    @isTest
+    public static void testGetProcedenciaUsuarioGRR() {
+        String orgId = UserInfo.getOrganizationId();
+        String dateString = String.valueof(Datetime.now()).replace(' ','').replace(':','').replace('-','');
+        Integer randomInt = Integer.valueOf(math.rint(math.random()*1000000));
+        String uniqueName = orgId + dateString + randomInt;
+        User usuario = new User();
+        usuario.IsActive = true;
+        usuario.ProfileId = [SELECT Id FROM Profile WHERE Name = 'GRR_Usuario_CaixaBank'].Id;
+        usuario.UserRoleId = [SELECT Id FROM UserRole WHERE Name = 'GRR'].Id;
+        usuario.FirstName = 'GRR Prueba Clases Test';
+        usuario.LastName = 'GRR Prueba Clases Test';
+        usuario.Alias = uniqueName.substring(18, 23);
+        usuario.Email = uniqueName + '@test' + orgId + '.org';
+        usuario.Username = uniqueName + '@test' + orgId + '.org';
+        usuario.EmailEncodingKey = 'UTF-8';
+        usuario.LanguageLocaleKey = 'es';
+        usuario.LocaleSidKey = 'es_ES';
+        usuario.TimezonesIdKey = 'Europe/Madrid';
+        insert usuario;
+        List<PermissionSetAssignment> psAssignments = new List<PermissionSetAssignment>();
+        for (PermissionSet ps : [SELECT Id FROM PermissionSet WHERE Name IN ('GRR_Agente','GRR_Supervisor')]) {
+            PermissionSetAssignment psAssignment = new PermissionSetAssignment();
+            psAssignment.AssigneeId = usuario.Id;
+            psAssignment.PermissionSetId = ps.Id;
+            psAssignments.add(psAssignment);
+        }
+        insert psAssignments;
+    
+        Group grupo = [SELECT Id, Name, DeveloperName, Type FROM Group WHERE DeveloperName = 'GRR_Buzon_Murcia' and Type = 'Regular' LIMIT 1];
+        GroupMember miembroGrupo = new GroupMember();
+        miembroGrupo.GroupId = grupo.Id;
+        miembroGrupo.UserOrGroupId = usuario.Id;
+        insert miembroGrupo;
+
+        System.runAs(usuario) {
+            Test.startTest();
+            String resultado = CC_Case_Crear_Controller.getProcedenciaUsuarioGRR();
+            Test.stopTest();
+            
+            System.assertEquals('DT Murcia', resultado);       
+        }
+    }
+    
 }

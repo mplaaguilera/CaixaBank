@@ -60,12 +60,13 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
             SAC_Accion__c tarea = SAC_TestDataFactory.crearTareas(1, casoPretension, true)[0]; 
             tarea.SAC_MaestroAccionesReclamacion__c = maestro.id; 
             tarea.SAC_Estado__c = 'SAC_PendienteEnviar';
+            tarea.SAC_Observaciones__c = 'TestTareaSACGH';
             Database.insert(tarea);
         }
     }
 
     @IsTest
-    static void comprobarTareas_Test(){
+    static void comprobarTareasTest(){
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany ='pretension'];   
 
@@ -73,21 +74,37 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
             Test.startTest();
             Boolean respuesta = SAC_LCMP_GastosHipotecarios.comprobarTareas(pretension.Id);  
             Test.stopTest();
-            System.assertEquals(false, respuesta, 'El resultado deberia ser un false la variable de metodo se llama noSePuedeModificarTarea');
+            Assert.areEqual(false, respuesta, 'El resultado deberia ser un false la variable de metodo se llama noSePuedeModificarTarea');
+        }     
+    }
+
+    @IsTest
+    static void comprobarTareasTest2(){
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany ='pretension'];   
+        SAC_Accion__c tarea = [SELECT Id FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'TestTareaSACGH' LIMIT 1];
+
+        System.runAs(usuario){
+            Test.startTest();
+            tarea.SAC_Estado__c = 'SAC_PendienteRevision';
+            SAC_DatabaseDML.updateDML(tarea, true);
+
+            Boolean respuesta = SAC_LCMP_GastosHipotecarios.comprobarTareas(pretension.Id);  
+            Test.stopTest();
+            Assert.areEqual(true, respuesta, 'El resultado deberia ser un true la variable de metodo se llama noSePuedeModificarTarea');
         }     
     }
 
     @isTest
-    static void modificarImportesTarea_Test(){
+    static void modificarImportesTareaTest(){
         User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
         Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany ='pretension'];
-        Integer[] arrayImportes = new List<Integer>();
+        String[] arrayImportes = new List<String>();
         
-        arrayImportes.add(10);
-        arrayImportes.add(10);
-        arrayImportes.add(10);
-        arrayImportes.add(10);
-        arrayImportes.add(10);
+        arrayImportes.add('10');
+        arrayImportes.add('10');
+        arrayImportes.add('10');
+        arrayImportes.add('10');
 
         System.runAs(usuario){
             Test.startTest();
@@ -97,6 +114,33 @@ public with sharing class SAC_LCMP_GastosHipotecarios_Test {
 
         SAC_Accion__c tarea = [SELECT Id, SAC_ImpResueltoNotaria__c FROM SAC_Accion__c];
 
-        System.assertNotEquals(null, tarea.SAC_ImpResueltoNotaria__c,'ha fallado el test');
+        Assert.areNotEqual(null, tarea.SAC_ImpResueltoNotaria__c,'ha fallado el test');
+    }
+
+    @isTest
+    static void modificarImportesTareaTest2(){
+        User usuario = [SELECT id FROM User WHERE Username = 'usertest0@test.com.testSetup' AND isActive = true Limit 1];
+        Case pretension = [SELECT Id FROM Case WHERE SuppliedCompany ='pretension'];
+        SAC_Accion__c tarea = [SELECT Id, SAC_ImpResueltoNotaria__c FROM SAC_Accion__c WHERE SAC_Observaciones__c = 'TestTareaSACGH' LIMIT 1];
+        String[] arrayImportes = new List<String>();
+        
+        arrayImportes.add(null);
+        arrayImportes.add(null);
+        arrayImportes.add(null);
+        arrayImportes.add(null);
+
+        System.runAs(usuario){
+            Test.startTest();
+            tarea.SAC_ImpResueltoNotaria__c = 10;
+            tarea.SAC_ImpResueltoGestoria__c = 10;
+            tarea.SAC_ImpResueltoRegistros__c = 10;
+            tarea.SAC_ImpResueltoTasacion__c = 10;
+            SAC_DatabaseDML.updateDML(tarea, true);
+
+            SAC_LCMP_GastosHipotecarios.modificarImportesTarea(pretension.Id, arrayImportes);
+            Test.stopTest();
+        }
+
+        Assert.areNotEqual(tarea.SAC_ImpResueltoNotaria__c, null,'ha fallado el test');
     }
 }

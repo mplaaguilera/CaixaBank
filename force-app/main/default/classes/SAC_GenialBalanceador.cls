@@ -68,7 +68,6 @@ public with sharing class SAC_GenialBalanceador implements Queueable {
                 if (limiteAdjuntos) {
                     bestIntegration = String.isNotBlank(settings.SAC_Integracion_Adjuntos_Pesados__c) ? 
                                       settings.SAC_Integracion_Adjuntos_Pesados__c : 'Azure';
-                    //falta caso si el max de tamaño es superado y no hay integración para desviarlo, hay que volverlo a caso normal(resetear a null GenialEstado y owner pendiente de asignar)
                 } else {
 
                     List<AggregateResult> casosAgrupadosPorTipo = ejecutarConsultaSOQL();

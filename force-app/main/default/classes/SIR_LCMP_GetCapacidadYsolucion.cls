@@ -27,7 +27,7 @@ public with sharing class SIR_LCMP_GetCapacidadYsolucion {
     public static List<SIR_FormularioRefinanciacion__c> getCapacidadFormulario(String idFormulario) {
         String metodo = 'getCapacidadFormulario';
         List<SIR_FormularioRefinanciacion__c> formulario = new  List<SIR_FormularioRefinanciacion__c>();
-        if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isAccessible()){
             formulario = [SELECT SIR_capActualImporteCuota__c ,SIR_capActualRatioEndeudamiento__c ,SIR_SolucionFinalista__c
                           ,SIR_capActualImporteFinanciacion__c ,SIR_capActualRatioTotal__c ,SIR_capActualPagoCliente__c ,SIR_capActualTipoSolucion__c , SIR_TotalIngresosTrabajo__c ,SIR_TotalGastos__c ,
                           SIR_ingresosFuturo__c , SIR_ratioEndeudamientoFuturo__c ,SIR_importeCuotaActual__c , SIR_textIngresosFuturo__c , SIR_ratioAdmision__c , SIR_ratioActual__c , SIR_ratioFuturo__c,
@@ -53,7 +53,7 @@ public with sharing class SIR_LCMP_GetCapacidadYsolucion {
     public static String guardarFormulario(String idFormulario , List<String> data) {
         String metodo = 'guardarFormulario';
         try {
-           if(SIR_FormularioRefinanciacion__c.SObjectType.getDescribe().isUpdateable()){          
+           if(Schema.SObjectType.SIR_FormularioRefinanciacion__c.isUpdateable()){          
                 SIR_FormularioRefinanciacion__c updateForm = [SELECT SIR_SolucionFinalista__c, SIR_ingresosFuturo__c , SIR_textIngresosFuturo__c ,
                                                     SIR_ratioAdmision__c ,SIR_solucionCortoPlazo__c , SIR_solucionLargoPlazo__c , SIR_tipoDificultad__c,
                                                     SIR_solucionAplicar__c ,SIR_solucionDeudaAplicar__c ,SIR_textSolucionAplicar__c

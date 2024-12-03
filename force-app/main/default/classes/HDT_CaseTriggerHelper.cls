@@ -536,7 +536,6 @@ public with sharing class HDT_CaseTriggerHelper {
             if (caso.AssetId != mapOldObj.get(caso.Id).AssetId && caso.AssetId != null) {
                 if(!setIdAssets.contains(caso.AccountId)){
                     setIdAssets.add(caso.AssetId);
-                    system.debug('Recogiendo el nombre del Activo principal : ' + caso.AssetId);
                 }
                 lstCasosAsociados.add(caso);
             }
@@ -1012,7 +1011,7 @@ public with sharing class HDT_CaseTriggerHelper {
             }
 
             if (!idsCasos.isEmpty()) {
-                CC_Envio_Encuestas_3N.enviarEncuesta(idsCasos);
+                HDT_Envio_Encuestas_3N.enviarEncuesta(idsCasos);
             }
         }
     }
@@ -1201,49 +1200,20 @@ public with sharing class HDT_CaseTriggerHelper {
     
 
     public static void generarEncuestaHDT1N(Map<Id, Case> mapOldObj, Map<Id, Case> mapNewObj) {
-        //Añadimos los canales de resolución a una lista para luego comprobar que es uno de los que aplica
-        Set<String> canalesResolucion = new Set<String>{'Incidencias Técnicas', 'Servicios Centrales', 'SmartPhones','EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE',
-        'EDG-COMERCIA',
-        'EDG-CREDIFIMO',
-        'EDG-IMAGIN',
-        'EDG-BUILDING CENTER',
-        'EDG-CAIXABANK PAYMENTS & CONSUMER',
-        'EDG-GDS / CAIXABANK OPERATIONAL SERVICES',
-        'EDG-GESTICAIXA / CAIXABANK TITULACION',
-        'EDG-HABITATGE ASSEQUIBLE / INMOCAIXA',
-        'EDG-MICROBANK',
-        'EDG-MONEY TO PAY',
-        'EDG-PROMOCAIXA / WIVAI',
-        'EDG-PTR / PUERTO TRIANA',
-        'EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT',
-        'EDG-TCF / TELEFONICA CONSUMER FINANCE',
-        'EDG-VDC / VIDACAIXA',
-        'EDG-CBI / CAIXA BUSINESS INTELLIGENCE',
-        'EDG-BANKIA MEDIACIÓN',
-        'EDG-OpenWealth',
-        'EDG-CAM / CAIXABANK ASSET MANAGEMENT',
-        'EDG-CAM PORTUGAL',
-        'EDG-CAM LUXEMBURGO',
-        'EDG - Dualiza',
-        'EDG - Externos'};
+
+        List<CC_Lista_Valores__c> listaCanalResolucion = [SELECT Name,CC_Activa__c,CC_Valor__c FROM CC_Lista_Valores__c WHERE CC_Lista__r.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución'];
+
+		Set<String> canalesResolucion = new Set<String>();
+        for (CC_Lista_Valores__c resolucion : listaCanalResolucion) {
+            if(resolucion.CC_Activa__c){
+                canalesResolucion.add(resolucion.Name);
+            }
+        }
 
         List<Case> casos = new List<Case>();
         for (Case casoNew : mapNewObj.values()) {
-            
-            //Comprobamos que el agrupador NO sea de RT Masiva de Control
-            Boolean esAgrupadorMasivadeControl = false;
-           
-            if (casoNew.CC_Agrupador_Id__c != null){
-                String tipodeAgrupador = casoNew.CC_Agrupador_Id__r.RecordType.DeveloperName;
-                if (tipodeAgrupador == 'CC_Masiva_Control'){
-                        esAgrupadorMasivadeControl = true;
-                }else{
-                        esAgrupadorMasivadeControl = false;
-                }
-            }
-
             if (casoNew.HDT_Resuelto_Primera_Llamada__c && casoNew.Origin == 'Phone'
-            && casoNew.Status == 'Cerrado' && !esAgrupadorMasivadeControl
+            && casoNew.Status == 'Cerrado'
             && mapOldObj.get(casoNew.Id).Status != 'Cerrado'
             && canalesResolucion.contains(casoNew.CC_Canal_Resolucion__c)) {
                 casos.add(casoNew);
@@ -1293,62 +1263,32 @@ public with sharing class HDT_CaseTriggerHelper {
     }
 
     public static void cierreCasoHDT1N(List<Case> lstCasos, Map<Id, Case> oldMap) {
+        List<CC_Lista_Valores__c> listaCanalResolucion = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución'];
+        List<CC_Lista_Valores__c> listaCanalResolucion2 = [SELECT Name,CC_Valor__c, CC_Activa__c FROM CC_Lista_Valores__c WHERE CC_Valor__c = 'No EDG' AND CC_Lista__r.Name = 'HDT - Envío de Encuesta 3N - Canales de resolución'];
+    
+		Set<String> canalesResolucionEdG = new Set<String>();
+        for (CC_Lista_Valores__c resolucion : listaCanalResolucion) {
+            if(resolucion.CC_Activa__c){
+                canalesResolucionEDG.add(resolucion.Name);
+            }
+        }
 
-        system.debug('Entrando a Cierre Caso HDT 1N');
-
-        Set<String> canalesResolucionPrimeros = new Set<String>{'Incidencias Técnicas', 'Servicios Centrales', 'SmartPhones'};
-        Set<String> canalesResolucionEdG = new Set<String>{
-            'EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE',
-            'EDG-COMERCIA',
-            'EDG-CREDIFIMO',
-            'EDG-IMAGIN',
-            'EDG-BUILDING CENTER',
-            'EDG-CAIXABANK PAYMENTS & CONSUMER',
-            'EDG-GDS / CAIXABANK OPERATIONAL SERVICES',
-            'EDG-GESTICAIXA / CAIXABANK TITULACION',
-            'EDG-HABITATGE ASSEQUIBLE / INMOCAIXA',
-            'EDG-MICROBANK',
-            'EDG-MONEY TO PAY',
-            'EDG-PROMOCAIXA / WIVAI',
-            'EDG-PTR / PUERTO TRIANA',
-            'EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT',
-            'EDG-TCF / TELEFONICA CONSUMER FINANCE',
-            'EDG-VDC / VIDACAIXA',
-            'EDG-CBI / CAIXA BUSINESS INTELLIGENCE',
-            'EDG-BANKIA MEDIACIÓN',
-            'EDG-OpenWealth',
-            'EDG-CAM / CAIXABANK ASSET MANAGEMENT',
-            'EDG-CAM PORTUGAL',
-            'EDG-CAM LUXEMBURGO',
-            'EDG - Dualiza',
-            'EDG - Externos'};
+        Set<String> canalesResolucionPrimeros = new Set<String>();
+        for (CC_Lista_Valores__c resolucion : listaCanalResolucion2) {
+            if(resolucion.CC_Activa__c){
+                canalesResolucionPrimeros.add(resolucion.Name);
+            }
+        }
 
         String apiNamePlantillas = 'HDT_Encuesta_1N_%';
         String apiNamePlantillasEdG = 'HDT_Encuesta_EdG_1N_%';
         
         List<Case> lstCasosHDT = new List<Case>();
+
         for (Case caso : lstCasos) {
             if(oldMap.containsKey(caso.Id)){
-
-                //Comprobamos que el agrupador NO sea de RT Masiva de Control
-                Boolean esAgrupadorMasivadeControl = false;
-            
-                if (caso.CC_Agrupador_Id__c != null){
-                    String tipodeAgrupador = caso.CC_Agrupador_Id__r.RecordType.DeveloperName;
-                    if (tipodeAgrupador == 'CC_Masiva_Control'){
-                            esAgrupadorMasivadeControl = true;
-                    }else{
-                            esAgrupadorMasivadeControl = false;
-                    }
-                }
-                // Fin comprobar Agrupador - Masiva de Control
-                system.debug('El valor del AGRUPADOR ES es' + caso.CC_Agrupador_Id__C);
-                system.debug('El valor del boolean es :  ' + esAgrupadorMasivadeControl);
-                system.debug('El valor del agrupador  es :  ' + caso.CC_Agrupador_Id__r.RecordType.DeveloperName);
-                
-
                 if (caso.HDT_Resuelto_Primera_Llamada__c && caso.Origin == 'Phone' && caso.Status =='Cerrado' 
-                    && oldMap.get(caso.Id).Status != 'Cerrado' && !esAgrupadorMasivadeControl
+                    && oldMap.get(caso.Id).Status != 'Cerrado' 
                     && (canalesResolucionPrimeros.contains(caso.CC_Canal_Resolucion__c) || canalesResolucionEdG.contains(caso.CC_Canal_Resolucion__c))) {
                     lstCasosHDT.add(caso);
                 }
@@ -1509,5 +1449,17 @@ public with sharing class HDT_CaseTriggerHelper {
                 }
             }
         }
+    }
+
+    public static String generarUrlEncuesta(String configuracion2, String configuracion1, String idioma, String canalResolucion, String matriculaEmpleado, String caseNumber, String tematicaId, String tematicaName) {
+        return configuracion2 +
+               'sid=' + configuracion1 +
+               '&lang=' + idioma +
+               '&empresa=' + canalResolucion +
+               '&userid=' + matriculaEmpleado +
+               '&ticketid=' + caseNumber +
+               '&idet=' + tematicaId +
+               '&et=' + tematicaName.replace(' ', '_') +
+               '&newtest=Y';
     }
 }

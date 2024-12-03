@@ -2,17 +2,17 @@
 public with sharing class CC_Contact_Fusion_Test {
     public static String CRON_EXP = '0 0 0 15 3 ? 2022';
     public static testMethod void fusionarContactosDuplicados() {
-    Id cuentaRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+		Id cuentaRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Id clienteRecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         
         Account cuenta1 = new Account(
-          RecordTypeId = cuentaRecordTypeId,
+        	RecordTypeId = cuentaRecordTypeId,
             Name = 'Cuenta Cliente Test 1',
             CC_NumPerso__c = '42671'
         );
         insert cuenta1;
         Account cuenta2 = new Account(
-          RecordTypeId = cuentaRecordTypeId,
+        	RecordTypeId = cuentaRecordTypeId,
             Name = 'Cuenta Cliente Test 2',
             CC_NumPerso__c = '42672'
         );
@@ -45,7 +45,7 @@ public with sharing class CC_Contact_Fusion_Test {
             masterContacts.add(masterContact);
         }
         insert masterContacts;
-    
+		
         List<Contact> mergeContactsBefore = [SELECT Id FROM Contact WHERE FirstName = 'Merge'];
         List<Contact> masterContactsBefore = [SELECT Id FROM Contact WHERE FirstName = 'Master'];
         System.assertEquals(10, mergeContactsBefore.size());

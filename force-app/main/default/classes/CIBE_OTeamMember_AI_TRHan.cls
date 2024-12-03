@@ -24,8 +24,9 @@ public class CIBE_OTeamMember_AI_TRHan extends CC_TriggerHandlerBase {
             boolean hasCustomPermission = FeatureManagement.checkPermission('AV_AvoidBulkApi');
             if (!hasCustomPermission && !System.isbatch()) {
                 CIBE_OpprtTeamMemberTriggerHelper.createNotificationNewUser(listNewObj);
+                CIBE_OpportunityEmail.emailAddOppTM(listData);
             }
             CIBE_OpprtTeamMemberTriggerHelper.setOpportunityUsers(listData);
-        }          
+        }
     }
 }

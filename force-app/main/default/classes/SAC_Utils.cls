@@ -870,7 +870,7 @@ public without sharing class SAC_Utils {
 	 */
     public static Integer calcularTiempoParadaSubsanacion(Case caso, Integer tiempoTotal) {
         if(caso.SAC_TiempoParadaSubsanacion__c != null) {
-            tiempoTotal = tiempoTotal + Integer.ValueOf(caso.SAC_TiempoParadaSubsanacion__c);
+            tiempoTotal = tiempoTotal + (Integer.ValueOf(caso.SAC_TiempoParadaSubsanacion__c) * 1440);
 		}
 		return tiempoTotal;
 	}

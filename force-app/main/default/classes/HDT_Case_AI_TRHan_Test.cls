@@ -58,18 +58,6 @@ public with sharing class HDT_Case_AI_TRHan_Test {
 		car2.CC_Descripcion__c = 'Caracteristica Test2';
 		car2.Name = 'TestCaracteristica2';
 		insert car2;
-
-		List <String> owaEmails = new List<String>{('Atención Empleados HDT CaixaBank')};
-
-        List <OrgWideEmailAddress> owa = new List <OrgWideEmailAddress>([SELECT Id, Address FROM OrgWideEmailAddress WHERE DisplayName IN : owaEmails]);
-
-        HDT_Parametros__c params = new HDT_Parametros__c();
-        params.Name = 'HDT_Email_Respuesta_Empleados_New';
-        params.HDT_Configuracion_1__c = owa[0].Address;
-        params.HDT_Configuracion_2__c = owa[0].Address;
-        insert params;
-
-		
 	}
 }    /* @isTest
     static void enmascararPANs_test() {

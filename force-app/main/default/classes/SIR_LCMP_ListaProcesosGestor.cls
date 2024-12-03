@@ -30,11 +30,11 @@ public with sharing class SIR_LCMP_ListaProcesosGestor {
         Id recordTypeIdAmistoso = Schema.SObjectType.SIREC__SIREC_obj_proceso__c.getRecordTypeInfosByName().get(SIR_Constantes.PROCESO_RECORDTYPE_NAME_AMISTOSO).getRecordTypeId();
         List<SIREC__SIREC_obj_proceso__c> procesos = new List<SIREC__SIREC_obj_proceso__c>();
 
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
-            procesos = [SELECT id, SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.Id, name, toLabel(SIREC__SIREC_fld_estrategia__c), toLabel(SIREC__SIREC_fld_situacion__c), 
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
+            procesos = [SELECT id, SIREC__SIREC_fld_cliente__r.Name, SIREC__SIREC_fld_cliente__r.Id, name, SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIR_fld_Situacion_SF__c), 
                         SIREC__SIREC_fld_fechaSituacion__c, SIREC__SIREC_fld_fechaInicio__c, Owner.Name
                         FROM SIREC__SIREC_obj_proceso__c 
-                        WHERE SIREC__SIREC_fld_situacion__c IN :setSituaciones 
+                        WHERE SIR_fld_Situacion_SF__c IN :setSituaciones 
                         AND OwnerId = :UserInfo.getUserId()
                         AND RecordTypeId =: recordTypeIdAmistoso
                         AND SIR_ObjetivoProceso__c != :SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO

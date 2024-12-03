@@ -34,7 +34,7 @@ public class CC_Account_BI_TRHan_Test {
     public static void encryptNumperso_beforeInsert() {
         // Alta de datos para la prueba
         Account acc = new Account();
-    acc.FirstName = 'Prueba';
+		acc.FirstName = 'Prueba';
         acc.LastName = 'Test';
         acc.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
         acc.CC_Numero_Documento__c = '45855598S';

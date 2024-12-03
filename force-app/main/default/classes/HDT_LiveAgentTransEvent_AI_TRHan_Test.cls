@@ -52,7 +52,6 @@ public class HDT_LiveAgentTransEvent_AI_TRHan_Test {
     @isTest
     static void testLeaveAgentWithTask(){    
         
-        //Prueba para Agent with Task
         LiveChatTranscript liveChatTranscript  = [SELECT Id,RecordType.developername, CaseId,OwnerId,CC_Categoria__c,CC_Espacio__c,CC_Id_Cognitive__c 
                                                   FROM LiveChatTranscript WHERE CC_Nickname__c = 'Empleado HDT'
                                                   AND CC_NumEmpleado__c = 'U01A45E2' AND CC_Tipo__c = 'Agente' ];        

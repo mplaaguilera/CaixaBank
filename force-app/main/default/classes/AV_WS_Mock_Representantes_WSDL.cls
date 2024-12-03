@@ -1,6 +1,6 @@
 @isTest
-global class AV_WS_Mock_Representantes_WSDL implements WebServiceMock {
-       global void doInvoke(
+public class AV_WS_Mock_Representantes_WSDL implements WebServiceMock {
+       public void doInvoke(
                Object stub,
                Object request,
                Map<String, Object> response,

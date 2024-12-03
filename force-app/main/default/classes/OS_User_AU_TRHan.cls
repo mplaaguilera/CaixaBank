@@ -34,6 +34,9 @@ public with sharing class OS_User_AU_TRHan extends CC_TriggerHandlerBase{
                         idUsuarios.add(usuarioNew.Id);
                     }
             }
+            if(usuarioNew.OS_Inicio_Vigencia_Agente_Backup__c <= System.today()){
+                idUsuarios.add(usuarioNew.Id);
+            }
         }
         if(!procesos.isEmpty()){
             insert procesos;

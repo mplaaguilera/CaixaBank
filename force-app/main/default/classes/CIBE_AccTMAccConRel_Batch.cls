@@ -8,7 +8,6 @@ Historial
 ---------------------
 	VERSION		USER_STORY		AUTHOR				  DATE				Description
 	1.0			US493757	    Alex Pérez	   	      04/05/2023	    Init version
-    1.1         
 ***********************************************************************************************************************/
 public without sharing class CIBE_AccTMAccConRel_Batch implements Database.Batchable<sObject>, Database.Stateful {
     public list<id> relationIds = new list<Id>();
@@ -80,12 +79,15 @@ public without sharing class CIBE_AccTMAccConRel_Batch implements Database.Batch
                 boolean bNegocioCIB=false;
                 
                 //list<string> negocios = ;
-                for(string negocio : acc.AV_Negocio__c.split(';')){      
-                    if(sNegocioCIB.contains(negocio)){
-                        bNegocioCIB=true;
-                        break;
-                    }  
+                if(acc.AV_Negocio__c !=null){
+                    for(string negocio : acc.AV_Negocio__c.split(';')){      
+                        if(sNegocioCIB.contains(negocio)){
+                            bNegocioCIB=true;
+                            break;
+                        }  
+                    }
                 }
+
                 if(bNegocioCIB){
                     continue;
                 }
@@ -134,21 +136,34 @@ public without sharing class CIBE_AccTMAccConRel_Batch implements Database.Batch
                         }
                     }
                 }
+
+
+                boolean hasError = false;
+                List<Object> objs = new List<Object>();
+                Map<String, String> msjs = new Map<String, String>();
+
                 Database.SaveResult[] dmlResult = Database.insert(accMemberToInsert, false);
                 Database.deleteResult[] deleteResult = Database.delete(accMemberToDelete, false);
-                for(Database.SaveResult res : dmlResult) {
-                    if(!res.isSuccess()) {
-                        for(Database.Error err : res.getErrors()) {
-                            CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+
+                for (Integer i = 0; i < accMemberToInsert.size(); i++) {
+                    Database.SaveResult sr = dmlResult[i];
+                    if(!sr.isSuccess() && !sr.getErrors().isEmpty() && accMemberToInsert[i] !=null) {
+                        msjs.put(accMemberToInsert[i].Id, ((String) sr.getErrors()[0].getMessage()));
+                        objs.add(accMemberToInsert[i]);
+                        hasError = true;
                         }
                     }
-                }
-                for(Database.deleteResult res : deleteResult) {
-                    if(!res.isSuccess()) {
-                        for(Database.Error err : res.getErrors()) {
-                            CBK_Log.error(err.getStatusCode() + ': ' + err.getMessage());
+                    for (Integer i = 0; i < accMemberToDelete.size(); i++) {
+                        Database.deleteResult dr = deleteResult[i];
+                        if(!dr.isSuccess() && !dr.getErrors().isEmpty() && accMemberToDelete[i] !=null) {
+                            msjs.put(accMemberToDelete[i].Id, ((String) dr.getErrors()[0].getMessage()));
+                            objs.add(accMemberToDelete[i]);
+                            hasError = true;
                         }
                     }
+                
+                if(hasError) {
+                    CBK_Log.error(msjs, objs);
                 }
             }
         } catch(Exception e) {

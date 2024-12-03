@@ -63,7 +63,7 @@ public class CSBD_FamiliaProductoPicklist_Test {
         User usuarioGestor = [SELECT Id FROM User WHERE FirstName = 'GestorCSBD' AND Profile.Name = 'CSBD Gestor' LIMIT 1];
         System.runAs(usuarioGestor) {
             Test.startTest();
-            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba');
+            List<CC_Lista_Valores__c> productos = CSBD_FamiliaProductoPicklistController.getProductos('Familia prueba', 'Hipoteca');
             Test.stopTest();
 
             System.assertEquals(CC_MetodosUtiles.listaCampo(productos, 'Name').contains('Producto prueba'), true);

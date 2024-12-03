@@ -34,7 +34,7 @@ public with sharing class CIBE_HomeEventosHoy_Controller {
 
                 for(Event event : [SELECT Id, Account.Name, Subject, AV_Tipo__c, ActivityDateTime, toLabel(CSBD_Evento_Estado__c) 
                                     FROM Event 
-                                    WHERE RecordType.DeveloperName in ('CIBE_EventoCliente') and ActivityDate = TODAY AND OwnerId =: userinfo.getUserId()
+                                    WHERE RecordType.DeveloperName in ('CIBE_EventoCliente' , 'CIBE_EventoClienteCIB') and ActivityDate = TODAY AND OwnerId =: userinfo.getUserId()
                                     ORDER BY ActivityDateTime ASC ]) {
                     listReturn.add(
                         new Wrapper(

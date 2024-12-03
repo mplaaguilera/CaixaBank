@@ -11,7 +11,7 @@ Historial
 	1.1			App FSC			David Rufo			09/12/2020			Include a general check of the Record Types
 	1.2			Bug				Sandra Gómez		29/01/2021			Include if hasCustomPermission
 	1.3			Fix Performance	Carolina Alonso		21/10/2021			Include if has custom setting of Forbidden Words validation
-
+	1.5			IN1112575		Sandra Gómez		28/02/2024			Add method updateIsPreconceived
 ***********************************************************************************************************************/
 public class AV_Account_BU_TRHan extends CC_TriggerHandlerBase{
 	
@@ -31,6 +31,7 @@ public class AV_Account_BU_TRHan extends CC_TriggerHandlerBase{
 			AV_AccountTriggerHelper.descriptionLastModifiedDateAndUser(listData, mapOldObj);
 			AV_AccountTriggerHelper.processOwnerEAPGestor(listData, mapOldObj);
 			AV_AccountTriggerHelper.accountValueOficinaPrincipalRelacionas(listData);
+			AV_AccountTriggerHelper.updateIsPreconceived(listData,mapOldObj);
 		}
 	}
 }

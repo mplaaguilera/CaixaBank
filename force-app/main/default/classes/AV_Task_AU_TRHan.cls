@@ -15,6 +15,7 @@ Historial
 	1.5			US353735			Sandra Gómez		20/04/2022			Added method deleteUpdateTasksGCF
 	1.6			Fix					Patricia Solano 	08/08/2022			Changed the method call to AV_TaskTriggerHelperSharing
 	1.7			Fix					Sandra Gómez		13/11/2023			Change method updateNextManagementDateOpp add patameter mapToByPassTask
+	1.8                             Oscar Moreno        16/02/2024          Comments updateTareaOpp and recordChannel methods
 ***********************************************************************************************************************/
 public class AV_Task_AU_TRHan extends CC_TriggerHandlerBase {
 
@@ -34,8 +35,8 @@ public class AV_Task_AU_TRHan extends CC_TriggerHandlerBase {
         	//AV_TaskTriggerHelper.validateTaskOnboardingPositiveClosed(listData,mapOldObj); //Doing in the component
         	if (!hasCustomPermission && !System.isbatch()){
         		AV_TaskTriggerHelper.updateNextManagementDateOpp(listData, mapOldObj, mapToByPassTask);
-				AV_TaskTriggerHelper.updateTareaOpp(listData, mapOldObj);
-				AV_TaskTriggerHelper.recordChannel(listData, mapOldObj);
+				//AV_TaskTriggerHelper.updateTareaOpp(listData, mapOldObj);
+				//AV_TaskTriggerHelper.recordChannel(listData, mapOldObj);
 				AV_TaskTriggerHelper.notifyExperienciaCliTask(listData,mapOldObj,true);
 
             }

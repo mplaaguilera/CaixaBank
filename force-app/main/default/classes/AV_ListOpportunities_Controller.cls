@@ -17,7 +17,8 @@ Historial
 	1.6			US504147								Vladislav Lityagin	11/01/2023		Added RecordTypes filter in retrieveListOpp and retrieveListWithOutTask
     1.7			US481572		                        Patricia Solano 	25/01/2023		Modified method retrieveListWithOutTask
     1.8         Fix PMD Errors 		                    Humberto Vilchez    23/10/2023      Add WITH SECURITY_ENFORCED to queries
-
+    1.9         Cambiar lógica para mostrar las opp     Ángel Medina        22/01/2024      Modified method retrieveListOpp
+    2.0         PPM100205279                            Luis Fernández      14/05/2024      Added new fields to retrieve in opportuntiees. AV_NoOfrecerHasta__c and AV_PF__r.AV_NewReportsActions__c
 ***********************************************************************************************************************/
 public with sharing class AV_ListOpportunities_Controller {
 
@@ -26,29 +27,45 @@ public with sharing class AV_ListOpportunities_Controller {
      */
     @AuraEnabled
     public static List<OppTaskResponse> retrieveListOpp(String recordInfoJson){
-        
         RecordInfo recordInfo = (RecordInfo)JSON.deserialize(recordInfoJson, RecordInfo.class);
-        //Obtengo el registro Tarea-Oportunidad asociado
         
+        //Obtengo el registro Tarea-Oportunidad asociado
         List<AV_CustomActivityOpportunity__c> listTareaOpp;
+        Set<Id> opportunityIds = new Set<Id>();
+        Map<Id,Boolean> mapMain = new Map<Id, Boolean>();
+
+       
         if(recordInfo != null && String.isNotBlank(recordInfo.taskHeader)) {
-            listTareaOpp = [Select Id, AV_LicensePlate__c, Name, AV_IsMain__c, AV_Opportunity__c, AV_Task__c, AV_Product__c, AV_Product__r.Name, AV_Gestor__c,AV_Gestor__r.Name, RecordTypeId, AV_Opportunity__r.RecordTypeId, 
-            AV_Opportunity__r.RecordType.Name, AV_Priority__c, AV_ReviewDate__c, AV_Stage__c, AV_Valor1__c, AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c, AV_Concepto4__c, AV_Valor5__c, AV_Concepto5__c, AV_HoldingAnotherEntity__c, AV_Entity__c, AV_DueDate__c, 
-            AV_FeeAmount__c, AV_Amount__c, AV_TypeOfInterest__c, AV_Commentary__c, AV_Opportunity__r.AV_Tenencia__c,AV_IncludeInPrioritizingCustomers__c,AV_Opportunity__r.AV_FechaActivacion__c,AV_Resolucion__c, AV_ByProduct__c, AV_MarginEuro__c, AV_AmountEuro__c
-            From AV_CustomActivityOpportunity__c where AV_Task__c = :recordInfo.taskHeader AND RecordType.DeveloperName =:AV_AppConstants.TAREA_OPOR_RT WITH SECURITY_ENFORCED order by AV_IsMain__c DESC];
-        }
-        if(listTareaOpp!= null && !listTareaOpp.isEmpty()){
-            List<OppTaskResponse> listOppTaskRes = new List<OppTaskResponse>();
-            for(AV_CustomActivityOpportunity__c oppTask :listTareaOpp) {
-                OppTaskResponse oppTaskRes = new OppTaskResponse();
-                oppTaskRes.oppTask = oppTask;
-                listOppTaskRes.add(oppTaskRes);
+            listTareaOpp = [SELECT AV_IsMain__c, AV_Opportunity__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :recordInfo.taskHeader AND RecordType.DeveloperName =:AV_AppConstants.TAREA_OPOR_RT WITH SECURITY_ENFORCED ORDER BY AV_IsMain__c DESC];
+            for(AV_CustomActivityOpportunity__c tareaOpp : listTareaOpp){
+                opportunityIds.add(tareaOpp.AV_Opportunity__c);
+                mapMain.put(tareaOpp.AV_Opportunity__c, tareaOpp.AV_IsMain__c);
             }
-            return listOppTaskRes;
-        } else {
-            return null;
         }
+       
+        List<OppTaskResponse> listOppTaskRes = new List<OppTaskResponse>();
+        if(opportunityIds != null && !opportunityIds.isEmpty()){
+            List<Opportunity> listOpp = [SELECT Id, AV_PEA__c, AV_PF__c, AV_LicensePlate__c, Name, AV_Product__c, AV_ProductName__c, AV_Gestor__c,AV_Gestor__r.Name, RecordTypeId,RecordType.Name, AV_Potencial__c, StageName , AV_Valor1__c, 
+            AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c, AV_Concepto4__c, AV_Valor5__c, AV_Concepto5__c, AV_Entidad__c , Amount,
+            AV_TipoInteres__c, AV_Comentarios__c, AV_Tenencia__c,AV_IncludeInPrioritizingCustomers__c,AV_FechaActivacion__c,AV_Resolucion__c, AV_ByProduct__c, AV_MarginEuro__c, AV_AmountEuro__c,AV_FechaVencimiento__c,
+            CloseDate, AV_Cuota__c, AV_FechaProximoRecordatorio__c,RecordType.DeveloperName,AV_PF__r.AV_NewReportActions__c,AV_NoOfrecerHasta__c
+            FROM Opportunity WHERE Id IN :opportunityIds WITH SECURITY_ENFORCED];
+           
+            for(Opportunity opp : listOpp){
+                OppTaskResponse oppTaskRes = new OppTaskResponse();
+                oppTaskRes.opp = opp;
+                oppTaskRes.isMain = mapMain.get(opp.Id);
+                if(oppTaskRes.isMain && listOppTaskRes.size() > 0){
+                    listOppTaskRes.add(0,oppTaskRes); 
+                }else{
+                    listOppTaskRes.add(oppTaskRes); 
+                }
+            }
+        }
+       return listOppTaskRes;
     }
+
+
 
     /**
      * Retrieve the list of the opp's no related with task or event but is related with the customer
@@ -75,6 +92,7 @@ public with sharing class AV_ListOpportunities_Controller {
                 for(AV_CustomActivityOpportunity__c tareaOpp : listTareaOpp){
                     setOpp.add(tareaOpp.AV_Opportunity__c);
                 } 
+
             }
 
             if(setOpp != null && !setOpp.isEmpty()) {
@@ -89,7 +107,7 @@ public with sharing class AV_ListOpportunities_Controller {
                 List<String> listRTs = AV_AppUtilities.getListFromSet(setRTs);
                 queryOpp = 'SELECT Id, Name, AV_PF__c, AV_PF__r.Name, AV_Gestor__c, AV_Gestor__r.Name, RecordTypeId, RecordType.Name, AV_Potencial__c, AV_FechaProximoRecordatorio__c, StageName, AV_Valor1__c, AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c,'+
                 'AV_Concepto4__c, AV_Valor5__c, AV_Concepto5__c, AV_Tenencia__c, AV_Entidad__c, CloseDate, AV_Cuota__c, Amount, AV_TipoInteres__c, AV_Comentarios__c,AV_IncludeInPrioritizingCustomers__c,'+
-                'AV_FechaActivacion__c, AV_MarginEuro__c, AV_AmountEuro__c, AV_ByProduct__c FROM Opportunity ';
+                'AV_FechaActivacion__c, AV_MarginEuro__c, AV_AmountEuro__c, AV_ByProduct__c,AV_PF__r.AV_NewReportActions__c,AV_NoOfrecerHasta__c FROM Opportunity ';
                 queryWhere = ' WHERE AccountId = \''+ recordInfo.accountId +'\' AND StageName in '+ listStatusOpen +' AND RecordType.DeveloperName IN '+listRTs;                         
                 
                 if (setOpp!=null && !setOpp.isEmpty()){
@@ -190,7 +208,10 @@ public with sharing class AV_ListOpportunities_Controller {
 
     public class OppTaskResponse {
         @AuraEnabled
-        public AV_CustomActivityOpportunity__c oppTask;
+        public Opportunity opp;
+        @AuraEnabled
+        public Boolean isMain;
     }
+
 
 }

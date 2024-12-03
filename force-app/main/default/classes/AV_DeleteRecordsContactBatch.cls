@@ -18,11 +18,13 @@ Historial
 	2.7			FIX					David Rufo			22/06/2021			Use the number of days via Custom Metadata
 	2.8		    AV_Query IT	        Daniel Rodríguez    03/03/2022	        Change AV_Query to SOQL for User, Account, Contact
 	2.9			OrgHealth			Carolina Alonso		17/03/2022			Change AV_Query logic to allow calling method with an external query
-***********************************************************************************************************************/
-global class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+    3.0		    FIX11070844	    Oscar Moreno		   22/07/2024			Fix error The Global modifier should be avoided.
 
-	global Integer recordsProcessed = 0;
-	global static final String BATCHNAME = 'AV_DeleteContacts';
+***********************************************************************************************************************/
+public class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
+
+	public Integer recordsProcessed = 0;
+	public static final String BATCHNAME = 'AV_DeleteContacts';
 	
     private String avQuery = '';
 	
@@ -61,7 +63,7 @@ global class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
         if(avQuery==null){
             avQuery = setQuery();
@@ -82,7 +84,7 @@ global class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<Contact> param with the list of Sales to delete
 	 */
-	global void execute(Database.BatchableContext bc, List<Contact> scope){
+	public void execute(Database.BatchableContext bc, List<Contact> scope){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -98,7 +100,7 @@ global class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	 global void execute(SchedulableContext sc) {
+	 public void execute(SchedulableContext sc) {
 		 Database.executeBatch(new AV_DeleteRecordsContactBatch());
 	 }
 		
@@ -108,7 +110,7 @@ global class AV_DeleteRecordsContactBatch implements Database.Batchable<sObject>
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processed: ' + recordsProcessed);
 		//Database.executeBatch(new AV_DeleteRecordsAccountBatch());

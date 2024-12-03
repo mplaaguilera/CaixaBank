@@ -8,17 +8,21 @@ Historial
 ---------------------
 	VERSION		USER_STORY		     AUTHOR				 DATE				Description
 	1.0			US345266		Vladislav Lityagin     03/05/2022			Init version
-   
-***********************************************************************************************************************/
-global class AV_LeadOpportunity_AnonymityBatch implements Database.Batchable<sObject>, Database.Stateful{
-    global Integer recordsProcessed = 0;
-	global String limitBatch;
+    1.1		    FIX11070844	    Oscar Moreno		   22/07/2024			Fix error The Global modifier should be avoided.
 
-    global AV_LeadOpportunity_AnonymityBatch(String limitQuery) {
+  
+***********************************************************************************************************************/
+public class AV_LeadOpportunity_AnonymityBatch implements Database.Batchable<sObject>, Database.Stateful{
+    public Integer recordsProcessed = 0;
+	public String limitBatch;
+
+    public AV_LeadOpportunity_AnonymityBatch(String limitQuery) {
 		limitBatch = limitQuery;
     }
 
-    global AV_LeadOpportunity_AnonymityBatch(){}
+    public AV_LeadOpportunity_AnonymityBatch(){}
+
+   
 
     /**
 	 * Get a list of leads opportunities to process the data
@@ -26,7 +30,7 @@ global class AV_LeadOpportunity_AnonymityBatch implements Database.Batchable<sOb
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
 
-    global Database.QueryLocator start(Database.BatchableContext bc){
+    public Database.QueryLocator start(Database.BatchableContext bc){
         String methodName = 'start';
 		AV_LogDebug.printLogDebug(methodName, 'Batch limit: ' + limitBatch);
         /*Set<String> conditionName = new Set<String>();
@@ -56,7 +60,7 @@ global class AV_LeadOpportunity_AnonymityBatch implements Database.Batchable<sOb
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<AV_LeadOpportunity__c> param with the list of Leads
 	 */
-    global void execute(Database.BatchableContext bc, List<AV_LeadOpportunity__c> scope){
+    public void execute(Database.BatchableContext bc, List<AV_LeadOpportunity__c> scope){
         //process each batch of records
         String methodName = 'execute';
         try {
@@ -194,7 +198,7 @@ global class AV_LeadOpportunity_AnonymityBatch implements Database.Batchable<sOb
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-    global void finish(Database.BatchableContext bc){
+    public void finish(Database.BatchableContext bc){
         //execute any post-processing operations
         String methodName='finish';
         AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);

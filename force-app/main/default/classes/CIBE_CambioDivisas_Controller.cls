@@ -7,8 +7,10 @@ Proposito: Clase controladora de los componentes "cibe_cambioDivisas"
 Historial
 ---------------------
     VERSION		USER_STORY                                          AUTHOR                      DATE			Description
-    1.0         SF - Integración con API's de Divisas      Jose Maria Fernandez        26/10/2022		Init version
-***********************************************************************************************************************/
+    1.0         SF - Integración con API's de Divisas               Jose Maria Fernandez        26/10/2022		Init version
+    2.0         SF - Avoid Callout Constructor in Apex              Borja Lavesiera             07/03/2024		Second version
+*******************************************************************************************************************/
+
 public with sharing class CIBE_CambioDivisas_Controller {
   
     /**
@@ -137,44 +139,40 @@ public with sharing class CIBE_CambioDivisas_Controller {
     VERSION        USER_STORY       AUTHOR                         DATE           Description   
     1.0             US Id           Jose María Fernandez           26-10-2022     Created    
     *****************************************************************/
-    public static Response sendRequest(String jsonBody) {
-        System.debug('Entering <Method sendRequest>: '  +  'Parameter jsonBody: ' + jsonBody);
-
-        Response responseWrapper = new Response();
-        HttpRequest req = new HttpRequest();
-        HttpResponse res = new HttpResponse();
+    public static Response sendRequest(String jsonBody) {  
+            Response responseWrapper = new Response();
         //Comprobamos que la llamada anterior al servicio y su respuesta con este identificador no tenga menos de 24 horas de diferencia.
-            Map<String,String> mHeaders =  new  Map<String,String>();
-
-            mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-        
-
             try {
-                req = CBK_HttpServiceIntegration.getRequest(jsonBody, 'changeCurrency', 'POST', mHeaders);
-                res = CBK_HttpServiceIntegration.callHttpService(req);    
-                System.debug('res : '+ res); 
+                CBK_log.debug('Entering Parameter jsonBody:'+ jsonBody);     
+                Map<String,String> mHeaders =  new  Map<String,String>();
+                mHeaders.put('Content-Type', 'application/json;charset=UTF-8');
 
-            }
-            catch(DmlException e){
-                responseWrapper.errorMessage = res.getStatus();
-            }
-            finally{
+                CBK_HttpServiceIntegration.RequestWapper reqWrapper =  new CBK_HttpServiceIntegration.RequestWapper();
+                reqWrapper.body = jsonBody;
+                reqWrapper.intSetting = 'changeCurrency';
+                reqWrapper.method = 'POST';
+                reqWrapper.mHeaders =  mHeaders;
+                reqWrapper.mUriParams = new  Map<String,string>();
+                reqWrapper.mQueryParams = new  Map<String,string>();
+
+                HttpRequest req = CBK_HttpServiceIntegration.getRequest(reqWrapper);                        
+                HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req, 'Int Divisas', 'changeCurrency');
+
                 responseWrapper.statusCode = res.getStatusCode();
-                System.debug('Finally : '+ responseWrapper); 
+                responseWrapper.errorMessage = res.getStatus();
 
-                if (responseWrapper.statusCode == 200){
+                if (responseWrapper.statusCode == 200) {
                     responseWrapper.data = (List<ResponseData>)JSON.deserialize(res.getBody(), List<ResponseData>.class);  
-                    System.debug('responseWrapper.data: '+ responseWrapper); 
-
+                } else{
+				    throw new CBK_ServiceRestManager.BadResponseException(res.getBody(), res.getStatus(), res.getStatusCode());
                 }
             }
-        
-      
-        System.debug('Exiting <Method sendRequest>: '+ responseWrapper); 
+            catch(DmlException e){
+                responseWrapper.errorMessage = 'Ha habido un problema al ejecutar la integración';
+            }
         return responseWrapper;
     }
 
- 
  /*****************************************************************   
   * Proposito:  Obtención del Record Id desde el componente LWC y preparación de la llamada                                                           
     Parameters: [String numPerson, fechaRefresci, jsonBody]   
@@ -183,13 +181,12 @@ public with sharing class CIBE_CambioDivisas_Controller {
     Historial
     --------    
     VERSION        USER_STORY       AUTHOR                         DATE           Description   
-    1.0             US Id           Jose María Fernandez           26-10-2022     Created    
+    1.0            US Id            Jose María Fernandez           26-10-2022     Created 
+    1.1            US841839         Borja Lavesiera                12/03/2024     Eliminar Http, HttpRequest y HttpResponse Constructor  
     *****************************************************************/
 	@AuraEnabled
 	public static List<CIBE_Divisas__c> getDivisas() {
         List<CIBE_Divisas__c> divisasList = new List<CIBE_Divisas__c>();
-
-        System.debug('Entering <Method getDivisasProducts>: ');
         Response responseFromRequest = new Response();
         String jsonResponse = 'jsonResponse';
 
@@ -198,31 +195,19 @@ public with sharing class CIBE_CambioDivisas_Controller {
         bodyPattern.put('option',4);
         bodyPattern.put('requestType','D');
         String jsonSerialize = JSON.serialize(bodyPattern);
-            responseFromRequest = sendRequest(jsonSerialize);
-            System.debug('responseFromRequest '+ responseFromRequest);
+        responseFromRequest = sendRequest(jsonSerialize);
 
         if (responseFromRequest.data != null) {
             divisasList = jsonToDatabase(responseFromRequest.data);
-
-        }else{
+        } else {
             //Si la llamada al servicio no es correcta, se lanza una excepción para que el usuario pueda verla en el componente.
-           System.debug('Error: '+ responseFromRequest.errorMessage);     
-           }
-    
-
-        System.debug('Exiting <Method getDivisasProducts>: '+ divisasList);
+            CBK_log.debug('Respuesta: ' + responseFromRequest.errorMessage);
+            }
 		return divisasList;
-		
-
 	}
-
-
     //Clase que contiene el cuerpo del JSON de la integración de Divisas
     public static List<CIBE_Divisas__c> jsonToDatabase(List<ResponseData> wrapperResponse){
-        System.debug('Entering <Method getDivisasProducts>: ' + wrapperResponse);
-
-        List<CIBE_Divisas__c> divisasList = new List<CIBE_Divisas__c>();
-     
+        List<CIBE_Divisas__c> divisasList = new List<CIBE_Divisas__c>();     
         //Creamos un objeto de la clase ResponseData para poder deserializar el JSON de respuesta.
         //iteramos sobre el objeto ResponseData para obtener los datos de las divisas.
         for (ResponseData res : wrapperResponse ) { 
@@ -234,19 +219,9 @@ public with sharing class CIBE_CambioDivisas_Controller {
             if( res.ccyData.ccyShortName!=null){newDivisa.CIBE_NombreDivisa__c = res.ccyData.ccyShortName;}
             if(res.ExchangeData.fixingReutersExchange!=null){newDivisa.CIBE_TipoCambio__c = Decimal.valueOf(res.ExchangeData.fixingReutersExchange);}
 
-            //Añadimos el objeto a la lista de divisas.
             divisasList.add(newDivisa);
         }
-        System.debug('divisasList : '+ divisasList); 
-
+        CBK_log.debug('Divisa a actualizar: ' + divisasList);
         return divisasList;
     }
-
- 
-
-
-
-   
-
-
 }

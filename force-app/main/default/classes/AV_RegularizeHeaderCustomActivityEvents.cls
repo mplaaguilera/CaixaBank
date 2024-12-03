@@ -16,6 +16,8 @@ Historial
    1.6			Fix bug		  David Rufo		09/03/2021		The date field is not filling in all the cases
    1.7			Fix 		  David Rufo		31/05/2021		Update query to user Query FWK
    1.8			US306420	  Víctor Santiago	30/12/2021		Added query limit and deleted Event Gestor RT
+   1.9			Deuda Técnica Luis Fernández	14/03/2024		Optimización del código
+
    
 ***********************************************************************************************************************/
 global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchable<sObject>, Database.Stateful,Schedulable {
@@ -40,17 +42,8 @@ global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchab
         Integer numDays = AV_SchedulerBatches.getNumDays(BATCHNAME);
 		String batchLimit = AV_SchedulerBatches.getLimit(BATCHNAME);
 	
-        // AV_Query avQuery = new AV_Query('Event')
-        //                             .selectFields('Id, AV_ExternalID__c, AV_Task__c, Subject, RecordTypeId, RecordType.DeveloperName')
-        //                             .addConditionIn('RecordType.DeveloperName', setRt)
-        //      						.addConditionEq('AV_Task__c', null)
-        //      						.addConditionEq('SystemModstamp', AV_Query.LAST_N_DAYS(numDays));
-             						//.addConditionEq('AV_BatchProcessRegularizeHCA__c', Label.AV_BatchLabel_ToBeProcess)
-		
-		String avQuery = 'SELECT Id, AV_ExternalID__c, AV_Task__c, Subject, RecordTypeId, RecordType.DeveloperName FROM EVENT WHERE RecordType.DeveloperName = \''+AV_AppConstants.EVENTCLIENTE_RT+'\' AND AV_Task__c = NULL AND SystemModstamp = LAST_N_DAYS:'+numDays;
-	
+		String avQuery = 'SELECT Id, AV_ExternalID__c, AV_Task__c,Subject FROM EVENT WHERE RecordType.DeveloperName = \''+AV_AppConstants.EVENTCLIENTE_RT+'\' AND AV_Task__c = NULL AND SystemModstamp = LAST_N_DAYS:'+numDays;
 		if(String.isNotBlank(batchLimit)){
-			// avQuery.setLimit(Integer.valueOf(batchLimit));
 			avQuery += ' LIMIT '+batchLimit;
 		}
         return avQuery;
@@ -83,22 +76,25 @@ global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchab
 	global void execute(Database.BatchableContext bc, List<Event> listEvent){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
-		try{
 			recordsProcessed= listEvent.size();
 			AV_LogDebug.printLogDebug(methodName,'Data that does not have an associated AV_HeaderCustomActivity__c (EVENTs): ' + listEvent.size());
 			List<Event> listEventsToUpdate = getListEventToUpdate(listEvent);
 			if (listEventsToUpdate!=null && !listEventsToUpdate.isEmpty()){
-				try{
 					AV_LogDebug.printLogDebug('process', 'upsert Events: ' + listEventsToUpdate.size());
-					Database.upsert(listEventsToUpdate, false);
-				}catch(Exception e){
-					AV_LogDebug.printException('process', e);
-				}
+
+					List<Database.UpsertResult> srList = Database.upsert(listEventsToUpdate, false);
+
+					for(Database.UpsertResult sr : srList){
+						if(!sr.isSuccess()){
+							for(Database.Error err : sr.getErrors()){
+
+								AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getMessage()+'\n'+err.getStatusCode()+'\Following fields are affected: '+err.getFields());
+							}
+
+						}
+					}
 			}
 			
-		}catch(System.Exception e){
-			AV_LogDebug.printException(methodName, e);
-		}
 	}	
 
 	/**
@@ -155,11 +151,11 @@ global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchab
         
 		//Obtengo todas las cabecera-tareas asociadas a la lista de Eventos
 		Map<String,Id> mapCabeceraTarea = getMapCabeceraTareaAsociada(listEvent);
+		Map<String, AV_HeaderCustomActivity__c> mapHeaderTask = new Map<String, AV_HeaderCustomActivity__c>();
 		
 		for(Event evento : listEvent){
 			//Si existe una cabecera-tarea con ese ExternalId se lo asocio
-			String recordTypeDeveloperName = evento.RecordType.DeveloperName;
-			if(recordTypeDeveloperName.startsWithIgnoreCase('AV_') && evento.AV_Task__c==null){
+			if(evento.AV_Task__c==null){
 				if(mapCabeceraTarea != null && mapCabeceraTarea.containsKey(evento.AV_ExternalID__c)){
 					evento.AV_Task__c = mapCabeceraTarea.get(evento.AV_ExternalID__c);
 					listEventsToUpdate.add(evento);
@@ -173,24 +169,24 @@ global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchab
 					headerCustomAct.AV_ExternalID__c = evento.AV_ExternalID__c;
                     headerCustomAct.IDTask__c = evento.Id;
 					listHeaderTask.add(headerCustomAct);
+					mapHeaderTask.put(headerCustomAct.AV_ExternalID__c, headerCustomAct);
+
 				}
 			}
 		}
 
 		//Insert data && update the field "AV_Task__c"
 		if (listHeaderTask!=null && !listHeaderTask.isEmpty()){
-			try{
 				AV_LogDebug.printLogDebug(methodName, 'insert listHeaderTask: ' + listHeaderTask.size());
-				Database.insert(listHeaderTask, false);
-			}catch(Exception e){
-				AV_LogDebug.printException(methodName + ' - listHeaderTask', e);
-			}
-			try{
-				//Map where the key is the external ID
-				Map<String, AV_HeaderCustomActivity__c> mapHeaderTask = new Map<String, AV_HeaderCustomActivity__c>();
-				for(AV_HeaderCustomActivity__c auxHeaderTask : listHeaderTask){
-					mapHeaderTask.put(auxHeaderTask.AV_ExternalID__c, auxHeaderTask);
+				List<Database.SaveResult> srList = Database.insert(listHeaderTask, false);
+				for(Database.SaveResult sr : srList){
+					if(!sr.isSuccess()){
+						for(Database.Error err : sr.getErrors()){
+							AV_LogDebug.printLogDebug(methodName, 'Error: ' + err.getMessage()+'\n'+err.getStatusCode()+'\Following fields are affected: '+err.getFields());
+						}
+					}
 				}
+				//Map where the key is the external ID
 				//Update field "AV_Task__c"
 				for(Event evento : listEvent){
 					AV_HeaderCustomActivity__c auxHeaderTask = mapHeaderTask.get(evento.AV_ExternalID__c);
@@ -199,9 +195,6 @@ global class AV_RegularizeHeaderCustomActivityEvents implements Database.Batchab
 						listEventsToUpdate.add(evento);
 					}
 				}
-			}catch(Exception e){
-				AV_LogDebug.printException(methodName + ' - listEventsToUpdate', e);
-			}
 		}
 
 		return listEventsToUpdate;

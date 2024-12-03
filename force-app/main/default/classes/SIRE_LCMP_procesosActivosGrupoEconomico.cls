@@ -26,7 +26,7 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
     public static List<ProcesoWrapper> getProcesos(String idCliente){
 
         List<ProcesoWrapper> pro = new List<ProcesoWrapper>(); 
-        if(FinServ__AccountAccountRelation__c.SObjectType.getDescribe().isAccessible() && SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.FinServ__AccountAccountRelation__c.isAccessible() && Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             // Buscamos todas las empresas que pertenecen a este grupo Economico
             List<FinServ__AccountAccountRelation__c> empresas = new List<FinServ__AccountAccountRelation__c>();
             empresas = [SELECT Id, FinServ__RelatedAccount__c FROM FinServ__AccountAccountRelation__c 
@@ -38,12 +38,14 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
                 for(FinServ__AccountAccountRelation__c empresa : empresas){
                     idEmpresas.add(empresa.FinServ__RelatedAccount__c);
                 }
-                List<SIREC__SIREC_obj_proceso__c> todosProcesos = [ SELECT Id, RecordType.Name, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_cliente__r.Name,  
-                                                                    SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c,
-                                                                    toLabel(SIREC__SIREC_fld_estrategia__c), toLabel(SIREC__SIREC_fld_situacion__c),
+                List<SIREC__SIREC_obj_proceso__c> todosProcesos = [SELECT Id, RecordType.Name, SIREC__SIREC_fld_cliente__c, SIREC__SIREC_fld_cliente__r.Name,  
+                                                                    SIREC__SIREC_fld_fechaInicio__c, SIREC__SIREC_fld_fechaSituacion__c, toLabel(SIR_PropuestaNivelGrupo__c), 
+                                                                    SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIREC__SIREC_fld_situacion__c),
                                                                     SIR_DeudaTotal__c, SIR_MaximoDiasImpago__c, Owner.Name, SIR_PropuestaProceso__c
                                                                     FROM SIREC__SIREC_obj_proceso__c 
                                                                     WHERE SIREC__SIREC_fld_cliente__c in :idEmpresas 
+                                                                    AND (RecordType.Name = : SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_PREVENTIVO 
+                                                                        OR RecordType.Name = : SIR_Constantes.PROCESO_RECORDTYPE_NAME_EMP_FLUJO)
                                                                     AND SIREC__SIREC_fld_situacion__c != : SIR_Constantes.PROCESO_SITUACION_FINALIZADO
                                                                     AND SIR_ObjetivoProceso__c != :SIR_Constantes.PROCESO_OBJETIVO_INFORMATIVO
                                                                     ORDER BY SIREC__SIREC_fld_cliente__c];
@@ -59,7 +61,7 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
                             Items procesoWrapp = new Items();
                             procesoWrapp.idProceso      = URL.getSalesforceBaseUrl().toExternalForm() + '/' + todosProcesos[i].Id;
                             procesoWrapp.tipoProceso    = todosProcesos[i].RecordType.Name;
-                            procesoWrapp.estrategia     = todosProcesos[i].SIREC__SIREC_fld_estrategia__c;
+                            procesoWrapp.estrategia     = todosProcesos[i].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                             procesoWrapp.fechaInicio    = string.valueOf(todosProcesos[i].SIREC__SIREC_fld_fechaInicio__c);
                             procesoWrapp.fechaSituacion = string.valueOf(todosProcesos[i].SIREC__SIREC_fld_fechaSituacion__c);
                             procesoWrapp.situacion      = todosProcesos[i].SIREC__SIREC_fld_situacion__c;
@@ -67,6 +69,7 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
                             procesoWrapp.diasImpago     = string.valueOf(todosProcesos[i].SIR_MaximoDiasImpago__c);
                             procesoWrapp.gestor         = todosProcesos[i].Owner.Name;
                             procesoWrapp.propuesta      = todosProcesos[i].SIR_PropuestaProceso__c;
+                            procesoWrapp.propuestaNivelGrupo = todosProcesos[i].SIR_PropuestaNivelGrupo__c;
                             procesosMismaEmpresa.add(procesoWrapp);                           
                             if(i == todosProcesos.size()-1){
                                 padreWraper.items = procesosMismaEmpresa;
@@ -89,7 +92,7 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
                             Items procesoWrapp = new Items();
                             procesoWrapp.idProceso      = URL.getSalesforceBaseUrl().toExternalForm() + '/' + todosProcesos[i].Id;
                             procesoWrapp.tipoProceso    = todosProcesos[i].RecordType.Name;
-                            procesoWrapp.estrategia     = todosProcesos[i].SIREC__SIREC_fld_estrategia__c;
+                            procesoWrapp.estrategia     = todosProcesos[i].SIREC__SIREC_fld_descEstrategiaCatalogo__c;
                             procesoWrapp.fechaInicio    = string.valueOf(todosProcesos[i].SIREC__SIREC_fld_fechaInicio__c);
                             procesoWrapp.fechaSituacion = string.valueOf(todosProcesos[i].SIREC__SIREC_fld_fechaSituacion__c);
                             procesoWrapp.situacion      = todosProcesos[i].SIREC__SIREC_fld_situacion__c;
@@ -97,6 +100,7 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
                             procesoWrapp.diasImpago     = string.valueOf(todosProcesos[i].SIR_MaximoDiasImpago__c);
                             procesoWrapp.gestor         = todosProcesos[i].Owner.Name;
                             procesoWrapp.propuesta      = todosProcesos[i].SIR_PropuestaProceso__c;
+                            procesoWrapp.propuestaNivelGrupo = todosProcesos[i].SIR_PropuestaNivelGrupo__c;
                             procesosMismaEmpresa.add(procesoWrapp);
                             if(i == todosProcesos.size()-1){
                                 padreWraper.items = procesosMismaEmpresa;                                
@@ -140,7 +144,9 @@ public with sharing class SIRE_LCMP_procesosActivosGrupoEconomico {
         @AuraEnabled
         public String propuesta {get;set;}
         @AuraEnabled
-        public String idProceso {get;set;} 
+        public String idProceso {get;set;}
+        @AuraEnabled
+        public String propuestaNivelGrupo {get;set;} 
     }
    
 }

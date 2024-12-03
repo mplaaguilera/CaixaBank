@@ -7,9 +7,10 @@ Proposito: Clase para Trigger de Task AfterDelete
 Historial
 ---------------------
 	VERSION		USER_STORY		  	AUTHOR				DATE				Description
-	1.0								Jose María Perez	10/05/2022			Add Scoring Task
+	1.0			ini 				Jose María Perez	10/05/2022			Add Scoring Task
     1.1			Fix					Patricia Solano 	08/08/2022			Changed the method call to AV_TaskTriggerHelperSharing
-	1.2								Vlaislav Lityagin	16/01/2023			Added check permission AV_AvoidDeleteTask for skip calculateScoreTask
+	1.2			Fix					Vlaislav Lityagin	16/01/2023			Added check permission AV_AvoidDeleteTask for skip calculateScoreTask
+    1.3         Fix                 Sandra Gómez        16/11/2023          Add filter isQueueable in method deleteRecordsRelatedWithTask
 ***********************************************************************************************************************/
 public class AV_Task_AD_TRHan extends CC_TriggerHandlerBase {
     
@@ -25,8 +26,9 @@ public class AV_Task_AD_TRHan extends CC_TriggerHandlerBase {
             if(!hasAvoidDeleteTask){
                 AV_TaskTriggerHelperSharing.calculateScoreTask(listData,'delete');
             }
-            AV_TaskTriggerHelper.deleteRecordsRelatedWithTask(listData);
+            if(!System.isQueueable()) {
+                AV_TaskTriggerHelper.deleteRecordsRelatedWithTask(listData);
+            }
         }
     }
-    
 }

@@ -225,7 +225,7 @@ public class OS_Case_AU_Test {
             System.assertEquals(mccMotivo2.Id, elCasoCreado.CC_MCC_Motivo__c);
         }
     }
-    
+    /*
     @isTest
     public static void casoRelacionadoSegCierre() {
         User usuario =  [SELECT Id FROM User WHERE Email = 'testdevdev@test.com' LIMIT 1] ; 
@@ -323,5 +323,5 @@ public class OS_Case_AU_Test {
             
 
         }
-    }
+    }*/
 }

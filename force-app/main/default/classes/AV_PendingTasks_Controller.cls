@@ -24,11 +24,12 @@ public with sharing class AV_PendingTasks_Controller {
 	public static List<TaskAvisos> getAvisosTasks(String recordId) {
 		String accId;
 		List<TaskAvisos> listTaskAvisos=new List<TaskAvisos>();
-		Task taskAccount = [SELECT AccountId FROM Task WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
-		if (taskAccount == null) {
+		String sObjectTypeName = ((Id) recordId).getSObjectType().getDescribe().getName();
+		if (sObjectTypeName.equals(AV_AppConstants.OBJECT_NAME_EVENT)) {
 			Event eventAccount = [SELECT AccountId FROM Event WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
 			accId = eventAccount.AccountId;
-		} else {
+		} else if (sObjectTypeName.equals(AV_AppConstants.OBJECT_NAME_TASK)) {
+			Task taskAccount = [SELECT AccountId FROM Task WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
 			accId = taskAccount.AccountId;
 		}
 		if(accId != null){

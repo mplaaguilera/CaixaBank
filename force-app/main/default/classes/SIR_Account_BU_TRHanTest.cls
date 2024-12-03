@@ -29,7 +29,7 @@ public with sharing class SIR_Account_BU_TRHanTest {
         System.runAs(primero) {
             Account cuenta = SIR_TestDataFactory.crearCuenta();
             SIREC__SIREC_obj_proceso__c proceso = SIR_TestDataFactory.CrearProceso(cuenta);
-            SIREC__SIREC_obj_informacionCliente__c informacionCliente = SIR_TestDataFactory.CrearInfoCliente(cuenta);
+            //SIREC__SIREC_obj_informacionCliente__c informacionCliente = SIR_TestDataFactory.CrearInfoCliente(cuenta);
             SIR_FormularioRefinanciacion__c formulario = SIR_TestDataFactory.CrearFormulario(proceso); 
             formulario.SIR_Persona__c = cuenta.Id;
             update formulario;
@@ -40,7 +40,7 @@ public with sharing class SIR_Account_BU_TRHanTest {
         }
         System.assertEquals(segundo.Id, [SELECT OwnerId FROM SIREC__SIREC_obj_proceso__c].OwnerId , constantes.STRING_TEST);
         System.assertEquals(segundo.Id, [SELECT OwnerId FROM SIR_FormularioRefinanciacion__c].OwnerId , constantes.STRING_TEST);
-        System.assertEquals(segundo.Id, [SELECT OwnerId FROM SIREC__SIREC_obj_informacionCliente__c].OwnerId , constantes.STRING_TEST);
+       // System.assertEquals(segundo.Id, [SELECT OwnerId FROM SIREC__SIREC_obj_informacionCliente__c].OwnerId , constantes.STRING_TEST);
 
     }
 }

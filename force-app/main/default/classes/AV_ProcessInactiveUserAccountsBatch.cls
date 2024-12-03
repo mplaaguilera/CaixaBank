@@ -11,30 +11,32 @@ Historial
 	1.1         US306420		Sandra Gómez        	21/01/2022			Fix
 	1.2		    AV_Query IT		Daniel Rodríguez	    3/02/2022			Change AV_Query to SOQL for User and Account
 	1.3			Fix				Sandra Gómez			22/03/2022			Add AV_AppUtilities.setToStringIn
+	1.4         FIX28080841     Oscar Moreno            28/08/2024          Fix error The Global modifier should be avoided.
 
 ***********************************************************************************************************************/
-global with sharing class AV_ProcessInactiveUserAccountsBatch implements Database.Batchable<sObject>, Database.Stateful {
-	global Integer recordsProcessed = 0;
-	global String limitBatch;
-	global Set<String> setUserIds;
+public with sharing class AV_ProcessInactiveUserAccountsBatch implements Database.Batchable<sObject>, Database.Stateful {
+	public Integer recordsProcessed = 0;
+	public String limitBatch;
+	public Set<String> setUserIds;
 
 	private static AV_AppUtilities.SearchRT clientePA 	= new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_ACCOUNT, 'CC_ClientePA');
 	private static AV_AppUtilities.SearchRT cliente 	= new AV_AppUtilities.SearchRT(AV_AppConstants.OBJECT_NAME_ACCOUNT, 'CC_Cliente');
 	private static Set<Id> setRtAll 		= getAllRT();
 	
-	global AV_ProcessInactiveUserAccountsBatch(String limitQuery, Set<String> userId) {
+	public AV_ProcessInactiveUserAccountsBatch(String limitQuery, Set<String> userId) {
 		limitBatch = limitQuery;
 		setUserIds = new Set<String>();
 		setUserIds.addAll(userId);
 	}
-	global AV_ProcessInactiveUserAccountsBatch() {}
-	
+
+	public AV_ProcessInactiveUserAccountsBatch() {}
+		
 	/**
 	 * Get a list of Accounts where EAPGestor is different of the OwnerId
 	 *
 	 * @param bc  Database.BatchableContext param that contains the batch job ID
 	 */	
-	global Database.QueryLocator start(Database.BatchableContext bc) {
+	public Database.QueryLocator start(Database.BatchableContext bc) {
 		String methodName = 'start';
 		AV_LogDebug.printLogDebug(methodName, 'Batch limit: ' + limitBatch);
 		AV_LogDebug.printLogDebug(methodName, 'List users ids: ' + setUserIds);
@@ -73,7 +75,7 @@ global with sharing class AV_ProcessInactiveUserAccountsBatch implements Databas
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 * @param scope List<Account> param with the list of Accounts
 	 */
-	global void execute(Database.BatchableContext bc, List<Account> scope){
+	public void execute(Database.BatchableContext bc, List<Account> scope){
 		// Procesar cada batch de registros
 		String methodName = 'execute';
 		try{
@@ -117,7 +119,7 @@ global with sharing class AV_ProcessInactiveUserAccountsBatch implements Databas
 	 *
 	 * @param sc	SchedulableContext param that contains the job ID
 	 */
-	/*global void execute(SchedulableContext sc) {
+	/*public void execute(SchedulableContext sc) {
 		Database.executeBatch(new AV_ProccessAccountsOwnersBatch(limitBatch, userIdBatch));
 	}*/
 
@@ -126,7 +128,7 @@ global with sharing class AV_ProcessInactiveUserAccountsBatch implements Databas
 	 *
 	 * @param bc	Database.BatchableContext param that contains the batch job ID
 	 */
-	global void finish(Database.BatchableContext bc){
+	public void finish(Database.BatchableContext bc){
 		String methodName='finish';
 		AV_LogDebug.printLogDebug(methodName, 'Record Processes: ' + recordsProcessed);
 

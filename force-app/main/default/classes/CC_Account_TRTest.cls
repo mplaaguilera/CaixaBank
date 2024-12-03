@@ -150,7 +150,7 @@ public with sharing class CC_Account_TRTest {
                 
                 Account cuentaConf = [Select Name From Account Where Id = :cuenta.Id LIMIT 1]; 
                 
-                System.assertNotEquals('CONFIDENCIAL', cuentaConf.Name);
+                System.assertEquals('CONFIDENCIAL', cuentaConf.Name);
             }
         }
     }
@@ -166,6 +166,7 @@ public with sharing class CC_Account_TRTest {
                     FirstName = 'Cuenta',
                     LastName = 'Cliente Confidencial',
                     CC_NumPerso__c = '00000002',
+                    AV_NumPerso__c = '00000002',
                     CC_Numero_Documento__c = '00000002R'
                 );
                 insert cuenta;

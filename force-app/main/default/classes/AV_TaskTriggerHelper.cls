@@ -48,6 +48,17 @@ Modify UserGFC in processOwmerGestoresEAP method
 8.0			US610044			Luis Fernández		19/06/2023			Added new method checkOfficeTaskUpdate to do not let update tasks with "Task Office" value in AV_Tipo__C field unless it is a report update
 8.1			US546892			Sandra Gómez		12/09/2023			Add method checkReportClient and change method updateNextManagementDateOpp to no call with origen report client
 8.2			Fix					Sandra Gómez		13/11/2023			Change method updateNextManagementDateOpp and checkReportClient to bypass and checkOfficeTaskUpdate to change label and add origen report client
+8.3			US756725			Luis Fernández		17/11/2023			Added  new method validationTaskRules to bypass some of the Task Validation Rules
+8.4			DE86213				Sandra Gómez		24/11/2023			Change method recordChannel duplicity list
+8.5			DE76223				Humberto Vilchez	22/12/2023			Change method updateNextManagementDateOpp to fix UNABLE_TO_LOCK_ROW error
+8.6			US599658			Humberto Vilchez	26/12/2023			Change method updateTareaOpp to fix UNABLE_TO_LOCK_ROW error
+8.7			Fix error			Daniel Rodriguez    15/01/2024			Fix method validationRulesTask to fix Attempt to de-reference a null object
+8.8                             Oscar Moreno        16/01/2024          Comment updateTareaOpp and recordChannel methods
+8.9                             Oscar Moreno        13/02/2024          Modify  validationRulesTask method to control nulls
+9.0			US839375			Ángel Medina		18/04/2024			Modify method updateNextManagementDateOpp  to update stagename opportunity
+9.1								Ángel Medina		04/07/2024			Modify method validationRulesTask method to control Attempt to de-reference a null object
+9.2			PPM100265161   		Sandra Gómez		11/10/2024		 	Change method updateGCF and checkReportClient to add filter DATAPIPELINES_ORIGENAPP
+9.3			PPM100265161		Ángel Medina		18/10/2024			Delete methods updateTareaOpp,validateRecordChannel and validateForbiddenWords
 ***********************************************************************************************************************/
 public with sharing class AV_TaskTriggerHelper {
 	
@@ -208,34 +219,6 @@ public with sharing class AV_TaskTriggerHelper {
 	}
 
 	/**
-	* @description		 Validate forbidden words in Task field 
-	* @param  listNews  list of new Task records
-	* @param mapOlds map of old Task records
-	*/
-	/*public static void validateForbiddenWords(List<Task> listNews, Map<Id, Task> mapOlds) {		
-		Set<Id> setIdsRt = getAllRT();
-		List<Task> listToProcess = new List<Task>();
-		Set<String> setFields = new Set<String>{'Description', 'Subject'};
-			if(mapOlds != null) {
-				for(Task tas : listNews) {
-					if((setIdsRt).contains(tas.RecordTypeId) && ((String.isNotBlank(tas.Description) && mapOlds.get(tas.Id).Description != tas.Description) ||
-																 (String.isNotBlank(tas.Subject) && mapOlds.get(tas.Id).Subject != tas.Subject))) {
-																	 listToProcess.add(tas);
-																 }
-				}
-			} else {
-				for(Task tas : listNews) {
-					if( (setIdsRt).contains(tas.RecordTypeId) && String.isNotBlank(tas.Description) || String.isNotBlank(tas.Subject)) {
-						listToProcess.add(tas);
-					}
-				}
-			}
-		if(!listToProcess.isEmpty()) {
-			AV_ForbiddenWords.validateRecords(listToProcess, setFields);
-		}
-	}*/
-	
-	/**
 	* @description		 Create minimum data of the header custom activity
 	* @param  listNews  list of new Task records
 	*/
@@ -243,7 +226,6 @@ public with sharing class AV_TaskTriggerHelper {
 		Set<Id> setIdsRt = getAllRT();
 		List<AV_HeaderCustomActivity__c> listHeaderTask = new List<AV_HeaderCustomActivity__c>();
 		
-		//AV_LogDebug.printLogDebug('process', 'listNewObj: ' + listNews.size());
 		
 		//Create minimum data of the header custom activity
 		for(Task auxTask : listNews){
@@ -266,7 +248,6 @@ public with sharing class AV_TaskTriggerHelper {
 					headerCustomAct.Name = auxTask.AV_ExternalID__c;
 				}
 				headerCustomAct.AV_ExternalID__c = auxTask.AV_ExternalID__c;
-				//headerCustomAct.OwnerId = auxTask.OwnerId;
 				listHeaderTask.add(headerCustomAct);
 			}
 		}
@@ -525,16 +506,18 @@ public with sharing class AV_TaskTriggerHelper {
 		Set<Id> setTaskEventExId = new Set<Id>();
 		Map<Id,List<String>> mapOppTask = new Map<Id,List<String>>();
 		List<Opportunity> listOppUpdate = new List<Opportunity>();
+		Map<id,Opportunity> mapOppUpdate = new Map<id,Opportunity>();
 		Map<String,List<String>> mapTaskOpp = new Map<String,List<String>>();
 		List<String> ids= new List<String>();
 		Date dateOppNew = null;
 		if(mapOlds != null && !mapOlds.isEmpty() ) {
 			for(Task tNew : listNews){
-				Task taskOld = mapOlds.get(tNew.id);
+				Task taskOld = mapOlds.get(tNew.id);	
 				if(((setIdsRtsTask).contains(tNew.RecordTypeId) && (taskOld.ActivityDate != tNew.ActivityDate) && tNew.AV_ExternalID__c != null && (tNew.Status == AV_AppConstants.TASK_STATUS_PENDIENTE || tNew.Status == AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL)) && tNew.AV_OrigenApp__c != AV_AppConstants.CLIENT_REPORT_ORIGENAPP){
 					setIdsTask.add(tNew.AV_ExternalID__c);
 				} 
 			}
+
 			if(!setIdsTask.isEmpty()){
 				List<AV_HeaderCustomActivity__c> listHeaderTask = [Select Id, AV_ExternalID__c from AV_HeaderCustomActivity__c where AV_ExternalID__c in :setIdsTask];
 				if(!listHeaderTask.isEmpty()){
@@ -548,6 +531,7 @@ public with sharing class AV_TaskTriggerHelper {
 						setOpp.add(taskOpp.AV_Opportunity__c);
 					}
 				}
+
 				if(!setOpp.isEmpty()){
 					List<AV_CustomActivityOpportunity__c> listTaskAndOppRelated = [Select Id, AV_Task__r.AV_ExternalID__c, AV_Opportunity__c from AV_CustomActivityOpportunity__c where AV_Opportunity__c in :setOpp];
 					if(!listTaskAndOppRelated.isEmpty()){  
@@ -569,6 +553,7 @@ public with sharing class AV_TaskTriggerHelper {
 						}
 					}
 				}       
+				
 				if(!mapOppTask.isEmpty()){ 
 					Set<String> statusTask = new Set<String>{AV_AppConstants.TASK_STATUS_PENDIENTE, AV_AppConstants.TASK_STATUS_PENDIENTE_NO_LOCAL};
 						Set<String> statusEvent = new Set<String>{AV_AppConstants.EVENT_STATUS_PENDIENTE};
@@ -599,24 +584,48 @@ public with sharing class AV_TaskTriggerHelper {
 							}
 						}
 					}
+
 					if(mapOppFecha != null) {
+    					Map<Id, Opportunity> oppMap = new Map<Id, Opportunity>([SELECT Id, StageName, AV_FechaProximoRecordatorio__c FROM Opportunity WHERE Id IN :mapOppTask.keySet()]);
+
 						for (Id idOpp : mapOppTask.keySet()){
 							if (mapOppFecha.get(idOpp) != null) {
 								Opportunity oppUpdate;
+								Opportunity currentOpp = oppMap.get(idOpp);
+
 								if(listOppOrigen.contains(idOpp)) {
 									oppUpdate = new Opportunity(Id= idOpp, AV_FechaProximoRecordatorio__c = mapOppFecha.get(idOpp), AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP);
 								} else {
 									oppUpdate = new Opportunity(Id= idOpp, AV_FechaProximoRecordatorio__c = mapOppFecha.get(idOpp));
 								}
+								if(currentOpp != null){
+									if(currentOpp.AV_FechaProximoRecordatorio__c != mapOppFecha.get(idOpp) && currentOpp.StageName == AV_AppConstants.OPP_STATUS_VENCIDO){
+										oppUpdate.StageName = AV_AppConstants.OPP_STATUS_ENGESTION;
+									}
+								}
 								listOppUpdate.add(oppUpdate);
+								mapOppUpdate.put(oppUpdate.Id, oppUpdate);
 							}	
 						}
 					}
 				}
+
 				if(!listOppUpdate.isEmpty()){
-					AV_LogDebug.printLogDebug(methodName, 'Oportunidades: ' + listOppUpdate.size());
-					List<Database.SaveResult> listUpdateResult=database.update(listOppUpdate);
-					AV_AppUtilities.displayErrors(methodName,listUpdateResult);
+
+					List<Database.SaveResult> listUpdateResult = Database.update(listOppUpdate, false);					
+
+					for (Database.SaveResult sr : listUpdateResult) {
+						if (sr.isSuccess()) {
+							if(mapOppUpdate.get(sr.getId()) != null){
+								mapOppUpdate.remove(sr.getId());
+							}
+						}
+					}
+
+					if (!mapOppUpdate.isEmpty() ) {
+						List<Database.SaveResult> listUpdateErrorResult = Database.update(mapOppUpdate.values(), false);
+					}
+
 				}
 			}
 		}
@@ -699,49 +708,6 @@ public with sharing class AV_TaskTriggerHelper {
 		}
 	} 
 	
-	/**
-	* @description      Update Tarea-Oportunidad with Task's ActivityDate and Status
-	* @param  listNews  list of new Task records
-	* @param  mapOlds 	map of old Task records
-	*/
-	public static void updateTareaOpp(List<Task> listNews, Map<Id, Task> mapOlds) {
-		Map<String, Task> changedTasks = new Map<String, Task>();
-		Map<Id, AV_HeaderCustomActivity__c> headerMap = new Map<Id, AV_HeaderCustomActivity__c>();
-		Task aux;
-		if (mapOlds == null && mapOlds.isEmpty()) {
-			return;
-		}
-		for (Task t : listNews) {
-			if (t.ActivityDate != mapOlds.get(t.Id).ActivityDate) {
-				changedTasks.put(t.AV_ExternalID__c, t);
-			}
-		}
-		if (!changedTasks.isEmpty()) {
-			List<AV_HeaderCustomActivity__c> headerList = [
-				SELECT Id, AV_ExternalID__c
-				FROM AV_HeaderCustomActivity__c
-				WHERE AV_ExternalID__c IN :changedTasks.keySet()
-			];
-
-			if (!headerList.isEmpty()) {
-				headerMap.putAll(headerList);
-					List<AV_CustomActivityOpportunity__c> taskOppList = [
-					SELECT Id, AV_Task__c
-					FROM AV_CustomActivityOpportunity__c
-					WHERE AV_Task__c IN :headerMap.keySet()
-				];
-				if (!taskOppList.isEmpty()) {
-					for (AV_CustomActivityOpportunity__c taskOpp : taskOppList) {
-						aux = changedTasks.get(headerMap.get(taskOpp.AV_Task__c).AV_ExternalID__c);
-						taskOpp.AV_ActivityDate__c = aux.ActivityDate;
-						taskOpp.AV_Status__c = aux.Status;
-					}
-
-					Database.update(taskOppList);
-				}
-			}
-		}
-	}
 	
 	/**
 	 *Process the value of the field "AV_CenterRtIndex__c", which should  
@@ -791,17 +757,19 @@ public with sharing class AV_TaskTriggerHelper {
 					}
 				}
 				for(Task tsk : listNews) {
-					if ((!(tsk.Status == AV_AppConstants.TASK_STATUS_PENDIENTE ||  (tsk.Status == AV_AppConstants.NO_GESTIONADA && (activityIdManagementHistoryMap.get(tsk.Id)) == null)) && mapOlds.get(tsk.Id).AV_ToDelete__c != tsk.AV_ToDelete__c && tsk.AV_ToDelete__c == true)) {
-						tsk.AV_ToDelete__c = mapOlds.get(tsk.Id).AV_ToDelete__c;
-					}
-					if ((mapOlds.get(tsk.Id).Status != tsk.Status || mapOlds.get(tsk.Id).AV_Tipo__c != tsk.AV_Tipo__c || mapOlds.get(tsk.Id).Description != tsk.Description) && (mapOlds.get(tsk.Id).Status == AV_AppConstants.GESTIONADO_POSITIVO_ESTADO || mapOlds.get(tsk.Id).Status == AV_AppConstants.GESTIONADO_NEGATIVA_ESTADO)) {
-						tsk.Status = mapOlds.get(tsk.Id).Status;
-						tsk.AV_Tipo__c = mapOlds.get(tsk.Id).AV_Tipo__c;
-						tsk.Description = mapOlds.get(tsk.Id).Description;
-					}
-					if ((mapOlds.get(tsk.Id).AV_Center__c != tsk.AV_Center__c || mapOlds.get(tsk.Id).AV_CodigoGestorAsignado__c != tsk.AV_CodigoGestorAsignado__c) && !listIdUserApiOnly.contains(mapOlds.get(tsk.Id).LastModifiedById)) {
-						tsk.AV_Center__c = mapOlds.get(tsk.Id).AV_Center__c;
-						tsk.AV_CodigoGestorAsignado__c = mapOlds.get(tsk.Id).AV_CodigoGestorAsignado__c;
+					if(tsk.AV_OrigenApp__c != AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET && tsk.AV_OrigenApp__c != AV_AppConstants.DATAPIPELINES_ORIGENAPP){
+						if ((!(tsk.Status == AV_AppConstants.TASK_STATUS_PENDIENTE ||  (tsk.Status == AV_AppConstants.NO_GESTIONADA && (activityIdManagementHistoryMap.get(tsk.Id)) == null)) && mapOlds.get(tsk.Id).AV_ToDelete__c != tsk.AV_ToDelete__c && tsk.AV_ToDelete__c == true)) {
+							tsk.AV_ToDelete__c = mapOlds.get(tsk.Id).AV_ToDelete__c;
+						}
+						if ((mapOlds.get(tsk.Id).Status != tsk.Status || mapOlds.get(tsk.Id).AV_Tipo__c != tsk.AV_Tipo__c || mapOlds.get(tsk.Id).Description != tsk.Description) && (mapOlds.get(tsk.Id).Status == AV_AppConstants.GESTIONADO_POSITIVO_ESTADO || mapOlds.get(tsk.Id).Status == AV_AppConstants.GESTIONADO_NEGATIVA_ESTADO)) {
+							tsk.Status = mapOlds.get(tsk.Id).Status;
+							tsk.AV_Tipo__c = mapOlds.get(tsk.Id).AV_Tipo__c;
+							tsk.Description = mapOlds.get(tsk.Id).Description;
+						}
+						if ((mapOlds.get(tsk.Id).AV_Center__c != tsk.AV_Center__c || mapOlds.get(tsk.Id).AV_CodigoGestorAsignado__c != tsk.AV_CodigoGestorAsignado__c) && !listIdUserApiOnly.contains(mapOlds.get(tsk.Id).LastModifiedById)) {
+							tsk.AV_Center__c = mapOlds.get(tsk.Id).AV_Center__c;
+							tsk.AV_CodigoGestorAsignado__c = mapOlds.get(tsk.Id).AV_CodigoGestorAsignado__c;
+						}
 					}
 				}
 			}
@@ -846,36 +814,12 @@ public with sharing class AV_TaskTriggerHelper {
         }
 		List<AV_CustomActivityOpportunity__c> taskOppList = [Select Id From AV_CustomActivityOpportunity__c Where (AV_Task__c IN :listIdsHeaderTask OR AV_Task__r.AV_ExternalID__c IN :listExternalIdsHeaderTask) OR (AV_Task__c IN :listIdsHeaderTask AND AV_Task__r.AV_ExternalID__c IN :listExternalIdsHeaderTask)];
 		List<AV_HeaderCustomActivity__c> listHeaderTask = [SELECT Id FROM AV_HeaderCustomActivity__c WHERE (Id IN :listIdsHeaderTask OR AV_ExternalID__c IN :listExternalIdsHeaderTask) OR (Id IN :listIdsHeaderTask AND AV_ExternalID__c IN :listExternalIdsHeaderTask)];
-		if(managementHistoryList.size() > 0 || taskExtensionList.size() > 0 || managementHistoryList.size() > 0 || managementHistoryList.size() > 0) {
+		if((!managementHistoryList.isEmpty() || !taskExtensionList.isEmpty() || !taskOppList.isEmpty() || !listHeaderTask.isEmpty())) {
 			System.enqueueJob(new AV_DeleteRelatedTaskQueueable(managementHistoryList,taskExtensionList,taskOppList,listHeaderTask));
 		}	
 	}
 
-	public static void recordChannel(List<Task> listTask, Map<Id, Task> mapOlds){
-		List<String> listString = new List<String>();
-		Map<String, Task> taskMap = new Map<String, Task>();
-		List<AV_CustomActivityOpportunity__c> customActivityOpportunitytoUpdateList = new List<AV_CustomActivityOpportunity__c>();
-		for(Task t : listTask){
-			if(mapOlds.get(t.Id).AV_Tipo__c != t.AV_Tipo__c){
-				listString.add(t.AV_Task__c);
-				taskMap.put(t.AV_Task__c, t);
-			}
-		}
-		if(listString != null && !listString.isEmpty()){
-			List<AV_CustomActivityOpportunity__c> taskOppList = [SELECT Id, AV_Task__c, AV_Channel__c FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c IN: listString AND RecordType.DeveloperName =: AV_AppConstants.OPPTASK_RT];
-			if(taskOppList != null && !taskOppList.isEmpty()){
-				for(AV_CustomActivityOpportunity__c to : taskOppList){
-					if(taskMap.get(to.AV_Task__c) != null && to.AV_Channel__c != taskMap.get(to.AV_Task__c).AV_Tipo__c){
-						to.AV_Channel__c = taskMap.get(to.AV_Task__c).AV_Tipo__c;
-						CustomActivityOpportunitytoUpdateList.add(to);
-					}
-				}
-				if(CustomActivityOpportunitytoUpdateList != null && !CustomActivityOpportunitytoUpdateList.isEmpty()){
-					Database.update(customActivityOpportunitytoUpdateList, false);
-				}
-			}
-		}
-	}
+
 	/**
 	 * Notify the owners of inserted Experiencia Clientes tasks and make an instance in the bbdd in order to 
 	 * send a custom notify to the owner trough the CBK_SchedulableProcess framework.
@@ -924,7 +868,6 @@ public with sharing class AV_TaskTriggerHelper {
 			if(tskToNotify!=null && !tskToNotify.isEmpty()){
 				executeNotification(tskToNotify);
 			}
-			//NOTIFICAR AQUI
 			if(launchSchedule != null && !launchSchedule.isEmpty()){
 				CBK_ScheduleProcess_Controller.createRecordSchProcess(launchSchedule);
 			}
@@ -1022,14 +965,20 @@ public with sharing class AV_TaskTriggerHelper {
 	 * @param  mapOlds   map of old Task records
 	 */
 	public static void checkOfficeTaskUpdate(List<Task> listTask,Map<Id, Task> mapOlds){
-		for (Task t : listTask) {
-			if (t.AV_Tipo__c != mapOlds.get(t.id).AV_Tipo__c && t.AV_Tipo__c.equals(AV_AppConstants.TASKOFFICETYPE)) {
-				if (!AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(t.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(t.AV_OrigenApp__c)) {
-					t.addError('Este tipo de tarea solo puede ser informado desde el reporte.');
+		if(listTask != null && !listTask.isEmpty()){
+			for (Task t : listTask) {
+				if(t.AV_Tipo__c != null && !String.isEmpty(t.AV_Tipo__c)){
+					if (t.AV_Tipo__c 
+				!= mapOlds.get(t.id).AV_Tipo__c && 
+				t.AV_Tipo__c.equals(AV_AppConstants.TASKOFFICETYPE)) {
+					if (!AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(t.AV_OrigenApp__c) && !AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(t.AV_OrigenApp__c)) {
+						t.addError('Este tipo de tarea solo puede ser informado desde el reporte.');
+					}
 				}
-			}
-			if(t.AV_OrigenApp__c != null && String.isNotBlank(t.AV_OrigenApp__c) && !t.AV_OrigenApp__c.equals(mapOlds.get(t.Id).AV_OrigenApp__c) && t.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_SF_REPORT){
-				t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(mapOlds.get(t.Id).AV_OrigenApp__c) ? '' : mapOlds.get(t.Id).AV_OrigenApp__c;
+				if(t.AV_OrigenApp__c != null && String.isNotBlank(t.AV_OrigenApp__c) && !t.AV_OrigenApp__c.equals(mapOlds.get(t.Id).AV_OrigenApp__c) && t.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_SF_REPORT){
+					t.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_SF_REPORT.equals(mapOlds.get(t.Id).AV_OrigenApp__c) ? '' : mapOlds.get(t.Id).AV_OrigenApp__c;
+				}
+				}
 			}
 		}
 	}
@@ -1041,12 +990,80 @@ public with sharing class AV_TaskTriggerHelper {
 	*/
 	public static Map<String, Task> checkReportClient(List<Task> listNew, Map<Id,Task> mapOld) {
 		Map<String, Task> mapReturnToAfter = new Map<String, Task>();
+		Set<String> originsToByPass = new Set<String>{
+			AV_AppConstants.CLIENT_REPORT_ORIGENAPP,
+			AV_AppConstants.OPP_ORIGEN_BACK_REPORT
+		};
 		for (Task o : listNew) {
-			if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.CLIENT_REPORT_ORIGENAPP){
-				o.AV_OrigenApp__c = AV_AppConstants.CLIENT_REPORT_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
+			if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && originsToByPass.contains(o.AV_OrigenApp__c)){
+				o.AV_OrigenApp__c = originsToByPass.contains(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 				mapReturnToAfter.put(o.AV_ExternalID__c,o);
+			}
+			if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET){
+				o.AV_OrigenApp__c = AV_AppConstants.OPP_ORIGEN_UPDATE_WALLET.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
+			}
+			if(o.AV_OrigenApp__c != null && String.isNotBlank(o.AV_OrigenApp__c) && !o.AV_OrigenApp__c.equals(mapOld.get(o.Id).AV_OrigenApp__c) && o.AV_OrigenApp__c == AV_AppConstants.DATAPIPELINES_ORIGENAPP){
+				o.AV_OrigenApp__c = AV_AppConstants.DATAPIPELINES_ORIGENAPP.equals(mapOld.get(o.Id).AV_OrigenApp__c) ? '' : mapOld.get(o.Id).AV_OrigenApp__c;
 			}
 		}
 		return mapReturnToAfter;
+	}
+
+	public static void validationRulesTask(List<Task> listNew, Map<Id,Task> mapOld){
+		List<Task> taskToValidate = new List<Task>();
+		Set<String> validOrigins = new Set<String>{
+			AV_AppConstants.CLIENT_REPORT_ORIGENAPP,
+			AV_AppConstants.OPP_ORIGEN_BACK_REPORT
+		};
+
+		for(Task t : listNew){
+			if(t.AV_OrigenApp__c == null || String.isBlank(t.AV_OrigenApp__c) || (!(validOrigins.contains(t.AV_OrigenApp__c)))){
+				taskToValidate.add(t);
+			}
+		}
+
+		if(!taskToValidate.isEmpty() && taskToValidate != null){
+			Set<String> taskRetailRt = new Set<String>{
+				AV_AppConstants.TASKINICIATIVA_RT,
+				AV_AppConstants.TASKALERTACOM_RT,
+				AV_AppConstants.TASKAVISOS_RT,
+				AV_AppConstants.TASKCONTACTGCF_RT,
+				AV_AppConstants.TASKEXPCLIENT_RT,
+				AV_AppConstants.TASKONBOARDING_RT,
+				AV_AppConstants.TASKPRIORIZADOR_RT,
+				AV_AppConstants.TASKCPENDIENTE_RT
+			};
+			Map<Id,RecordType> rtIdToDevName = new Map<Id,RecordType>([SELECT Id FROM RecordType WHERE DeveloperName IN :taskRetailRt]);
+			Set<String> closedStatusTasks = new Set<String>{
+						AV_AppConstants.GESTIONADO_POSITIVO_ESTADO,
+						AV_AppConstants.GESTIONADO_NEGATIVA_ESTADO,
+						AV_AppConstants.NO_GESTIONADA,
+						AV_AppConstants.GESTIONADO_NO_LOCALIZADO,
+						AV_AppConstants.TASK_DESACTIVADA
+			};
+
+			User currentUserProfile = [SELECT AV_ProfileName__c FROM USER 	WHERE ID = :UserInfo.getUserId() LIMIT 1];
+			Boolean isUsuarioCaixabank = false;
+			
+			if(currentUserProfile != null && currentUserProfile.AV_ProfileName__c != null){
+				isUsuarioCaixabank = currentUserProfile.AV_ProfileName__c.equals(AV_AppConstants.AV_PROFILE);
+			}
+			
+			Boolean hasByPassValidationRulesAv = FeatureManagement.checkPermission('AV_ByPassValidationRules');
+			Boolean hasByPassValidationRulesCbk = FeatureManagement.checkPermission('CBK_BypassValidationRules');
+			Boolean hasByPassAvoidBulkApi = FeatureManagement.checkPermission('AV_AvoidBulkApi');
+			Boolean isInsert = (mapOld == null);
+			for(Task t : taskToValidate){
+				Task oldTask = (!isInsert) ? mapOld.get(t.Id) : null;
+				Boolean changedStatus = (!isInsert) ? (oldTask != null && oldTask.Status != null && !(t.Status.equals(oldTask.Status))) : null;
+				Boolean isInRetailRt = rtIdToDevName.containsKey(t.RecordTypeId);
+
+				if(!isInsert){
+					if(changedStatus && isInRetailRt && !hasByPassValidationRulesAv && !hasByPassValidationRulesCbk && closedStatusTasks.contains(oldTask.Status) && isUsuarioCaixabank && !hasByPassAvoidBulkApi){
+						t.addError('No se permite cambiar al estado seleccionado.');
+					}
+				}			
+			}
+		}
 	}
 }

@@ -11,6 +11,8 @@ Historial
    1.1			App FSC			Carolina Alonso		02/09/2020		Add coverage for new method getCabeceraTareaAsociada
    1.2			App FSC			Sandra Gómez		04/11/2020		Refactor
    1.3         US671736         Oscar Moreno        17/10/2023      Delete the content of the class
+   1.4            QC              Oscar Moreno      05/06/2024      Insert AssertEquals on deleteRecordTest method
+
 
 ***********************************************************************************************************************/
 @isTest
@@ -20,5 +22,6 @@ private class AV_DeleteRecordsActivityBatch_Test {
     public static void deleteRecordTest(){
 
 		        AV_DeleteRecordsActivityBatch.deleteRecord();
+                System.assertEquals(AV_DeleteRecordsActivityBatch.deleteRecord(),'entra en deleteRecord');
     }
 }

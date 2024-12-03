@@ -10,6 +10,8 @@ Historial
     1.0			US410036         Jose Maria     14/07/2022		Init Version
     2.0         US618099         Ali            12/06/2023      Edit linkOpp() para que la primera oportunidad vinculada sea favorita.
     3.0         US584194         Lucía          21/06/2023      Nuevo metodo roleCIB() y modificado el metodo updateEvent() para añadir el usuario cib.
+    4.0         US584194         Luis          	12/06/2024      Nuevo metodo updateCommentEvent() para actualizar el comentario y al cierre del evento.
+
 
 		
 ***********************************************************************************************************************/
@@ -59,7 +61,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
                 tsk = [SELECT AV_Task__c FROM Task WHERE Id = :recordId LIMIT 1];
             }
         }
-
         String avTaskString = null;
         List<AV_CustomActivityOpportunity__c> listTareaOpp;
         if(evt != null){
@@ -67,14 +68,13 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
         }else{
             avTaskString = tsk.AV_Task__c;
         }
-
         if(avTaskString != null){
             listTareaOpp = [SELECT Id, AV_LicensePlate__c, Name, AV_IsMain__c, AV_Opportunity__c, AV_Task__c, AV_Product__c, AV_Product__r.Name, AV_Gestor__c,AV_Gestor__r.Name, RecordTypeId, AV_Opportunity__r.RecordTypeId, 
-            AV_Opportunity__r.RecordType.Name, AV_Priority__c, AV_ReviewDate__c, AV_Stage__c, AV_Valor1__c, AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c, AV_Concepto4__c, AV_Valor5__c, AV_Concepto5__c, AV_HoldingAnotherEntity__c, AV_Entity__c, AV_DueDate__c, 
+            AV_Opportunity__r.RecordType.Name, AV_Priority__c, AV_ReviewDate__c, AV_Stage__c, AV_Valor1__c, AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c, AV_Concepto4__c, AV_Valor5__c, 
+            AV_Concepto5__c, AV_HoldingAnotherEntity__c, AV_Entity__c, AV_DueDate__c, 
             AV_FeeAmount__c, AV_Amount__c, AV_TypeOfInterest__c, AV_Commentary__c, AV_Opportunity__r.AV_Tenencia__c,AV_IncludeInPrioritizingCustomers__c
             FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :avTaskString ORDER BY AV_IsMain__c DESC];
         }
-        
         if(listTareaOpp!= null && !listTareaOpp.isEmpty()){
             List<AV_CustomActivityOpportunity__c> listOppTaskRes = new List<AV_CustomActivityOpportunity__c>();
             for(AV_CustomActivityOpportunity__c oppTask :listTareaOpp) {
@@ -82,7 +82,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
                 oppTaskRes = oppTask;
                 listOppTaskRes.add(oppTaskRes);
             }
-            
             return listOppTaskRes;
         } else {
             return new List<AV_CustomActivityOpportunity__c>();
@@ -95,8 +94,8 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
         List<Opportunity> opps = new List<Opportunity>();
         if(String.isNotBlank(oppoId) && Opportunity.SObjectType.getDescribe().isAccessible()) {
             opps = [SELECT Id, Name, StageName, CIBE_CerradoNegativo__c, CIBE_ProbabilidadExito__c, Amount,
-                     CloseDate, AV_Comentarios__c, AV_IncludeInPrioritizingCustomers__c, AV_FechaProximoRecordatorio__c
-             FROM Opportunity WHERE Id = :oppoId];
+                    CloseDate, AV_Comentarios__c, AV_IncludeInPrioritizingCustomers__c, AV_FechaProximoRecordatorio__c
+                    FROM Opportunity WHERE Id = :oppoId];
         }
         if(!opps.isEmpty()) {
             return opps.get(0);
@@ -158,7 +157,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
             if(AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible()) {
                 listToDelete = [SELECT Id FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c=:avTask AND AV_Opportunity__c = :oppTask];
             }
-           
             if(!listToDelete.isEmpty()){
                 User user = AV_AppUtilities.getUserInfo();
                 AV_CustomActivityOpportunity__c oppTask2 = new AV_CustomActivityOpportunity__c(Id=listToDelete.get(0).id, OwnerId=user.Id);
@@ -183,11 +181,14 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
      */
     @AuraEnabled
     public static List<Opportunity> retrieveListWithOutTask(List<AV_CustomActivityOpportunity__c> listTareaOpp,String recordId, String objectName){
-       
         String methodName = 'retrieveListWithOutTask';
         List<Opportunity> listOpp;
-        Set<String> setStatusOpen = new Set<String>{'Potencial', 'En curso','CIBE_Pendiente_Firma'};
+        Set<String> setStatusOpen = new Set<String>{'Potencial', 
+                                                    'En curso',
+                                                    'CIBE_Pendiente_Firma'};
         List<String> listStatusOpen = AV_AppUtilities.getListFromSet(setStatusOpen);
+        String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
+        String vencida = 'CIBE_Vencido';
         
         
         String idAccount = null;
@@ -199,9 +200,8 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
                 idAccount = [SELECT AccountId FROM Task WHERE Id = :recordId LIMIT 1].AccountId;
             }
         }
-       
-        if(listTareaOpp != null) {
-            
+
+        if(listTareaOpp != null) {   
             Set<String> setOpp = new Set<String>();
             String listOppId = '';
             
@@ -221,17 +221,24 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
                 String queryAll = '';
                 String queryWhere = '';
                 String queryOpp = '';
-                 queryOpp = 'Select Id, Name, AV_PF__c, AV_PF__r.Name, AV_Gestor__c, AV_Gestor__r.Name, RecordTypeId, RecordType.Name, AV_Potencial__c, AV_FechaProximoRecordatorio__c, StageName, AV_Valor1__c, AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c,'+
+                queryOpp = 'Select Id, Name, AV_PF__c, AV_PF__r.Name, AV_Gestor__c, AV_Gestor__r.Name, RecordTypeId, RecordType.Name, AV_Potencial__c, AV_FechaProximoRecordatorio__c, StageName, AV_Valor1__c,'+ 
+                'AV_Concepto1__c, AV_Valor2__c, AV_Concepto2__c, AV_Valor3__c, AV_Concepto3__c, AV_Valor4__c,'+
                 'AV_Concepto4__c, AV_Valor5__c, AV_Concepto5__c, AV_Tenencia__c, AV_Entidad__c, CloseDate, AV_Cuota__c, Amount, AV_TipoInteres__c, AV_Comentarios__c,AV_IncludeInPrioritizingCustomers__c'+
                 ' From Opportunity ';
-                queryWhere = ' WHERE AccountId = \''+ idAccount +'\' and StageName in '+ listStatusOpen +' ';                         
+
+                if(roleUser == 'CIB' || roleUser == 'CIBE_CIBEmpresas'){
+                    queryWhere = ' WHERE AccountId = \''+ idAccount +'\' and ( StageName in '+ listStatusOpen + ' OR (StageName = \''+ vencida +'\' AND CloseDate  = LAST_N_MONTHS:4 ))';                         
+
+                }else{
+                    queryWhere = ' WHERE AccountId = \''+ idAccount +'\' and StageName in '+ listStatusOpen +' ';                         
+                }
                                 
                 if (setOpp!=null && !setOpp.isEmpty()){
                     queryWhere = queryWhere + 'and Id not in '+ listOppId;
                     //queryWhere = queryWhere + 'and Id not in '+ listOppId; 
                 }
                 queryAll = queryOpp + queryWhere + ' Order by AV_FechaProximoRecordatorio__c ASC';
-		        listOpp = database.query(queryAll);
+                listOpp = database.query(queryAll);
             }
         } 
         
@@ -272,7 +279,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
             if(AV_CustomActivityOpportunity__c.SObjectType.getDescribe().isAccessible()) {
                 listOppTask = [SELECT Id  FROM AV_CustomActivityOpportunity__c WHERE AV_Task__c = :avTask AND AV_Opportunity__c = :opp LIMIT 1];
             }
-
 
             if(!listOppTask.isEmpty()) {
                 return 'KO';
@@ -368,9 +374,13 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
             if( obj.get('exito')!=null){
                 opp.CIBE_ProbabilidadExito__c=(String) obj.get('exito');
             }
-            if( obj.get('amount')!=null){
-                //opp.Amount =obj.get('amount') != null ? Decimal.valueOf(String.valueOf(obj.get('amount')).replace(',', '.')) : null;
-                opp.CIBE_AmountDivisa__c =obj.get('amount') != null ? Decimal.valueOf(String.valueOf(obj.get('amount')).replace(',', '.')) : null;
+            if( obj.get('amount')!=null &&
+                obj.get('amount')!=''){
+                String importe = (String) obj.get('amount');
+                if(importe.contains('.')){
+                    importe = importe.replace('.', '');
+                }
+                opp.CIBE_AmountDivisa__c = String.isBlank(importe) || importe == ' ' ? 0 : Decimal.valueOf(importe);
             }
             if( obj.get('closedate')!=null){
                 opp.closedate= obj.get('closedate') != null ? Date.valueOf(String.valueOf(obj.get('closedate'))) : null;
@@ -396,10 +406,9 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
     public static Boolean roleEMP(){
         Boolean emp = false;
         String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
-        if(roleUser.contains('EMP') || roleUser.contains('Emp')){
+        if(roleUser == 'EMP'){
             emp = true;
         }
-
         return emp;
     }
 
@@ -414,7 +423,35 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
         return cib;
     }
 
+    @AuraEnabled(cacheable=true)
+    public static Boolean roleCIB2(){
+        Boolean cibemp = false;
+        String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
+        if(roleUser == 'CIBE_CIBEmpresas' || roleUser == 'CIB'){
+            cibemp = true;
+        }
 
+        return cibemp;
+    }
+
+    /**
+     * @description     Updates the event by closing it and adding the comment.
+     * @param recordId        Id of the event about to be closed
+     * @param comentario   Comment added when the event was managed
+     */
+    @AuraEnabled
+    public static void updateCommentEvent(String recordId, String comentario ) {
+
+        if(recordId != null){
+            Event eventoUpdate = new Event();
+            eventoUpdate.Id = recordId;
+            eventoUpdate.description = comentario;
+            eventoUpdate.CSBD_Evento_Estado__c = 'Gestionada Positiva';
+            if(eventoUpdate != null && Schema.sObjectType.Event.isUpdateable()){
+            	Database.update(eventoUpdate, false);
+        	}
+        }
+    }
     
 
     /**
@@ -423,47 +460,12 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
      * @param comentario   Comment added when the event was managed
      */
     @AuraEnabled
-    public static void updateEvent(String recordId, String comentario, Boolean clienteNuevo, Boolean clienteEspana, String antecedentes, String conclusionGestor, String conclusionCliente, String proximosPasos, String categoriaAenor, String relacionCliente) {
+    public static void updateEvent(String recordId) {
         String methodName = 'updateEvent';
-        String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
-
-        List<Event> event = [select Id, CSBD_Evento_Estado__c, Description from Event where id=:recordId];
-
-        List<CBK_Activity_Extension__c> eventExtensionCIB = [SELECT Id, CIBE_ClienteEspana__c, CIBE_ClienteNuevo__c, CIBE_ConclusionesGestor__c, CIBE_ConclusionesCliente__c,  CIBE_CategoriaAenor__c, CIBE_RelacionCliente__c FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c =: recordId];
-        List<CBK_Activity_Extension__c> eventExtensionEMP = [SELECT Id, CIBE_ClienteEspana__c, CIBE_ClienteNuevo__c, CIBE_ConclusionesGestor__c, CIBE_ConclusionesCliente__c, CIBE_InformacionComplementariaGestor__c, CIBE_ProximosPasosCliente__c FROM CBK_Activity_Extension__c WHERE AV_ActivityId__c =: recordId];
-
-        List<CBK_Activity_Extension__c> updateEventExtension = new List<CBK_Activity_Extension__c>();
-
-
-        if(roleUser == 'EMP'){
-            if(!eventExtensionEMP.isEmpty()){
-                eventExtensionEMP[0].CIBE_ClienteNuevo__c = clienteNuevo;
-                eventExtensionEMP[0].CIBE_ClienteEspana__c = clienteEspana;
-                eventExtensionEMP[0].CIBE_ConclusionesGestor__c = conclusionGestor;
-                eventExtensionEMP[0].CIBE_ConclusionesCliente__c = conclusionCliente;
-                eventExtensionEMP[0].CIBE_InformacionComplementariaGestor__c = antecedentes;
-                eventExtensionEMP[0].CIBE_ProximosPasosCliente__c = proximosPasos;
-
-                updateEventExtension.add(eventExtensionEMP[0]);
-              
-            }
-        }else if(roleUser == 'CIB'){
-            if(!eventExtensionCIB.isEmpty()){
-                eventExtensionCIB[0].CIBE_ClienteNuevo__c = clienteNuevo;
-                eventExtensionCIB[0].CIBE_ClienteEspana__c = clienteEspana;
-                eventExtensionCIB[0].CIBE_ConclusionesGestor__c = conclusionGestor;
-                eventExtensionCIB[0].CIBE_ConclusionesCliente__c = conclusionCliente;
-                eventExtensionCIB[0].CIBE_CategoriaAenor__c = categoriaAenor;
-                eventExtensionCIB[0].CIBE_RelacionCliente__c = relacionCliente;
-                
-                updateEventExtension.add(eventExtensionCIB[0]);
-            }            
-        }
-
+        List<Event> event = [select Id, CSBD_Evento_Estado__c from Event where id=:recordId];
        //actualizar el evento
         for(Event e : event){
             e.CSBD_Evento_Estado__c = 'Gestionada Positiva'; 
-            e.Description = comentario;
         }
 
         if(!event.isEmpty() && Schema.sObjectType.Event.isUpdateable()){
@@ -482,25 +484,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
                 if(hasError) {
                     CBK_Log.error(msjs, objs);
                 }
-        }
-
-        //actulizar el activity extension
-        if(!updateEventExtension.isEmpty() && Schema.sObjectType.CBK_Activity_Extension__c.isUpdateable()){
-            Database.SaveResult[] updateActivityExtension = Database.update(updateEventExtension, false);
-            boolean hasError = false;
-            List<Object> objs = new List<Object>();
-            Map<String, String> msjs = new Map<String, String>();
-            for (Integer i = 0; i < updateEventExtension.size(); i++) {
-                Database.SaveResult dr = updateActivityExtension[i];
-                if(!dr.isSuccess() && !dr.getErrors().isEmpty()) {
-                    msjs.put(updateEventExtension[i].Id, ((String)dr.getErrors()[0].getMessage()));
-                    objs.add(updateEventExtension[i]);
-                    hasError = true;
-                }
-            }
-            if(hasError) {
-                CBK_Log.error(msjs, objs);
-            }
         }
     }
 
@@ -540,7 +523,12 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
             }else if(!String.isBlank(comentario)){
                 tsk.Description = comentario;
             }           
-            tsk.AV_Tipo__c =  tipo; 
+            String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
+            if(roleUser == 'EMP'){
+                tsk.AV_Tipo__c =  !string.isBlank(tipo) ? tipo : CIBE_AppConstants.LLAMADA_TIPO; 
+            }else{
+                tsk.AV_Tipo__c =  !string.isBlank(tipo) ? tipo : CIBE_AppConstants.LLAMADA_TLF_TIPO;
+            }
             update tsk;
             //Database.SaveResult sr = Database.update(tsk, false);
         
@@ -557,8 +545,13 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
             AV_ManagementHistory__c managementH = new AV_ManagementHistory__c();
             managementH.AV_ActivityId__c = recordId;
             managementH.AV_Date__c  = System.today();
-            managementH.AV_Status__c = estado;
-            managementH.AV_Type__c = tipo;
+            managementH.AV_Status__c = !string.isBlank(estado) ? estado : CIBE_AppConstants.GESTIONADO_POSITIVO_ESTADO; 
+            String roleUser = [SELECT UserRole.DeveloperName FROM User WHERE Id =: UserInfo.getUserId()].UserRole.DeveloperName;
+            if(roleUser == 'EMP'){
+                managementH.AV_Type__c =  !string.isBlank(tipo) ? tipo : CIBE_AppConstants.LLAMADA_TIPO; 
+            }else{
+                managementH.AV_Type__c =  !string.isBlank(tipo) ? tipo : CIBE_AppConstants.LLAMADA_TLF_TIPO;
+            }
             managementH.AV_Comment__c = comentario;
 
         insert managementH;
@@ -571,7 +564,6 @@ public with sharing class CIBE_Oportunidades_Vinculadas_Controller {
      */
     @AuraEnabled(cacheable=true)
 	public static List<Action> getActions(String actionSetting) {
-        system.debug('### actionSetting ' + actionSetting);
 		List<CIBE_FlowActions__mdt> actions = [SELECT Id, Label, CIBE_FlowName__c, CIBE_Output__c, CIBE_Order__c 
                                                 FROM CIBE_FlowActions__mdt 
                                                 WHERE CIBE_FlowName__c = :actionSetting LIMIT 1];

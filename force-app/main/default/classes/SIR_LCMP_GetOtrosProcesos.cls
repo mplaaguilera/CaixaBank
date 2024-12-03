@@ -29,7 +29,7 @@ public with sharing class SIR_LCMP_GetOtrosProcesos {
     public static String[] getProcesos(String idCuenta){
         String[] resultado = new String[]{''};
 		
-		if(SIREC__SIREC_obj_informacionCliente__c.SObjectType.getDescribe().isAccessible()){
+		if(Schema.SObjectType.SIREC__SIREC_obj_informacionCliente__c.isAccessible()){
             List<SIREC__SIREC_obj_informacionCliente__c> infoCliente = [SELECT Id, SIREC__SIREC_fld_masterRecordId__c
                                                                   FROM SIREC__SIREC_obj_informacionCliente__c 
                                                                   WHERE SIREC__SIREC_fld_cliente__c =: idCuenta LIMIT 1];

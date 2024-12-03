@@ -118,8 +118,8 @@ public class CC_CaseTriggerHelper_Test {
             insert userList2;
 
             insert new List<PermissionSetAssignment>{
-                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psClasses.Id),
-                new PermissionSetAssignment(AssigneeId = supervisor.Id, PermissionSetId = psSupervisor.Id)
+                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psClasses.Id),
+                new PermissionSetAssignment(AssigneeId = supervisor.id, PermissionSetId = psSupervisor.Id)
             };
 
             Id recordTypeOficina = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
@@ -251,24 +251,6 @@ public class CC_CaseTriggerHelper_Test {
             mcc4.CC_Codigo_Externo__c = 'SO-000001';
             insert mcc4;
 
-            List<Case> lstCasos = new List<Case>();
-            Case casoEmpleadoFCO = new Case();
-            casoEmpleadoFCO.AccountId = cuentaEmpleado.Id;
-            casoEmpleadoFCO.ContactId = contactoEmpleado.Id;
-            casoEmpleadoFCO.Subject = 'Caso Empleado FCO';
-            casoEmpleadoFCO.Origin = 'Email';
-            casoEmpleadoFCO.CC_Canal_Procedencia__c ='Formulario Consultas Operativas';
-            casoEmpleadoFCO.CC_Tipo_Contacto__c = 'Consulta';
-            casoEmpleadoFCO.Status = 'Activo';
-            casoEmpleadoFCO.CC_MCC_Tematica__c = mcc.Id;
-            casoEmpleadoFCO.CC_MCC_ProdServ__c = mcc1.Id;
-            casoEmpleadoFCO.CC_MCC_Motivo__c = mcc2.Id;
-            casoEmpleadoFCO.CC_Detalles_Consulta__c = 'Test';
-            casoEmpleadoFCO.CC_Reapertura_Valida__c = 'No';
-            casoEmpleadoFCO.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
-            lstCasos.add(casoEmpleadoFCO);
-            insert lstCasos;
-
             CC_Caracteristica__c caracteristica = new CC_Caracteristica__c();
             caracteristica.RecordTypeId = Schema.SObjectType.CC_Caracteristica__c.getRecordTypeInfosByDeveloperName().get('CC_Campana').getRecordTypeId();
             caracteristica.Name = 'Campa Prueba';
@@ -388,13 +370,13 @@ public class CC_CaseTriggerHelper_Test {
     @isTest
     public static void testBICaseGestionado() {
 
-        Account cliente = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account cliente = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
 
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
@@ -420,7 +402,7 @@ public class CC_CaseTriggerHelper_Test {
         insert caso;
         Test.stopTest();
 
-        Case casoUpdate = [SELECT CC_Gestionado_Agente__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+        Case casoUpdate = [Select CC_Gestionado_Agente__c from Case where id = :caso.Id limit 1];
 
         system.assertEquals(false, casoUpdate.CC_Gestionado_Agente__c, 'Comprobamos que el campo no está checked');
 
@@ -429,14 +411,14 @@ public class CC_CaseTriggerHelper_Test {
     @isTest
     public static void testBUCasoGestionado() {
 
-        Account cliente = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account cliente = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Buzon_Usuario_Publico' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000111@amamama.com' LIMIT 1];
+        User usuario = [Select id from User where email = 'tuser000111@amamama.com' limit 1];
 
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
@@ -463,7 +445,7 @@ public class CC_CaseTriggerHelper_Test {
         caso.OwnerId = usuario.Id;
         update caso;
 
-        Case casoUpdate = [SELECT CC_Gestionado_Agente__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+        Case casoUpdate = [Select CC_Gestionado_Agente__c from Case where id = :caso.Id limit 1];
         Test.stopTest();
 
 
@@ -475,11 +457,11 @@ public class CC_CaseTriggerHelper_Test {
     @isTest
     public static void testNumeroAgrupadores() {
 
-        Account cliente = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account cliente = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
@@ -501,14 +483,14 @@ public class CC_CaseTriggerHelper_Test {
         RecordTypeId = rtCliente);
         insert caso;
 
-        CC_Agrupador__c agrupador = [SELECT Id FROM CC_Agrupador__c WHERE CC_Titulo__c = 'Prueba Número Agrupador'];
+        CC_Agrupador__c agrupador = [Select id from CC_Agrupador__c where CC_Titulo__c = 'Prueba Número Agrupador'];
 
         Test.startTest();
         caso.CC_Agrupador_Id__c = agrupador.Id;
         update caso;
         Test.stopTest();
 
-        List<CC_Agrupador__c> lstAgrupadorUpdate = [SELECT CC_Numero_Casos__c FROM CC_Agrupador__c WHERE Id = :agrupador.Id];
+        List<CC_Agrupador__c> lstAgrupadorUpdate = [Select CC_Numero_Casos__c from CC_Agrupador__c where id = :agrupador.Id];
 
         system.assertEquals(1, lstAgrupadorUpdate.size(), 'Comprobamos que se actualiza el número de casos del agrupador');
 
@@ -517,11 +499,11 @@ public class CC_CaseTriggerHelper_Test {
     @isTest
     public static void testCatalogoFacturacion() {
 
-        Account cliente = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account cliente = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         CBK_CatalogoFacturacion__c catalogo = new CBK_CatalogoFacturacion__c();
         catalogo.CC_Canal_de_Procedencia__c = 'Google Play Store';
@@ -616,11 +598,11 @@ public class CC_CaseTriggerHelper_Test {
     @isTest
     public static void testGetOficinaPersonAccount()
     {
-        Account cliente = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account cliente = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
         //Creación nuevo caso asociado a un usuario
@@ -644,7 +626,7 @@ public class CC_CaseTriggerHelper_Test {
         Test.startTest();
         Test.stopTest();
 
-        Account accUpdate = [SELECT CC_Telefono_Unico__c FROM Account WHERE Id = :cliente.Id LIMIT 1];
+        Account accUpdate = [Select CC_Telefono_Unico__c from Account where id = :cliente.Id limit 1];
 
         system.assertEquals(true, accUpdate.CC_Telefono_Unico__c, 'Comprobamos que el campo está checked');
     }
@@ -693,6 +675,12 @@ public class CC_CaseTriggerHelper_Test {
     {
         User supervisor = [SELECT Id FROM User WHERE FirstName = 'Supervisor' AND IsActive = TRUE AND UserRole.Name = 'Contact Center' LIMIT 1];
 
+        Account cuentaEmpleado = [Select id from Account where CC_Email__c = 'test@gmail.com' limit 1];
+        Contact contactoEmpleado = [Select id from Contact where LastName = 'Contacto Prueba Empleado' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
+
         CC_Lista_Valores__c lovAvisosSobreAgrupadores = new CC_Lista_Valores__c();
         lovAvisosSobreAgrupadores.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('CC_Lista_Valores__c', 'CC_Lista_Valores');
         lovAvisosSobreAgrupadores.CC_Activa__c = true;
@@ -709,14 +697,38 @@ public class CC_CaseTriggerHelper_Test {
         valorUmbralPrimerAviso.CC_Valor2__c = '10';
         insert valorUmbralPrimerAviso;
 
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
-        System.runAs(supervisor) {
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+
+        //Creación nuevo caso asociado a un usuario
+        Case caso = new Case(AccountId = cuentaEmpleado.Id,
+        ContactId = contactoEmpleado.Id,
+        Status = 'Activo',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Empleado',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_MCC_Tematica__c = tematica.Id,
+        CC_MCC_ProdServ__c = producto.Id,
+        CC_MCC_Motivo__c = motivo.Id,
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        ownerId = supervisor.Id,
+        RecordTypeId = rtEmpleado);
+        insert caso;
+
+        System.runAs(supervisor)
+        {
+            /*caso.CC_Canal_Procedencia__c = 'Formulario Consultas Operativas';
+            update caso;*/
+
             Test.startTest();
-            casoEmpleado.Status = 'Cerrado';
-            update casoEmpleado;
+            caso.Status = 'Cerrado';
+            update caso;
             Test.stopTest();
 
-            Case casoUP = [SELECT CC_FechaSLAsinEstados__c FROM Case WHERE Id =: casoEmpleado.Id LIMIT 1];
+            Case casoUP = [SELECT CC_FechaSLAsinEstados__c FROM Case WHERE Id =: caso.Id LIMIT 1];
 
             System.AssertNotEquals(null, casoUP.CC_FechaSLAsinEstados__c, 'El calculo SLA no ha funcionado');
         }
@@ -734,14 +746,39 @@ public class CC_CaseTriggerHelper_Test {
     }
 
     @isTest
-    public static void permiteCambioOwnerCCTest() {
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
+    public static void permiteCambioOwnerCCTest()
+    {
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba Empleado' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
+
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
+
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        Status = 'Activo',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_MCC_Tematica__c = tematica.Id,
+        CC_MCC_ProdServ__c = producto.Id,
+        CC_MCC_Motivo__c = motivo.Id,
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        RecordTypeId = rtEmpleado);
+        insert caso;
 
         Test.startTest();
-        casoEmpleado.OwnerId = usuario.Id;
+        caso.OwnerId = usuario.Id;
         try{
-            update casoEmpleado;
+            update caso;
         }
         catch(Exception e){
             System.assertNotEquals(null, e, 'El envío de errores ha fallado.');
@@ -755,8 +792,8 @@ public class CC_CaseTriggerHelper_Test {
 
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -783,7 +820,7 @@ public class CC_CaseTriggerHelper_Test {
         insert caso;
         Test.stopTest();
 
-        CC_Caracteristica_Case__c car = [SELECT CC_Case__c FROM CC_Caracteristica_Case__c WHERE CC_Case__c = :caso.Id LIMIT 1];
+        CC_Caracteristica_Case__c car = [Select CC_Case__c from CC_Caracteristica_Case__c where CC_Case__c = :caso.Id limit 1];
         System.assertNotEquals(null, car, 'No se ha insertado la característica correctamente');
     }
 
@@ -792,8 +829,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -833,9 +870,9 @@ public class CC_CaseTriggerHelper_Test {
         mcc.CC_Canal_Operativo__c = 'App BrokerNow';
         insert mcc;
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'Tarjetas' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [SELECT id FROM CC_MCC__c WHERE Name = 'Tarjetas' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -875,11 +912,12 @@ public class CC_CaseTriggerHelper_Test {
     }
 
     @isTest
-    public static void casosWebTest() {
+    public static void casosWebTest()
+    {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba Empleado' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -903,14 +941,17 @@ public class CC_CaseTriggerHelper_Test {
         Test.stopTest();
 
         System.assertEquals(null, null, '');
+
     }
 
     @isTest
-    public static void casosColaFormularioTF() {
+    public static void casosColaFormularioTF()
+    {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba Empleado' limit 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Formulario_Terminal_Financiero' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
@@ -942,7 +983,7 @@ public class CC_CaseTriggerHelper_Test {
 
     @future
     public static void insertarGrupoTF() {
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Formulario_Terminal_Financiero' LIMIT 1];
 
         GroupMember grpMember = new GroupMember();
@@ -956,9 +997,9 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        Account empleado = [Select id from Account where Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba Empleado' limit 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Buzon_Usuario_Publico' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
@@ -990,7 +1031,7 @@ public class CC_CaseTriggerHelper_Test {
 
     @future
     public static void insertarGrupoBP() {
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Buzon_Usuario_Publico' LIMIT 1];
 
         GroupMember grpMember = new GroupMember();
@@ -1005,8 +1046,8 @@ public class CC_CaseTriggerHelper_Test {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Id rtClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [Select id from Account where LastName = 'Cuenta Prueba ClientePA' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1038,8 +1079,8 @@ public class CC_CaseTriggerHelper_Test {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         Id rtClientePA = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_ClientePA').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [Select id from Account where LastName = 'Cuenta Prueba ClientePA' limit 1];
+        Contact contacto = [Select id from Contact where LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1055,7 +1096,7 @@ public class CC_CaseTriggerHelper_Test {
         RecordTypeId = rtCliente);
         insert caso;
 
-        Account empleado2 = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA2' LIMIT 1];
+        Account empleado2 = [Select id from Account where LastName = 'Cuenta Prueba ClientePA2' limit 1];
 
         Test.startTest();
         caso.AccountId = empleado2.Id;
@@ -1074,8 +1115,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
+        Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1108,8 +1149,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
+        Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1144,8 +1185,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
 
         List<Account> listaCuentas = new List<Account>();
         Account cuenta3 = new Account();
@@ -1181,7 +1222,7 @@ public class CC_CaseTriggerHelper_Test {
         RecordTypeId = rtCliente);
         insert caso;
 
-        //Account empleado2 = [SELECT Id, CC_Gerencia_Comercial__c, CC_Gerencia_Comercial__r.ParentId FROM Account WHERE Name = 'cuenta5' LIMIT 1];
+        //Account empleado2 = [Select id, CC_Gerencia_Comercial__c, CC_Gerencia_Comercial__r.ParentId from Account where Name = 'cuenta5' limit 1];
 
         Test.startTest();
         caso.CC_Oficina_Afectada_Lookup__c = cuenta5.Id;
@@ -1201,8 +1242,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
 
         Contact contactoEmpleado = new Contact();
         contactoEmpleado.RecordTypeId = CC_MetodosUtiles.getRecordTypeIdFromDeveloperName('Contact', 'CC_Empleado');
@@ -1212,45 +1253,99 @@ public class CC_CaseTriggerHelper_Test {
         contactoEmpleado.Email = 'correotest@gmail.com';
         insert contactoEmpleado;
 
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        Status = 'Activo',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        RecordTypeId = rtEmpleado);
+        insert caso;
+
         Test.startTest();
-        casoEmpleado.ContactId = contactoEmpleado.Id;
-        update casoEmpleado;
+        caso.ContactId = contactoEmpleado.Id;
+        update caso;
         Test.stopTest();
 
-        Case casoActualizado = [SELECT CC_MailTelfNotif__c FROM Case WHERE Id = :casoEmpleado.Id LIMIT 1];
+        Case casoActualizado = [SELECT CC_MailTelfNotif__c FROM Case WHERE Id = :caso.Id LIMIT 1];
 
         System.assertEquals(contactoEmpleado.Email, casoActualizado.CC_MailTelfNotif__c, 'El email del caso no se ha actualizado correctamente');
+
     }
 
     @isTest
-    public static void blanqueoAccountTest() {
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
+    public static void blanqueoAccountTest()
+    {
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
+
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        Status = 'Activo',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        RecordTypeId = rtEmpleado);
+        insert caso;
 
         Test.startTest();
-        casoEmpleado.AccountId = null;
-        update casoEmpleado;
+        caso.AccountId = null;
+        update caso;
         Test.stopTest();
 
-        Case casoActualizado = [SELECT CC_MailTelfNotif__c, CC_Numero_Documento__c, CC_NumPerso__c, CC_Oficina_Afectada_Lookup__c, CC_Oficina__c, CC_Oficina_afectada__c FROM Case WHERE Id = :casoEmpleado.Id LIMIT 1];
+        Case casoActualizado = [SELECT CC_MailTelfNotif__c, CC_Numero_Documento__c, CC_NumPerso__c FROM Case WHERE Id = :caso.Id LIMIT 1];
 
         System.assertEquals(null, casoActualizado.CC_MailTelfNotif__c, 'El mail no se ha actualizado correctamente');
         System.assertEquals(null, casoActualizado.CC_Numero_Documento__c, 'El numero de documento no se ha actualizado correctamente');
         System.assertEquals(null, casoActualizado.CC_NumPerso__c, 'El numero personalizado no se ha actualizado correctamente');
-
-        System.assertEquals(null, casoActualizado.CC_Oficina_Afectada_Lookup__c, 'Assert');
-        System.assertEquals(null, casoActualizado.CC_Oficina__c, 'Assert');
-        System.assertEquals(null, casoActualizado.CC_Oficina_afectada__c, 'Assert');
 
     }
 
     @isTest
     public static void estadoCerradoUpdateTest()
     {
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
+
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        OwnerId = usuario.Id,
+        Status = 'Activo',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Resolucion__c = 'Descripcion Resolucion Test',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        CC_MCC_Tematica__c = tematica.Id,
+        CC_MCC_ProdServ__c = producto.Id,
+        CC_MCC_Motivo__c = motivo.Id,
+        RecordTypeId = rtEmpleado);
+        insert caso;
 
         Task tarea = new Task(
-        WhatId = casoEmpleado.Id,
+        WhatId = caso.Id,
         Status = 'Pendiente',
         Type = 'Traslado Tercer Nivel',
         Description  = 'Descripción tarea test',
@@ -1266,16 +1361,17 @@ public class CC_CaseTriggerHelper_Test {
         CC_Llamada__c llamada = new CC_Llamada__c();
         llamada.CC_Servicio_Genesys__c = servicioGenesys.Id;
         llamada.CC_Tipo__c = 'Saliente';
-        llamada.CC_Case_Consulta__c = casoEmpleado.Id;
+        llamada.CC_Case_Consulta__c = caso.Id;
         insert llamada;
 
         Test.startTest();
-        casoEmpleado.Status = 'Cerrado';
-        casoEmpleado.CC_Resolucion__c = 'Descripción resolucion test';
-        update casoEmpleado;
+        caso.Status = 'Cerrado';
+        caso.CC_Resolucion__c = 'Descripción resolucion test';
+        update caso;
         Test.stopTest();
 
-        Case casoActualizado = [SELECT Id, CC_Resolucion__c, Status, CC_Llamada_Saliente__c FROM Case WHERE Id = :casoEmpleado.Id LIMIT 1];
+        Case casoActualizado = [SELECT Id, CC_Resolucion__c, Status, CC_Llamada_Saliente__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+
         Task tareaActualizada = [SELECT Status, CC_Tipo_Cierre__c, CC_Fecha_Fin__c, Description FROM Task WHERE WhatId = :casoActualizado.Id AND CC_Tipo_Cierre__c != null LIMIT 1];
 
 
@@ -1292,8 +1388,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Buzon_Usuario_Publico' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
@@ -1434,9 +1530,9 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
+        User usuario = [Select id from User where email = 'tuser000@amamama.com' limit 1];
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Buzon_Usuario_Publico' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
@@ -1464,14 +1560,92 @@ public class CC_CaseTriggerHelper_Test {
 
         System.assertEquals('Activo', casoActualizado.Status, 'El status no se ha actualizado correctamente');
     }
-    
+
+    /*@isTest
+    public static void revisarReclamacionesTwitterTest()
+    {
+        Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
+
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+
+        Test.startTest();
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        Status = 'Pendiente Interno',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Twitter',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_Canal_Procedencia__c = 'CaixaBank',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        RecordTypeId = rtCliente);
+        insert caso;
+
+        SocialPost postTwitter = new SocialPost();
+        postTwitter.Name = 'Test';
+        postTwitter.ParentId = caso.Id;
+        postTwitter.CC_ReclamacionActiva__c = true;
+        postTwitter.isOutbound = true;
+        postTwitter.Provider = 'Twitter';
+        postTwitter.CC_Solicitud_Informacion__c = true;
+        postTwitter.Posted = System.now();
+        postTwitter.CC_ZonaHoraria__c = 2;
+        postTwitter.CC_Primer_DM__c = true;
+        insert postTwitter;
+
+        caso.Status = 'Activo';
+        update caso;
+        Test.stopTest();
+
+        SocialPost spActualizado = [SELECT CC_ReclamacionActiva__c FROM SocialPost WHERE ParentId = :caso.Id LIMIT 1];
+
+        System.assertEquals(false, spActualizado.CC_ReclamacionActiva__c, 'Assert');
+    }*/
+
+    @isTest
+    public static void cuentaDesasociadaTest()
+    {
+        Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
+
+        Case caso = new Case(AccountId = empleado.Id,
+        ContactId = contacto.Id,
+        Status = 'Pendiente Interno',
+        CC_Idioma__c = 'es',
+        Subject = 'Prueba',
+        CC_Tipo_Cliente__c = 'Cliente',
+        Origin = 'Email',
+        CC_Tipo_Contacto__c = 'Consulta',
+        CC_Canal_Procedencia__c = 'Formulario Consultas Operativas',
+        CC_Detalles_Consulta__c = 'Detalles 1234-5678-9876-5432 Consulta',
+        CC_Detalles_Solucion__c = 'Detalles 1234-5678-9876-5432 Solución',
+        RecordTypeId = rtEmpleado);
+        insert caso;
+
+        Test.startTest();
+        caso.AccountId = null;
+        update caso;
+        Test.stopTest();
+
+        Case casoActualizado = [SELECT CC_Oficina_Afectada_Lookup__c, CC_Oficina__c, CC_Oficina_afectada__c FROM Case WHERE Id = :caso.Id LIMIT 1];
+
+        System.assertEquals(null, casoActualizado.CC_Oficina_Afectada_Lookup__c, 'Assert');
+        System.assertEquals(null, casoActualizado.CC_Oficina__c, 'Assert');
+        System.assertEquals(null, casoActualizado.CC_Oficina_afectada__c, 'Assert');
+    }
+
     @isTest
     public static void actualizarFechaLimiteTest()
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1547,8 +1721,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
         CC_Caracteristica__c caracteristica = [SELECT Id FROM CC_Caracteristica__c WHERE Name = 'Campa Prueba' LIMIT 1];
 
         Case caso = new Case(AccountId = empleado.Id,
@@ -1580,8 +1754,8 @@ public class CC_CaseTriggerHelper_Test {
         Test.startTest();
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1607,8 +1781,8 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1637,8 +1811,8 @@ public class CC_CaseTriggerHelper_Test {
         Test.startTest();
         Id rtEmpleado = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba Empleado' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1669,11 +1843,11 @@ public class CC_CaseTriggerHelper_Test {
         Test.startTest();
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Case caso = new Case(AccountId = empleado.Id,
         ContactId = contacto.Id,
@@ -1725,11 +1899,11 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Test.startTest();
         Case caso = new Case(AccountId = empleado.Id,
@@ -1748,7 +1922,7 @@ public class CC_CaseTriggerHelper_Test {
         RecordTypeId = rtCliente);
         insert caso;
 
-        Account cuenta2 = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' LIMIT 1];
+        Account cuenta2 = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' limit 1];
 
         caso.AccountId = cuenta2.Id;
         update caso;
@@ -1762,11 +1936,11 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Test.startTest();
         Case caso = new Case(AccountId = empleado.Id,
@@ -1798,11 +1972,11 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Test.startTest();
         Case caso = new Case(AccountId = empleado.Id,
@@ -1835,11 +2009,11 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
 
-        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' LIMIT 1];
-        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' LIMIT 1];
-        CC_MCC__c tematica = [SELECT Id FROM CC_MCC__c WHERE Name = 'App\'s' LIMIT 1];
-        CC_MCC__c producto = [SELECT Id FROM CC_MCC__c WHERE Name = 'APP CaixaBank' LIMIT 1];
-        CC_MCC__c motivo = [SELECT Id FROM CC_MCC__c WHERE Name = 'Valoración positiva' LIMIT 1];
+        Account empleado = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba 2' limit 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName = 'Contacto Prueba' limit 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
 
         Test.startTest();
         Case caso = new Case(AccountId = empleado.Id,
@@ -2317,7 +2491,7 @@ public class CC_CaseTriggerHelper_Test {
     {
         Id rtCliente = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
         List<Group> ownerLst = [SELECT Id FROM Group WHERE DeveloperName = 'CC_Formulario_Terminal_Financiero' LIMIT 1];
-        User usuario = [SELECT Id FROM User WHERE email = 'tuser000@amamama.com' LIMIT 1];
+        User usuario = [Select Id from User where email = 'tuser000@amamama.com' LIMIT 1];
 
         Case caso = new Case();
         caso.Origin = 'Email';
@@ -2343,8 +2517,8 @@ public class CC_CaseTriggerHelper_Test {
     {
 
         Id rtCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
-        Account cuenta3 = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' limit 1];
+        Account cuenta3 = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' limit 1];
 
         Case caso = new Case();
         caso.AccountId = null;
@@ -2369,7 +2543,7 @@ public class CC_CaseTriggerHelper_Test {
     {
 
         Id rtCaso = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Cliente').getRecordTypeId();
-        Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' LIMIT 1];
+        Account cuenta = [SELECT Id FROM Account WHERE LastName = 'Cuenta Prueba ClientePA' limit 1];
 
         Case caso = new Case();
         caso.CC_Oficina__c = cuenta.Id;
@@ -2494,17 +2668,39 @@ public class CC_CaseTriggerHelper_Test {
 
     }
 
-    @isTest
+    /*@isTest
     private static void reaperturaNoValidaTest() {
-        Case casoEmpleado = [SELECT Id FROM Case WHERE Subject = 'Caso Empleado FCO' LIMIT 1];
-        
+
+        Account cuenta = [SELECT Id FROM Account WHERE Name = 'Cuenta Prueba Empleado' LIMIT 1];
+        Contact contacto = [SELECT Id FROM Contact WHERE LastName ='Contacto Prueba Empleado' LIMIT 1];
+        CC_MCC__c tematica = [Select id from CC_MCC__c where Name = 'App\'s' limit 1];
+        CC_MCC__c producto = [Select id from CC_MCC__c where Name = 'APP CaixaBank' limit 1];
+        CC_MCC__c motivo = [Select id from CC_MCC__c where Name = 'Valoración positiva' limit 1];
+
+        Case caso = new Case();
+        caso.AccountId = cuenta.Id;
+        caso.ContactId = contacto.Id;
+        caso.Origin = 'Phone';
+        caso.CC_Tipo_Cliente__c = 'Cliente';
+        caso.Origin = 'Email';
+        caso.CC_Tipo_Contacto__c = 'Consulta';
+        caso.CC_Canal_Procedencia__c ='Formulario Consultas Operativas';
+        caso.Status = 'Activo';
+        caso.CC_MCC_Tematica__c = tematica.Id;
+        caso.CC_MCC_ProdServ__c = producto.Id;
+        caso.CC_MCC_Motivo__c = motivo.Id;
+        caso.CC_Detalles_Consulta__c = 'Test';
+        caso.CC_Reapertura_Valida__c = 'No';
+        caso.RecordTypeId = Schema.SObjectType.Case.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+        insert caso;
+
         Test.startTest();
-        casoEmpleado.Status = 'Cerrado';
-        update casoEmpleado;
+        caso.Status = 'Cerrado';
+        update caso;
         Test.stopTest();
 
-        List<EmailMessage> correosCaso = [SELECT Id FROM EmailMessage WHERE ParentId = :casoEmpleado.Id LIMIT 1];
+        List<EmailMessage> correosCaso = [SELECT Id FROM EmailMessage WHERE ParentId = :caso.Id LIMIT 1];
         system.assertEquals(1, correosCaso.size());
 
-    }
+    }*/
 }

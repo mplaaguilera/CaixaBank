@@ -520,7 +520,7 @@ public with sharing class SPV_AccionHelper {
      * 1.0            --               CS             18/07/24     Creación
     *****************************************************************************/
     public static void cerrarReclamaciones(List<Id> reclamacionesParaCerrar){
-        List<Case> listaReclamaciones = [SELECT id, status, SEG_Subestado__c, SPV_Organismo__c, SAC_Reclamacion__r.SPV_Organismo__c, RecordTypeId FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN: reclamacionesParaCerrar) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: reclamacionesParaCerrar)];
+        List<Case> listaReclamaciones = [SELECT id, status, SEG_Subestado__c, SPV_Organismo__c, RecordTypeId FROM Case WHERE (RecordTypeId = :RECTYPERECLAMACION AND Id IN: reclamacionesParaCerrar) OR (RecordTypeId = :RECTYPEPRETENSION AND SAC_Reclamacion__c IN: reclamacionesParaCerrar)];
         List<Case> casosUpdate = new List<Case>();
 
         for(Case reclamacion: listaReclamaciones){
@@ -533,9 +533,7 @@ public with sharing class SPV_AccionHelper {
                 }
                 casosUpdate.add(reclamacion);
             } else if(reclamacion.RecordTypeId == RECTYPEPRETENSION && reclamacion.Status != 'Descartado') {
-                if(reclamacion.SAC_Reclamacion__r.SPV_Organismo__c == 'SPV_Consumo') {
-                    reclamacion.Status = 'Cerrado';
-                }                
+                reclamacion.Status = 'Cerrado';
                 casosUpdate.add(reclamacion);
             }
         }

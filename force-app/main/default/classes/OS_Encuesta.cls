@@ -1,6 +1,6 @@
 public with sharing class OS_Encuesta {
     public static void enviarEncuesta(List<Id> idCasos) {
-        //Comprobar que hay un caso para enviar la encuesta.
+        //Comprobar que hay un caso para enviar la encuesta
         if (!idCasos.isEmpty()) {
             List<Case> casos = [SELECT Origin, CaseNumber, CC_Admin__c, ContactId, CC_Canal_Procedencia__c, CC_Idioma__c, CC_MCC_Tematica__r.OS_No_Enviar_Encuestas__c, CC_Buzon_Salida__c, CC_Tematica__c FROM Case 
                                 WHERE Id IN :idCasos 

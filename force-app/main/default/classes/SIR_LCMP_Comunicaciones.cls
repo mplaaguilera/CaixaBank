@@ -26,7 +26,7 @@ public with sharing class SIR_LCMP_Comunicaciones {
 	*****************************************************************/
     @AuraEnabled(Cacheable=true)
     public static List<CBK_Notification__c> getComunicaciones(){
-        if(Contact.SObjectType.getDescribe().isAccessible() && Account.SObjectType.getDescribe().isAccessible() && CBK_Notification__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.Contact.isAccessible() && Schema.SObjectType.Account.isAccessible() && Schema.SObjectType.CBK_Notification__c.isAccessible()){
             Set<Id> setIdCentros = new Set<Id>();
             List<CBK_Notification__c> comunicaciones = new List<CBK_Notification__c>();
             List<Contact> oficinaUsuario = [SELECT AccountId, 
@@ -91,11 +91,11 @@ public with sharing class SIR_LCMP_Comunicaciones {
     @AuraEnabled(Cacheable=true)
     public static List<SIREC__SIREC_obj_acciones__c> getQueryAcciones(String url){
         List<SIREC__SIREC_obj_acciones__c> acciones = new List<SIREC__SIREC_obj_acciones__c>();
-        if(SIREC__SIREC_obj_acciones__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_acciones__c.isAccessible()){
 
             if(url.contains('SIR_InicioPRESOL')){
                 acciones = [SELECT id, Name, SIREC__SIREC_fld_interviniente__c, SIREC__SIREC_fld_interviniente__r.Name, toLabel(SIREC__SIREC_fld_resultado__c), 
-                        toLabel(SIREC__SIREC_fld_tipo__c), SIREC__SIREC_fld_proceso__c, SIREC__SIREC_fld_proceso__r.Id, toLabel(SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_estrategia__c), toLabel(SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c), 
+                        toLabel(SIREC__SIREC_fld_tipo__c), SIREC__SIREC_fld_proceso__c, SIREC__SIREC_fld_proceso__r.Id, SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c), 
                         SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaSituacion__c, SIREC__SIREC_fld_fechaContacto__c
                         FROM SIREC__SIREC_obj_acciones__c 
                         WHERE SIREC__SIREC_fld_responsable__c =: UserInfo.getUserId() 
@@ -107,7 +107,7 @@ public with sharing class SIR_LCMP_Comunicaciones {
 
             }else{
                 acciones = [SELECT id, Name, SIREC__SIREC_fld_interviniente__c, SIREC__SIREC_fld_interviniente__r.Name, toLabel(SIREC__SIREC_fld_resultado__c), 
-                        toLabel(SIREC__SIREC_fld_tipo__c), SIREC__SIREC_fld_proceso__c, SIREC__SIREC_fld_proceso__r.Id, toLabel(SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_estrategia__c), toLabel(SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c), 
+                        toLabel(SIREC__SIREC_fld_tipo__c), SIREC__SIREC_fld_proceso__c, SIREC__SIREC_fld_proceso__r.Id, SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_descEstrategiaCatalogo__c, toLabel(SIREC__SIREC_fld_proceso__r.SIR_fld_Situacion_SF__c), 
                         SIREC__SIREC_fld_proceso__r.SIREC__SIREC_fld_fechaSituacion__c, SIREC__SIREC_fld_fechaContacto__c
                         FROM SIREC__SIREC_obj_acciones__c 
                         WHERE SIREC__SIREC_fld_responsable__c =: UserInfo.getUserId() 
@@ -135,7 +135,7 @@ public with sharing class SIR_LCMP_Comunicaciones {
     @AuraEnabled(Cacheable=true)
     public static List<Report> getQueryReports(String url){
         List<Report> informes = new List<Report>();
-        if(Report.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.Report.isAccessible()){
 
             if(url.contains('SIR_InicioPRESOL')){
                 informes = [SELECT id, name, DeveloperName  

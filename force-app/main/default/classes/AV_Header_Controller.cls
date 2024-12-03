@@ -6,53 +6,96 @@ Proposito: Controller for the LWC AV_Header_Controller
 -----------------------------------------------------------------------------------------------------------------------
 Historial
 ---------------------
-VERSION		USER_STORY		AUTHOR			DATE			Description
-1.0			Init    		Ángel Medina 	14/06/2022		Init version. Copy the CIBE_Header_Controller class from CIBE 
+VERSION		USER_STORY		AUTHOR				DATE			Description
+1.0			Init    		Ángel Medina 		14/06/2022		Init version. Copy the CIBE_Header_Controller class from CIBE
+1.1		    Fix PMD Errors	Daniel Rodriguez	25/10/2023	    Add queries WITH SECURITY_ENFORCED 
+1.2		    US562059        Luis Fernández   	24/11/2023	    Changed getAccountInfo in order to retrieve more fields and a ordered response
+1.3         PPM100492394    Ángel Medina        30/09/2024      Changed getAccountInfo add fields in query
 ***********************************************************************************************************************/
 public with sharing class AV_Header_Controller {
     @AuraEnabled(cacheable=true)
-	public static List<String> getAccountInfo(Id recordId) {
+	public static Map<String,String> getAccountInfo(Id recordId,String clientNumper ) {
 		String nameRecord = '';
-		String filterObject = recordId.getSObjectType().getDescribe().getName();
+		String filterObject = (recordId != null ) ? recordId.getSObjectType().getDescribe().getName() : null;
 		String accName = ''; 
-		String accRtDevName = ''; //PARTE CAMBIADA
+		String accRtDevName = ''; 
 		String accId = '';
+		String clientNumperToSend = '';
+		String contactPlate = '';
+		String accNumDocument = '';
+        String eventType;
+        String eventDateTime;
+        String eventInitTime;
+        String eventEndTime;
+		List<Account> accClientList;
+        List<Account> accClientListOffice;
+		if(recordId != null){
 
-		if(filterObject.equals(AV_AppConstants.OBJECT_NAME_OPPORTUNITY)){
-			Opportunity opp = [SELECT AccountId,Name FROM Opportunity WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
-			recordId = opp.AccountId;
-			nameRecord = opp.Name;
+			if(filterObject.equals(AV_AppConstants.OBJECT_NAME_OPPORTUNITY)){
+				List<Opportunity> oppList = [SELECT AccountId,Name FROM Opportunity WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
+				if(oppList != null && !oppList.isEmpty()){
+					recordId = oppList[0].AccountId;
+					nameRecord = oppList[0].Name;
+				}
+			}
+			else if(filterObject.equals(AV_AppConstants.OBJECT_NAME_EVENT)){
+				List<Event> evtList = [SELECT AccountId,Subject, AV_Tipo__c, ActivityDateTime, Account.Name, Account.RecordType.DeveloperName,StartDateTime,EndDateTime, Description, Location, AV_BranchPhysicalMeet__c  FROM Event WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
+				if(evtList != null && !evtList.isEmpty()){
+					recordId = evtList[0].AccountId;
+					nameRecord = evtList[0].Subject;
+					eventType = evtList[0].AV_Tipo__c;
+					eventDateTime = evtList[0].ActivityDateTime.format('yyyy-MM-dd');
+					eventInitTime = evtList[0].StartDateTime.format('HH:mm');
+					eventEndTime = evtList[0].EndDateTime.format('HH:mm');
+					accName = evtList[0].Account.Name;
+					accRtDevName = evtList[0].Account.RecordType.DeveloperName;
+				}
+			}else if(filterObject.equals(AV_AppConstants.OBJECT_NAME_TASK)){
+				List<Task> tskList = [SELECT AccountId, Subject FROM Task WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
+				if(tskList != null && !tskList.isEmpty()){
+					recordId = tskList[0].AccountId;
+					nameRecord = tskList[0].Subject;
+				}
+			}
+			accClientList = [SELECT Id, Name, RecordType.DeveloperName,AV_NumPerso__c, CC_Numero_Documento__c FROM Account WHERE Id = :recordId WITH SECURITY_ENFORCED];
+			if(accClientList != null && !accClientList.isEmpty()){
+				accName = accClientList[0].Name;
+				accRtDevName = accClientList[0].RecordType.DeveloperName;
+				accId = accClientList[0].Id;
+				clientNumperToSend = accClientList[0].AV_NumPerso__c;
+				accNumDocument = accClientList[0].CC_Numero_Documento__c;
+            }
+		}else if(clientNumper != null){
+			accClientList = [SELECT Id, Name, RecordType.DeveloperName,AV_NumPerso__c, CC_Numero_Documento__c FROM Account WHERE AV_NumPerso__c = :clientNumper WITH SECURITY_ENFORCED];
+			if(accClientList != null && !accClientList.isEmpty()){
+				accName = accClientList[0].Name;
+				accRtDevName = accClientList[0].RecordType.DeveloperName;
+				accId = accClientList[0].Id;
+				clientNumper = accClientList[0].AV_NumPerso__c;
+				accNumDocument = accClientList[0].CC_Numero_Documento__c;
+			}
 		}
-		else if(filterObject.equals(AV_AppConstants.OBJECT_NAME_EVENT)){
-			Event evt = [SELECT AccountId,Subject FROM Event WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
-			recordId = evt.AccountId;
-			nameRecord = evt.Subject;
-		}else if(filterObject.equals(AV_AppConstants.OBJECT_NAME_TASK)){
-			Task tsk = [SELECT AccountId, Subject FROM Task WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
-			recordId = tsk.AccountId;
-			nameRecord = tsk.Subject;
-		}
-		List<Account> accClientList = [SELECT Id, Name, RecordType.DeveloperName FROM Account WHERE Id = :recordId WITH SECURITY_ENFORCED];//PARTE CAMVIADA
-		if(accClientList != null && !accClientList.isEmpty()){
-			accName = accClientList[0].Name;
-			accRtDevName = accClientList[0].RecordType.DeveloperName;
-			accId = accClientList[0].Id;
-		}
-		List<Contact> cntGestor = [SELECT AV_EmpleadoIntouch__c  FROM Contact WHERE AV_UsuarioAsociado__c = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
 		
-		
-		return new List<String>{
-			accName, 
-			accRtDevName, 
-			(!cntGestor.isEmpty()) ? String.valueOf(cntGestor[0].AV_EmpleadoIntouch__c) : null, //Parte canviada
-			nameRecord,
-			accId
+		List<Contact> cntGestor = [SELECT AV_EmpleadoIntouch__c,CC_Matricula__c  FROM Contact WHERE AV_UsuarioAsociado__c = :UserInfo.getUserId() WITH SECURITY_ENFORCED];
+		return new Map<String,String>{
+			'accountName' 	=> accName,
+			'rtDevName'   	=> accRtDevName,
+			'isIntouch'   	=> (!cntGestor.isEmpty()) ? String.valueOf(cntGestor[0].AV_EmpleadoIntouch__c) : null,
+			'nameRecord'  	=> nameRecord,
+			'accountId'   	=> accId,
+			'contactPlate'	=>  (!cntGestor.isEmpty()) ? String.valueOf(cntGestor[0].CC_Matricula__c) : null,
+			'clientNumper'  => clientNumperToSend,
+			'numDocument' => accNumDocument,
+            'eventType' => eventType,
+            'eventDateTime' => eventDateTime,
+			'eventInitTime' => eventInitTime,
+			'eventEndTime' => eventEndTime        
 		};
     }
 
 	public static String getName(Id recordId, String fieldName) {
 		String filterObject = recordId.getSObjectType().getDescribe().getName();
-		List<sObject> results = Database.query('SELECT ' + String.escapeSingleQuotes(fieldName) + ' FROM ' + String.escapeSingleQuotes(filterObject) + ' WHERE Id = :recordId');
+		List<sObject> results = Database.query('SELECT ' + String.escapeSingleQuotes(fieldName) + ' FROM ' + String.escapeSingleQuotes(filterObject) + ' WHERE Id = :recordId WITH SECURITY_ENFORCED');
 		if(!results.isEmpty()) {
 			return String.valueOf(results.get(0).get(fieldName));
 		}
@@ -102,8 +145,6 @@ public with sharing class AV_Header_Controller {
 			for(Schema.FieldSetMember f: fieldSet){
 				Field field = new Field();
 				field.name = f.getFieldPath();
-				// field.isRating = f.getFieldPath() == 'CIBE_Rating_PD__c' ? true : false;
-				// field.helpText = f.getSObjectField().getDescribe().getInlineHelpText();
 				result.add(field);
 			}
 		}else{
@@ -124,7 +165,7 @@ public with sharing class AV_Header_Controller {
 				activity = capsulateQueryTask(queryData);
 			}
 			Id accId = (Id) activity.get('WhatId');
-			String accName = [SELECT Name FROM Account WHERE Id = :accId LIMIT 1].Name;
+			String accName = [SELECT Name FROM Account WHERE Id = :accId WITH SECURITY_ENFORCED LIMIT 1].Name;
 			String objectName = AV_AppConstants.OBJECT_NAME_EVENT;
 			String fieldApiName = 'AV_Tipo__c';
 			Map<String,String> picklistValueSelected = new Map<String,String>();
@@ -171,6 +212,8 @@ public with sharing class AV_Header_Controller {
 		return response;
     }
 
+
+
 	private static Task capsulateQueryTask(String q){//Método para pasar qualityClouds
 		return (Task) Database.query(q);
 	}
@@ -208,10 +251,11 @@ public with sharing class AV_Header_Controller {
 		@AuraEnabled public String type;
 	}
 
+	/*
 	@AuraEnabled(cacheable=true)
 	public static String getDateLoad(Id recordId) {
 		List<String> mesesES = new List<String>{'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'};
-		Account acc = [SELECT Id, CIBE_FechaRating_SP__c FROM Account WHERE Id = :recordId LIMIT 1];
+		Account acc = [SELECT Id, CIBE_FechaRating_SP__c FROM Account WHERE Id = :recordId WITH SECURITY_ENFORCED LIMIT 1];
 		if (acc != null && acc.CIBE_FechaRating_SP__c != null) {
 			Integer year = acc.CIBE_FechaRating_SP__c.year();
 			Integer month = acc.CIBE_FechaRating_SP__c.month();
@@ -219,10 +263,11 @@ public with sharing class AV_Header_Controller {
 		}
 		return null;
 	}
+	*/
 	
 	@AuraEnabled(cacheable=true)
 	public static List<String> getRecordsFieldsHeaderEvent(Id recordId,List<String> labels){
-		Event ev= [SELECT StartDateTime, EndDateTime,WhatId,type,CSBD_Evento_Estado__c FROM Event WHERE id =:recordId LIMIT 1];
+		Event ev= [SELECT StartDateTime, EndDateTime,WhatId,type,CSBD_Evento_Estado__c FROM Event WHERE id =:recordId WITH SECURITY_ENFORCED LIMIT 1];
 		return null;
 	}
 }

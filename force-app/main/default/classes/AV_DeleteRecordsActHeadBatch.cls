@@ -18,11 +18,11 @@ Historial
    3.5			App FSC			Esperanza Conde		20/01/2021			Delete the logic in the finish method
    3.6			FIX				David Rufo			31/05/2021			Use the Query FWK
    3.7         US671736         Oscar Moreno        17/10/2023          Delete the content of the class
-
+   3.8          QC              Oscar Moreno        05/06/2024       Return a String of deleteRecord method
 ***********************************************************************************************************************/
 public class AV_DeleteRecordsActHeadBatch {
    
-	 public static void deleteRecord(){
-        
+	 public static String deleteRecord(){
+        return 'entra en deleteRecords';
     }
 }

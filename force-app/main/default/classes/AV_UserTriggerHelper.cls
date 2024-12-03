@@ -42,7 +42,8 @@ Historial
 	3.9			Fix				Luis Martínez		24/01/2024			Change updateFuncion fix match user - employee
 	4.0			DT03			Luis Fernández		17/04/2024			Added debugs in order to find mismatchings in User-Contact pairment in PROD
 	4.1			IN1160717	    Manuel Ramos        02/07/2024          Isolate user deactivation methods in AV_UserHandlerWithoutSharing class
-
+	4.2			FIX040724844	Oscar Moreno        04/07/2024          Isolate updateUsuarioAsociado method in AV_UserHandlerWithoutSharing class
+	4.3			FIX20091243		Sandra Gómez		25/09/2024			Add method groupConfidenProfileRol
 ***********************************************************************************************************************/
 public with sharing class AV_UserTriggerHelper {
 
@@ -164,123 +165,6 @@ public with sharing class AV_UserTriggerHelper {
 		}
 	}
 	
-	/**
-	 * @description		 		AfterProcess:
-	 * 							Update AV_UsuarioAsociado__c in Contacts with the Id the associated User
-	 * 							Update the center of the office associate with the user
-	 * @param  isTriggerBefore  flag to indicate if the trigger that is executing is before or after
-	 * @param  listNewObj  		list of user data that execute the process
-	 * @param  mapOldObj		map with the previous data of users
-	 */
-	public static void updateUsuarioAsociado(Boolean isTriggerBefore, List<User> listNewObj,  Map<Id, User> mapOldObj){
-		if (!System.isFuture() && !System.isBatch()){
-			List<User> updatedUsers = new List<User>();
-			CBK_Log.debug('updateUsuarioAsociado; Users to process : ' +listNewObj,listNewObj,LoggingLevel.DEBUG);
-			//Extract the External ID values (CRM)
-			Set<String> setExternalIdsUser = getSetExternalIds(listNewObj);
-			CBK_Log.debug('updateUsuarioAsociado; Users extId => ' + setExternalIdsUser,new List<String>(setExternalIdsUser),LoggingLevel.DEBUG);
-			if (setExternalIdsUser.isEmpty()){
-				return;
-			}
-	
-			//Search the employees with the external Id of the CRM
-			List<Contact> listEmployees= [Select Id, AV_UsuarioAsociado__c, CC_Matricula__c, AccountId, Account.CC_Numero_Oficina_Empresa__c, AV_JobLevels__c, AV_TipoCentro__c From Contact Where RecordType.DeveloperName = 'CC_Empleado' and CC_Matricula__c in :setExternalIdsUser];
-			CBK_Log.debug('updateUsuarioAsociado; Find matricula match contacts: '+listEmployees,listEmployees,LoggingLevel.DEBUG);
-			if (listEmployees!=null && !listEmployees.isEmpty()) {
-				CBK_Log.debug('updateUsuarioAsociado; Find matricula match contacts: '+listEmployees,listEmployees,LoggingLevel.DEBUG);
-				List<Contact> listUpdateEmployees = new List<Contact>();
-				if(mapOldObj == null || mapOldObj.isEmpty()){
-					//Modified
-					for (User userAux : listNewObj) {
-						if (userAux.isActive && String.isNotBlank(userAux.AV_ExternalID__c)) {
-							for (Contact employee : listEmployees) {
-								//Update the contact associate to the user (only in after process)
-								if (!isTriggerBefore && (userAux.AV_ExternalID__c).equalsIgnoreCase(employee.CC_Matricula__c)) {
-									employee.AV_UsuarioAsociado__c = userAux.Id;
-									listUpdateEmployees.add(employee);
-								}
-							}
-						}
-					}
-					CBK_Log.debug('updateUsuarioAsociado; (InsertUser) Updated contact list => '+listUpdateEmployees,listUpdateEmployees,LoggingLevel.DEBUG);
-				}else{
-					for (User userAux : listNewObj) {
-						if (userAux.isActive && String.isNotBlank(userAux.AV_ExternalID__c)) {
-							for (Contact employee : listEmployees) {
-								//Update the contact associate to the user (only in after process)
-								if (!isTriggerBefore && (userAux.AV_ExternalID__c).equalsIgnoreCase(employee.CC_Matricula__c) 
-								&& userAux.AV_ExternalID__c != mapOldObj.get(userAux.Id).AV_ExternalID__c) {
-									employee.AV_UsuarioAsociado__c = userAux.Id;
-									listUpdateEmployees.add(employee);
-								}
-							}
-							CBK_Log.debug('updateUsuarioAsociado; (Updated User) Updated contact list => '+listUpdateEmployees,listUpdateEmployees,LoggingLevel.DEBUG);
-						}
-					}
-				}
-
-				
-				//Update Contacts
-				if (!listUpdateEmployees.isEmpty()){
-					Set<String> listJsonContacts = new Set<String>();
-					for(Contact employee : listUpdateEmployees){
-						String jsonEmployee =  System.JSON.serialize(employee);
-						listJsonContacts.add(jsonEmployee);
-					}
-					CBK_Log.debug('updateUsuarioAsociado; JSONED contact list => '+listJsonContacts,new List<String>(listJsonContacts),LoggingLevel.DEBUG);
-					Map<String,Contact> listUpdateEmployeesDebug = new Map<String,Contact>();
-					//DEBUG CODE
-					Type typeClass = Type.forName('Contact');
-					for(String jsonContact : listJsonContacts){
-						Contact contact = (Contact)System.JSON.deserializeStrict(jsonContact, typeClass);
-						listUpdateEmployeesDebug.put(contact.CC_Matricula__c,contact);
-					}
-					List<User> userWithNoMatch = new List<User>();
-					for(User us : listNewObj){
-						if(!listUpdateEmployeesDebug.containsKey(us.AV_ExternalId__c)){
-							userWithNoMatch.add(us);
-						}
-					}
-
-					if(userWithNoMatch.isEmpty()){
-						CBK_Log.debug('updateUsuarioAsociado; (All users matched) ',LoggingLevel.DEBUG);
-					}else{
-						
-						CBK_Log.debug('updateUsuarioAsociado; (Users with no match) => '+userWithNoMatch,userWithNoMatch,LoggingLevel.DEBUG);
-						CBK_Log.debug('updateUsuarioAsociado; (Contacts with no match) => '+userWithNoMatch,userWithNoMatch,LoggingLevel.DEBUG);
-					}
-
-					//END DEBUG CODE
-					updateUsuarioAsociado(listJsonContacts);
-				}
-			}
-		}
-	}
-
-	/**
-	 * @description		 Update AV_UsuarioAsociado__c in Contacts with the Id the associated User
-	 * @param  listJsonContacts  list of Users
-	 */
-	@Future
-	private static void updateUsuarioAsociado(Set<String> listJsonContacts) {
-		String methodName = 'updateUsuarioAsociado';
-		//Deserialize
-		List<Contact> listUpdateEmployees = new List<Contact>();
-		Type typeClass = Type.forName('Contact');
-		for(String jsonContact : listJsonContacts){
-			Contact contact = (Contact)System.JSON.deserializeStrict(jsonContact, typeClass);
-			listUpdateEmployees.add(contact);
-		}
-		CBK_Log.debug('updateUsuarioAsociado; Unserialized json of contacts ready to be updated with new associated user => '+listUpdateEmployees,listUpdateEmployees,LoggingLevel.DEBUG);
-
-		AV_LogDebug.printLogDebug(methodName, 'listUpdateEmployees: ' + listUpdateEmployees.size());
-		if (!listUpdateEmployees.isEmpty()) {
-			List<Database.SaveResult> listResult = Database.update(listUpdateEmployees);
-			CBK_Log.debug('updateUsuarioAsociado; Update contact DML results => '+listResult,listResult,LoggingLevel.DEBUG);
-
-			AV_AppUtilities.displayErrors(methodName, listResult);
-		}
-	}
 	
 	public with sharing class WrapperPS {
 		public List<PermissionSetAssignment> listInsertPS = new List<PermissionSetAssignment>();
@@ -801,5 +685,44 @@ public with sharing class AV_UserTriggerHelper {
 		||	
 		email.endsWith('caixabankbi.com') 
 		);
+	}
+
+	/**
+	 * @description		Insert/Update Sharing Rules for the users visibility
+	 * @param  listNewObj  		list of user data that execute the process
+	 * @param  mapOlds		    map with the previous data of users
+	 */
+	public static void groupConfidenProfileRol(List<User> listNewObj, Map<Id, User> mapOlds) {
+		String methodName = 'groupConfidenProfile';
+		Set<String> listIds = new Set <String>();
+		List<User> listUsers = new List<User>();
+		List<GroupMember> listGroupMemberDelete = new List<GroupMember>();
+		Profile idProfile = [SELECT Id FROM Profile WHERE Name ='AV_Usuario_CaixaBank' LIMIT 1];
+		UserRole idRol = [SELECT Id FROM UserRole WHERE name ='Sistemática Comercial' LIMIT 1];
+		for(User usr : listNewObj){
+			if (mapOlds != null && !mapOlds.isEmpty() && mapOlds.get(usr.Id) != null && ((usr.ProfileId != mapOlds.get(usr.Id).ProfileId && mapOlds.get(usr.Id).ProfileId == idProfile.Id) || (usr.UserRoleId != mapOlds.get(usr.Id).UserRoleId && mapOlds.get(usr.Id).UserRoleId == idRol.Id))) {
+				listUsers.add(usr);
+				listIds.add(usr.id);
+			}
+		}
+		if (listUsers != null && !listUsers.isEmpty()) {
+			Group newGroup = [SELECT Id FROM Group WHERE DeveloperName = 'AV_Confidencial' LIMIT 1];
+			List<GroupMember> newGroupMembers = [SELECT id, UserOrGroupId FROM GroupMember WHERE GroupId = : newGroup.Id AND UserOrGroupId IN :listIds];
+			Map<String, String> userGroupMembers = new Map<String, String>();
+			for (GroupMember members: newGroupMembers){
+				userGroupMembers.put(members.UserOrGroupId, members.Id);
+			}
+			for (User user: listUsers) {
+				if (userGroupMembers.get(user.Id) != null){
+					GroupMember member = new GroupMember();
+					member.Id = userGroupMembers.get(user.Id);
+					listGroupMemberDelete.add(member);
+				}
+			}
+		}
+		if (!listGroupMemberDelete.isEmpty() && listGroupMemberDelete != null) {
+			AV_LogDebug.printLogDebug(methodName, 'listGroupMemberDelete: ' + listGroupMemberDelete.size());
+			database.delete(listGroupMemberDelete, false);
+		}
 	}
 }

@@ -20,9 +20,10 @@ public class CIBE_Opportunity_AI_TRHan extends CC_TriggerHandlerBase {
         List<Opportunity> listData = CIBE_OpportunityTriggerHelper.checkGeneralRT(listNewObj);
         
         if (listData!=null && !listData.isEmpty()){
-			CIBE_OpportunityTriggerHelper.addRelationshipManager(listData);
+			//CIBE_OpportunityTriggerHelper.addRelationshipManager(listData);
             CIBE_OpportunityTriggerHelper.insertTaskWithOpp(listData);
-			CIBE_OpportunityTriggerHelper.insertOppTM(listData);
+			CIBE_OpportunityTriggerHelper.insertOppTM(listData, mapOldObj);
+			CIBE_OpportunityTriggerHelper.createCommentsHistory(listData);
         }
 	}
 }

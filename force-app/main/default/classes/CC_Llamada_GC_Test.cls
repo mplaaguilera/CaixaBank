@@ -469,7 +469,7 @@ Test.stopTest();
 
 				caso = [SELECT OwnerId, CC_Owner_Anterior__c FROM Case WHERE Id = :caso.Id AND Status = 'Activo' AND CC_En_Tercer_Nivel__c = true];
 				System.assertNotEquals(null, caso.CC_Owner_Anterior__c, 'El owner anterior no esta vacio');
-				System.assertNotEquals(caso.OwnerId, caso.CC_Owner_Anterior__c, 'El owner actual y el anterior no coinciden');		
+				System.assertNotEquals(caso.OwnerId, caso.CC_Owner_Anterior__c, 'El owner actual y el anterior no coinciden');
 			}
 			Test.stopTest();
 		}

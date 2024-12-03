@@ -92,6 +92,7 @@ trigger CBK_LogEventTrigger on CBK_LogEvent__e (after insert) {
             EvtLog.CBK_LimitQueueableJobs__c  = event.CBK_LimitQueueableJobs__c;
             EvtLog.CBK_SoslQueries__c  = event.CBK_SoslQueries__c;
             EvtLog.CBK_LimitSoslQueries__c  = event.CBK_LimitSoslQueries__c;
+            EvtLog.CBK_Category__c = event.CBK_Category__c;
 
             //EvtLog.Apex_Class__c=''; --> Cálculo en la función CBK_Log.populateLocation
             //EvtLog.Apex_Method__c='';--> Cálculo en la función CBK_Log.populateLocation

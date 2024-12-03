@@ -11,6 +11,7 @@ VERSION		USER_STORY	   AUTHOR		   		DATE			Description
 2.0         Hotfix         Eric Vázquez        26/01/2021       fix the call API to purse
 2.1			AV_Query IT	   Daniel Rodríguez	   3/02/2022		Change AV_Query to SOQL for User, Account, Contact
 2.2         US592987	   Ángel Medina		   31/05/2023		Changed AV_Query to SOQL queries
+2.3 		US649249	   Óscar Moreno	  	    27/11/2023		Include system.asserts in all methods
 ***********************************************************************************************************************/
 @isTest
 public with sharing class AV_ReasignarCartera_Test {
@@ -74,7 +75,7 @@ public with sharing class AV_ReasignarCartera_Test {
             Database.delete(cbk);
             AV_ReasignarCartera.reassignPurse(listWords);
 
-            //System.assertNotEquals('OK', listResult[0]);
+            System.assertNotEquals( AV_ReasignarCartera.reassignPurse(listWords),null); //
             Test.stopTest();
         }
     }
@@ -116,6 +117,7 @@ public with sharing class AV_ReasignarCartera_Test {
             tarea.AV_ExternalID__c = 'U0009006';
             tarea.RecordTypeId = rt.Id;
             insert tarea;
+            System.assert( tarea != null, 'El registro no se insertó correctamente'); //
         }
         Test.stopTest();
     }
@@ -134,11 +136,9 @@ public with sharing class AV_ReasignarCartera_Test {
         String externalId = '50071';
         AV_Book__c purseTest = AV_TestHelper.createPurse(externalId);
         AV_BookManagementMember__c bookAssigmentTest = AV_TestHelper.createBookManagement(conTest, purseTest);
-        //Set<String> setFieldsUsr = new Set<String>{'Id', 'Name'};
         List<User> listUsers = [Select Id, Name From User limit 1];
         List<Account> listAccounts= [Select Id, Name From Account limit 1];
 
-        //Set<String> setFieldsCon = new Set<String>{'Id', 'Name'};
         List<Contact> listContacts= [Select Id, Name From Contact limit 1];
 
         Set<String> setFieldsBook = new Set<String>{'Id', 'Name'};
@@ -150,6 +150,7 @@ public with sharing class AV_ReasignarCartera_Test {
         Test.startTest();
         System.runAs(us1){
         AV_ReasignarCartera.getPurseFromContact(listContacts[0].Id);
+        System.assertNotEquals( AV_ReasignarCartera.getPurseFromContact(listContacts[0].Id),null); //
         Test.stopTest();
         }
     }

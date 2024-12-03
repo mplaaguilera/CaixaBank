@@ -75,9 +75,7 @@ public with sharing class CC_MCC_Knowledge_AI_TRHan extends CC_TriggerHandlerBas
             Id idMapDespublicado = mapDespublicado.get(i.Id);
             Id idMccRelacionado = mccKnowledgeArticle.get(idMapDespublicado);
             CC_MCC__c mccRelacionado = mccs.get(idMccRelacionado);
-            if(mccRelacionado != null){
             errorArticulos.putAll(updateArticle(mccRelacionado, i, idMapDespublicado));
-            }
         }
 
         //Para cada elemento que tiene un error (1) lanza un error como que ya se ha añadido previamente

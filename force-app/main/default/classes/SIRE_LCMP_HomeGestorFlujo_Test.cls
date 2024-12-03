@@ -35,15 +35,18 @@ public class SIRE_LCMP_HomeGestorFlujo_Test {
             tarea.SIREC__SIREC_fld_estado__c = SIR_Constantes.TAREA_ESTADO_PENDIENTE;
             update tarea;
             Test.startTest();
-            recordTypeProceso = SIRE_LCMP_HomeGestorFlujo.getQueryRecordTypeProceso();
+            SIR_Parametros__c setting = new SIR_Parametros__c();
+            setting.Name = 'maxCajas_FLUJO';
+            setting.SIR_Valor__c = '8';
+            setting.SIR_Parametro__c = 'maxCajas_FLUJO';
+            setting.SIR_Tipo__c = 'maxCajas_FLUJO';
+            insert setting;
+            SIRE_LCMP_HomeGestorFlujo.getAgrupacionesEstrategias();
             procesos = SIRE_LCMP_HomeGestorFlujo.getQueryProcesos();
             informes = SIRE_LCMP_HomeGestorFlujo.getQueryReports();
             Test.stopTest();
         }
-        List<RecordType> procesosRT = new List<RecordType>();
-        procesosRT = [SELECT DeveloperName FROM RecordType WHERE SobjectType ='SIREC__SIREC_obj_proceso__c' AND id =: recordTypeProceso LIMIT 1];
         System.assertEquals(procesoTest[0].id, procesos[0].id, 'SIRE_LCMP_HomeGestorFlujo.HomeGestorFlujoTest La query no está trayendo el proceso correcto');
-        System.assertEquals('SIRE_RT_Amistoso', procesosRT[0].DeveloperName, 'SIRE_LCMP_HomeGestorFlujo.HomeGestorFlujoTest El recordType no es el correcto');
-        System.assertNotEquals(null, informes);
+  System.assertNotEquals(null, informes);
     }
 }

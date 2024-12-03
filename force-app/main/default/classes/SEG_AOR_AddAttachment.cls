@@ -18,9 +18,10 @@ public with sharing class SEG_AOR_AddAttachment {
         casoSeg=[SELECT Id,OwnerId, CaseNumber, SEG_Numero_centro__c, Account.Name, Account.CC_Numero_Documento__c,SEG_Consulta_AOR__c,SEG_Identificador_AOR__c,SEG_Comentario_AOR__c FROM Case WHERE id=:casoid];
         datosEnviarAdjuntoAOR sendCaseAtt = new datosEnviarAdjuntoAOR();
         oTraza.CC_Identificador__c = casoSeg.CaseNumber;
+        String nombreAdjunto = !listFiles[0].Title.endsWithIgnoreCase(listFiles[0].FileExtension) ? listFiles[0].Title + '.' + listFiles[0].FileExtension : listFiles[0].Title;
 
         sendCaseAtt.id_attachment = listFiles[0].Id;
-        sendCaseAtt.nombre_attachment = !listFiles[0].Title.endsWithIgnoreCase(listFiles[0].FileExtension) ? listFiles[0].Title + '.' + listFiles[0].FileExtension : listFiles[0].Title;
+        sendCaseAtt.nombre_attachment = nombreAdjunto;
         sendCaseAtt.tipo_attachment = listFiles[0].FileExtension;
 
 
@@ -75,7 +76,7 @@ public with sharing class SEG_AOR_AddAttachment {
 
                     FeedItem feed = new FeedItem();
                     feed.ParentId = casoid; 
-                    feed.Body = 'Adjuntos añadidos al caso de Asesoría Jurídica - ' + casoSeg.SEG_Identificador_AOR__c; 
+                    feed.Body = 'Adjuntos añadidos al caso de Asesoría Jurídica - ' + casoSeg.SEG_Identificador_AOR__c + ' - ' + nombreAdjunto; 
                     insert feed;
                     //Update caso
                     update casoSeg;                                                                            

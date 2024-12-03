@@ -122,12 +122,8 @@ public without sharing class SAC_TareasOperativas_Controller {
 
         SAC_Accion__c tarea = recuperarTarea(tareaId);
 
-        System.debug('Entro tomarPropiedadTarea 1');
-
         tarea.ownerId = idUser;
         if(tarea.SAC_Estado__c != 'SAC_PendienteEnviar' && tarea.SAC_Estado__c != 'SAC_Devuelta') {
-            System.debug('Entro tomarPropiedadTarea 2 - Cambio estado a En Gestion');
-
             tarea.SAC_Estado__c = 'SAC_EnGestion';
         }
         
@@ -367,15 +363,12 @@ public without sharing class SAC_TareasOperativas_Controller {
 
         SAC_Accion__c tarea = recuperarTarea(tareaId);
         //List<SAC_TMECaso__c> tmesTarea = [SELECT ID, SAC_Accion__c FROM SAC_TMECaso__c WHERE SAC_Accion__c =: tareaId];
-        System.debug('Entro finalizarTareaObservacion 1');
 
         if(tarea.SAC_Estado__c == 'SAC_PendienteEnviar' || tarea.SAC_Estado__c == 'SAC_PendienteAsignar' || tarea.SAC_Estado__c == 'SAC_Devuelta'){
-            System.debug('Entro finalizarTareaObservacion 2 - antes tomar en propiedad');
             tomarPropiedadTarea(tareaId, idUser);
         }
 
         if(System.IsBatch() == false && System.isFuture() == false){
-            System.debug('Entro finalizarTareaObservacion 3 - antes finalizar');
             finalizarTareaFutureObservacion(tareaid, idUser, observaciones, estado);
         }       
         
@@ -876,18 +869,13 @@ public without sharing class SAC_TareasOperativas_Controller {
     @future
     public static void finalizarTareaFutureObservacion(Id tareaid, Id idUser, String observaciones, String estado){
         SAC_Accion__c tarea = recuperarTarea(tareaId);      
-        System.debug('Entro finalizarTareaFutureObservacion 1');
-
+        
         //Si el estado es descartada, se rellena un campo de observaciones distinto
         if (estado == 'SAC_Descartada') {
-            System.debug('Entro finalizarTareaFutureObservacion 2 - Descartada');
-
             tarea.SAC_MotivoDescarte__c = observaciones.replaceAll('<[/a-zAZ0-9]*>','');
             tarea.SAC_MotivoDescarte__c = tarea.SAC_MotivoDescarte__c.left(255);
             tarea.SAC_Estado__c = estado;
         } else { //De lo contrario se procede normalmente
-            System.debug('Entro finalizarTareaFutureObservacion 2 - Finalizada');
-            
             tarea.SAC_Comentarios2__c =  observaciones;
             tarea.SAC_Estado__c = estado;
         }

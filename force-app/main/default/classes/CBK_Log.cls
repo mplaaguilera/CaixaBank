@@ -47,6 +47,8 @@ public class CBK_Log {
     private static Integer consultasLimites = 0;
 
     private static list<CBK_Log__c> lstErroresaGuardar = New list<CBK_Log__c>();
+    private static list<CBK_LogEvent__e> lstErroresaGuardarDebug = New list<CBK_LogEvent__e>();
+    
     private static list<Messaging.SingleEmailMessage> lstmailGeneral = New list<Messaging.SingleEmailMessage>();
     private static OrgWideEmailAddress[] owea;  
     private static List<CBK_Framework_Login__mdt> fwLogin; 
@@ -121,7 +123,6 @@ public class CBK_Log {
 	public static void debug(String contextId,map<String,String> message, List<Object> values,LoggingLevel level) {
         emit(contextId,level, null,JSON.serialize(message), values,false, new Messaging.InboundEmail());
 	}  
-    
     
 
     // ERROR (exception)   
@@ -235,6 +236,76 @@ public class CBK_Log {
 	}
 
     //Nueva Funcionalidad para guardar una lista de errores antes de guardarla.
+    public static void addDebug(CBK_Log_Debug_Builder.DebugProcessConfig builder){       
+        emitDebug(builder);
+	}
+     //Nueva Funcionalidad para guardar una lista de errores antes de guardarla.
+     public static void insertDMLDebug(){
+
+         //Comprobamos que haya habido algún error para hacer el insert de los errores
+         if(!lstErroresaGuardarDebug.isEmpty()){
+            Database.SaveResult[] resltPub = EventBus.publish(lstErroresaGuardarDebug);
+        }
+	}
+
+    // METODO DE ENVIO A EVENTO O SYSTEM.DEBUG
+	private static void emitDebug(CBK_Log_Debug_Builder.DebugProcessConfig myInstance){
+
+        boolean trace;
+        LoggingLevel level = myInstance.getlevel();
+        boolean force = myInstance.getforce();
+        Exception err = myInstance.geterr();
+        Map<String, String> message = myInstance.getmessage();
+        String contextId = myInstance.getcontextId();
+        List<Object> values = myInstance.getvalues();
+        Messaging.InboundEmail email = myInstance.getemail();
+        String category = myInstance.getCategory();
+
+        switch on level.name() {
+            when 'INFO'  { trace= LOG_CONFIG.INFO; }	
+            when 'WARN'  { trace= LOG_CONFIG.WARN; }
+    		when 'ERROR' { trace= LOG_CONFIG.ERROR; }
+            when 'DEBUG' { trace= LOG_CONFIG.DEBUG; }
+    		when else    { trace= LOG_CONFIG.DEBUG; }
+        }
+        
+        if (trace || force || (Test.isRunningTest())){
+
+            String stacktrace='';
+            String errType='';
+            if (err==null) {
+                stacktrace = new DmlException().getStackTraceString();
+            } else {
+                stacktrace = err.getStackTraceString();
+                if (stacktrace?.left(32000)=='()'){
+                    stacktrace = new DmlException().getStackTraceString();
+                }
+                errType = err.getTypeName();
+            }
+            if((LOG_VIA_EVENTS) || (Test.isRunningTest())){
+                currentEvent = new CBK_LogEvent__e();
+                currentEvent.txt_User__c = UserInfo.getUserId();
+                currentEvent.txt_Message__c = JSON.serialize(message)?.left(2000);
+                currentEvent.txt_ErrType__c = String.isNotBlank(errType) ? errType.left(30) : '';
+                currentEvent.txt_Level__c = level.name();
+                currentEvent.txt_Context__c = ((contextId == null) ? THIS_CONTEXT : '' + myInstance).left(80);
+                currentEvent.txt_stacktrace__c = stacktrace?.left(32000);
+                currentEvent.txt_Detail__c = String.join(values,'@Det@')?.left(32000);
+                currentEvent.CBK_sfdcMessageId__c = email?.messageId?.left(255);
+                currentEvent.CBK_MessageException__c =  err?.getMessage()?.left(32500);
+                currentEvent.CBK_Category__c = category?.left(255);
+                currentEvent = (CBK_LogEvent__e) CBK_Log.getApexLimits(currentEvent);
+
+                //Sustituimos la insercion por una lista
+                lstErroresaGuardarDebug.add(currentEvent); 
+                System.debug(level,message);
+            } else {
+                System.debug(level,message);
+            }
+        }
+	}
+
+    //Nueva Funcionalidad para guardar una lista de errores antes de guardarla.
     public static void addError(String contextId,Exception err,String message, List<Object> values, Map<String,String> mapOptionalFields){
         // Le pasamos false al ultimo paramtero para que no guarde en la base de datos el registro
         createLogWithoutevent(contextId, LoggingLevel.ERROR, err, message, values, mapOptionalFields,false,null);
@@ -244,12 +315,12 @@ public class CBK_Log {
     public static void insertDML(){
         //Comprobamos que haya habido algún error para hacer el insert de los errores
         if(!lstErroresaGuardar.isEmpty()){
-        //Insertamos los registros de la lista guardada anteriormente
-        Database.SaveResult[] srList = Database.insert(lstErroresaGuardar,false);
+            //Insertamos los registros de la lista guardada anteriormente
+            Database.SaveResult[] srList = Database.insert(lstErroresaGuardar,false);
 
-        //Llamamos al metodo para guardar los detalles de los registros y le decimos que se inserten.
-        generaDetallesdeErrores(srList);   
-	}
+            //Llamamos al metodo para guardar los detalles de los registros y le decimos que se inserten.
+            generaDetallesdeErrores(srList);
+        }
 	}
 
 

@@ -37,6 +37,7 @@ public with sharing class CC_Int_ObtInfCarterizaCliente {
             entrada = 'CC_Numperso__c : ' + numpersoDecimal + ' Hexa: ' + CC_MetodosUtiles.decimalToHex(numpersoDecimal);
 
             try {
+                User[] gestorCliente;
                 Http http = new Http();
                 HTTPResponse respuesta = http.send(req);
                 statusCode = String.valueOf(respuesta.getStatusCode());
@@ -44,52 +45,44 @@ public with sharing class CC_Int_ObtInfCarterizaCliente {
                 if(String.isNotBlank(respuesta.getBody()) && respuesta.getStatusCode() == 200) {
                     RespuestaClienteDigital valoresCliente = (RespuestaClienteDigital) System.JSON.deserialize(respuesta.getBody(), RespuestaClienteDigital.class);
                        if(valoresCliente.empleado1 != null) {  
-                        while (valoresCliente.empleado1.length() < 5){
+                        while (valoresCliente.empleado1.length() < 5) {
                             valoresCliente.empleado1 = '0' +  valoresCliente.empleado1;
                         }
                         respuestaClienteDigital.put('empleado1', valoresCliente.empleado1);
                         respuestaClienteDigital.put('oficina1', valoresCliente.oficina1);
-                        String matriculaGestor = 'U01'+valoresCliente.empleado1;
-                        User[] gestorCliente = [SELECT Id, Name FROM User WHERE AV_ExternalID__c =: matriculaGestor];
-                        if(!gestorCliente.isEmpty()){
+                        String matriculaGestor = 'U01' + valoresCliente.empleado1;
+                        gestorCliente = [SELECT Id, Name FROM User WHERE AV_ExternalID__c =: matriculaGestor];
+                        if(!gestorCliente.isEmpty()) {
                             respuestaClienteDigital.put('gestorClienteName', gestorCliente[0].Name);
                             respuestaClienteDigital.put('gestorClienteId', gestorCliente[0].Id);
                             /////// EVALUAR SI EL GESTOR OBTENIDO ES EL MISMO QUE EL ASIGNADO EN EL REGISTRO DEL CLIENTE. SI NO COINCIDEN AVISAR
-                            if(caso[0].Account.AV_EAPGestor__r.CC_Matricula__c != null && matriculaGestor != caso[0].Account.AV_EAPGestor__r.CC_Matricula__c){
+                            if(caso[0].Account.AV_EAPGestor__r.CC_Matricula__c != null && matriculaGestor != caso[0].Account.AV_EAPGestor__r.CC_Matricula__c) {
                                 respuestaClienteDigital.put('gestorAsignadoCoincide', 'false');
                                 if(caso[0].Account.AV_EAPGestor__r.Name != null) {
                                     respuestaClienteDigital.put('nombreGestorAsignado', caso[0].Account.AV_EAPGestor__r.Name);
-                                }
-                                else {
+                                } else {
                                     respuestaClienteDigital.put('nombreGestorAsignado', 'Gestor no asignado');
                                 }
-                            }
-                            else if(caso[0].Account.AV_EAPGestor__r.CC_Matricula__c == null) {
+                            } else if(caso[0].Account.AV_EAPGestor__r.CC_Matricula__c == null) {
                                 respuestaClienteDigital.put('gestorAsignadoCoincide', 'false');
                                 respuestaClienteDigital.put('nombreGestorAsignado', 'Gestor no asignado');
                             }
                         }
                     }
-                    if(valoresCliente.empleado1 == null) {
+                    if(valoresCliente.empleado1 == null || gestorCliente.isEmpty()) {
                         String nameGestor;
                         String externalID;
                         List<CC_Lista_Valores__c> listaLOV = [SELECT CC_Valor__c, Name FROM CC_Lista_Valores__c  WHERE CC_Lista__r.name = 'Gestor por defecto CC'];
-                        for(CC_Lista_Valores__c valor: listaLOV)
-                        {
-                            if(valor.Name == 'ExternalID')
-                            {
+                        for(CC_Lista_Valores__c valor: listaLOV) {
+                            if(valor.Name == 'ExternalID') {
                                 externalID = valor.CC_Valor__c;
                             }
-                            else if (valor.Name == 'Nombre')
-                            {
-                                nameGestor = valor.CC_Valor__c;
-                            }
                         }
-                        User[] gestorGenerico = [SELECT Id, Name FROM User WHERE AV_ExternalID__c = :externalID LIMIT 1];
+                        gestorCliente = [SELECT Id, Name FROM User WHERE AV_ExternalID__c = :externalID LIMIT 1];
                         respuestaClienteDigital.put('gestorAsignadoCoincide', 'false');
-                        respuestaClienteDigital.put('gestorClienteName', gestorGenerico[0].Name);
-                        respuestaClienteDigital.put('gestorClienteId', gestorGenerico[0].Id);
-                        respuestaClienteDigital.put('nombreGestorAsignado', gestorGenerico[0].Name);
+                        respuestaClienteDigital.put('gestorClienteName', gestorCliente[0].Name);
+                        respuestaClienteDigital.put('gestorClienteId', gestorCliente[0].Id);
+                        respuestaClienteDigital.put('nombreGestorAsignado', gestorCliente[0].Name);
                         // YA NO APLICA TRAS US588861
                         /*Task tarea = new Task();
                         tarea.RecordTypeId = Schema.getGlobalDescribe().get('Task').getDescribe().getRecordTypeInfosByDeveloperName().get('CC_Task').getRecordTypeId();
@@ -112,16 +105,14 @@ public with sharing class CC_Int_ObtInfCarterizaCliente {
                     respuestaClienteDigital.put('resultado', 'OK');
                    
                     finOk = true;
-                }
-                else {
+                } else {
                     //Respuesta distinta de 200
                     respuestaClienteDigital.put('resultado', 'KO');
                     respuestaClienteDigital.put('mensajeError', ' El proceso de consulta del gestor ha funcionado pero no se ha obtenido una respuesta válida. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
                     error = ' El proceso de consulta del gestor ha funcionado pero no se ha obtenido una respuesta válida.';
                     finOk = false;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 respuestaClienteDigital.put('resultado', 'KO');
                 salida = String.valueOf(respuestaClienteDigital.get('resultado'));
                 respuestaClienteDigital.put('mensajeError', ' El proceso de consulta del gestor ha fallado. Por favor, vuelva a intentarlo o póngase en contacto con su administrador. ');
@@ -129,7 +120,7 @@ public with sharing class CC_Int_ObtInfCarterizaCliente {
             }
         }
         CC_TrazaInt__c traza = CC_TrazaInt.generarTraza('CC_Int_ObtInfCarterizaCliente', endpoint, statusCode, entrada, error, salida, finOK);
-        if(traza != null){
+        if(traza != null) {
             insert traza;
         }
         return respuestaClienteDigital;

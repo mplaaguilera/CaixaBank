@@ -12,6 +12,11 @@ Historial
     1.2         US633217            Elisabeth R.        20/06/2023      Error messages and indInTouch logic
     1.3         Fix                 Elisabeth R.        07/10/2023      Change numperso to NUMPERSO
     1.4         US602229            Elisabeth R.        08/08/2023      Added centerOpp parameter
+    1.5                             Gonzalo Ávila       11/01/2024      Added a check of the AV_PilotCenters__c customSetting centers before creating the task in the createOpp method
+    1.6         US796266            Ángel Medina        01/02/2024      Modified method createOpp and getStage
+    1.7         Fix Name Opp        Elisabeth R.        29/02/2024      Modified Name of Opp to add idProducto
+    1.8         Fix IOP Sharing     Elisabeth R.        14/03/2024      Revert changes of US796266
+    1.9         US869301            Ángel Medina        02/04/2024      Add Center 0268 in method getManager and change the name to idproduct
 ***********************************************************************************************************************/
 
 public with sharing class AV_CreateOpportunityCallMe {
@@ -80,18 +85,20 @@ public with sharing class AV_CreateOpportunityCallMe {
             opp.CSBD_Email_Solicitud__c = String.valueOf(jsonOppMap.get('email1Tit'));
             opp.CSBD_Now_NIF__c = String.valueOf(jsonOppMap.get('nif'));
             opp.CSBD_Detalle_producto__c = String.valueOf(jsonOppMap.get('subproducto_1'));
+            opp.CSBD_Now_Codigo_Producto__c = String.valueOf(jsonOppMap.get('subproducto_1'));
             opp.CSBD_Now_Origen__c = String.valueOf(jsonOppMap.get('origen'));
             Datetime myDateTime = Datetime.now();
-            opp.AV_ExternalID__c = 'CallMe-' +  myDateTime.getTime(); 
+
+            opp.AV_ExternalID__c = 'CallMe-' +  myDateTime.getTime();
             getSchedule(String.valueOf(jsonOppMap.get('horaIni')), String.valueOf(jsonOppMap.get('minIni')), String.valueOf(jsonOppMap.get('horaFin')), String.valueOf(jsonOppMap.get('minFin')), fields);
-            checkBlakList(jsonOppMap, fields); 
+            checkBlakList(jsonOppMap, fields);
             for (String field : fields.keySet()) {
                 opp.put(field, fields.get(field));
             }
 
-            if(productName != null){
-                opp.Name = 'CallMe - ' + productName + ' - ' + opp.CSBD_Turno_Contacto__c + ' - ' + opp.CSBD_Horario_Contacto__c; 
-
+            String subproducto1 = String.valueOf(jsonOppMap.get('subproducto_1'));
+            if(subproducto1 != null && String.isNotBlank(subproducto1)){
+                opp.Name = 'CallMe - ' + subproducto1 + ' - ' + opp.CSBD_Turno_Contacto__c + ' - ' + opp.CSBD_Horario_Contacto__c; 
             }else{
                 opp.Name = 'CallMe - ' + opp.CSBD_Turno_Contacto__c + ' - ' + opp.CSBD_Horario_Contacto__c; 
             }
@@ -99,9 +106,30 @@ public with sharing class AV_CreateOpportunityCallMe {
             Database.SaveResult srOpp = Database.insert(opp, false);
 
             if(srOpp.isSuccess()){
-
                 if(String.valueOf(jsonOppMap.get('indInTouch')) == 'S'){
-                    AV_OpportunityTriggerHelperSharing.createTaskCallMeFromJSON(opp);
+
+                    List<AV_PilotCenters__c> listAvPilotCenters = AV_PilotCenters__c.getall().values();
+		            List<String> officeNumbers = new List<String>();
+		            if(listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+			            for (AV_PilotCenters__c pilotCenterGroup : listAvPilotCenters){
+				            List<String> pilotCenterOfficeNumbers = new List<String>();
+				            if(pilotCenterGroup.AV_OfficeNumber__c!=null && !String.isEmpty(pilotCenterGroup.AV_OfficeNumber__c)){
+					            pilotCenterOfficeNumbers = pilotCenterGroup.AV_OfficeNumber__c.split(',');
+					            for(String officeNumber : pilotCenterOfficeNumbers){
+							        officeNumbers.add(officeNumber);
+					            }
+				            }
+			            }
+                    }
+                    Boolean checkPilotCenters = true;
+			        if(opp.AV_Center__c != null && !String.isEmpty(opp.AV_Center__c) && listAvPilotCenters != null && !listAvPilotCenters.isEmpty()){
+				        if(officeNumbers.contains(opp.AV_Center__c)){
+					        checkPilotCenters = false;
+				        }
+			        }
+                    if(checkPilotCenters){
+                        AV_OpportunityTriggerHelperSharing.createTaskCallMeFromJSON(opp);
+                    }   
                 }
                 respWrapper.idOpp = srOpp.getId();
                 respWrapper.isSuccess = String.valueOf(srOpp.isSuccess());
@@ -126,17 +154,12 @@ public with sharing class AV_CreateOpportunityCallMe {
     }
 
     public static String getStage(Map<String,Object> jsonOpp) {
-
         string stageName;
 
         if(String.valueOf(jsonOpp.get('indInTouch')) == 'N'){
-
             stageName = 'Potencial';
-
         }else if(String.valueOf(jsonOpp.get('indInTouch')) == 'S'){
-
             stageName = 'En gestión/insistir';
-
         }
 
         return stageName;
@@ -160,7 +183,6 @@ public with sharing class AV_CreateOpportunityCallMe {
             }else{
                 return null;
             }
-            
 
         }catch(QueryException  e){
             return null;
@@ -180,10 +202,9 @@ public with sharing class AV_CreateOpportunityCallMe {
 
             List<Account> c = new List<Account>();
 
-            if(centerOpp == '04563' || centerOpp == '05202'){
+            if(centerOpp == '04563' || centerOpp == '05202' || centerOpp == '02868'){
 
                 c = [SELECT CC_Numero_Oficina__c FROM Account WHERE RecordType.DeveloperName = 'CC_CentroCaixaBank' AND CC_Numero_Oficina__c =: centerOpp];
-
             }
 
             if(withoutManager != null && !withoutManager.isEmpty()){
@@ -195,10 +216,7 @@ public with sharing class AV_CreateOpportunityCallMe {
             if(c != null && !c.isEmpty()){
 
                 center = c[0].CC_Numero_Oficina__c;
-
             }
-
-
         }else if(String.valueOf(jsonOpp.get('indInTouch')) == 'S'){
 
             if(client.AV_EAPGestor__r.AV_UsuarioAsociado__c != null){

@@ -44,7 +44,7 @@
         String metodo = 'sendAction';
         List<String> lstResponse = new List<String>();
         CancelarRequest request = new CancelarRequest();
-        if(SIREC__SIREC_obj_proceso__c.SObjectType.getDescribe().isAccessible()){
+        if(Schema.SObjectType.SIREC__SIREC_obj_proceso__c.isAccessible()){
             SIREC__SIREC_obj_proceso__c proceso =[SELECT id ,SIREC__SIREC_fld_codigoEmpleado__c ,SIREC__SIREC_fld_masterRecordId__c
                                                             FROM SIREC__SIREC_obj_proceso__c 
                                                             WHERE Id=: procesoId];     
@@ -67,7 +67,7 @@
                     }else{
                         try {
                             HttpRequest req = CBK_HttpServiceIntegration.getRequest(body, 'cancelarProcRefinanciacion', 'POST', mHeaders);
-                            HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req);
+                            HttpResponse res = CBK_HttpServiceIntegration.callHttpService(req,'SIR','cancelarProcRefinanciacion');
                             if(res.getStatusCode() == 200 || res.getStatusCode() == 201){
                                 CancelarResponse resp = (CancelarResponse)JSon.deserialize(res.getBody(), CancelarResponse.class);        
                                 if( resp.codigoSalida == '1'){
