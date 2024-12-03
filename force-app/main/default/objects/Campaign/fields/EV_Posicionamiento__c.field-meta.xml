@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Posicionamiento__c</fullName>
+    <inlineHelpText>Posicionamiento del evento en el Portal</inlineHelpText>
+    <label>Posicionamiento del evento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Destacado home</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Próximos eventos home</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Vídeos más recomendados home</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Últimos eventos subidos home</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Calendario cuadricula</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>Calendario lista</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>Calendario ficha</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>Landing Ficha evento</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

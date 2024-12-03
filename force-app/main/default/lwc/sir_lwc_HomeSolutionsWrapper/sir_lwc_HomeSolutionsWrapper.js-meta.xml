@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="sir_lwc_HomeSolutionsWrapper">
+    <apiVersion>52.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Home Mis Clientes Solutions</masterLabel>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage">
+            <property name="hasHeader" type="Boolean" default="false" label="Cabecera" description="Seleccionar si se desea añadir una cabecera"/>
+            <property name="headerIcon" type="String" default="standard:dashboard" label="Icono Cabecera" description="Icono para la cabera. Ejemplo: standard:dashboard"/>
+            <property name="headerTitle" type="String" default="" label="Título" description="Título para la cabecera"/>
+            <property name="headerSubtitle" type="String" default="" label="Subtítulo" description="Subtítulo de la cabecera"/>
+            <property name="listDatasets" type="String" default="" label="Nombre de los componentes" required="true"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

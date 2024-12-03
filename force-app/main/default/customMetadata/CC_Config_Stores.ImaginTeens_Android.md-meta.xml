@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>ImaginTeens</label>
+    <protected>false</protected>
+    <values>
+        <field>Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>App_Name__c</field>
+        <value xsi:type="xsd:string">ImaginTeens</value>
+    </values>
+    <values>
+        <field>Canal_operativo__c</field>
+        <value xsi:type="xsd:string">App Imagin</value>
+    </values>
+    <values>
+        <field>Identificador__c</field>
+        <value xsi:type="xsd:string">com.imaginbank.teens</value>
+    </values>
+    <values>
+        <field>Imagen__c</field>
+        <value xsi:type="xsd:string">https://lh3.googleusercontent.com/yV-0znbUYY4M_sVuHTV7QJyJ9OdWE3oy9i_I3Y_ZSZrYsbyZIYPHoOoIMshowQSInIE=s60-rw</value>
+    </values>
+    <values>
+        <field>Tipo__c</field>
+        <value xsi:type="xsd:string">Google Play</value>
+    </values>
+    <values>
+        <field>countryCode__c</field>
+        <value xsi:type="xsd:string">es</value>
+    </values>
+</CustomMetadata>

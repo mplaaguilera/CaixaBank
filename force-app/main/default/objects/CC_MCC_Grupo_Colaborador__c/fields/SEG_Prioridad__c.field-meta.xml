@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Prioridad__c</fullName>
+    <description>Campo para determinar la prioridad de asignación de grupos</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    CC_MCC__r.RecordType.DeveloperName == &apos;SEG_Detalle&apos;,
+    IF(
+        NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+        1,
+        IF(
+            ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+            2,
+            IF(
+                NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;),
+                3,
+                4
+            )
+        )
+    ),
+    IF (
+        CC_MCC__r.RecordType.DeveloperName == &apos;CC_Motivo&apos;,
+        IF(
+            NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+            5,
+            IF(
+                ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+                6,
+                IF(
+                    NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;),
+                    7,
+                    8
+                )
+            )
+        ),
+        IF (
+            CC_MCC__r.RecordType.DeveloperName == &apos;CC_Producto_Servicio&apos;,
+            IF(
+                NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+                9,
+                IF(
+                    ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+                    10,
+                    IF(
+                        NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;),
+                        11,
+                        12
+                    )
+                )
+            ),
+            IF (
+                CC_MCC__r.RecordType.DeveloperName == &apos;CC_Tematica&apos;,
+                IF(
+                    NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+                    13,
+                    IF(
+                        ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;) &amp;&amp; NOT(ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;)),
+                        14,
+                        IF(
+                            NOT(ISPICKVAL(SEG_Organizacion__c, &apos;Todas&apos;)) &amp;&amp; ISPICKVAL(SEG_Zona__c, &apos;Todas&apos;),
+                            15,
+                            16
+                        )
+                    )
+                ),
+                9999
+            )
+        )
+    )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Prioridad</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

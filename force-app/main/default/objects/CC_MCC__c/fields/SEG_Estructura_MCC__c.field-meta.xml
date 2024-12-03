@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Estructura_MCC__c</fullName>
+    <externalId>false</externalId>
+    <formula>LOWER(
+IF( RecordType.DeveloperName = &apos;SEG_Detalle&apos;,  &apos;Temática = &apos; + CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.Name + &apos; / &apos; +  &apos;Producto = &apos; + CC_Motivo__r.CC_Producto_Servicio__r.Name + &apos; / &apos; + &apos;Motivo = &apos; + CC_Motivo__r.Name + &apos; / &apos; + &apos;Detalle = &apos; + Name,
+
+IF( RecordType.DeveloperName = &apos;CC_Motivo&apos;, &apos;Temática = &apos; +  CC_Motivo__r.CC_Producto_Servicio__r.CC_Tematica__r.Name + &apos; / &apos; +  &apos;Producto = &apos; + CC_Motivo__r.CC_Producto_Servicio__r.Name + &apos; / &apos; +  &apos;Motivo = &apos; + Name,
+
+IF( RecordType.DeveloperName = &apos;CC_Producto_Servicio&apos;, &apos;Temática = &apos; + CC_Producto_Servicio__r.CC_Tematica__r.Name + &apos; / &apos; + &apos;Producto = &apos; +  Name, Name
+))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Estructura MCC</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

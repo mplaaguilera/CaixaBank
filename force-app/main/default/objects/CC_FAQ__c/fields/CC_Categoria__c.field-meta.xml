@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Categoria__c</fullName>
+    <label>Categoría</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CC_Espacio__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>LineaAbiertaLOE</fullName>
+                <default>false</default>
+                <label>Linea Abierta</label>
+            </value>
+            <value>
+                <fullName>APPCaixaBankNow</fullName>
+                <default>false</default>
+                <label>APPCaixaBankNow</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>liniaObertaWSLOE</controllingFieldValue>
+            <valueName>LineaAbiertaLOE</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

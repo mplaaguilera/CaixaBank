@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EstadoTasacion__c</fullName>
+    <label>Estado tasación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_001</fullName>
+                <default>false</default>
+                <label>Descripción no definida</label>
+            </value>
+            <value>
+                <fullName>SAC_002</fullName>
+                <default>false</default>
+                <label>Pago total: STS 26oct20 (100% Gest/ 50% Not/ 100% Reg/ 100% Tas)</label>
+            </value>
+            <value>
+                <fullName>SAC_003</fullName>
+                <default>false</default>
+                <label>Pago parcial: Factura incluye otros conceptos aparte PH(ej. Compraventa, subrogación, etc.)</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>No pago: Factura emitida a nombre de CXB(gastos compartidos)</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>No pago: Partida ya pagada en reclamación anterior</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>No pago: No se aporta documento / Documento aportado no es factura / Factura no concepto TS</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>No pago: Documentación ilegible</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Liquidación no efectuada: cuenta cancelada, bloqueada u otros.</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Gestionar pago como factura especial</label>
+            </value>
+            <value>
+                <fullName>SAC_010</fullName>
+                <default>false</default>
+                <label>deprecated</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

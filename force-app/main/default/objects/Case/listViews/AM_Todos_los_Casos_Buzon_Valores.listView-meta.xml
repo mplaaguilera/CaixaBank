@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AM_Todos_los_Casos_Buzon_Valores</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Fecha_Ultima_Interaccion__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>OWNER_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Canal_Procedencia__c</field>
+        <operation>equals</operation>
+        <value>Buzón Valores</value>
+    </filters>
+    <label>Todos los Casos Buzón Banca Privada</label>
+    <sharedTo>
+        <group>AM_Buzon_Valores</group>
+    </sharedTo>
+</ListView>

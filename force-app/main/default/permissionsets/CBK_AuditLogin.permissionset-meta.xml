@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoria</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoriaEntry</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoriaFactory</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoriaInterface</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoriaRTObligatorio</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_RegistroAuditoriaRTOpcional</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>Permission Set para el registro de auditoria - Usuarios que  requieren registrar actividad</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Registro de Auditoria - Login</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>CBK_AuditLog__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+</PermissionSet>

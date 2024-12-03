@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fin_Reclamacion_Activa_COPS</fullName>
+    <active>true</active>
+    <description>Al activar el Fin Reclamación, obligatoriedad de asignar valor a &apos;Estado del Caso&apos;, y valor para uno de los siguientes campos: &apos;Asignar Propietario&apos;, &apos;Asignar Usuario&apos; o &apos;Asignar Grupo de Trabajo&apos;</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL(OS_Negocio__c , &apos;COPS&apos;),
+    OS_Fin_Reclamacion_Activa__c,	
+				OR(
+				    ISPICKVAL(OS_EstadoCaso__c, &apos;&apos;),
+								AND( 
+									    OS_Asignar_Propietario__c == False, 
+								    	OS_Asignar_Usuario__c == Null, 
+									    OS_Asignar_GrupoTrabajo__c == Null
+					    )
+				)
+)</errorConditionFormula>
+    <errorMessage>Selecciona valor para &apos;Estado del Caso&apos;, y valor para uno de los siguientes campos: &apos;Asignar Propietario&apos;, &apos;Asignar Usuario&apos; o &apos;Asignar Grupo de Trabajo&apos;</errorMessage>
+</ValidationRule>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_RiesgoInformeDesfavorable__c</fullName>
+    <description>Campo picklist que indica si hay riesgo de informe desfavorable del formulario de la reclamación</description>
+    <label>¿Hay riesgo de informe desfavorable?</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>No</fullName>
+                <default>false</default>
+                <label>No</label>
+            </value>
+            <value>
+                <fullName>Si</fullName>
+                <default>false</default>
+                <label>Si</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

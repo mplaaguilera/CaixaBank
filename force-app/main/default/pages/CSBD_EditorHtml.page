@@ -1,0 +1,65 @@
+<apex:page controller="CSBD_GenerarDocumento_Controller">
+
+	<apex:includeScript value="{!URLFOR($Resource.TinyMCE, 'tinymce/js/tinymce/tinymce.min.js')}" />
+	<script>
+		const origin = '{!origin}';
+		const recordId = new URLSearchParams(window.location.search).get('recordId');
+
+		window.onload = () => {
+			tinymce.init({
+				license_key: "gpl",
+				selector: "#textarea",
+				font_formats: 'Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n;Andale Mono=andale mono,times;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sans-serif;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;',
+				toolbar: "undo redo | fontfamily fontsizeinput | forecolor bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | removeformat code",
+				toolbar_mode: 'sliding',
+				content_css: ['//fonts.googleapis.com/css?family=Lato:300,300i,400,400i', '//www.tiny.cloud/css/codepen.min.css'],
+				image_advtab: true,
+				skin: 'oxide',
+				plugins: ["advlist", "autolink", "lists", "searchreplace", "wordcount", "visualchars", "insertdatetime", "table", "code"],
+				language_url: "{!URLFOR($Resource.TinyMCE, 'tinymce/langs/es.js')}",
+				language: 'es',
+				height: "100%",
+				resize: false,
+				setup: editor => {
+					editor.on('change', () => enviarMensajeLwc({name: 'contentChanged'}));
+					editor.on('keydown', event => editorOnkeypress(event.keyCode));
+				}
+			}).then(() => enviarMensajeLwc({name: 'finInit'}));
+		};
+
+		window.addEventListener("message", event => {
+			if (origin.endsWith(event.origin) && event.data.recordId === recordId) { //Mensaje publicado desde el LWC
+				if (event.data.name === 'setContent') {
+					tinyMCE.get('textarea').setContent(event.data.content);
+					enviarMensajeLwc({name: 'setContentOk'});
+
+				} else if (event.data.name === 'getContent') {
+					enviarMensajeLwc({
+						name: 'getContentOk',
+						content: tinyMCE.get('textarea').getContent(),
+						vistaPrevia: event.data.vistaPrevia
+					});
+
+				} else if (event.data.name === 'focusEditor') {
+					tinyMCE.get('textarea').getBody().focus();
+				}
+			}
+		});
+
+		function enviarMensajeLwc(mensaje) {
+			parent.postMessage({...mensaje, recordId}, origin);
+		}
+
+		function editorOnkeypress(keyCode) {
+			if (keyCode === 27) { //Tecla ESC
+				!tinyMCE.get('textarea').getContent() && enviarMensajeLwc({name: 'cerrarModal'});
+			}
+		}
+	</script>
+
+	<apex:slds />
+	<div style="height: 534px;">
+		<textarea id="textarea"></textarea>
+	</div>
+
+</apex:page>

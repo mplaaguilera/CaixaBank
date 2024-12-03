@@ -1,0 +1,8 @@
+<template>
+    <template if:true={url}>
+      <img src={url} onerror={fallback}></img>
+    </template>
+    <template if:false={url}>
+      <lightning-card>{message}</lightning-card>
+    </template>
+  </template>

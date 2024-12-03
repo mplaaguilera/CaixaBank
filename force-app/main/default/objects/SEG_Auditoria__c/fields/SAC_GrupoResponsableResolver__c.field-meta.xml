@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GrupoResponsableResolver__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para informar el grupo responsable de la auditoria</description>
+    <label>Grupo responsable</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 OR 2 OR 3 OR 4 OR 5</booleanFilter>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Grupo proveedores</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Letrados</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.SAC_DeveloperName__c</field>
+            <operation>equals</operation>
+            <value>COPS</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.SAC_DeveloperName__c</field>
+            <operation>equals</operation>
+            <value>AJ</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.SAC_DeveloperName__c</field>
+            <operation>equals</operation>
+            <value>SAC_AUDITORES</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Auditorias (Grupo responsable)</relationshipLabel>
+    <relationshipName>Auditorias2</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

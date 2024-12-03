@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Negocio__c</fullName>
+    <description>Negocio del Producto Ficha y Cliente</description>
+    <label>Negocio</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>AV_Negocio</valueSetName>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

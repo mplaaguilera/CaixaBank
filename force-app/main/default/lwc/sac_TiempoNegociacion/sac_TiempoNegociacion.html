@@ -1,0 +1,18 @@
+<template>
+    <article class="slds-card" style="margin-bottom: -18px; height:40px;background-color: rgb(244 151 86);border-color: rgb(244 151 86);">
+        <div class="slds-card__header slds-grid slds-grid_align-end" style="padding-right: 6px !important;padding: 0;"></div>
+    </article>
+    <lightning-card>
+        <div  class="slds-grid slds-gutters" style="margin-left: 0; margin-right: 0">
+            <div class="slds-col slds-size_6-of-7">
+                <h1 style="font-size:0.825rem;padding-bottom:2px;"><b>SLA Negociación</b></h1>
+                <p style="font-style:italic;font-size:0.75rem">{days} días {hours} h {minutes} min remaining</p> 
+            </div>
+            <div class="slds-col slds-size_1-of-7">
+                <div style="float: right;">
+                  <!--  <lightning-progress-ring value={porcentajeCompletado} variant="brand"> </lightning-progress-ring> -->
+                </div>                
+            </div>
+        </div>         
+    </lightning-card>
+</template>

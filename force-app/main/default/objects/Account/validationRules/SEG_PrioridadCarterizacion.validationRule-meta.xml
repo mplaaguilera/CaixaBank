@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_PrioridadCarterizacion</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				 RecordType.DeveloperName = &quot;CC_Cliente&quot;,
+				 SEG_Prioridad_Carterizacion_Segmentos__c = true,
+				 ISBLANK(SEG_Oficina_Gestora_Segmentos__c))</errorConditionFormula>
+    <errorMessage>Si el check &quot;Prioridad Carterización Segmentos&quot; está activo, debe seleccionar una Oficina Gestora (Segmentos).</errorMessage>
+</ValidationRule>

@@ -1,0 +1,449 @@
+<template>
+    <lightning-card title="Gestor Documental" icon-name="standard:display_rich_text" style="font-weight: bold;">
+        <lightning-record-edit-form
+            object-api-name="CC_Gestor_Documental__c">
+            <div class="slds-m-around_medium" style="font-weight: normal;">
+                <div class="slds-m-around_medium">
+
+                    <template if:false={nombrePlantilla}>
+                        <h4>Para esta tabulación la plantilla no tiene campos dinámicos.</h4>
+                    </template>
+                                      
+                    <!-- Campos a rellenar cuando se detecte que es atencion deficiente en oficina -->
+                     <!-- <template if:true={oficina}>
+                        <lightning-input-field field-name="CC_Contacto_Cliente__c" value={contactoCliente} onchange={handleContactoClienteChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Campos a rellenar cuando se detecte que es una solicitud de datos de consulta de oficina -->
+                     <!-- <template if:true={solicitudDatosContOfi}>
+                        <lightning-input-field field-name="CC_All_In_One__c" value={allInOne} onchange={handleAllInOneChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Dejamos preparados para el resto de plantillas cuando vengan -->
+                     <!-- <template if:true={cambioOficinaPlantilla}>
+                        <lightning-input-field field-name="CC_Cambio_Oficina__c" value={cambioOficina} onchange={handleCambioOficinaChange}></lightning-input-field>
+                    </template> 
+                    <template if:true={faltaEntregaPlantilla}>
+                        <lightning-input-field field-name="CC_Falta_Entrega__c" value={faltaEntrega} onchange={handleFaltaEntregaChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla fraude -->
+                     <!-- <template if:true={plantillaFraude}>
+                        <lightning-input-field field-name="CC_Fraude__c" value={valorFraude} onchange={handleFraudeChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Informacion sobre movimiento en cuenta -->
+                     <!-- <template if:true={plantillaMovimientoCuenta}>
+                        <lightning-input-field field-name="CC_Movimiento_En_Cuenta__c" value={valorMovimientoCuenta} onchange={handleMovimientoCuentaChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla operacion tarjeta -->
+                     <!-- <template if:true={plantillaOperacionTarjeta}>
+                        <lightning-input-field field-name="CC_Usuario_Now__c" value={valorUsuarioNow} onchange={handleUsuarioNowChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla solicitud cuentas a mi nombre -->
+                    <!-- <template if:true={plantillaSolicitudAMiNombre}>
+                        <lightning-input-field field-name="CC_Cuenta_A_Mi_Nombre__c" value={valorCuentaAMiNombre} onchange={handleCuentaAMiNombreChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla De Respuesta Genérica -->
+                     <!--<template if:true={plantillaRespuestaGenerica}>
+                        <lightning-input-field field-name="CC_Respuesta_Cliente__c" value={valorRespuestaCliente} onkeyup={handleRespuestaClienteChange}></lightning-input-field>
+                        <lightning-input-field field-name="CC_Contestar_Respuesta_Cliente__c" value={valorContestarRespuestaCliente} onkeyup={handleContestarRespuestaClienteChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla Bloqueo de Retencion de saldos -->
+                     <!--<template if:true={plantillaBloqueoRetencionSaldos}>
+                        <lightning-input-field field-name="CC_Bloqueo_Retencion_Saldo__c" value={valorBloqueoRetencionSaldo} onchange={handleBloqueoRetencionSaldoChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla Cancelacion Seguros -->
+                     <!--<template if:true={plantillaCancelacionSeguros}>
+                        <lightning-input-field field-name="CC_Solicitud_Cancelacion_Seguro__c" value={valorSolicitudCancelacionSeguro} onchange={handleSolicitudCancelacionSeguroChange}></lightning-input-field>
+                    </template> -->
+                    <!-- Plantilla Solicitudes de Testamentaria -->
+                    <!-- <template if:true={plantillaSolicitudesTestamentaria}>
+                        <lightning-input-field field-name="CC_Solicitud_Testamentaria__c" value={valorSolicitudTestamentaria} onchange={handleSolicitudTestamentariaChange}></lightning-input-field>
+                    </template> -->        
+                </div>
+
+                <template if:true={nombrePlantilla}>         
+                               
+                    <template if:true={plantillaAtencionDeficienteOficina}>
+                        <b>Atención Deficiente en Oficina:</b>
+                        <!-- Campo Contacto Cliente -->
+                        <template if:true={vContactoCliente}>
+                            <lightning-input-field field-name="CC_Contacto_Cliente__c" value={contactoCliente} onchange={handleContactoClienteChange}></lightning-input-field>
+                        </template>                        
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaAtencionDeficientTelefonoContact}>
+                        <b>Atención deficiente en Teléfono Contact:</b>
+                        <!-- Campo Si se quejan del cobro de una tarifa tel	 -->
+                        <template if:true={vQuejaCobroTarifaTelefonica}>
+                            <lightning-input-field field-name="CC_Queja_Cobro_Tarifa_Telefonica__c" value={valorQuejaCobroTarifaTelefonica} onchange={handleQuejaCobroTarifaTelefonicaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaAtencionDeficienteCasoConflictivo}>
+                        <b>Atención Deficiente: caso conflictivo:</b>
+                        <!-- Campo Intervención Fuerzas Seguridad-->
+                        <template if:true={vIntervencionFuerzasSeguridad}>
+                            <lightning-input-field field-name="CC_Intervencion_Fuerzas_Seguridad__c" value={intervencionFuerzasSeguridad} onchange={handleIntervencionFuerzasSeguridadChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaBloqueoRetencionSaldos}>
+                        <b>Bloqueo Retencion de Saldos:</b>
+                         <!-- Campo Bloqueo Retencion Saldo -->
+                        <template if:true={vBloqueoRetencionSaldo}>
+                            <lightning-input-field field-name="CC_Bloqueo_Retencion_Saldo__c" value={valorBloqueoRetencionSaldo} onchange={handleBloqueoRetencionSaldoChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaCambioOficina}>
+                        <b>Cambio De Oficina:</b>
+                        <!-- Campo Cambio Oficina -->
+                        <template if:true={vCambioOficina}>
+                            <lightning-input-field field-name="CC_Cambio_Oficina__c" value={cambioOficina} onchange={handleCambioOficinaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaCierreOficina}>
+                        <b>Cierre De Oficina:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+                    
+                    <template if:true={plantillaCierreOficinasPeriodoEstival}>
+                        <b>Cierre de Oficinas Periodo Estival:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaDerivacionSAC}>
+                        <b>Derivación SAC:</b>
+                        <!-- Campo  Indicar Gastos-->
+                        <template if:true={vIndicarGastos}>
+                            <lightning-input-field field-name="CC_Indicar_Gastos__c" value={valorIndicarGastos} onkeyup={handleIndicarGastosChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaDobleConfirmacionIdentidadEnNOW}>
+                        <b>Doble confirmacion identidad en NOW:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaFallosTecnicosEnCajeros}>
+                        <b>Fallos Técnicos en Cajeros:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaFallosOperativosEnNOW}>
+                        <b>Fallos tecnicos operativos en NOW:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaFallosTecnicosAveriaEnOficina}>
+                        <b>Fallos tecnicos/averia en oficina:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaFaltaEntrega}>
+                        <b>Falta Entrega:</b>
+                        <!-- Campo Falta Entrega -->
+                        <template if:true={vFaltaEntrega}>
+                            <lightning-input-field field-name="CC_Falta_Entrega__c" value={faltaEntrega} onchange={handleFaltaEntregaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaFraude}>
+                        <b>Fraude:</b>
+                        <!-- Campo Fraude -->
+                        <template if:true={vFraude}>
+                            <lightning-input-field field-name="CC_Fraude__c" value={valorFraude} onchange={handleFraudeChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaInformacionPrestamos}>
+                        <b>Información préstamos:</b>
+                        <!-- Campo Contacto Cliente -->
+                        <template if:true={vContactoCliente}>
+                            <lightning-input-field field-name="CC_Contacto_Cliente__c" value={contactoCliente} onchange={handleContactoClienteChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Solicita info para pedir un prestamo	 -->
+                        <template if:true={vSolicitudInfoPrestamo}>
+                            <lightning-input-field field-name="CC_Solicitud_Info_Prestamo__c" value={valorSolicitudInfoPrestamo} onchange={handleSolicitudInfoPrestamoChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaInformacionSobreMovimientoEnCuenta}>
+                        <b>Informacion sobre movimiento en cuenta:</b>
+                        <!-- Campo Informacion Movimiento Cuenta -->
+                        <template if:true={vInfoMovimientoCuenta}>
+                            <lightning-input-field field-name="CC_Movimiento_En_Cuenta__c" value={valorMovimientoCuenta} onchange={handleMovimientoCuentaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaInstalacionesDeficientesCajeros}>
+                        <b>Instalaciones deficientes cajeros:</b>
+                         <!-- Campo Cierre recinto Cajero-->
+                         <template if:true={vCierreRecintoCajero}>
+                            <lightning-input-field field-name="CC_Cierre_Recinto_Cajero__c" value={valorCierreRecintoCajero} onchange={handleCierreRecintoCajeroChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Queja limpieza	-->
+                        <template if:true={vQuejaLimpieza}>
+                            <lightning-input-field field-name="CC_Queja_Limpieza__c" value={valorQuejaLimpieza} onchange={handleQuejaLimpiezaChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Queja personas sin hogar	-->
+                        <template if:true={vQuejaPersonaSinHogar}>
+                            <lightning-input-field field-name="CC_Queja_Persona_Sin_Hogar__c" value={valorQuejaPersonaSinHogar} onchange={handleQuejaPersonaSinHogarChange}></lightning-input-field>
+                        </template>       
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaNoHayInformacionEnNuestraBaseDeDatos}>
+                        <b>No hay informacion en nuestra base de datos:</b>
+                        <p>Esta plantlla no tiene campos dinámicos</p>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaOperacionTarjeta}>
+                        <b>Operacion tarjeta:</b>
+                        <!-- Campo Usuario Now -->
+                        <template if:true={vValorUsuarioNow}>
+                            <lightning-input-field field-name="CC_Usuario_Now__c" value={valorUsuarioNow} onchange={handleUsuarioNowChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaRespuestaGenerica}>
+                        <b>Plantilla de respuesta genérica:</b>
+                        <!-- Campo Contestar Respuesta Cliente -->
+                        <template if:true={vContestarRespuestaCliente}>
+                            <lightning-input-field field-name="CC_Contestar_Respuesta_Cliente__c" value={valorContestarRespuestaCliente} onkeyup={handleContestarRespuestaClienteChange}></lightning-input-field>
+                        </template>
+                         <!-- Campo Resumen Respuesta Cliente -->
+                        <template if:true={vResumenRespuestaCliente}>
+                            <lightning-input-field field-name="CC_Respuesta_Cliente__c" value={valorRespuestaCliente} onkeyup={handleRespuestaClienteChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaDeRespuestaJUNTAOMIC}>
+                        <b>Plantilla de respuesta JUNTA/OMIC:</b>
+                        <!-- Campo Informacion documentacion adicional -->
+                        <template if:true={vInformacionAdicional}>
+                            <lightning-input-field field-name="CC_Informacion_Documentacion_Adicional__c" value={valorInformacionAdicional} onchange={handleInformacionAdicionalChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaPrestamosICOAlquileres}>
+                        <b>Préstamos ICO alquileres:</b>
+                        <!-- Campo Solicitud Info requisitos	-->
+                        <template if:true={vSolicitudInformacionRequisitos}>
+                            <lightning-input-field field-name="CC_Solicitud_Informacion_Requisitos__c" value={valorSolicitudInformacionRequisitos} onchange={handleSolicitudInformacionRequisitosChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Solicitud Info requisitos	-->
+                        <template if:true={vSolicitudInformacionAportar}>
+                            <lightning-input-field field-name="CC_Solicitud_Informacion_Aportar__c" value={valorSolicitudInformacionAportar} onchange={handleSolicitudInformacionAportarChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Info Condiciones Financiacion	-->
+                        <template if:true={vInformacionCondicionesFinanciacion}>
+                            <lightning-input-field field-name="CC_Informacion_Condiciones_Financiacion__c" value={valorInformacionCondicionesFinanciacion} onchange={handleInformacionCondicionesFinanciacionChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudCancelacionContratos}>
+                        <b>Solicitud cancelacion contrato:</b>
+                         <!-- Campo Solicitud Cancelacion Contratos -->
+                         <template if:true={vSolicitudCancelacionContratos}>
+                            <lightning-input-field field-name="CC_Solicitud_Cancelacion_Contratos__c" value={valorSolicitudCancelacionContratos} onchange={handleSolicitudCancelacionContratosChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaIntegracionBankia}>
+                        <b>Integracion Bankia:</b>
+                         <!-- Campo Solicitud Cancelacion Contratos -->
+                         <template if:true={vSolicitudCancelacionContratos}>
+                            <lightning-input-field field-name="CC_Solicitud_Cancelacion_Contratos__c" value={valorSolicitudCancelacionContratos} onchange={handleSolicitudCancelacionContratosChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudCancelacionSeguros}>
+                        <b>Solicitud cancelacion seguros:</b>
+                        <!-- Campo Solicitud Cancelacion Seguro -->
+                        <template if:true={vSolicitudCancelacionSeguro}>
+                            <lightning-input-field field-name="CC_Solicitud_Cancelacion_Seguro__c" value={valorSolicitudCancelacionSeguro} onchange={handleSolicitudCancelacionSeguroChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudACuentasAMiNombre}>
+                        <b>Solicitud cuentas a mi nombre:</b>
+                        <!-- Campo Solicitud Cuenta a mi nombre -->
+                        <template if:true={vSolicitudCuentaAMiNombre}>
+                            <lightning-input-field field-name="CC_Cuenta_A_Mi_Nombre__c" value={valorCuentaAMiNombre} onchange={handleCuentaAMiNombreChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudDatosContactoOficina}>
+                        <b>Solicitud datos contacto oficina:</b>
+                        <!-- Campo All In One -->
+                        <template if:true={vAllInOne}>
+                            <lightning-input-field field-name="CC_All_In_One__c" value={allInOne} onchange={handleAllInOneChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudDeRenegociacionDeDeuda}>
+                        <b>Solicitud de renegociación de deuda:</b>
+                        <!-- Campo Contacto Cliente -->
+                        <template if:true={vContactoCliente}>
+                            <lightning-input-field field-name="CC_Contacto_Cliente__c" value={contactoCliente} onchange={handleContactoClienteChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Ofrecio Soluciones Refinanciacion-->
+                        <template if:true={vOfrecioSolucionesRefinanciacion}>
+                            <lightning-input-field field-name="CC_Ofrecio_Soluciones_Refinanciacion__c" value={valorOfrecioSolucionesRefinanciacion} onchange={handleOfrecioSolucionesRefinanciacionChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaSolicitudDocumentacion}>
+                        <b>Solicitud documentación:</b>
+                        <!-- Campo cuadro amortizacion -->
+                        <template if:true={vCuadroAmortizacion}>
+                            <lightning-input-field field-name="CC_Cuadro_amortizacion__c" value={valorCuadroAmortizacion} onchange={handleCuadroAmortizacionChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo parte documentacion -->
+                        <template if:true={vParteDocumentacion}>
+                            <lightning-input-field field-name="CC_Parte_Documentacion__c" value={valorParteDocumentacion} onchange={handleParteDocumentacionChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo documentacion adicional-->
+                        <template if:true={vDocumentacionAdicional}>
+                            <lightning-input-field field-name="CC_Documentacion_Adicional__c" value={valorDocumentacionAdicional} onchange={handleDocumentacionAdicionalChange}></lightning-input-field>
+                        </template>
+                         <!-- Campo Informacion documentacion adicional -->
+                         <template if:true={vInformacionAdicional}>
+                            <lightning-input-field field-name="CC_Informacion_Documentacion_Adicional__c" value={valorInformacionAdicional} onchange={handleInformacionAdicionalChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo documentacion no localizada-->
+                        <template if:true={vDocumentacionNoLocalizada}>
+                            <lightning-input-field field-name="CC_Documentacion_No_Localizada__c" value={valorDocumentacionNoLocalizada} onchange={handleDocumentacionNoLocalizadaChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo documentacion no localizada cliente-->
+                        <template if:true={vDocumentacionNoLocalizadaCliente}>
+                            <lightning-input-field field-name="CC_Documentacion_No_Localizada_Cliente__c" value={valorDocumentacionNoLocalizadaCliente} onchange={handleDocumentacionNoLocalizadaClienteChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo tasacion inmueble hipotecado-->
+                        <template if:true={vTasacionInmuebleHipotecado}>
+                            <lightning-input-field field-name="CC_Tasacion_Inmueble_Hipotecado__c" value={valorTasacionInmuebleHipotecado} onchange={handleTasacionInmuebleHipotecadoChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo prestamo titulizado -->
+                        <template if:true={vPrestamoTitulizado}>
+                            <lightning-input-field field-name="CC_Prestamo_Titulizado__c" value={valorPrestamoTitulizado} onchange={handlePrestamoTitulizadoChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo prestamo vendido tercero -->
+                        <template if:true={vPrestamoVendidoTercero}>
+                            <lightning-input-field field-name="CC_Prestamo_Vendido_Tercero__c" value={valorPrestamoVendidoTercero} onchange={handlePrestamoVendidoTerceroChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo solicitud facturas gastos -->
+                        <template if:true={vSolicitudFacturasGastos}>
+                            <lightning-input-field field-name="CC_Solicitud_Facturas_Gastos__c" value={valorSolicitudFacturasGastos} onchange={handleSolicitudFacturasGastosChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo contrato tarjeta cliente -->
+                        <template if:true={vContratoTarjetaCliente}>
+                            <lightning-input-field field-name="CC_Contrato_Tarjeta_Cliente__c" value={valorContratoTarjetaCliente} onchange={handleContratoTarjetaClienteChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo extractos liquidacion -->
+                        <template if:true={vExtractosLiquidacion}>
+                            <lightning-input-field field-name="CC_Extractos_Liquidacion__c" value={valorExtractosLiquidacion} onchange={handleExtractosLiquidacionChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo fecha final calculo -->
+                        <template if:true={vFechaFinalCalculo}>
+                            <lightning-input-field field-name="CC_Fecha_Final_Calculo__c" value={valorFechaFinalCalculo} onchange={handleFechaFinalCalculoChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo copia parcial escritura -->
+                        <template if:true={vCopiaParcialEscritura}>
+                            <lightning-input-field field-name="CC_Copia_Parcial_Escritura__c" value={valorCopiaParcialEscritura} onchange={handleCopiaParcialEscrituraChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo hello letter -->
+                        <template if:true={vHelloLetter}>
+                            <lightning-input-field field-name="CC_Hello_Letter__c" value={valorHelloLetter} onchange={handleHelloLetterChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo codigo prestamo -->
+                        <template if:true={vCodigoPrestamo}>
+                            <lightning-input-field field-name="CC_Codigo_Prestamo__c" value={valorCodigoPrestamo} onchange={handleCodigoPrestamoChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Solicitud -->
+                        <template if:true={vSolicitud}>
+                            <lightning-input-field field-name="CC_Solicitud__c" value={valorSolicitud} onchange={handleSolicitudChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo Solicitud Documentacion -->
+                        <template if:true={vSolicitudDocumentacion}>
+                            <lightning-input-field field-name="CC_Solicitud_Documentacion__c" value={valorSolicitudDocumentacion} onchange={handleSolicitudDocumentacionChange}></lightning-input-field>
+                        </template>                                         
+                        <!-- Campo detalle informacion enviar -->
+                        <template if:true={vDetalleInformacionEnviar}>
+                            <lightning-input-field field-name="CC_Detalle_Informacion_Enviar__c" value={valorDetalleInformacionEnviar} onkeyup={handleDetalleInformacionEnviarChange}></lightning-input-field>
+                        </template>
+                        <!-- Campo cuando no se localiza en contrato cuenta -->
+                        <template if:true={vNoLocalizaContratoCuenta}>
+                            <lightning-input-field field-name="CC_No_Localiza_Contrato_Cuenta__c" value={valorNoLocalizaContratoCuenta} onchange={handleNoLocalizaContratoCuentaChange}></lightning-input-field>
+                        </template>                           
+                        <br><br>
+                    </template>
+                    
+                    <template if:true={plantillaSolicitudesdeTestamentaria}>
+                        <b>Solicitudes de testamentaria:</b>
+                        <!-- Campo Solicitud Testamentaria -->
+                        <template if:true={vSolicitudTestamentaria}>
+                            <lightning-input-field field-name="CC_Solicitud_Testamentaria__c" value={valorSolicitudTestamentaria} onchange={handleSolicitudTestamentariaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>
+
+                    <template if:true={plantillaTiempoDeEspera}>
+                        <b>Tiempo de espera:</b>
+                        <!-- Campo Tiempo Espera -->
+                        <template if:true={vTiempoEspera}>
+                            <lightning-input-field field-name="CC_Tiempo_Espera__c" value={tiempoEspera} onchange={handleTiempoEsperaChange}></lightning-input-field>
+                        </template>
+                        <br><br>
+                    </template>                                    
+                                        
+                    <!-- Campo Sexo -->
+                    <template if:true={vSexo}>
+                        <lightning-input-field field-name="CC_Sexo__c" value={sexoElegir} onchange={handleSexoChange}></lightning-input-field>
+                    </template>    
+                    <!-- Campo Tono Irrespetuoso -->
+                    <template if:true={vTonoIrrespetuoso}>
+                        <lightning-input-field field-name="CC_Tono_Irrespetuoso__c" value={tonoIrrespetuoso} onchange={handleTonoIrrespetuosoChange}></lightning-input-field>
+                    </template>                  
+                                 
+                    <lightning-input-field field-name="Id" value={docId} class="slds-hidden slds-m-top_small"></lightning-input-field>
+                    <p>Pulsar guardar incluso si no tienen que rellenar campos</p>
+                    <div class="slds-m-top_medium">
+                        <lightning-button
+                            class="slds-m-top_small"
+                            variant="brand"
+                            onclick={handleSave}
+                            label="Guardar">
+                        </lightning-button>
+                    </div>
+                </template>
+            </div>
+        </lightning-record-edit-form>
+    </lightning-card>
+</template>

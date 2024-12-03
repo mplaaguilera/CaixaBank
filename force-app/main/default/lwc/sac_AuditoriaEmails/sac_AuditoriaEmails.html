@@ -1,0 +1,30 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+      <lightning-card title="Emails de la auditoría" icon-name="standard:email">
+        <div slot="actions">
+          <div class="slds-float_right">
+            <lightning-button-icon
+              icon-name="utility:refresh"
+              title="Refrescar"
+              onclick={handleRefreshClick}>
+            </lightning-button-icon>
+          </div>
+        </div>
+        <lightning-datatable
+          key-field="Id"
+          data={emailMessages}
+          columns={columns}
+          sorted-by={sortedBy}
+          sorted-direction={sortedDirection}
+          onsort={handleSortData}
+          onrowaction={handleRowClick}
+          hide-checkbox-column="true">
+        </lightning-datatable>
+        <template if:true={error}>
+          <div class="slds-theme_error slds-m-around_medium">
+            <p>Error al cargar los datos: {error}</p>
+          </div>
+        </template>
+      </lightning-card>
+    </div>
+  </template>

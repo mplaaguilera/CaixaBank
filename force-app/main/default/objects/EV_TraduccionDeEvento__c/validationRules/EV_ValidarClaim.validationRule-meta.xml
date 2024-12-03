@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ValidarClaim</fullName>
+    <active>true</active>
+    <description>Validación para que el campo tenga entre 140 y 160 caracteres.</description>
+    <errorConditionFormula>LEN(EV_Claim__c) &lt; 140 || LEN(EV_Claim__c) &gt; 160</errorConditionFormula>
+    <errorDisplayField>EV_Claim__c</errorDisplayField>
+    <errorMessage>El campo debe tener entre 140 y 160 caracteres.</errorMessage>
+</ValidationRule>

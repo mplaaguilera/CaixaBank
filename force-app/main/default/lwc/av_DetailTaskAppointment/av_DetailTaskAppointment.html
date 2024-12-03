@@ -1,0 +1,22 @@
+<template>
+    <div class="slds-grid basicContainer">
+        <div class="subject-col">
+            <a onclick={navigateToRecord} name={id}>{subject}</a>
+        </div>
+        <div class="buttons-col marginButtons">
+            <lightning-button-icon icon-name="utility:check" class={buttonClassCheck} data-id="check" onclick={clickIcon} variant="border"  name="check"  size='large' title="Positiva"></lightning-button-icon>
+            <lightning-button-icon icon-name="utility:close" class={buttonClassClose} data-id="close" onclick={clickIcon} variant="border"  name="close" size='large' title="Negativa"></lightning-button-icon>
+        </div>
+        <div class="slds-col comment-col" >
+            <textarea if:true={showComentary} class="slds-textarea textarea" data-id="commentary"  placeholder="Comentario"  onchange={handleChangeComment}>{commentToSend}</textarea>
+        </div>
+        <div class="fieldOrigin-col">
+            <span>Origen </span>
+            <p>{origen}</p>
+        </div>
+        <div class="fieldDate-col">
+            <span>Fecha de vencimiento </span>
+            <p>{date}</p>
+        </div>
+    </div>
+</template>

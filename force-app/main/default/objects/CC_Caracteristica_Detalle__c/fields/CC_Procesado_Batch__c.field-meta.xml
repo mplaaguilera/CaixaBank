@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Procesado_Batch__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Flag que nos va a indicar si el batch lo ha procesado al actualizar e informar la cuenta/contacto asociada a la caracteristica.</description>
+    <label>Procesado Batch</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

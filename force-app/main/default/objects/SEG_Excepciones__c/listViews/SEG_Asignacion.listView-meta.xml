@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Asignacion</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_Activa__c</columns>
+    <columns>SEG_Organizacion__c</columns>
+    <columns>SEG_Zona__c</columns>
+    <columns>SEG_Grupoasignado__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SEG_Excepciones__c.SEG_Asignacion</value>
+    </filters>
+    <label>Asignación</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

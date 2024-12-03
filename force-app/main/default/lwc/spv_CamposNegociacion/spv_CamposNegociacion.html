@@ -1,0 +1,73 @@
+<template>
+    <lightning-card>
+        <template for:each={pretensiones} for:item="pretension">
+            <lightning-record-edit-form object-api-name="Case" key={pretension.Id} record-id={pretension.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                <lightning-messages>
+                </lightning-messages>
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-size_1-of-2">
+                                <lightning-output-field field-name="CaseNumber"> </lightning-output-field>
+                            </div>
+                            <div class="slds-size_1-of-1">
+                                <lightning-output-field field-name="Subject"> </lightning-output-field>
+                            </div>
+                            <div class="slds-size_1-of-2">
+                                <lightning-input-field field-name="SAC_ResultadoNegociacion__c">
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_DetalleResultadoNegociacion__c">
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_Motivoresultadonegociacion__c">
+                                </lightning-input-field> 
+                                <lightning-input-field field-name="SAC_Observaciones__c" >
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_NegociacionFinalizada__c">
+                                </lightning-input-field>
+                            </div>
+                            <div class="slds-size_1-of-2">
+                                <lightning-input-field field-name="CC_Importe_Reclamado__c" disabled="true"> 
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_Importe_Resuelto__c">
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_TipoInteresContrato__c">
+                                </lightning-input-field>
+                                <lightning-input-field field-name="SAC_TipoInteresNegociado__c">
+                                </lightning-input-field>
+                                
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">                            
+                                <lightning-button class="slds-float_right" variant="brand" type="submit" name="update"
+                                    label="Guardar">
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                        </div> 
+                    </div>
+                </div>               
+            </lightning-record-edit-form>
+        </template>
+    </lightning-card>
+
+
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

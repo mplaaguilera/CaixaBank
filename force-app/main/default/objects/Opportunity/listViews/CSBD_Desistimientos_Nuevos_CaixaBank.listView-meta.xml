@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Desistimientos_Nuevos_CaixaBank</fullName>
+    <booleanFilter>3 AND (2 OR (1 AND 4 AND 5))</booleanFilter>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>CSBD_Now_NIF__c</columns>
+    <columns>CSBD_Now_Codigo_Producto__c</columns>
+    <columns>CSBD_Resumen__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_Desistimiento</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_DesistimientoPAI</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Nueva</value>
+    </filters>
+    <filters>
+        <field>CSBD_Now_Codigo_Producto__c</field>
+        <operation>notContain</operation>
+        <value>Imagin</value>
+    </filters>
+    <filters>
+        <field>CSBD_Now_Codigo_Producto__c</field>
+        <operation>notEqual</operation>
+        <value>Darse de baja,Donar-se de baixa,Drop Out,Cancel</value>
+    </filters>
+    <label>Desistimientos CaixaBank a gestionar</label>
+    <sharedTo>
+        <group>CSBD_Empleados</group>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

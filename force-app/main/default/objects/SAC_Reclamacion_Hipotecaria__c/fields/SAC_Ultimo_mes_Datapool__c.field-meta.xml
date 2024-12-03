@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Ultimo_mes_Datapool__c</fullName>
+    <description>Último mes en el que hay datos del préstamo en Datapool</description>
+    <externalId>false</externalId>
+    <label>Último mes Datapool</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

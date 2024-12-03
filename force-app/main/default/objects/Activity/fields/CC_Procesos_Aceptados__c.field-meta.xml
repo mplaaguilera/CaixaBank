@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Procesos_Aceptados__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(OR(CONTAINS(Subject, &apos;Rechazado&apos;), CONTAINS(Subject, &apos;Devuelto&apos;)), &apos;&apos;, &apos;Aceptadas&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Procesos Aceptados</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

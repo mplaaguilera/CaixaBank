@@ -1,0 +1,98 @@
+<template>
+	<template if:false={casoCargado}>
+		<div style="min-height: 46px;">
+            <lightning-spinner size="small"></lightning-spinner>
+        </div>
+	</template>
+	<template if:true={casoCargado}>
+		<!-- Botones -->
+		<div style="padding-top: 5px" align="center">
+			<lightning-button label="Enviar correo" icon-name="utility:email" onclick={modalEnviarAbrir} disabled={operativaEnviarDisabled} class="slds-var-m-left_small"></lightning-button>
+            <template if:true={servicioPremium}>
+				<lightning-button variant="destructive-text" label="Desmarcar Servicio Premium" icon-name="utility:close" onclick={handleButtonNoServicioPremium} disabled={operativaPremiumDisabled} class="slds-var-m-left_small"></lightning-button>
+			</template>
+			<template if:false={servicioPremium}>
+				<lightning-button label="Marcar Servicio Premium" icon-name="action:approval" onclick={handleButtonServicioPremium} disabled={operativaPremiumDisabled} class="slds-var-m-left_small"></lightning-button>
+			</template>
+		</div>
+
+		<!-- Modales -->
+		<template if:true={showOperativas}>
+			<!-- Modal Enviar correo-->
+			<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalEnviar" onkeydown={modalTeclaPulsada}>
+				<div class="slds-modal__container">
+					<lightning-button-icon icon-name="utility:close" size="large" onclick={closeModals} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+					<div class="slds-modal__header">
+						<h1 class="slds-modal__title slds-hyphenate">Enviar correo</h1>
+						<p class="slds-var-m-top_x-small">Seleccione la plantilla a usar para el envío de correo.</p>
+					</div>
+					<div class="slds-modal__content slds-var-p-around_xx-large" style="padding-top: 12px; padding-bottom: 16px;">
+						<div style="height: 1.3rem;"></div>
+						<div class="slds-grid slds-gutters slds-gutters_x-small">
+							<div class="slds-col slds-grow-none">
+								<lightning-icon icon-name="standard:template" style="margin-top: 21px;"></lightning-icon>
+							</div>
+							<div class="slds-col">
+								<template if:false={verTodasLasPlantillas}>
+									<!--Desplegable de plantillas relacionadas con el grupo-->
+									<lightning-combobox class="comboboxPlantillasEnviar" label="Plantilla" placeholder="-- Plantilla de correo --" options={plantillas} onchange={comboboxPlantillasOnChange} required data-operativa="Enviar"></lightning-combobox>
+								</template>
+								<template if:true={verTodasLasPlantillas}>
+									<!--Buscador de todas las plantillas -->
+									<div class="slds-form-element slds-lookup" data-select="single">
+										<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+										<div class="slds-form-element__control">
+											<div class="slds-input-has-icon slds-input-has-icon_right">
+												<div class="slds-show">
+													<lightning-input class="inputBuscarPlantillasEnviar" type="search" onchange={inputBuscarPlantillasOnChange} placeholder="Buscar plantilla de correo..." variant="label-hidden" onfocus={inputBuscarPlantillasEnviarOnFocus} onblur={inputBuscarPlantillasEnviarOnBlur} onkeydown={inputOnKeyDown} data-operativa="Enviar"></lightning-input>
+												</div>
+											</div>
+										</div>
+										<!--Resultados del buscador de todas las plantillas-->
+										<template if:true={resultadosPlantillasMostrar}>
+											<div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="left: 272px; width: 100%; max-width: initial;">
+												<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+													<template if:false={resultadosPlantillasSinDatos} for:each={plantillasFiltro} for:item="plantilla">
+														<li key={plantilla.value} role="presentation" class="slds-listbox__item" style="list-style-type: none;" onclick={seleccionarPlantilla} data-id={plantilla.value} data-name={plantilla.label} data-operativa="Enviar">
+															<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" title={plantilla.label}>
+																<span class="slds-media__figure slds-listbox__option-icon">
+																	<lightning-icon icon-name="standard:template" size="x-small"></lightning-icon>
+																</span>
+																<span class="slds-media__body">
+																	<span class="slds-listbox__option-text_entity">{plantilla.label}</span>
+																</span>
+															</div>
+														</li>
+													</template>
+													<template if:true={resultadosPlantillasSinDatos}>
+														<li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+															<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center slds-text-color_weak" role="option">
+																Sin resultados.
+															</div>
+														</li>
+													</template>
+												</ul>
+											</div>
+										</template>
+									</div>
+								</template>
+							</div>
+						</div>
+						<div class="slds-grid slds-grid_align-end" style="padding-top: 10px;">
+							<div class="slds-col">
+								<lightning-input class="toggleVerTodasLasPlantillasEnviar" type="toggle" label="Mostrar todas las plantillas" onchange={toggleVerTodasLasPlantillasOnChange} message-toggle-active="" message-toggle-inactive="" data-operativa="Enviar"></lightning-input>
+							</div>
+						</div>
+					</div>
+					<div class="slds-modal__footer">
+						<lightning-button class="modalEnviarEnviar" label="Generar borrador" variant="brand" icon-name="utility:email" onclick={EnviarCorreo} disabled={botonGenerarBorradorDisabled}></lightning-button>
+						<lightning-button class="modalEnviarCancelar slds-var-m-left_medium" label="Cancelar" onclick={closeModals}></lightning-button>
+					</div>
+				</div>
+			</section>
+
+			<!--Backdrop para los modales-->
+			<div class="slds-backdrop backdropModales"></div>
+		</template>
+	</template>
+</template>

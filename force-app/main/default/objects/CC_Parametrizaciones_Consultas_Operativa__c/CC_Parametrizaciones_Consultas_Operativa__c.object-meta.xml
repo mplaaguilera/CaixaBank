@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>List</customSettingsType>
+    <description>Custom settings con las parametrizaciones de las tematicas/canales de resolución/colas</description>
+    <enableFeeds>false</enableFeeds>
+    <label>CC_Parametrizaciones_Consultas_Operativa</label>
+    <visibility>Public</visibility>
+</CustomObject>

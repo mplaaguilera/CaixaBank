@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_EventosFisicos</fullName>
+    <columns>CAMPAIGN.NAME</columns>
+    <columns>CAMPAIGN.START_DATE</columns>
+    <columns>CAMPAIGN.END_DATE</columns>
+    <columns>CAMPAIGN.CAMPAIGN_TYPE</columns>
+    <columns>CAMPAIGN.STATUS</columns>
+    <columns>CORE.USERS.FIRST_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CAMPAIGN.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Campaign.EV_EventoFisico</value>
+    </filters>
+    <label>Eventos Físicos</label>
+    <sharedTo>
+        <portalRole>x0013Y00002uzFnjPartnerUser</portalRole>
+        <role>EV_Eventos</role>
+        <role>EV_Organizador</role>
+        <role>EV_Promotor</role>
+        <role>EV_Promotor_Externo</role>
+        <role>EV_Promotor_Interno</role>
+    </sharedTo>
+</ListView>

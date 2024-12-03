@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_DocumentFile__c</fullName>
+    <description>Formula que genera el enlace Expediente Documental</description>
+    <externalId>false</externalId>
+    <formula>IMAGE(&quot;/resource/CIBE_imgNewWindow&quot;, &quot;New Window&quot;, 15, 15)&amp;&quot; &quot;&amp;
+HYPERLINK(SUBSTITUTE($CustomMetadata.CIBE_Link__mdt.CIBE_ExpedienteDocumental.CIBE_URL__c, &apos;{idPeticion}&apos;, CIBE_NumberExpedient__c), $Label.CIBE_ExpedienteDocumental)</formula>
+    <label>Document File Link</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

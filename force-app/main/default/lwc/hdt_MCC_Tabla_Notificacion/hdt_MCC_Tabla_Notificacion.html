@@ -1,0 +1,14 @@
+<template>
+    <lightning-card title="Actualizaciones MCC" icon-name="custom:custom62">
+        <div  style="height: 200px">
+            <lightning-datatable 
+                data={data} 
+                columns={columns} 
+                key-field="Id" 
+                show-row-number-column
+                row-number-offset={rowOffset}
+                hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+    </lightning-card>    
+</template>

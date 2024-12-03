@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_SLACircuitosEspeciales</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SAC_ParametrizacionSLATME__c.SAC_SLACircuitosEspeciales</value>
+    </filters>
+    <label>SLA Circuitos especiales</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

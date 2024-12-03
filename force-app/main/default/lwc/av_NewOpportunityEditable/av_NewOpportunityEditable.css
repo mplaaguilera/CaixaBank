@@ -1,0 +1,177 @@
+.recordEditForm{
+    margin-left: 1em;
+}
+.slds-form-element__label {
+    margin-left: 0.5em;
+}
+.ptoggle{
+    padding-top: 1.5em;
+}
+.chev-icon{
+	vertical-align: top;
+}
+.opptask-title{
+	display: block;
+    line-height: normal;
+}
+.opptask-stage{
+	color: rgb(45 86 116);
+	font-size: 12px;
+	font-style: italic;
+	padding-bottom: 0.4rem;
+	position: relative;
+	display: inline;
+}
+.opptask-name{
+	padding-top: 0.4rem;
+}
+.button-label{
+	color: #006dcc;
+	vertical-align: sub;
+	cursor: pointer;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	font-size: 12px;
+}
+.main-icon{
+	margin-top: 0.1rem;
+}
+.main-label{
+	vertical-align: sub;
+	padding-left: 0.5rem;
+	font-size: 12px;
+	padding-right: 0.5rem;
+}
+.last-opptask-button{
+	margin-right: 0.3rem;
+	background-image: linear-gradient(#4e4e4e 33%, rgba(255, 255, 255, 0) 0%);
+	background-position: right;
+	background-size: 0.1rem 0.25rem;
+	background-repeat: repeat-y;
+}
+.section-div{
+	display: grid;
+	/*overflow: auto;*/
+	margin: 1rem;
+	/*padding-bottom: 0.3rem;
+	padding-top: 0.3rem;*/
+}
+.opptask-form{
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+.opptask-link{
+	text-decoration: none;
+}
+.help-text-icon{
+	padding-left: 0.2rem;
+}
+.read-only-field{
+	padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+	margin-bottom: var(--lwc-spacingXSmall,0.5rem);
+}
+.read-only-label{
+	padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+}
+.header-layout{
+	height: 3rem;
+}
+.button-group{
+	position: relative;
+    top: 10%;
+}
+.span-button{
+    vertical-align: middle;
+}
+.center-buttons{
+	margin-top: auto;
+    margin-bottom: auto;
+}
+.chever-buttons{
+	margin-right: 1rem;
+}
+.label-priorizador{
+	width: 17rem;
+}
+.layout-padding{
+	padding-bottom: 1rem;
+}
+.toggle-div{
+	padding-top: 1rem;
+	padding-left: 2rem;
+}
+.toggle-input{
+	padding-top: 0.5rem;
+}
+.entidad-color{
+	background-color: rgb(255, 254, 246);
+}
+.entidad-color-padd{
+	padding-bottom: 1rem;
+}
+/* Botón guardar */
+.buttonStyle{
+    background-color: #009fe3;
+    width: 15%;
+    color: white;
+}
+.buttonAlign{
+    text-align: center;
+}
+.buttonStyle:hover {
+	background-color: #007cb1;
+}
+.btnReset {
+	background-color: #b9b9b9;
+}
+.btnReset:hover {
+	background-color: #919191;
+}
+template {
+	border: 1px solid grey;
+	border-radius: 5px;
+}
+.fecha-priorizados {
+	padding-bottom: 0;
+}
+.req-label {
+	margin: -1rem 0 0 0;
+	padding: 0 0 2px 0;
+	color: red;
+}
+.asterisk {
+	float: left;
+	color: red;
+}
+.label-fecha-gestion {
+	margin: 0;
+}
+/* #lookupProduct:focus{
+box-shadow: red 1px 1px 1px;
+
+} */
+.lookup-cmp{
+	box-shadow: red 1px 1px 1px;
+	
+}
+.padding-priority{
+	padding: 0;
+}
+.force-width {
+	width:18rem !important;
+}
+.false_dropdown{
+	margin:22.5px 0;
+}
+.fix-margin{
+	margin-top: -1rem;
+}
+.margin-right-display{
+	margin-right: 2.6rem;
+}
+.margin-right-search{
+	margin-right: 2rem;
+}
+.margin-left-search{
+	margin-left: -0.4rem;
+}

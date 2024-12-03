@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tiempo_Estado_Pendiente__c</fullName>
+    <description>Calcula el tiempo que pasa en estado pendiente</description>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(Status , &apos;Pendiente Colaborador&apos;),
+	(NOW()-CC_Fecha_Traslado_Colaborador__c)*24,
+	IF(ISPICKVAL(Status , &apos;Pendiente Interno&apos;),
+		(NOW()-CC_Fecha_Traslado_3N__c)*24,
+		IF(ISPICKVAL(Status , &apos;Pendiente Incidencia&apos;),
+			(NOW()-CC_Agrupador_Id__r.CC_Fecha_creacion_MAXIMO__c)*24,
+			null
+		)
+	)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tiempo Estado Pendiente</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

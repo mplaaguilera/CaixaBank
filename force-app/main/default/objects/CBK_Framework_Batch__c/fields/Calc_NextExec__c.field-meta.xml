@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Calc_NextExec__c</fullName>
+    <label>Cálculo siguiente ejecución</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>SCHED</fullName>
+                <default>false</default>
+                <label>Según fecha de última planificación</label>
+            </value>
+            <value>
+                <fullName>END</fullName>
+                <default>true</default>
+                <label>Según última fecha de fin de ejecución</label>
+            </value>
+            <value>
+                <fullName>INI</fullName>
+                <default>false</default>
+                <label>Según última fecha de inicio ejecución</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

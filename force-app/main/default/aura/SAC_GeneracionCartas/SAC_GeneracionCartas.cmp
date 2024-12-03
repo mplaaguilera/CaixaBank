@@ -1,0 +1,303 @@
+<aura:component controller="SAC_GeneracionCartas"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable,flexipage:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute name="progress" type="Integer" default="0" />
+    <aura:attribute name="isProgressing" type="Boolean" default="false" />
+    <aura:attribute name="iteracionRefresco" type="Integer" default="0" />
+    <aura:attribute name="act" type="String" default="" />
+    <aura:attribute name="edicionEnvio" type="Boolean" default="false" />
+
+    <aura:attribute name="plantilla" type="String" default="texto de prueba" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="cuerpoPrevio" type="String" />
+
+    <aura:attribute name="procedencia" type="String" default="subsanacion" />
+    <aura:attribute name="caseId" type="id" />
+    <aura:attribute name="nombreTitular" type="String" />
+    <aura:attribute name="direccionTotal" type="String" />
+    <aura:attribute name="direccion" type="String" />
+    <aura:attribute name="poblacion" type="String" />
+    <aura:attribute name="provincia" type="String" />
+    <aura:attribute name="pais" type="String" />
+    <aura:attribute name="codigoPostal" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+
+    <aura:attribute name="idCarta" type="id" default="" />
+    <aura:attribute name="verEditor" type="Boolean" default="false" />
+    <aura:attribute name="actAutomatica" type="Boolean" default="false" />
+    <aura:attribute name="urlVisFo" type="String" />
+
+    <aura:attribute name="habilitado" type="Boolean" default="false" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.inicio}" />
+    <aura:handler name="change" value="{!v.cuerpo}" action="{!c.posibleActualizacion}" />
+
+
+    <div class="slds-grid slds-wrap">
+
+        <aura:If isTrue="{!v.idCarta !=  ''}">
+            <div class="slds-col slds-size_1-of-1 slds-border_right slds-border_left slds-border_top slds-border_bottom"
+                style="padding: 14px">
+
+                <div class="slds-text-longform">
+                    
+                    <h1 style="font-size: 15px"><b>El canal de contacto para este cliente es correo postal</b></h1>
+
+                    <p style="font-weight:bold; color: red;">Compruebe que los datos postales sean correctos.</p>
+
+                    <h1 style="padding-top: 12px; font-size: 14px"><b>Datos de envío:</b></h1>
+
+                    <div style="line-height : 2px;">
+                        <p>{!v.nombreTitular}</p>
+                        <p>{!v.direccion}</p>
+                        <p>{!v.codigoPostal}</p>
+                        <p>{!v.poblacion} </p>
+                        <p>{!v.provincia} </p>
+                    </div>
+                    <br />
+                    <p style="font-weight:bold; color: red;">Se ha detectado una carta pendiente de envío</p>
+                </div>
+            </div>
+            <!--
+                <iframe style="border: 1px solid; height: 100%;width: 100%;"
+                    src="{!'https:visualforce.com/apex/SAC_CartaPDF?id=' + v.idCarta}" />
+-->
+
+            <div class="slds-col slds-size_1-of-1" style="margin-top: 12px">
+                <lightning:button variant="brand" label="Continuar edición" title="Continuar edición"
+                    onclick="{! c.continuarCarta }" />
+                <lightning:button variant="brand" label="Eliminar carta actual y generar nueva"
+                    title="Eliminar carta actual y generar nueva" onclick="{!c.nuevaCarta}" />
+            </div>
+
+
+            <aura:set attribute="else">
+                <div class="slds-col slds-size_1-of-1 slds-border_right slds-border_left slds-border_top slds-border_bottom"
+                    style="margin-top:12px; padding: 14px">
+
+                    <div class="slds-text-longform">
+
+                        <h1 style="font-size: 15px"><b>El canal de contacto para este cliente es correo postal</b></h1>
+
+                        <p style="font-weight:bold; color: red;">Compruebe que los datos postales sean correctos.</p>
+
+                        <h1 style="padding-top: 12px; font-size: 14px; "><b>Datos de envío:</b></h1>
+
+                        <div style="line-height : 2px;">
+                            <p>{!v.nombreTitular}</p>
+                            <p>{!v.direccion}</p>
+                            <p>{!v.codigoPostal}</p>
+                            <p>{!v.poblacion} </p>
+                            <p>{!v.provincia} </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1" style="margin-top: 12px">
+                    <lightning:button variant="brand" label="Generar nueva carta" title="Generar nueva carta"
+                        onclick="{!c.nuevaCarta}" />
+                </div>
+            </aura:set>
+        </aura:If>
+
+    </div>
+
+
+
+    <aura:If isTrue="{!v.verEditor}">
+        <div class="slds-backdrop slds-backdrop_open" style="width: 100vw;
+        height: 100vh;
+        left: calc(-50vw + 50%) !important;">
+            <div class="slds-grid">
+
+                <div class="slds-col slds-size_2-of-3"
+                    style="padding-left: 36px; padding-top: 24px; padding-bottom: 24px; height: 100vh;">
+                    <article class="slds-card" style="height: 100%; padding:13px">
+                        <div class="slds-card__header slds-grid">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__figure">
+                                    <lightning:icon iconName="action:new_note" alternativeText="Redacción"
+                                        title="Redacción" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-grid slds-wrap slds-media_center">
+                                        <div class="slds-col slds-size_1-of-4 slds-media_center">
+                                            <h2 class="slds-card__header-title">
+                                                <span>Redacción comunicación postal</span>
+                                                
+
+                                            </h2>
+                                        </div>
+                                        <div class="slds-col slds-size_3-of-4 slds-p-right_none">
+
+                                            <div class="slds-grid" style="padding: 8px">
+                                                <div class="slds-col">
+                                                    <div class="slds-float_right" style="padding-left: 4px;">
+                                                        <lightning:button label="Salir" iconName="utility:close"
+                                                            onclick="{!c.cerrarEdicion}" />
+                                                        <aura:if isTrue="{!v.habilitado}">
+                                                            <lightning:button label="Guardar" iconName="utility:save"
+                                                                onclick="{!c.guardar}" />
+                                                        <!--    <lightning:button label="Salir" iconName="utility:text_template"
+                                                                onclick="{!c.cerrarGuardar}" /> -->
+                                                            <aura:set attribute="else">
+                                                                <lightning:button label="Guardar" iconName="utility:save"
+                                                                    onclick="{!c.guardar}" disabled="true" />
+                                                            <!--    <lightning:button label="Salir"
+                                                                    iconName="utility:text_template"
+                                                                    onclick="{!c.cerrarGuardar}" disabled="true" /> -->
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </div>
+                                                    <div class="slds-float_right">
+                                                        <lightning:button label="Cargar plantilla por defecto"
+                                                            onclick="{!c.nuevaCarta}" />
+                                                        <lightning:button
+                                                            label="{! v.edicionEnvio ? 'Guardar datos de envío' : 'Modificar datos de envío' }"
+                                                            onclick="{! c.edicionEnvio }" />
+                                                    </div>
+                                                </div>                                                
+                                                <div class="slds-col" style="padding-left: 4px">
+                                                    <c:SAC_RecuperarPlantillas recordId="{!v.caseId}" cuerpoPlantilla="{!v.cuerpo}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </header>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner">
+
+                            <aura:If isTrue="{!v.edicionEnvio}">
+                                <div style="max-width: 50%; margin:auto">
+
+                                    <lightning:input name="input1" label="Dirección" required="true" value="{!v.direccion}"/>
+                                    <lightning:input name="input2" label="Código postal" required="true" value="{!v.codigoPostal}"/>
+                                    <lightning:input name="input3" label="Población" required="true" value="{!v.poblacion}"/>
+                                    <lightning:input name="input4" label="Provincia" required="true" value="{!v.provincia}"/>
+
+                                    <!--    <lightning:inputAddress addressLabel="Dirección de envío" streetLabel="Dirección"
+                                    cityLabel="Población" provinceLabel="Provincia"
+                                    postalCodeLabel="Código postal" street="{!v.direccion}" city="{!v.poblacion}"
+                                    province="{!v.provincia}" postalCode="{!v.codigoPostal}"provinciaECpai required="true"
+                                    />-->
+                                    <aura:if isTrue="{!or(v.pais == 'España', v.pais == 'españa')}">
+                                        <lightning:combobox aura:id="selectorPais" name="status" label="País"
+                                        placeholder="--Seleccione un país--"
+                                        value="011"
+                                        onchange="{!c.cambioPais}"
+                                        options="{!v.options}"/>
+
+                                        <aura:set attribute="else">
+                                            <lightning:combobox aura:id="selectorPais" name="status" label="País"
+                                            placeholder="--Seleccione un país--"
+                                            value="{!v.paisSeleccionado}"
+                                            onchange="{!c.cambioPais}"
+                                            options="{!v.options}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                </div>
+                            </aura:If>
+
+                            <lightning:recordEditForm aura:id="formularioMagicoDeCartas" recordId="{!v.idCarta}"
+                                objectApiName="SAC_DocumentoEnvio__c" onload="{!c.handleCreateLoad}"
+                                onsuccess="{!c.handleSuccess}" onsubmit="{!c.handleSubmit}" onerror="{!c.error}">
+                                <lightning:messages />
+                                <lightning:inputField fieldName="SAC_Caso__c" value="{!v.caseId}" class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_TipoDocumento__c" value="{!v.procedencia}"
+                                    class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_Direccion__c" value="{!v.direccion}"
+                                    class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_Poblacion__c" value="{!v.poblacion}"
+                                    class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_CP__c" value="{!v.codigoPostal}"
+                                    class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_Provincia__c" value="{!v.provincia}"
+                                    class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_Pais__c" value="{!v.paisSeleccionado}" class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_Cuerpo__c" style="min-height: 50vh;"
+                                    value="{!v.cuerpo}" class="slds-hide" />
+                                <lightning:button class="slds-m-top_small slds-show slds-hide" type="submit"
+                                    label="Actualizar previsualización" />
+                            </lightning:recordEditForm>
+
+
+                            <aura:if isTrue="{!!v.habilitado}">
+                                <br />
+                                <strong style="font-weight:bold; color: red;">
+                                    La dirección indicada para la carta postal es:
+                                    {!v.direccionTotal}.
+                                </strong>
+                                <strong>
+                                    Complete los campos mediante el boton "Modificar datos de envío"
+                                </strong>
+                                <br />
+                            </aura:if>
+
+                            <lightning:inputRichText aura:id="campoRedaccion" value='{!v.cuerpo}' label="Cuerpo"
+                                labelVisible="false" title="Cuerpo" class="TextAreaFull">
+                                <lightning:insertImageButton />
+                                <lightning:button class="slds-m-top_small slds-show slds-hide" type="submit"
+                                    label="Actualizar previsualización" />
+                            </lightning:inputRichText>
+
+
+                        </div>
+                    </article>
+                </div>
+                <div class="slds-col slds-size_1-of-3" style="min-height: 50vh;">
+                    <div style="background-color:#16325c;padding:0.5rem">
+
+                        <aura:If isTrue="{!v.actAutomatica}">
+                            <div class="slds-grid slds-wrap slds-media_center">
+                                <div
+                                    class="slds-col slds-size_1-of-1 slds-media_center slds-p-bottom_x-small slds-p-left_none slds-p-right_none">
+                                    <lightning:progressBar value="{! v.progress }" />
+                                </div>
+                            </div>
+                        </aura:If>
+
+
+                        <div class="slds-grid slds-wrap slds-media_center">
+                            <div class="slds-col slds-size_2-of-3 slds-media_center">
+                                <div class="slds-float_right">
+                                    <lightning:input type="toggle" label="Actualizar vista previa automáticamente"
+                                        checked="{!v.actAutomatica}" style="color: white;" />
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-right_none">
+
+                                <div class="slds-float_right">
+                                    <lightning:button label="Previsualizar" variant="brand-outline"
+                                        iconName="utility:preview" onclick="{!c.guardar}" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aura:If isTrue="{!v.idCarta !=  ''}">
+
+                        <iframe style="border: 1px solid; height: 100vh;width: 100%;"
+                            src="{!v.urlVisFo + v.idCarta + v.act}" />
+                        <aura:set attribute="else">
+                            <div
+                                style="border: 1px solid; height: 100vh;width: 100%;background-color: white; text-align:center;">
+                                <div class="slds-text-heading_medium" style="top: 50%; position: relative;">
+                                    <lightning:icon iconName="utility:save" alternativeText="Connected" size="large"
+                                        title="large size" />
+                                    <p>Guarde el registro para poder previsualizarlo</p>
+                                </div>
+                            </div>
+                        </aura:set>
+                    </aura:If>
+
+                </div>
+            </div>
+        </div>
+    </aura:If>
+
+</aura:component>

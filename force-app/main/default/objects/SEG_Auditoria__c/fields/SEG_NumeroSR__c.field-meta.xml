@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_NumeroSR__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Número del caso</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Debe asociarse a una SR con CR de Auditoría.</errorMessage>
+        <filterItems>
+            <field>Case.SEG_SRAuditoria__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Fichas de Auditoría</relationshipLabel>
+    <relationshipName>Auditorias</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

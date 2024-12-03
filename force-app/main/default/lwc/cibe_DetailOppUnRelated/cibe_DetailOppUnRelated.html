@@ -1,0 +1,61 @@
+<template>
+    <article class="slds-card slds-m-top_x-small">
+        <div class="slds-card__header slds-grid slds-theme_shade slds-m-bottom_none slds-p-bottom_x-small">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__figure">
+                <lightning-button-icon if:true={showDetail} variant="border-filled" icon-name="utility:chevrondown" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                <lightning-button-icon if:false={showDetail} variant="border-filled" icon-name="utility:chevronright" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+            </div>
+            <div class="slds-media__body">
+              <h2 class="slds-card__header-title">
+                <div class="slds-grid slds-grid_vertical">
+                    <div class="slds-col" onclick={handleNavigateOpp}>
+                        <span class="opptask-title">{currentName}</span>
+                    </div>
+                </div>
+              </h2>
+            </div>
+            <div class="slds-no-flex">
+                <lightning-button-icon icon-name="utility:link" alternative-text={labels.vincularOportunidad} class="slds-m-left_xx-small linked-opptask-button last-opptask-button" title={labels.vincularOportunidad} variant="border-filled" onclick={handlelink}></lightning-button-icon>
+            </div>
+          </header>
+        </div>
+        <footer class="slds-card__footer slds-m-top_none">
+            <template if:true={showDetail}>
+                <div slot="footer">
+                    <lightning-record-view-form record-id={customactivityopp} object-api-name='Opportunity' density="comfy">
+                        <div class="slds-m-left_x-small slds-text-align_left">
+                            <div class="slds-grid slds-wrap">
+                                <div class="slds-col slds-size_3-of-3">
+                                    <span class="slds-m-left_xxx-small">{labels.etapa}</span>
+                                    <c-av_-custom-path all-stages={allStages} current-stage={currentStage}></c-av_-custom-path>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="AV_PF__c" ></lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="Amount"></lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="CloseDate"></lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="CIBE_ProbabilidadExito__c"></lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="OwnerId"></lightning-output-field> 
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-output-field field-name="AV_Comentarios__c"></lightning-output-field> 
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-record-view-form>
+                </div>
+            </template>
+        </footer>
+        <template if:true={showSpinner}> 
+            <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        </template>
+    </article>
+</template>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_Organismo__c</fullName>
+    <label>Código ISIN</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>EDE</fullName>
+                <default>false</default>
+                <label>EDE</label>
+            </value>
+            <value>
+                <fullName>CNMV</fullName>
+                <default>false</default>
+                <label>CNMV</label>
+            </value>
+            <value>
+                <fullName>DGS o Consumo</fullName>
+                <default>false</default>
+                <label>DGS o Consumo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

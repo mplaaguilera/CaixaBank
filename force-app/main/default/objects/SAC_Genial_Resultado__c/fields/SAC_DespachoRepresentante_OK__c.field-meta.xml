@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_DespachoRepresentante_OK__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Validador del despacho del representante proporcionado por la IA</description>
+    <label>Despacho Represante</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

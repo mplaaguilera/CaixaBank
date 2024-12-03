@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>App_FORMWEB</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Aplicacion__c</field>
+        <value xsi:type="xsd:string">FORMWEB</value>
+    </values>
+    <values>
+        <field>CC_CasoCanalEntrada__c</field>
+        <value xsi:type="xsd:string">Email</value>
+    </values>
+    <values>
+        <field>CC_CasoCanalOperativo__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CasoCanalProc__c</field>
+        <value xsi:type="xsd:string">Formulario web</value>
+    </values>
+    <values>
+        <field>CC_CasoEstado__c</field>
+        <value xsi:type="xsd:string">Activo</value>
+    </values>
+    <values>
+        <field>CC_CasoPrioridad__c</field>
+        <value xsi:type="xsd:string">Medium</value>
+    </values>
+    <values>
+        <field>CC_CasoTipoCliente__c</field>
+        <value xsi:type="xsd:string">Cliente</value>
+    </values>
+    <values>
+        <field>CC_MotivosExcl__c</field>
+        <value xsi:type="xsd:string">006;</value>
+    </values>
+    <values>
+        <field>CC_ReglaAssigCaso__c</field>
+        <value xsi:type="xsd:string">CC_Asig_Caso_Cola</value>
+    </values>
+</CustomMetadata>

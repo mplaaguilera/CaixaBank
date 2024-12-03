@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Asignar_GrupoTrabajo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Asignar Grupo de trabajo</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Hay que informar un grupo de trabajo de COPS</errorMessage>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordType.Name</field>
+            <operation>equals</operation>
+            <value>Grupo de Trabajo</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.OS_Negocio__c</field>
+            <operation>equals</operation>
+            <value>COPS</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Configuración Reclamaciones</relationshipLabel>
+    <relationshipName>Configuracion_Reclamaciones</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

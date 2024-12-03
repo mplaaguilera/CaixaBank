@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_DireccionesEmail</fullName>
+    <active>true</active>
+    <errorConditionFormula>CONTAINS(SEG_Destinatarioemail__c, &quot;;&quot;)</errorConditionFormula>
+    <errorDisplayField>SEG_Destinatarioemail__c</errorDisplayField>
+    <errorMessage>Las direcciones deben estar separadas por coma y no por punto y coma.</errorMessage>
+</ValidationRule>

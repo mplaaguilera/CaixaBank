@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MCC_Global_Empleados</fullName>
+    <columns>RECORDTYPE</columns>
+    <columns>CC_Tematica_Formula__c</columns>
+    <columns>CC_Producto_Servicio__c</columns>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Motivo</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Empleado</value>
+    </filters>
+    <filters>
+        <field>CC_Activo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>MCC Global Empleados</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+    </sharedTo>
+</ListView>

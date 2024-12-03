@@ -1,0 +1,79 @@
+<aura:component controller="CC_Notificacion_Volumen_Crear_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride" access="global">
+
+    <!--
+    Existe una known issue de Salesforce por la que la segunda vez que se abre un
+    lightning para override de quick action se queda colgado invocando la lógica del controlador Apex.
+    Workaround: refrescar la página o la pestaña con el componente.
+    Reference W-5708022: https://success.salesforce.com/issues_view?id=a1p3A000001RWqvQAG
+    -->
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="parentRecordId" type="String"/>
+    <aura:attribute name="cargando" type="Boolean" default="true"/>
+    <aura:attribute name="renderizar" type="Boolean" default="true"/>
+    <aura:attribute name="CC_Agrupador_Id__c" type="Id"/>
+    <aura:attribute name="llamadasAtendidas" type="Integer"/>
+    <aura:attribute name="llamadasAtendidasParcial" type="Integer"/>
+    <aura:attribute name="llamadasAbandonadas" type="Integer"/>
+    <aura:attribute name="llamadasAbandonadasParcial" type="Integer"/>
+    <aura:attribute name="llamadasAbandonadasAnterior" type="Integer"/>
+    <aura:attribute name="fechaUltimoEnvio" type="String" default=""/>
+
+    <aura:handler name="render" value="{!this}" action="{!c.init}"/>
+
+    <article class="slds-card"> 
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-form__item slds-align_absolute-center" role="listitem">
+
+                <lightning:recordEditForm aura:id="formulario" recordId="{!v.recordId}" objectApiName="CC_Notificacion_Volumen__c" onerror="{!c.error}" onsuccess="{!c.success}">
+                    <lightning:messages /> <!--Mensajes de error al guardar, etc.--> 
+                    
+                    <!--Spinner-->
+                    <aura:if isTrue="{!v.cargando}">
+                        <div class="demo-only" style="height:6rem">
+                            <div class="slds-spinner_container">
+                                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                                <span class="slds-assistive-text">Cargando...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Formulario-->
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <lightning:inputField fieldName="CC_Agrupador_Id__c" value="{!v.parentRecordId}"/>
+                            <lightning:inputField fieldName="CC_Tipo__c"/>
+                            <lightning:inputField fieldName="CC_Mensaje__c"/>
+                            <lightning:inputField fieldName="CC_Contenido__c"/>
+                        </div>
+                        <div class="slds-col">
+                            <lightning:inputField type="number" fieldName="CC_Llamadas_Atendidas__c" value="{!v.llamadasAtendidas}" disabled="true"/>
+                            <lightning:inputField type="number" fieldName="CC_Llamadas_Atendidas_Parcial__c" value="{!v.llamadasAtendidasParcial}" disabled="true"/>
+                            <lightning:inputField type="number" fieldName="CC_Llamadas_Abandonadas__c" value="{!v.llamadasAbandonadas}" onchange="{!c.actualizarAbandonadasParcial}"/>
+                            <lightning:inputField type="number" fieldName="CC_Llamadas_Abandonadas_Parcial__c" value="{!v.llamadasAbandonadasParcial}" disabled="true"/>
+                        </div>
+                    </div>
+
+                    <aura:if isTrue="{! !(v.fechaUltimoEnvio == '')}">
+                        <br/>
+                        <c:ccScopedNotification tema="Claro" icono="info" mensaje="{! 'La anterior actualización de volumen se envió a Maximo el ' + v.fechaUltimoEnvio}"/>
+                        <br/>
+                    </aura:if>
+                    
+                    <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                        <lightning:button label="Cancelar" onclick="{!c.cerrarTab}"/>
+                        <lightning:button variant="brand" label="Guardar" title="Guardar" type="submit"/>
+                    </lightning:layout>
+
+                </lightning:recordEditForm>
+            </div>
+        </div>
+    
+    </article>
+
+</aura:component>

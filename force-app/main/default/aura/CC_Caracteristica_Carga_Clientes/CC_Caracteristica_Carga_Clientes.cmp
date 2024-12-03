@@ -1,0 +1,22 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+	<aura:attribute name="recordId" type="Id" />
+	<lightning:card title="Cargar clientes" iconName="action:share_file">
+		<br/>
+		<div>
+            <p>
+                Seleccione un fichero <b>.txt</b> que contenga los identificadores a cargar. Cada identificador debe ser un <b>número de documento</b> y estar separado por un salto de línea.<br/>
+                <br/>
+                <div>
+                    <div style="display:inline-block; vertical-align: top;">Ejemplo:</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 8px; padding-bottom: 8px; margin-left: 20px; border:1px solid lightgray; display:inline-block;">
+                        <code>12345678Z</code><br/>
+                        <code>31935001F</code><br/>
+                        <code>22710134A</code><br/>
+                    </div>
+                </div>
+            </p>
+        </div>
+        <br/>
+		<c:cc_Caracteristica_Carga name="cc_Caracteristica_Carga" recordId="{!v.recordId}" onclickcancelar="{!c.handleClickCancelar}" onclickaceptar="{!c.handleClickAceptar}" onshowlogtoast="{!c.handleShowLogToast}"/>
+	</lightning:card>
+</aura:component>

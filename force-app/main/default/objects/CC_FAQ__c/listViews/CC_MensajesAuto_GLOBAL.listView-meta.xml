@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MensajesAuto_GLOBAL</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Procedencia_Mensaje_Automatico__c</columns>
+    <columns>CC_Codigo_Cognitive__c</columns>
+    <columns>CC_Mensaje_solo_de_agente__c</columns>
+    <columns>CC_Origen__c</columns>
+    <columns>CC_IdiomaMsj__c</columns>
+    <columns>CC_Mensaje_Agente_es__c</columns>
+    <columns>CC_Respuesta_Mensaje_Automatico_es__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_FAQ__c.Mensaje_Automatico_Chat</value>
+    </filters>
+    <filters>
+        <field>CC_GlobalId__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <label>Mensajes Auto GLOBAL</label>
+</ListView>

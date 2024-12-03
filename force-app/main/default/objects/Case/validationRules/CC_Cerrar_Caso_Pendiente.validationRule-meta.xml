@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Caso_Pendiente</fullName>
+    <active>true</active>
+    <description>Un caso pendiente no puede ser cerrado directamente. Si el caso se encuentra en pendiente, este solo puede cambiar a activo o rechazado.</description>
+    <errorConditionFormula>IF(CC_Admin__c != TRUE,
+	OR( 
+	AND( 
+	ISCHANGED(Status), 
+	ISPICKVAL(Status,&quot;Cerrado&quot;), 
+	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Colaborador&apos;), 
+	CC_Admin__c = FALSE), 
+	AND( 
+	ISCHANGED(Status), 
+	ISPICKVAL(Status,&quot;Cerrado&quot;), 
+	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Cliente&apos;), 
+	CC_Admin__c = FALSE), 
+	AND( 
+	ISCHANGED(Status), 
+	ISPICKVAL(Status,&quot;Cerrado&quot;), 
+	ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente Interno&apos;), 
+	CC_Admin__c = FALSE)),
+	CC_Admin__c = FALSE
+)</errorConditionFormula>
+    <errorMessage>Un caso pendiente no puede ser cerrado directamente.</errorMessage>
+</ValidationRule>

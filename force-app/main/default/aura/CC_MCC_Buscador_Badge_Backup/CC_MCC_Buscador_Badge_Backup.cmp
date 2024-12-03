@@ -1,0 +1,11 @@
+<aura:component>
+	<aura:attribute name="text" type="String"/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    <aura:attribute name="destacar" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <span class="{!!v.destacar ? 'slds-badge slds-badge_lightest' : 'slds-badge slds-badge_inverse'}" style="font-size:small;">
+        {!v.text}
+    </span>
+</aura:component>

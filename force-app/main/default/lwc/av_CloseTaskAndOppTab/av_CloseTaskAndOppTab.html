@@ -1,0 +1,76 @@
+<template>
+    <div class="container-div">
+    
+            <div class="cardMargin">
+                <c-av_-finished-task record-id={recordId}></c-av_-finished-task>
+            </div>
+            <div class="cardMargin">
+                <div class="slds-box messageWarning cardMargin slds-align_absolute-center">
+                    <div>
+                        <p>Para reportar correctamente las oportunidades es necesario:</p>
+                        <ol class="slds-list_ordered">
+                            <li>Actualizar el listado de las oportunidades vinculadas a la tarea.</li>
+                            <li>Informar el estado y detalle de las oportunidades vinculadas.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="cardMargin">
+                <c-av_-list-opportunities recid={recordId} sobjname='Task' isreport=true ondatareport={handleDataReport} onrefreshlink={handleRefresh}></c-av_-list-opportunities>
+            </div>
+            <div if:true={showNewoppo}>
+                <lightning-card>
+                    <div class="cardMargin">
+                        <c-av_-new-opportunity-editable taskid={recordId} default-stage="En gestión/insistir" ondata={handleDataOpp}></c-av_-new-opportunity-editable>
+                    </div>
+                </lightning-card>
+            </div>
+            <div class="cardMargin">
+                <lightning-button if:false={showNewoppo} label="Crear una nueva oportunidad" title="Crear oportunidad" icon-name="utility:add" class="slds-m-left_x-small" onclick={handleNewOpp}></lightning-button>
+            </div>
+            <div class="postionButton">
+                <c-av_-pending-tasks if:true={pendingTask} record-id={recordId} ondata={handleDataPendingTask}></c-av_-pending-tasks>
+            </div>
+            <div class="slds-docked-form-footer">
+                <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={saveButton}  onclick={handleSave}>Grabar Reporte</button>
+                <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={saveButton}  onclick={handleSaveAndNewEventButton}>Grabar Reporte + Alta de Evento</button>
+            </div>
+
+        <template if:true ={launchFlow}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" >
+
+                <header class="slds-modal__header " >
+                    <div class="title " >Alta de Evento</div>
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={handleClose}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" >
+                    <div class="container-div">
+
+                    <slot name="body">
+                        
+                            <lightning-flow 
+                                flow-api-name='AV_NuevoEvento'  flow-input-variables={inputVariables} onstatuschange={handleStatusChange}>
+                            </lightning-flow> 
+
+                    </slot>
+                    </div>
+                </div>
+                
+                
+            </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+            
+    </div>
+    <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="large" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+    
+</template>

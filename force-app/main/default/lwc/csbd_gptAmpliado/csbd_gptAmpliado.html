@@ -1,0 +1,41 @@
+<template>
+    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+        <div class="slds-col slds-size_12-of-12 slds-notify slds-notify_alert slds-alert_warning" role="alert">
+            <span class="slds-assistive-text">warning</span>
+            <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+            <lightning-icon icon-name="utility:warning" alternative-text="Warning!" title="Warning"></lightning-icon>
+            </span>
+            <h2>{label.mensajeIAResponsable}</h2>
+        </div>
+        <div class="slds-col slds-size_4-of-12">
+            
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-card class="slds-m-around_medium">
+                            <c-csbd-_resumen-oportunidad record-id={recordId} plan-opo={planOpo} plan-ampli={planAmpli} class="slds-m-left_large"></c-csbd-_resumen-oportunidad>
+                        </lightning-card>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-card class="slds-m-around_medium">
+                            <c-csbd-_resumen-producto record-id={recordId} plan-prod={planProd} class="slds-m-left_large"></c-csbd-_resumen-producto>
+                        </lightning-card>
+                    </div>
+                </div>
+        </div>
+        <div class="slds-col slds-size_4-of-12">
+            <lightning-card class="slds-m-around_medium">
+                <c-csbd-_resumen-argumentario record-id={recordId} plan-arg={planArg} class="slds-m-left_large"></c-csbd-_resumen-argumentario>
+            </lightning-card>
+        </div>
+        <div class="slds-col slds-size_4-of-12">
+            <lightning-card class="slds-m-around_medium">
+                <c-csbd_-chat-g-p-t record-id={recordId} class="slds-m-left_large"></c-csbd_-chat-g-p-t >
+            </lightning-card>
+        </div>
+        <!--<div class="slds-col slds-size_4-of-12">
+            <lightning-card class="slds-m-around_medium">
+                <c-csbd-_resumen-producto record-id={recordId} plan-prod={planProd} class="slds-m-left_large"></c-csbd-_resumen-producto>
+            </lightning-card>
+        </div>-->
+    </div>
+</template>

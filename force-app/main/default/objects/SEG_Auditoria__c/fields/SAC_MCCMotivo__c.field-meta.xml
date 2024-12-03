@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MCCMotivo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para informar el MCC Motivo al generar una auditoria</description>
+    <label>Motivo</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>C - Motivo</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.SAC_MCCProducto__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Producto_Servicio__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Auditorias (Motivo)</relationshipLabel>
+    <relationshipName>Auditorias2</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

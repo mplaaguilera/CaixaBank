@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ReclamacionesContratos__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Reclamaciones Contratos</label>
+    <referenceTo>SEG_Reclamaciones__c</referenceTo>
+    <relationshipLabel>Clasificaciones Rápidas</relationshipLabel>
+    <relationshipName>Clasificaci_n_R_pida</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

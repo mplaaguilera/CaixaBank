@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ExcepcionesContrato__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Excepciones Contratos</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>SEG_Excepciones__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Contratos</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>SEG_Excepciones__c</referenceTo>
+    <relationshipLabel>Excepciones Caso (Excepciones Contratos)</relationshipLabel>
+    <relationshipName>Excepciones_Caso1</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

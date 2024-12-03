@@ -1,0 +1,38 @@
+<apex:page standardController="Case" recordSetVar="casos" extensions="SEG_PropietarioAnterior_Controller" 
+           standardStylesheets="false" docType="html-5.0" showHeader="false" lightningStylesheets="true" applyBodyTag="false" >
+    <apex:slds />
+       
+      <div class="slds-scope">
+    <div class="slds-spinner_container" style="z-index:1000;position:fixed;">
+             <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+            <span class="slds-assistive-text">Actualizando</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+         </div>
+         </div>
+    </div>
+     
+   
+     
+    
+    
+     <apex:form >
+      <apex:actionFunction action="{!main}" name="hold"/>
+  </apex:form>
+<script> var previousOnload = window.onload; window.onload = function() { if (previousOnload) { previousOnload(); } after(); } </script>
+    
+<script>
+    function after()
+    {
+    	hold();
+    	console.log('OK');
+        sforce.one.showToast({
+                "title": "¡Éxito!",
+                "message": "Se han actualizado los propietarios.",
+                "type": "success"
+            });
+        window.history.back();
+    }
+</script>
+
+</apex:page>

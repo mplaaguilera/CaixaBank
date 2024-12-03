@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ReglasconCRInactivas</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_Inactiva__c</columns>
+    <columns>SEG_ClasificacionRapida__c</columns>
+    <columns>SEG_CRInactiva__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>SEG_Inactiva__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>SEG_CRInactiva__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Reglas con CR Inactivas</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

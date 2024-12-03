@@ -1,0 +1,6 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+    
+    <lightning:workspaceAPI aura:id="workspace"/>    
+    <aura:handler event="lightning:tabFocused" action="{!c.onTabFocused}"/>
+
+</aura:component>

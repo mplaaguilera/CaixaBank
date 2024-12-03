@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Mensaje legal - es</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Idioma__c</field>
+        <value xsi:type="xsd:string">es</value>
+    </values>
+    <values>
+        <field>CC_Nombre__c</field>
+        <value xsi:type="xsd:string">Mensaje legal</value>
+    </values>
+    <values>
+        <field>CC_Texto__c</field>
+        <value xsi:type="xsd:string">Te informamos que tus datos serán tratados por CaixaBank o por la empresa del grupo que corresponda para gestionar tu tweet y valorar la calidad del servicio. Puedes ampliar la información y ejercer tus derechos en nuestro portal, apartado privacidad (www.CaixaBank.es/ejerciciodederechos).</value>
+    </values>
+</CustomMetadata>

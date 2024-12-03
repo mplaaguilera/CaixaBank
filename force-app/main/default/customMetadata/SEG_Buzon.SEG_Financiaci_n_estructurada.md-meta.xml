@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Financiación estructurada</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">invalid.buzon.financiacion.estructurada@gmail.com</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">invalid.seg_emailservice@db2v4u5t67iy4slwscpp7six79o01n2x4t5nioa5w1j1og5pz.5e-dpqpua0.cs84.apex.sandbox.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">FFEE</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

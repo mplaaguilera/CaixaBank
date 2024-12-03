@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Clientes</fullName>
+    <description>Support process para el proyecto de Segmentos</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Abierto</fullName>
+        <default>true</default>
+    </values>
+    <values>
+        <fullName>Activo</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Cerrado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Descartado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Planificado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Reabierto</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

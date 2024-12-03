@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Incidencias_activas_publicas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Titulo__c</columns>
+    <columns>CC_Evento__c</columns>
+    <columns>CC_Numero_Casos__c</columns>
+    <columns>CC_Fecha_Deteccion__c</columns>
+    <columns>CC_Id_Maximo__c</columns>
+    <columns>CC_Estado_Maximo__c</columns>
+    <columns>CC_Tematica_Id__c</columns>
+    <columns>CC_Producto_Servicio__c</columns>
+    <columns>CC_Motivo__c</columns>
+    <columns>CC_Causa__c</columns>
+    <columns>CC_Agrupador_Padre_Id_Maximo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Estado__c</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Agrupador__c.CC_Incidencia</value>
+    </filters>
+    <filters>
+        <field>CC_Publica__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Incidencias activas públicas</label>
+</ListView>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Fecha_Contrato__c</fullName>
+    <description>Fecha de alta del contrato. Por defecto se pondrá la fecha en la que se generó la SR de seguimiento de contratos.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Contrato</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

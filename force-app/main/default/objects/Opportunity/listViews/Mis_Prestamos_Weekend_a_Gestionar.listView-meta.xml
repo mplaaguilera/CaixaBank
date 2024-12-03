@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mis_Prestamos_Weekend_a_Gestionar</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>CSBD_Now_Importe__c</columns>
+    <columns>CSBD_Horario_Contacto__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_Prestamo</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Nueva</value>
+    </filters>
+    <label>Mis Prestamos Weekend a Gestionar</label>
+    <sharedTo>
+        <group>CSBD_Empleados</group>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

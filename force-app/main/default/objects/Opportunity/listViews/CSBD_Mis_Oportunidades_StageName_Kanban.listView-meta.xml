@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Mis_Oportunidades_StageName_Kanban</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>OPPORTUNITY.AMOUNT</columns>
+    <columns>CORE.USERS.FULL_NAME</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>OPPORTUNITY.CLOSED</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>notEqual</operation>
+        <value>Nueva</value>
+    </filters>
+    <label>Mis Oportunidades por Etapa (Kanban)</label>
+    <sharedTo>
+        <group>CSBD_Empleados</group>
+    </sharedTo>
+</ListView>

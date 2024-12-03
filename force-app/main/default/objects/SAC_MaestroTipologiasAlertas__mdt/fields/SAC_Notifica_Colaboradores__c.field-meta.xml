@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Notifica_Colaboradores__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>flag para activar en esa alerta que notifique con la campana a todos los integrantes del grupo colaborador</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Notifica Colaboradores</label>
+    <type>Checkbox</type>
+</CustomField>

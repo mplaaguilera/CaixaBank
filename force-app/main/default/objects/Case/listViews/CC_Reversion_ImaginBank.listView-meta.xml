@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Reversion_ImaginBank</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CLOSED_DATE</columns>
+    <columns>CC_Fecha_Hora_Procesado__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CC_NIF__c</columns>
+    <columns>CC_Estado_Reversion__c</columns>
+    <columns>CC_MCC_Tematica__c</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>CC_MCC_Causa__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Estado_Reversion__c</field>
+        <operation>equals</operation>
+        <value>Pendiente envío,Enviado,Recibido</value>
+    </filters>
+    <label>Reversión ImaginBank</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

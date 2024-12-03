@@ -1,0 +1,16 @@
+<!--********************************************************************************************************************
+Name:	  AV_CloseEventTab
+Copyright © 2020  CaixaBank
+________________________________________________________________________________________________________________________
+Proposito: Component to delete event tab when is delete.
+________________________________________________________________________________________________________________________
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY			AUTHOR				DATE				Description
+1.0			Display Data		Carolina Alonso		28/10/2021			Init version
+
+*********************************************************************************************************************-->
+<aura:component implements="lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:workspaceAPI aura:id="workspace" /> 
+</aura:component>

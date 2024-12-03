@@ -1,0 +1,62 @@
+<template>
+    <lightning-button variant="neutral" label={labels.equipo} onclick={showAddMember} class="slds-grid slds-grid_align-end slds-float_right slds-m-left_x-small"></lightning-button>
+
+    <template if:true={isShowAddMember}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="small"></lightning-spinner>
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={hideAddMember}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{labels.añadirParticipante}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form slds-m-around_medium">
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small">
+                            <c-av_-lookup class="lookup-cmp slds-size_1-of-5"
+                                data-id="clookup"
+                                selection={initialSelection}
+                                errors={errors}
+                                onsearch={handleSearch}
+                                onselectionchange={handleSelectionChange}
+                                fieldlabel={labels.participante}
+                                placeholder={labels.buscaParticipantes}
+                                required>
+                            </c-av_-lookup>
+                        </div>
+
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small ">
+                            <lightning-combobox
+                                label={labels.codigoCartera}
+                                value={allValues}
+                                aria-controls="multi-pick-list-dropdown-items"
+                                placeholder={labels.select}
+                                options={optionsAdd}
+                                onchange={handleChange}
+                                dropdown-alignment="auto"
+                                required>
+                            </lightning-combobox>
+                        </div>
+
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small">
+                           <template for:each={allValues} for:item="val">
+                            <lightning-pill key={val} label={val} name={val} onremove={handleRemove} class="slds-m-right_x-small"></lightning-pill>
+                           </template>
+                        </div>
+                    </div>
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={hideAddMember}>{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={handleSaveMember}>{labels.add}</button> 
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+ </template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Direccion_Territorial__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Look up directo a la DT de la cuenta.</description>
+    <label>Dirección territorial</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Accounts (Delegación territorial)</relationshipLabel>
+    <relationshipName>CC_Delegacion_Territorial</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

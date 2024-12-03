@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Conversacion__c</fullName>
+    <description>Conversación mantenida con el cliente</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Conversación mantenida con el cliente</inlineHelpText>
+    <label>Conversación</label>
+    <length>50000</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

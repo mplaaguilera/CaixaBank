@@ -1,0 +1,7 @@
+<aura:component controller="CC_Llamada_Subtab_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+</aura:component>

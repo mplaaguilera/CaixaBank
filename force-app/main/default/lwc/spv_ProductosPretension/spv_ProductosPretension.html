@@ -1,0 +1,164 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+      <lightning-card title={tituloTabla} icon-name="standard:account">
+        <div slot="actions">
+          <div class="slds-float_right">
+            <lightning-button
+                variant="border-filled"
+                title="Ver productos"
+                onclick={abrirModalListaProductosClick}
+                icon-name="utility:preview"
+                class="slds-p-around_xxx-small">
+            </lightning-button>
+            <lightning-button
+                variant="border-filled"
+                title="Refrescar"
+                onclick={handleRefreshClick}
+                icon-name="utility:refresh"
+                class="slds-p-around_xxx-small">
+            </lightning-button>
+            <template if:true={mostrarPretension}>
+              <lightning-button
+                  variant="border-filled"
+                  label="Nuevo producto"
+                  onclick={handleNewProduct}
+                  icon-name="utility:new"
+                  class="slds-p-around_xxx-small">
+              </lightning-button>
+            </template>
+          </div>
+        </div>
+        <!-- spinner -->
+        <template if:true={spinnerLoading}>
+          <div class="demo-only demo--inverse">
+              <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+          </div>
+        </template>
+
+        <template if:true={mostrarReclamacion}>
+            <lightning-datatable
+            key-field="Id"
+            data={productosPorColumnas}
+            columns={columnsReclamacion}
+            sorted-by={sortedBy}
+            sorted-direction={sortedDirection}
+            onsort={handleSortDataRec}
+            hide-checkbox-column="true">
+            </lightning-datatable>
+        </template>
+        <template if:true={mostrarPretension}>
+            <lightning-datatable
+            key-field="Id"
+            data={listaProductos}
+            columns={columnsPretension}
+            sorted-by={sortedBy}
+            sorted-direction={sortedDirection}
+            onsort={handleSortData}
+            hide-checkbox-column="true"
+            onrowaction={handleButtonClick}>
+            </lightning-datatable>
+        </template>
+
+
+
+        <template if:true={error}>
+          <div class="slds-theme_error slds-m-around_medium">
+            <p>Error al cargar los datos: {error}</p>
+          </div>
+        </template>
+      </lightning-card>
+    </div>
+
+
+    <template if:true={abrirModalListaProductos}>
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+            <!-- Botón cerrar superior y cabecera -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalListaProductosClick}>
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Cerrar</span>
+                </button>
+                <template if:true={mostrarReclamacion}>
+                  <h2  id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Productos de las pretensiones</h2>
+                </template>
+                <template if:true={mostrarPretension}>
+                  <h2  id="modal-heading-05" class="slds-text-heading_medium slds-hyphenate">Productos de la pretensión</h2>
+                </template>
+            </header>
+            <div class="slds-modal__content slds-p-around_large">
+                <div class="slds-form-element__control">
+                    <div class="slds-p-around_small slds-align_absolute-center">
+              
+                  <template if:true={spinnerLoading}>
+                    <div class="demo-only demo--inverse">
+                     <lightning-spinner alternative-text="Cargando..." variant= "brand" size="large"></lightning-spinner>
+                    </div>
+                   </template>
+
+                      <template if:true={mostrarReclamacion}>
+                        <lightning-datatable
+                        key-field="Id"
+                        data={productosPorColumnas}
+                        columns={columnsReclamacionExpandida}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortDataRec}
+                        hide-checkbox-column="true">
+                        </lightning-datatable>
+                    </template>
+                    <template if:true={mostrarPretension}>
+                        <lightning-datatable
+                        key-field="Id"
+                        data={listaProductos}
+                        columns={columnsPretensionExpandida}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortData}
+                        hide-checkbox-column="true"
+                        onrowaction={handleButtonClick}>
+                        </lightning-datatable>
+                    </template>
+                    </div>    
+                </div>
+            </div>
+            <!-- Botonera -->
+            <footer class="slds-modal__footer">
+                <lightning-button title = "Refrescar datos" icon-name="utility:refresh"  onclick={handleRefreshClick} variant="border_filled" class="slds-m-left_x-small"></lightning-button>
+                <lightning-button label="Cerrar" onclick={cerrarModalListaProductosClick} class="slds-m-left_x-small"></lightning-button>
+            </footer>
+            
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <template if:true={mostrarEliminar}>
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+          <div class="slds-modal__container">
+              <!-- Botón cerrar superior y cabecera -->
+              <header class="slds-modal__header">
+                  <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalEliminar}>
+                      <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                      <span class="slds-assistive-text">Cerrar</span>
+                  </button>
+                  <h2  id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">Eliminar producto de la pretensión</h2>
+              </header>
+              <div class="slds-modal__content slds-p-around_large">
+                  <div class="slds-form-element__control">
+                      <div class="slds-p-around_small slds-align_absolute-center">
+                        ¿Está seguro de que desea eliminar este producto de la pretensión?
+                      </div>    
+                  </div>
+              </div>
+              <!-- Botonera -->
+              <footer class="slds-modal__footer">
+                  <lightning-button label="Cancelar" onclick={cerrarModalEliminar} class="slds-m-left_x-small"></lightning-button>
+                  <lightning-button variant="brand" label="Eliminar" onclick={confirmarEliminar} class="slds-m-left_x-small"></lightning-button>
+              </footer>
+          </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+
+</template>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_MCCGrupoSegmentos</fullName>
+    <active>true</active>
+    <errorConditionFormula>IF ( ISPICKVAL( CC_MCC__r.CC_Tipo_Cliente__c  , &quot;Segmentos&quot;), CC_Grupo_Colaborador__r.SEG_GrupoSegmentos__c = FALSE, FALSE )</errorConditionFormula>
+    <errorDisplayField>CC_Grupo_Colaborador__c</errorDisplayField>
+    <errorMessage>El negocio del MCC es Segmentos, solo se puede añadir un grupo Segmentos.</errorMessage>
+</ValidationRule>

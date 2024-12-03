@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Second_Priority_Headers__c</fullName>
+    <description>Campo para guardar los elementos del Header con segunda prioridad</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Campo para guardar los elementos del Header con segunda prioridad</inlineHelpText>
+    <label>Second Priority Headers</label>
+    <length>32000</length>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

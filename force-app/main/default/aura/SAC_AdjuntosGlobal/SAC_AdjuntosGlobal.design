@@ -1,0 +1,31 @@
+<design:component >
+    <design:attribute name="registroActual"
+    label="Mostrar únicamente el registro actual"
+    description="Este atributo permite utlizar el componente únicamente para el registro actual,
+    sin contar con un registro 'padre', necesario para las Reclamaciones" />
+
+    <design:attribute name="mostrarOculto"
+    label="Mostrar Oculto" 
+    description="Este atributo permite ocultar o mostrar los archivos adjuntos"/>
+
+    <design:attribute name="permitirEdicion"
+    label="Permitir Edición" 
+    description="Este atributo permite editar un archivo adjunto"/>
+
+    <design:attribute name="recordName"
+    label="Nombre del registro" 
+    description="Este atributo devuelve el nombre del registro"/>
+
+    <design:attribute name="caseId"
+    label="Id case" />
+
+    <design:attribute name="reclamacionId"
+    label="Id reclamacion" />
+
+    <design:attribute name="objectApiName"
+    label="Nombre Api del objeto" required="true"/>
+
+    <design:attribute name="fieldApiName"
+    label="Nombre Api del campo" required="true"/>
+    
+</design:component>

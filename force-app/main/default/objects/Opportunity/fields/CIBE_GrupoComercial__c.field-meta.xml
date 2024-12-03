@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_GrupoComercial__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Grupo Comercial</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>La cuenta asociada a la oportunidad no es de tipo grupo comercial.</errorMessage>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Grupo Comercial</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Opportunities (Grupo Comercial)</relationshipLabel>
+    <relationshipName>Opportunities1</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

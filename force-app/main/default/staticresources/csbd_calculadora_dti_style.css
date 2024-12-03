@@ -1,0 +1,583 @@
+/* @charset "UTF-8"; */
+
+/* TABLA: Bordes */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) table.slds-table_bordered,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:last-child table.slds-table_bordered,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:last-child table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > td,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:last-child table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > th,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:not(:first-child):not(:last-child) table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > th,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:not(:first-child):not(:last-child) table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > td {
+    border-top: none;
+    border-bottom: none;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > td,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > th,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:first-child table.slds-table_bordered,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:first-child table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > td,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:first-child table.slds-table_bordered > tbody > tr.slds-hint-parent:first-child > th {
+	border-top: none;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) table.slds-table_bordered > tbody > tr.slds-hint-parent:last-child > td,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) table.slds-table_bordered > tbody > tr.slds-hint-parent:last-child > th {
+    border-bottom: none;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.datatablePrimerTitular):not(.datatableSegundoTitular) table td {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody th {
+	padding-left: 12px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action:focus,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action:active,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action:hover,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset .slds-has-focus .slds-th__action {
+    background-color: unset;
+    box-shadow: none;
+}
+
+/* TABLA: Bordes redondeados */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable:not(.listaTablas) > div.dt-outer-container > div.slds-scrollable_x {
+	border-radius: 4px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:first-child > div.dt-outer-container > div.slds-scrollable_x {
+    border-radius: 4px 4px 0px 0px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:last-child > div.dt-outer-container > div.slds-scrollable_x {
+    border-radius: 0px 0px 4px 4px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.listaTablas:last-child > div.dt-outer-container > div.slds-scrollable_x {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+/* TABLA: Alto de las filas */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr:not(.slds-line-height_reset),
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr:not(.slds-line-height_reset) {
+	height: 32px;
+}
+
+/* CABECERA: Cursor default */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action span.slds-truncate {
+    cursor: default;
+}
+
+c-csbd_calculadora_dti .slds-table, .slds-table th {
+    font-weight: 300;
+}
+/* CABECERA: Negrita del texto y alineaciÃƒÆ’Ã‚Â³n a la derecha */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th:nth-child(n+2) > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action span.slds-truncate {
+	font-weight: 400;
+}
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th:nth-child(n+3) > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action span.slds-truncate {
+	margin-left: auto;
+	margin-right: 3px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr.slds-line-height_reset > th:nth-child(n+3) > lightning-primitive-header-factory > div.slds-cell-fixed > span.slds-th__action {
+	width: min-content;
+	margin-left: auto;
+}
+
+/* FILAS: Sin box-shadow en filas resaltadas (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover > th,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover > td,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent:hover > th,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent:hover > td {
+	box-shadow: none !important;
+}
+
+/* Ocultar primera columna de nÃƒÆ’Ã‚Âºmeros de filas (obligatoria cuando hay columnas editables) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr > td:first-child,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > thead > tr > th:first-child {
+	display: none;
+}
+
+/* Color de fondo de las celdas grises */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr > td:first-child,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.gris,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.gris,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent td.gris,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent th.gris {
+	background-color: #fbfbfb;
+}
+
+c-csbd_calculadora_dti tbody td:not(:first-child) {
+	letter-spacing: 0.3px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent > th {
+	cursor: default;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th:nth-child(2) {
+	background-color: #f5f5f5;
+	box-shadow: inset 3px 0px 0px 0px rgb(214, 214, 214) !important;
+}
+
+/*
+div.datatableContainer > lightning-datatable table.slds-table_header-hidden > tbody > div.slds-truncate,
+div.datatableContainer > lightning-datatable table.slds-table_header-hidden > tbody div.slds-truncate {
+	margin-left: 53px;
+}
+*/
+
+/* CELDAS: Fondo gris para celdas con valor fijo (no editabled ni calculadas) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.noEditable,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.noEditable,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent td.noEditable,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent th.noEditable {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	color: #444444;
+	background-color: #f5f4f5;
+}
+
+/* CELDAS: Fondo gris para celdas con valor fijo (no editabled ni calculadas) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.noEditable,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.noEditable,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.noEditable,
+c-csbd_calculadora_dti div.datatableContainerTipos > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.noEditable {
+	background-color: #e7e7e7 !important;
+}
+
+/* CELDAS: Ocultar botÃƒÆ’Ã‚Â³n de ediciÃƒÆ’Ã‚Â³n */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr > td.noEdit lightning-primitive-cell-factory button.slds-cell-edit__button {
+	visibility: hidden;
+	pointer-events: none;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody tr td lightning-primitive-cell-factory button.slds-cell-edit__button > lightning-primitive-icon > svg {
+	fill: #919191;
+    transition: opacity 88ms linear;
+    opacity: 0.4 !important;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody tr:hover td lightning-primitive-cell-factory button.slds-cell-edit__button > lightning-primitive-icon > svg {
+	fill: #919191;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody tr td lightning-primitive-cell-factory button.slds-cell-edit__button:hover > lightning-primitive-icon > svg {
+	fill: rgb(33, 97, 134);
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody tr td:hover lightning-primitive-cell-factory button.slds-cell-edit__button > lightning-primitive-icon > svg {
+    opacity: 1 !important;
+}
+
+
+/* Color de fondo de las celdas */
+/* Verde */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.verdeDisabled,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.verdeDisabled {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	background-color: #edf8f0;
+}
+
+/* Verde (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.verdeDisabled {
+	background-color: #e0ffea;
+}
+
+/* Verde */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.verde,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.verde {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	background-color: #e2f4eb;
+}
+
+/* Verde (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.verde,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.verde {
+	background-color: #d6fae8 !important;
+}
+
+/* Amarillo */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.amarillo,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.amarillo {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	background-color: #fffae8;
+}
+
+/* Amarillo (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.amarillo,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.amarillo {
+	background-color: #fffacb !important;
+}
+
+/* Azul */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.azul,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.azul {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	background-color: #e1eff7;
+}
+
+/* Azul (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.azul,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.azul {
+	background-color: #d1e7ff !important;
+}
+
+/* Rojo */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent td.rojo,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent th.rojo {
+	will-change: background-color;
+	transition: background-color 70ms ease-out;
+	background-color: #bbdaf6;
+}
+
+/* Rojo (:hover) */
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover td.rojo,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent:hover th.rojo {
+	background-color: #ffcbcb;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent > th {
+	border-right: 1px solid #d4d4d4;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.sinNumerosFilas table > thead > tr.slds-line-height_reset > th:first-child,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.sinNumerosFilas table > tbody > tr.slds-hint-parent > td:first-child {
+	display: none;
+}
+
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable table > tbody > tr.slds-hint-parent > td > lightning-primitive-cell-factory > span > div.slds-truncate {
+	margin-top: 2px;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable th,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable td {
+	--slds-c-input-shadow: none;
+	--_slds-g-shadow-outline-focus: none;
+	--lwc-shadowButtonFocus: none;
+	--slds-c-checkbox-shadow: none;
+	--_slds-g-shadow-outset-focus: none;
+	--lwc-shadowButtonFocus: none;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C1 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C1 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C2 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C2 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C3 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C3 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C4 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF0C4 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C1 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C1 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C2 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C2 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C3 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C3 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C4 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF1C4 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C1 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C1 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C2 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C2 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C3 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C3 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C4 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF2C4 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C1 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C1 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C2 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C2 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C3 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C3 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C4 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF3C4 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C1 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C1 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C2 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C2 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C3 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C3 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C4 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF4C4 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C1 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C1 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C2 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C2 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C3 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C3 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C4 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF5C4 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C1 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C1 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C2 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C2 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C3 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C3 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C4 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF6C4 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C1 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C1 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C2 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C2 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C3 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C3 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C4 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF7C4 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C1 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C1 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C2 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C2 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C3 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C3 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C4 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaAumentoF8C4 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before {
+	content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><ellipse cx="256.5" cy="260" rx="231.5" ry="233" fill="rgb(255, 255, 255)" stroke="rgb(129, 42, 42)"/><path fill="forestgreen" d="M 9 262 C 9 125 120 14 257 14 s 248 111 248 248 s -111 248 -248 248 S 9 399 9 262 z m 143.6 28.9 l 72.4 -75.5 V 398 c 0 13.3 10.7 24 24 24 h 16 c 13.3 0 24 -10.7 24 -24 V 215.4 l 72.4 75.5 c 9.3 9.7 24.8 9.9 34.3 0.4 l 10.9 -11 c 9.4 -9.4 9.4 -24.6 0 -33.9 L 274 113.7 c -9.4 -9.4 -24.6 -9.4 -33.9 0 L 107.3 246.4 c -9.4 9.4 -9.4 24.6 0 33.9 l 10.9 11 c 9.6 9.5 25.1 9.3 34.4 -0.4 z"/></svg>');
+	display: inline-block;
+	width: 13px;
+	position: relative;
+	top: 2px;
+	margin-right: 6px;
+	shape-rendering: geometricPrecision;
+	animation-name: incrementoKf;
+    animation-iteration-count: 12;
+    animation-duration: 130ms;
+	animation-direction: alternate;
+    animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C1 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C1 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C2 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C2 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C3 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C3 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C4 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF0C4 table > tbody > tr:nth-child(1).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C1 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C1 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C2 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C2 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C3 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C3 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C4 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF1C4 table > tbody > tr:nth-child(2).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C1 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C1 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C2 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C2 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C3 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C3 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C4 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF2C4 table > tbody > tr:nth-child(3).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C1 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C1 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C2 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C2 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C3 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C3 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C4 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF3C4 table > tbody > tr:nth-child(4).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C1 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C1 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C2 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C2 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C3 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C3 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C4 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF4C4 table > tbody > tr:nth-child(5).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C1 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C1 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C2 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C2 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C3 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C3 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C4 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF5C4 table > tbody > tr:nth-child(6).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C1 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C1 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C2 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C2 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C3 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C3 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C4 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF6C4 table > tbody > tr:nth-child(7).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C1 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C1 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C2 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C2 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C3 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C3 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C4 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF7C4 table > tbody > tr:nth-child(8).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C1 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(3).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C1 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(3).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C2 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(4).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C2 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(4).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C3 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(5).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C3 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(5).verde div.slds-truncate::before,
+
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C4 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(6).azul div.slds-truncate::before,
+c-csbd_calculadora_dti div.datatableContainer > lightning-datatable.animarCeldaDescensoF8C4 table > tbody > tr:nth-child(9).slds-hint-parent td:nth-child(6).verde div.slds-truncate::before {
+	content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><ellipse cx="255.5" cy="260" rx="231.5" ry="233" fill="rgb(255, 255, 255)" stroke="rgb(129, 42, 42)"/><path fill="firebrick" d="M504 256c0 137-111 248-248 248S8 393 8 256 119 8 256 8s248 111 248 248zm-143.6-28.9L288 302.6V120c0-13.3-10.7-24-24-24h-16c-13.3 0-24 10.7-24 24v182.6l-72.4-75.5c-9.3-9.7-24.8-9.9-34.3-.4l-10.9 11c-9.4 9.4-9.4 24.6 0 33.9L239 404.3c9.4 9.4 24.6 9.4 33.9 0l132.7-132.7c9.4-9.4 9.4-24.6 0-33.9l-10.9-11c-9.5-9.5-25-9.3-34.3.4z"/></svg>');
+	display: inline-block;
+	width: 13px;
+	position: relative;
+	top: 2px;
+	margin-right: 6px;
+	shape-rendering: geometricPrecision;
+	animation-name: decrementoKf;
+    animation-iteration-count: 12;
+    animation-duration: 130ms;
+	animation-direction: alternate;
+    animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+}
+/*
+@keyframes animarCeldaAumentoKf {
+    0% { background-color: none; }
+    30% { background-color: #c0ffce; }
+    100% { background-color: none; }
+}
+
+@keyframes animarCeldaDescensoKf {
+    0% { background-color: none; }
+    30% { background-color: #ffcdb6; }
+    100% { background-color: none; }
+} */
+
+/* % DTI bonificado, % InterÃƒÆ’Ã‚Â©s, % Tasa y % Gastos de constituciÃƒÆ’Ã‚Â³n */
+c-csbd_calculadora_dti lightning-datatable.datatableGeneral3 tbody tr td:nth-child(3) lightning-primitive-cell-factory lightning-formatted-number::after,
+c-csbd_calculadora_dti lightning-datatable.datatableCuotaMensual2 tbody tr td:nth-child(3) lightning-primitive-cell-factory lightning-formatted-number::after,
+c-csbd_calculadora_dti lightning-datatable.datatableCuotaMensual5 tbody tr td:nth-child(3) lightning-primitive-cell-factory lightning-formatted-number::after,
+c-csbd_calculadora_dti lightning-datatable.datatableFondosPropios1 tbody tr td:nth-child(3) lightning-primitive-cell-factory lightning-formatted-number::after {
+	content: " %";
+}
+
+@keyframes incrementoKf {
+    from { opacity: 0; }
+    to { opacity: 0.85; }
+}
+
+@keyframes decrementoKf {
+    from { opacity: 0; }
+    to { opacity: 0.85; }
+}
+
+c-csbd_calculadora_dti .negrita, lightning-datatable.datatableTiposBonificados .negrita {
+	font-weight: 400;
+}
+
+c-csbd_calculadora_dti article.cardCalculadoraDti {
+    --slds-g-color-border-base-4: rgb(201, 201, 201) !important;
+	--slds-g-color-border-base-1: rgb(201, 201, 201) !important;
+	--_slds-g-shadow-outline-focus: none !important;
+}
+
+c-csbd_calculadora_dti section.popoverTiposBonificados lightning-datatable table > body lightning-button-icon {
+	position: relative;
+	top: -1px;
+}
+
+c-csbd_calculadora_dti c-lwc-labs-loading-stencil div.skeleton-loader-row {
+	height: 31px !important;
+}
+
+c-csbd_calculadora_dti c-lwc-labs-loading-stencil div.skeleton-loader-row > div.skeleton-loader-cell {
+	height: 6px;
+}
+
+div.datosTitular lightning-badge {
+	transition: background-color 90ms linear;
+}
+
+div.datosTitular lightning-badge.slds-badge_lightest {
+	font-weight: 300;
+}
+
+div.datosTitular lightning-badge span.slds-badge__icon {
+	position: relative;
+	top: -1px;
+}
+
+div.datosTitular lightning-badge span.slds-badge__icon.slds-badge__icon_left {
+	margin-right: 6px;
+}

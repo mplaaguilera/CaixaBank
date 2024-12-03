@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Auditorias</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_FechaAuditoriaFormato__c</columns>
+    <columns>SEG_NumeroSR__c</columns>
+    <columns>SEG_Destinatarioemail__c</columns>
+    <columns>SEG_Centro__c</columns>
+    <columns>SEG_Comision__c</columns>
+    <columns>SEG_Idioma__c</columns>
+    <columns>SEG_Resultado__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SEG_Auditoria__c.SEG_Auditorias</value>
+    </filters>
+    <label>SEG Auditorias</label>
+    <sharedTo>
+        <roleAndSubordinatesInternal>SEG_Segmentos_FFEE</roleAndSubordinatesInternal>
+    </sharedTo>
+</ListView>

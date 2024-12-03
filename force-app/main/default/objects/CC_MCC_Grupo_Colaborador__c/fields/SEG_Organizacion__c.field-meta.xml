@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Organizacion__c</fullName>
+    <label>Organización</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Banca Corporativa</fullName>
+                <default>false</default>
+                <label>Banca Corporativa</label>
+            </value>
+            <value>
+                <fullName>Centro Empresas</fullName>
+                <default>false</default>
+                <label>Centro Empresas</label>
+            </value>
+            <value>
+                <fullName>Instituciones</fullName>
+                <default>false</default>
+                <label>Instituciones</label>
+            </value>
+            <value>
+                <fullName>Centro Soporte Especialistas</fullName>
+                <default>false</default>
+                <label>Centro Soporte Especialistas</label>
+            </value>
+            <value>
+                <fullName>Financiación Estructurada</fullName>
+                <default>false</default>
+                <label>Financiación Estructurada</label>
+            </value>
+            <value>
+                <fullName>Todas</fullName>
+                <default>false</default>
+                <label>Todas</label>
+            </value>
+            <value>
+                <fullName>PYMES</fullName>
+                <default>false</default>
+                <label>PYMES</label>
+            </value>
+            <value>
+                <fullName>Banca Internacional</fullName>
+                <default>false</default>
+                <label>Banca Internacional</label>
+            </value>
+            <value>
+                <fullName>UGE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>UGE</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

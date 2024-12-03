@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NumeroDocumento__c</fullName>
+    <description>Número documento</description>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(EV_LeadId__c),
+IF(ISBLANK(EV_ContactId__c),
+IF(ISBLANK(EV_AccountId__c),
+&apos;No se ha vinculado a cliente&apos;,IF(ISBLANK(EV_AccountId__r.CC_Numero_Documento__c),&apos;El cliente no tiene numero de documento&apos;,EV_AccountId__r.CC_Numero_Documento__c)) ,IF(EV_ContactId__r.IsPersonAccount = true, EV_ContactId__r.Account.CC_Numero_Documento__c, IF(ISBLANK(EV_ContactId__r.CC_Numero_Documento__c),&apos;El contacto vinculado no figura como cliente&apos;, EV_ContactId__r.CC_Numero_Documento__c))), EV_LeadId__r.EV_NumeroDocumento__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Numero de documento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

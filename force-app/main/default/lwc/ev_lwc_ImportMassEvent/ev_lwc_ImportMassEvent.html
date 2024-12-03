@@ -1,0 +1,239 @@
+<template>
+   <div class="slds-grid slds-align_absolute-left">
+      <lightning-icon variant="Narrow"  icon-name="standard:account" size="medium"></lightning-icon>
+      <p class="slds-m-left_small slds-text-longform slds-align_absolute-center"><b>Alta masiva de evento</b></p>
+   </div>
+   <hr class="slds-m-vertical_x-small"/>
+   <lightning-card>
+      <div>
+         <p class="slds-m-left_small slds-text-heading_small slds-text-align_center"><b>Alta masiva de evento</b></p>
+      </div>
+
+      <lightning-modal-body if:true={showFirstPage}>
+         <div class="slds-align_vertical-center">
+            <div class="slds-form-element__control slds-size_5-of-6 slds-align_absolute-center">
+               <lightning-input
+                  label="Nombre"
+                  name="name" 
+                  value = {campaignName}
+                  onchange={handleNameChange}
+                  required 
+                  field-level-help="Este campo cuenta con un valor precargado personalizable.
+                  Si se deja el campo en blanco el sistema cargará dicho valor de forma automática."
+                  class="slds-input_custom slds-size_small"
+                  >
+               </lightning-input>
+            </div>
+
+               <div class="slds-form-element__control  slds-align_absolute-center  slds-size_5-of-6">
+                  <div class="slds-form-element slds-text-align_left ">
+                     <span class="slds-required">*</span><span class="slds-form-element__label">Número de sesiones</span>
+                   <div class="slds-input-has-icon slds-input-has-icon_left-right">
+                       <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_left" title="Decrementar" onclick={decrementValue}>
+                           <lightning-icon icon-name="utility:ban" size="xx-small"></lightning-icon>
+                       </button>
+                       <input
+                           name="numSe"
+                           required
+                           class="slds-input slds-text-align_center slds-size_small"
+                           value={inputValue}
+                           onchange={handleValueChange}
+                       />
+                       <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Incrementar" onclick={incrementValue}>
+                           <lightning-icon icon-name="utility:new" size="xx-small"></lightning-icon>
+                       </button>
+                   </div>
+               </div>
+           </div>
+
+               <div class="slds-form-element__control slds-size_5-of-6 slds-align_absolute-center">
+                  <div class="slds-form-element slds-text-align_left ">
+                     <span class="slds-required">*</span><span class="slds-form-element__label">Aforo</span>
+                   <div class="slds-input-has-icon slds-input-has-icon_left-right">
+                       <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_left" title="Decrementar" onclick={decrementValueAforo}>
+                           <lightning-icon icon-name="utility:ban" size="xx-small"></lightning-icon>
+                       </button>
+                       <input 
+                           name="aforo"
+                           required
+                           class="slds-input slds-text-align_center slds-size_small"
+                           value={inputAforo}
+                           onchange={handleAforoChange}
+                       />
+                       <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Incrementar" onclick={incrementValueAforo}>
+                           <lightning-icon icon-name="utility:new" size="xx-small"></lightning-icon>
+                       </button>
+                   </div>
+               </div>
+           </div>
+
+           <div class="slds-form-element__control slds-size_5-of-6 slds-align_absolute-center">
+               <lightning-combobox 
+                  data-id="estado" 
+                  name="Estado" 
+                  label="Estado" 
+                  class="slds-input_custom slds-size_small"
+                  options={optionsEstado} 
+                  placeholder="--Seleccionar--" 
+                  onchange={handleEstadoChange}  
+                  value={estadoFilter} required>
+               </lightning-combobox> 
+            </div>
+            <div class="slds-form-element__control slds-size_5-of-6 slds-align_absolute-center">
+               <lightning-radio-group 
+                  name="howAsign"
+                  label="Asignar mediante asignación a..."
+                  required
+                  class="slds-input_custom slds-size_small"
+                  options={optionsAsign} 
+                  value={valueAsign} 
+                  onchange={handleAsignChange} 
+                  type="radio">
+               </lightning-radio-group>
+               <div class="tooltip-container slds-m-bottom_xx-large slds-p-bottom_x-small">
+                  <lightning-helptext content="Mediante la asignación por directores y 
+                     gestores se permitirá una selección sobre el
+                     árbol de centros. Al asignar individualmente se
+                     procederá a una búsqueda directa del usuario."
+                  ></lightning-helptext>
+               </div>
+            </div>
+      </div>
+      </lightning-modal-body>
+     
+      <template if:false={showFirstPage}>
+         <div class="slds-p-bottom_x-large">
+            <c-ev_lwc_lookup-employees
+               show-first-page={showFirstPage}
+               show-second-page={showSecondPage}
+               show-third-page={showThirdPage}
+               campaign-name={campaignName}
+               input-value={inputValue}
+               input-aforo={inputAforo}
+               estado-filter={estadoFilterLabel}
+               is-centros={isCentros}
+               is-individual={isIndividual}
+               is-responsabilidad={isResponsabilidad}
+               onemployeelistchange={handleEmployeeListChange}
+               > 
+            </c-ev_lwc_lookup-employees>
+         </div>
+      </template>
+
+      <lightning-modal-footer>
+      <div class="slds-grid slds-align_absolute-center ">
+         <div class="slds-col slds-size_2-of-5 slds-text-align_left">
+            <lightning-button
+               class="slds-button"
+               variant="neutral"
+               label="Anterior"
+               onclick={handlePrevious}
+               if:true={showButton}
+            ></lightning-button>
+         </div>
+         <div class="slds-col slds-size_2-of-12">
+         <lightning-progress-indicator current-step={currentStep} type="base" variant="base">
+            <lightning-progress-step label="Info general" value="1">
+            </lightning-progress-step>
+            <lightning-progress-step label="Asignación" value="2">
+            </lightning-progress-step>
+            <lightning-progress-step label="Resumen" value="3">
+            </lightning-progress-step>
+         </lightning-progress-indicator>
+      </div>
+         <div class="slds-col slds-size_2-of-5 slds-text-align_right">
+            <lightning-button
+               class="slds-button"
+               variant="neutral"
+               label="Cancelar"
+               onclick={handleDismiss}
+            ></lightning-button>
+
+            <template if:false={showThirdPage}>
+               
+               <lightning-button
+               class="slds-button slds-m-left_x-small"
+               variant="brand"
+               label="Siguiente"
+               onclick={handleNext}
+               ></lightning-button>
+            </template>
+
+            <template if:true={showThirdPage}>
+            
+               <lightning-button
+               class="slds-button slds-m-left_x-small"
+               variant="brand"
+               label="Confirmar" 
+               onclick={handleDone}              
+               ></lightning-button>
+            </template>
+            
+            <template if:true={isLoading}>
+               <div class="loading-container">
+                  <lightning-spinner alternative-text="Cargando..." title="Cargando..." size="large"></lightning-spinner>
+               </div>
+            </template>
+
+            <template if:true={isModalOpen}>
+               <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                   <div class="slds-modal__container">
+                       <!-- Modal/Popup header -->
+                       <header class="slds-modal__header">
+                           <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                               <lightning-icon icon-name="utility:close"
+                                   alternative-text="close"
+                                   variant="inverse"
+                                   size="small" ></lightning-icon>
+                               <span class="slds-assistive-text">Close</span>
+                           </button>
+                           <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirmación de evento masivo</h2>
+                       </header>
+                       <!-- Modal/Popup Box body -->
+                       <div class="slds-modal__content slds-p-around_medium slds-text-align_left" id="modal-content-id-1">
+                           <p>Al pulsar confirmar se genera el alta de un evento masivo con las características 
+                              especificadas durante el proceso ¿Desea continuar?</p> 
+                       </div>
+                       <!-- Modal/Popup footer -->
+                       <footer class="slds-modal__footer">
+                           <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">No, volver</button>
+                           <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">Sí, confirmar</button>
+                       </footer>
+                   </div>
+               </section>
+               <div class="slds-backdrop slds-backdrop_open"></div>
+           </template>
+
+      <template if:true={isModalInsertOpen}>
+         <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+             <div class="slds-modal__container">
+                 <!-- Modal/Popup header -->
+                 <header class="slds-modal__header">
+                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={backCampaign}>
+                         <lightning-icon icon-name="utility:close"
+                             alternative-text="close"
+                             variant="inverse"
+                             size="small" ></lightning-icon>
+                         <span class="slds-assistive-text">Close</span>
+                     </button>
+                     <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Proceso de inserción</h2>
+                 </header>
+                 <!-- Modal/Popup Box body -->
+                 <div class="slds-modal__content slds-p-around_medium slds-text-align_left" id="modal-content-id-2">
+                     <p>{inserciones}</p> 
+                 </div>
+                 <!-- Modal/Popup footer -->
+                     <footer class="slds-modal__footer">
+                        <template if:true={isFinish}>
+                           <button class="slds-button slds-button_brand" onclick={backCampaign} title="OK">Salir</button>
+                            </template> 
+                     </footer>
+             </div>
+         </section>
+         <div class="slds-backdrop slds-backdrop_open"></div>
+     </template>
+         </div>
+      </div>
+      </lightning-modal-footer>
+   </lightning-card>
+</template>

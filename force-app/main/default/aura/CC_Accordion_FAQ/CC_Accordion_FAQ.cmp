@@ -1,0 +1,116 @@
+<aura:component controller="CC_LiveAgent_FAQ_Controller" access="global" implements="flexipage:availableForAllPageTypes,force:hasRecordId">
+    <lightning:conversationToolkitAPI aura:id="conversationKit" /> 
+    <aura:handler event="c:CC_LiveAgent_Event" action="{!c.getValueFromApplicationEvent }" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="c:CC_Refresh_FAQ" action="{!c.refrescoDatos}" />    
+    
+    <aura:attribute name="areaChat" type="String" />
+    <aura:attribute name="oIdentGlobales" type="List" />
+    <aura:attribute name="gridData" type="Object" />
+    <aura:attribute name="activeAcc" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="idioma" type="String" />
+    <aura:attribute name="espacio" type="String" />
+    <aura:attribute name="categoria" type="String" />
+    <aura:attribute name="aplicacion" type="String" />
+    <aura:attribute name="tipoChat" type="String" />
+    <aura:attribute name="search" type="String"/>
+    <aura:attribute name="temporalSearch" type="String"/>
+    
+    <aura:attribute name="optionsCheckbox" type="Object" />   
+    <aura:attribute name="value" type="Object[]"/>
+    <aura:attribute name="optionSelected" type="String"/>
+    <aura:attribute name="envioDisabled" type="boolean" default="true" /> 
+    <aura:attribute name="isActive" type="Boolean" default="false" required="true" />
+    <aura:attribute name="verURL" type="Boolean" default="false" />
+    
+    <aura:attribute name="FaqsCognitivo" type="Object[]"/>
+    
+    <!--Picklist-->
+    <aura:attribute name="picklistFirstOptionsEspacio" type="Object[]"/>
+    <aura:attribute name="picklistFirstOptionsCategoria" type="Object[]"/>
+    <aura:attribute name="actualFirstOption" type="String" default="-- Select one --"/>    
+    <aura:attribute name="optionFirstLabel" type="String"/>
+    
+    <aura:renderIf isTrue="{!v.isActive}">
+        
+        <lightning:card variant="Narrow" title="F.A.Q." iconName="standard:question_feed" >
+            <p class="slds-p-horizontal_small">
+                
+                <!-- Acciones a realizar sobre las FAQs -->
+                <lightning:button variant="Neutral" label="Enviar FAQ" disabled="{!v.envioDisabled}" title="Enviar" onclick="{! c.sendFAQChat }"/>                
+                <lightning:button variant="Neutral" label="Cerrar" title="Enviar" onclick="{! c.handleClose }"/>
+                
+                <!-- Selección de espacio -->
+                <lightning:layoutItem size="12" padding="around-small"> 
+                    <ui:inputSelect disabled="false" multiple="false" label="Espacio" aura:id="firstOptionEspacio" change="{!c.onCodeSelectFirstChangeEspacio}" value="{!v.espacio}" >
+                        <aura:iteration items="{!v.picklistFirstOptionsEspacio}" var="picklistFirstOptionEspacio">
+                            <ui:inputSelectOption text="{!picklistFirstOptionEspacio.picklistValue}" label="{!picklistFirstOptionEspacio.picklistLabel}" value="{!picklistFirstOptionEspacio.bSel}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center"/>
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </lightning:layoutItem>
+                
+                <!-- Selección de categoría. -->
+                <lightning:layoutItem size="12" padding="around-small"> 
+                    <ui:inputSelect disabled="false" multiple="false" label="Categoría" change="{!c.onCodeSelectFirstChange}" aura:id="firstOptionCategoria" value="{!v.categoria}" >
+                        <aura:iteration items="{!v.picklistFirstOptionsCategoria}" var="picklistFirstOptionsCategoria">
+                            <ui:inputSelectOption text="{!picklistFirstOptionsCategoria.picklistValue}" label="{!picklistFirstOptionsCategoria.picklistLabel}" value="{!picklistFirstOptionsCategoria.bSel}" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center"/>
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </lightning:layoutItem>
+                
+                <!-- Buscador de FAQs -->
+                <lightning:layoutItem size="12" padding="around-small">
+                    <lightning:input value="{!v.search}" type="search" onchange="{!c.searchKeyChange}" placeholder="Buscar "/>                    
+                </lightning:layoutItem>
+                
+                <!-- Sección de FAQs -->
+                <lightning:accordion aura:id="accordion" activeSectionName="{!v.activeAcc}" onsectiontoggle="{!c.desplegarFAQ}">
+                    <!--<div class="slds-scrollable"  style="height: 20rem; width: 100%">-->
+                        <div class="slds-scrollable"  style="{!v.verURL == false ? 'height: 20rem; width: 100%' : 'height: 80rem; width: 100%'}">
+                        <!-- Iterar por cada FAQ devuelta del controlador -->
+                        <aura:iteration items="{!v.gridData}" var="item" indexVar="itemIndex">                            
+                            
+                            <!-- Sección para cada FAQ a mostrar -->
+                            <!--<lightning:accordionSection name="{!itemIndex+1}" label="{!item.faqRecord.CC_TextoMostrar__c}" class="{!item.sOfrecidaWatson == 'Y' ? 'faqsPropuestas' : ''}">-->
+                            <lightning:accordionSection name="{!item.faqRecord.Id + '#' + item.sOfrecidaWatson}" label="{!item.faqRecord.CC_TextoMostrar__c}" class="{!item.sOfrecidaWatson == 'Y' ? 'faqsPropuestas' : ''}">
+                                <aura:set attribute="body">                                    
+                                    <!-- Nueva representación Intents -->
+                                    <aura:iteration items="{!v.optionsCheckbox}" var="itemIntent">
+                                    	<div class="slds-checkbox slds-p-left_x-small">
+                                        	<lightning:input type="checkbox" aura:id="intentSel" name="{!itemIntent.identificador}" label="{!itemIntent.label}" value="{!itemIntent.identificador}" onchange="{!c.seleccionarFAQNew}" checked="{!itemIntent.seleccion}"  />
+                                        </div>
+                                        <br />
+                                    </aura:iteration>
+                                    
+                                    <!-- Si la URL se queda finalmente a nivel de custom -->
+                                    <aura:renderIf isTrue="{!item.bContieneURL}">
+                                        <aura:renderIf isTrue="{!item.bMostrarURL == false}">
+                                            <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                                                <lightning:button variant="brand" label="Ver URL" title="Ver URL" name="{!item.faqRecord.Id}" onclick="{!c.verURLFAQ}"/>
+                                            </lightning:layout>
+                                        </aura:renderIf>
+                                        <aura:renderIf isTrue="{!item.bMostrarURL}">
+                                            <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                                                <lightning:button variant="brand" label="Cerrar URL" title="Cerrar URL" name="{!item.faqRecord.Id}" onclick="{!c.cerrarURLFAQ}"/>
+                                            </lightning:layout>
+                                        </aura:renderIf>
+                                        <br />
+                                        <aura:renderIf isTrue="{!item.bMostrarURL}">
+                                            <c:CC_IFrameURL iframeUrl="{!item.faqRecord.CC_URL__c}" width="100%" height="600px"/>
+                                            <br />                                                
+                                            <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                                                <lightning:button variant="brand" label="Cerrar URL" title="Cerrar URL" name="{!item.faqRecord.Id}" onclick="{!c.cerrarURLFAQ}"/>
+                                            </lightning:layout>
+                                            <br />
+                                        </aura:renderIf>
+                                    </aura:renderIf>
+                                </aura:set>
+                            </lightning:accordionSection> 
+                        </aura:iteration>
+                    </div>
+                </lightning:accordion>              
+            </p>
+        </lightning:card>   
+    </aura:renderIf>
+</aura:component>

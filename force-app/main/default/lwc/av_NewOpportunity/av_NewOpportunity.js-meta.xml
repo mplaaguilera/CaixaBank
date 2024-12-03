@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>50.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>New opportunity flow</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="defaultStage" type="String" label="defaultStage" description="defaultStage." role="inputOnly"/>
+            <property name="pfId" type="String" label="Id PF Experiencia" description="Id del PF Experiencia." role="inputOnly"/>
+            <property name="producto" type="String" label="Producto" description="Productos." role="outputOnly"/>
+            <property name="oportunidad" type="String" label="*Nombre de la oportunidad" description="Nombre de la oportunidad." role="outputOnly"/>
+            <property name="path" type="String" label="Path" description="Estado de la oportunidad." role="outputOnly"/>
+            <property name="fechagestion" type="Date" label="* Fecha de la próxima gestión" description="Fecha de la próxima gestión." role="outputOnly"/>
+            <property name="comentario" type="String" label="Comentario" description="Comentario." role="outputOnly"/>
+            <property name="entidad" type="String" label="Entidad/Compañía" description="Entidad/Compañía." role="outputOnly"/>
+            <property name="fechavencimiento" type="Date" label="Fecha vencimiento" description="Fecha vencimiento." role="outputOnly"/>
+            <property name="importe" type="Integer" label="Importe" description="Importe." role="outputOnly"/>
+            <property name="interes" type="Integer" label="Tipo de interés" description="Tipo de interés." role="outputOnly"/>
+            <property name="incluir" type="Boolean" label="Incluir en clientes priorizados" description="Incluir la oportunidad en 'Clientes Priorizados' la semana de 'próxima gestión'." role="outputOnly"/>
+            <property name="cuota" type="Integer" label="Importe cuota" description="Importe cuota." role="outputOnly"/>
+            <property name="matricula" type="String" label="Matrícula" description="Matrícula del vehículo." role="outputOnly"/>
+            <property name="otraentidad" type="Boolean" label="Producto en otra entidad" description="¿Tiene producto en otra entidad?" role="outputOnly"/>
+            <property name="otraentidadpick" type="String" label="Producto en otra entidad" description="¿Tiene producto en otra entidad?" role="outputOnly"/>
+            <property name="fechaActivacion" type="Date" label="Fecha de activación" description="Fecha en la que la oportunidad deja de estar en stage 'Potencial' " role="outputOnly"/>
+            <property name="potencial" type="String" label="Potencial" description="Potencial de la oportunidad " role="outputOnly"/>
+            <property name ="owner" type = "String" label ="owner" description ="Owner escogido por el creador de la oportunidad" role ="outputOnly"/>
+            <property name ="contact" type = "String" label ="Gestor" description ="Gestor de la oportunidad" role ="outputOnly"/>
+            <property name="resolucion" type="String" label = "Resolución" description="Motivo del cierre negativo" />
+            <property name="margin" type="Integer" label="Margen Euros" description="Margen en Euros" role="outputOnly"/>
+            <property name="amount" type="Integer" label="Importe Euros" description="Importe en Euros" role="outputOnly"/>
+            <property name="byProduct" type="String" label="Sub Producto" description="Sub producto" role="outputOnly"/>
+            <property name="validationError" type="String" label="Validación" description="Error de Validación" role="outputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

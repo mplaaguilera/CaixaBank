@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_Desactivacion_2a_Rec__c</fullName>
+    <description>Fecha desde la cual se desactiva el envío automático de la segunda reclamación</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Desactivación 2ª Rec.</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

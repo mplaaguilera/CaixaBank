@@ -1,0 +1,685 @@
+.cabecera {
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-bottom: 8px;
+	z-index: 90;
+}
+
+.cabecera:has(.slds-combobox .resultadosBuscador.visible) + .slds-col .panelFiltros {
+	z-index: 89;
+}
+
+.divPills {
+	display: none;
+}
+
+.cabecera:has(li.slds-listbox-item) {
+	padding-bottom: 4px;
+}
+
+.divPills:has(.slds-listbox-item) {
+	display: block;
+}
+
+.busquedaBackdrop {
+	position: fixed;
+	z-index: 89;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	background-color: rgba(8, 7, 7, 0.16);
+}
+
+.popoverEditarFiltroBackdrop {
+	position: fixed;
+	z-index: 90;
+	background-color: #08070715;
+	transition: opacity 200ms linear;
+}
+
+.menuTipoBusqueda {
+	z-index: 91;
+}
+
+.spinnerContainerZIndex {
+	z-index: 90 !important;
+}
+
+.inputBuscarGrupo {
+	z-index: 91;
+	--slds-c-input-radius-border: 0px 4px 4px 0px;
+}
+
+.resultadosBuscador {
+	will-change: max-height, opacity;
+	position: absolute;
+	display: block;
+	top: 100%;
+	left: 50%;
+	width: 100%;
+	max-width: initial;
+	margin: 0;
+	padding: 0;
+	z-index: 92;
+	border: var(--lwc-borderWidthThin, 1px) solid var(--slds-g-color-border-base-1, var(--lwc-colorBorder, rgb(229, 229, 229)));
+	border-radius: var(--lwc-borderRadiusMedium, 0.25rem);
+	font-size: 0.75rem;
+	background: var(--slds-g-color-neutral-base-100, var(--lwc-colorBackgroundAlt, rgb(255, 255, 255)));
+	box-shadow: var(--lwc-shadowDropDown, 0 2px 3px 0 rgba(0, 0, 0, 0.16));
+	transform: translateX(-50%);
+	overflow-y: auto;
+	visibility: hidden;
+	opacity: 0;
+	max-height: 0;
+	transition: visibility 230ms linear, opacity 230ms linear, max-height 230ms linear;
+}
+
+.resultadosBuscador.visible {
+	visibility: visible;
+	opacity: 1;
+	max-height: calc(100vh - 300px);
+}
+
+.confirmacionDeseleccionarGrupos {
+	position: absolute;
+	display: block;
+	top: 100%;
+	width: 100%;
+	max-width: initial;
+	z-index: 801;
+	margin: 0;
+	padding: 0;
+	box-shadow: var(--lwc-shadowDropDown, 0 2px 3px 0 rgba(0, 0, 0, 0.16));
+	visibility: hidden;
+	opacity: 0;
+	transform: translateY(-40%);
+	transition: visibility 90ms ease, opacity 90ms ease, transform 90ms ease;
+}
+
+.confirmacionDeseleccionarGrupos.visible {
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0)
+}
+
+.slds-media__figure {
+	margin-right: 0.55rem;
+}
+
+.inputShadowFocusNone {
+	--slds-c-input-shadow-focus: none;
+}
+
+.inputBordeNaranja {
+	--slds-c-input-color-border: #ff9700;
+	--slds-c-input-color-border-focus: #ff9700;
+}
+
+.iconoResultadoSeleccionado {
+	--sds-c-icon-color-background: #f77e75;
+	--sds-c-icon-radius-border: 1rem;
+}
+
+.iconoZonaCombobox {
+	--sds-c-icon-color-background: #00000000;
+	--sds-c-icon-color-foreground: #747474;
+}
+
+.iconoZonaSeleccionada {
+	--sds-c-icon-color-background: #2f9ddd;
+}
+
+.iconoFiltroSeleccionado {
+	--sds-c-icon-color-background: #47cfc9;
+}
+
+.iconoLogicaFiltroSeleccionada {
+	--sds-c-icon-color-background: #ffb84f;
+}
+
+.divDatatable {
+	position: relative;
+	height: calc(100vh - 370px);
+}
+
+.botonFavoritoIconDisabled {
+	--slds-c-icon-color-foreground-default: rgb(201, 201, 201);
+}
+
+.iconoEditarFavoritos {
+	--slds-c-icon-color-background: #edc808;
+	margin-left: 6px;
+}
+
+.indicadorLoadMoreNoDisponible {
+	position: relative;
+	top: -3px;
+	height: 4px;
+	background-color: orange;
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	opacity: 0;
+}
+
+.indicadorLoadMoreNoDisponibleBlink {
+	animation-name: blinkKeyframes;
+	animation-iteration-count: 10;
+	animation-duration: 0.16s;
+	animation-timing-function: ease-out;
+	animation-direction: alternate;
+}
+
+.estiloSeleccionarFiltro {
+	margin: 0 auto;
+	margin-bottom: 5%;
+}
+
+@keyframes blinkKeyframes {
+	100% {
+		opacity: 1;
+	}
+}
+
+.favoritoDrag {
+	background-color: #faffc36b;
+	cursor: ns-resize !important;
+	opacity: .9 !important;
+}
+
+.favoritoDragOver {
+	background-color: #ffffc36b;
+	cursor: ns-resize !important;
+}
+
+.listaFavoritos {
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 4px;
+	border-color: var(--lwc-colorBorder, rgb(229, 229, 229));
+	height: calc(100% - 7px);
+}
+
+.indicadorColorSeleccionado {
+	height: 15px;
+	width: 15px;
+	background-color: #edc808;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #d5d5d5;
+	border-radius: 50%;
+	display: inline-block;
+	position: relative;
+	top: 5px;
+	cursor: pointer;
+}
+
+.indicadorColorMenu {
+	height: 12px;
+	width: 12px;
+	border-style: solid;
+	border-width: .5px;
+	border-color: #adadad66;
+	border-radius: 50%;
+	display: inline-block;
+	position: relative;
+	cursor: pointer;
+	margin-right: 11px;
+}
+
+.indicadorColor {
+	height: 18px;
+	width: 18px;
+	background-color: #edc808;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #adadad;
+	border-radius: 50%;
+	display: inline-block;
+	position: relative;
+	top: 1px;
+	cursor: pointer;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.indicadorColor:hover {
+	outline: 1.5px solid rgb(77, 144, 254);
+}
+
+.indicadorColorRojo {
+	box-shadow: none;
+	border-color: #bebebe;
+	background-color: #dd7c7c;
+}
+
+.indicadorColorAzul {
+	box-shadow: none;
+	border-color: #bebebe;
+	background-color: #8ca9d5;
+}
+
+.indicadorColorVerde {
+	box-shadow: none;
+	border-color: #bebebe;
+	background-color: #9bc785;
+}
+
+.indicadorColorNaranja {
+	box-shadow: none;
+	border-color: #bebebe;
+	background-color: #efc16f;
+}
+
+.popoverCustom {
+	position: absolute;
+	z-index: 110;
+	border-color: rgb(206, 206, 206);
+}
+
+.favorito {
+	border-color: #f1f1f1;
+}
+
+.botonMenuFavoritosDisabled {
+	position: relative;
+	cursor: initial;
+}
+
+.botonMenuFavoritosIcon {
+	position: relative;
+	top: 1px;
+}
+
+.botonMenuFavoritosDisabled .botonMenuFavoritosIcon {
+	--slds-c-icon-color-foreground-default: rgb(201, 201, 201);
+}
+
+.pageHeaderBorderBottom {
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: rgb(201, 201, 201);
+	border-bottom-left-radius: 0%;
+	border-bottom-right-radius: 0%;
+}
+
+:host {
+	--slds-c-textarea-sizing-min-height: 6rem;
+}
+
+.panelFiltros {
+	transition: all 300ms cubic-bezier(0, 0.3, 0.15, 1);
+	display: block;
+	overflow: visible;
+	background: rgb(250, 250, 249);
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	height: auto;
+	width: 20rem;
+	will-change: transform;
+	opacity: 0;
+	transform: translate3d(120%, 0, 0);
+	z-index: 91;
+	margin-left: auto;
+	min-width: 15rem;
+	border-radius: 0 0 4px 0;
+	box-shadow: -1px 0 3px 0 rgb(0 0 0 / 25%);
+}
+
+.panelFiltros.slds-is-open:not(.popoverEditarFiltro) {
+	will-change: opacity, transform;
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+
+.panelFiltros.slds-is-open > div {
+	opacity: 1;
+}
+
+.divFiltro:hover {
+	background-color: var(--lwc-colorBackground, rgb(243, 243, 243));
+}
+
+.divFiltro.modificado {
+	background-color: var(--lwc-colorBackgroundHighlight, rgb(250, 255, 189));
+}
+
+.divFiltro.modificado:hover {
+	background-color: #f8ffaa;
+}
+
+.botonAplicarFiltros {
+	width: 100px !important;
+	margin-top: 1rem;
+	margin-bottom: var(--lwc-spacingSmall, 0.75rem);
+	float: right;
+}
+
+.listaFiltros .liFiltro {
+	opacity: 0;
+	animation: fadeinKeyframes 150ms ease;
+	animation-fill-mode: forwards;
+	transition: margin-left 50ms ease;
+}
+
+@keyframes fadeinKeyframes {
+	100% {
+		opacity: 1;
+	}
+}
+
+.listaFiltros.listaNumerada .liFiltro {
+	margin-left: 1.1rem;
+	list-style: decimal;
+}
+
+.listaFiltros.listaNumerada .liFiltro div:first-child {
+	margin-left: 4px;
+}
+
+.listaFiltros .divFiltro {
+	cursor: pointer;
+	opacity: 0;
+	transform: scaleY(0);
+	transition: opacity 150ms ease, transform 150ms ease, background-color 120ms linear;
+}
+
+.listaFiltros .divFiltro.visible {
+	opacity: 1;
+	transform: scaleY(1);
+}
+
+.textAreaLogica {
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 70ms linear, opacity 70ms ease;
+}
+
+.textAreaLogica.visible {
+	visibility: visible;
+	opacity: 1;
+}
+
+.popoverEditarFiltro {
+	will-change: top;
+	position: absolute;
+	right: 20.43rem;
+	background-color: #ffffff;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+	transition: top 70ms ease-in-out, visibility 90ms ease-out, opacity 90ms ease-out;
+	opacity: 0 !important;
+	visibility: hidden;
+	border: 1px solid #c9c9c9;
+	border-radius: 6px;
+
+}
+
+.popoverEditarFiltro.popoverEditarFiltroVisible {
+	opacity: 1 !important;
+	visibility: visible;
+}
+
+.popoverEditarFiltroBody {
+	padding: var(--lwc-spacingSmall, 0.75rem) var(--lwc-spacingMedium, 1rem) var(--lwc-spacingSmall, 0.75rem) var(--lwc-spacingMedium, 1rem);
+	width: 320px;
+}
+
+.popoverEditarFiltro .popoverEditarFiltroPointer {
+	width: 1.25625rem;
+	height: 1.25625rem;
+	transform: rotate(135deg);
+	border-top: 1px solid #c9c9c9;
+	border-left: 1px solid #c9c9c9;
+	background: #fff;
+	position: absolute;
+	top: 7rem;
+	right: -0.65rem;
+}
+
+.listaFiltros+.slds-filters__footer {
+	margin-top: 3px;
+}
+
+.divLogicaActual {
+	transition: visibility 110ms ease, opacity 110ms ease;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.divLogicaActual.visible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.pillBuscador {
+	cursor: default;
+	opacity: 0;
+	transform: scaleX(0);
+	animation: pillBuscadorKeyframes 140ms ease;
+	animation-fill-mode: forwards;
+	transition: background-color 200ms linear;
+}
+
+.pillBuscador .slds-pill__remove {
+	cursor: pointer;
+}
+
+.pillBuscador:hover {
+	--slds-c-pill-color-background: #f3f5ff;
+}
+
+@keyframes pillBuscadorKeyframes {
+	100% {
+		opacity: 1;
+		transform: scaleX(1);
+	}
+}
+
+.textareaLogicaFiltros {
+	transition: background-color 160ms linear;
+}
+
+.textareaLogicaFiltros.modificado {
+	--slds-c-textarea-color-background: var(--lwc-colorBackgroundHighlight, rgb(250, 255, 189));
+	--slds-c-textarea-color-background-focus: var(--lwc-colorBackgroundHighlight, rgb(250, 255, 189));
+}
+
+.popoverPillLogicaFiltro {
+	position: absolute;
+	top: 32px;
+	width: max-content;
+	transform: translateX(-50%);
+	left: 50%;
+	padding-top: 1px;
+	transition: visibility 150ms ease, opacity 150ms ease;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.popoverPillLogicaFiltro.visible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.iconoAgregarLogicaFiltro {
+	position: relative;
+	top: -1px;
+	--sds-c-icon-color-foreground-default: var(--lwc-brandTextLink, rgb(1, 118, 211));
+}
+
+.iconoLogicaFiltro {
+	position: relative;
+	top: -1px;
+}
+
+.inputBuscarGrupoIconoDropdown {
+	position: absolute;
+	display: block;
+	z-index: 91;
+}
+
+.inputBuscarGrupoIconoDropdown.oculto {
+	display: none;
+}
+
+.botonFavorito {
+	height: 32px;
+	min-width: 34px;
+	max-width: 260px;
+	transition: background-color 80ms linear;
+}
+
+.botonFavorito.indicadorColorRojo,
+.botonFavorito.indicadorColorAzul,
+.botonFavorito.indicadorColorNaranja,
+.botonFavorito.indicadorColorVerde {
+	cursor: initial;
+}
+
+.botonFavorito.indicadorColorRojo .botonFavoritoTexto,
+.botonFavorito.indicadorColorAzul .botonFavoritoTexto,
+.botonFavorito.indicadorColorNaranja .botonFavoritoTexto,
+.botonFavorito.indicadorColorVerde .botonFavoritoTexto {
+	margin-left: 0.5rem;
+	max-width: 220px;
+}
+
+.botonFavoritoTexto {
+	transition: max-width 300ms ease;
+	color: white;
+	max-width: 0px;
+}
+
+.botonFavoritoIcon {
+	transition: transform 200ms ease-out;
+}
+
+.animarBotonFavoritoIcon {
+	animation: animarBotonFavoritoIconKeyframes 600ms cubic-bezier(0.46, 0.32, 0, 0.98);
+	transform-origin: center;
+}
+
+@keyframes animarBotonFavoritoIconKeyframes {
+	25% {transform:scale(0.85, 0.85) rotate(17deg)}
+	70% {transform:scale(1.3, 1.3) rotate(0deg)}
+	100% {transform:scale(1, 1) rotate(0deg)}
+}
+
+.animarBotonFavoritoIcon2 {
+	animation: animarBotonFavoritoIconKeyframes2 420ms cubic-bezier(0.46, 0.32, 0, 0.98);
+	transform-origin: center;
+}
+
+@keyframes animarBotonFavoritoIconKeyframes2 {
+	0% {transform:scale(1, 1)}
+	25% {transform:scale(0.85, 0.85)}
+	60% {transform:scale(1.12, 1.12)}
+	100% {transform:scale(1, 1)}
+}
+
+.botonActualizar:hover lightning-icon {
+	--sds-c-icon-color-foreground-default: var(--slds-c-button-text-color-hover, var(--sds-c-button-text-color-hover, var(--lwc-brandAccessibleActive,rgb(1, 68, 134))));
+}
+
+.botonActualizar:active {
+	color: var(--slds-c-button-text-color-active, var(--sds-c-button-text-color-active, var(--lwc-brandAccessibleActive,rgb(1, 68, 134))));
+    background-color: var(--slds-c-button-color-background-active);
+    border-color: rgb(201, 201, 201);
+}
+
+.botonActualizar.disabled {
+	outline: none;
+	cursor: default;
+	pointer-events: none;
+}
+
+.botonActualizar.disabled lightning-icon {
+	--sds-c-icon-color-foreground-default: rgb(201, 201, 201);
+}
+
+.animarBotonActualizar {
+	animation: animarBotonActualizarKeyframes 600ms cubic-bezier(0.46, 0.32, 0, 0.98);
+}
+
+@keyframes animarBotonActualizarKeyframes {
+	to {transform: rotate(360deg)};
+}
+
+.menuZonas {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	float: left;
+	overflow-y: auto;
+	display: block;
+	z-index: 92;
+	visibility: hidden;
+	opacity: 0;
+	max-height: 0px;
+	transition: visibility 200ms ease, opacity 200ms ease, max-height 200ms ease;
+}
+
+.slds-is-open .menuZonas.slds-dropdown_length-10 {
+	max-height: 400px;
+}
+
+.botonesEliminar {
+	color: var(--sds-c-button-text-destructive-text-color, #c23934);
+}
+
+.botonesEliminarIconColor {
+	--slds-c-icon-color-foreground-default: var(--sds-c-button-text-destructive-text-color, #c23934);
+}
+
+.botonAgregarFiltroIcon {
+	--slds-c-icon-color-foreground-default: var(--slds-c-button-text-color, var(--sds-c-button-text-color, var(--lwc-brandAccessible,rgb(1, 118, 211))))
+}
+
+.botonAgregarFiltro:focus, .botonAgregarFiltro:active, .botonesEliminar:focus, .botonesEliminar:active {
+	border-color: transparent;
+	box-shadow: none;
+}
+
+.modalRestablecerPersonalizacionPorDefecto ul li:not(:last-child) {
+    margin-bottom: 3px;
+}
+
+span.slds-pill__icon_container {
+	margin-right: 6px;
+}
+
+lightning-textarea.modalCrearNuevoCasoDescripcion {
+	--sds-c-textarea-sizing-min-height: 100px;
+}
+
+lightning-button {
+	--slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+lightning-input, lightning-combobox {
+	--slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+lightning-textarea {
+	--slds-c-textarea-color-border: rgb(201, 201, 201);
+	--slds-c-textarea-color-border-focus: rgb(201, 201, 201);
+}
+
+lightning-button-group, lightning-button-menu, lightning-button-icon, lightning-dual-listbox {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+div.slds-dropdown,
+div.slds-combobox__input,
+input.slds-combobox__input,
+button.slds-combobox__input,
+button.slds-button_icon,
+span.slds-pill,
+div.slds-filters__item {
+	border-color: rgb(201, 201, 201);
+}

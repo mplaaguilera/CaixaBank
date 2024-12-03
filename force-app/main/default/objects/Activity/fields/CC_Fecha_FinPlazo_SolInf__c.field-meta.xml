@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_FinPlazo_SolInf__c</fullName>
+    <description>Fecha en la que cumple el plazo de respuesta del cliente a una Solicitud de Información.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Fin Plazo Sol. Inf.</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

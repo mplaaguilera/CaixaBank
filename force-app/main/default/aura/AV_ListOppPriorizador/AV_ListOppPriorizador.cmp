@@ -1,0 +1,187 @@
+<aura:component description="AV_ListOppPriorizador" controller="AV_ListViewComponentController"
+				implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId,force:lightningQuickAction,lightning:availableForFlowScreens" access="global">
+
+	<!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="expandAccordion"  type="Boolean"/>
+	<aura:attribute name="titleAccordion"		type="String"/>
+	<aura:attribute name="titleCard"		type="String"/>
+	<aura:attribute name="iconCard"		 type="String"/>
+	<aura:attribute name="oppType"		 type="String"/>
+
+	<!-- PRIVATE FOR COMPONENT -->
+	<aura:attribute name="data"	 type="AV_ListViewComponentController.Response"/>
+	<aura:attribute name="clienteId" type="String"/>
+	<aura:attribute name="pfId" type="String"/>
+	<aura:attribute name="valueTitleCard"   type="String"/>
+	<aura:attribute name="valueTitleAccordion"   type="String"/>
+	<aura:attribute name="activeSections"   type="String"   default="defaultAccordionSection" />
+	<aura:attribute name="isOpen" type="boolean" default="false"/>
+	<aura:attribute name="isOpenEvent" type="boolean" default="false"/>
+	<!-- INIT AURA COMPONENT -->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<!--<lightning:flow aura:id="AV_NuevaTarea"/>-->
+	
+	<lightning:workspaceAPI aura:id="workspace" />
+	<lightning:quickActionAPI aura:id="quickActionAPI" />
+
+	<lightning:card>
+		<aura:set attribute="title">
+			<aura:if isTrue="{!not(empty(v.iconCard))}">
+				<lightning:icon alternativeText="IconCard" iconName="{!v.iconCard}" size="medium" class="slds-m-around--small"/>
+			</aura:if>
+			<aura:if isTrue="{!not(empty(v.titleCard))}">
+				<a class="slds-m-around--small">{!v.valueTitleCard}</a>
+				<lightning:badge label="{!v.data.size}" class="slds-m-around--small"/>			
+			</aura:if>
+			
+		</aura:set>
+		<aura:set attribute="actions">
+			<lightning:button iconName="utility:refresh" onclick="{!c.doInit}" title="Refrescar listado" />
+		</aura:set>
+
+		<lightning:spinner aura:id="mySpinner"/>
+
+		<!-- DATA WITH ACCORDION -->
+		<aura:iteration items="{!v.data.listRowData}" var="rowData" indexVar="i">
+			<div class = "slds-p-top_x-small slds-p-bottom_x-small slds-p-right_medium slds-p-left_medium">
+				<lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{! v.expandAccordion ? v.activeSections : '' }" >
+					<lightning:accordionSection name="defaultAccordionSection" label="{!rowData.oppName}" >
+						<!-- BUTTONS -->
+						<aura:set attribute="actions">
+							<div class='alignButtons'>
+								<a data-codOpp="{!rowData.oppId}" title="{!rowData.text}" onclick="{!c.newEvent}" class="slds-button slds-button_neutral">{!$Label.c.AV_NuevaCita}</a>
+								<a data-codOpp="{!rowData.oppId}" title="{!rowData.text}" onclick="{!c.newTask}" class="slds-button slds-button_neutral">{!$Label.c.AV_NuevaTarea}</a>
+							</div>
+						</aura:set>
+						<!-- ACCORDION SECTION -->
+						<div class = "slds-p-around_large">
+							<!-- OPPORTUNITY DETAIL LINK -->
+							<div class="slds-grid slds-gutters slds-p-bottom_medium">
+								<div class="slds-col slds-size_2-of-3">
+								</div>
+								<div class="slds-col slds-size_1-of-3 ">
+									<div class="slds-float_right">
+										<lightning:tile label="{!$Label.c.AV_DetalleOportunidad}" href="{! '/lightning/r/Opportunity/' + rowData.oppId + '/view'}">
+										</lightning:tile>
+									</div>									
+								</div>
+							</div>
+							<!-- DATA -->
+							<div class="slds-m-bottom--medium">
+								<div class="slds-grid ">
+									<div class="slds-col">
+										<dl>
+											<dt>
+												<p class="slds-truncate" title="Tipo">{!$Label.c.AV_Type}</p>
+											</dt>
+											<dd class="slds-tile__meta">
+												<p>
+													<span class="itemStyle" title="{!'Tipo oportunidad: ' + rowData.oppRecordTypeName}">
+														{!rowData.oppRecordTypeName}
+													</span>
+												</p>
+											</dd>
+										</dl>
+									</div>
+									<div class="slds-col">
+										<dl>
+											<dt>
+												<p class="slds-truncate" title="Producto">{!$Label.c.AV_Product}</p>
+											</dt>
+											<dd class="slds-tile__meta">
+												<p>
+													<span class="" title="{!rowData.oppProductName}">
+															{!rowData.oppProductName}
+													</span>
+												</p>
+											</dd>
+										</dl>
+									</div>
+									<div class="slds-col">
+										<dl>
+											<dt>
+												<p class="slds-truncate" title="Fecha cierre">{!$Label.c.AV_CloseDate}</p>
+											</dt>
+											<dd class="slds-tile__meta">
+												<p>
+													<span title="{!rowData.oppCloseDate}">
+														{!rowData.oppCloseDate}
+													</span>
+												</p>
+											</dd>
+										</dl>
+									</div>
+								</div>
+								<div class="slds-col slds-p-top--large slds-p-bottom_medium">
+									<ui:scrollerWrapper class="scrollerSize ">
+										<lightning:progressIndicator currentStep="{!rowData.oppStageName}" type="path" variant="base">
+											<aura:iteration items="{!rowData.stages}" var="step">
+												<lightning:progressStep label="{!step.label}" value="{!step.value}"/>
+											</aura:iteration>
+										</lightning:progressIndicator>
+									</ui:scrollerWrapper>
+								</div>
+								<div class="slds-grid slds-col slds-col slds-p-top--medium slds-p-bottom_medium">
+									<dl>
+										<dt>
+											<p class="slds-truncate" title="Comentario">{!$Label.c.AV_Comment}</p>
+										</dt>
+										<dd class="slds-tile__meta">
+											<p>{!rowData.oppComentarios}</p>
+										</dd>
+									</dl>
+								</div>
+								<div class="slds-clearfix"></div>
+							</div>
+						</div>						
+					</lightning:accordionSection>
+				</lightning:accordion>
+			</div>
+		</aura:iteration>
+		
+		<aura:if isTrue="{!v.isOpen}">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<!-- ###### MODAL BOX HEADER ######-->
+					<header class="slds-modal__header">
+						<lightning:buttonIcon iconName="utility:close"
+											onclick="{! c.closeModel }"
+											alternativeText="close"
+											variant="bare-inverse"
+											class="slds-modal__close"/>
+						<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.AV_NuevaTarea}</h2>
+					</header>
+					<!--###### MODAL BOX BODY ######-->
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						<lightning:flow aura:id="AV_NuevaTarea" onstatuschange="{!c.statusChange}"/>
+						
+					</div>
+				</div>		
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+			<!--###### MODAL BOX Part END Here ######-->
+		</aura:if>
+
+		<aura:if isTrue="{!v.isOpenEvent}">
+			<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<!-- ###### MODAL BOX HEADER ######-->
+					<header class="slds-modal__header">
+						<lightning:buttonIcon iconName="utility:close"
+											onclick="{! c.closeModel }"
+											alternativeText="close"
+											variant="bare-inverse"
+											class="slds-modal__close"/>
+						<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.AV_NuevaCita}</h2>
+					</header>
+					<!--###### MODAL BOX BODY ######-->
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+						<lightning:flow aura:id="AV_NuevoEvento" onstatuschange="{!c.statusChange}"/>						
+					</div>
+				</div>		
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+			<!--###### MODAL BOX Part END Here ######-->
+		</aura:if>
+	</lightning:card>
+</aura:component>

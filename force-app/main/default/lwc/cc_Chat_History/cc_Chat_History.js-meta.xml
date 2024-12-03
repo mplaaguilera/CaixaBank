@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="cc_Chat_History">
+    <apiVersion>45.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property label="En el detalle de una transcripción de agente, mostrar en su lugar la transcripción cognitiva asociada." name="forzarCognitivo" type="Boolean"/>
+            <objects>
+                <object>Case</object>
+                <object>LiveChatTranscript</object>
+                <object>Task</object>
+                <object>CC_Llamada__c</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

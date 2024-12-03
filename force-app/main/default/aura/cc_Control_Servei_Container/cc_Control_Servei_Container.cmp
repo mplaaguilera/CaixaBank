@@ -1,0 +1,6 @@
+<aura:component>
+    <aura:attribute name="recordId" type="String"/>
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+    <aura:handler name="oSelectedAccountEvent" event="c:CC_SelectedAccountEvent" action="{!c.handleComponentEvent}" />
+    <c:cc_Control_Servei recordId="{!v.recordId}" onmodalcerrado="{!c.handleModalOficinaCerrado}"/>
+</aura:component>

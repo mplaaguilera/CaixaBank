@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_DespachoRepresentante__c</fullName>
+    <description>Despacho del representante proporcionado por la IA</description>
+    <label>Despacho representante</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_AndresMorata</fullName>
+                <default>false</default>
+                <label>Andrés Morata Semitiel</label>
+            </value>
+            <value>
+                <fullName>SAC_Arriaga</fullName>
+                <default>false</default>
+                <label>Arriaga Asociados A.J.E.</label>
+            </value>
+            <value>
+                <fullName>SAC_Rosales</fullName>
+                <default>false</default>
+                <label>Bufete Rosales</label>
+            </value>
+            <value>
+                <fullName>SAC_DanielGonzalez</fullName>
+                <default>false</default>
+                <label>Daniel González Navarro</label>
+            </value>
+            <value>
+                <fullName>SAC_DespachoPrincipal</fullName>
+                <default>false</default>
+                <label>Despacho principal</label>
+            </value>
+            <value>
+                <fullName>SAC_Duran</fullName>
+                <default>false</default>
+                <label>Durán</label>
+            </value>
+            <value>
+                <fullName>SAC_Ezaro</fullName>
+                <default>false</default>
+                <label>Ezaro Legal</label>
+            </value>
+            <value>
+                <fullName>SAC_Hipotecasos</fullName>
+                <default>false</default>
+                <label>Hipotecasos</label>
+            </value>
+            <value>
+                <fullName>SAC_Ibarra</fullName>
+                <default>false</default>
+                <label>Ibarra Finanzas</label>
+            </value>
+            <value>
+                <fullName>SAC_Robinjud</fullName>
+                <default>false</default>
+                <label>Los Robinjud Servicios Legales, SL</label>
+            </value>
+            <value>
+                <fullName>SAC_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>SAC_PreicoJuridicos</fullName>
+                <default>false</default>
+                <label>Preico Jurídicos Abogados</label>
+            </value>
+            <value>
+                <fullName>SAC_Reclamapormi</fullName>
+                <default>false</default>
+                <label>Reclama Por Mi, SL</label>
+            </value>
+            <value>
+                <fullName>SAC_Reclamaprestamo</fullName>
+                <default>false</default>
+                <label>Reclama tu préstamo</label>
+            </value>
+            <value>
+                <fullName>SAC_RespuestaJuridica</fullName>
+                <default>false</default>
+                <label>Respuesta Jurídica</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

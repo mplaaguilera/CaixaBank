@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado__c</fullName>
+    <label>Estado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Aprobado</fullName>
+                <default>false</default>
+                <label>Aprobado</label>
+            </value>
+            <value>
+                <fullName>Cancelada por agente</fullName>
+                <default>false</default>
+                <label>Cancelada por agente</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Denegado</fullName>
+                <default>false</default>
+                <label>Denegado</label>
+            </value>
+            <value>
+                <fullName>En progreso</fullName>
+                <default>false</default>
+                <label>En progreso</label>
+            </value>
+            <value>
+                <fullName>Error</fullName>
+                <default>false</default>
+                <label>Error</label>
+            </value>
+            <value>
+                <fullName>Expirado</fullName>
+                <default>false</default>
+                <label>Expirado</label>
+            </value>
+            <value>
+                <fullName>No autorizado</fullName>
+                <default>false</default>
+                <label>No autorizado</label>
+            </value>
+            <value>
+                <fullName>OTP No recibida</fullName>
+                <default>false</default>
+                <label>OTP No recibida</label>
+            </value>
+            <value>
+                <fullName>Pdte. Envío</fullName>
+                <default>false</default>
+                <label>Pdte. Envío</label>
+            </value>
+            <value>
+                <fullName>Pdte. Validar</fullName>
+                <default>false</default>
+                <label>Pdte. Validar</label>
+            </value>
+            <value>
+                <fullName>Pendiente</fullName>
+                <default>false</default>
+                <label>Pendiente</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

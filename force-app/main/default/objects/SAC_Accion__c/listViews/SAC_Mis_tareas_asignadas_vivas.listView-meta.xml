@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Mis_tareas_asignadas_vivas</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_Descripcion__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <columns>SAC_Criticidad__c</columns>
+    <columns>SAC_Propietario__c</columns>
+    <columns>SAC_EquipoResponsable__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_FechaVencimientoInicial__c</columns>
+    <columns>SAC_FechaVencimientoProrroga__c</columns>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>SAC_Gestor__c</columns>
+    <columns>SAC_GrupoProveedor__c</columns>
+    <columns>SAC_TareaRelacionada__c</columns>
+    <columns>SAC_Tercero__c</columns>
+    <columns>SAC_FechaTentativa__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>SAC_Estado__c</field>
+        <operation>equals</operation>
+        <value>SAC_EnGestion,SAC_StandBy,SAC_Devuelta</value>
+    </filters>
+    <label>SAC - Mis tareas asignadas vivas</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

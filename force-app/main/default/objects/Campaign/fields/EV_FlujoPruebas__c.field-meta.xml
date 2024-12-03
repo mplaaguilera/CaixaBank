@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_FlujoPruebas__c</fullName>
+    <description>Campo picklist para el flujo de prueba de campaign.</description>
+    <inlineHelpText>Estado de las pruebas que se realizan para la preparación del evento.</inlineHelpText>
+    <label>Flujo de pruebas</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Solicitud de pruebas</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Pruebas enviadas</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Pruebas validadas</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Pruebas no validas</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Pruebas fallidas</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

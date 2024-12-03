@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón SACH</label>
+    <protected>false</protected>
+    <values>
+        <field>SACH_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">SACH</value>
+    </values>
+    <values>
+        <field>SACH_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">SACH_Buzon</value>
+    </values>
+    <values>
+        <field>SACH_Email_Destino__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SACH_Email_Redireccion_Buzon__c</field>
+        <value xsi:type="xsd:string">sach_emailservice@f-28f5cm3qxt7v4huitxd9ncx89b4q9sfm76q6kvh98ruxxavsq4.1t-x4n6eaa.eu33.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>SACH_RecordType_DeveloperName_defecto__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

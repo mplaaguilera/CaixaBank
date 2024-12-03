@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Situacion_SR__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Ultima_Interaccion__c,&apos;Respuesta de solicitud de información&apos;) || ISPICKVAL(CC_Ultima_Interaccion__c,&apos;Respuesta de cliente&apos;) || ISPICKVAL(CC_Ultima_Interaccion__c,&apos;Respuesta de colaborador&apos;),
+	IMAGE(&quot;/resource/OS_CorreoNuevo&quot;,&apos;Correo Nuevo&apos;,20,20),
+		IF(ISPICKVAL(CC_Ultima_Interaccion__c,&apos;Reasignación del caso&apos;) || ISPICKVAL(CC_Ultima_Interaccion__c,&apos;Fin reclamación&apos;),IMAGE(&quot;/resource/OS_ReasignacionCaso&quot;,&apos;Reasignación Caso&apos;,20,20),null))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Situación Caso</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

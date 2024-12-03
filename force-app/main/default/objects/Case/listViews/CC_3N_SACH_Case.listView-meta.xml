@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_3N_SACH_Case</fullName>
+    <columns>Flag__c</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Fecha_Limite_Resolucion__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_MCC_Tematica__c</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>CC_Ultima_Interaccion__c</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
+    <label>Cola 3N AC NEGOCIO</label>
+    <queue>CC_3N_SACH</queue>
+    <sharedTo>
+        <group>PublicGroup_3N_SACH</group>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SACH_Compact_Layout</fullName>
+    <fields>CaseNumber</fields>
+    <fields>CreatedDate</fields>
+    <fields>Status</fields>
+    <fields>Origin</fields>
+    <fields>ContactId</fields>
+    <fields>Subject</fields>
+    <fields>OwnerId</fields>
+    <label>SACH Compact Layout</label>
+</CompactLayout>

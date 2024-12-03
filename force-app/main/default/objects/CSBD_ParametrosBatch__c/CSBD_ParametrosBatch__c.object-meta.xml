@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Parámetros de tiempo entre ejecuciones y número de registros por ejecución para batch.</description>
+    <enableFeeds>false</enableFeeds>
+    <label>CSBD - Parametros batch</label>
+    <visibility>Public</visibility>
+</CustomObject>

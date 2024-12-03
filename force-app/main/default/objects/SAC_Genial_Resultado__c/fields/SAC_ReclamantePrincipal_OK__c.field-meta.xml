@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ReclamantePrincipal_OK__c</fullName>
+    <formula>OR(AND(SAC_SuppliedNIF__c!=null, SAC_SuppliedNIF_OK__c), AND(SAC_Email__c!=null, SAC_Email_OK__c))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Reclamante Principal OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

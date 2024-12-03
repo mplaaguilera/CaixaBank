@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_CaseHistory</fullName>
+    <description>Este conjunto de campos se va a utilizar en el trigger HDT_Case_BU_TRHan para comprobar que campos han cambiado cuando se realice una actualización de un registro del caso.</description>
+    <displayedFields>
+        <field>CC_Detalles_Consulta__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>Subject</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <label>HDT_CaseHistory</label>
+</FieldSet>

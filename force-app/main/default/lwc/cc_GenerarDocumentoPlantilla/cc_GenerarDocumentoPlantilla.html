@@ -1,0 +1,81 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <lightning-button icon-name="utility:open_folder" label="Seleccionar plantilla" onclick={mostrarModalPlantillas}></lightning-button>
+
+    <!--Modal seleccionar plantilla-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="modalSeleccionarPlantilla slds-modal" onkeydown={modalSeleccionarPlantillaOnkeydown}>
+        <div class="slds-modal__container" style="width:250px;">
+            <header class="slds-modal__header">
+                <!-- sldsValidatorIgnoreNextLine -->
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalPlantillas} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Seleccionar plantilla</h2>
+            </header>
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <!--<div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                        <template for:each={plantillas} for:item="plantilla">
+                            Resultado 
+                            <li key={plantilla.Id} role="presentation" class="slds-listbox__item" onclick={lookupBusquedaSeleccionarResultado} data-id={plantilla.Id}>
+                                <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                    Icono del resultado -
+                                    <span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -3px;">
+                                        <lightning-icon icon-name="standard:template" size="small"></lightning-icon>
+                                    </span>
+                                    <span class="slds-media__body">
+                                        <span class="slds-listbox__option-text_entity" style="font-weight: 500;">{plantilla.Name}</span>
+                                        <span class="slds-listbox__option-meta" style="font-weight: 300; padding-top: 1px;">{plantilla.Subject}</span>
+                                    </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>-->
+                <div class="slds-form-element">
+                    <!-- <label class="slds-form-element__label" for="text-input-id-46">Buscador de plantilla</label> -->
+                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                        <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
+                        </svg>
+                        <input type="search" id="busquedaPlantilla" placeholder="Buscar plantilla…" class="slds-input" onchange={test}/>
+                    </div>
+                </div>
+                </br>
+                    <ul>
+                        <template for:each={plantillas} for:item="plantilla">
+                            <!-- Resultado -->
+                            <li class="liplantilla" key={plantilla.Id} onclick={lookupBusquedaSeleccionarResultado} data-id={plantilla.Id}>
+                                <div class="slds-media" role="option">
+                                    <!-- Icono del resultado -->
+                                    <span class="slds-media__figure slds-is-relative" style="top: -3px;">
+                                        <lightning-icon icon-name="standard:template" size="small"></lightning-icon>
+                                    </span>
+                                    <span class="slds-media__body">
+                                        <span  style="font-weight: 500;">{plantilla.Name}</span>
+                                        <!--<span  style="font-weight: 300; padding-top: 1px;">{plantilla.Subject}</span>-->
+                                    </span>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+
+            </div>
+
+            <footer class="slds-modal__footer">
+                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                    <div class="slds-col">
+                        <span lwc:if={plantillaSeleccionada} class="slds-var-m-left_medium">
+                            <span class="slds-var-m-right_medium">Plantilla seleccionada:</span>
+                            <lightning-icon icon-name="standard:template" size="x-small" class="slds-var-m-right_small slds-is-relative" style="top: -1px;"></lightning-icon>
+                            <span style="font-weight: 500;">{plantillaSeleccionada.Name}</span>
+                        </span>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-button class="botonCancelar slds-var-m-left_small" label="Cancelar" onclick={cerrarModalPlantillas}></lightning-button>
+                        <lightning-button class="botonAplicar slds-var-m-left_small" label="Seleccionar plantilla" variant="brand" onclick={botonAplicarOnclick} disabled></lightning-button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+</template>

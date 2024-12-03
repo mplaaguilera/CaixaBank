@@ -1,0 +1,32 @@
+<aura:component controller="CC_LiveAgent_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" description="Conversation toolkit api sample"> 
+    
+    <lightning:conversationToolkitAPI aura:id="conversationKit" />
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="msg" type="String" default=""/> 
+    <aura:attribute name="showNoSoportada" type="Boolean"  default="false" />
+    <aura:attribute name="idioma" type="String"/>
+    <aura:registerEvent name="ShowBuscar" type="c:CC_LiveAgent_Event" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="lightning:conversationNewMessage"  action="{!c.onNewMessage}" />
+    <aura:handler event="lightning:conversationAgentSend"   action="{!c.onAgentMessage}" />
+    <aura:handler event="lightning:conversationCustomEvent" action="{!c.onCustomEvent}" />
+	
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <c:CC_LiveAgent_NoSoportada aura:id="compNoSoportada" isActive="{!v.showNoSoportada}" idioma="{!v.idioma}" chatId="{!v.recordId}"/>
+
+    <div>
+        <lightning:button label="Buscar" onclick="{!c.buscar}"/>   
+        <lightning:button label="No soportada" onclick="{!c.noSoportada}"/>   
+        <lightning:button label="Escalar" onclick="{!c.sendMessage}"/>   
+        <lightning:button label="Transferir" onclick="{!c.sendMessage}"/>  
+        <lightning:button label="Finalizar" onclick="{!c.sendMessage}"/>  
+        <lightning:button name="modal" label="Show Modal" onclick="{!c.handleShowModal}"/>
+        
+        
+        <lightning:button label="sendCustomEvent" onclick="{!c.sendCustomEvent}"/>  
+        <br></br> 
+        {!v.msg}     
+    </div>
+</aura:component>

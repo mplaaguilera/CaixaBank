@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Resultado_Cierre__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Resultado de cierre</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>OB_Parametrizacion__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Resultado de cierre</value>
+        </filterItems>
+        <filterItems>
+            <field>OB_Parametrizacion__c.OB_Activo__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>OB_Parametrizacion__c</referenceTo>
+    <relationshipLabel>Llamadas (Resultado de cierre)</relationshipLabel>
+    <relationshipName>LlamadasResultadoCierre</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

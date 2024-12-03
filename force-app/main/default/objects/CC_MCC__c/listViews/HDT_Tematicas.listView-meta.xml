@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Tematicas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Tematica</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>HDT Empleado</value>
+    </filters>
+    <label>Temáticas HDT</label>
+    <sharedTo>
+        <role>HDT</role>
+    </sharedTo>
+</ListView>

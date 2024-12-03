@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_AreaDelContrato__c</fullName>
+    <label>Área del contrato</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>000</fullName>
+                <default>false</default>
+                <label>REFERENCIAS</label>
+            </value>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>AHORRO</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>VALORES</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>PRESTAMOS</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>PERSONAL</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>INMUEBLES</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>BANCA PRIVADA</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>CARTERA DE EFECTOS</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>PREVISION Y PASIVO</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <label>TARJETA XIP</label>
+            </value>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <label>PERSONAL PASIVO</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <label>DERECHOS DE REMATADA</label>
+            </value>
+            <value>
+                <fullName>012</fullName>
+                <default>false</default>
+                <label>AVALES</label>
+            </value>
+            <value>
+                <fullName>013</fullName>
+                <default>false</default>
+                <label>SEGUROS</label>
+            </value>
+            <value>
+                <fullName>014</fullName>
+                <default>false</default>
+                <label>CUENTAS DE CREDITO</label>
+            </value>
+            <value>
+                <fullName>015</fullName>
+                <default>false</default>
+                <label>INMUEBLES II</label>
+            </value>
+            <value>
+                <fullName>016</fullName>
+                <default>false</default>
+                <label>SOLICITUDES ACTIVO</label>
+            </value>
+            <value>
+                <fullName>017</fullName>
+                <default>false</default>
+                <label>TARJETAS</label>
+            </value>
+            <value>
+                <fullName>018</fullName>
+                <default>false</default>
+                <label>COMERCIOS</label>
+            </value>
+            <value>
+                <fullName>020</fullName>
+                <default>false</default>
+                <label>CARTERA GESTIONADA</label>
+            </value>
+            <value>
+                <fullName>019</fullName>
+                <default>false</default>
+                <label>CTO CORRESPONSAL</label>
+            </value>
+            <value>
+                <fullName>021</fullName>
+                <default>false</default>
+                <label>ASESORAMIENTO PERSON.</label>
+            </value>
+            <value>
+                <fullName>022</fullName>
+                <default>false</default>
+                <label>P.P Y SEGUR. EXTERNOS</label>
+            </value>
+            <value>
+                <fullName>023</fullName>
+                <default>false</default>
+                <label>IMPOSICION PLAZO</label>
+            </value>
+            <value>
+                <fullName>024</fullName>
+                <default>false</default>
+                <label>MULTICTO. PASIVO</label>
+            </value>
+            <value>
+                <fullName>025</fullName>
+                <default>false</default>
+                <label>CONTRATOS SEGUROS</label>
+            </value>
+            <value>
+                <fullName>026</fullName>
+                <default>false</default>
+                <label>MESA EJECUCION</label>
+            </value>
+            <value>
+                <fullName>027</fullName>
+                <default>false</default>
+                <label>PAGARES EMPRESA</label>
+            </value>
+            <value>
+                <fullName>028</fullName>
+                <default>false</default>
+                <label>ALERTAS/CAIXAPROTECT</label>
+            </value>
+            <value>
+                <fullName>029</fullName>
+                <default>false</default>
+                <label>SISTEMA ACCESO UNICO</label>
+            </value>
+            <value>
+                <fullName>030</fullName>
+                <default>false</default>
+                <label>PGM. FIDELIZACION</label>
+            </value>
+            <value>
+                <fullName>031</fullName>
+                <default>false</default>
+                <label>CONVENIOS</label>
+            </value>
+            <value>
+                <fullName>032</fullName>
+                <default>false</default>
+                <label>CONFIRMING Y FACTORIN</label>
+            </value>
+            <value>
+                <fullName>033</fullName>
+                <default>false</default>
+                <label>EMISIONES CAIXABANK</label>
+            </value>
+            <value>
+                <fullName>034</fullName>
+                <default>false</default>
+                <label>BANCA TELEFONICA</label>
+            </value>
+            <value>
+                <fullName>035</fullName>
+                <default>false</default>
+                <label>SERV.COMER.EXTERIOR</label>
+            </value>
+            <value>
+                <fullName>036</fullName>
+                <default>false</default>
+                <label>EMISORAS DOMICIL.</label>
+            </value>
+            <value>
+                <fullName>037</fullName>
+                <default>false</default>
+                <label>TARJETA FINANCIERA</label>
+            </value>
+            <value>
+                <fullName>038</fullName>
+                <default>false</default>
+                <label>RENTING</label>
+            </value>
+            <value>
+                <fullName>039</fullName>
+                <default>false</default>
+                <label>CAPITAL MARKETS</label>
+            </value>
+            <value>
+                <fullName>040</fullName>
+                <default>false</default>
+                <label>CREDITO ABIERTO</label>
+            </value>
+            <value>
+                <fullName>041</fullName>
+                <default>false</default>
+                <label>CREDITO TARJETA</label>
+            </value>
+            <value>
+                <fullName>042</fullName>
+                <default>false</default>
+                <label>ACTIVO EN DIVISAS</label>
+            </value>
+            <value>
+                <fullName>043</fullName>
+                <default>false</default>
+                <label>GESTION LEASING</label>
+            </value>
+            <value>
+                <fullName>044</fullName>
+                <default>false</default>
+                <label>CLIENTES DIVERSOS</label>
+            </value>
+            <value>
+                <fullName>045</fullName>
+                <default>false</default>
+                <label>PLAN AHORRO POPULAR</label>
+            </value>
+            <value>
+                <fullName>046</fullName>
+                <default>false</default>
+                <label>CAJAS DE SEGURIDAD</label>
+            </value>
+            <value>
+                <fullName>047</fullName>
+                <default>false</default>
+                <label>SEGUROS DE CAMBIO</label>
+            </value>
+            <value>
+                <fullName>048</fullName>
+                <default>false</default>
+                <label>PER.COMERCI.SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>049</fullName>
+                <default>false</default>
+                <label>GESTION LEASING STAND</label>
+            </value>
+            <value>
+                <fullName>050</fullName>
+                <default>false</default>
+                <label>EXPEDIENTES</label>
+            </value>
+            <value>
+                <fullName>051</fullName>
+                <default>false</default>
+                <label>GESTION CTOS. TRANSM.</label>
+            </value>
+            <value>
+                <fullName>052</fullName>
+                <default>false</default>
+                <label>DISTR. REGULAR PAGOS</label>
+            </value>
+            <value>
+                <fullName>053</fullName>
+                <default>false</default>
+                <label>PROFIT</label>
+            </value>
+            <value>
+                <fullName>054</fullName>
+                <default>false</default>
+                <label>PLANES DE PENSIONES</label>
+            </value>
+            <value>
+                <fullName>055</fullName>
+                <default>false</default>
+                <label>CORREO PERSONALIZADO</label>
+            </value>
+            <value>
+                <fullName>056</fullName>
+                <default>false</default>
+                <label>CONTRATO FIRMA</label>
+            </value>
+            <value>
+                <fullName>057</fullName>
+                <default>false</default>
+                <label>GEST.LINEAS ACTIVO</label>
+            </value>
+            <value>
+                <fullName>058</fullName>
+                <default>false</default>
+                <label>OPCIONES EN DIVISAS</label>
+            </value>
+            <value>
+                <fullName>059</fullName>
+                <default>false</default>
+                <label>OTR. VEH. DE INVERS</label>
+            </value>
+            <value>
+                <fullName>060</fullName>
+                <default>false</default>
+                <label>P-TARJETAS</label>
+            </value>
+            <value>
+                <fullName>061</fullName>
+                <default>false</default>
+                <label>INGRESO CHEQUES</label>
+            </value>
+            <value>
+                <fullName>062</fullName>
+                <default>false</default>
+                <label>EXPEDIENTE FFEE</label>
+            </value>
+            <value>
+                <fullName>063</fullName>
+                <default>false</default>
+                <label>MONTE DE PIEDAD</label>
+            </value>
+            <value>
+                <fullName>064</fullName>
+                <default>false</default>
+                <label>TOT DESPESAS</label>
+            </value>
+            <value>
+                <fullName>065</fullName>
+                <default>false</default>
+                <label>LIBRETA FINANCIERA</label>
+            </value>
+            <value>
+                <fullName>067</fullName>
+                <default>false</default>
+                <label>DEUDA PUBLICA</label>
+            </value>
+            <value>
+                <fullName>068</fullName>
+                <default>false</default>
+                <label>SERVICUENTA</label>
+            </value>
+            <value>
+                <fullName>069</fullName>
+                <default>false</default>
+                <label>TESORERIA</label>
+            </value>
+            <value>
+                <fullName>071</fullName>
+                <default>false</default>
+                <label>DEUDA SUBORDINADA</label>
+            </value>
+            <value>
+                <fullName>072</fullName>
+                <default>false</default>
+                <label>AHORRO EN DIVISAS</label>
+            </value>
+            <value>
+                <fullName>078</fullName>
+                <default>false</default>
+                <label>PRECONTRATO INTERNET</label>
+            </value>
+            <value>
+                <fullName>079</fullName>
+                <default>false</default>
+                <label>RECAUDACIONES</label>
+            </value>
+            <value>
+                <fullName>080</fullName>
+                <default>false</default>
+                <label>BANCA PERSONAL</label>
+            </value>
+            <value>
+                <fullName>085</fullName>
+                <default>false</default>
+                <label>SEGUROS PBS</label>
+            </value>
+            <value>
+                <fullName>090</fullName>
+                <default>false</default>
+                <label>FONDOS DE INVERSION</label>
+            </value>
+            <value>
+                <fullName>092</fullName>
+                <default>false</default>
+                <label>FACTORING</label>
+            </value>
+            <value>
+                <fullName>094</fullName>
+                <default>false</default>
+                <label>PENSIONISTA</label>
+            </value>
+            <value>
+                <fullName>095</fullName>
+                <default>false</default>
+                <label>ALFABETIC CAIXA BARNA</label>
+            </value>
+            <value>
+                <fullName>096</fullName>
+                <default>false</default>
+                <label>CLI.LINEA ABIERTA</label>
+            </value>
+            <value>
+                <fullName>097</fullName>
+                <default>false</default>
+                <label>SERVICIO DE PAGOS</label>
+            </value>
+            <value>
+                <fullName>098</fullName>
+                <default>false</default>
+                <label>CREDITOS-REMESAS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

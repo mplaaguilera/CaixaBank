@@ -1,0 +1,12 @@
+<template>
+        <lightning-datatable
+                key-field="Id"
+                data={data}
+                columns={columns}
+                selected-rows={selectedRecords}
+                sorted-by={sortBy}
+                sorted-direction={sortDirection}
+                onsort={handleSortdata}
+                onrowselection={handleSelect}>
+        </lightning-datatable>
+</template>

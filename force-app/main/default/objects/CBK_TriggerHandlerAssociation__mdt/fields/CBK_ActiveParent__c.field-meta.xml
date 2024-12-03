@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_ActiveParent__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Activar/desactivar lógica parent handler (EmailMessage).Si se activa poner class name &quot;CBK_EmailMessage_Parent_TRHan&quot;</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Active Parent Handler (EmailMessage)</label>
+    <type>Checkbox</type>
+</CustomField>

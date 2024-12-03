@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_FechaVencimiento__c</fullName>
+    <description>Fecha de vencimiento de la oportunidad</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha vencimiento en otra entidad</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

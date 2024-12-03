@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Respuesta_Reclamada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Flag que indica si se ha reclamado respuesta a la solicitud de información</description>
+    <label>Respuesta reclamada</label>
+    <type>Checkbox</type>
+</CustomField>

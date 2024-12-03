@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarCambioNaturaleza</fullName>
+    <active>true</active>
+    <description>Validar que el campo SAC_Naturaleza__c se completa de forma correcta</description>
+    <errorConditionFormula>AND(NOT($Permission.SAC_ByPass),
+				 RecordType.DeveloperName == &apos;SAC_Reclamacion&apos;,
+					 OR( AND(ISCHANGED(Status), ISPICKVAL(Status, &apos;SAC_002&apos;), ISBLANK(TEXT( SAC_Naturaleza__c ))) ,
+								  AND(ISCHANGED(SAC_Naturaleza__c), NOT(ISPICKVAL(Status, &apos;SAC_001&apos;)), ISBLANK(TEXT( SAC_Naturaleza__c ))) 
+							) 
+				 )</errorConditionFormula>
+    <errorMessage>Recuerde completar el campo Naturaleza</errorMessage>
+</ValidationRule>

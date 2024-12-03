@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Periodicidad__c</fullName>
+    <description>Periodicidad</description>
+    <label>Periodicidad</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>Operaciones Periódicas</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>Carteras Gestionadas</label>
+            </value>
+            <value>
+                <fullName>N</fullName>
+                <default>false</default>
+                <label>Sin periodicidad</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

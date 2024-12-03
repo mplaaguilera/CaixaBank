@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ModificarCamposTarea</fullName>
+    <active>true</active>
+    <description>Permitir informar los campos Tarea relacionada, Tercero y Fecha tentativa solo al propietario de la tarea, a los usuarios pertenecientes al grupo de la tarea y a los usuarios COPS/AJ. El resto de campos solo al propietario de la tarea y COPS/AJ</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.CBK_BypassValidationRules),
+				NOT($Permission.SAC_ByPass),
+    IF(AND(
+				    RecordType.DeveloperName = &apos;SAC_MaestroDeTareas&apos; || 	RecordType.DeveloperName = &apos;SAC_OtrasTareas&apos;,
+        ISCHANGED(SAC_Tercero__c) || ISCHANGED(SAC_TareaRelacionada__c) || ISCHANGED(SAC_FechaTentativa__c), 
+        OwnerId &lt;&gt; $User.Id,
+				    SAC_EsMiGrupo__c  = false,
+				    $User.SAC_PerteneceCOPSAJ__c = false
+    ),
+    true,
+    IF(AND(
+			    	RecordType.DeveloperName = &apos;SAC_MaestroDeTareas&apos; || 	RecordType.DeveloperName = &apos;SAC_OtrasTareas&apos;,
+			    	ISCHANGED(SAC_MaestroAccionesReclamacion__c) || ISCHANGED (SAC_Oficina__c) || ISCHANGED(SAC_Antecedentes_Revisados__c) || ISCHANGED(SAC_NCuentaAbono__c) || ISCHANGED(SAC_ImporteResuelto__c) || ISCHANGED(SAC_ImpResueltoInteresesLegales__c) || ISCHANGED(SAC_Importe_Revisado__c) || ISCHANGED(SAC_ImporteAbonar__c) || ISCHANGED(SAC_NumeroContrato__c) || ISCHANGED(SAC_NCuentaAbono__c),
+				    OwnerId &lt;&gt; $User.Id,
+			    	$User.SAC_PerteneceCOPSAJ__c = false
+        ),
+			     true,
+		    	false) 
+    )
+)</errorConditionFormula>
+    <errorMessage>No tiene permisos para editar este campo</errorMessage>
+</ValidationRule>

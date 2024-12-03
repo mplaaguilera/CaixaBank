@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_AcuseDelay__c</fullName>
+    <description>Tiempo de delay para el envío del acuse de recibo</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Tiempo de delay para el envío del acuse de recibo</inlineHelpText>
+    <label>Acuse Delay (Interno)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

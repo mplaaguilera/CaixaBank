@@ -1,0 +1,69 @@
+<template>
+    <div class="slds-page-header">
+        <div class="slds-page-header__row">
+          <div class="slds-page-header__col-title">
+            <div class="slds-media">
+              <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-opportunity">
+                    <lightning-icon icon-name="standard:opportunity" alternative-text="Opportunity" title="Opportunity"></lightning-icon>
+                </span>
+              </div>
+              <!--Cuerpo del HTML  - Header. Titulo/Boton Down/ Listado de Oportunidades-->
+              <div class="slds-media__body">
+                <div class="slds-page-header__name">           
+                <div class="slds-page-header__name-title">
+                  <!--Titulo del Header en variable fija en el JS -->
+                    <h1>
+                      <span class="slds-page-header__title  slds-truncate">{opportunities}</span>
+                    </h1>
+                </div>
+                <div class="slds-page-header__name-switcher">
+                  <!-- Icono Lightning que maneja el control de la lista -->
+                  <lightning-icon
+                  class={dropdownIconTriggerClass} onclick={handleClickExtend} icon-name={iconNameTriggerClass} size="x-small">
+                  </lightning-icon>
+                </div>
+              </div>
+                      <div class={dropdownTriggerClass} aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none" >
+                          <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox">
+                            <ul class="large-slds-listbox slds-listbox_vertical " role="presentation">
+                              <template if:true={ifReports}>
+
+                              <span class="slds-p-left_small"><b>{label.reportLabel}</b></span>
+                              </template>
+                                <template for:each={reportsForCurrentView} for:item="option">
+                                    <li role="presentation" class="slds-listbox__item" key={option.value}>
+                                        <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                            data-filter={option.value} onclick={handleFilterChangeButton}>
+                                            <span class="slds-media__figure slds-listbox__option-icon" data-filter={option.value}></span>
+                                            <span class="slds-media__body" data-filter={option.value}>
+                                             <span class="slds-truncate" title="Option A" data-filter={option.value}>{option.value}</span>
+                                            </span>
+                                          </div>
+                                      </li>
+                                  </template>
+                                  <template if:true={ifTabs}>
+                                    <span class="slds-p-left_small"><b>{label.tabLabel}</b></span>                                  
+                                  </template>
+                                  <template for:each={tabsForCurrentView} for:item="option">
+                                    <li role="presentation" class="slds-listbox__item" key={option.label}>
+                                        <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                            data-filter={option.label} onclick={handleFilterChangeButtonTabs}>
+                                            <span class="slds-media__figure slds-listbox__option-icon" data-filter={option.label}></span>
+                                            <span class="slds-media__body" data-filter={option.label}>
+                                             <span class="slds-truncate" title="Option A" data-filter={option.label}>{option.label}</span>
+                                            </span>
+                                          </div>
+                                      </li>
+                                  </template>
+                              </ul>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+ </template>

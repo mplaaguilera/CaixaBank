@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ImporteResueltoGGH__c</fullName>
+    <description>Este importe solo se mostrará si el maestro de tareas de esta tarea es de tipo gastos hipotecarios (filtro en el lightning record page):</description>
+    <formula>SAC_ImpResueltoGestoria__c + SAC_ImpResueltoNotaria__c + SAC_ImpResueltoRegistros__c + SAC_ImpResueltoTasacion__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Importe resuelto</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,52 @@
+<template>
+	<div class="container-div">
+		<div class="cardMargin">
+			<lightning-card>
+				<h1 slot="title" class="card-title">
+					<lightning-icon class="slds-media__figure" icon-name="custom:custom18" size="small" style="background-color: gray;"></lightning-icon>
+					Evento finalizado
+				</h1>
+				<lightning-layout class="card-body">
+					<h1>El evento se cierra automáticamente</h1>
+					<br />
+					<lightning-layout-item size="12">
+						<label class="slds-form-element__label comment-label">Comentario</label>
+						<lightning-input class="user-input" type="text" name="comentario" value={comment} onchange={handleComment}></lightning-input>
+					</lightning-layout-item>
+				</lightning-layout> 
+			</lightning-card>
+		</div>
+		<div class="cardMargin">
+			<div class="slds-box messageWarning cardMargin slds-align_absolute-center">
+				<div>
+					<p>Para reportar correctamente las oportunidades es necesario:</p>
+					<ol class="slds-list_ordered slds-is-nested">
+						<li>Actualizar el listado de las oportunidades vinculadas al evento.</li>
+						<li>Informar el estado y detalle de las oportunidades vinculadas.</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="cardMargin">
+			<c-av_-list-opportunities recid={recordId} sobjname='Event' isreport=true ondatareport={handleDataReport} onrefreshlink={handleRefresh}></c-av_-list-opportunities>
+		</div>
+		<div if:true={showNewoppo}>
+			<lightning-card>
+				<lightning-button-icon icon-name="utility:close" alternative-text="Cancelar creación de oportunidad" class="slds-m-left_xx-small close-button" title="Cancelar creación de oportunidad" onclick={handelCancelNewOpp}></lightning-button-icon>
+				<div class="cardMargin">
+					<c-av_-new-opportunity-editable taskid={recordId} default-stage="En gestión/insistir" ondata={handleDataOpp}></c-av_-new-opportunity-editable>
+				</div>
+			</lightning-card>
+		</div>
+		<div class="cardMargin">
+			<lightning-button if:false={showNewoppo} label="Crear una nueva oportunidad" title="Crear oportunidad" icon-name="utility:add" class="slds-m-left_x-small" onclick={handleNewOpp}></lightning-button>
+		</div>
+		<div class="postionButton">
+			<c-av_-pending-tasks if:true={pendingTask} record-id={recordId} ondata={handleDataPendingTask}></c-av_-pending-tasks>
+		</div>
+		<div class="slds-docked-form-footer">
+			<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={saveButton} onclick={handleSave}>Grabar Reporte</button>
+		</div>
+	</div>
+	<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+</template>

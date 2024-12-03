@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoId__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Grupo colaborador anterior del caso</description>
+    <label>Grupo</label>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Grupos por casos</relationshipLabel>
+    <relationshipName>Grupos_por_casos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

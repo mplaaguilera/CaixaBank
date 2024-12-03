@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Obligatoriedad__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador de si la operación requiere el registro de auditoría para continuar la operación. En caso de que se marque como verdadero, si se produce un error el sistema lanzará una excepción; en caso contrario, se continuará la ejecución sin excepción aunque el registro de auditoría falle.</description>
+    <label>Obligatoriedad</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

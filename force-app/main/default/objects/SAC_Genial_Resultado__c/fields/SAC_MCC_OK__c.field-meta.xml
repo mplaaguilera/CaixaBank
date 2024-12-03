@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MCC_OK__c</fullName>
+    <description>True si los 4 niveles MCC son correctos</description>
+    <formula>AND(SAC_MCC_Tematica_OK__c ,SAC_MCC_ProdServ_OK__c ,  SAC_Detalle_OK__c ,   SAC_MCC_Motivo_OK__c )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>MCC OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

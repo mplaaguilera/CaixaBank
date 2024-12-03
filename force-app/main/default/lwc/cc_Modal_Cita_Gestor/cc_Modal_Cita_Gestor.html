@@ -1,0 +1,162 @@
+<template>
+    <template lwc:if={cargandoGestor}>
+        <div style="height: 55px;" align="center">
+            <lightning-spinner size="small" variant="brand" style="position: absolute;"
+            alternativetext="Cargando..."></lightning-spinner>
+        </div>
+    </template>
+    <template lwc:else>
+        <template lwc:if={numeroGestorKO}>
+            <div style="margin: 10px">
+                <span style="margin-right: 10px" class="slds-icon_container">
+                    <lightning-icon icon-name="utility:warning" variant="warning"
+                    size="x-small"></lightning-icon>
+                </span>
+                <b>No es posible agendar un evento</b>
+                <p style="margin-top: 10px">{mensajeErrorInt}</p>
+            </div>
+        </template>
+        <template lwc:else>
+            <template lwc:if={tieneGestor}>
+                <div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
+                <div class="slds-var-m-top_medium">
+                    <template lwc:if={esClienteDigital}>
+                        <lightning-select class="tipoCitaDigital" name="tipoCita" label="Tipo de cita" required="true" options={opcionesCitaDigital}></lightning-select>
+                    </template>
+                    <template lwc:else>
+                        <template lwc:if={ocultarOpcionCitaGestor}>
+                            <lightning-select class="tipoCitaOcultada" name="tipoCita" label="Tipo de cita" required="true" onchange={resetDisponibilidadConsultada} options={opcionesCitaDigital}></lightning-select>
+                        </template>
+                        <template lwc:else>
+                            <lightning-select class="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange={resetDisponibilidadConsultada} options={opcionesCita}></lightning-select>
+                        </template>
+                    </template>
+                    <lightning-input name="asuntoEvento" required="true" label="Asunto" maxlength="200"
+                    class="asuntoEvento slds-var-m-top_medium"></lightning-input>
+                    <template if:false={gestorBackupActivo}>
+                        <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">
+                            Asignado a</div>
+                            <div style="margin-top:10px;">
+                                <span style="padding-right:10px;" class="slds-icon">
+                                    <lightning-icon class="slds-var-m-right_small" icon-name="standard:user"
+                                    size="x-small"></lightning-icon>
+                                </span>
+                                {nombreGestor}
+                            </div>
+                            <div style="margin-top:15px;">
+                                <template if:false={gestorAsignadoCoincide}>
+                                    <span style="margin-right: 5px" class="slds-icon_container">
+                                        <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
+                                    </span>
+                                    El gestor disponible no coincide con el asignado al
+                                    cliente: {nombreGestorAsignado}.
+                                </template>
+                            </div>
+                            <div>
+                                <div class="slds-var-m-top_xx-large"
+                                style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                                Fecha y hora</div>
+                                <template if:false={disponibilidadConsultada}>
+                                    <lightning-button label="Consultar disponibilidad"
+                                    icon-name="utility:search" title="Consultar disponibilidad"
+                                    onclick={consultarFechasDisponibilidadGestor}></lightning-button>
+                                </template>
+                                <template if:true={disponibilidadConsultada}>
+                                    <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                        <div class="citaGestorFechaBackUpFalse slds-col slds-size_1-of-2">
+                                            <lightning-combobox label="Fecha" class="fechasDisponibilidad"
+                                            placeholder="--Seleccione una fecha--"
+                                            options={fechasDisponibilidad}
+                                            onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
+                                        </div>
+                                        <div class="horasDisponibilidad1 slds-col slds-size_1-of-2">
+                                            <lightning-combobox label="Hora"
+                                            placeholder="--Seleccione una hora--"
+                                            options={horasDisponibilidad}
+                                            onchange={guardarHorasDisponibilidad}></lightning-combobox>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <div>
+                            <div class="slds-var-m-top_xx-large"
+                            style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                            Otros gestores
+                        </div>
+                        <lightning-input name="checkbox" type="toggle"
+                        checked={gestorBackupActivo} onchange={mostrarGestorBackup}
+                        messagetoggleactive="Gestor backup" messagetoggleinactive="Gestor asignado"
+                        disabled="true"></lightning-input>
+                    </div>
+                    <template if:true={gestorBackupActivoDos}>
+                        <template if:true={existeBackup}>
+                            <div class="slds-col slds-size_1-of-1"
+                            style="margin-top:15px; margin-bottom:10px;">
+                            <lightning-combobox label="Gestor backup"
+                            placeholder="--Seleccione un gestor--" options={gestoresBackup}
+                            onchange={resetDisponibilidadConsultada}></lightning-combobox>
+                            <div>
+                                <div
+                                style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
+                                Fecha y hora
+                            </div>
+                            <template if:false={disponibilidadConsultada}>
+                                <lightning-button label="Consultar disponibilidad"
+                                icon-name="utility:search" title="Consultar disponibilidad"
+                                onclick={consultarFechasDisponibilidadBackup}></lightning-button>
+                            </template>
+                            <template if:true={disponibilidadConsultada}>
+                                <div
+                                class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                    <lightning-combobox class="fechasDisponibilidad"
+                                    label="Fecha" placeholder="--Seleccione una fecha--"
+                                    options={fechasDisponibilidad}
+                                    onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
+                                </div>
+                                <div class="horasDisponibilidad slds-col slds-size_1-of-2">
+                                    <lightning-combobox
+                                    label="Hora" placeholder="--Seleccione una hora--"
+                                    options={horasDisponibilidad}></lightning-combobox>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <template if:false={existeBackup}>
+                <div style="margin-top:15px;">
+                    <span style="margin-right: 5px; margin-left: 5px;"
+                    class="slds-icon_container">
+                    <lightning-icon icon-name="utility:info_alt"
+                    size="small"></lightning-icon>
+                </span>
+                No existen backups asignados al gestor de este cliente.
+            </div>
+        </template>
+    </template>
+    <div>
+        <div class="slds-var-m-top_xx-large" style="margin-top:15px;font-size:14px;font-weight:700; margin-bottom:10px;">
+            La cita no cumple las expectativas del cliente. Quiero crear una tarea.
+        </div>
+        <div >
+            <lightning-input class ="checkBoxCitaGestor" type="toggle" onchange={checkCrearTareaOnchange}></lightning-input>
+        </div>
+    </div>
+</div>
+</template>
+<template lwc:else>
+    <div style="margin: 10px">
+        <span style="margin-right: 10px" class="slds-icon_container">
+            <lightning-icon icon-name="utility:warning" variant="warning"
+            size="x-small"></lightning-icon>
+        </span>
+        <b>No es posible agendar un evento</b>
+        <p style="margin-top: 10px">El cliente relacionado con este caso no tiene un
+            gestor asignado. </p>
+        </div>
+    </template>
+</template>
+</template>
+</template>

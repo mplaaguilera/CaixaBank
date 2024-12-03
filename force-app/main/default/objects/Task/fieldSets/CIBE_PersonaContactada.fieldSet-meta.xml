@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_PersonaContactada</fullName>
+    <description>Se usa en la FlexiPage de Task - CIBE_Task</description>
+    <displayedFields>
+        <field>AV_PersonaContactada__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <label>CIBE_PersonaContactada</label>
+</FieldSet>

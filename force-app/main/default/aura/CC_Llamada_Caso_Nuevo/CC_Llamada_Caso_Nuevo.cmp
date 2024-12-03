@@ -1,0 +1,53 @@
+<aura:component controller="CC_Llamada_Caso_Nuevo_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <aura:attribute name="llamada" type="CC_Llamada__c"/>
+    <aura:attribute name="errorLds" type="String"/>
+
+    <aura:registerEvent name="casoCreado" type="c:CC_Llamada_Caso_Creado_Event"/>
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <force:recordData aura:id="recordLlamada" recordId="{!v.recordId}" targetFields="{!v.llamada}"
+        fields="RecordType.DeveloperName, CC_Fecha_Fin__c, CC_Cuenta__c, CC_No_Identificado__c, HDT_Desborde__c"
+        targetError="{!v.errorLds}" recordUpdated="{!c.llamadaUpdated}"/>
+
+    <article class="slds-card">
+        <aura:if isTrue="{!v.spinner}">
+            <div class="spinnerCBK">
+                <lightning:spinner variant="brand"/>
+            </div>
+        </aura:if>
+
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:case" size="small"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Crear nuevo caso</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner slds-var-p-bottom_x-small">
+            <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-end">
+                <!--Asunto del caso-->
+                <div class="slds-col">
+                    <span onkeypress="{!c.asuntoTeclaPulsada}">
+                        <lightning:input aura:id="asunto" label="Asunto" maxlength="255" required="true"
+                            messageWhenTooLong="No se puede introducir un asunto con más de 255 caracteres"/>
+                    </span>
+                </div>
+                <!--Botón para crear caso-->
+                <div class="slds-col slds-grow-none">
+                    <lightning:button aura:id="botonCrearCaso" variant="brand" label="Crear caso" onclick="{!c.handleClickAceptar}" iconName="utility:case"/>
+                </div>
+            </div>
+        </div>
+    </article>
+</aura:component>

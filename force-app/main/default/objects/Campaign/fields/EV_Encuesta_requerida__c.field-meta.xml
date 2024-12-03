@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Encuesta_requerida__c</fullName>
+    <defaultValue>true</defaultValue>
+    <inlineHelpText>Desmarque la casilla si no requiere enviar encuesta al finalizar el evento.</inlineHelpText>
+    <label>Encuesta requerida</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

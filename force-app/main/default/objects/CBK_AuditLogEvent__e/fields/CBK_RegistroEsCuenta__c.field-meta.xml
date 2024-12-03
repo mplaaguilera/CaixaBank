@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_RegistroEsCuenta__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo booleano que indica si el objeto relacionado es de tipo cuenta.</description>
+    <isFilteringDisabled>false</isFilteringDisabled>
+    <isNameField>false</isNameField>
+    <isSortingDisabled>false</isSortingDisabled>
+    <label>Es Cuenta</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,166 @@
+<template>
+    <br/>
+    <lightning-card title="Reclamaciones SAC relacionadas" icon-name="">
+
+        <div class="slds-grid slds-wrap">
+          <template if:true={existenReclamaciones}>
+            <template for:each={listadoReclamaciones} for:item="reclamacion">
+              <div key={reclamacion.reclamacionActual.Id} style="padding:8px" class="slds-large-size_6-of-12 slds-medium-size_12-of-12 slds-grid slds-wrap slds-p-right_small">
+                <!--INFORMACION RECLAMACION-->
+                <lightning-card title={reclamacion.reclamacionActual.CaseNumber} icon-name="standard:case" class="slds-card_boundary" variant="narrow" style="width: 100%">
+                  <div class="slds-m-left_small slds-text-heading_small">
+                    <p>Asunto:
+                      <lightning-button style="padding-left:8px" variant="base" id={reclamacion.reclamacionActual.Id} label={reclamacion.reclamacionActual.Subject}
+                        onclick={navigateToCase} ></lightning-button>
+                    </p>
+                  </div>
+                  <div class="slds-m-left_small  slds-grid slds-wrap slds-text-heading_small">
+                    <div class="slds-size_6-of-12">
+                      <p>
+                        Fecha alta:
+                        <lightning-formatted-date-time style="padding-left:8px"
+                          value={reclamacion.reclamacionActual.CreatedDate}></lightning-formatted-date-time>
+                      </p>
+                    </div>
+                    <div class="slds-size_6-of-12">
+                      Estado:
+                      {reclamacion.reclamacionActual.Status}</br>
+                      Sentido Resolución:
+                      {reclamacion.reclamacionActual.SAC_SentidoResolucion__c}</br>
+                      
+                      <template if:true={reclamacion.reclamacionActual.SAC_ArgumentarioPretensiones__c}>
+                      Argumentario Pretensiones:
+
+                      <!-- Mostrar el contenido completo cuando isExpanded sea verdadero -->
+                      <p>
+                          <span if:true={reclamacion.isExpanded}>
+                              {reclamacion.reclamacionActual.SAC_ArgumentarioPretensiones__c}
+                          </span>
+
+                          <!-- Botón Ver más/Ver menos -->
+                          <a href="javascript:void(0);" onclick={toggleText} data-id={reclamacion.reclamacionActual.Id}>
+                            {reclamacion.toggleText}
+                          </a>
+                      </p>
+                      </template>
+                    </div>
+                  </div>
+                  <!--BOTONES VINCULAR Y DESVINCULAR-->
+                  <template if:true={deshabilitarBotones}>  
+                    <lightning-button id={reclamacion.reclamacionActual.Id} style= "padding: 4px" label="Desvincular" slot="actions" 
+                      variant="brand" onclick={handleClickDesvincular} disabled={reclamacion.desactivarDesvincular}>
+                    </lightning-button>
+    
+                    <lightning-button id={reclamacion.reclamacionActual.Id} style= "padding: 4px"
+                      label="Vincular" slot="actions" variant="brand" onclick={handleClickVincular} disabled={reclamacion.desactivarVincular}>
+                    </lightning-button>
+                  </template> 
+                  <template if:false={deshabilitarBotones}>      
+                    <lightning-button style= "padding: 4px" label="Desvincular" slot="actions" variant="brand" disabled="true">
+                    </lightning-button>
+    
+                    <lightning-button  style= "padding: 4px" label="Vincular" slot="actions" variant="brand" disabled="true">
+                    </lightning-button>
+                  </template> 
+                  <!--INFORMACION RECLAMANTES-->
+                  <div class="slds-card__header slds-grid slds-wrap" style="padding: 12 px">
+                    <div class="slds-size_12-of-12">
+                      <template if:true={reclamacion.reclamantePrincipalActual}>
+                        <span style="padding: 5px">Reclamante Principal:</span>
+                        <div style="padding: 4px" class="slds-size_12-of-12">
+                            <lightning-badge label={reclamacion.reclamantePrincipalActual}></lightning-badge>
+                        </div>
+                        <br />  
+                      </template>
+                    </div>
+                    <div class="slds-size_12-of-12">
+                      <template if:true={reclamacion.listaReclamantesSecundariosActual}>
+                        <span style="padding: 5px">Reclamantes Secundarios:</span>
+                        <template for:each={reclamacion.listaReclamantesSecundariosActual} for:item="reclamante">
+                          <div style="padding: 4px" key={reclamante} class="slds-size_12-of-12">
+                              <lightning-badge label={reclamante}></lightning-badge>
+                          </div>
+                        </template>
+                      </template>
+                      <br />
+                    </div>
+                    <!--INFORMACION PRETENSIONES-->
+                    <template for:each={reclamacion.listaPretensionesActual} for:item="pretension">
+                      <div key={pretension.Id} class="slds-size_6-of-12">
+                        <lightning-card title={pretension.CaseNumber} icon-name="standard:guidance_center">
+                          <div>
+                            <ul>
+                              <li class="slds-p-horizontal_small slds-size_1-of-1 slds-medium-size_1-of-1">
+                                <article class="slds-tile slds-media slds-card__tile slds-hint-parent">
+
+                                  <div class="slds-media__body">
+                                    <div class="slds-grid">
+                                      <h3 class="slds-tile__title">
+                                        <lightning-button variant="base" id={pretension.Id} label={pretension.Subject} onclick={navigateToCase}></lightning-button>
+                                      </h3>
+                                      <div class="slds-shrink-none">
+                                      </div>
+                                    </div>
+                                    <div class="slds-tile__detail">
+                                      <dl class="slds-list_horizontal slds-wrap">
+                                        <dt class="slds-item_label slds-text-color_weak" title="Estado">Estado:
+                                        </dt>
+                                        <dd class="slds-item_detail" title={pretension.Status}>
+                                          <template if:true={pretension.Status}>
+                                            &nbsp; {pretension.Status}
+                                          </template>
+                                        </dd>
+                                        <dt class="slds-item_label slds-text-color_weak" title="Grupo de trabajo">
+                                          Grupo trabajo:</dt>
+                                        <template if:true={pretension.SEG_Grupo__c}>
+                                          <dd class="slds-item_detail" title={pretension.SEG_Grupo__r.Name}>
+                                            &nbsp;  {pretension.SEG_Grupo__r.Name}
+                                          </dd>
+                                        </template> 
+                                        <template if:false={pretension.SEG_Grupo__c}>
+                                          <dd class="slds-item_detail" >
+                                            &nbsp;  
+                                          </dd>
+                                        </template> 
+                                        <dt class="slds-item_label slds-text-color_weak" title="Propietario">
+                                          Propietario:  
+                                        </dt>
+                                        <template if:true={pretension.Owner.Name}>
+                                          <dd class="slds-item_detail" title={pretension.Owner.Name}>
+                                            &nbsp; {pretension.Owner.Name}
+                                          </dd>
+                                        </template>
+                                        <template if:false={pretension.Owner.Name}>
+                                          <dd class="slds-item_detail">
+                                            &nbsp; 
+                                          </dd>
+                                        </template>
+                                      </dl>
+                                    </div>
+                                  </div>
+                                </article>
+                              </li>
+                            </ul>
+                            <br/>
+                          </div>
+                        </lightning-card>
+                      </div>
+                    </template>
+                  </div>
+                </lightning-card>
+                <!-- <hr key={reclamacion.reclamacionActual.Id} /> -->
+              </div>
+            </template>
+    
+          </template>
+        </div>
+      </lightning-card>
+    
+      <div>
+        <template if:true={isLoading}>
+          <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+          </div>
+        </template>
+      </div>
+</template>

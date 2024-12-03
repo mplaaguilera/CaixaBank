@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>VIZCAYA</label>
+    <protected>false</protected>
+    <values>
+        <field>GRR_Comunidad_Autonoma__c</field>
+        <value xsi:type="xsd:string">País Vasco</value>
+    </values>
+    <values>
+        <field>GRR_Correos_Buzones_Relacionado__c</field>
+        <value xsi:type="xsd:string">GRR_Buzon_Norte</value>
+    </values>
+    <values>
+        <field>GRR_Provincia__c</field>
+        <value xsi:type="xsd:string">VIZCAYA</value>
+    </values>
+</CustomMetadata>

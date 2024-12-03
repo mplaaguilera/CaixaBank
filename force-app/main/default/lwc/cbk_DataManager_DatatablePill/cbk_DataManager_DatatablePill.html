@@ -1,0 +1,12 @@
+<template>
+	<div lwc:if={pills.length} class="slds-pill_container" title={tooltip}>
+		<template for:each={pills} for:item="pill">
+			<span key={pill.label} class="slds-pill slds-pill_link" data-name={pill.label} style={pill.style}>
+				<span class="slds-pill__action" style="padding: 0 6px 0 3px;">
+					<lightning-icon icon-name="standard:screen" size="x-small"></lightning-icon>
+					<span class="slds-pill__label" style="margin-left: 4px;">{pill.label}</span>
+				</span>
+			</span>
+		</template>
+	</div>
+</template>

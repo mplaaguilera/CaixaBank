@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_EstadoEnvioOfComercial__c</fullName>
+    <label>Estado envío of. comercial</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>6</fullName>
+                <default>false</default>
+                <label>Pending</label>
+            </value>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>Sent</label>
+            </value>
+            <value>
+                <fullName>0</fullName>
+                <default>false</default>
+                <label>Ignored</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>Failed</label>
+            </value>
+            <value>
+                <fullName>7</fullName>
+                <default>false</default>
+                <label>Delivery canceled</label>
+            </value>
+            <value>
+                <fullName>9</fullName>
+                <default>false</default>
+                <label>Sent to the service provider</label>
+            </value>
+            <value>
+                <fullName>8</fullName>
+                <default>false</default>
+                <label>Prepared</label>
+            </value>
+            <value>
+                <fullName>5</fullName>
+                <default>false</default>
+                <label>Received on mobile</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>Taken into account by the service provider</label>
+            </value>
+            <value>
+                <fullName>127</fullName>
+                <default>false</default>
+                <label>Not applicable</label>
+            </value>
+            <value>
+                <fullName>Delivery canceled</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Delivery canceled</label>
+            </value>
+            <value>
+                <fullName>Failed</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Failed</label>
+            </value>
+            <value>
+                <fullName>Ignored</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Ignored</label>
+            </value>
+            <value>
+                <fullName>Pending</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pending</label>
+            </value>
+            <value>
+                <fullName>Sent</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Sent</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

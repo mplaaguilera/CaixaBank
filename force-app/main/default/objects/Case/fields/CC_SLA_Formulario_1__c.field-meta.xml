@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_SLA_Formulario_1__c</fullName>
+    <description>SLA 1 para formularios, menor de 2 horas (70%)
+SLA 1 para Caixabank talks, menor de 5 horas</description>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Canal_Procedencia__c, &apos;Caixabank Talks&apos;),IF(AND(ISNULL(CC_Fecha_Activo_Formulario__c),CC_Respuesta_Personalizada__c = false),IF((CC_Tiempo_Cerrado_FormWeb__c &lt; 5),1,0),null),IF(AND(ISNULL(CC_Fecha_Activo_Formulario__c),CC_Respuesta_Personalizada__c = false),IF((CC_Tiempo_Cerrado_FormWeb__c &lt;= 2),1,0),null))</formula>
+    <label>SLA Formulario 1</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tiempo_Respuesta_Twitter__c</fullName>
+    <description>Tiempo en lo que tarda el agente en atender y responder al Twitter. Resultado en minutos.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    NOT(
+    ISBLANK(CC_Fecha_Twitter_Entrante__c)
+    ),
+    IF(
+        NOT(
+        ISBLANK(CC_Fecha_1a_Respuesta_Twitter__c)
+        ),
+        (CC_Fecha_1a_Respuesta_Twitter__c - CC_Fecha_Twitter_Entrante__c)*24*60,
+        IF(
+            NOT(
+            ISBLANK(ClosedDate)
+            ),
+            (ClosedDate - CC_Fecha_Twitter_Entrante__c)*24*60,
+            (NOW() - CC_Fecha_Twitter_Entrante__c)*24*60
+        )
+    ),
+    IF(
+        OR(ISPICKVAL(Status,&quot;Rechazado&quot;), ISPICKVAL(Status,&quot;Cerrado&quot;)),
+        (ClosedDate - CreatedDate)*24*60,
+        (NOW() - CreatedDate)*24*60
+    )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tiempo de Respuesta Twitter</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

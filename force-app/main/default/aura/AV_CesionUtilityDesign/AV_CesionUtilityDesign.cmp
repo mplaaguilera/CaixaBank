@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:utilityItem" description="Display an interface for the user to gives own office acces" controller="AV_CesionPermisos_Controller"  access="global">
+    <lightning:overlayLibrary body="hola mundo" aura:id="overlayLib"/>
+    <aura:attribute name = "numPermiso" type = 'String'></aura:attribute>
+    <aura:attribute name = "attrToUpdt" type = 'Object'>+</aura:attribute>
+    <aura:handler name="init" value="{!this}" action="{!c.initLabel}"/>
+    <c:av_CesionPermisosOficina aura:id = "cederPermisosCmp" onnumeropermisos="{!c.setNumPerm}" onrefresh="{!c.refreshComponent}" onupdate="{!c.handleShowModalUpdt}" onnuevopermiso="{!c.handleShowModalNew}" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:utilityBarAPI aura:id="utilitybar2" />
+    <aura:attribute name = "footerCmp" type="Aura.Component"></aura:attribute>
+</aura:component>

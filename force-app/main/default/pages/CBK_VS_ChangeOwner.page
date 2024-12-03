@@ -1,0 +1,49 @@
+<apex:page standardController="CBK_Adoption_FWK__c" recordSetVar="accs" extensions="CBK_VS_ChangeOwner_Controller">
+    <apex:includeLightning />
+    <apex:slds />
+    <div id="example-container"  class="slds-scope">
+      <apex:form >
+        <div id="spinner" class="slds-spinner_container slds-is-relative" style="z-index:1000;position:fixed;">
+          <div role="status" class="slds-spinner slds-spinner--large slds-spinner--brand">
+              <div class="slds-spinner__dot-a"></div>
+              <div class="slds-spinner__dot-b"></div>
+          </div>
+      </div>
+      </apex:form>
+      <div id="lwc-container"></div>
+    </div>
+    <script>
+      var getIDs= '{!updateIds}';
+      if (!getIDs){
+        sforce.one.showToast({
+          "title":"Select one and more items",
+          "message":"Select Items",
+          "type":"warning"
+        })
+       window.history.back();
+      }else{
+        if (getIDs.split(',').length > 0){
+          setTimeout(function(){ document.getElementById('spinner').className += ' slds-hide' }, 6000);
+          $Lightning.use("c:cbkChangeOwnerApp", function() {
+            $Lightning.createComponent("c:cbk_LWC_ChangeOwner",
+              { labeltest : getIDs },
+              "lwc-container",
+              function(cmp) {
+                console.log("LWC was created " + cmp);
+              }
+            );
+          });
+        }
+       //}
+      }
+    </script>
+    <!-- <style>
+      #example-container {
+        border: 1px solid black;
+        padding: 10px;
+      }
+      form {
+        margin-top: 10px;
+      }
+    </style> -->
+</apex:page>

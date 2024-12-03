@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Tipolog_a_de_Grupo_Operativo__c</fullName>
+    <label>Tipología de Grupo Operativo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>BO</fullName>
+                <default>false</default>
+                <label>BO</label>
+            </value>
+            <value>
+                <fullName>CSO</fullName>
+                <default>false</default>
+                <label>CSO</label>
+            </value>
+            <value>
+                <fullName>MCC</fullName>
+                <default>false</default>
+                <label>MCC</label>
+            </value>
+            <value>
+                <fullName>Firmas</fullName>
+                <default>false</default>
+                <label>Firmas</label>
+            </value>
+            <value>
+                <fullName>CSE</fullName>
+                <default>false</default>
+                <label>CSE</label>
+            </value>
+            <value>
+                <fullName>CSO FFEE</fullName>
+                <default>false</default>
+                <label>CSO FFEE</label>
+            </value>
+            <value>
+                <fullName>BO FFEE</fullName>
+                <default>false</default>
+                <label>BO FFEE</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

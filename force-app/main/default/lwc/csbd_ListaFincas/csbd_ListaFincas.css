@@ -1,0 +1,25 @@
+div.datatableFincasContainer {
+    border: 1px solid rgba(201, 201, 201);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    min-height: 114px;
+    width: 100%;
+}
+
+article.contenedor.editando div.datatableFincasContainer {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* lightning-icon.iconoFinca {
+    --slds-c-icon-color-background: #dcac4a;
+} */
+
+div.campos > div.slds-grid > div.slds-col {
+    height: 60px;
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_NotasContactoSR__c</fullName>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Las notas incluidas en este campo se heredarán en la SR.</inlineHelpText>
+    <label>Notas Contacto en Caso</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>TextArea</type>
+</CustomField>

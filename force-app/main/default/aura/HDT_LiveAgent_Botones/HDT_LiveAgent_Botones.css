@@ -1,0 +1,15 @@
+.THIS.boxWarning {
+    padding: 11px 12px 16px 12px;
+    background-color: #fffaf9;
+    border-color: #ffe2e2;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.THIS.cardDetalles {
+    background-color: #fefefe;
+    border-style: solid;
+    border-color: rgb(235, 235, 235);
+    border-width: 1px;
+    border-radius: 5px;
+}

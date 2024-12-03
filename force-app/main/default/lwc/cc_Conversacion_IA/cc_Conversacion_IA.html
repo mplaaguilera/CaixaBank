@@ -1,0 +1,92 @@
+<template>
+	<article class="slds-card slds-hide">
+		<div class="slds-card__header slds-grid">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<h1 class="slds-card__header-title">
+						<span>Conversación IA</span>
+					</h1>
+				</div>
+				<div class="slds-no-flex">
+					<!-- sldsValidatorIgnoreNextLine -->
+					<lightning-button-icon class="botonLike buttonIcon" icon-name="utility:like" onclick={like}></lightning-button-icon>
+					<!-- sldsValidatorIgnoreNextLine -->
+					<lightning-button-icon class="botonDislike buttonIcon slds-var-m-left_x-small" icon-name="utility:dislike" onclick={dislike}></lightning-button-icon>
+				</div>
+			</header>
+		</div>
+<!-- 
+		<div class="slds-card__body slds-card__body_inner">
+			<lightning-record-edit-form lwc:if={campos} record-id={recordId} object-api-name="Case" onload={recordEditFormOnload}>
+				<div class="slds-form" role="list">
+					<template for:each={campos} for:item="campo">
+						<div key={campo.fieldApiName} class="slds-form__row">
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<lightning-output-field field-name={campo.fieldApiName}></lightning-output-field>
+								</div>
+							</div>
+						</div>
+					</template>
+				</div>
+			</lightning-record-edit-form>
+		</div> -->
+ 
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning-record-edit-form lwc:if={campos} record-id={recordId} object-api-name="Case" onload={recordEditFormOnload}>
+                <div class="slds-form" role="list">
+                    <template for:each={campos} for:item="campo">
+                        <div key={campo.fieldApiName} class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+                                    <label class="slds-form-element__label" for={campo.fieldApiName}>{campo.label}</label>
+                                    <div class="slds-form-element__control">
+                                        <template if:true={campo.isRespuestaAsistente}>
+                                            <lightning-formatted-rich-text value={campo.value}></lightning-formatted-rich-text>
+                                            <!-- <lightning-output-field field-name={campo.value}>{campo.fieldApiName}</lightning-output-field> -->
+                                        </template>
+                                        <template if:false={campo.isRespuestaAsistente}>
+                                            <lightning-formatted-text value ={campo.value}></lightning-formatted-text>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </lightning-record-edit-form>
+        </div>
+		
+		<!-- <template lwc:if={abrirModalMotivoValoracion}> -->
+		<div class="slds-backdrop"></div>
+
+		<div class="modalMotivoValoracion slds-modal" onkeydown={modalTeclaPulsada}>
+			<div class="slds-modal__container">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button_icon slds-modal__close"></lightning-button-icon>
+
+				<!-- <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalesSinMotivoValoracion} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon> -->
+				<div class="slds-modal__header">
+					<h1 class="slds-modal__title slds-hyphenate">Comenta tu valoración</h1>
+				</div>
+				<div class="slds-modal__content slds-var-p-around_medium">
+					<lightning-record-edit-form object-api-name="Case">
+						<lightning-messages></lightning-messages>
+						<lightning-input-field data-name='motivo' field-name="CC_Motivo_Valoracion__c" required>
+						<!-- <lightning-input-field data-name="motivo" field-name="CC_Motivo_Valoracion__c"> -->
+						</lightning-input-field>
+					</lightning-record-edit-form>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button label="Cancelar" onclick={cerrarModales}></lightning-button>
+					<lightning-button class="slds-var-m-left_small" label="Valorar" icon-name="utility:dislike" variant="brand" onclick={valorar}></lightning-button>
+				</div>
+			</div>
+		</div>
+
+
+	</article>
+</template>

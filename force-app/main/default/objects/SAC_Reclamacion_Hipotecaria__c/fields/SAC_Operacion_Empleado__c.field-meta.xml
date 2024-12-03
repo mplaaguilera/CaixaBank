@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Operacion_Empleado__c</fullName>
+    <formula>IF(
+				OR(
+								SAC_Codigo_Tipo_Convenio__c = &apos;BONHOE&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;BONHON&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;EAMORH&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;EAMORP&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;LI7083&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;LI7084&apos;,
+								SAC_Codigo_Tipo_Convenio__c = &apos;LI2981&apos;,
+        RIGHT(SAC_Codigo_Tipo_Convenio__c, 3) = &apos;VMV&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;VB2T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;VB1T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;VA2T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;VA1T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 2) = &apos;AV&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;ALTR&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;ALTS&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;1T4A&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;1T5A&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;2T4A&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;2T5A&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 2) = &apos;1T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 2) = &apos;2T&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;PLAV&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;PLCE&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 2) = &apos;HA&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 2) = &apos;AF&apos;,
+								RIGHT(SAC_Codigo_Tipo_Convenio__c, 4) = &apos;BEST&apos;
+				)
+				,true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Operación Empleado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

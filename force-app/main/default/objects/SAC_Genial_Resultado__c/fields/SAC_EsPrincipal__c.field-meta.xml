@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EsPrincipal__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo que informa si se trata de la pretensión principal de la reclamación. Informado por la IA.</description>
+    <label>Es Principal</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

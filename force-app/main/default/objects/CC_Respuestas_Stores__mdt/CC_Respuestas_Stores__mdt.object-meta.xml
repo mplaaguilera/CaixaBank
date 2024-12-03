@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Respuestas automáticas para los comentarios de 4 y 5 estrellas de la aplicación CaixaBank, CaixaBank Pay y BrokerNow.</description>
+    <label>Respuesta Store</label>
+    <pluralLabel>Respuestas Stores</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

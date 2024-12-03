@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_UtilizarDatosMineria__c</fullName>
+    <description>Propiedad del derecho de Revocación del consentimiento.</description>
+    <inlineHelpText>Utilizar sus datos para:
+- Efectuar estudios y seguimiento de la operativa
+- Gestionar las alertas de los productos que tiene contratados
+- Estudiar productos y servicios ajustados a su perfil del grupo CaixaBank</inlineHelpText>
+    <label>Utilizar datos para minería de datos</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Vacío</fullName>
+                <default>true</default>
+                <label>Vacío</label>
+            </value>
+            <value>
+                <fullName>Sí</fullName>
+                <default>false</default>
+                <label>Sí</label>
+            </value>
+            <value>
+                <fullName>No</fullName>
+                <default>false</default>
+                <label>No</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,81 @@
+<aura:component controller="SAC_LCMP_RepresentanteValido"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="validarRepresentante" type="Boolean" default="false"/>
+    <aura:attribute name="validarCampos" type="Boolean" default="false"/>
+    <aura:attribute name="validarCheckALF" type="Boolean" default="false"/>
+    <aura:attribute name="direccionPostalInformada" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarCaracteristicas" type="Boolean" default="false"/>
+    <aura:attribute name="listCaracteristicas" type="List" default="[]" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    
+    <aura:if isTrue="{!v.mostrarCaracteristicas == true}">
+        <p style="color:red; font-size:12px;"><b>Atención: este despacho tiene firmados acuerdos de prelitigio con la entidad, deberás revisar si esta reclamación se corresponde con algún acuerdo.</b></p>
+        <aura:iteration items="{!v.listCaracteristicas}" var="elemento">
+            <div class="slds-grid slds-wrap"> 
+                <p style="color:red; font-size:12px; margin-left: 30px; padding-top: 4px;"><b>- {!elemento.CC_Caracteristica__r.Name}:  {!elemento.CC_Caracteristica__r.CC_Descripcion__c}</b></p>
+            </div>
+        </aura:iteration>
+        <br/><br/>
+    </aura:if>
+
+    <!--Si está informado algún campo del apartado de representante en el caso, paso a comprobar las validaciones-->
+    <aura:if isTrue="{!v.validarRepresentante == true}">
+        <!--Si alguno de los campos que hay que validar estan vacíos, pasamos a validarlos uno por uno-->
+        <aura:if isTrue="{!and(v.validarCampos == true, v.caso.SAC_UsarDatos__c == false)}">
+            <p style="color:red; font-size:12px;">Para validar el representante es obligatorio tener los siguientes campos de contacto informados:</p>
+            <br/>
+            <div class="slds-grid slds-wrap"> 
+                <aura:if isTrue="{!empty(v.caso.SAC_TipoDeRepresentante__c)}">
+                    <div class="slds-size_1-of-2">    
+                        <p style="color:red; font-size:12px;">- Tipo de representante</p>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!empty(v.caso.SAC_TipoDeDocumento__c)}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Tipo de documento</p>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!empty(v.caso.SAC_NombreRepresentante__c)}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Nombre completo</p>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!empty(v.caso.SAC_NumeroDelDocumento__c)}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Número del documento</p>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!v.direccionPostalInformada == false}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Todos los campos de dirección postal</p>
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!empty(v.caso.SAC_EmailRepresentante__c)}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Correo electrónico</p>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.caso.SAC_PoderRepresentante__c == false}">
+                    <div class="slds-size_1-of-2"> 
+                        <p style="color:red; font-size:12px;">- Poder representante</p>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:if>
+        </aura:if>
+    <aura:if isTrue="{!v.validarCheckALF == true}">
+        <p style="color:red; font-size:12px;">No puede validar el representante y arrastrar los datos de contacto ya que están seleccionados los datos del reclamante, por favor desactive la marca “Usar los datos del reclamante ” de la sección Datos de contacto de la reclamación si quiere usar los datos del representante</p>
+    </aura:if>
+
+</aura:component>

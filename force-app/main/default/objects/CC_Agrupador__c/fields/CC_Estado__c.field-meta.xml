@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado__c</fullName>
+    <label>Estado</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Activo</fullName>
+                <default>true</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Pendiente Revision</fullName>
+                <default>false</default>
+                <label>Pendiente revisión solución</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

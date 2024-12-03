@@ -1,0 +1,17 @@
+<aura:component controller="CBK_Fusion"  implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="ShowSpinner" type="Boolean" default="true"/>
+    <aura:attribute name="Result" type="String" default="Registro fusionado" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+        <aura:renderIf isTrue="{!v.ShowSpinner}">
+            <div role="status" class="slds-spinner slds-spinner_brand slds-spinner_large">    
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+            <aura:set attribute="else">
+<!--                <aura:unescapedHtml value="{!v.Result}" /> -->
+            </aura:set>
+        </aura:renderIf> 
+            
+</aura:component>

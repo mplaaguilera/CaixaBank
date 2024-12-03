@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Accion_Aviso__c</fullName>
+    <description>Acción sobre el aviso valores posibles
+- A --&gt; Alta
+- B --&gt; Baja</description>
+    <label>Acción Aviso</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>A</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>B</label>
+            </value>
+            <value>
+                <fullName>N</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>N</label>
+            </value>
+            <value>
+                <fullName>S</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>S</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

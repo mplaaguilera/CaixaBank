@@ -1,0 +1,29 @@
+<template>
+    <article class="slds-card">
+		<div class="slds-card__header slds-grid slds-page-header">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="custom:custom57" size="small" class="iconoHeader"></lightning-icon>
+				</div>
+				<div class={headerTitleClass}>
+					Características del contacto
+					<span class="slds-var-m-left_x-small">({caracteristicas.length})</span>
+				</div>
+			</header>
+		</div>
+
+		<div lwc:if={caracteristicas.length} class="slds-card__body slds-card__body_inner slds-var-p-vertical_x-small">
+            <ul class="listaCaracteristicas">
+                <template for:each={caracteristicas} for:item="caracteristica">
+                    <li key={caracteristica.Id} class="slds-var-m-bottom_medium" >
+                        <span title={caracteristica.CC_Caracteristica__r.CC_Descripcion__c} onclick={navigateToCaracteristica} data-id={caracteristica.CC_Caracteristica__c}>
+                            <lightning-icon class="warning slds-var-m-horizontal_small" icon-name="utility:warning" size="x-small"></lightning-icon>
+                            <lightning-icon class="iconoCaracteristica slds-var-m-right_xx-small" icon-name="custom:custom57" size="small"></lightning-icon>
+                            <span class="titulo">{caracteristica.CC_Caracteristica__r.Name}</span>
+                        </span>
+                    </li>
+                </template>
+            </ul>
+        </div>
+	</article>
+</template>

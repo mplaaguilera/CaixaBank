@@ -1,0 +1,421 @@
+<aura:component controller="CC_LiveAgent_BotonesController"
+    implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+    <lightning:conversationToolkitAPI aura:id="conversationKit" />
+    <lightning:omniToolkitAPI aura:id="omniToolkit" />
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="ShowBuscar" type="c:CC_LiveAgent_Event" />
+    <aura:registerEvent name="refresh" type="c:CC_Refresh_FAQ" />
+    <aura:registerEvent name="refreshHistory" type="c:CC_Refresh_ChatHistory" />
+    <aura:attribute name="workId" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="cognitiveId" type="String" />
+    <aura:attribute name="codCognitive" type="String" />
+    <aura:attribute name="auto" type="Object" />
+    <aura:attribute name="contactoId" type="String" />
+    <aura:attribute name="contador" type="Integer" default="1" />
+    <aura:attribute name="showNoSoportada" type="Boolean" default="false" />
+    <aura:attribute name="liveChatTranscript" type="LiveChatTranscript" />
+    <aura:attribute name="picklistValues" type="Object" />
+    
+    <aura:attribute name="radioOptions" type="List" default="[
+    	{'label': 'Castellano', 'value': 'es'},
+    	{'label': 'Català', 'value': 'ca'},
+		]" />
+    <aura:attribute name="radioValue" type="String" />
+    <aura:attribute name="transferAPP" type="Boolean" default="false" />
+    <aura:attribute name="chatCerrado" type="Boolean" default="false" />
+    <aura:attribute name="valor" type="Boolean" default="" required="false" />
+    <!-- <aura:attribute name="contadorHidden" type="String"/> US461779: Visualizar Nº stop&go Se suplanta el contador de casos Hidden por el contador de stop&go  -->
+    <aura:attribute name="contadorStopAndGo" type="String" />
+    <aura:attribute name="contadorTransfer" type="String" />
+    <aura:attribute name="tipoChat" type="String" />
+    <aura:attribute name="espacio" type="String" />
+    <aura:attribute name="categoria" type="String" />
+    <aura:attribute name="transferirChecked" type="Boolean" default="false" />
+    <aura:attribute name="aplicacion" type="String" />
+    <aura:attribute name="aplicacionOrigen" type="String" />
+    <aura:attribute name="habilitarC2C" type="String" />
+    <aura:attribute name="origen" type="String" />
+    <aura:attribute name="stopAndGo" type="String" default="No" />
+    <aura:attribute name="transfer" type="String" default="No" />
+    <aura:attribute name="habilitarEscalar" type="Boolean" default="false" />
+    <aura:attribute name="perfil" type="String" />
+    <aura:attribute name="pilotaje" type="String" />
+    <aura:attribute name="radioButtonDisabled" type="Boolean" default="" required="false" />
+    <aura:attribute name="mostrarMensaje" type="Boolean" default="false" />
+
+    <aura:attribute name="sourceApp" type="String" />
+    <aura:attribute name="sourceConversationId" type="String" />
+
+    <!--Picklist-->
+    <aura:attribute name="picklistFirstOptionsEspacio" type="Object[]" />
+    <aura:attribute name="picklistFirstOptionsCategoria" type="Object[]" />
+    <aura:attribute name="optionFirstLabel" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.inicializar}" />
+    <aura:handler event="lightning:conversationChatEnded" action="{!c.onCloseWork}" />
+    <aura:handler event="lightning:conversationCustomEvent" action="{!c.onCustomEvent}" />
+     <!-- US572043 - Contador tiempo S&G  -->
+    <aura:handler event="lightning:conversationNewMessage" action="{!c.onNewMessage}" />
+    <aura:handler event="lightning:conversationAgentSend" action="{!c.onAgentSend}" />
+    <aura:handler event="lightning:conversationChatEnded" action="{!c.onChatEnded}" />
+    <aura:attribute type="String" name="agentTimer"/>    
+    <aura:attribute type="String" name="agentIntervalId"/>
+    <aura:attribute name="mostrarContador" type="Boolean" default="true" />
+
+    <!-- Cognitivo 360 -->
+    <aura:attribute name="oIdentGlobales" type="List" />
+    <aura:attribute name="areaChat" type="String" />
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div class="slds-backdrop" aura:id="backdrop" />
+
+    <!-- Pausar/Retomar -->
+    <aura:attribute name="timer1" type="Integer" />
+    <aura:attribute name="timer2" type="Integer" />
+    <aura:attribute name="timer3" type="Integer" />
+    <aura:attribute name="timer4" type="Integer" />
+    <aura:attribute name="start" type="Date" />
+    <aura:attribute name="pausedTime" type="Integer" default="0" />
+    <aura:attribute name="pauses" type="Integer" default="0" />
+    <aura:attribute name="taskId" type="String" />
+    <aura:attribute name="mensaje" type="String" />
+    <aura:attribute name="isButtonActive" type="Boolean" default="" required="false" />
+    <!-- US572038 - Pausa agente: mensaje automático de disculpa cuando el agente retoma la conversación -->
+    <aura:attribute name="mensajesRetomar" type="String" />
+    <aura:attribute name="agenteIniciaChat" type="String" />
+    <aura:attribute name="retomarContador" type="Integer" default="0" />
+
+
+    <lightning:overlayLibrary aura:id="overlayLib" />
+    <c:CC_LiveAgent_NoSoportada aura:id="compNoSoportada" isActive="{!v.showNoSoportada}" idioma="{!v.radioValue}"
+        origen="{!v.origen}" caseId="{!v.caseId}" chatId="{!v.recordId}" cognitiveId="{!v.cognitiveId}"
+        oIdentGlobales="{!v.oIdentGlobales}" areaChat="{!v.areaChat}" />
+    <c:CC_LiveAgentTranscript_MotivoCierreChat aura:id="compTimeOut" chatCerrado="{!v.chatCerrado}"
+        areaChat="{!v.areaChat}" />
+
+    <table>
+        <aura:if isTrue="{!v.mostrarMensaje}">
+            <tr>
+                <td>
+                    <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                        <b style="font-size:16px; color:red">Recuerda que debes finalizar el transfer por la operativa
+                            actual.</b>
+                    </div>
+                </td>
+            </tr>
+        </aura:if>
+        <aura:if isTrue="{!and(v.areaChat=='Empleado',v.mostrarContador)}">
+            <tr>
+                <td>
+                    <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                        <b class="slds-m-left_small" style="font-size:16px">{!v.agentTimer}</b>
+                        <br/>
+                    </div>
+                </td>
+            </tr>
+        </aura:if>
+        <tr>
+            <aura:if isTrue="{!and(v.areaChat=='Cliente' &amp;&amp; v.aplicacionOrigen=='Whatsapp')}">
+        <tr>
+            <td>
+                <div class="slds-p-bottom_xx-small" style="margin-top: 5px" size="x-small">
+                    <img src="{!$Resource.CC_Icono_WhatsApp}" />
+                </div>
+            </td>
+        </tr>
+        </aura:if>
+        <td>
+            <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                <b style="font-size:13px">Canal de procedencia: </b>
+                {!v.origen}
+            </div>
+        </td>
+        <td>
+            <div class="slds-p-bottom_x-small,slds-float_right" style="margin-top: 5px">
+                <b style="font-size:13px">Aplicación: </b>
+                {!v.aplicacion}
+            </div>
+        </td>
+        </tr>
+        <aura:if isTrue="{!v.areaChat=='Empleado'}">
+
+            <tr>
+                <td>
+                    <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                        <b style="font-size:13px">Stop&amp;Go: </b>
+                        {!v.stopAndGo}
+                    </div>
+                </td>
+                <td>
+                    <aura:if isTrue="{!and(v.areaChat=='Empleado', v.aplicacion!='CC_OFICINAS_CSI')}">
+                        <div class="slds-p-bottom_x-small,slds-float_right" style="margin-top: 5px">
+                            <!-- //US461779: Visualizar Nº stop&go Se suplanta el contador de casos Hidden por el contador de stop&go  -->
+                            <!-- <b style="font-size:13px" >Conversaciones con Hidden:  </b>
+                            {!v.contadorHidden} -->
+                            <b style="font-size:13px">Nº Stop&amp;Go: </b>
+                            {!v.contadorStopAndGo}
+                        </div>
+                    </aura:if>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                        <b style="font-size:13px">Transfer: </b>
+                        {!v.transfer}
+                    </div>
+                </td>
+                <td>
+                    <aura:if isTrue="{!and(v.areaChat=='Empleado', v.aplicacion!='CC_OFICINAS_CSI')}">
+                        <div class="slds-p-bottom_x-small,slds-float_right" style="margin-top: 5px">
+                            <!-- //US461779: Visualizar Nº stop&go Se suplanta el contador de casos Hidden por el contador de stop&go  -->
+                            <!-- <b style="font-size:13px" >Conversaciones con Hidden:  </b>
+                            {!v.contadorHidden} -->
+                            <b style="font-size:13px">Nº Transfer: </b>
+                            {!v.contadorTransfer}
+                        </div>
+                    </aura:if>
+                </td>
+            </tr>
+        </aura:if>
+        <tr>
+            <td width="50%">
+                <div class="slds-p-bottom_x-small" style="margin-top: 5px">
+                    <b style="font-size:13px">Perfil: </b>
+                    {!v.perfil}
+                </div>
+            </td>
+            <td width="50%">
+                <div class="slds-p-bottom_x-small,slds-float_right" style="margin-top: 5px">
+                    <b style="font-size:13px">Pilotaje: </b>
+                    {!v.pilotaje}
+                </div>
+            </td>
+        </tr>
+    </table>
+    <aura:if isTrue="{!v.areaChat!='Empleado'}">
+        <div class="slds-p-bottom_x-large" style="margin-top: 25px">
+            <lightning:button label="Buscar" onclick="{!c.buscar}" />
+            <lightning:radioGroup class="slds-float_right" name="radioGroup" label="Idioma"
+                options="{! v.radioOptions }" value="{! v.radioValue }" type="radio"
+                onchange="{! c.onChangeLanguage}" />
+        </div>
+        <div class="slds-p-bottom_x-large" style="margin-top: 25px">
+            <lightning:button label="Finalizar" aura:id="botonFinalizar" onclick="{!c.sendFIN}"
+                class="slds-float_left" />
+            <lightning:button label="No soportada" aura:id="botonNoSoportada" onclick="{!c.noSoportada}"
+                class="slds-float_right" />
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!or(v.tipoChat == 'Hidden',v.areaChat=='Empleado')}">
+        <table>
+            <tr>
+                <td>
+                    <lightning:radioGroup class="slds-float_left" name="radioGroup" label="Idioma"
+                        options="{! v.radioOptions }" value="{! v.radioValue }" type="radio"
+                        onchange="{! c.onChangeLanguage}" disabled="{!v.radioButtonDisabled}" />
+                </td>
+                <td>
+                    <div class="slds-float_right">
+                        <aura:if isTrue="{!v.tipoChat != 'Hidden'}">
+                            <lightning:button label="Pausar" aura:id="botonPausar" onclick="{!c.pausar}" />
+                        </aura:if>
+                        <!-- <lightning:button label="Buscar" aura:id="botonBuscar" onclick="{!c.buscar}" disabled="{!v.isButtonActive}"/> -->
+                        <lightning:button label="Buscar" aura:id="botonBuscar" onclick="{!c.buscar}" />
+                        <aura:if isTrue="{!v.tipoChat == 'Hidden'}">
+                            <lightning:button label="Reformular" aura:id="botonReformular"
+                                onclick="{!c.abrirModalReformular}" disabled="{!v.isButtonActive}" />
+                        </aura:if>
+                        <aura:if isTrue="{!v.aplicacion!='CC_OFICINAS_CSI'}">
+                            <lightning:button label="Escalar" aura:id="botonEscalar" onclick="{!c.abrirModalEscalar}"
+                                disabled="{!v.isButtonActive}" />
+                        </aura:if>
+                        <lightning:button label="Transferir" aura:id="botonTransferir"
+                            onclick="{!c.abrirModalReclasificar}" disabled="{!v.isButtonActive}" />
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+
+                </td>
+                <div class="slds-float_right">
+                    <lightning:button label="No soportada" aura:id="botonNoSoportada" onclick="{!c.noSoportada}"
+                        disabled="{!v.isButtonActive}" />
+                    <aura:if isTrue="{!v.tipoChat != 'Hidden'}">
+                        <lightning:button label="Finalizar" aura:id="botonFinalizar" onclick="{!c.sendFIN}"
+                            disabled="{!v.isButtonActive}" />
+                    </aura:if>
+                </div>
+            </tr>
+        </table>
+    </aura:if>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxReformular">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReformular}"
+                    alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reformular</h2>
+                <p class="slds-m-top_x-small">Seleccione un mensaje para reformular</p>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <lightning:layoutItem size="12" padding="around-small">
+                    <div class="custom-box">
+                        <lightning:select value="{!v.valor}" aura:id='selectId'>
+                            <option value="">Elige uno...</option>
+                            <aura:iteration items="{!v.picklistValues}" var="item" indexVar="itemIndex">
+                                <option value="{!itemIndex}">
+                                    {!item}
+                                </option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                </lightning:layoutItem>
+            </div>
+            <footer class="slds-modal__footer">
+                <!--{!v.footer}-->
+                <lightning:button variant="Neutral" label="Aceptar" title="Aceptar" onclick="{! c.reformular }" />
+                <lightning:button variant="Neutral" label="Cancelar" title="Cancelar"
+                    onclick="{! c.cerrarModalReformular }" />
+            </footer>
+        </div>
+    </section>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxEscalar">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalEscalar}"
+                    alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Escalar</h2>
+                <p class="slds-m-top_x-small">Seleccione una categoría para escalar</p>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <!-- Selección de espacio -->
+                <lightning:layoutItem size="12" padding="around-small">
+                    <ui:inputSelect disabled="true" multiple="false" label="Espacio" aura:id="firstOptionEspacio">
+                        <aura:iteration items="{!v.picklistFirstOptionsEspacio}" var="picklistFirstOptionEspacio">
+                            <ui:inputSelectOption text="{!picklistFirstOptionEspacio.picklistValue}"
+                                label="{!picklistFirstOptionEspacio.picklistLabel}"
+                                value="{!picklistFirstOptionEspacio.bSel}"
+                                class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </lightning:layoutItem>
+
+                <!-- Selección de categoría. -->
+                <lightning:layoutItem size="12" padding="around-small">
+                    <ui:inputSelect disabled="false" multiple="false" label="Categoría"
+                        change="{!c.onCodeSelectFirstChange}" aura:id="firstOptionCategoria" value="{!v.categoria}">
+                        <aura:iteration items="{!v.picklistFirstOptionsCategoria}" var="picklistFirstOptionsCategoria">
+                            <ui:inputSelectOption text="{!picklistFirstOptionsCategoria.picklistValue}"
+                                label="{!picklistFirstOptionsCategoria.picklistLabel}"
+                                value="{!picklistFirstOptionsCategoria.bSel}"
+                                class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </lightning:layoutItem>
+            </div>
+            <footer class="slds-modal__footer">
+                <!--{!v.footer}-->
+                <aura:if isTrue="{!v.habilitarC2C == 'SI'}">
+
+                    <aura:if isTrue="{!v.categoria != '--Selecciona una categoría--'}">
+
+                        <lightning:button variant="Neutral" label="Enviar C2C" title="Enviar C2C" onclick="{!c.c2c}"
+                            disabled="{!v.habilitarEscalar}" />
+                    </aura:if>
+                </aura:if>
+
+
+                <aura:if isTrue="{!v.categoria != '--Selecciona una categoría--'}">
+
+                    <lightning:button variant="Neutral" label="Enviar Chat" title="Enviar Chat" onclick="{!c.escalar}"
+                        disabled="{!v.habilitarEscalar}" />
+                </aura:if>
+                <lightning:button variant="Neutral" label="Cancelar" title="Cancelar"
+                    onclick="{! c.cerrarModalEscalar }" />
+            </footer>
+        </div>
+    </section>
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+             aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxReclasificar">
+        <div class="slds-modal__container">
+            
+            <aura:if isTrue="{!v.transferAPP}">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReclasificar}"
+                                          alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Se va a proceder a realizar un transfer a la APP de HDT</h2>
+                </header>
+                <footer class="slds-modal__footer">
+                    <!--{!v.footer}-->
+                    <lightning:button variant="Neutral" label="Aceptar" title="Aceptar" onclick="{!c.transferAPP}" />
+                </footer>
+                <aura:set attribute="else">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalReclasificar}"
+                                              alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />                
+                <aura:if isTrue="{!v.tipoChat == 'Hidden'}">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reclasificar espacio</h2>
+                    <p class="slds-m-top_x-small">Seleccione un espacio</p>
+                </aura:if>
+                <aura:if isTrue="{!v.tipoChat != 'Hidden'}">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reclasificar
+                        espacio/categoría</h2>
+                    <p class="slds-m-top_x-small">Seleccione un espacio y una categoría</p>
+                             </aura:if>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <!-- Selección de espacio -->
+                            <lightning:layoutItem size="12" padding="around-small">
+                                <ui:inputSelect disabled="false" multiple="false" label="Espacio"
+                                                change="{!c.handleEspacioSeleccionado}" aura:id="firstOptionEspacios" value="{!v.espacio}">
+                                    <aura:iteration items="{!v.picklistFirstOptionsEspacio}" var="picklistFirstOptionEspacio">
+                                        <ui:inputSelectOption text="{!picklistFirstOptionEspacio.picklistValue}"
+                                                              label="{!picklistFirstOptionEspacio.picklistLabel}"
+                                                              value="{!picklistFirstOptionEspacio.bSel}"
+                                                              class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                            </lightning:layoutItem>
+                            
+                            <aura:if isTrue="{!v.tipoChat != 'Hidden'}">
+                                <!-- Selección de categoría. -->
+                                <lightning:layoutItem size="12" padding="around-small">
+                                    <ui:inputSelect disabled="false" multiple="false" label="Categoría"
+                                                    change="{!c.handleCategoriaSeleccionada}" aura:id="firstOptionCategorias"
+                                                    value="{!v.categoria}">
+                                        <aura:iteration items="{!v.picklistFirstOptionsCategoria}"
+                                                        var="picklistFirstOptionsCategoria">
+                                            <ui:inputSelectOption text="{!picklistFirstOptionsCategoria.picklistValue}"
+                                                                  label="{!picklistFirstOptionsCategoria.picklistLabel}"
+                                                                  value="{!picklistFirstOptionsCategoria.bSel}"
+                                                                  class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" />
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </lightning:layoutItem>
+                            </aura:if>
+                            <lightning:layoutItem size="12" padding="around-small">
+                                <lightning:input aura:id="checkTransferir" type="checkbox" label="Transferir" name="transferir"
+                                                 onchange="{!c.transferir}" checked="{!v.transferirChecked}" />
+                            </lightning:layoutItem>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <!--{!v.footer}-->
+                            <aura:if isTrue="{!or(v.tipoChat == 'Hidden', v.categoria != '--Selecciona una categoría--')}">
+                                <lightning:button variant="Neutral" label="Guardar" title="Guardar" onclick="{!c.reclasificar}" />
+                            </aura:if>
+                            <lightning:button variant="Neutral" label="Cancelar" title="Cancelar"
+                                              onclick="{! c.cerrarModalReclasificar}" />
+                        </footer> 
+                </aura:set>
+            </aura:if>
+        </div>
+    </section>
+
+</aura:component>

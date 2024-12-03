@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_StopGo__c</fullName>
+    <formula>IF(AND( NOT(ISBLANK( CC_Agente_Chat_Atendido__c )), NOT(ISNULL( CC_Agente_Chat_Atendido__c ))), true,false)</formula>
+    <label>Stop&amp;Go</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

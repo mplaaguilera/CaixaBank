@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_PromptOportunidadAUtilizar__c</fullName>
+    <description>El API name del prompt que hace el resumen de la oportunidad.
+Con Text es suficiente porque en prompt el api name tiene como máximo 80 caracteres.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Prompt Oportunidad a utilizar</label>
+    <length>100</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

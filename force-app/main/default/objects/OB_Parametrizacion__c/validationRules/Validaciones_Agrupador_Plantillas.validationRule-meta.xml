@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Agrupador_Plantillas</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Agrupador_Plantillas&apos;,
+   OR (
+      AND (
+         OB_Email__c,
+         ISBLANK(OB_Plantilla_Email_Defecto__c)
+      ),
+      AND (
+         OB_SMS__c,
+         ISBLANK(OB_Plantilla_SMS_Defecto__c)
+      )
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

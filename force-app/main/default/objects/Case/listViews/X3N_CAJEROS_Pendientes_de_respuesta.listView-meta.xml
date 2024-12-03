@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>X3N_CAJEROS_Pendientes_de_respuesta</fullName>
+    <columns>SEG_Case_Owner__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CC_Fecha_Traslado_Colaborador__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <filters>
+        <field>CC_Ultima_Interaccion__c</field>
+        <operation>equals</operation>
+        <value>Respuesta de colaborador</value>
+    </filters>
+    <label>3N_CAJEROS_con RESPUESTA COLABORADOR</label>
+    <sharedTo>
+        <group>PublicGroup_3N_Cajeros</group>
+    </sharedTo>
+</ListView>

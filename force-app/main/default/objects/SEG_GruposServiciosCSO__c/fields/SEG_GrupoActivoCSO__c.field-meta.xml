@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoActivoCSO__c</fullName>
+    <formula>SEG_GrupoCSO__r.SEG_ActivoCSO__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Grupo Activo CSO</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

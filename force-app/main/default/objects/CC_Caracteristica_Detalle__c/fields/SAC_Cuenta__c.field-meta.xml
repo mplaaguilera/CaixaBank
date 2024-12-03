@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Cuenta__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que muestra las cuentas de SAC</description>
+    <label>Cuenta</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 OR 2 OR 3</booleanFilter>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente</value>
+        </filterItems>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente Particular</value>
+        </filterItems>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>No Cliente PA</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Característica Detalles (Cuenta)</relationshipLabel>
+    <relationshipName>SAC_Cuentas_Clientes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

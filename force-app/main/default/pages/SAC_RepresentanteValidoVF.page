@@ -1,0 +1,17 @@
+<apex:page standardController="Case">
+
+    <apex:includeLightning />
+    <div  id="compContainer" />
+  <script>
+     $Lightning.use("c:SAC_RepresentanteValidoAPP", function() {
+         $Lightning.createComponent("c:SAC_RepresentanteValido",
+             {recordId:"{!$CurrentPage.parameters.id}"},
+             "compContainer",
+             function(cmp) {
+          console.log("c:VFPageApp loaded successfully in VF page");
+             }
+         );
+     });
+  </script>
+
+</apex:page>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIR_capActualPagoCliente__c</fullName>
+    <formula>IF((SIR_capActualIngresosDisponibles__c * 0.55) &gt; SIR_capActualGastosNecesarios__c, SIR_capActualIngresosDisponibles__c * 0.45, SIR_capActualIngresosDisponibles__c  - SIR_capActualGastosNecesarios__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Capacidad pago cliente</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,66 @@
+<template>
+    <lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        <h1 slot="title" class="card-title">
+            <lightning-icon class="slds-media__figure" icon-name="custom:custom18" size="small" style="background-color: gray;"></lightning-icon>
+            {labels.tareaFinalizada}
+        </h1>
+        <div class="closed-form">
+			<div class="slds-grid slds-gutters ">
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Fecha">{labels.fechaGestion}</label>
+						<div class="slds-form-element__control">
+							<!--<lightning-input class="inputs" type="date" id="Fecha" name="ActivityDate" date-style="short" value={fecha} onchange={handleChangeDate}></lightning-input>-->
+							<p class="formattedDate">{formattedFechaGestion}</p>
+						</div>
+					</div>
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Tipo">{labels.tipo}</label>
+						<!-- <div class="slds-form-element__control movePicklist"> -->
+							<lightning-combobox class="inputs" name="AV_Tipo__c" id="Tipo" value={valueTipo} options={optionsTipo} onchange={handleChangeTipo} ></lightning-combobox>
+						<!-- </div> -->
+					</div>
+				</div>
+			</div>
+			<div class="slds-grid slds-gutters ">
+				<!-- <div if:true={showState} class="slds-col slds-size_1-of-3"> -->
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label " for="Estado">{labels.estado}</label>
+						<!-- <div class="slds-form-element__control movePicklist"> -->
+							<lightning-combobox class="inputs" name="Status" id="Estado" placeholder={labels.gestionadaPositiva} value={valueEstado} options={optionsEstado} onchange={handleChangeEstado} ></lightning-combobox>
+						
+						<!-- </div> -->
+					</div>
+				</div>
+				<div if:true={rtClienteAccount} class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing" data-id= 'lookup3'>
+						<label class="slds-form-element__label " for="Persona de contacto">{labels.personaContacto}</label>
+						<c-av_-lookup
+							data-id="clookup3"
+							selection={initialSelection}
+							errors={errors}
+							onsearch={handleSearchContact}
+							onselectionchange={handleSelectionChange}
+							fieldlabel=""
+							placeholder={labels.buscarContacto}>
+						</c-av_-lookup>
+					</div>
+				</div>	
+			</div>
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
+						<label class="slds-form-element__label" for="comment">{labels.comentario}</label>
+						<div class="slds-form-element__control">
+							<lightning-textarea class="inputs" maxlength="250" type="text" id="comment" name="comentario"  value={comment} onchange={handleChangeComment}></lightning-textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</lightning-card>
+</template>

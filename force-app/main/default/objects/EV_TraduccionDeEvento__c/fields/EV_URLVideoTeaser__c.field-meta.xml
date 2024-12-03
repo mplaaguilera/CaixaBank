@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLVideoTeaser__c</fullName>
+    <description>campo que contendrá el vídeo teaser del evento.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>URL vídeo teaser</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

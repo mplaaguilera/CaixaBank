@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_SLA_Completado__c</fullName>
+    <label>Milestone Completado</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completed</label>
+            </value>
+            <value>
+                <fullName>Violated</fullName>
+                <default>true</default>
+                <label>Violated</label>
+            </value>
+            <value>
+                <fullName>SLAAltaEntitlement</fullName>
+                <default>false</default>
+                <label>SLA Alta Entitlement</label>
+            </value>
+            <value>
+                <fullName>SLAAltaTrigger</fullName>
+                <default>false</default>
+                <label>SLA Alta Trigger</label>
+            </value>
+            <value>
+                <fullName>48LetradoEntitlement</fullName>
+                <default>false</default>
+                <label>48h Letrado desde Entitlement</label>
+            </value>
+            <value>
+                <fullName>48LetradoTrigger</fullName>
+                <default>false</default>
+                <label>48h Letrado desde Trigger</label>
+            </value>
+            <value>
+                <fullName>48RegulatorioEntitlement</fullName>
+                <default>false</default>
+                <label>48h Regulatorio desde Entitlement</label>
+            </value>
+            <value>
+                <fullName>48RegulatorioTrigger</fullName>
+                <default>false</default>
+                <label>48h Regulatorio desde Trigger</label>
+            </value>
+            <value>
+                <fullName>24LetradoEntitlement</fullName>
+                <default>false</default>
+                <label>24h Letrado desde Entitlement</label>
+            </value>
+            <value>
+                <fullName>24LetradoTrigger</fullName>
+                <default>false</default>
+                <label>24h Letrado desde Trigger</label>
+            </value>
+            <value>
+                <fullName>24RegulatorioEntitlement</fullName>
+                <default>false</default>
+                <label>24h Regulatorio desde Entitlement</label>
+            </value>
+            <value>
+                <fullName>24RegulatorioTrigger</fullName>
+                <default>false</default>
+                <label>24h Regulatorio desde Trigger</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

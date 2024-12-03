@@ -1,0 +1,61 @@
+/* remove the "or drop files" label from the right of the lightning:input type file */
+.THIS .slds-file-selector__dropzone .slds-file-selector__text {
+    display: none;
+}
+
+/* remove the "Upload Files" text from the button of the lightning:input type file */
+.THIS .slds-file-selector__dropzone .slds-file-selector__button {
+    font-size: 0;
+}
+
+/* insert the text "Subir Archivos" into the button of the lightning:input type file */
+.THIS .slds-file-selector__dropzone .slds-file-selector__button:after {
+    content: 'Adjuntar archivos';
+    font-size: .8125rem;
+    color: rgba(17, 82, 121, 1.0);
+}
+
+.THIS .slds-listbox__option-text {
+    width: 300px !important;
+}
+
+.THIS .slds-listbox__option-meta {
+    width: 300px !important;
+}
+
+.THIS .rojo svg {
+    background-color: #f77e75 !important;
+}
+/*
+.THIS .slds-rich-text-editor {
+    height: 1500px !important;
+
+}
+
+.THIS .slds-rich-text-editor__content {
+    height: 1500px !important;
+}
+
+.THIS .trest .slds-rich-text-editor__textarea {
+    height: 1500px !important;
+}*/
+
+.THIS .slds-modal__content{
+    overflow: visible;
+}
+
+.THIS .canEnter .ql-container.slds-rich-text-editor__textarea .ql-editor.slds-rich-text-area__content {
+    min-height: 1500px !important;
+}
+
+.THIS .slds-pill_container_color {
+    background-color: #fcfbfa;
+    border-color: #c9c9c9;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.THIS .slds-pill {
+    line-height: initial;
+    margin-right: 2px;
+}

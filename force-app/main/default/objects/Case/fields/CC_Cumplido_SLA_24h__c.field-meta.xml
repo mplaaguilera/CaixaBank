@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cumplido_SLA_24h__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si se ha hecho un traslado a colaborador, a 3N o a incidencia antes de 24h computables</description>
+    <label>Cumplido SLA 24h</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

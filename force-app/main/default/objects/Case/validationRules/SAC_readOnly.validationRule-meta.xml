@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_readOnly</fullName>
+    <active>true</active>
+    <description>Validation Rule para que los usuarios solo puedan actualizar el estado del caso desde la botonera creada y no desde la vista de detalles del caso.</description>
+    <errorConditionFormula>AND($Profile.Name = &apos;SAC_General&apos;, RecordType.Name = &apos;SAC_Reclamacion&apos; ,RecordType.Name = &apos;SAC_Pretension&apos;)</errorConditionFormula>
+    <errorMessage>Use la botonera para modificar el estado.</errorMessage>
+</ValidationRule>

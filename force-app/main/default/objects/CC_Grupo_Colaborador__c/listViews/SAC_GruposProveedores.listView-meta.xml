@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GruposProveedores</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_PorcentajeAsignacion__c</columns>
+    <columns>SAC_MaximoCasosDiarios__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.SAC_GrupoProveedores</value>
+    </filters>
+    <label>Grupos Proveedores</label>
+    <sharedTo>
+        <roleAndSubordinates>SAC_General</roleAndSubordinates>
+    </sharedTo>
+</ListView>

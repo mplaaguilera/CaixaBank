@@ -1,0 +1,5 @@
+<template>
+    <div if:false={typeAttributes.isInterloc} style="margin-top:.5rem;width:fit-content"></div>
+    {typeAttributes.nameAccount} <lightning-badge if:true={typeAttributes.isInterloc} label="Interlocutor" style="margin:.25rem 0"></lightning-badge>
+    <div if:false={typeAttributes.isInterloc} style="margin-top:.5rem;width:fit-content"></div>
+ </template>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_3a_Reclamacion_ejecutada_manualmente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Tick que marca el usuario si la segunda reclamación (la 3ª) la ha hecho él vía correo electrónico manual.</description>
+    <label>3a Reclamación ejecutada manualmente</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

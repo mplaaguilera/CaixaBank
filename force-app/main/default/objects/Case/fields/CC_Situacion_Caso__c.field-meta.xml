@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Situacion_Caso__c</fullName>
+    <label>Situación Caso</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Respuesta colaborador</fullName>
+                <default>false</default>
+                <label>Respuesta colaborador</label>
+            </value>
+            <value>
+                <fullName>Respuesta cliente</fullName>
+                <default>false</default>
+                <label>Respuesta cliente</label>
+            </value>
+            <value>
+                <fullName>Devuelto 3N</fullName>
+                <default>false</default>
+                <label>Devuelto 3N</label>
+            </value>
+            <value>
+                <fullName>Rechazado 3N</fullName>
+                <default>false</default>
+                <label>Rechazado 3N</label>
+            </value>
+            <value>
+                <fullName>Devuelto 2N</fullName>
+                <default>false</default>
+                <label>Devuelto 2N</label>
+            </value>
+            <value>
+                <fullName>Rechazado 2N</fullName>
+                <default>false</default>
+                <label>Rechazado 2N</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

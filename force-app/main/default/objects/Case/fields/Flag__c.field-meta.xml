@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Flag__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(Origin, &apos;Comentarios Stores&apos;),
+IF(App_Reviews__r.CC_Tiempo_Respuesta_Stores__c &lt;= 20, IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+IF(App_Reviews__r.CC_Tiempo_Respuesta_Stores__c &lt; 24, IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15)
+)
+),
+IF(ISPICKVAL(Origin, &apos;Twitter&apos;),
+IF(CC_Tiempo_Respuesta_Twitter__c &lt;= 25, IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+IF(CC_Tiempo_Respuesta_Twitter__c &lt; 30, IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15)
+)
+),
+IF(AND(NOT(ISBLANK(CC_Fecha_Limite_Resolucion__c)), NOT(ISBLANK(CC_Fecha_Limite_Resolucion_Verde__c)), NOT(ISBLANK(CC_Fecha_Limite_Resolucion_Naranja__c))),
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion_Verde__c+1, IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion_Naranja__c+1, IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion__c+1, IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),
+IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+)
+)
+),IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+)
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>IMAGE(&apos;/resource/CC_Flags/Flags/Flag_Green.png&apos;,&quot;Rojo&quot;,30,30)</inlineHelpText>
+    <label>Prioridad</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Caso__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Caso</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Case.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente (SEG)</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Case</referenceTo>
+    <relationshipName>Reglas_inconistentes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,106 @@
+<template>
+    <lightning-card>
+        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+            <span class="slds-assistive-text">warning</span>
+            <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+            <lightning-icon icon-name="utility:warning" alternative-text="Warning!" title="Warning"></lightning-icon>
+            </span>
+            <h2>{label.mensajeIAResponsable}</h2>
+        </div>
+        <lightning-button class="slds-align_absolute-center slds-m-top_medium" variant="brand" label="Vista Completa" icon-name="utility:expand" onclick={navigateToParentComponent}></lightning-button>
+        <lightning-tabset class="slds-align_absolute-center">
+            <lightning-tab label="Oportunidad" class="slds-align_absolute-center" value="oportunidad" onactive={handleTabClick}>
+                <c-csbd-_resumen-oportunidad record-id={recordId} plan-opo={planOpo} plan-ampli={planAmpli} class="slds-m-left_large"></c-csbd-_resumen-oportunidad>
+                <!-- <div class="slds-m-bottom_xx-large">
+                    <lightning-card  class="slds-m-bottom_xx-large">
+                    <template if:true={isLoadingOpp}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <template lwc:if={muestraCopiaOpp}>
+                        <lightning-formatted-rich-text
+                        value={copiaResOpp}
+                        ></lightning-formatted-rich-text>
+                    </template>
+                    <template lwc:else>
+                        <lightning-formatted-rich-text
+                        value={resumenOportunidad}
+                        ></lightning-formatted-rich-text>
+                    </template>
+                    <div class="slds-m-top_medium slds-m-bottom_x-large">
+                        <lightning-record-edit-form
+                            object-api-name="Opportunity"
+                            record-id={recordId}
+                            onsubmit={handleSubmitOpp}
+                            >
+                                <lightning-messages></lightning-messages>
+                                <lightning-input-field
+                                    field-name="CSBD_InstruccionesGPT__c"
+                                ></lightning-input-field>
+                                
+                                <div class="slds-m-top_large slds-align_absolute-center">
+                                    <lightning-button class="slds-m-horizontal_x-small" variant="brand" type="submit" label="Actualizar"></lightning-button>
+                                </div>
+                        </lightning-record-edit-form>
+                    </div>
+                    </lightning-card>
+                </div> -->
+            </lightning-tab>
+            <lightning-tab label="Producto" class="slds-align_absolute-center" value="producto" onactive={handleTabClick}>
+                <c-csbd-_resumen-producto record-id={recordId} plan-prod={planProd} class="slds-m-left_large"></c-csbd-_resumen-producto>
+                <!-- <lightning-card  class="slds-m-bottom_xx-large">
+                    <template if:true={isLoadingProd}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <template lwc:if={muestraCopiaProd}>
+                        <lightning-formatted-rich-text
+                        value={copiaResProd}
+                        ></lightning-formatted-rich-text>
+                    </template>
+                    <template lwc:else>
+                        <lightning-formatted-rich-text value={resumenProducto}>
+                        </lightning-formatted-rich-text>
+                    </template>
+                    <div slot="footer">
+                        <lightning-button class="slds-col" label="Refrescar" onclick={handleRefrescarProd}></lightning-button>
+                    </div>
+                </lightning-card> -->
+            </lightning-tab>
+            <lightning-tab label="Argumentario" class="slds-align_absolute-center" value="argumentario" onactive={handleTabClick}>
+                <c-csbd-_resumen-argumentario record-id={recordId} plan-arg={planArg} class="slds-m-left_large"></c-csbd-_resumen-argumentario>
+                <!-- <div class="slds-m-bottom_xx-large">
+                    <lightning-card  class="slds-m-bottom_xx-large">
+                    <template if:true={isLoadingArgu}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <template lwc:if={muestraCopiaArgu}>
+                        <lightning-formatted-rich-text
+                        value={copiaResArgu}
+                        ></lightning-formatted-rich-text>
+                    </template>
+                    <template lwc:else>
+                        <lightning-formatted-rich-text
+                        value={resumenArgumentario}
+                        ></lightning-formatted-rich-text>
+                    </template>
+                    <div class="slds-m-top_medium slds-m-bottom_x-large">
+                        <lightning-record-edit-form
+                            object-api-name="Opportunity"
+                            record-id={recordId}
+                            onsubmit={handleSubmitArgu}
+                            >
+                                <lightning-messages></lightning-messages>
+                                <lightning-input-field
+                                    field-name="CSBD_InformacionAdicional__c"
+                                ></lightning-input-field>
+                                
+                                <div class="slds-m-top_large slds-align_absolute-center">
+                                    <lightning-button class="slds-m-horizontal_x-small" variant="brand" type="submit" label="Recalcular"></lightning-button>
+                                </div>
+                        </lightning-record-edit-form>
+                    </div>
+                    </lightning-card>
+                </div> -->
+            </lightning-tab>
+        </lightning-tabset>
+    </lightning-card>
+</template>

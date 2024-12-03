@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_trazadoNif__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Trazado para saber si un NIF es necesario en el Link.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>SEG_trazadoNif</label>
+    <type>Checkbox</type>
+</CustomField>

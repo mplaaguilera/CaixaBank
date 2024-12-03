@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_SepararProfesional__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador para separar los PF de profesionales</description>
+    <label>Separar profesional</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

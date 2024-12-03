@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Caixabank</label>
+    <protected>false</protected>
+    <values>
+        <field>Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>App_Name__c</field>
+        <value xsi:type="xsd:string">CaixaBank</value>
+    </values>
+    <values>
+        <field>Canal_operativo__c</field>
+        <value xsi:type="xsd:string">App CBKNow</value>
+    </values>
+    <values>
+        <field>Identificador__c</field>
+        <value xsi:type="xsd:string">318806094</value>
+    </values>
+    <values>
+        <field>Imagen__c</field>
+        <value xsi:type="xsd:string">https://is5-ssl.mzstatic.com/image/thumb/Purple123/v4/61/aa/08/61aa0846-b4ae-cb2e-9cff-a64c1c79a8c5/AppIcon_FULL-0-1x_U007emarketing-0-0-85-220-0-5.png/60x0w.jpg</value>
+    </values>
+    <values>
+        <field>Tipo__c</field>
+        <value xsi:type="xsd:string">Apple Store</value>
+    </values>
+    <values>
+        <field>countryCode__c</field>
+        <value xsi:type="xsd:string">es</value>
+    </values>
+</CustomMetadata>

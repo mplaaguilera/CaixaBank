@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Numero_total_pretensiones__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>se informará con el número total de pretensiones diagnosticadas</description>
+    <externalId>false</externalId>
+    <label>Numero total pretensiones</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

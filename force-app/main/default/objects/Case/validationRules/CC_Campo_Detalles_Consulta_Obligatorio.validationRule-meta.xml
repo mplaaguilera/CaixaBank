@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Campo_Detalles_Consulta_Obligatorio</fullName>
+    <active>true</active>
+    <description>El campo detalles consulta tiene que ser obligatorio para todos los canales de entrada excepto: Twitter, Chat, Comentarios APPs y Propuestas de mejora.</description>
+    <errorConditionFormula>AND(
+RecordType.DeveloperName &lt;&gt; &quot;SEG_Cliente&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Pretension&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;OS_Cliente&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;OS_Empleado&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;GRR_Cliente&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Pretension&quot;,
+ISCHANGED(Status),
+ISPICKVAL(Status,&quot;Cerrado&quot;),
+NOT(ISPICKVAL(Origin,&quot;Twitter&quot;)),
+NOT(ISPICKVAL(Origin,&quot;Propuestas de mejora&quot;)),
+NOT(ISPICKVAL(Origin,&quot;Chat&quot;)),
+NOT(ISPICKVAL(Origin,&quot;Comentarios Stores&quot;)),
+NOT(ISPICKVAL(CC_Canal_Procedencia__c,&quot;Buzón Fondos&quot;)),
+NOT(ISPICKVAL(CC_Canal_Procedencia__c,&quot;Buzón Carteras&quot;)),
+ISBLANK(CC_Detalles_Consulta__c))</errorConditionFormula>
+    <errorMessage>No se permite cerrar el caso sin especificar el campo &apos;Detalles consulta&apos;.</errorMessage>
+</ValidationRule>

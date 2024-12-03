@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CSBD_Hipotecas</label>
+    <protected>false</protected>
+    <values>
+        <field>CSBD_Cola_Asignada__c</field>
+        <value xsi:type="xsd:string">CSBD_Hipotecas</value>
+    </values>
+    <values>
+        <field>CSBD_Criterio_1__c</field>
+        <value xsi:type="xsd:string">AND (RecordType.Name = &quot;Hipoteca&quot; OR (CSBD_Familia_Producto__c = &quot;Hipotecas&quot; AND RecordType.Name != &quot;Hipoteca&quot;))</value>
+    </values>
+    <values>
+        <field>CSBD_Criterio_2__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

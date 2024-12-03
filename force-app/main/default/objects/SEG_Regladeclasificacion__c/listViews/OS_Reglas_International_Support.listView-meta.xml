@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Reglas_International_Support</fullName>
+    <columns>NAME</columns>
+    <columns>OS_AgrupacionBuzon__c</columns>
+    <columns>SEG_ClasificacionRapida__c</columns>
+    <columns>OS_OrdenEjecucion__c</columns>
+    <columns>SEG_Inactiva__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>OWNER.ALIAS</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CBK_Negocio__c</field>
+        <operation>equals</operation>
+        <value>Cops</value>
+    </filters>
+    <filters>
+        <field>OS_AgrupacionBuzon__c</field>
+        <operation>equals</operation>
+        <value>Buzón International Support</value>
+    </filters>
+    <label>Reglas International Support</label>
+    <sharedTo>
+        <group>OS_GOC</group>
+    </sharedTo>
+</ListView>

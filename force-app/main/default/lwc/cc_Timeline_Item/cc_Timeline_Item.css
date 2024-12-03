@@ -1,0 +1,88 @@
+.slds-timeline__item_expandable.slds-is-open article {
+    margin-bottom: 8px;
+}
+
+.botonExpandirContraerItem {
+    position: relative;
+    display: inline-block;
+    top: 1px;
+    height: 18px;
+    width: 16px;
+    transform: rotate(-90deg);
+    transition: all 200ms cubic-bezier(0.3, 0, 0.15, 1);
+}
+
+.slds-timeline__item_expandable.slds-is-open .botonExpandirContraerItem {
+    transform: rotate(0);
+}
+
+.slds-timeline__trigger:hover {
+    background-color: initial;
+}
+
+.slds-timeline__item_expandable .slds-media {
+    border-radius: 7px;
+    transition: background-color 100ms ease;
+}
+
+.slds-timeline__item_task.slds-timeline__item_expandable .slds-media:hover {
+    background: #3ba75510;
+}
+
+.slds-timeline__item_email.slds-timeline__item_expandable .slds-media:hover {
+    background: #93939313;
+}
+
+.timeline__item_case.slds-timeline__item_expandable .slds-media:hover {
+    background: #ff538a10;
+}
+
+.timeline__item_chat.slds-timeline__item_expandable .slds-media:hover {
+    background: #ff5e2e10;
+}
+
+.timeline__item_social.slds-timeline__item_expandable .slds-media:hover {
+    background: #f6538a11;
+}
+
+.timeline__item_twitter.slds-timeline__item_expandable .slds-media:hover {
+    background: #21a1f410;
+}
+.slds-timeline__item_expandable:before {
+    top: 1px;
+}
+
+.timeline__item_case.slds-timeline__item_expandable:before {
+    background: #ff538a;
+}
+
+.timeline__item_chat.slds-timeline__item_expandable:before {
+    background: #ff5e2e;
+}
+
+.timeline__item_social.slds-timeline__item_expandable:before {
+    background: #f6538a;
+}
+
+.timeline__item_twitter.slds-timeline__item_expandable:before {
+    background: #21a1f4;
+}
+
+.slds-timeline__item_details {
+    will-change: opacity;
+    opacity: 0;
+    transition: all 200ms cubic-bezier(0.3, 0, 0.15, 1);
+}
+
+.slds-timeline__item_expandable.slds-is-open .slds-timeline__item_details {
+    opacity: 1;
+}
+
+.iconoTwitter {
+    background-color: #21a1f4;
+    border-radius: 4px;
+}
+
+.iconoCorreoEntrante {
+    --slds-c-icon-color-background: #A4A4A4;
+}

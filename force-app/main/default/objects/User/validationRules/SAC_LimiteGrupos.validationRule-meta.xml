@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_LimiteGrupos</fullName>
+    <active>true</active>
+    <description>Controla que el usuario no exceda el limite de grupos al que puede pertenecer</description>
+    <errorConditionFormula>AND(
+NOT($Permission.CBK_BypassValidationRules),
+NOT($Permission.SAC_ByPass),
+LEN(SAC_GruposPerteneciente__c) - LEN(SUBSTITUTE(SAC_GruposPerteneciente__c, &quot;;&quot;, &quot;&quot;)) &gt; 12
+)</errorConditionFormula>
+    <errorMessage>Este usuario ha alcancado el máximo número de grupos a los que puede pertenecer</errorMessage>
+</ValidationRule>

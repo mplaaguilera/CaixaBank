@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Caso</fullName>
+    <active>true</active>
+    <description>Al cerrar un caso si el campo Resolución no está informado muestra error indicando que se debe informar dicho campo</description>
+    <errorConditionFormula>AND(
+				ISCHANGED(Status),
+				ISCHANGED(CC_Cerrado_Operativa__c),
+				NOT(ISBLANK(CC_Cerrado_Operativa__c)),
+				ISPICKVAL(Status,&quot;Cerrado&quot;),
+				CC_En_Tercer_Nivel__c=True,
+				ISBLANK (CC_Resolucion__c)
+)</errorConditionFormula>
+    <errorMessage>Debes informar el campo Resolución 3Nivel en la gestión del caso.</errorMessage>
+</ValidationRule>

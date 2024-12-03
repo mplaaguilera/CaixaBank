@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TextoRectificacion__c</fullName>
+    <description>Propiedad del derecho de Rectificación.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Texto</label>
+    <length>400</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

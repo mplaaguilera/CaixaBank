@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EsMiGrupo__c</fullName>
+    <formula>IF(ISBLANK( SAC_GrupoColaborador__c ) , false, OR(CONTAINS($User.SAC_GruposPerteneciente__c, SAC_GrupoColaborador__c) , AND($Profile.Name == &apos;AV_Usuario_CaixaBank&apos;,  SAC_GrupoColaborador__r.SAC_DeveloperName__c = &apos;OFICINA&apos;)) )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Es mi grupo</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EscaladoRespondido</fullName>
+    <active>false</active>
+    <description>No permite responder un escalado una vez ya está en estado atendido o re escalado</description>
+    <errorConditionFormula>AND(
+ OR(
+  RecordType.DeveloperName == &apos;SAC_Escalado&apos;,
+  RecordType.DeveloperName == &apos;SAC_EscaladoNV3&apos;
+ ),
+ OR(ISPICKVAL(PRIORVALUE( SAC_Estado__c ),&apos;SAC_Atendida&apos;),
+  ISPICKVAL(PRIORVALUE( SAC_Estado__c ),&apos;SAC_Reescalada&apos;)
+ ),
+ OR(
+  ISCHANGED(SAC_Estado__c),
+  ISCHANGED(SAC_ImporteAutorizado__c),
+  ISCHANGED(SAC_Respuesta__c),
+  ISCHANGED(SAC_Conclusion__c)
+ )
+)</errorConditionFormula>
+    <errorMessage>El escalado ya ha sido respondido o re escalado, no se puede volver a responder o re escalar</errorMessage>
+</ValidationRule>

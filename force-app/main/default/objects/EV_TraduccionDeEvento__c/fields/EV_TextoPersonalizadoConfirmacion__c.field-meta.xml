@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_TextoPersonalizadoConfirmacion__c</fullName>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Aplica únicamente al programa de evento &apos;Eventos Comunicaciones personalizadas&apos;. Si se rellena este campo, no aparece QR en dicha comunicación.</inlineHelpText>
+    <label>Texto personalizado confirmación</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

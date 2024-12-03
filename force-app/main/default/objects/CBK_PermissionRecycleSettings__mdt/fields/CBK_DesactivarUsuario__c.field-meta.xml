@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_DesactivarUsuario__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador que denota si apare de realizarse la operación de reciclado de permisos, adicionalmente se ha de proceder a desactivar al usuario que cumpla las condiciones de reciclaje del permiso.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Desactivar usuario</label>
+    <type>Checkbox</type>
+</CustomField>

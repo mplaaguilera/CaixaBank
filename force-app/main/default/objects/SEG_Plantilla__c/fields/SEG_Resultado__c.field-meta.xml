@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Resultado__c</fullName>
+    <label>Resultado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SEG_TipoOperativa__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>SEG_Resultado</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>Valija</controllingFieldValue>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Enviado justificantes al cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija</controllingFieldValue>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Operaciones gestionadas pte envío justificante</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija</controllingFieldValue>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Operaciones gestionadas sin envío justificante</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Cierre por gestor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Gestión en otro caso</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Petición gestionada completa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Petición gestionada de forma incompleta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Petición no gestionada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Reenvío al contacto del caso</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cierre</controllingFieldValue>
+            <valueName>Respuesta a peticionario</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

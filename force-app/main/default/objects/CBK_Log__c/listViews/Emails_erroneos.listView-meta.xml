@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Emails_erroneos</fullName>
+    <columns>NAME</columns>
+    <columns>Subject__c</columns>
+    <columns>FromAddress__c</columns>
+    <columns>Project__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_Log__c.Emails_erroneos</value>
+    </filters>
+    <label>Emails erróneos</label>
+</ListView>

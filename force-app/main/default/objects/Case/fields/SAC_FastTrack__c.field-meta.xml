@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FastTrack__c</fullName>
+    <description>Picklist para elegir el tipo de fast track que se desea. Sirve para determinar que tipo de automatización para completar la resolución de la reclamación se va a ejecutar al pasar de alta a análisis</description>
+    <label>Fast track</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_Completo</fullName>
+                <default>false</default>
+                <label>Completo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

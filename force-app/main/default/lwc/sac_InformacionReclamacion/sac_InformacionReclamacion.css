@@ -1,0 +1,32 @@
+lightning-card {
+  width: 100%;
+}
+
+/* Ajustar el ancho de la tabla al 100% */
+.slds-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Ajustar el contenido de las celdas para que se muestre en varias líneas si es necesario */
+.slds-table td {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.slds-table td.record-link {
+  color: rgb(23, 152, 193);
+  cursor: pointer;
+}
+  
+.slds-table td.record-link:hover {
+  text-decoration: underline;
+}
+
+.custom-bg-color {
+  background-color:  rgb(250, 250, 250);
+}
+
+.titulo {
+  font-size: 16px;
+}

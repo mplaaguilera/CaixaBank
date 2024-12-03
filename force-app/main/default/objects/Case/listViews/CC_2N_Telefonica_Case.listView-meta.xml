@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_2N_Telefonica_Case</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>Flag__c</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Queue</filterScope>
+    <label>Cola Telefónica</label>
+    <queue>CC_2N_Telefonica</queue>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

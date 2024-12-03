@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ImagenCabecera__c</fullName>
+    <description>Imagen cabecera personalizada para las creatividades.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Logo sobre la imagen de invitación</inlineHelpText>
+    <label>URL logo cabecera</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

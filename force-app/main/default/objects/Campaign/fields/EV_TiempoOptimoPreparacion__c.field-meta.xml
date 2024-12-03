@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_TiempoOptimoPreparacion__c</fullName>
+    <description>Tiempo que conlleva preparar, organizar y realizar el evento.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Informar el tiempo necesario para la preparación del evento, envío de invitaciones, etc.</inlineHelpText>
+    <label>Tiempo óptimo de preparación (Días)</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

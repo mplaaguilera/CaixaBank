@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_AdjuntoLink__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checkbox para habilitar la transformación de adjuntos a link html cuando superan el límite de espacio.</description>
+    <label>Permitir trasformar adjuntos a link html</label>
+    <type>Checkbox</type>
+</CustomField>

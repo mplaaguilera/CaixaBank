@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón GRR Servicios Centrales</label>
+    <protected>false</protected>
+    <values>
+        <field>GRR_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">DT Servicios Centrales</value>
+    </values>
+    <values>
+        <field>GRR_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">GRR_Buzon_Servicios_Centrales</value>
+    </values>
+    <values>
+        <field>GRR_Email_Destino__c</field>
+        <value xsi:type="xsd:string">corporativo@reputacional.caixabank.com</value>
+    </values>
+    <values>
+        <field>GRR_Email_Redireccion_Buzon__c</field>
+        <value xsi:type="xsd:string">corporativo</value>
+    </values>
+    <values>
+        <field>GRR_RecordType_DeveloperName_defecto__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

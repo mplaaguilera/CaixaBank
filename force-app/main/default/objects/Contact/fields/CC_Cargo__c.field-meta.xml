@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cargo__c</fullName>
+    <label>Cargo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Empleado</fullName>
+                <default>false</default>
+                <label>Empleado</label>
+            </value>
+            <value>
+                <fullName>Director</fullName>
+                <default>false</default>
+                <label>Director</label>
+            </value>
+            <value>
+                <fullName>DIRECCIÓN</fullName>
+                <default>false</default>
+                <label>DIRECCIÓN</label>
+            </value>
+            <value>
+                <fullName>SUBDIRECCIÓN</fullName>
+                <default>false</default>
+                <label>SUBDIRECCIÓN</label>
+            </value>
+            <value>
+                <fullName>DIRECCIÓN ÁREA DE NEGOCIO</fullName>
+                <default>false</default>
+                <label>DIRECCIÓN ÁREA DE NEGOCIO</label>
+            </value>
+            <value>
+                <fullName>AGENTE FINANCIERO</fullName>
+                <default>false</default>
+                <label>AGENTE FINANCIERO</label>
+            </value>
+            <value>
+                <fullName>GENERICO</fullName>
+                <default>false</default>
+                <label>GENERICO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

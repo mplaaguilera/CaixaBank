@@ -1,0 +1,62 @@
+<template>
+    <div class="slds-grid slds-wrap formulario">    
+      <div class="slds-size_2-of-2 formulario">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+          <thead>
+              <tr class="slds-line-height_reset">
+                <th colspan="2" class="colorBlanco noBordes slds-truncate " ></th>
+                <th colspan="2" class="colorBlanco slds-truncate bordeIzquierda bordeDerecha textCenter fondoAzul">Rentas procedentes del trabajo</th>
+                <th colspan="2" class="colorBlanco slds-truncate textCenter">Rentas procedentes de la explotación del capital mobiliario o inmobiliario</th>
+              </tr>  
+              <tr class="slds-line-height_reset">
+                <th class=" negritaSuave slds-truncate"></th>
+                <th class=" negritaSuave slds-truncate">Nombre</th>
+                <th class=" negritaSuave slds-truncate bordeIzquierda">Profesión</th>
+                <th class=" negritaSuave ancho bordeDerecha">Ingresos mensuales procedentes del trabajo</th>
+                <th class=" negritaSuave slds-truncate textCenter">Bienes</th>
+                <th class=" negritaSuave ancho">Ingresos mensuales procedentes de la explotación </th>
+              </tr>
+          </thead>  
+          <tbody>   
+          <template for:each={intervinientes} for:item="inter" for:index="index">
+            <tr class="slds-hint-parent" key={inter.Id} >            
+              <td><div class="slds-truncate">{inter.SIR_Relacion__c}</div> </td>              
+              <td class="textoAdap"><div>{inter.SIR_Cliente__r.Name}</div></td>
+              <td class="bordeIzquierda textoAdap"><div>{inter.SIR_Profesion__c}</div></td>
+              <td class="bordeDerecha tdImporte"><div class="slds-m-around_x-small noLabel slds-truncate formulario divImporte "><lightning-input class="textoDerecha input-text-align_right" type="number" label={index} variant="label-hidden" formatter="currency" step=".01" name='SIR_IngresosTrabajo__c'  value={inter.SIR_IngresosTrabajo__c} onchange={changeIngresosTrabajo} ></lightning-input></div></td>
+              <td><div class="slds-m-around_x-small noLabel slds-truncate"><lightning-textarea label={index} variant="label-hidden" name='SIR_Bienes__c' value={inter.SIR_Bienes__c} onchange={changeBienes}></lightning-textarea></div></td>
+              <td class="tdImporte"><div class="slds-m-around_x-small noLabel slds-truncate formulario divImporte"><lightning-input class="textoDerecha input-text-align_right" type="number" label={index} variant="label-hidden" formatter="currency" step=".01" name='SIR_IngresosBienes__c' value={inter.SIR_IngresosBienes__c} onchange={changeIngresosBienes}></lightning-input></div></td>                  
+            </tr>
+          </template> 
+          <tr class="slds-hint-parent">
+            <th><div class="slds-m-around_x-small negrita textRight"></div></th>
+            <th><div class="slds-m-around_x-small negrita textRight"></div></th>
+            <th class="bordeIzquierda"><div class="slds-m-around_x-small negrita textRight">Total</div></th>
+            <th class="bordeDerecha tdImporte"><div class="slds-m-around_x-small noLabel negrita divImporte"><lightning-input class="textoDerecha" type="number" label="" variant="label-hidden" formatter="currency" read-only="true" disabled="true" value={totalTrabajo}></lightning-input></div></th>                  
+            <th><div class="slds-m-around_x-small negrita textRight">Total</div></th>
+            <th class="tdImporte"><div class="slds-m-around_x-small noLabel negrita divImporte"><lightning-input class="textoDerecha" type="number" label="" variant="label-hidden" formatter="currency" read-only="true" disabled="true" value={totalBienes}></lightning-input></div></th>                  
+          </tr> 
+        </tbody>                 
+      </table>
+    </br> 
+    </div>  
+    
+    <div class="slds-size_1-of-2">
+      <div class=" slds-m-around_x-small ancho">
+        <lightning-input type="number" label="Ingresos mensuales adicionales unid. Fam." formatter="currency" step=".01" value={ingresosAdicionales} onchange={changeIngresosAdicionales}></lightning-input>
+      </div>
+    </div> 
+    <div class="slds-size_1-of-2">
+      <lightning-textarea label="Otros datos de interés" value={otrosDatos} onchange={changeOtrosDatos}></lightning-textarea>
+    </div>
+    </br>
+  </div>
+
+  <div class="slds-grid slds-wrap">
+    <div class="slds-size_2-of-2">
+      <div class="slds-m-around_x-small">
+        <button class="slds-button slds-button_brand" onclick={guardar}>Guardar</button>
+      </div>
+    </div>       
+  </div>
+</template>

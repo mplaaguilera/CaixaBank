@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_OnlyNumMobilePhone</fullName>
+    <active>true</active>
+    <description>Validation Rule para controlar que el móvil sea sólo con valores numéricos.</description>
+    <errorConditionFormula>AND ( 
+NOT ISBLANK(MobilePhone), 
+NOT ISNUMBER(MobilePhone)
+)</errorConditionFormula>
+    <errorDisplayField>MobilePhone</errorDisplayField>
+    <errorMessage>Sólo se aceptan valores numéricos para definir el teléfono móvil.</errorMessage>
+</ValidationRule>

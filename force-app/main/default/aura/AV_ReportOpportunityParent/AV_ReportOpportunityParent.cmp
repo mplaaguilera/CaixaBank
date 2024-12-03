@@ -1,0 +1,5 @@
+<aura:component implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="appEvent" type="c:AV_ReportAppEvent"/>
+    <c:av_ReportOpportunity onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:av_ReportOpportunity>
+</aura:component>

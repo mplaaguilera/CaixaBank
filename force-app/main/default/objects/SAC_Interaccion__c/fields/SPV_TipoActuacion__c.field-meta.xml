@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_TipoActuacion__c</fullName>
+    <description>Campo para seleccionar el tipo de actuación en el escalado</description>
+    <label>Tipo de actuación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>SPV_Pago</fullName>
+                <default>false</default>
+                <label>Pago</label>
+            </value>
+            <value>
+                <fullName>SPV_PagoTarea</fullName>
+                <default>false</default>
+                <label>Pago + Tarea</label>
+            </value>
+            <value>
+                <fullName>SPV_Tarea</fullName>
+                <default>false</default>
+                <label>Tarea</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

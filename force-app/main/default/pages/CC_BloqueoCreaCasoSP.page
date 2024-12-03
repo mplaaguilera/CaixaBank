@@ -1,0 +1,8 @@
+<apex:page standardController="SocialPost">
+     <apex:pageBlock >
+        <apex:PageMessage summary="No se pueden crear casos desde una publicación social."
+            severity="Warning"
+            strength="3"/>
+        <apex:pageMessages />
+    </apex:pageBlock>
+</apex:page>

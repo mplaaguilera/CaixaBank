@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_RecyclePermissionDaysInformed</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISBLANK(CBK_DiasInactividad__c) , NOT(OR(ISPICKVAL(CBK_Operacion__c, &apos;CBK_Exclusion_PS&apos;),	ISPICKVAL(CBK_Operacion__c, &apos;CBK_Exclusion_CP&apos;))))</errorConditionFormula>
+    <errorDisplayField>CBK_DiasInactividad__c</errorDisplayField>
+    <errorMessage>For the indicated operation it is necessary to inform the number of days of inactivity.</errorMessage>
+</ValidationRule>

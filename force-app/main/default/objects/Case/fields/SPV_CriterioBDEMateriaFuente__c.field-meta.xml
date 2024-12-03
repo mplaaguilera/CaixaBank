@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_CriterioBDEMateriaFuente__c</fullName>
+    <description>Campo picklist que indica el criterio del BdE sobre materia y fuente de la pretensión</description>
+    <inlineHelpText>Mencionar el criterio del BdE sobre esta materia y fuente (resoluciones anteriores, memoria del BdE, etc…)</inlineHelpText>
+    <label>Criterio BdE sobre materia y fuente</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>No</fullName>
+                <default>false</default>
+                <label>No</label>
+            </value>
+            <value>
+                <fullName>Sí</fullName>
+                <default>false</default>
+                <label>Sí</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_TablaPrecios_Plazo__c</fullName>
+    <inlineHelpText>Corto: hasta 20 años (240 meses). Largo: más de 20 años.</inlineHelpText>
+    <label>Plazo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Corto</fullName>
+                <default>false</default>
+                <label>Corto</label>
+            </value>
+            <value>
+                <fullName>Largo</fullName>
+                <default>false</default>
+                <label>Largo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

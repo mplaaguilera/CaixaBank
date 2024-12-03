@@ -1,0 +1,66 @@
+<aura:component controller="OS_Account_Campos_COPS_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+    <aura:attribute name="carteras" type="List" default="[]"/>
+    <aura:attribute name="carterasCentroManipulador" type="List" default="[]"/>
+    <aura:attribute name="centroCaixabank" type="Boolean" default="true"/>
+    <aura:attribute name="personAccount" type="Boolean" default="true"/>
+    <aura:attribute name="clienteAccount" type="Boolean" default="true"/>
+    <aura:attribute name="objectAccount" type="Boolean" default="true"/>
+    <aura:attribute name="objectContact" type="Boolean" default="true"/>
+    <!-- <aura:attribute name="recordtype" type="String"/> -->
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="enlaces">
+                        <lightning:icon iconName="standard:person_account" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate">
+                            <span>Datos COPS</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+            <!--Si Account-->
+            <aura:if isTrue="{!v.objectAccount}">
+                <lightning:combobox aura:id="OS_Cartera__c" label="Cartera" options="{!v.carteras}"/>
+                <div style="height:1rem;"/>
+                <lightning:input aura:id="OS_Premium__c" type="checkbox" label="Cliente Premium"/>
+                <aura:if isTrue="{!v.centroCaixabank}">
+                    <div style="height:1rem;"/>
+                    <lightning:input aura:id="CBK_HolaBank__c" type="checkbox" label="HolaBank"/>
+                    <div style="height:1rem;"/>
+                    <lightning:combobox aura:id="OS_Centro_Manipulador__c" options="{!v.carterasCentroManipulador}" label="Centro Manipulador"/>
+               </aura:if>
+                <aura:if isTrue="{!v.personAccount}">
+                    <div style="height:1rem;"/>
+                    <lightning:input aura:id="SEG_No_enviar_Acuse_Recibo__pc" type="checkbox" label="No enviar Acuse Recibo"/>
+                </aura:if>
+            </aura:if>
+            <!--Si Contact-->
+            <aura:if isTrue="{!v.objectContact}">
+                <div style="height:1rem;"/>
+                <lightning:input aura:id="SEG_No_enviar_Acuse_Recibo__c" type="checkbox" label="No enviar Acuse Recibo"/>
+            </aura:if>
+        </div>
+
+        <!--Footer-->
+        <footer class="slds-card__footer">
+            <div align="right">
+                <lightning:button variant="brand" label="Guardar" onclick="{!c.guardarDatos}"/>
+            </div>
+        </footer>
+	</article>
+
+</aura:component>

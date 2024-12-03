@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Negocio_Agrup__c</fullName>
+    <label>Agrupador de Negocios</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>CAIXABANKNOW</fullName>
+                <default>false</default>
+                <label>CAIXABANKNOW</label>
+            </value>
+            <value>
+                <fullName>CAJEROS</fullName>
+                <default>false</default>
+                <label>CAJEROS</label>
+            </value>
+            <value>
+                <fullName>IMAGINBANK</fullName>
+                <default>false</default>
+                <label>IMAGINBANK</label>
+            </value>
+            <value>
+                <fullName>RESTO</fullName>
+                <default>false</default>
+                <label>RESTO</label>
+            </value>
+            <value>
+                <fullName>TARJETAS</fullName>
+                <default>false</default>
+                <label>TARJETAS</label>
+            </value>
+            <value>
+                <fullName>TELÉFONO ÚNICO + AIO</fullName>
+                <default>false</default>
+                <label>TELEFONO UNICO + AIO</label>
+            </value>
+            <value>
+                <fullName>TODOS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TODOS</label>
+            </value>
+            <value>
+                <fullName>WIVAI</fullName>
+                <default>false</default>
+                <label>WIVAI</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Fechayhoracreacion__c</fullName>
+    <externalId>false</externalId>
+    <formula>TEXT(DATEVALUE(CreatedDate)) &amp;&quot; &quot;&amp;
+IF (DATEVALUE(NOW()) &gt;= DATE( YEAR (DATEVALUE(NOW())),03,31) - MOD(DATE ( YEAR (DATEVALUE(NOW())),03,31) - DATE (1900,1,7),7)
+&amp;&amp; DATEVALUE(NOW()) &lt; DATE( YEAR (DATEVALUE(NOW())),10,31) - MOD(DATE ( YEAR (DATEVALUE(NOW())),10,31) - DATE (1900,1,7),7),
+LEFT(TEXT (TIMEVALUE( CreatedDate + (120/1440))),8),
+LEFT(TEXT (TIMEVALUE( CreatedDate + (60/1440))),8))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Fecha y hora creación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Tipo__c</fullName>
+    <label>Tipo COPS</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Actividad manual</fullName>
+                <default>false</default>
+                <label>Actividad manual</label>
+            </value>
+            <value>
+                <fullName>Acuse de recibo</fullName>
+                <default>false</default>
+                <label>Acuse de recibo</label>
+            </value>
+            <value>
+                <fullName>Alta manual de caso</fullName>
+                <default>false</default>
+                <label>Alta manual de caso</label>
+            </value>
+            <value>
+                <fullName>Cambio de tipo del caso</fullName>
+                <default>false</default>
+                <label>Cambio de tipo del caso</label>
+            </value>
+            <value>
+                <fullName>Canal de procedencia modificado</fullName>
+                <default>false</default>
+                <label>Canal de procedencia modificado</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Consulta</fullName>
+                <default>false</default>
+                <label>Consulta</label>
+            </value>
+            <value>
+                <fullName>Correo - Entrada</fullName>
+                <default>false</default>
+                <label>Correo - Entrada</label>
+            </value>
+            <value>
+                <fullName>Duplicar caso</fullName>
+                <default>false</default>
+                <label>Duplicar caso</label>
+            </value>
+            <value>
+                <fullName>Fin</fullName>
+                <default>false</default>
+                <label>Fin</label>
+            </value>
+            <value>
+                <fullName>Fusionado</fullName>
+                <default>false</default>
+                <label>Fusionado</label>
+            </value>
+            <value>
+                <fullName>Llamada entrante</fullName>
+                <default>false</default>
+                <label>Llamada entrante</label>
+            </value>
+            <value>
+                <fullName>Llamada saliente</fullName>
+                <default>false</default>
+                <label>Llamada saliente</label>
+            </value>
+            <value>
+                <fullName>Llamada transferida</fullName>
+                <default>false</default>
+                <label>Llamada transferida</label>
+            </value>
+            <value>
+                <fullName>Notificación - Salida</fullName>
+                <default>false</default>
+                <label>Notificación - Salida</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Petición Encuesta Offline</fullName>
+                <default>false</default>
+                <label>Petición Encuesta Offline</label>
+            </value>
+            <value>
+                <fullName>Reactivación</fullName>
+                <default>false</default>
+                <label>Reactivación</label>
+            </value>
+            <value>
+                <fullName>Reapertura por respuesta de cliente</fullName>
+                <default>false</default>
+                <label>Reapertura por respuesta de cliente</label>
+            </value>
+            <value>
+                <fullName>Reasignación</fullName>
+                <default>false</default>
+                <label>Reasignación</label>
+            </value>
+            <value>
+                <fullName>Recepción de valija digital</fullName>
+                <default>false</default>
+                <label>Recepción de valija digital</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Reclasificación</fullName>
+                <default>false</default>
+                <label>Reclasificación</label>
+            </value>
+            <value>
+                <fullName>Remitir Colaborador</fullName>
+                <default>false</default>
+                <label>Remitir Colaborador</label>
+            </value>
+            <value>
+                <fullName>Responder a cliente</fullName>
+                <default>false</default>
+                <label>Responder a cliente</label>
+            </value>
+            <value>
+                <fullName>Solicitud Información</fullName>
+                <default>false</default>
+                <label>Solicitud Información</label>
+            </value>
+            <value>
+                <fullName>Traslado Colaborador</fullName>
+                <default>false</default>
+                <label>Traslado Colaborador</label>
+            </value>
+            <value>
+                <fullName>Reclamación Traslado Colaborador</fullName>
+                <default>false</default>
+                <label>Reclamación Traslado Colaborador</label>
+            </value>
+            <value>
+                <fullName>Solicitud autorización pago</fullName>
+                <default>false</default>
+                <label>Solicitud autorización pago</label>
+            </value>
+            <value>
+                <fullName>Solicitud creación pago</fullName>
+                <default>false</default>
+                <label>Solicitud creación pago</label>
+            </value>
+            <value>
+                <fullName>Solicitud revisión</fullName>
+                <default>false</default>
+                <label>Solicitud revisión</label>
+            </value>
+            <value>
+                <fullName>Solicitud carga fichero</fullName>
+                <default>false</default>
+                <label>Solicitud carga fichero</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

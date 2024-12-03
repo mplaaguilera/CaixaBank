@@ -1,0 +1,126 @@
+<template>
+	<template if:false={activateOpportunityFlow}>
+		<div class="container-div slds-p-around_small">
+			<div class="cardMargin">
+				<lightning-card>
+					<h1 slot="title" class="card-title">
+						<lightning-icon class="slds-media__figure" icon-name="custom:custom18" size="small" style="background-color: gray;"></lightning-icon>
+						{labels.eventoFinalizado}
+					</h1>
+					<h1 class="slds-m-left_small ">{labels.eventoSeCierraAutomaticamente}</h1>
+					<lightning-layout multiple-rows if:true={roleEmp}>
+						<lightning-layout-item size="6"  padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.clienteNuevo}</label>
+							<lightning-input class="user-input"  type="checkbox" checked={clienteNuevo}  onchange={handleClienteNuevo} ></lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="6"  padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.clienteEspana}</label>
+							<lightning-input class="user-input"  type="checkbox" checked={clienteEspaña} onchange={handleClienteEspana}  ></lightning-input>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.infoComplementariaGestor}</label>
+							<lightning-textarea class="user-input" type="text" name="comentario" value={antecedentes}  onchange={handleAntecedentes} ></lightning-textarea>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label  comment-label">{labels.conclusionesGestor}</label>
+							<lightning-textarea class="user-input" type="text" name="comentario" value={conclusionGestor} onchange={handleConclusionesGestor}></lightning-textarea>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.conclusionesCliente}</label>
+							<lightning-textarea class="user-input" type="text"  name="comentario" value={conclusionCliente} onchange={handleConclusionesCliente}></lightning-textarea>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.proximosPasos}</label>
+							<lightning-textarea class="user-input" type="text" name="comentario" value={proximosPasos} onchange={handleProximosPasos}></lightning-textarea>
+						</lightning-layout-item>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.comentario}</label>
+							<lightning-input class="user-input" type="text" name="comentario" value={comment} onchange={handleComment}></lightning-input>
+						</lightning-layout-item>
+					</lightning-layout> 
+
+					<lightning-layout multiple-rows if:true={roleCib}>
+						<lightning-layout-item size="12" padding="around-small">
+							<label class="slds-form-element__label comment-label">{labels.comentario}</label>
+							<lightning-input class="user-input" type="text" name="comentario" value={comment} onchange={handleComment}></lightning-input>
+						</lightning-layout-item>
+					</lightning-layout> 
+
+				</lightning-card>
+			</div>
+			<div class="cardMargin">
+				<div class="slds-box messageWarning cardMargin slds-align_absolute-center">
+					<div>
+						<p>{labels.paraReportar}</p>
+						<ol class="slds-list_ordered slds-is-nested">
+							<li>{labels.actualizarListado}</li>
+							<li>{labels.informarEstado}</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+			<div class="cardMargin">
+				<lightning-button if:false={isShowFlowActionOpp} label={labels.createNewOpportunity} title="Crear oportunidad" 
+					icon-name="utility:add" class="slds-m-left_x-small" onclick={handleComboBoxChange} >
+				</lightning-button>
+				
+				
+				<template if:true={isShowFlowActionOpp}>
+					<lightning-card>				
+						<div class="slds-modal__header">
+							<h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
+						</div>
+						<lightning-button-icon icon-name="utility:close" alternative-text="Cancelar creación de oportunidad" class="slds-m-left_xx-small close-button" title="Cancelar creación de oportunidad" onclick={handelCancelNewOpp}></lightning-button-icon>
+						<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+							<div class="slds-is-relative">
+								<lightning-flow flow-api-name={flowName} flow-input-variables={inputVariables} onstatuschange={handleStatusChangeOpp}> </lightning-flow>
+							</div>
+						</div>
+					</lightning-card>
+				</template>
+			</div>
+			<div class="cardMargin">
+				<c-cibe_-List-Opportunities recid={recordId} ondatareport={handleDataAbuelo} editable="true" onchangenew={updateRecords2} list-to-update={listToUpdate}></c-cibe_-List-Opportunities>
+			</div>
+
+			<template if:false ={showSpinner}>			
+				<template if:true ={launchFlow}>
+					<section  tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+					aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+					<div class="slds-modal__container" >
+		
+						<header class="slds-modal__header " >
+							<div class="title " >{flowHeader}</div>
+							<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+								title="Close" onclick={handleClose}>
+								<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"></lightning-icon>
+								<span class="slds-assistive-text">Close</span>
+							</button>
+						</header>
+						<div class="scrollbar style-3">
+							<div class="force-overflow">
+								<div>
+									<lightning-flow 
+										flow-api-name={actionSetting}  flow-input-variables={inputVariables} onstatuschange={handleStatusChange}>
+									</lightning-flow> 
+								</div>
+							</div>
+						</div>
+					</div>
+					</section>
+					<div class="slds-backdrop slds-backdrop_open"></div>
+				</template>
+			</template>
+
+			<div class="slds-docked-form-footer" >
+				<lightning-button variant="brand" label={labels.grabarReporte} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+				<lightning-button variant="brand" label={labels.cerrarAltaEvento} onclick={handleClickEvent} class="slds-m-left_x-small"></lightning-button>
+				<lightning-button variant="brand" label={labels.cerrarAltaTarea} onclick={handleClickTarea} class="slds-m-left_x-small"></lightning-button>
+				<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="small" class="spin-cls" ></lightning-spinner>
+			</div>
+			<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" ></lightning-spinner>
+		</div>
+
+		
+	</template>
+</template>

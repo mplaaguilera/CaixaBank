@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Parametros</fullName>
+    <columns>MasterLabel</columns>
+    <columns>DeveloperName</columns>
+    <columns>Nombre__c</columns>
+    <columns>Descriptivo__c</columns>
+    <columns>Valor_Numerico_Entero__c</columns>
+    <columns>Valor_Texto__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Parámetros</label>
+</ListView>

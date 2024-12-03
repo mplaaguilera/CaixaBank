@@ -1,0 +1,193 @@
+<template>
+   <lightning-card style="margin-bottom: 40px;">
+      <template if:true={hasFormularios}>
+         <template for:each={formulariosRT} for:item="formularios">
+            <lightning-card key={formularios.recordTypeDevName} title={formularios.tableTitle}>
+               <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                  <tbody>
+                     <template for:each={formularios.formularios} for:item="formulario">
+                        <!-- GGH -->
+                           <template if:true={formularios.gghRT}>
+                              <tr key={formulario.formulario.Id}>
+                                 <td colspan="5">
+                                    <table class="no-horizontal-borders">
+                                       <tr>
+                                          <!-- Column 1 -->
+                                          <td style="vertical-align: top; padding-right: 20px;">
+                                             <p class="field-title">Nombre</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedName}</p>
+                                             <p class="field-title">Tipo documento</p>
+                                             <p class="field-value underlined">{formulario.formulario.SAC_Tipo_Documento__c}</p>
+                                             <p class="field-title">Email</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedEmail}</p>
+                                             <p class="field-title">Provincia reclamante</p>
+                                             <p class="field-value underlined">{formulario.formulario.SAC_Provincia__c}</p>
+                                             <p class="field-title">Representante Legal</p>
+                                             <template if:true={formulario.formulario.SAC_Representante_Legal__c}>
+                                                <p class="field-value underlined">Sí</p>
+                                             </template>
+                                             <template if:false={formulario.formulario.SAC_Representante_Legal__c}>
+                                                <p class="field-value underlined">No</p>
+                                             </template>
+                                             <p class="field-title">Tipo documento Rep Legal</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_Tipo_Doc_Rep_Legal__c}</p>
+                                             <p class="field-title">Motivo</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedMotivo__c}</p>
+                                             <p class="field-title">Oficina</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedOficina__c}</p>
+                                          </td>
+                                          <!-- Column 2 -->
+                                          <td style="vertical-align: top; padding-right: 20px;">
+                                             <p class="field-title">Apellidos</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedApellido1__c}  {formulario.reclamacion.CC_SuppliedApellido2__c}</p>
+                                             <p class="field-title">Documento</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_Numero_Documento__c}</p>
+                                             <p class="field-title">Teléfono</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedPhone}</p>
+                                             <p class="field-title">&nbsp;</p>
+                                             <p class="field-value">&nbsp;</p>
+                                             <p class="field-title">Nombre/Razón social</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_NombreRepresentante__c}</p>
+                                             <p class="field-title">Documento Rep Legal</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_NumeroDelDocumento__c}</p>
+                                             <p class="field-title">Producto</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedProducto__c}</p>
+                                             <p class="field-title">Causa</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedAmbito__c}</p>
+                                          </td>
+                                       </tr>
+                                       <tr>
+                                          <td colspan="2" style="vertical-align: top; padding-right: 20px;">
+                                              <p class="field-title" style="margin-top: 0px;">Descripción</p>
+                                              <p class="field-value underlined">{formulario.reclamacion.Description}</p>
+                                          </td>
+                                      </tr>
+                                    </table>
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                       <thead>
+                                          <tr>
+                                             <th scope="col">Pretensión</th>
+                                             <th scope="col">Número Préstamo</th>
+                                             <th scope="col">Importe Reclamado</th>
+                                             <th scope="col">Importe Rec. Gestoría</th>
+                                             <th scope="col">Importe Rec. Notaría</th>
+                                             <th scope="col">Importe Rec. Registros</th>
+                                             <th scope="col">Importe Rec. Otros</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          <!-- Pretensiones -->
+                                          <template for:each={formulario.pretensiones} for:item="pretension">
+                                             <tr key={pretension.Id}>
+                                                <td>{pretension.CaseNumber}</td>
+                                                <td>{pretension.SAC_Prestamo_seleccionado__c}</td>
+                                                <td>{pretension.CC_Importe_Reclamado__c}€</td>
+                                                <td>{pretension.SAC_ImpReclamadoGestoria__c}€</td>
+                                                <td>{pretension.SAC_ImpReclamadoNotaria__c}€</td>
+                                                <td>{pretension.SAC_ImpReclamadoRegistros__c}€</td>
+                                                <td>{pretension.SAC_Otros_gastos__c}€</td>
+                                             </tr>
+                                          </template>
+                                       </tbody>
+                                    </table>
+                                 </td>
+                              </tr>
+                           </template>
+                           <!-- FRAUDE -->
+                           <template if:true={formularios.fraudeRT}>
+                              <tr key={formulario.formulario.Id}>
+                                 <td colspan="5">
+                                    <table class="no-horizontal-borders">
+                                       <tr>
+                                          <!-- Column 1 -->
+                                          <td style="vertical-align: top; padding-right: 20px;">
+                                             <p class="field-title">Nombre</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedName}</p>
+                                             <p class="field-title">Tipo documento</p>
+                                             <p class="field-value underlined">{formulario.formulario.SAC_Tipo_Documento__c}</p>
+                                             <p class="field-title">Email</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedEmail}</p>
+                                             <p class="field-title">Provincia reclamante</p>
+                                             <p class="field-value underlined">{formulario.formulario.SAC_Provincia__c}</p>
+                                             <p class="field-title">Representante Legal</p>
+                                             <template if:true={formulario.formulario.SAC_Representante_Legal__c}>
+                                                <p class="field-value underlined">Sí</p>
+                                             </template>
+                                             <template if:false={formulario.formulario.SAC_Representante_Legal__c}>
+                                                <p class="field-value underlined">No</p>
+                                             </template>
+                                             <p class="field-title">Tipo documento Rep Legal</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_Tipo_Doc_Rep_Legal__c}</p>
+                                             <p class="field-title">Motivo</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedMotivo__c}</p>
+                                             <p class="field-title">Oficina</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedOficina__c}</p>
+                                          </td>
+                                          <!-- Column 2 -->
+                                          <td style="vertical-align: top; padding-right: 20px;">
+                                             <p class="field-title">Apellidos</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedApellido1__c}  {formulario.reclamacion.CC_SuppliedApellido2__c}</p>
+                                             <p class="field-title">Documento</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_Numero_Documento__c}</p>
+                                             <p class="field-title">Teléfono</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SuppliedPhone}</p>
+                                             <p class="field-title">&nbsp;</p>
+                                             <p class="field-value">&nbsp;</p>
+                                             <p class="field-title">Nombre/Razón social</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_NombreRepresentante__c}</p>
+                                             <p class="field-title">Documento Rep Legal</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.SAC_NumeroDelDocumento__c}</p>
+                                             <p class="field-title">Producto</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedProducto__c}</p>
+                                             <p class="field-title">Causa</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_SuppliedAmbito__c}</p>
+                                          </td>
+                                       </tr>
+                                       <tr>
+                                          <td colspan="2"  style="vertical-align: top; padding-right: 20px;">
+                                              <p class="field-title" style="margin-top: 0px;">Descripción</p>
+                                              <p class="field-value underlined">{formulario.reclamacion.Description}</p>
+                                          </td>
+                                      </tr>
+                                    </table>
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                       <thead>
+                                          <tr>
+                                             <th scope="col">Fecha</th>
+                                             <th scope="col">Importe</th>
+                                             <th scope="col">Producto</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody>
+                                          <!-- Fechas -->
+                                          <template for:each={formulario.fechas} for:item="fecha">
+                                             <tr key={fecha.Id}>
+                                                <td>{fecha.fecha}</td>
+                                                <td>{fecha.importe}€</td>
+                                                <td>{fecha.producto}</td>
+                                             </tr>
+                                          </template>
+                                       </tbody>
+                                    </table>
+                                    <table class="no-horizontal-borders">
+                                       <tr>
+                                          <td style="vertical-align: top; padding-right: 20px;">
+                                             <p class="field-title">Total reclamado</p>
+                                             <p class="field-value underlined">{formulario.reclamacion.CC_Importe_Reclamado__c}€</p>
+                                          </td>
+                                       </tr>
+                                    </table>
+                                 </td>
+                              </tr>
+                           </template>
+                     </template>
+                  </tbody>
+               </table>
+            </lightning-card>
+         </template>
+      </template>
+      <template if:false={hasFormularios}>
+         <p>No hay formularios relacionados con esta reclamación.</p>
+      </template>
+   </lightning-card>
+</template>

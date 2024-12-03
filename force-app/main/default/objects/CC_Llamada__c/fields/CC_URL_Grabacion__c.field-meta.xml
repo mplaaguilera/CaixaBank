@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_URL_Grabacion__c</fullName>
+    <externalId>false</externalId>
+    <formula>&quot;https://cccontent-pro1.cxbpro.objst1cd1.lacaixa.es/rest/&quot;+CC_Fecha_Grabacion__c+&quot;_&quot;+UPPER(CC_ConnId__c)+&quot;_&quot;+CC_Extension__c+&quot;.mp3&quot;</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>URL Grabación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,75 @@
+<aura:component controller="CC_Marcas_Case" implements="flexipage:availableForAllPageTypes,force:hasRecordId,lightning:actionOverride,lightning:hasPageReference" access="global">
+
+    <!--
+    Existe una known issue de Salesforce por la que la segunda vez que se abre un
+    lightning para override de quick action se queda colgado invocando la lógica del controlador Apex.
+    Workaround: refrescar la página o la pestaña con el componente.
+    Reference W-5708022: https://success.salesforce.com/issues_view?id=a1p3A000001RWqvQAG
+    -->
+
+    <!--Handlers-->
+    <aura:handler name="render" value="{!this}" action="{!c.doInit}"/>
+   
+    
+    <!--Variables-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="spinner" type="Boolean" default="true"/>
+    <aura:attribute name="opcionesMarcasActivasLista" type="List" default="[]"/>
+	<aura:attribute name="idMarca" type="String" default=""/>
+
+    <!--Workspace API para gestión de las pestañas de la consola-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--HTML-->
+    <article class="slds-card">
+        <!--Spinner-->
+        <aura:if isTrue="{!v.spinner}">
+            <div>
+                <lightning:spinner variant="brand" size="large" alternativeText="Cargando..." />
+            </div>
+        </aura:if>
+
+        <!--Cuerpo-->
+        <div class="slds-card__body slds-card__body_inner">
+            <!--Título-->
+            <div class="forceChangeRecordType" style="border-color: #dddbda; color: #dddbda; border-bottom-color: #dddbda; border-bottom: solid; border-width: 1px;">
+                <h2 class="slds-p-top--large slds-p-horizontal--medium slds-p-bottom--medium slds-text-heading--medium" style="color: black;">
+                    Vincular marca al caso
+                </h2>
+            </div>
+
+            <!--Footer-->
+            <div class="slds-card__body slds-card__body_inner" style="padding-top: 5px;">
+                <div class="slds-form__item slds-align_absolute-center" role="listitem">
+                    <!--Formulario-->
+                    <lightning:recordEditForm onsuccess="{!c.success}" objectApiName="CC_Marca_Case__c">
+                        
+                        <!--Grid con 2 columnas-->
+                        <div class="slds-grid slds-gutters slds-wrap">
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning:inputField fieldName="CC_Case__c" disabled="true" value="{!v.recordId}"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning:combobox aura:id='marcaSeleccionada' label="Marca a vincular"  
+                                    placeholder="--Seleccione una marca--"
+                                    value="{!v.idMarca}"
+                                    required="true"
+                                    messageWhenValueMissing="Debe seleccionar una marca"
+                                    onchange="{!c.handleOptionSelected}"
+                                    options="{!v.opcionesMarcasActivasLista}"/>
+                            </div>
+                        </div>
+
+                        <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                            <lightning:button label="Cancelar" onclick="{!c.cerrarTab}"/>
+                            <lightning:button variant="brand" type="submit" name="guardar" label="Vincular" disabled="{!empty(v.idMarca)}"/>
+                        </lightning:layout>
+
+                        <lightning:inputField fieldName="CC_Marca__c" value="{!v.idMarca}" class="slds-hidden"/>
+
+                    </lightning:recordEditForm>
+                </div>
+            </div>
+        </div>
+    </article>
+</aura:component>

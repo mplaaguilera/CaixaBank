@@ -1,0 +1,489 @@
+<aura:component controller="SEG_Email_Launcher_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
+    <!-- Attributes -->
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="errorLds" type="String"/>
+    <aura:attribute name="iniciando" type="Integer" default="0"/>
+    <aura:attribute name="caseSubject" type="String" />
+    <aura:attribute name="caseStatus" type="String" />
+    <aura:attribute name="caseGrupo" type="String" />
+    <aura:attribute name="currentEmail" type="EmailMessage" />
+    <aura:attribute name="currentContact" type="Contact" />
+    <aura:attribute name="emailList" type="List" />
+    <aura:attribute name="emailDatesList" type="List" />
+    <aura:attribute name="infoEmailRespuesta" type="EmailMessage" />
+    <aura:attribute name="infoEmailInicial" type="EmailMessage" />
+    <aura:attribute name="urlOrg" type="String" />
+    <aura:attribute name="contactNuevoData" type="Contact" />
+    <aura:attribute name="messageFromEvent" type="boolean" />
+    <aura:attribute name="horaActualizacion" type="String" />
+    <aura:attribute name="abrirPlantillas" type="boolean" default="false" />
+    <aura:attribute name="abrirBusqueda" type="boolean" default="false" />
+    <aura:attribute name="abrirRedactar" type="boolean" default="false" />
+    <aura:attribute name="cuerpoNuevo" type="boolean" default="false" />
+    <aura:attribute name="esPropietario" type="boolean" default="false" />
+    <aura:attribute name="origenBuscador" type="String" />
+    <aura:attribute name="deNuevo" type="boolean" default="false" />
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="registroId" type="String" />
+    <aura:attribute name="lstPara" type="List" default="[]"/>
+    <aura:attribute name="lstCopia" type="List" default="[]"/>
+    <aura:attribute name="lstCCO" type="List" default="[]"/>
+    <aura:attribute name="newDestinatario" type="List" />
+    <aura:attribute name="cambioDestinatario" type="boolean" default="false" />
+    <aura:attribute name="getPlantilla" type="String" />
+    <aura:attribute name="getIdiomaPlantilla" type="String" />
+    <aura:attribute name="getPlantillaOrg" type="String" />
+    <aura:attribute name="dIdioma" type="String" />
+    <aura:attribute name="dataAnexos" type="Object" />
+    <aura:attribute name="columnasAnexos" type="List" />
+    <aura:attribute name="hasAnexos" type="boolean" default="false" />
+    <aura:attribute name="botonPulsado" type="String" />
+    <aura:attribute name="tipoDestinatarioPrincipal" type="String" default=""/>
+    <aura:attribute name="nombreGrupoColaboradorPrincipal" type="String" />
+    <aura:attribute name="nombreContactoSOEOSN" type="String" default=""/>
+    <aura:attribute name="emailContactoSOEOSN" type="String" default=""/>
+
+
+
+    <!-- Control cuenta pendiente Asociar -->
+    <aura:attribute name="noContacto" type="boolean" default="false"/>
+    <aura:attribute name="avisoNoContacto" type="Boolean" default="false"/>
+
+    <aura:method name="actualizarListaCorreos" action="{!c.actualizarListaCorreos}"/>
+
+    <!--EVENTO PARA RECIBIR ID CONTACTO -->
+    <aura:handler name="cargarEvento" event="c:SEG_senCntct_event" action="{!c.getValueFromApplicationEvent}" />
+    <!-- EVENTO PARA PASAR LISTA NUEVO CONTACTO EN BUSCADOR -->
+    <aura:handler name="cargarLista" event="c:SEG_lstDestinatario_event" action="{!c.getListFromApplicationEvent}" />
+    <!-- EVENTO PARA PASAR LISTA NUEVO CONTACTO EN BUSCADOR -->
+    <aura:handler name="cargarListaPara" event="c:SEG_Event_LstPara" action="{!c.getListParaFromApplicationEvent}" />
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--Init
+    <aura:handler name="init" value="{!this}" action="{!c.getCaso}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarEmails}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarFechaEmails}" />
+    <aura:handler name="init" value="{!this}" action="{!c.getPropietario}" />
+    <aura:handler name="init" value="{!this}" action="{!c.getDynamicUrlToApex}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarEmailReciente}" />
+	-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarAnexos}"/>
+
+    <!--On render-->
+    <!-- <aura:handler name="render" value="{!this}" action="{!c.checkContact}"/> -->
+
+    <!--refreshView
+    <aura:handler event="force:refreshView" action="{!c.getCaso}" />
+    <aura:handler event="force:refreshView" action="{!c.cargarEmails}" />
+    <aura:handler event="force:refreshView" action="{!c.cargarFechaEmails}" />
+    <aura:handler event="force:refreshView" action="{!c.getPropietario}" />
+    <aura:handler event="force:refreshView" action="{!c.cargarEmailReciente}" />
+	-->
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    <aura:handler event="force:refreshView" action="{!c.cargarAnexos}" />
+
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" fields="ContactId, SEG_Organizacion__c, SEG_Zona__c"
+        targetFields="{!v.caso}" targetError="{!v.errorLds}" recordUpdated="{!c.casoUpdatedDataService}"/>
+
+    <!--
+    <aura:if isTrue="{!v.noContacto &amp;&amp; !v.avisoNoContacto}">
+        <div style="text-align: center;">
+            <div id="child" class="slds-notify slds-notify_alert slds-alert_error" role="alert" style="margin-top: 5px; margin-bottom: 15px;">
+                <span class="slds-icon_container slds-icon-utility-use" style="padding-right: 10px;">
+                    <lightning:icon iconName="utility:warning" size="x-small" variant="inverse"/>
+                </span>
+                <h2>
+                    Para poder realizar una comunicación saliente informe el contacto del caso, la Organización y la Zona.
+                </h2>
+                <div class="slds-notify__close">
+                    <button class="slds-button slds-button_icon slds-button_icon-small" onclick="{!c.cerrarAvisoNoContacto}" title="Ocultar este aviso">
+                        <lightning:icon iconName="utility:close" size="xx-small"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    -->
+    <div class="slds-grid slds-gutters">
+        <aura:if isTrue="{!lessthan(v.iniciando, 5)}">
+            <div class="slds-modal__container slds-is-relative" style="height: 176px;">
+                <div class="slds-spinner_container">
+                    <lightning:spinner size="small" alternativeText="Cargando..."/>
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-col slds-size_1-of-3">
+                    <aura:if isTrue="{!and(!v.abrirPlantillas, !v.abrirBusqueda)}">
+                        <div class="slds-grid slds-grid_vertical slds-gutters_direct-xxx-small" style="height: 100%;">
+                            <div class="slds-col" style="border-style: solid; border-width: 1px; border-color: #dddbda; border-radius: 4px; padding: 0px; box-shadow: 0 1px 0px 0px rgb(0 0 0 / 10%);">
+                                <header class="slds-split-view__header slds-border_bottom" style="padding-top: 11px; padding-bottom: 13px;">
+                                    <div class="slds-grid slds-grid_vertical-align-center">
+                                        <p class="slds-text-body_small">{!v.emailList.length + ' correos • Actualizado: ' + v.horaActualizacion}</p>
+                                        <div class="slds-no-flex slds-grid slds-col_bump-left">
+                                            <div class="slds-button-group">
+                                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container-more" aria-haspopup="true" aria-expanded="false">
+                                                    <lightning:button label="Nuevo" class="slds-button_stretch" iconName="utility:new_direct_message" onclick="{!c.abrirNuevo}" disabled="{!or(!v.esPropietario, v.caseStatus == 'Cerrado') || v.noContacto || v.caseGrupo == null}" />
+                                                </button>
+                                            </div>
+                                            <div class="slds-button-group">
+                                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container" title="Refresh List">
+                                                    <lightning:buttonIcon iconName="utility:refresh" title="Actualizar lista" onclick="{!c.actualizarListaCorreos}"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </header>
+                                <ul>
+                                    <aura:iteration items="{!v.emailList}" var="email" indexVar="iEmail">
+                                        <aura:iteration items="{!v.emailDatesList}" var="emailDate" indexVar="iDates">
+                                            <aura:if isTrue="{!iEmail == iDates}">
+                                                <!--Entrantes-->
+                                                <aura:if isTrue="{!email.Incoming}">
+                                                    <!--Reciclado-->
+                                                    <aura:if isTrue="{!email.SEG_EmailReciclado__c}">
+                                                        <li class="slds-split-view__list-item backgroundColor-blue" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                            <a label="{!index}" class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-blue" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <lightning:icon iconName="utility:text_template" size="x-small" title="Recibido + Reciclado" />
+                                                                    &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                    <span class="slds-truncate slds-col_bump-left">{!emailDate} </span>
+                                                                </div>
+                                                                <div class="slds-grid slds-wrap">
+                                                                    <span class="slds-truncate" title="{!email.Subject}">{!email.Subject}</span>
+                                                                    <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                        <span class="slds-truncate slds-col_bump-left">
+                                                                            <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                        </span>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </a>
+                                                        </li>
+                                                        <!--No reciclado-->
+                                                        <aura:set attribute="else">
+                                                            <li class="slds-split-view__list-item backgroundColor-green" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-green" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:email" size="x-small" title="Recibido" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:set>
+                                                    </aura:if>
+
+                                                    <!--Salientes-->
+                                                    <aura:set attribute="else">
+                                                        <!--Automático (menos acuses)-->
+                                                        <aura:if isTrue="{!empty(email.SEG_BotonPulsado__c)}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:undo" size="x-small" title="Automático" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+
+                                                        <!--Acuses-->
+                                                        <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Acuse'}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:undo" alternativeText="Enviado" size="x-small" title="Automático" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+
+                                                        <!--Responder-->
+                                                        <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Responder'}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:reply" size="x-small" title="Respondido" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+
+                                                        <!--Nuevo-->
+                                                        <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Nuevo'}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:send" size="x-small" title="Enviado" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+
+                                                        <!--Reenviar-->
+                                                        <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'Reenviar'}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:forward" size="x-small" title="Reenviado" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+
+                                                        <!--Responder a todos-->
+                                                        <aura:if isTrue="{!email.SEG_BotonPulsado__c == 'ResponderTodos'}">
+                                                            <li class="slds-split-view__list-item backgroundColor-red" role="presentation" onclick="{!c.getEmail}" Name="{!email.Id}">
+                                                                <a class="slds-split-view__list-item-action slds-grow slds-has-flexi-truncate backgroundColor-red" aria-current="{!email.Id == v.currentEmail.Id ? 'page' : ''}">
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <lightning:icon iconName="utility:reply_all" size="x-small" title="Respondido a todos" />
+                                                                        &nbsp;<span class="slds-truncate slds-text-body_regular slds-text-color_default">{!email.FromName}</span>
+                                                                        <span class="slds-truncate slds-col_bump-left">{!emailDate}</span>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-wrap">
+                                                                        <span class="slds-truncate">{!email.Subject}</span>
+                                                                        <aura:if isTrue="{!email.SEG_HasAnexo__c}">
+                                                                            <span class="slds-truncate slds-col_bump-left">
+                                                                                <lightning:icon iconName="utility:attach" size="xx-small" />
+                                                                            </span>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.abrirBusqueda}">
+                        <c:Email_buscador
+                            caseId="{!v.recordId}"
+                            origenBusqueda="{!v.origenBuscador}"
+                            contactPara="{!v.lstPara}"
+                            deNuevo="{!v.deNuevo}"
+                            contactCCO="{!v.lstCCO}"
+                            cerrarDestinatarios="{!v.abrirBusqueda}"
+                            contactCopia="{!v.lstCopia}"
+                            boolRedactar="{!v.abrirRedactar}"
+                            boolPlantillas="{!v.abrirPlantillas}"
+                            dataPara="{!v.newDestinatario}"
+                            nuevoDestinatario="{!v.cambioDestinatario}"
+                            tipoDestinatarioPrincipal="{!v.tipoDestinatarioPrincipal}"
+                            nombreGrupoColaboradorPrincipal="{!v.nombreGrupoColaboradorPrincipal}"
+                            nombreContactoSOEOSN="{!v.nombreContactoSOEOSN}"
+                            emailContactoSOEOSN="{!v.emailContactoSOEOSN}"/>
+
+                        <aura:if isTrue="{!v.origenBuscador == 'principal'}">
+                            <div>
+                                <lightning:button label="Cancelar" iconName="utility:close" onclick="{!c.cerrarPlantillas}"/>
+                            </div>
+                        </aura:if>
+                    </aura:if>
+                    <aura:if isTrue="{!v.abrirPlantillas}">
+                        <c:SEG_Email_Plantillas
+                            datosEmail="{!v.infoEmailRespuesta}"
+                            caseId="{!v.recordId}"
+                            plantillaId="{!v.getPlantilla}"
+                            idiomaPlanId="{!v.getIdiomaPlantilla}"
+                            plantillaIdOrg="{!v.getPlantillaOrg}"
+                            selectedIdioma="{!v.dIdioma}"
+                            datosContact="{!v.currentContact}"
+                            cntId="{!v.contactId}"
+                            infoContacto="{!v.contactNuevoData}"
+                            nuevoDestino="{!v.cambioDestinatario}"
+                            dataPara="{!v.newDestinatario}"
+                            tipoDestinatarioPrincipal="{!v.tipoDestinatarioPrincipal}"
+                            nombreGrupoColaboradorPrincipal="{!v.nombreGrupoColaboradorPrincipal}"
+                            nombreContactoSOEOSN="{!v.nombreContactoSOEOSN}"
+                            emailContactoSOEOSN="{!v.emailContactoSOEOSN}"/>
+
+                        <div class="slds-grid slds-grid_align-spread slds-wrap" style="padding-top: 19px;">
+                            <div class="slds-col">
+                                <lightning:button label="Cancelar" iconName="utility:close" onclick="{!c.cerrarPlantillas}"/>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:button label="Redactar" variant="brand" iconName="utility:new_direct_message" onclick="{!c.abrirRedactar}"/>
+                            </div>
+                        </div>
+                    </aura:if>
+                </div>
+                <div id="elementScroll" class="slds-col slds-size_2-of-3" style="padding-left: 0px; max-height: 975px; overflow: scroll; padding-bottom: 1px;">
+                    <!--Redacción email-->
+                    <aura:if isTrue="{!v.abrirRedactar}">
+                        <c:SEG_redactarEmail
+                            aura:id="redactar"
+                            parent="{!this}"
+                            isBusqueda="{!v.abrirBusqueda}"
+                            isRedactar="{!v.abrirRedactar}"
+                            datosEmail="{!v.infoEmailRespuesta}"
+                            caseId="{!v.recordId}"
+                            contactId="{!v.contactId}"
+                            otroDestinatario="{!v.cambioDestinatario}"
+                            idPlantilla="{!v.getPlantilla}"
+                            idPlanIdioma="{!v.getIdiomaPlantilla}"
+                            idPlantillaOrg="{!v.getPlantillaOrg}"
+                            paraContacts="{!v.lstPara}"
+                            ccoContacts="{!v.lstCCO}"
+                            copiaContacts="{!v.lstCopia}"
+                            aPara="{!v.newDestinatario}"
+                            nuevoEmail="{!v.cuerpoNuevo}"
+                            datContact="{!v.currentContact}"
+                            idRecord="{!v.registroId}"
+                            botonPulsado="{!v.botonPulsado}"
+                            datosEmailInicial="{!v.infoEmailInicial}"
+                            tipoDestinatarioPrincipal="{!v.tipoDestinatarioPrincipal}"
+                            nombreGrupoColaboradorPrincipal="{!v.nombreGrupoColaboradorPrincipal}"/>
+                        <aura:set attribute="else">
+                            <article class="slds-card slds-card_boundary" style="box-shadow: 0 1px 0px 0px rgb(0 0 0 / 10%); border-color: #dddbda;">
+                                <div class="slds-card__body slds-card__body_inner" style="margin-top: 6px; margin-bottom: 6px; padding-left: 7px; padding-right: 7px;">
+                                    <div class="slds-page-header" style="padding: 5px 6px 5px 12px; border-width: 1px; border-style: solid; border-color: #dddbda; min-height: 44px;">
+                                        <div class="slds-page-header__row slds-wrap">
+                                            <div class="slds-page-header__col-title">
+                                                <div class="slds-media" style="line-height: 32px;">
+                                                    <aura:if isTrue="{!not(empty(v.currentEmail))}">
+                                                        <div class="slds-media__figure">
+                                                            <span class="slds-icon_container slds-is-relative" style="top: -1px;">
+                                                                <lightning:icon iconName="standard:email" size="small"/>
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <div class="slds-page-header__name">
+                                                                <div class="slds-page-header__name-title">
+                                                                    <h1>
+                                                                        <span class="slds-page-header__title slds-truncate slds-text-link_reset" title="{!v.currentEmail.Subject}" style="font-size: 15px; font-weight: 600;" onclick="{!c.abrirEmailMessage}">
+                                                                            {!!empty(v.currentEmail.Subject) ? v.currentEmail.Subject : '(sin asunto)'}
+                                                                        </span>
+                                                                    </h1>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                            </div>
+                                            <aura:if isTrue="{!v.esPropietario}">
+                                                <lightning:button aura:id="RespUnico" label="Responder" iconName="utility:reply" onclick="{!c.abrirPlantillas}" disabled="{!or(v.infoEmailRespuesta == null, v.caseStatus == 'Cerrado') || v.noContacto || v.caseGrupo == null}"/>
+                                                <lightning:button aura:id="RespMultiple" label="Resp. a todos" iconName="utility:reply_all" onclick="{!c.abrirPlantillas}" disabled="{!or(v.infoEmailRespuesta == null, v.caseStatus == 'Cerrado') || v.noContacto || v.caseGrupo == null}"/>
+                                                <lightning:button label="Reenviar" iconName="utility:forward" onclick="{!c.abrirRemitir}" disabled="{!or(v.infoEmailRespuesta == null, v.caseStatus == 'Cerrado') || v.noContacto || v.caseGrupo == null}"/>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+
+
+                                    <aura:if isTrue="{!not(empty(v.currentEmail))}">
+
+                                        <aura:if isTrue="{!v.hasAnexos}">
+                                            <div class="slds-scrollable_y slds-border_top slds-border_right slds-border_bottom slds-border_left" style="margin-top: 15px; max-height: 9.4rem; border-color: #dddbda; border-radius: 4px;">
+                                                <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" hideCheckboxColumn="true" keyField="ContentDocumentId" />
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!and(!empty(v.infoEmailInicial), empty(v.infoEmailRespuesta))}">
+                                            <div style="overflow:auto; padding-top: 9px;">
+                                                From: <lightning:formattedRichText value="{!v.infoEmailInicial.FromAddress}"></lightning:formattedRichText>
+                                                <br/>
+                                                To: <lightning:formattedRichText value="{!v.infoEmailInicial.ToAddress}"></lightning:formattedRichText>
+                                                <aura:if isTrue="{!!empty(v.infoEmailInicial.CcAddress)}">
+                                                    <br/>
+                                                    CC: <lightning:formattedRichText value="{!v.infoEmailInicial.CcAddress}"></lightning:formattedRichText>
+                                                </aura:if>
+                                                <br/><br/>
+                                                <lightning:formattedRichText value="{!v.infoEmailInicial.HtmlBody}"></lightning:formattedRichText>
+                                                <br/>
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!!empty(v.infoEmailRespuesta)}">
+                                            <div style="overflow:auto">
+                                                <br/>
+                                                From: <lightning:formattedRichText value="{!v.infoEmailRespuesta.FromAddress}"></lightning:formattedRichText>
+                                                <br/>
+                                                To: <lightning:formattedRichText value="{!v.infoEmailRespuesta.ToAddress}"></lightning:formattedRichText>
+                                                <aura:if isTrue="{!!empty(v.infoEmailRespuesta.CcAddress)}">
+                                                    <br/>
+                                                    CC: <lightning:formattedRichText value="{!v.infoEmailRespuesta.CcAddress}"></lightning:formattedRichText>
+                                                </aura:if>
+                                                <br/><br/>
+                                                <lightning:formattedRichText value="{!v.infoEmailRespuesta.HtmlBody}"></lightning:formattedRichText>
+                                                <br/>
+                                            </div>
+                                        </aura:if>
+                                        <aura:if isTrue="{!and(empty(v.infoEmailInicial), empty(v.infoEmailRespuesta))}">
+                                            <!-- <br/> -->
+                                        </aura:if>
+                                        <!--Botón para subir al principio de la página-->
+                                        <div align="right" style="opacity: .4;">
+                                            <lightning:buttonIcon iconName="utility:arrowup" size="small" variant="bare" class="slds-var-m-right_xx-small" title="Volver al principio de la página" onclick="{!c.scrollToTop}" tabindex="-1"/>
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </article>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </aura:set>
+        </aura:if>
+    </div>
+</aura:component>

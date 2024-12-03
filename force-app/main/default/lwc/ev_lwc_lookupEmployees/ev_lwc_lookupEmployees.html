@@ -1,0 +1,358 @@
+<template>
+    <lightning-spinner 
+        if:true={isLoading} 
+        alternative-text="Loading" 
+        size="small">
+    </lightning-spinner>
+
+    <div class="slds-form-element">
+        <div class="slds-form-element__control">
+            <div class="slds-combobox_container">
+                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                    <template  if:true={isIndividual}>
+                    <template if:true={showSecondPage}>
+                        <template if:false={selectedRecord}>
+                        <div class="slds-var-p-around_x-small slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning-input 
+                                label={labelName}
+                                name="combobox-id-1"
+                                onchange={handleInputChange} 
+                                class="slds-var-p-around_x-small"
+                                placeholder={placeholder}>
+                            </lightning-input>
+
+                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right slds-p-top_small">
+                                <svg class="slds-button__icon" aria-hidden="true">
+                                    <use xlink:href={ICON_SEARCH_URL}></use>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div style="background: white;" id="listbox-id-1" class="slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+
+                                <div if:true={nameToSearch} onclick={navigateToNewContact} class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+
+                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                        <span class="slds-icon_container slds-icon-utility-add">
+                                            <svg class="slds-icon slds-icon_x-small" aria-hidden="false">
+                                                <use xlink:href={ICON_SEARCH_URL} fill="grey"></use>
+                                            </svg>
+                                        </span>
+                                    </span>
+                                    <span class="slds-media__body">
+                                    <span class="slds-listbox__option-text slds-listbox__option-text_entity">
+                                        "{nameToSearch}" en Contactos
+                                    </span>                                
+                                    </span>
+                                </div>
+
+                                <template if:true={employeesFound} for:each={employeesFound} for:item="record" for:index="index">
+                                    <li onclick={handleSelect} role="presentation" class="slds-listbox__item" data-record-id={record.Id} key={record.Id}>
+                                        <div data-id={record.Id} class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                <span class="slds-icon_container slds-icon-standard-contact">
+                                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                        <use xlink:href={ICON_URL}></use>
+                                                    </svg>
+                                                </span>
+                                            </span>
+
+                                            <span class="slds-media__body">
+                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">
+                                                    {record.Name}                                                
+                                                </span>
+                                                <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+                                                    {record.id}  {record.CC_Nombre_Oficina__c} 
+                                                </span>
+                                                <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+                                                    {record.id}  {record.CC_Matricula__c} 
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </template>
+            </template>
+
+            <template if:false={isIndividual}>
+                <div if:true={showSecondPage} class="slds-modal__content slds-p-around_medium slds-m-top_large slds-text-align_left">
+                    <p><b>Selecciona en el siguiente árbol de centros las oficinas a cuyos gestores se asignarían los eventos creados.</b></p>
+                </div>
+            </template>   
+            
+           <template if:true={showThirdPage}>
+                <div class="slds-text-title slds-m-around_xx-small" style="padding-left: 2%; margin-top: 2%;">Resumen</div>
+                <div class="slds-m-around_xx-small"  style="display: flex; flex-wrap: wrap;  flex-direction: row; padding-left: 2%;">
+                    <div class="custom-column  slds-m-right_xx-large" style="padding-right: 2%;">
+                        <div class="slds-text-title">Titulo</div>
+                        <div class="slds-text-color_default">{campaignName}</div>
+                    </div>
+                    <div class="custom-column slds-m-right_xx-large">
+                        <div class="slds-text-title">Nº de sesiones</div>
+                        <div class="slds-text-color_default">{inputValue}</div>
+                    </div>
+                    <div class="custom-column slds-m-right_xx-large">
+                        <div class="slds-text-title">Aforo</div> 
+                        <div class="slds-text-color_default">{inputAforo}</div>
+                    </div>
+                    <div class="custom-column slds-m-right_xx-large" >
+                        <div class="slds-text-title">Asignaciones</div>
+                        <div class="slds-text-color_default">{valueAsign}</div>
+                    </div>
+                    <div class="custom-column slds-m-right_xx-large" >
+                        <div class="slds-text-title">Estado</div>
+                        <div class="slds-text-color_default">{estadoFilter}</div>
+                    </div>                      
+
+                    <div if:true={isResponsabilidad} class="slds-size_1-of-4" style="margin-left: auto;">
+
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col">
+                                <lightning-input type="search" label="Filtro Responsabilidad" onchange={handleSearch} value={searchTerm}
+                                    onblur={blurhandler} onfocusout={focuhandler} onclick={clickhandler} placeholder={itemcounts}>
+                                </lightning-input>
+                            </div>
+                            <div class="slds-col slds-m-top_medium slds-m-top_x-small">
+                                <div if:true={showsApliBtn} >
+                                    <lightning-button  
+                                        class="slds-button"
+                                        label="Aplicar Filtro"  
+                                        variant="brand"
+                                        onclick={handleFilterNegocio}>
+                                    </lightning-button>            
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-grid slds-wrap">
+                            <template if:true={showselectall}>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <a onclick={selectall}>Seleccionar todos</a>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <div class="slds-float_right">
+                                        <a onclick={handleclearall}>Limpiar todos</a>
+                                    </div>
+                                </div>
+                            </template>
+                            <template if:false={showselectall}>
+                                <div class="slds-col slds-size_1-of-3">
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <div class="slds-float_right">
+                                        <a onclick={handleclearall}>Limpiar todos</a>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>            
+
+                        <template if:true={showDropdown}>
+                            <div class="slds-box_border">
+                                <ul class="dropdown-list slds-dropdown_length-7 slds-p-left_medium">
+                                    <template for:each={filteredResults} for:item="responsability">
+                                        <li key={responsability.value} class="dropdown-item slds-p-around_xx-small">
+                                            <lightning-input type="checkbox" checked={responsability.isChecked} label={responsability.label}
+                                                value={responsability.value} onchange={handleSelection}>
+                                            </lightning-input>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+
+
+                        <div class="selection-summary">
+                            <div class="slds-p-around_x-small">
+                                <template for:each={selectedItems} for:item="selectedItem">
+                                    <lightning-pill key={selectedItem.value} label={selectedItem.label} name={selectedItem.value}
+                                        onremove={handleRemove}></lightning-pill>
+                                </template>
+                            </div>
+                        </div>
+        
+                    </div>
+                </div>      
+
+                   
+            </template>
+
+            <template if:false={isIndividual}>
+
+                <div class="slds-p-horizontal_x-small slds-p-vertical_large">
+
+                    <template if:true={showSecondPage}>
+
+                        <lightning-tree-grid
+                            columns={columnCentro}
+                            data={displayedRecordsResp}
+                            key-field="Id"
+                            expanded-rows={expandedTreeGRows}
+                            ontoggle={handleExpandedRow} 
+                            selected-rows={selectedTreeGRows}                
+                            onrowselection={handleRowSelection}
+                            >
+                        </lightning-tree-grid >
+                        
+                        <!-- Sección de paginación -->
+                        <div class="slds-align_absolute-center slds-m-top_medium">
+                            <lightning-button-group>
+                                <template for:each={pagesResp} for:item="page">
+                                    <lightning-button
+                                        key={page}
+                                        label={page}
+                                        value={page}
+                                        onclick={handlePageChange}  
+                                        >
+                                    </lightning-button>  
+                                </template>
+                            </lightning-button-group>
+                        </div>
+                    </template>
+
+                    <template if:true={showThirdPage} >
+                        <div class="slds-text-title slds-m-around_xx-small">{valueAsign} elementos</div> 
+                        <lightning-datatable
+                            key-field="Id"
+                            data={displayedRecordsResumen}
+                            hide-checkbox-column=true
+                            columns={columnContact}>
+                        </lightning-datatable>
+
+                        <!-- Sección de paginación -->
+                        <div class="slds-align_absolute-center slds-m-top_medium">
+                            <lightning-button-group>
+                                <template for:each={pages} for:item="page">
+                                    <lightning-button
+                                        data-id="dummy"
+                                        key={page}
+                                        label={page}
+                                        value={page}
+                                        onclick={handlePageChange}  
+                                        >
+                                    </lightning-button>  
+                                </template>
+                            </lightning-button-group>
+                        </div>
+
+                    </template>
+
+            </div>
+                
+            </template>
+                <template if:true={selectedIsSelected} >
+                    <div class="slds-p-horizontal_x-small slds-p-vertical_x-large">
+                        <div if:true={showThirdPage} class="slds-text-title slds-m-around_xx-small">{valueAsign} elementos</div> 
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example table of Opportunities with vertical borders">
+                            <thead class="slds-table_col-bordered">
+                                <tr class="slds-line-height_reset">
+                                <template if:true={showSecondPage}> 
+                                    <th class="" scope="col" style="width:5px;"> 
+                                        <label class="slds-checkbox-button"  style="width: 20px; height: 20px;">
+                                            <input type="checkbox" class="slds-assistive-text slds-checkbox--small" name="checkboxAll" onclick={handleDone}/>
+                                            <span class="slds-icon_container slds-icon-utility-check slds-current-color">
+                                                <lightning-icon class="slds-icon slds-icon_x-small slds-align_absolute-center" icon-name="utility:dash" size="xx-small" style="width: 5px; height: 5px;"></lightning-icon>
+                                            </span>
+                                        </label>
+
+                                        <template if:true={isModalOpen}>
+                                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                                <div class="slds-modal__container">
+                                                    <header class="slds-modal__header">
+                                                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                                                            <lightning-icon icon-name="utility:close"
+                                                                alternative-text="close"
+                                                                variant="inverse"
+                                                                size="small" ></lightning-icon>
+                                                            <span class="slds-assistive-text">Close</span>
+                                                        </button>
+                                                        <h2 id="modal-heading-01" class="slds-text-heading_small slds-hyphenate">Eliminación de selección</h2>
+                                                    </header>
+                                                    <div class="slds-modal__content slds-p-around_medium slds-text-align_left" id="modal-content-id-1">
+                                                        <p style="font-weight: normal;">¿Está seguro que desea eliminar todos los Contactos incluidos?</p> 
+                                                    </div>
+                                                    <footer class="slds-modal__footer">
+                                                        <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancelar</button>
+                                                        <button class="slds-button slds-button_brand" onclick={submitDetails} title="OK">Confirmar</button>
+                                                    </footer>
+                                                </div>
+                                            </section>
+                                            <div class="slds-backdrop slds-backdrop_open"></div>
+                                        </template>
+                                    </th>
+                                    </template>     
+
+                                    <template if:true={isIndividual}>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Nombre">Nombre</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Oficina">Provincia</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Responsabilidad">Responsabilidad</div>
+                                        </th>
+                                    </template>     
+
+                                </tr>
+
+                          </thead>
+
+                          <tbody>
+                            <template for:each={displayedRecords} for:item="record">
+                                <tr key={record.Id} class="slds-hint-parent">    
+                                    <template if:true={showSecondPage}> 
+                                    <td data-label="checkbox" style="width:5px;">
+                                        <label class="slds-checkbox-button slds-checkbox-button_is-checked" style="width:20px; height:20px;">
+                                        <input type="checkbox" class="slds-assistive-text" name="checkbox" onclick={handleRowDelete}
+                                         data-id={record.Id}/>
+                                        <span class="slds-icon_container slds-icon-utility-check slds-current-color">
+                                            <lightning-icon icon-name={record.iconName} data-key={record.Id} size="xx-small" onmouseover={handleMouseOverIcon} onmouseout={handleMouseOutIcon}></lightning-icon>
+                                          </span>
+                                        </label>
+                                    </td>                                   
+                                    </template>             
+                                    
+                                    <template if:true={isIndividual}>                        
+                                        <td data-label="Nombre">
+                                            <div class="slds-truncate" title={record.Name}>{record.Name}</div>
+                                        </td>
+                                        <td data-label="Provincia">
+                                            <div class="slds-truncate" title={record.CC_Nombre_Oficina__c}>{record.CC_Nombre_Oficina__c}</div>
+                                        </td>
+                                        <td data-label="Responsabilidad">
+                                            <div class="slds-truncate" title={record.AV_Responsabilidad__c}>{record.AV_Responsabilidad__c}</div>
+                                        </td>
+                                    </template>     
+                                    
+                                </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                            <!-- Sección de paginación -->
+                        <div class="slds-align_absolute-center slds-m-top_medium">
+                            <lightning-button-group>
+                                <template for:each={pages} for:item="page">
+                                    <lightning-button
+                                        key={page}
+                                        label={page}
+                                        value={page}
+                                        onclick={handlePageChange}  
+                                        >
+                                    </lightning-button>
+                                </template>
+                            </lightning-button-group>
+                        </div>
+                    </div>
+                </template>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

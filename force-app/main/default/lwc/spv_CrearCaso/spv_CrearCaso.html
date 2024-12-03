@@ -1,0 +1,32 @@
+<template>
+    <lightning-record-edit-form 
+        object-api-name="Case"
+        onsubmit={handleOnSubmit}
+        onsuccess={handleOnSuccess}
+        record-type-id={idRecordType}
+    >
+        <lightning-messages> </lightning-messages>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="SPV_NumExpediente__c" class="anchura_field" value={numExpediente} onchange={changeNumExpediente} required></lightning-input-field>
+                <lightning-input-field field-name="Description" class="cc_textarea_alto anchura_field"></lightning-input-field>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-input-field field-name="SPV_Organismo__c" class="anchura_field" required></lightning-input-field>
+                <lightning-input-field field-name="SPV_ComunidadAutonoma__c" class="anchura_field" required></lightning-input-field>
+                <lightning-input-field field-name="SAC_Entidad_Afectada__c" class="anchura_field" onchange={changeEntidadAfectada} required></lightning-input-field>
+            </div>
+        </div>
+        <lightning-layout class="slds-grid slds-grid_align-end slds-var-m-top_large">
+            <lightning-button label="Cancelar" onclick={cerrarTabCrearCaso}></lightning-button>&nbsp;
+            <lightning-button variant="brand" label="Guardar" type="submit"></lightning-button>
+        </lightning-layout>
+    </lightning-record-edit-form>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

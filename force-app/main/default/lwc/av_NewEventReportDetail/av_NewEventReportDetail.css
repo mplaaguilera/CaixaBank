@@ -1,0 +1,57 @@
+.customInputs div c-av_-lookup:first-child, .customInputs div lightning-input:first-child{
+margin-top: 0 !important;
+}
+
+.customInputs div c-av_-lookup, .customInputs div lightning-input{
+    width: 100%;
+    display: block;
+    margin:.5rem 0;
+}
+.customInputs div:first-child c-av_-lookup, .customInputs div:first-child lightning-input{
+    width: 95%;
+}
+
+.attendesBox{
+    display: flex;
+    flex-wrap: wrap;
+    gap:.5rem;
+}
+.radioButtonStyle{
+    display: flex;
+    width: fit-content;
+    margin-bottom:.75rem;
+
+}
+.radioButtonStyle div{
+    width:max-content ;
+    padding:0 2vw;
+}
+.radioButtonStyle div:first-child{
+    padding: 0 1vw 0 0;
+}
+.radioButtonStyle div label{
+    margin-left: 5px;
+    vertical-align:text-top;
+}
+.radioButtonStyle div input{
+    margin-bottom: 2px;
+    vertical-align:text-top;
+}
+
+.typeRelatedInputs{
+    width: 25rem;
+    /* gap:1.5rem; */
+    display: flex;
+    /* gap:.5rem; */
+}
+.typeRelatedInputs div{
+    width: calc(100%/3);
+}
+.typeRelatedInputs:first-child *{
+    margin:0;
+    width: 90%;
+}
+.typeRelatedInputs div lightning-combobox{
+    margin:0 auto;
+    width: 90%;
+}

@@ -1,0 +1,16 @@
+.slds-input {
+    text-align: right !important;
+}
+
+.ancho{
+    width: 150px;
+}
+
+td{
+    padding: 5px;
+}
+
+    
+:host(.slds-input){
+    text-align: right !important;
+}

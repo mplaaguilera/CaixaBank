@@ -1,0 +1,52 @@
+.styleCard{
+    position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgb(221, 219, 218);
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+}
+
+.num-records-container{
+    text-align: center;
+    font-size: 5rem;
+    width: auto;
+    height: auto;
+    color: #d40000;
+}
+.card-title{
+    font-family: "SalesforceSans-Regular",Arial,sans-serif;
+    font-size: 1rem;
+    color: #16325c;
+    line-height: 1.25rem;
+    top: inherit;
+    padding-top: 1.75rem;
+}
+.cursor-link{
+    cursor: pointer;
+}
+.cursor-default{
+    cursor: default;
+}
+.no-select{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.min-size{
+    min-height: 13rem;
+}
+.min-size-title{
+    min-height: 3.5rem;
+}
+.card-temp{
+    position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgb(221, 219, 218);
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+}

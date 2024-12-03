@@ -1,0 +1,154 @@
+<template>
+
+    <!-- <p>El valor de parámetro es: {parametro}</p> -->
+    
+    <!-- Spinner -->
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br />
+                                Actualizando los datos... por favor espere
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand">
+                                </lightning-spinner>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+  
+            <!--<div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-size_11-of-12" style="margin-left: 8px;">
+                    <p>El valor de parámetro es: {parametro}</p>
+                </div>
+                <div class="slds-col slds-size_1-of-12" style="text-align:center">
+                    <button class="slds-button slds-button_icon slds-button_icon-border" title="Refresh"
+                        alternative-text="Refresh" onclick={recuperarClick}>
+                        <svg class="slds-button__icon" aria-hidden="true">
+                            <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.28.0#refresh"></use>
+                        </svg>
+                    </button>
+                </div>
+            </div> 
+                
+                <br />
+-->
+<!-- Apartado Agentes -->
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <lightning-icon class="slds-icon " icon-name="standard:opportunity_contact_role" alternative-text="opportunity_contact_role" title="opportunity_contact_role"></lightning-icon>
+                        <span class="slds-assistive-text">Agentes</span>
+                    </div>
+                    <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        
+                        <span>Agentes</span>
+                        
+                    </h2>
+                    </div>
+                </header>
+                </div>
+            </article>
+            <!-- FILTROS -->
+            <div style="padding-left: 24px; padding-bottom: 12px; padding-top: 12px;" class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-size_6-of-12">
+                    <span>Último refresco a las {refresco}</span>
+                </div>
+                <div class="slds-col slds-size_6-of-12 slds-text-align_right" style="padding-right:24px;">
+                    <c-cc_monitor-online-carga-cliente-new></c-cc_monitor-online-carga-cliente-new> 
+                </div>
+                <!-- <div class="slds-col slds-size_6-of-12 slds-text-align_right" style="padding-right:24px;">
+                    <lightning-button variant="brand" label="Refrescar" onclick={recuperarClickAgente} class="slds-m-left_x-small"></lightning-button>
+                </div> -->
+            </div>
+
+            <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-size_3-of-12" style="padding-left:24px;">
+                    <!-- <p>{franjaPorDefecto}</p> -->
+                    <c-cc_-multi-pick-list-l-w-c franja-por-defecto={franjaPorDefecto} values={franjaSeleccionada} label="Franja horaria" multi-select="true" options={optionsFH} onselectoption={eventFranja}></c-cc_-multi-pick-list-l-w-c>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <c-cc_-multi-pick-list-l-w-c values={proveedoresSeleccionado} label="Proveedor" multi-select="true" options={optionsPro} onselectoption={eventProveedores}></c-cc_-multi-pick-list-l-w-c>
+                </div>
+                <!-- <div class="slds-col slds-size_3-of-12">
+                    <c-cc_-multi-pick-list-l-w-c values={contactoSeleccionado} label="Tipo de previsión" multi-select="true" options={optionsPre} onselectoption={eventTipo}></c-cc_-multi-pick-list-l-w-c>
+                </div> -->
+                <div class="slds-col slds-size_6-of-12 slds-text-align_right" style="padding-right:24px;">
+                    <lightning-button variant="brand" label="Refrescar" onclick={recuperarClickAgente} class="slds-m-left_x-small"></lightning-button>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-scrollable_y" style="margin-right: 1px;margin-left:8px; max-height: 250px;">
+                    <lightning-datatable data={data} columns={columns} key-field="Id" hide-checkbox-column>
+                    </lightning-datatable>
+                </div>
+            </div>
+            <br>
+            <br>
+
+
+<!-- Apartado Chats -->
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <lightning-icon class="slds-icon " icon-name="standard:omni_supervisor" alternative-text="omni_supervisor" title="omni_supervisor"></lightning-icon>
+                            <span class="slds-assistive-text">Chats</span>
+                        </div>
+                        <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            
+                            <span>Chats</span>
+                            
+                        </h2>
+                        </div>
+                    </header>
+                    </div>
+                </article>
+            <!-- FILTROS -->
+            <div style="padding-left: 24px; padding-bottom: 12px; padding-top: 12px;" class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-size_6-of-12">
+                    <span>Último refresco a las {refresco2}</span>
+                </div>
+                <div class="slds-col slds-size_6-of-12 slds-text-align_right" style="padding-right:24px;">
+                    <lightning-button variant="brand" label="Refrescar" onclick={recuperarClickChat} class="slds-m-left_x-small"></lightning-button>
+                </div>
+            </div>
+
+            <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-size_3-of-12" style="padding-left:24px;">
+                    <!-- <p>{franjaPorDefecto}</p> -->
+                    <c-cc_-multi-pick-list-l-w-c franja-por-defecto={franjaPorDefecto} values={franjaSeleccionada} label="Franja horaria" multi-select="true" options={optionsFH} onselectoption={eventFranja}></c-cc_-multi-pick-list-l-w-c>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <c-cc_-multi-pick-list-l-w-c values={proveedoresSeleccionado} label="Proveedor" multi-select="true" options={optionsPro} onselectoption={eventProveedores}></c-cc_-multi-pick-list-l-w-c>
+                </div>
+                <!-- <div class="slds-col slds-size_3-of-12">
+                    <c-cc_-multi-pick-list-l-w-c values={contactoSeleccionado} label="Tipo de previsión" multi-select="true" options={optionsPre} onselectoption={eventTipo}></c-cc_-multi-pick-list-l-w-c>
+                </div> -->
+                <div class="slds-col slds-size_3-of-12">
+                    <c-cc_-multi-pick-list-l-w-c values={servicioSeleccionado} label="Servicio" multi-select="true" options={optionsServ} onselectoption={eventServicio}></c-cc_-multi-pick-list-l-w-c>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                <div class="slds-col slds-scrollable_y" style="margin-right: 1px;margin-left:8px; max-height: 250px;">
+                    <lightning-datatable data={data2} columns={columnsChats} key-field="Id" hide-checkbox-column>
+                    </lightning-datatable>
+                </div>
+            </div>
+</template>

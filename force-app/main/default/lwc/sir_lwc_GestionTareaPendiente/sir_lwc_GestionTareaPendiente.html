@@ -1,0 +1,17 @@
+<template>
+    <template if:true={tipoSEL_DAT}>
+        <!--<c-sir_lwc_-Form-S-E-L-D-A-T record-id={recordId}></c-sir_lwc_-Form-S-E-L-D-A-T>-->
+        <c-sir_lwc_-Form-S-E-L-D-A-T record-id={recordId} onsiguiente={calcularTarea}></c-sir_lwc_-Form-S-E-L-D-A-T>
+    </template>
+    <template if:true={tipoACT}>
+        <!--<c-sir_lwc_accion-Workflow record-id={recordId}></c-sir_lwc_accion-Workflow>-->
+        <c-sir_lwc_accion-Workflow record-id={recordId} onsiguiente={calcularTarea}></c-sir_lwc_accion-Workflow>
+    </template>
+    <template if:true={tipoCTL}>
+        <!-- Llamar al LWC -->
+        <c-sir_lwc_-Tarea-C-T-L record-id={recordId} onsiguiente={calcularTarea}></c-sir_lwc_-Tarea-C-T-L>
+    </template>
+    <template if:true={tipoOPC}>
+        <!-- Llamar al LWC -->
+    </template>
+</template>

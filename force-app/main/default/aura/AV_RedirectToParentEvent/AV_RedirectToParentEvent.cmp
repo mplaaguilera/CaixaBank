@@ -1,0 +1,8 @@
+<aura:component controller="AV_RedirectChildEvent_Controller" implements="force:appHostable,force:hasRecordId,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes" access="global"> 
+    <aura:attribute name="recordId" type="String" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:workspaceAPI aura:id="workspace" />
+    <div class="exampleHolder">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </div>
+</aura:component>

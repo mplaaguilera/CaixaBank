@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TrazaActiva__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador si se activa la traza de integración</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Indicador si se activa la traza de integración</inlineHelpText>
+    <label>Traza Activa</label>
+    <type>Checkbox</type>
+</CustomField>

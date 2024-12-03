@@ -1,0 +1,66 @@
+<template>
+    <lightning-card>
+            <lightning-record-edit-form 
+                object-api-name="Case" 
+                record-id={recordId} 
+                onsuccess={handleSuccess} 
+                onsubmit={handleSubmit}>
+                <lightning-messages>
+                </lightning-messages>
+                <div class="slds-form__item" role="listitem">
+                        <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                            <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                                    <div class="slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Canal_Operativo__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Tipo_Contacto__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="CC_Canal_Respuesta__c">
+                                        </lightning-output-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Aqumetrix__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Canal_Respuesta_Modificar__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Cambio_Estado_Pendiente_Externo__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Idioma__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_MCC_Causa__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Detalles_Consulta__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_MCC_Solucion__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CC_Resolucion__c">
+                                        </lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1">
+                                        <lightning-button class="slds-float_right" variant="brand" type="submit" name="update" label="Actualizar">
+                                        </lightning-button>
+                                    </div>
+                            </div>
+                        </div>
+                </div>
+            </lightning-record-edit-form>
+    </lightning-card>
+</template>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_Dia__c</fullName>
+    <description>Campo utilizado para saber si el registro es L-V o S-D</description>
+    <label>Tipo de día</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Lunes a viernes</fullName>
+                <default>true</default>
+                <label>Lunes a viernes</label>
+            </value>
+            <value>
+                <fullName>Sábado y domingo</fullName>
+                <default>false</default>
+                <label>Sábado y domingo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_StageNamePotencialIniciativa</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISNEW(),
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+ISPICKVAL(StageName, &quot;Potencial&quot;),
+RecordType.DeveloperName = &quot;AV_Iniciativa&quot;,
+NOT($Permission.AV_AvoidBulkApi)
+)</errorConditionFormula>
+    <errorMessage>No está permitido crear una oportunidad tipo iniciativa con la etapa &quot;Potencial&quot;</errorMessage>
+</ValidationRule>

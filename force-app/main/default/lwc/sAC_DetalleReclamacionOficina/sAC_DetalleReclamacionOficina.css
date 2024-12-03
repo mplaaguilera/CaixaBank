@@ -1,0 +1,20 @@
+.slds-section__title{
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    line-height: 1.875rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.slds-section__title-action {
+    display: flex;
+    align-items: center;
+    background: rgb(243, 243, 243);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    color: currentColor;
+    font-size: inherit;
+
+}

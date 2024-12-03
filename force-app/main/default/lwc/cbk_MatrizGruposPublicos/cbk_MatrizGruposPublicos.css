@@ -1,0 +1,38 @@
+thead th
+{
+    position: sticky;
+    top: 0px;
+}
+
+th[scope="col"] {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    width:fit-content;
+    height:fit-content;
+}
+
+.existe {
+    width: 100%;
+    color: greenyellow;
+    -slds-c-button-success-color-background:#15811e;
+    --slds-c-button-success-color-background-active:#126b19;
+    --slds-c-button-success-color-background-hover:#126b19;
+    --slds-c-button-success-color-border:#15811e;
+    --slds-c-button-success-color-border-hover:#126b19;
+    --slds-c-button-success-text-color:greenyellow;
+    --slds-c-button-success-text-color-active:greenyellow;
+    --slds-c-button-success-text-color-hover:greenyellow;
+
+}
+.noExiste {
+    width: 100%;
+    color: #f11f1f;
+    --slds-c-button-destructive-color-background:#be1515;
+    --slds-c-button-destructive-color-background-active:#aa1414;
+    --slds-c-button-destructive-color-background-hover:#aa1414;
+    --slds-c-button-destructive-color-border:#be1515;
+    --slds-c-button-destructive-color-border-hover:#aa1414;
+    --slds-c-button-destructive-text-color:#f11f1f;
+    --slds-c-button-destructive-text-color-active:#f11f1f;
+    --slds-c-button-destructive-text-color-hover:#f11f1f;
+}

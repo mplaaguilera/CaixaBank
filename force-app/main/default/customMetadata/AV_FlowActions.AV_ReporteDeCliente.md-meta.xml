@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Reporte de cliente</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_FlowName__c</field>
+        <value xsi:type="xsd:string">AV_Reportar_cita</value>
+    </values>
+    <values>
+        <field>AV_Order__c</field>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>AV_Output__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Setting__c</field>
+        <value xsi:type="xsd:string">AV_AccountWithPS</value>
+    </values>
+    <values>
+        <field>AV_Type__c</field>
+        <value xsi:type="xsd:string">Tab</value>
+    </values>
+</CustomMetadata>

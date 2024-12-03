@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Agenda__c</fullName>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Este campo se tiene que rellenar con el siguiente formato: Hora, descripción; Hora, descripción; Hora, descripción</inlineHelpText>
+    <label>Agenda</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
+</CustomField>

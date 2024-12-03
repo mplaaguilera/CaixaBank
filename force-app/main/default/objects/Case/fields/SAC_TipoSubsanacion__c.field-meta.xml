@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TipoSubsanacion__c</fullName>
+    <description>Listado de posibles motivos para la subsanación, de el dependerá la plantilla del correo de subsanación.</description>
+    <label>Tipo Subsanación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>En plazo legal</fullName>
+                <default>false</default>
+                <label>En plazo legal</label>
+            </value>
+            <value>
+                <fullName>Falta de identificación</fullName>
+                <default>false</default>
+                <label>Falta de identificación</label>
+            </value>
+            <value>
+                <fullName>Falta documentación</fullName>
+                <default>false</default>
+                <label>Falta documentación</label>
+            </value>
+            <value>
+                <fullName>Faltan datos o concreción</fullName>
+                <default>false</default>
+                <label>Faltan datos o concreción</label>
+            </value>
+            <value>
+                <fullName>Faltan poderes abogado/ familiar/ representante empresa</fullName>
+                <default>false</default>
+                <label>Faltan poderes abogado/ familiar/ representante empresa</label>
+            </value>
+            <value>
+                <fullName>Mail no registrado Seguros</fullName>
+                <default>false</default>
+                <label>Mail no registrado Seguros</label>
+            </value>
+            <value>
+                <fullName>No aporta factura</fullName>
+                <default>false</default>
+                <label>No aporta factura</label>
+            </value>
+            <value>
+                <fullName>Reclamante no se identifica</fullName>
+                <default>false</default>
+                <label>Reclamante no se identifica</label>
+            </value>
+            <value>
+                <fullName>Varios</fullName>
+                <default>false</default>
+                <label>Varios</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

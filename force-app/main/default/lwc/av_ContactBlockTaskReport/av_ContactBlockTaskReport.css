@@ -1,0 +1,10 @@
+.card-title{
+    font-weight: bold;
+    font-size: 1em;
+}
+.card-title-icon{
+    margin-left: 0.3rem;
+}
+.estrecho{
+    height: 33px !important;
+}

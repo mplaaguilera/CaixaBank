@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_No_Identificado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo que se pone a true si el cliente no se ha querido identificar.</description>
+    <label>No identificado</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

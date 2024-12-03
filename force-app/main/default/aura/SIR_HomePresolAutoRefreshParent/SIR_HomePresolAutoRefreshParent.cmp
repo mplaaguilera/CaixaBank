@@ -1,0 +1,17 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    
+    <!-- INIT AURA COMPONENT -->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler event="lightning:tabFocused" action="{!c.onTabFocused}"/>
+    
+    <c:sir_lwc_HomePresolAutoRefresh
+        aura:id="mcchild"
+        hasHeader="{!v.hasHeader}"
+        headerIcon="{!v.headerIcon}"
+        headerTitle="{!v.headerTitle}"
+        headerSubtitle="{!v.headerSubtitle}"
+        listDatasets="{!v.listDatasets}"
+        recordId="{!v.recordId}"
+    />
+
+</aura:component>

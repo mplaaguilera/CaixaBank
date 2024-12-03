@@ -1,0 +1,21 @@
+.THIS .os-rojo {
+    color: red;
+}
+
+.THIS .slds-modal__content {
+    overflow: initial;
+}
+
+.THIS .os-icono-sandybrown svg {
+    background-color: sandybrown;
+}
+
+.THIS .os-icono-darkseagreen svg {
+    background-color: darkseagreen;
+}
+.THIS.caseHolder{
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+}

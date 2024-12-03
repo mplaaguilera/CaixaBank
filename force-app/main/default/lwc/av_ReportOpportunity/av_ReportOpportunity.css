@@ -1,0 +1,42 @@
+.buttonStyle{
+	background-color: #009fe3;
+	width: 15%;
+	color: white;
+}
+.buttonAlign{
+	text-align: center;
+	margin-top: 15px;
+	margin-bottom: -20px;
+}
+
+.postionButton{
+	padding-bottom: 11em;
+}
+
+.cardMargin{
+	margin-bottom: 1rem;
+}
+.newOppCardMargin{
+	min-height: 800px;
+}
+.container-div{
+	width: 960px;
+	margin: 0 auto;
+}
+.close-button{
+	float: right;
+	margin-right: 1rem;
+}
+.messageWarning {
+	background-color: rgb(255, 247, 189);
+}
+.spinner-block {
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	top:0;
+	bottom: 0;
+}
+.slds-docked-form-footer {
+	bottom: 40px;
+}

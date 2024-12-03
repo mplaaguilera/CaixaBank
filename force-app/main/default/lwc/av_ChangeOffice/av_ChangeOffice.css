@@ -1,0 +1,22 @@
+.options-title {
+    font-weight: bold;
+}
+
+.office-box:hover {
+    background-color: rgb(243, 243, 243);
+    cursor: pointer;
+}
+
+.office-box div {
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    pointer-events: none;
+}
+
+.current-office {
+    font-weight: bold;
+    color:darkslategray;
+}

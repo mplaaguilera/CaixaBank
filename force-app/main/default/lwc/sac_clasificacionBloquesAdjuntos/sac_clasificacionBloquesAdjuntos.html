@@ -1,0 +1,140 @@
+<template>
+    <!-- Muestra el siguiente contenido si el bloque contiene el fichero -->
+    <template if:true={bloqueContieneElFichero}>
+        <!-- Aquí puedes añadir el contenido que quieras mostrar -->
+        <template if:true={mostrarOcultoOrFileVisible}>
+            <!-- Inicio item archivo-->
+            <div class="slds-nav-vertical__item" style="padding: 2px;" onclick={ficheroSeleccionado} id={fichero.ContentDocumentId}>
+              <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small">
+                <!--Boton clasificar-->
+                <div class="slds-col slds-size_1-of-12">
+                    <template if:true={esRecAsociadaASPV}>
+                        <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero} disabled="true"></lightning-button-icon>
+                    </template>
+                    <template if:false={esRecAsociadaASPV}>
+                        <lightning-button-icon icon-name="utility:sort" title="Clasificar" variant="bare" onclick={abrirModalClasificar} value={fichero}></lightning-button-icon>
+                    </template>
+                </div>
+                <!--Fecha-->
+                <div class="slds-col slds-size_2-of-12">
+                  <div class="slds-text-align_left">
+                    <lightning-formatted-date-time value={fichero.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12={formatoHoras12}></lightning-formatted-date-time>
+                  </div>
+                </div>
+                <!--Nombre del fichero-->
+                <div class="slds-col slds-size_3-of-12">
+                  <div class="slds-text-align_left" style="padding: 4px;">
+                    <span>{fichero.Title}</span>
+                  </div>
+                </div>
+                <!--Número de préstamo-->
+                <div class="slds-col slds-size_2-of-12">
+                    <div class="slds-text-align_left" style="padding: 4px;">
+                        <template if:true={fichero.SAC_Numero_Prestamo__c}>
+                            <span>{fichero.SAC_Numero_Prestamo__c}</span>
+                        </template>
+                    </div>
+                </div>
+                <!--Parte de la clasificacion de grupos del fichero-->
+                <div class="slds-col slds-size_3-of-12">
+                    <div class="slds-text-align_center">
+                        <!-- buscador/selector de grupos -->
+                        <template if:true={esUserGeneral}>
+                            <template if:true={esRecAsociadaASPV}>
+                                <lightning-input disabled data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-5"></lightning-input>
+                            </template>
+                            <template if:false={esRecAsociadaASPV}>
+                                <div class="slds-combobox_container">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" data-id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <template if:true={tieneTipoAdjunto}>
+                                                <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name={fichero.Id}></lightning-input>
+                                            </template>
+                                            <template if:false={tieneTipoAdjunto}>
+                                                <lightning-input data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="" onblur={handleBlur} onclick={mostrarOpciones} onkeyup={filtroBusqueda} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-3" name={fichero.Id}></lightning-input>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={esUserGeneral}>
+                            <lightning-input disabled data-id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value={nombreTipoAdjunto} autocomplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-4"></lightning-input>
+                        </template>
+                        <!-- Lista de grupos -->
+                        <template if:true={mostrarGrupos}>
+                            <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" style="margin-left: 13%; width: 60%;">
+                                <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                    <template if:true={resultadoEncontrado}>
+                                        <!-- Mostrar los grupos -->
+                                        <template for:each={opcionesMaestroAdjuntos} for:item="option" for:index="index">
+                                            <li key={option.Name} data-index={index} class="eachItem" onmousedown={seleccionarGrupo}>
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                            </li>
+                                        </template>
+                                    </template>
+                                    <!-- Mostrar mensaje de grupo no encontrado -->
+                                    <template if:false={resultadoEncontrado}>
+                                        <li class="slds-listbox__item">
+                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{mensaje}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!--Fin parte de la clasificacion de grupos del fichero-->
+                <div class="slds-col slds-size_1-of-12">
+                  <template if:true={fichero.SAC_Oculto__c}>
+                    <lightning-button-icon icon-name="utility:hide" variant="bare" alternative-text="Oculto" title="Oculto" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
+                  </template>
+                  <template if:false={fichero.SAC_Oculto__c}>
+                    <lightning-button-icon icon-name="utility:preview" variant="bare" alternative-text="Visible" title="Visible" name={fichero.Title} value={fichero.Id} class="slds-float_right" disabled ></lightning-button-icon>
+                  </template>
+                </div>
+                <template if:true={esRespuesta}>
+                <div class="slds-col slds-size_3-of-12">
+                    <template if:true={esRecAsociadaASPV}>
+                        <lightning-input disabled type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
+                    </template>
+                    <template if:false={esRecAsociadaASPV}>
+                        <lightning-input type="checkbox" label ="Validar" checked={fichero.SAC_ValidadoCV__c} onchange={handleChangeValidar} name={fichero.Title} value={fichero.Id}></lightning-input> 
+                    </template>
+                </div>
+                </template>
+              </div>
+            </div>
+        </template>
+    </template>
+    <!--Modal clasificar-->
+    <template if:true={modalClasificar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" onclick={cerrarModalClasificar} alternative-text="close"
+                        variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Clasificacion del fichero</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
+                    <lightning-dual-listbox name="combobox"
+                                   label="Selecciona valores"
+                                   source-label="Disponibles"
+                                   selected-label="Seleccionados"
+                                   options={sacBloqueValues}
+                                   value={opcionesBloquesFichero}
+                                   onchange={handleChangeClasificado}></lightning-dual-listbox>
+                    <br />
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick={cerrarModalClasificar} disabled={disableButtons}></lightning-button>
+                    <lightning-button variant="brand" label="Aceptar" title="OK" onclick={cambiarClasificacionFichero} disabled={disableButtons}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

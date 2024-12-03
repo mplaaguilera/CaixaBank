@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_RestrictName</fullName>
+    <active>true</active>
+    <description>Los gestores no pueden modificar el nombre de las oportunidades de tipo Call Me.</description>
+    <errorConditionFormula>AND(
+ISCHANGED(Name),
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+RecordType.DeveloperName = &quot;AV_CallMe&quot;,
+NOT($Permission.AV_AvoidBulkApi)
+)</errorConditionFormula>
+    <errorDisplayField>Name</errorDisplayField>
+    <errorMessage>No puede modificar el nombre de la oportunidad</errorMessage>
+</ValidationRule>

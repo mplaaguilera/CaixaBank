@@ -1,0 +1,22 @@
+.buttonStyle{
+    background-color: #009fe3;
+    width: 30%;
+    color: white;
+}
+.buttonAlign{
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: -15px;
+}
+.nameAccordation {
+    padding-top: 0.4rem;
+}
+.margin{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.buttonStyleDisabled{
+    background-color: #797979;
+    width: 30%;
+    color: white;
+}

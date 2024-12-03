@@ -1,0 +1,89 @@
+<template>
+    
+    <article class="slds-card">
+        <template if:true={showHeader}>
+            <div class="slds-page-header slds-page-header_record-home">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name={icon}></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1>
+                                            <span>{title}</span>
+                                            <ul class="slds-list_horizontal">
+                                                <li class="slds-m-right_x-small">
+                                                    <span class="slds-page-header__title slds-truncate">{name}</span>
+                                                </li>
+                                                <template if:true={showHierarchy}>
+                                                    <li>
+                                                        <lightning-button-icon icon-name="utility:hierarchy" class="slds-theme_default" size="x-small" onclick={navigateToHierarchy}></lightning-button-icon>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-no-flex">
+                                <lightning-button-group>
+                                    <template for:each={actions} for:item="action">
+                                        <lightning-button key={action.name} class="slds-button_neutral" label={action.label} data-label={action.label} data-flow={action.name} data-output={action.output} onclick={fireFlowAction}></lightning-button>
+                                    </template>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template if:true={showBody}>
+            <template if:true={fields}>
+                <div class="slds-media__body">
+                    <lightning-record-view-form density="comfy" record-id={recordId} object-api-name={filterObject}>
+                        <ul class="slds-list_horizontal slds-m-left_small">
+                            <template for:each={fields} for:item="field">
+                                <template if:false={field.isCustomField}>
+                                    <li class="slds-m-left_x-small slds-m-right_x-large slds-m-vertical_x-small" key={field.name} data-id={field.name} >
+                                        <lightning-output-field class="slds-float_left slds-has-left-magnet" field-name={field.name}></lightning-output-field>
+                                        
+                                    </li>
+                                </template>
+
+                                <template if:true={field.isCustomField}>
+                                    <li class="slds-m-left_x-small slds-m-vertical_x-small" key={field.name} data-id={field.name} >
+                                        <lightning-output-field class="slds-float_left slds-has-left-magnet" field-name={field.name}></lightning-output-field>
+                                        
+                                    </li>
+                                    <li class="slds-m-right_x-large slds-m-vertical_x-small" key={field.name}>
+                                        <lightning-helptext  key={field.name} data-id={field.name} content={fechaCarga}></lightning-helptext>
+                                    </li>
+                                </template>
+                            </template>
+                        </ul>
+                    </lightning-record-view-form>
+                </div>
+            </template>
+        </template>
+    </article>
+
+    <template if:true={isShowFlowAction}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideFlowAction}></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                    <div class="slds-is-relative">
+                        <lightning-flow flow-api-name={flowName} flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

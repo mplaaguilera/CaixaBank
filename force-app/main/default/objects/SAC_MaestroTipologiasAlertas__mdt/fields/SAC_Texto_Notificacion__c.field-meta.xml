@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Texto_Notificacion__c</fullName>
+    <description>texto para la notificacion de la campanita, en caso que no venga informado se cogerá el de la plantilla, si la plantilla tampoco viene informada el texto se tendrá que poner de manera externa al construir el objeto sac_alertas</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Texto Notificacion</label>
+    <length>750</length>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configuración para la entrada de casos por formularios web.</description>
+    <label>Configuración Formulario Web</label>
+    <pluralLabel>Configuración Formularios Web</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

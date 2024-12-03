@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Workday</fullName>
+    <active>true</active>
+    <label>Workday</label>
+    <picklistValues>
+        <picklist>AV_PresentAbsentIndicator__c</picklist>
+        <values>
+            <fullName>A</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>F</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>P</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>T</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

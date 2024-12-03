@@ -1,0 +1,158 @@
+<template>
+	<template if:false={newrecord}>
+		<template if:false={isreport}>
+			<div class="slds-card_boundary">
+				<lightning-card icon-name={icon}>
+					<h1 slot="title" class="card-title">{label.oppLinked}
+						<lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+					</h1>
+					<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
+						<div key={optyTask.oppTask.Id} >
+							<c-av_-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} is-deletable={optyTask.isDeletable} onflow={callLaunchFlow} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner} nameobject={sobjname} idobject={recid}></c-av_-detail-opp-task>
+						</div>
+					</template><template if:false={listOppTask}>
+						<div class="slds-card__body slds-card__body_inner">
+							<p>{label.noDataFoundLabel}</p>
+						</div>
+					</template> 
+					<template if:true={showSpinner}> 
+						<div>
+							<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+						</div>
+					</template>
+				</lightning-card>
+			</div>
+			<div class="not-first-card slds-card_boundary">
+				<lightning-card>
+					<h1 if:true={isBrowser} slot="title" class="card-title">
+						<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+						{label.oppUnLinked}
+					</h1>
+					<h1 if:false={isBrowser} slot="title" class="card-title">
+						<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+						{label.oppUnLinkedMobile}
+					</h1>
+					<template if:true={listOpp} for:each={listOpp} for:item="opty">
+						<div key={opty.opp.Id}>
+							<c-av_-detail-opp opp={opty.opp} record-info={recordInfo} onrefreshlink={refreshCmp} onenablespin={enableSpinner}></c-av_-detail-opp> 
+						</div>
+					</template><template if:false={listOpp}>
+						<div class="slds-card__body slds-card__body_inner">
+							<p>{label.noDataFoundLabel}</p>
+						</div>
+					</template> 
+					<template if:true={showSpinner}> 
+						<div>
+							<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+						</div>
+					</template>
+				</lightning-card>
+			</div>
+		</template>
+	</template>
+	<template if:true={newrecord}>
+		<div>
+			<lightning-card >
+				<h1 slot="title" class="card-title">
+					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
+					{label.oppLinked}
+					<lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+				</h1>
+				<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
+					<div key={optyTask.oppTask.Id}>
+						<template if:true={eventnoplanificado}>
+							<c-av_-new-opportunity-editable taskid={recid} isone={onlyOneOppTask} successfulsaving={successfulSaving}  onenablespin={enableSpinner} opptask={optyTask.oppTask} isreport=true onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendDataFlow}></c-av_-new-opportunity-editable>
+						</template>
+						<template if:false={eventnoplanificado}>
+							<c-av_-new-event-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp}  onrefreshunlink={refreshCmp}  onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task>
+						</template>
+					</div>
+				</template><template if:false={listOppTask}>
+					<div class="slds-card__body slds-card__body_inner">
+						<p>{label.noDataFoundLabel}</p>
+					</div>
+				</template> 
+				<template if:true={showSpinner}> 
+					<div>
+						<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+					</div>
+				</template>
+			</lightning-card>
+		</div>
+		<div class="not-first-card slds-card_boundary">
+			<lightning-card>
+				<h1 slot="title" class="card-title">
+					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+					{label.oppUnLinked}
+				</h1>
+				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+					<div key={opty.opp.Id}>
+						<c-av_-new-event-detail-opp opp={opty.opp} record-info={recordInfo} task-header-id={taskHeaderId} onenablespin={enableSpinner} onrefreshlink={refreshCmp}></c-av_-new-event-detail-opp> 
+					</div>
+				</template><template if:false={listOpp}>
+					<div class="slds-card__body slds-card__body_inner">
+						<p>{label.noDataFoundLabel}</p>
+					</div>
+				</template> 
+				<template if:true={showSpinner}> 
+					<div>
+						<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+					</div>
+				</template>
+			</lightning-card>
+		</div>
+	</template>
+	<template if:true={isreport}>
+		<div class="slds-card_boundary">
+			<lightning-card >
+				<h1 slot="title" class="card-title">
+					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
+					<template if:false={isEvent}>
+						{label.oppTask}
+					</template>
+					<template if:true={isEvent}>
+						Oportunidad del evento
+					</template>
+				</h1>
+				<template if:true={listOppTask} for:each={listOppTask} for:item="optyTask">
+					<div key={optyTask.oppTask.Id}>
+						<!--LINEA COMENTADA SIEMPRE <c-av_-new-event-detail-opp-task opptask={optyTask.oppTask} just-one={onlyOneOppTask} onrefreshmain={refreshMainCmp} onrefreshunlink={refreshCmp} ondisablespin={disableSpinner} onenablespin={enableSpinner}></c-av_-new-event-detail-opp-task> -->
+						<c-av_-new-opportunity-editable taskid={recid} isone={onlyOneOppTask} opptask={optyTask.oppTask} isreport=true onenablespin={enableSpinner} onrefreshunlink={refreshCmp} onrefreshmain={refreshMainCmp} ondatareport={sendData}></c-av_-new-opportunity-editable>
+					</div>
+				</template>
+				<template if:false={listOppTask}>
+					<div class="slds-card__body slds-card__body_inner">
+						<p>{label.noDataFoundLabel}</p>
+					</div>
+				</template> 
+				<template if:true={showSpinner}> 
+					<div>
+						<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+					</div>
+				</template>
+			</lightning-card>
+		</div>
+		<div class="not-first-card slds-card_boundary">
+			<lightning-card>
+				<h1 slot="title" class="card-title">
+					<lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+					{label.oppUnLinked}
+				</h1>
+				<template if:true={listOpp} for:each={listOpp} for:item="opty">
+					<div key={opty.opp.Id}>
+						<c-av_-new-event-detail-opp opp={opty.opp} record-info={recordInfo} task-header-id={taskHeaderId} onrefreshlink={refreshCmp} onenablespin={enableSpinner} ></c-av_-new-event-detail-opp> 
+					</div>
+				</template><template if:false={listOpp}>
+					<div class="slds-card__body slds-card__body_inner">
+						<p>{label.noDataFoundLabel}</p>
+					</div>
+				</template> 
+				<template if:true={showSpinner}> 
+					<div>
+						<lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+					</div>
+				</template>
+			</lightning-card>
+		</div>
+	</template>
+</template>

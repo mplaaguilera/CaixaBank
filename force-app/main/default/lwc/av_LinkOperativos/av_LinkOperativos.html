@@ -1,0 +1,30 @@
+<template>
+    
+    <lightning-card> 
+        <h3 slot="title">
+            <lightning-icon icon-name={icon} size="medium"></lightning-icon>
+            {title}
+        </h3>
+            <p class="slds-p-horizontal_small">
+                {description}
+            </p>
+        <div slot="footer">
+            <template if:true={hasLinks} for:each={listData} for:item="section">
+                <lightning-accordion key={section} allow-multiple-sections-open active-section-name={section.name}>  
+                    <lightning-accordion-section name={section.name} label={section.title} class="slds-text-title_bold">
+                        <div class="slds-grid slds-wrap slds-gutters slds-border_top color-border-separator links">
+                            <template for:each={section.links} for:item="link">
+                                <div key={link} class={section.columns}>
+                                    <div class="customNotification">
+                                        <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" class="slds-p-right_small" size="x-small" style="margin-top: 0.8em;"></lightning-icon>
+                                        <a href={link.url} title={link.label} class="slds-dl_horizontal__label slds-m-top_x-small" style="padding-left:0.0;">{link.label}</a>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </lightning-accordion-section>
+                </lightning-accordion>
+            </template>
+        </div>
+    </lightning-card>
+</template>

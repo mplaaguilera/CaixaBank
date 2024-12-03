@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Tipo__c</fullName>
+    <description>Tipo de fichero recibido desde Valija</description>
+    <inlineHelpText>Tipo de fichero recibido desde Valija</inlineHelpText>
+    <label>Tipo fichero valija</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>PAQUETERIA</fullName>
+                <default>false</default>
+                <label>PAQUETERIA</label>
+            </value>
+            <value>
+                <fullName>JUSTIFICANTES</fullName>
+                <default>false</default>
+                <label>JUSTIFICANTES</label>
+            </value>
+            <value>
+                <fullName>ENVIADO A VALIJA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>ENVIADO A VALIJA</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

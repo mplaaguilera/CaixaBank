@@ -1,0 +1,30 @@
+.slds-list_dotted, .slds-list--dotted {
+    list-style: none;
+}
+
+.slds-m-right_x-small>button {
+    border: none;
+    background: transparent;
+}
+
+.slds-m-right_x-small>button:hover {
+    border: none;
+    background: transparent;
+}
+
+.slds-m-right_x-small>button:active {
+    background: transparent;
+    outline: none;
+}
+
+.cc_blink {
+    animation: blinker 1s linear infinite;
+}
+
+.cc_opacidad80 {
+    opacity: 0.8;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Llamadas_COPS</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Tipo__c</columns>
+    <columns>CC_Tipo_Cierre__c</columns>
+    <columns>CC_Fecha_Inicio__c</columns>
+    <columns>CC_Fecha_Fin__c</columns>
+    <columns>OS_Duracion__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>RECORDTYPE</columns>
+    <columns>CC_Cuenta__c</columns>
+    <columns>CC_Contacto__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Llamada__c.OS_Cliente,CC_Llamada__c.OS_Empleado</value>
+    </filters>
+    <label>Llamadas COPS</label>
+    <sharedTo>
+        <role>COPS</role>
+    </sharedTo>
+</ListView>

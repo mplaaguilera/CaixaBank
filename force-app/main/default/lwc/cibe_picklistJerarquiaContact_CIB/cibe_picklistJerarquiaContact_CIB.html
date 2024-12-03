@@ -1,0 +1,210 @@
+<template>
+    <lightning-card>
+		<div class="slds-p-horizontal_small">
+			<div>
+				<button class="slds-button test-id__section-header-button slds-section__title-action" name="Jerarquía Negocio NAME" title="Jerarquía Negocio Title" onclick={toggleShowHierarchy}>
+					<lightning-icon if:true={showHierarchy} size="xx-small" icon-name="utility:chevrondown" class="slds-m-rigth_x-small"></lightning-icon>
+					<lightning-icon if:false={showHierarchy} size="xx-small" icon-name="utility:chevronright" class="slds-m-rigth_x-small"></lightning-icon>
+					<p class="slds-p-horizontal_small" style="font-size: medium;">{labels.jerarCIB}</p>
+				</button>
+			</div>
+
+
+				<lightning-record-edit-form record-id={contactId} object-api-name="Contact" onsubmit={handleSubmit} onsuccess={handleSuccess} onerror={handleError}>
+					<lightning-messages></lightning-messages>
+					<template if:false={editModeManager}>
+						<div class="slds-grid slds-wrap slds-gutters slds-m-top_small">
+							<template for:each={fields1} for:item="field">
+								<div key={field} class="slds-col slds-size_1-of-2">
+									<lightning-layout-item class="slds-form-element_readonly" size="12">
+										<lightning-layout>
+											<lightning-layout-item size="11" class="slds-border_bottom slds-m-left_large">
+												<lightning-output-field field-name={field}></lightning-output-field>
+											</lightning-layout-item>
+											<lightning-layout-item size="1" class="slds-border_bottom">
+												<template if:true={isShowEditButton}>
+													<lightning-button-icon class="slds-float_right" icon-name="utility:edit" size="small" variant="bare" alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon>
+												</template>
+											</lightning-layout-item>
+										</lightning-layout>
+									</lightning-layout-item>
+								</div>
+							</template>
+						</div>
+					</template>
+					<template if:true={editModeManager}>
+						<div class="slds-grid slds-wrap slds-gutters  slds-m-top_small slds-m-left_small">
+							<template for:each={fields1} for:item="field">
+								<div key={field} class="slds-col slds-size_1-of-2">
+									<lightning-input-field field-name={field}></lightning-input-field>
+								</div>
+							</template>
+						</div>
+						<div class="slds-align_absolute-center">
+							<lightning-button label={labels.cancel} onclick={handleCancel}></lightning-button>
+							<lightning-button label={labels.save} class="slds-m-left_small" variant="brand" type="submit"></lightning-button>
+						</div>
+					</template>
+					<lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
+				</lightning-record-edit-form> 
+
+
+			<div if:true={showHierarchy}>
+				<template if:false={editMode}>
+					<div class="slds-grid slds-grid_align-end slds-m-top_medium slds-m-right_medium">
+						<div class="slds-col" if:true={isShowEditButton}>
+							<lightning-button-icon 
+								class="slds-button slds-button_icon slds-modal__close"
+								variant="container"
+								icon-name="utility:edit"
+								icon-class="slds-icon-text-light"
+								size="medium"
+								onclick={handleClick}
+							></lightning-button-icon>
+						</div>
+					</div>
+					<div class="slds-grid slds-grid_align-center slds-gutters slds-m-left_x-small slds-m-right_x-small">
+						<div class="slds-col slds-size_1-of-4">
+							<article class="slds-card slds-card_boundary">
+								<div class="slds-card__header slds-grid">
+									<header class="slds-media slds-media_center slds-has-flexi-truncate">
+										<div class="slds-media__body">
+											<h2 class="slds-card__header-title">
+												<span class="slds-card__header-link slds-truncate">
+													{labels.negocio}
+												</span>
+											</h2>
+										</div>
+									</header>
+								</div>
+								<div class="slds-card__body slds-card__body_inner">
+									<ul class="slds-has-dividers_around-space">
+										<template for:each={selected} for:item="val">
+											<li class="slds-item" key={val}>{val}</li>
+										</template>
+									</ul>
+								</div>
+							</article>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<article class="slds-card slds-card_boundary">
+								<div class="slds-card__header slds-grid">
+									<header class="slds-media slds-media_center slds-has-flexi-truncate">
+										<div class="slds-media__body">
+											<h2 class="slds-card__header-title">
+												<span class="slds-card__header-link slds-truncate">
+													{labels.redeSeg}
+												</span>
+											</h2>
+										</div>
+									</header>
+								</div>
+								<div class="slds-card__body slds-card__body_inner">
+									<ul class="slds-has-dividers_around-space">
+										<template for:each={selected2} for:item="val">
+											<li class="slds-item" key={val}>{val}</li>
+										</template>
+									</ul>
+								</div>
+							</article>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<article class="slds-card slds-card_boundary">
+								<div class="slds-card__header slds-grid">
+									<header class="slds-media slds-media_center slds-has-flexi-truncate">
+										<div class="slds-media__body">
+											<h2 class="slds-card__header-title">
+												<span class="slds-card__header-link slds-truncate">
+													{labels.sectorPai}
+												</span>
+											</h2>
+										</div>
+									</header>
+								</div>
+								<div class="slds-card__body slds-card__body_inner">
+									<ul class="slds-has-dividers_around-space">
+										<template for:each={selected3} for:item="val">
+											<li class="slds-item" key={val}>{val}</li>
+										</template>
+									</ul>
+								</div>
+							</article>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<article class="slds-card slds-card_boundary">
+								<div class="slds-card__header slds-grid">
+									<header class="slds-media slds-media_center slds-has-flexi-truncate">
+										<div class="slds-media__body">
+											<h2 class="slds-card__header-title">
+												<span class="slds-card__header-link slds-truncate">
+													{labels.centCar}
+												</span>
+											</h2>
+										</div>
+									</header>
+								</div>
+								<div class="slds-card__body slds-card__body_inner">
+									<ul class="slds-has-dividers_around-space">
+										<template for:each={selected4} for:item="val">
+											<li class="slds-item" key={val}>{val}</li>
+										</template>
+									</ul>
+								</div>
+							</article>
+						</div>
+					</div>
+				</template>
+				<template if:true={editMode}>
+					<div>
+						<div class="slds-grid  slds-grid_align-center slds-gutters slds-m-around_medium  slds-grid_vertical-align-end">
+							<div class="slds-col slds-size_1-of-5">
+								<lightning-combobox  disabled={isDisabled1}  label={labels.negocio} options={picklistValues} value={picklistValue1} onchange={handleValueChange}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-5">
+								<lightning-combobox disabled={isDisabled2} label={labels.redeSeg} options={picklistValues2} value={picklistValue2} onchange={handleValueChange2}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-5">
+								<lightning-combobox disabled={isDisabled3} label={labels.sectorPai} options={picklistValues3} value={picklistValue3} onchange={handleValueChange3}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-5">
+								<lightning-combobox disabled={isDisabled4} label={labels.centCar} options={picklistValues4} value={picklistValue4} onchange={handleValueChange4}></lightning-combobox>
+							</div>
+							<div class="slds-col slds-size_1-of-5 ">
+								<lightning-button variant="brand"  label={labels.add} onclick={handleAddHierarchy}></lightning-button>
+							</div>
+						</div>
+						<div class="slds-grid slds-grid_align-center slds-gutters slds-m-around_medium slds-wrap">
+							<template for:each={hierarchies} for:item="hierarchy">
+								<div key={hierarchy.Ids} class="slds-col slds-size_1-of-1 ">
+									<div class="slds-grid slds-gutters slds-grid_vertical-align-end slds-var-m-around_medium">
+										<div class="slds-col slds-size_1-of-10">
+											<lightning-icon data-id={hierarchy.Ids} icon-name="utility:close" size="x-small" alternative-text="Remove" title="Remove" onclick={handleRemoveHierarchy}></lightning-icon>
+										</div>
+										<div class="slds-col slds-size_9-of-10">
+											<lightning-breadcrumbs>
+												<template for:each={hierarchy.hierarchyNames} for:item="hierarchyName">
+													<lightning-breadcrumb key={hierarchyName.value} label={hierarchyName} name={hierarchyName}></lightning-breadcrumb>
+												</template>
+											</lightning-breadcrumbs>
+										</div>
+									</div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</template>
+			</div>
+		</div>
+		<template if:true={editMode}>
+			<div slot="footer">
+				<div class="slds-grid">
+					<div class="slds-col slds-text-align_center slds-m-top_x-small slds-m-right_xx-small">
+						<lightning-button variant="neutral" label={labels.cancel} class="slds-m-right_medium" onclick={handleCancel}></lightning-button>
+						<lightning-button variant="brand" label={labels.save} onclick={handleSaveHierarchy}></lightning-button>
+					</div>
+				</div>
+			</div>
+		</template>
+		<lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
+    </lightning-card>
+</template>

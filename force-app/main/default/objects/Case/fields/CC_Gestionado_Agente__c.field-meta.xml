@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Gestionado_Agente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checkbox que indica cuando un caso ha sido tomado alguna vez en ciclo de vida por un agente.
+Así diferenciamos los Activos &quot;nuevos&quot; de los Activos que han sido traspasados.</description>
+    <label>Gestionado por un agente</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

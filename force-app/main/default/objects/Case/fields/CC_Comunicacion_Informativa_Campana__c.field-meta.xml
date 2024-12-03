@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Comunicacion_Informativa_Campana__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Comunicación Informativa de Campaña a la que está vinculado al caso.</description>
+    <label>Comunicación informativa de campaña</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Agrupador__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CC_Comunicacion_Informativa_de_Campana</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Agrupador__c</referenceTo>
+    <relationshipLabel>Casos</relationshipLabel>
+    <relationshipName>CC_Casos_Comunicacion_Informativa_Campan</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

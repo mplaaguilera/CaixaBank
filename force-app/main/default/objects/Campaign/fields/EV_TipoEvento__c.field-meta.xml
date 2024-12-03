@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_TipoEvento__c</fullName>
+    <inlineHelpText>En caso de ser tipo Hibrido rellenar datos evento físico y virtual</inlineHelpText>
+    <label>Tipo de Evento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Físico</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Virtual</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Híbrido</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

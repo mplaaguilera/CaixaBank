@@ -1,0 +1,22 @@
+<template>
+    <lightning-card>
+        <div class="margin">
+            <header slot="title" class="slds-page-header slds-page-header_record-home" onclick={toggleShow}>
+                <lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+                <lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+                <label class="nameAccordation">{labels.gestionarEvento}</label>
+            </header>
+            
+            <lightning-tabset active-tab-value="" if:true={showDetail} class="margin">
+                <lightning-tab label={labels.cerrarEvento} data-id="cerrarInformar" value="CerrarInformar">
+                    <div if:false={isDisabled} class="buttonAlign">
+                        <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={isDisabled}  onclick={navigateToTab}>{labels.btnCerrarEvento}</button>
+                    </div>
+                    <div if:true={isDisabled} class="buttonAlign">
+                        <button type="submit" class="slds-button slds-button_stretch buttonStyle buttonStyleDisabled" disabled={isDisabled}  onclick={navigateToTab}>{labels.btnCerrarEvento}</button>
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

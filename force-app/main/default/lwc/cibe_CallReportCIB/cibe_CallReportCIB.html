@@ -1,0 +1,60 @@
+<template>
+	<lightning-record-edit-form record-id={activityExtensionId} object-api-name="CBK_Activity_Extension__c" onsubmit={handleSubmit} onsuccess={handleSuccess} onerror={handleError}>
+		<lightning-messages></lightning-messages>
+		<template if:false={editMode}>
+			<div class="slds-grid slds-wrap slds-gutters">
+				<template for:each={fields1} for:item="field">
+					<div key={field} class="slds-col slds-size_1-of-2">
+						<lightning-layout-item class="slds-form-element_readonly" size="12">
+							<lightning-layout>
+								<lightning-layout-item size="11" class="slds-border_bottom">
+									<lightning-output-field field-name={field}></lightning-output-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="1" class="slds-border_bottom">
+									<template if:true={isEditable}>
+										<lightning-button-icon class="slds-float_right" icon-name="utility:edit" size="small" variant="bare" alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon>
+									</template>
+								</lightning-layout-item>
+							</lightning-layout>
+						</lightning-layout-item>
+					</div>
+				</template>
+				<template for:each={fields2} for:item="field">
+					<div key={field} class="slds-col slds-size_1-of-1">
+						<lightning-layout-item class="slds-form-element_readonly" size="12">
+							<lightning-layout>
+								<lightning-layout-item size="11" class="slds-border_bottom">
+									<lightning-output-field field-name={field}></lightning-output-field>
+								</lightning-layout-item>
+								<lightning-layout-item size="1" class="slds-border_bottom">
+									<template if:true={isEditable}>
+										<lightning-button-icon class="slds-float_right" icon-name="utility:edit" size="small" variant="bare" alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon>
+									</template>
+								</lightning-layout-item>
+							</lightning-layout>
+						</lightning-layout-item>
+					</div>
+				</template>
+			</div>
+		</template>
+		<template if:true={editMode}>
+			<div class="slds-grid slds-wrap slds-gutters">
+				<template for:each={fields1} for:item="field">
+					<div key={field} class="slds-col slds-size_1-of-2">
+						<lightning-input-field field-name={field}></lightning-input-field>
+					</div>
+				</template>
+				<template for:each={fields2} for:item="field">
+					<div key={field} class="slds-col slds-size_1-of-1">
+						<lightning-input-field field-name={field}></lightning-input-field>
+					</div>
+				</template>
+			</div>
+			<div class="slds-align_absolute-center">
+				<lightning-button label={labels.cancel} onclick={handleCancel}></lightning-button>
+				<lightning-button label={labels.save} class="slds-m-left_small" variant="brand" type="submit"></lightning-button>
+			</div>
+		</template>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium"></lightning-spinner>
+	</lightning-record-edit-form>
+</template>

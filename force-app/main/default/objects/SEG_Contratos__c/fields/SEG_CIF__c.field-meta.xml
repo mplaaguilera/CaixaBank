@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CIF__c</fullName>
+    <description>NIF del cliente titular del contracto.</description>
+    <externalId>false</externalId>
+    <formula>SEG_NombreCuenta__r.CC_Numero_Documento__c</formula>
+    <label>CIF</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

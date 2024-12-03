@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="busqueda grupos colaboradores">
+    <aura:attribute name="accountByEvent" type="CC_Grupo_Colaborador__c"/>
+</aura:event>

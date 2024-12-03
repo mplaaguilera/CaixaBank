@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Contacto__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Contacto</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 OR ((2 AND (3 OR 8)) OR (6 AND 7) OR (4 AND 5))) OR (9)</booleanFilter>
+        <filterItems>
+            <field>Contact.AccountId</field>
+            <operation>equals</operation>
+            <valueField>$Source.CC_Cuenta__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente, Cliente (CSBD), Cliente (COPS), Cliente (SACH), Cliente (Outbound), ReadOnly</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente, Cliente, Representante</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado (COPS), Empleado</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado, Buzón COPS</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado, ReadOnly, Empleado (HDT)</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.IsPersonAccount</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>ReadOnly</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Llamadas</relationshipLabel>
+    <relationshipName>Llamadas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

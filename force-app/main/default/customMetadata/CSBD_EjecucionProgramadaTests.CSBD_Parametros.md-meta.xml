@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Parámetros</label>
+    <protected>false</protected>
+    <values>
+        <field>CSBD_AnyadirClases__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CSBD_ClasesExcluidas__c</field>
+        <value xsi:type="xsd:string">CSBD_ArticulosProducto
+CSBD_ArticulosProducto_Test
+CSBD_ChatGPT_Controller
+CSBD_ChatGPT_Controller_Test
+CSBD_EnlaceArgumentario
+CSBD_EnlaceArgumentario_Test
+CSBD_ObtenerLabelSegmento
+CSBD_ObtenerLabelSegmento_Test
+CSBD_OtrasOportunidadesSubset
+CSBD_OtrasOportunidadesSubset_Test
+CSBD_ProductClientDeAccount
+CSBD_ProductClientDeAccount_Test
+CSBD_ProductosMismaFamilia
+CSBD_ProductosMismaFamilia_Test</value>
+    </values>
+    <values>
+        <field>CSBD_ClientId__c</field>
+        <value xsi:type="xsd:string">3MVG9od6vNol.eBhLAoIAqhH6Vtbn.jBjfhvhPIhPeeER8S.8u2EU31BEmyzPUvBoSG1Gnl3z.PZEfxjFhm1j</value>
+    </values>
+    <values>
+        <field>CSBD_ClientSecret__c</field>
+        <value xsi:type="xsd:string">A5FCCD82FBA13CEE69C7BD61943A61788E1867246BAEF974439C44A60791EA72</value>
+    </values>
+    <values>
+        <field>CSBD_DEV_DestinatariosResultado__c</field>
+        <value xsi:type="xsd:string">marc.pla@ibm.com</value>
+    </values>
+    <values>
+        <field>CSBD_DEV_ModoDesarrollo__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CSBD_DEV_TestSuiteName__c</field>
+        <value xsi:type="xsd:string">Marc</value>
+    </values>
+    <values>
+        <field>CSBD_DestinatariosCorreo__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CSBD_DestinatariosError__c</field>
+        <value xsi:type="xsd:string">marc.pla@ibm.com</value>
+    </values>
+    <values>
+        <field>CSBD_DestinatariosResultado__c</field>
+        <value xsi:type="xsd:string">marc.pla@ibm.com
+marta.caride@ibm.com
+Jiawei.Xia1@ibm.com
+Daymi.Morales.Vega@ibm.com
+Raul.Ramos@ibm.com
+sergio.villafafila.alijas@ibm.com</value>
+    </values>
+    <values>
+        <field>CSBD_Password__c</field>
+        <value xsi:type="xsd:string">trompeta1kHKnH2jLma6GLSgOFcuNpfAP</value>
+    </values>
+    <values>
+        <field>CSBD_PrefijoClases__c</field>
+        <value xsi:type="xsd:string">CSBD_</value>
+    </values>
+    <values>
+        <field>CSBD_TestSuiteName__c</field>
+        <value xsi:type="xsd:string">CSBD</value>
+    </values>
+    <values>
+        <field>CSBD_UmbralCoberturaAviso__c</field>
+        <value xsi:type="xsd:double">85.0</value>
+    </values>
+    <values>
+        <field>CSBD_UmbralCoberturaError__c</field>
+        <value xsi:type="xsd:double">80.0</value>
+    </values>
+    <values>
+        <field>CSBD_Username__c</field>
+        <value xsi:type="xsd:string">u0190347@cc-caixabank.com.devsercln</value>
+    </values>
+</CustomMetadata>

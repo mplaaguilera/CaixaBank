@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TipoCartera__c</fullName>
+    <description>Tipo de la cartera</description>
+    <label>Tipo de cartera</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>EMP</fullName>
+                <default>false</default>
+                <label>Banca Empresas</label>
+            </value>
+            <value>
+                <fullName>COR</fullName>
+                <default>false</default>
+                <label>Banca Corporativa</label>
+            </value>
+            <value>
+                <fullName>BPR</fullName>
+                <default>false</default>
+                <label>Banca Privada. Gestor</label>
+            </value>
+            <value>
+                <fullName>BAI</fullName>
+                <default>false</default>
+                <label>Banca Privada Independiente</label>
+            </value>
+            <value>
+                <fullName>BPJ</fullName>
+                <default>false</default>
+                <label>Banca Privada. Jurídicas</label>
+            </value>
+            <value>
+                <fullName>BPE</fullName>
+                <default>false</default>
+                <label>Banca Premier</label>
+            </value>
+            <value>
+                <fullName>PYM</fullName>
+                <default>false</default>
+                <label>Banca Pimes</label>
+            </value>
+            <value>
+                <fullName>NEG</fullName>
+                <default>false</default>
+                <label>Negocios</label>
+            </value>
+            <value>
+                <fullName>CIB</fullName>
+                <default>false</default>
+                <label>Corporate Institutions Banking</label>
+            </value>
+            <value>
+                <fullName>MIC</fullName>
+                <default>false</default>
+                <label>Banca Emprendedores</label>
+            </value>
+            <value>
+                <fullName>PRO</fullName>
+                <default>false</default>
+                <label>Banca Promotores</label>
+            </value>
+            <value>
+                <fullName>BPO</fullName>
+                <default>false</default>
+                <label>Banca Privada. Oficina</label>
+            </value>
+            <value>
+                <fullName>IBE</fullName>
+                <default>false</default>
+                <label>Banca Premier - IBE</label>
+            </value>
+            <value>
+                <fullName>BIR</fullName>
+                <default>false</default>
+                <label>Banca Priv. Indep. Relacionada</label>
+            </value>
+            <value>
+                <fullName>BIO</fullName>
+                <default>false</default>
+                <label>Banca Priv. Indep. Oficina</label>
+            </value>
+            <value>
+                <fullName>INE</fullName>
+                <default>false</default>
+                <label>Negocios-INE</label>
+            </value>
+            <value>
+                <fullName>IMI</fullName>
+                <default>false</default>
+                <label>Banca Emprendedores - IMI</label>
+            </value>
+            <value>
+                <fullName>INT</fullName>
+                <default>false</default>
+                <label>Internacional</label>
+            </value>
+            <value>
+                <fullName>INB</fullName>
+                <default>false</default>
+                <label>Internacional. Bancos</label>
+            </value>
+            <value>
+                <fullName>CON</fullName>
+                <default>false</default>
+                <label>Caixabank Consumer Finance</label>
+            </value>
+            <value>
+                <fullName>SEG</fullName>
+                <default>false</default>
+                <label>Seguros</label>
+            </value>
+            <value>
+                <fullName>AGE</fullName>
+                <default>false</default>
+                <label>Life</label>
+            </value>
+            <value>
+                <fullName>TES</fullName>
+                <default>false</default>
+                <label>Especialista Tesorería</label>
+            </value>
+            <value>
+                <fullName>FIN</fullName>
+                <default>false</default>
+                <label>Especialista Financiación</label>
+            </value>
+            <value>
+                <fullName>BCO</fullName>
+                <default>false</default>
+                <label>Bancos corresponsales</label>
+            </value>
+            <value>
+                <fullName>MOR</fullName>
+                <default>false</default>
+                <label>Especialista Morosidad</label>
+            </value>
+            <value>
+                <fullName>RIE</fullName>
+                <default>false</default>
+                <label>Analista de Risc</label>
+            </value>
+            <value>
+                <fullName>POT</fullName>
+                <default>false</default>
+                <label>Clientes Potenciales</label>
+            </value>
+            <value>
+                <fullName>OFI</fullName>
+                <default>false</default>
+                <label>Con EAP</label>
+            </value>
+            <value>
+                <fullName>EAP</fullName>
+                <default>false</default>
+                <label>Asignación prioritaria</label>
+            </value>
+            <value>
+                <fullName>PDT</fullName>
+                <default>false</default>
+                <label>Pendiente de asignación</label>
+            </value>
+            <value>
+                <fullName>CMX</fullName>
+                <default>false</default>
+                <label>Especialista Comex</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Not_change_owner_if_not_owner_GE_senior</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(OR($Permission.EV_Gestor_Eventos_Senior, $Permission.EV_NotChangeOwnerCampaign),PRIORVALUE(OwnerId) !=  $User.Id,  PRIORVALUE(OwnerId) != OwnerId )</errorConditionFormula>
+    <errorMessage>Error, no puede cambiar el propietario de una campaña de la que no es propietaria</errorMessage>
+</ValidationRule>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MasInformacion__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;),
+&quot;Si necessites més informació sobre aquest cas, posem a la teva disposició els diferents &quot;&amp;  HYPERLINK(&quot;https://www.caixabank.es/particular/atencioclient/subhomeatencioclient_ca.html&quot;, &quot;canals d&apos;atenció de l&apos;entitat&quot;) &amp;&quot;, a què pots adreçar-te fent constar el número de referència indicat més amunt.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;es&quot;),
+&quot;Si necesitas más información sobre este caso, ponemos a tu disposición los distintos &quot;&amp;  HYPERLINK(&quot;https://www.caixabank.es/particular/atencioclient/subhomeatencioclient_es.html&quot;, &quot;canales de atención de la entidad&quot;) &amp;&quot;, a los que puedes dirigirte haciendo constar el número de referencia arriba indicado.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;en&quot;),
+&quot;If you need more information on this matter, you can contact us through the &quot;&amp;  HYPERLINK(&quot;https://www.caixabank.es/particular/atencioclient/subhomeatenciocliente_en.html&quot;, &quot;company&apos;s different service channels&quot;) &amp;&quot;, which you can use by indicating the reference number above.&quot;,
+
+&quot;Si necesitas más información sobre este caso, ponemos a tu disposición los distintos &quot;&amp;  HYPERLINK(&quot;https://www.caixabank.es/particular/atencioclient/subhomeatencioclient_es.html&quot;, &quot;canales de atención de la entidad&quot;) &amp;&quot;, a los que puedes dirigirte haciendo constar el número de referencia arriba indicado.&quot;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Más información</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

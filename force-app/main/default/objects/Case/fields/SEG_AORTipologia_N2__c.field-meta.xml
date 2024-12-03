@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_AORTipologia_N2__c</fullName>
+    <label>Tipologia N2</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SEG_AORTipologiaN1__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>7a81001edbb368508bfabc45f3961967</fullName>
+                <default>false</default>
+                <label>Emisión aval no modelado</label>
+            </value>
+            <value>
+                <fullName>3a81001edbb368508bfabc45f3961968</fullName>
+                <default>false</default>
+                <label>Consultas generales</label>
+            </value>
+            <value>
+                <fullName>fe81001edbb368508bfabc45f3961966</fullName>
+                <default>false</default>
+                <label>Cancelación avales</label>
+            </value>
+            <value>
+                <fullName>f281001edbb368508bfabc45f3961968</fullName>
+                <default>false</default>
+                <label>Modificación avales</label>
+            </value>
+            <value>
+                <fullName>3681001edbb368508bfabc45f3961967</fullName>
+                <default>false</default>
+                <label>Ejecución avales</label>
+            </value>
+            <value>
+                <fullName>874c540ddba6b85061d79a12f3961900</fullName>
+                <default>false</default>
+                <label>Consultas generales Internacionales</label>
+            </value>
+            <value>
+                <fullName>84db9889dba6b85061d79a12f39619bb</fullName>
+                <default>false</default>
+                <label>Emisión aval no modelado I</label>
+            </value>
+            <value>
+                <fullName>b79b584ddb66b85061d79a12f39619ec</fullName>
+                <default>false</default>
+                <label>Cancelación avales I</label>
+            </value>
+            <value>
+                <fullName>1dae441b870a05103155c9980cbb35b5</fullName>
+                <default>false</default>
+                <label>Modificación de avales I</label>
+            </value>
+            <value>
+                <fullName>7e81001edbb368508bfabc45f396196b</fullName>
+                <default>false</default>
+                <label>Otros certificados no modelados</label>
+            </value>
+            <value>
+                <fullName>dbbbd889dba6b85061d79a12f3961977</fullName>
+                <default>false</default>
+                <label>Ejecución avales I</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>7a81001edbb368508bfabc45f3961966</controllingFieldValue>
+            <valueName>7a81001edbb368508bfabc45f3961967</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>7a81001edbb368508bfabc45f3961966</controllingFieldValue>
+            <valueName>3a81001edbb368508bfabc45f3961968</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>7a81001edbb368508bfabc45f3961966</controllingFieldValue>
+            <valueName>fe81001edbb368508bfabc45f3961966</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>7a81001edbb368508bfabc45f3961966</controllingFieldValue>
+            <valueName>f281001edbb368508bfabc45f3961968</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>7a81001edbb368508bfabc45f3961966</controllingFieldValue>
+            <valueName>3681001edbb368508bfabc45f3961967</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>be81001edbb368508bfabc45f3961967</controllingFieldValue>
+            <valueName>874c540ddba6b85061d79a12f3961900</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>be81001edbb368508bfabc45f3961967</controllingFieldValue>
+            <valueName>84db9889dba6b85061d79a12f39619bb</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>be81001edbb368508bfabc45f3961967</controllingFieldValue>
+            <valueName>b79b584ddb66b85061d79a12f39619ec</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>be81001edbb368508bfabc45f3961967</controllingFieldValue>
+            <valueName>1dae441b870a05103155c9980cbb35b5</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>7e81001edbb368508bfabc45f396196a</controllingFieldValue>
+            <valueName>7e81001edbb368508bfabc45f396196b</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

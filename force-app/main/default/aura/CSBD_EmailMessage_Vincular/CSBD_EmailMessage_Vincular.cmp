@@ -1,0 +1,189 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="CSBD_EmailMessage_Vincular_Controller">
+
+    <!--Atributos-->
+    <aura:attribute name="buzonCaixaBank" type="Boolean" default="true"/>
+    <aura:attribute name="correos" type="Object"/>
+    <aura:attribute name="correosColumns" type="List"/>
+    <aura:attribute name="correosSelectedRows" type="Object"/>
+    <aura:attribute name="correosNoneSelected" type="Boolean" default="true"/>
+    <aura:attribute name="correosRow" type="Object"/>
+    <aura:attribute name="oportunidades" type="Object"/>
+    <aura:attribute name="oportunidadesColumns" type="List"/>
+    <aura:attribute name="oportunidadesSelectedRows" type="Object"/>
+    <aura:attribute name="oportunidadesNoneSelected" type="Boolean" default="true"/>
+    <aura:attribute name="mismoRemitente" type="Boolean" default="true"/>
+
+    <!--Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <!--API-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--UI-->
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <!--Selector de empresa proveedora-->
+                    <div class="slds-form-element__control" style="text-align: center">
+                        <div class="slds-checkbox_button-group">
+                            <span class="slds-button slds-checkbox_button">
+                                <input type="checkbox" id="programarModoHora" value="hora" name="checkbox" checked="{!v.buzonCaixaBank}" onchange="{!c.cambiarBuzon}"/>
+                                <label class="slds-checkbox_button__label" for="programarModoHora">
+                                    <span class="slds-checkbox_faux">Buzones CaixaBank</span>
+                                </label>
+                            </span>
+                            <span class="slds-button slds-checkbox_button">
+                                <input type="checkbox" id="programarModoTramo" value="tramo" name="checkbox" checked="{!!v.buzonCaixaBank}" onchange="{!c.cambiarBuzon}"/>
+                                <label class="slds-checkbox_button__label" for="programarModoTramo">
+                                    <span class="slds-checkbox_faux">Buzones imaginBank</span>
+                                </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+    
+            <!--Recuento de mensajes-->
+            <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="border-radius: 3px;">
+                <c:ccScopedNotification mensaje="{!'Actualmente hay ' + v.correos.length + ' correos entrantes pendientes de vincular recibidos en los buzones de ' + (v.buzonCaixaBank ? 'CaixaBank' : 'imaginBank') + '.'}"/>
+            </div>
+
+            <!--Listado-->
+            <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-top: 0.9rem; border-radius: 3px;">
+                <lightning:datatable data="{!v.correos}" columns="{!v.correosColumns}" keyField="Id" hideCheckboxColumn="false" onrowselection="{!c.correosHandleRowSelection}" onrowaction="{!c.correosHandleRowActions}"/>
+            </div>
+            <br/>
+
+            <!--Botones-->
+            <div align="right">
+                <lightning:button label="Actualizar" iconName="utility:refresh" onclick="{!c.obtenerCorreos}"/>
+                <lightning:button label="Rechazar" iconName="utility:delete" disabled="{!v.correosNoneSelected}" onclick="{!c.abrirModalConfirmacion}" variant="destructive-text"/>
+            </div>
+            <br/>
+            <!--Cuerpo del correo seleccionado-->
+            <lightning:inputRichText value="{!v.correosSelectedRows[0].HtmlBody}" placeholder="-- Sin contenido --" disabled="true"/>
+        </div>
+	</article>
+    
+    <!--Modal de vinculación a oportunidad-->
+    <section role="dialog" tabindex="-1" aura:id="modalBoxVincularOportunidad" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-modal_large" onkeydown="{!c.modalVincularOportunidadTeclaPulsada}">
+        <div class="slds-modal__container" style="width: 58%;">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <!--<lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalVincularOportunidad}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>-->
+                <button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalVincularOportunidad}">
+                    <lightning:icon iconName="utility:close" size="small"></lightning:icon>
+                </button>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Vincular correo a oportunidad</h2>
+                <p class="slds-var-m-top_x-small">
+                    {!'Seleccione una oportunidad relacionada con el remitente '}<b>{!v.correosRow.FromAddress}</b><br/>
+                </p>
+            </header>
+
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <!--Selector de modo de vinculación-->
+                <div class="slds-form-element__control" style="text-align: center">
+                    <div class="slds-checkbox_button-group">
+                        <span class="slds-button slds-checkbox_button">
+                            <input type="checkbox" id="mismoRemitente" value="mismoRemitente" name="checkboxMismoRemitente" checked="{!v.mismoRemitente}" onchange="{!c.cambiarModoVincular}"/>
+                            <label class="slds-checkbox_button__label" for="mismoRemitente">
+                                <span class="slds-checkbox_faux">Oportunidades del mismo remitente</span>
+                            </label>
+                        </span>
+                        <span class="slds-button slds-checkbox_button">
+                            <input type="checkbox" id="todas" value="todas" name="checkboxTodas" checked="{!!v.mismoRemitente}" onchange="{!c.cambiarModoVincular}"/>
+                            <label class="slds-checkbox_button__label" for="todas">
+                                <span class="slds-checkbox_faux">Oportunidad específica</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+
+                <lightning:layoutItem size="12" padding="around-small">
+                    <aura:if isTrue="{!v.mismoRemitente}">
+                        <!--Oportunidades del mismo remitente-->
+                        <div class="slds-border_top slds-border_bottom slds-border_left slds-border_right" style="margin-top: 0.9rem;">
+                            <lightning:datatable data="{!v.oportunidades}" columns="{!v.oportunidadesColumns}" keyField="Id" hideCheckboxColumn="false" maxRowSelection="1" onrowselection="{!c.oportunidadesHandleRowSelection}"/>
+                        </div>
+                        <!--Oportunidad específica-->
+                        <aura:set attribute="else">
+                            <div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-gutters slds-gutters_x-small slds-border_top slds-border_bottom slds-border_left slds-border_right" style="padding-top: 0.9rem; padding-bottom: 0.9rem; border-radius: 3px;">
+                                <div class="slds-col slds-grow-none">
+                                    <lightning:icon iconName="standard:opportunity" size="small"/>
+                                </div>
+                                <div class="slds-col slds-grow-none">
+                                    <label class="slds-form-element__label">
+                                        Identificador de la oportunidad 
+                                    </label>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning:input aura:id="inputIdentificadorOportunidad" variant="label-hidden" minlength="10" maxlength="15" value="OP-" onchange="{!c.inputIdentificadorOportunidadOnChange}"/>
+                                </div>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </lightning:layoutItem>
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <div class="slds-grid">
+                    <div class="slds-col" style="padding-top: 4px; padding-left: 4px;">
+                        <lightning:input aura:id="abrirDetalleOportunidad" type="toggle" label="Navegar al detalle de la oportunidad tras vincular" checked="true" messageToggleActive="" messageToggleInactive="" style="padding-left: 13px;"/>
+                    </div>
+                    <div class="slds-col">
+                        <lightning:button aura:id="botonVincular" variant="brand" label="Vincular" iconName="action:new_opportunity" onclick="{!c.vincular}" disabled="{!v.oportunidadesNoneSelected}"/>
+                        <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalVincularOportunidad}" />
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <!--Fondo para el modal de vinculación a oportunidad-->
+    <div class="slds-backdrop" aura:id="modalbackdropVincularOportunidad"/>
+
+    <!--Modal de confirmación-->
+    <section role="dialog" tabindex="-1" aura:id="modalBoxConfirmacion" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <!--<lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalConfirmacion}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>-->
+                <button class="slds-button slds-button_icon slds-modal__close" onclick="{!c.cerrarModalConfirmacion}">
+                    <lightning:icon iconName="utility:close" size="small"></lightning:icon>
+                </button>
+                <!--Título del modal-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Confirmar rechazo</h2>
+                <p class="slds-var-m-top_x-small slds-text-color_destructive">
+                    Esta acción no se puede deshacer.
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                <lightning:layoutItem size="12" padding="around-small"> 
+                    <div class="slds-text-align_center">{!'¿Confirma que desea rechazar los ' + v.correosSelectedRows.length + ' correos seleccionados?'}</div>
+                </lightning:layoutItem>
+            </div>
+            
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning:button variant="destructive" label="Confirmar" onclick="{!c.rechazar}"/>
+                <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalConfirmacion}"/>
+            </footer>
+        </div>
+    </section>
+
+    <!--Fondo para el modal de confirmación-->
+    <div class="slds-backdrop" aura:id="modalbackdropConfirmacion"/>
+
+</aura:component>

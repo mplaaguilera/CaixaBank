@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RequestDoAlta>
+    <IdPeticion>007402F41535B22C54011</IdPeticion>
+    <TipoMovimiento>Cierre</TipoMovimiento>
+    <CodigoCampana>APC02</CodigoCampana>
+    <CodigoProducto>04780</CodigoProducto>
+    <NumPerso>0040399420</NumPerso>
+    <NifCliente>18208757W</NifCliente>
+    <NombreCliente>JOSE JAVIER</NombreCliente>
+    <Apellido1Cliente>OYARZABAL</Apellido1Cliente>
+    <Apellido2Cliente>ARRATIBEL</Apellido2Cliente>
+    <Idioma>002</Idioma>
+    <Plataforma>915</Plataforma>
+    <CentroGestor>11111</CentroGestor>
+    <UsuarioGestor>U1915010</UsuarioGestor>
+    <ResultadoCierre>NEGATIVO</ResultadoCierre>
+    <NumeroSR>8-6909726832</NumeroSR>
+    <ConnId>007402F41535B22C</ConnId>
+    <Extension>6915004</Extension>
+    <FechaLlamada>20200227</FechaLlamada>
+    <HoraLlamada>15:00:10</HoraLlamada>
+    <EnviarEmail>N</EnviarEmail>
+    <OficinaEmail>05209</OficinaEmail>
+    <EnviarSMS>N</EnviarSMS>
+    <ResultadoNivel2>4</ResultadoNivel2>
+    <DatosAdicionales></DatosAdicionales>
+    <Agente>1915010</Agente>
+</RequestDoAlta>

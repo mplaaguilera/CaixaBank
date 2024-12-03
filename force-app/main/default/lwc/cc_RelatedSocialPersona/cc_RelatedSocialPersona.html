@@ -1,0 +1,16 @@
+<template>
+        <lightning-card title="Persona Social" icon-name="standard:messaging_user">
+            <div class="slds-m-around_medium">
+                <template if:true={parameters.data}>
+                    <!--<template for:each={parameters.data} for:item="sp">-->
+                        <!--<p key={parameters.data.Id}>{parameters.data.Name}</p>-->
+                        <p key={parameters.data.Id}>Nombre: {parameters.data.RealName}</p>
+                        <lightning-button key={parameters.data.Id} variant="base" label={parameters.data.Name} title="Ver Persona Social" onclick={handleContactView} value={parameters.data.Id}></lightning-button>
+                    <!--</template>-->
+                </template >
+                <!--<template if:true={parameters.error}>
+                        <p>{parameters.error}></p>
+                </template >-->
+            </div>
+        </lightning-card>
+</template>

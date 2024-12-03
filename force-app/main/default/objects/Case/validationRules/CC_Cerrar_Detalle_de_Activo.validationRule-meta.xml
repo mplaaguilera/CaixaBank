@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Detalle_de_Activo</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(!$Permission.CC_ByPassVR, 
+				AND(
+        ISCHANGED(Status),
+        ISPICKVAL(Status,&quot;Cerrado&quot;),
+        ISPICKVAL(CC_Canal_Operativo__c,&quot;Cajero&quot;),
+        RecordType.DeveloperName = &quot;CC_Cliente&quot;,
+         AssetId = null))</errorConditionFormula>
+    <errorMessage>No se puede cerrar un caso con Canal operativo &apos;Cajero&apos; y no tener un Detalle de activo asociado</errorMessage>
+</ValidationRule>

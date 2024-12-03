@@ -1,0 +1,388 @@
+<aura:component controller="SAC_LCMP_HomeOficina"
+    implements="force:hasRecordId,lightning:actionOverride,lightning:hasPageReference,flexipage:availableForRecordHome,force:appHostable,flexipage:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute name="canalProcedencia" type="String" />
+    <aura:attribute name="canalEntrada" type="String" />
+    <aura:attribute name="canalRespuesta" type="String" />
+    <aura:attribute name="spinner" type="Boolean" default="true" />
+    <aura:attribute name="recordTypeRec" type="Id" />
+
+    <aura:attribute name="caseId" type="Id" />
+    <!--Reclamante-->
+    <aura:attribute name="contactoId" type="String" />
+    <aura:attribute name="cuentaId" type="String" />
+    <aura:attribute name="desdeOficina" type="Boolean" default="true" />
+    <!--Represenetante-->
+    <aura:attribute name="TipoDeRepresentante" type="String" />
+    <aura:attribute name="TipoDeDocumentoRepresentante" type="String" />
+    <aura:attribute name="NombreRepresentante" type="String" />
+    <aura:attribute name="EmailRepresentante" type="String" />
+    <aura:attribute name="DespachoRepresentante" type="String" />
+    <aura:attribute name="NumeroDelDocumentoRepresentante" type="String" />
+    <aura:attribute name="DireccionPostalRepresentante" type="String" />
+    <aura:attribute name="TelefonoRepresentante" type="String" />
+
+    <aura:attribute name="files" type="List" default="[]"/>
+
+
+    <aura:attribute name="viewForm" type="Boolean" default="false" />
+    <aura:attribute name="verRepresentante" type="Boolean" default="true" />
+    <aura:attribute name="step" type="string" default="step1" />
+    <aura:attribute name="mensajeError" type="string" default="" />
+    <aura:attribute name="errorStep" type="Boolean" default="false" />
+
+
+
+    <lightning:button variant="brand-outline" label="Nueva reclamación" title="Nueva reclamación" onclick="{!c.newCase}" />
+
+
+
+
+
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+
+
+
+
+
+
+  
+
+    <!-- Inicio PopUp-->
+    
+    <aura:If isTrue="{!v.viewForm}">
+
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        class="slds-modal slds-fade-in-open  slds-modal_medium">
+        <div class="slds-modal__container">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick="{!c.closeModal}">
+
+                <lightning:icon iconName="utility:close" size="small" variant="bare"/>
+
+                <span class="slds-assistive-text">Cancel and close</span>
+            </button>
+            <div class="slds-modal__header">
+                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Creación de reclamación</h1>
+                <p class="slds-m-top_x-small">Para llevar a cabo la creación de una reclamación complete los campos que
+                    el siguiente proceso guiado le irá solicitando.</p>
+            </div>
+            <!--Inicio alerta-->
+            <aura:If isTrue="{!v.errorStep}">
+            <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                <span class="slds-assistive-text">error</span>
+                <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                  
+                  <lightning:icon iconName="utility:error" size="small" class="iconoBlanco" />
+                </span>
+                <h2>{!v.mensajeError}</h2>
+              </div>
+            </aura:If>
+            <!--Fin alerta-->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="min-height: 50vh;">
+                                
+                
+                
+                
+                
+                <lightning:recordEditForm aura:id="formularioCaso" recordId="{!v.caseId}" objectApiName="Case" onload="{!c.load}"  onsuccess="{!c.success}" RecordTypeId="{!v.recordTypeRec}"
+                onerror="{!c.handleError}">
+                    <lightning:messages />
+                    <div class="{!v.step== 'step1' ? '' : 'slds-hide' }">
+
+                        <lightning:inputField fieldName="AccountId" value="{!v.cuentaId}" class="slds-hide" />
+                        <lightning:inputField fieldName="ContactId" value="{!v.contactoId}" class="slds-hide"  />
+                        <lightning:inputField fieldName="SAC_CreacionHomeOficina__c" value="{!v.desdeOficina}" class="slds-hide"  />
+                        
+
+                        <aura:If isTrue="{!or(v.cuentaId ==  null, v.contactoId ==  null)}">
+                            <c:SAC_BusquedaClienteOficina sObjectName="{!v.sObjectName}" contactoId="{!v.contactoId}"
+                                cuentaId="{!v.cuentaId}" />
+
+                                
+                            <aura:set attribute="else">
+                                <div class="slds-grid">
+                                    <div class="slds-col slds-size_1-of-2 slds-p-right_x-small">
+                                        <article class="slds-card">
+                                            <!--Cabecera de la card-->
+                                            <div class="slds-card__header slds-grid">
+                                                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                    <div class="slds-media__figure">
+                                                        <lightning:icon iconName="custom:custom64" size="small"
+                                                            class="cc_azul_cuenta" />
+                                                    </div>
+                                                    <div class="slds-media__body">
+                                                        <h2 class="slds-card__header-title">
+                                                            <span class="slds-card__header-link slds-truncate"
+                                                                style="font-size: 16px;">Datos del reclamante</span>
+                                                        </h2>
+                                                    </div>
+
+                                                    <div class="slds-no-flex"
+                                                        style="padding-top: 4px; padding-right: 1px;">
+                                                        <lightning:button label="Modificar Reclamante"
+                                                            onclick="{!c.eliminaCliente}" />
+                                                    </div>
+                                                </header>
+                                            </div>
+
+                                            <!--Cuerpo de la card-->
+                                            <div class="slds-card__body slds-card__body_inner"
+                                                style="position: relative;">
+                                                <!--Info Account-->
+                                                <!--density="comfy"-->
+                                                <lightning:recordViewForm recordId="{!v.cuentaId}" density="comfy"
+                                                    objectApiName="Account">
+                                                    <div class="slds-grid  slds-wrap">
+                                                        <div class="slds-col slds-size_1-of-1">
+                                                                                    
+                                                            <lightning:outputField fieldName="Name" />
+                                                            <lightning:outputField fieldName="CC_Numero_Documento__c" style="color:black;text-decoration:none;cursor:default"/>
+                                                            <lightning:outputField fieldName="Phone" />
+                                                            <lightning:outputField fieldName="PersonMobilePhone" />
+                                                            <lightning:outputField fieldName="PersonEmail" />
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-1">
+                                                            <lightning:outputField fieldName="CC_Nombre_Oficina__pc" />
+                                                            <lightning:outputField fieldName="CC_Numero_Oficina__pc" />
+                                                            <lightning:outputField fieldName="BillingAddress" />
+                                                        </div>
+                                                    </div>
+                                                </lightning:recordViewForm>
+                                                
+                                            </div>
+                                        </article>
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-2 slds-p-left_x-small">
+                                        <article class="slds-card">
+                                            <!--Cabecera de la card-->
+                                            <div class="slds-card__header slds-grid">
+                                                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                    <div class="slds-media__figure">
+                                                        <lightning:icon iconName="custom:custom64" size="small"
+                                                            class="cc_azul_cuenta" />
+                                                    </div>
+                                                    <div class="slds-media__body">
+                                                        <h2 class="slds-card__header-title">
+                                                            <span class="slds-card__header-link slds-truncate"
+                                                                style="font-size: 16px;">Datos del Contacto</span>
+                                                        </h2>
+                                                    </div>
+
+                                                    <div class="slds-no-flex"
+                                                        style="padding-top: 4px; padding-right: 1px;">
+                                                       <!-- <lightning:button label="Modificar Contacto"
+                                                            onclick="{!c.eliminaCliente}" /> -->
+                                                    </div>
+                                                </header>
+                                            </div>
+
+                                            <!--Cuerpo de la card-->
+                                            <div class="slds-card__body slds-card__body_inner"
+                                                style="position: relative;">
+                                                <!--Info Contacto-->
+                                                <lightning:recordViewForm recordId="{!v.contactoId}"
+                                                    objectApiName="Contact">
+                                                    <lightning:outputField fieldName="Name" />
+                                                    <div class="slds-grid">
+                                                        <div class="slds-col slds-size_1-of-2">
+
+                                                            <lightning:outputField fieldName="MailingAddress" />
+                                                            <lightning:outputField
+                                                                fieldName="FinServ__ShippingAddress__c" />
+                                                            <lightning:outputField
+                                                                fieldName="FinServ__MailingAddress__c" />
+                                                            <lightning:outputField fieldName="Phone" />
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-2">
+                                                            <lightning:outputField fieldName="CC_Nombre_Oficina__c" />
+                                                            <lightning:outputField fieldName="CC_OficinaGestoraId__c" />
+                                                            <lightning:outputField fieldName="CC_EmpleadoGestorId__c" />
+                                                            <lightning:outputField fieldName="CC_Numero_Oficina__c" />
+                                                        </div>
+                                                    </div>
+                                                </lightning:recordViewForm>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:If>
+
+
+
+
+
+                    </div>
+                    <div class="{!v.step== 'step2' ? '' : 'slds-hide' }">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-1">
+                                
+                                <lightning:input type="toggle"
+                                    label="La reclamación es realizada mediante un representante"
+                                    checked="{!v.verRepresentante}" />
+                                <div style="{! v.verRepresentante ? 'height: 10vh;' : '' }">
+
+                                </div>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="SAC_TipoDeRepresentante__c" value="{!v.TipoDeRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                                <lightning:inputField fieldName="SAC_TipoDeDocumento__c"  value="{!v.TipoDeDocumentoRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                                <lightning:inputField fieldName="SAC_NombreRepresentante__c" value="{!v.NombreRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                                <lightning:inputField fieldName="SAC_EmailRepresentante__c" value="{!v.EmailRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="SAC_DespachoRepresentante__c" value="{!v.DespachoRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                                <lightning:inputField fieldName="SAC_NumeroDelDocumento__c" value="{!v.NumeroDelDocumentoRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                           <!--    <lightning:inputField fieldName="SAC_DireccionPostal__c" value="{!v.DireccionPostalRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" /> --> 
+                                <lightning:inputField fieldName="SAC_TelefonoRepresentante__c" value="{!v.TelefonoRepresentante}"
+                                    class="{! v.verRepresentante ? '' : 'slds-hide' }" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="{!v.step== 'step3' ? '' : 'slds-hide' }">
+                        <!--<aura:If isTrue="{!v.step== 'step3'}">-->
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-1">
+                                <lightning:inputField fieldName="Subject" />
+                                <lightning:inputField fieldName="Description" class="cc_textarea_alto" />
+                                <lightning:inputField fieldName="CC_Idioma__c" required="true" />
+
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:inputField fieldName="Origin" value="SAC_FormularioOficina"  class="slds-hide"/>
+                               <!-- <lightning:inputField fieldName="CC_Canal_Procedencia__c" value="{!v.canalProcedencia}"/> -->
+                            </div>
+<!--
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:inputField fieldName="CC_Oficina_Afectada_Lookup__c" />
+                                <lightning:inputField fieldName="CC_Idioma__c" required="true" />
+                                    
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:inputField fieldName="CC_Tipo_Contacto__c" />
+                                <lightning:inputField fieldName="SAC_Naturaleza__c" value="SAC_004" />
+                                
+                            </div>
+                            -->
+                            <lightning:inputField fieldName="RecordTypeId" value="{!v.recordTypeRec}" class="slds-hide"/>
+                            <lightning:inputField fieldName="SAC_StatusAuxiliar__c" value="SAC_001"
+                                    class="slds-hide" />
+                            <!--</aura:If>-->
+                        </div>
+                    </div>
+                    <aura:If isTrue="{!v.step== 'step4'}">
+                        
+                                <h1>Aquí se informarán los datos asociados al producto...</h1>
+                                <h1>Pendiente construcción</h1>
+                            
+                    </aura:If>
+                    <aura:If isTrue="{!v.step== 'step5'}">
+                        <aura:If isTrue="{!or(v.caseId ==  null, v.caseId ==  '')}">
+                            <lightning:dynamicIcon type="ellie" alternativeText="Ellie intelligence"/>
+                            <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Cargando...</h1>
+
+                        
+                            <aura:set attribute="else">
+                                <lightning:fileUpload label="Ficheros asociados a la reclamación"
+                                    name="fileUploader"
+                                    multiple="true"
+                                    recordId="{!v.caseId}"
+                                    class="fileClass"
+                                    onuploadfinished="{!c.handleUploadFilesFinished}" />
+                                <ul class="slds-grid slds-wrap">
+                                    <aura:iteration items="{!v.files}" var="file">
+                                        <li class="slds-p-horizontal_xx-small slds-size_1-of-2 slds-medium-size_1-of-3">
+                                            <lightning:fileCard fileId="{!file.id}" description="{!file.label}"/>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+
+
+                            </aura:set>
+                        </aura:If>
+                        
+                    </aura:If>
+                </lightning:recordEditForm>
+                    <aura:If isTrue="{!v.step== 'step6'}">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_4-of-12">
+                            </div>
+                            <div class="slds-col slds-size_1-of-12">
+                                <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved"/>
+                            </div>
+                            <div class="slds-col slds-size_4-of-12">
+
+                                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">La reclamación ha sido guardada</h1>
+                                <h1>Detalle de la reclamación</h1>
+                                
+                            </div>
+                        </div>
+                        <div style="height: 50px;"/>
+                        <lightning:recordViewForm recordId="{!v.caseId}"
+                                objectApiName="Case">
+                                <div class="slds-grid  slds-wrap">
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning:outputField fieldName="AccountId" />
+                                        <lightning:outputField fieldName="CC_SuppliedNIF__c" />
+                                        <lightning:outputField fieldName="SAC_FechaRecepcion__c" />
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning:outputField fieldName="CaseNumber" />
+                                        <lightning:outputField fieldName="Status" />
+                                        <lightning:outputField fieldName="Origin" />
+                                    </div>
+
+                                    <div class="slds-col slds-size_1-of-1">
+                                        <div style="height: 50px;"/>
+                                        <lightning:outputField fieldName="Subject" />
+                                        <lightning:outputField fieldName="Description" />
+                                    </div>
+                                </div>
+                            </lightning:recordViewForm>
+                    </aura:If>
+
+            </div>
+            <!-- <div class="slds-modal__footer slds-modal__footer_directional">-->
+                
+            <div class="slds-modal__footer slds-grid slds-grid_align-spread">
+                
+
+
+
+
+                <lightning:button label="Cancelar" onclick="{!c.previusStep}" class="{!v.step== 'step1' ? '' : 'slds-hide' }"/>
+                <lightning:button label="Paso previo" onclick="{!c.previusStep}" class="{!v.step== 'step1' ? 'slds-hide' : '' }" disabled="{!v.step== 'step6'}"/>
+
+                <lightning:progressIndicator currentStep="{!v.step}" hasError="{!v.errorStep}">
+                    <lightning:progressStep label="Informar datos reclamante" value="step1" />
+                 <!--   <lightning:progressStep label="Informar datos representante" value="step2" /> -->
+                    <lightning:progressStep label="Datos de la reclamación" value="step3" />
+                   <!-- <lightning:progressStep label="Productos afectados" value="step4" /> -->
+                    <lightning:progressStep label="Adjuntar archivos" value="step5" />
+                    <lightning:progressStep label="Fin" value="step6" />
+                </lightning:progressIndicator>
+                <lightning:button label="Confirmar y Siguiente" variant="brand" onclick="{!c.nextStep}"  class="{!v.step== 'step6' ? 'slds-hide' : '' }"/>
+                <lightning:button label="Finalizar" variant="brand" onclick="{!c.closeModal}" class="{!v.step== 'step6' ? '' : 'slds-hide' }"/>
+
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </aura:If>
+</aura:component>

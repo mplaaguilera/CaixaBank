@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agrupacion_Motivo__c</fullName>
+    <label>Agrupación Motivo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CALIDAD</fullName>
+                <default>false</default>
+                <label>CALIDAD</label>
+            </value>
+            <value>
+                <fullName>COMISIONES Y GASTOS</fullName>
+                <default>false</default>
+                <label>COMISIONES Y GASTOS</label>
+            </value>
+            <value>
+                <fullName>CONFIGURACIÓN PERSONAL</fullName>
+                <default>false</default>
+                <label>CONFIGURACIÓN PERSONAL</label>
+            </value>
+            <value>
+                <fullName>DESACUERDOS, DEMORAS, DENEGACIONES, BLOQUEOS, ATRACO Y FRAUDE</fullName>
+                <default>false</default>
+                <label>DESACUERDOS, DEMORAS, DENEGACIONES, BLOQUEOS, ATRACO Y FRAUDE</label>
+            </value>
+            <value>
+                <fullName>ESTADOS LOGÍSTICOS</fullName>
+                <default>false</default>
+                <label>ESTADOS LOGÍSTICOS</label>
+            </value>
+            <value>
+                <fullName>GESTIÓN DE CONTRATOS: ALTAS, BAJAS Y OTRAS GESTIONES/ CLÁUSULAS CONTRACTUALES/ TITULARIDADES</fullName>
+                <default>false</default>
+                <label>GESTIÓN DE CONTRATOS: ALTAS, BAJAS Y OTRAS GESTIONES/ CLÁUSULAS CONTRACTUALES/ TITULARIDADES</label>
+            </value>
+            <value>
+                <fullName>IDENTIFICACIÓN, FIRMA DE OPERATIVA, OTP, SOLICITUD DE BLOQUEO, LÍMITES</fullName>
+                <default>false</default>
+                <label>IDENTIFICACIÓN, FIRMA DE OPERATIVA, OTP, SOLICITUD DE BLOQUEO, LÍMITES</label>
+            </value>
+            <value>
+                <fullName>INFORMACIÓN GENERAL</fullName>
+                <default>false</default>
+                <label>INFORMACIÓN GENERAL</label>
+            </value>
+            <value>
+                <fullName>INTERESES</fullName>
+                <default>false</default>
+                <label>INTERESES</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: ABONO/ AMPLIACIÓN DE CAPITAL/ APORTACIÓN/ CANJE/ VENTA/ TRASPASO</fullName>
+                <default>false</default>
+                <label>OPERATIVA: ABONO/ AMPLIACIÓN DE CAPITAL/ APORTACIÓN/ CANJE/ VENTA/ TRASPASO</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: ACCIONISTAS</fullName>
+                <default>false</default>
+                <label>OPERATIVA: ACCIONISTAS</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: DESCARGA/ ACCESO/ ACTIVACIÓN/ ENVÍO/ DOMICILIACIÓN/ GESTIÓN</fullName>
+                <default>false</default>
+                <label>OPERATIVA: DESCARGA/ ACCESO/ ACTIVACIÓN/ ENVÍO/ DOMICILIACIÓN/ GESTIÓN</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: EXTRACTO/ APUNTES/ MOVIMIENTOS/ LIQUIDACIONES</fullName>
+                <default>false</default>
+                <label>OPERATIVA: EXTRACTO/ APUNTES/ MOVIMIENTOS/ LIQUIDACIONES</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: INVERSIÓN</fullName>
+                <default>false</default>
+                <label>OPERATIVA: INVERSIÓN</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: PAGO/ REINTEGRO/ AMORTIZACIÓN/ COMPRA</fullName>
+                <default>false</default>
+                <label>OPERATIVA: PAGO/ REINTEGRO/ AMORTIZACIÓN/ COMPRA</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: RIESGO</fullName>
+                <default>false</default>
+                <label>OPERATIVA: RIESGO</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA: SEGUROS</fullName>
+                <default>false</default>
+                <label>OPERATIVA: SEGUROS</label>
+            </value>
+            <value>
+                <fullName>PETICIÓN DE DOCUMENTACIÓN</fullName>
+                <default>false</default>
+                <label>PETICIÓN DE DOCUMENTACIÓN</label>
+            </value>
+            <value>
+                <fullName>RRSS</fullName>
+                <default>false</default>
+                <label>RRSS</label>
+            </value>
+            <value>
+                <fullName>TEMAS TÉCNICOS - INSTALACIONES</fullName>
+                <default>false</default>
+                <label>TEMAS TÉCNICOS - INSTALACIONES</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

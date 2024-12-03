@@ -1,0 +1,158 @@
+<template>
+    <!-- <div data-id="lookup2" class="filters_row_1 slds-border_top slds-grid slds-wrap divPadding"> -->
+    <div data-id="lookup2" if:true={renderComponent}
+        class="filters_row_1 slds-grid slds-wrap slds-border_top divPadding">
+
+        <lightning-input class="slds-size_1-of-4" type="text" name="subject" label="Asunto"
+            onchange={handleChangeSubject}></lightning-input>
+
+        <lightning-combobox class="slds-size_1-of-4" name="recordTypes" label="Preconcedido"
+            options={optionsPreconcedido} placeholder="--Seleccionar--" onchange={handleChangePreconcedido}
+            value={preconcedidoFilter}>
+        </lightning-combobox>
+
+        <lightning-combobox class="slds-size_1-of-4" name="status" label="MyBox" options={optionsYesOrNo}
+            placeholder="--Seleccionar--" onchange={handleChangeMyBox} value={myBoxFilter}>
+        </lightning-combobox>
+
+        <lightning-combobox class="slds-size_1-of-4" name="owner" label="Target Auto" options={optionsYesOrNo}
+            value={targetAutoFilter} placeholder="--Seleccionar--" onchange={handleChangeTargetAuto}>
+        </lightning-combobox>
+
+    </div>
+    <div class="buttonAlign slds-border_top">
+        <lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
+        <lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={handleSearchData}
+            disabled={buttonDisabled}></lightning-button>
+    </div>
+    <!-- </div> -->
+
+    <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium"
+        class="spin-cls"></lightning-spinner>
+
+    <table class="slds-table slds-table_bordered">
+        <thead>
+            <tr class="slds-line-height_reset">
+                <th scope="col">
+                    <div class="slds-truncate" title="">Cliente</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Origen</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Asunto</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Más información 1</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Más información 2</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Estado</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Fecha de vencimiento</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Negocio</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Edad</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Ahorro e Inversión</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Financiación</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Ingresos</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Preconcedido</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Mybox</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="">Target Auto</div>
+                </th>
+                <!-- <th scope="col"> -->
+                <th if:true={isBpr} scope="col">
+                    <div class="slds-truncate" title="">Grupo</div>
+                </th>
+                <!-- <th scope="col"> -->
+                <th if:true={isBpr} scope="col">
+                    <div class="slds-truncate" title="">Interlocutor</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <template if:true={dataClient}>
+                <template for:each={productArray} for:item="client">
+                    <tr key={client.name} class="slds-hint-parent">
+                        <td data-label="Name" class={client.colour} rowspan={client.rowspan}>
+                            <div class="align-icon">
+                                <lightning-icon if:true={client.showIcon} class="size-icon" size="xx-small"
+                                    icon-name="action:priority" alternative-text="Approved"
+                                    title="Approved"></lightning-icon><a name={client.name}
+                                    onclick={redirectToClient}>{client.name} ({client.taskNumber})</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <template for:each={client.products} for:item="product">
+                        <tr key={product.assetName}>
+                            <td key={product.origen} data-label="client" class={client.colour}>{product.origen}</td>
+                            <td key={product.subject} data-label="client" class={client.colour}>
+                                <a name={product.taskId} onclick={redirectToTask}>{product.subject}</a>
+                            </td>
+                            <td key={product.subject} data-label="client" class={client.colour}>
+                                {product.value1}
+                            </td>
+                            <td key={product.subject} data-label="client" class={client.colour}>
+                                {product.value2}
+                            </td>
+                            <td key={product.status} data-label="client" class={client.colour}>{product.status}</td>
+                            <td key={product.expirationDate} class={client.colour} data-label="client"
+                                style="align-center">
+                                {product.expirationDate}
+                            </td>
+                            <td key={product.business} data-label="client" class={client.colour}>
+                                {product.business}
+                            </td>
+                            <td key={product.age} class={client.colour} data-label="client" style="align-center">
+                                {product.age}
+                            </td>
+                            <td key={product.savingsAndInvestment} class={client.colour} data-label="client"
+                                style="align-right">
+                                {product.savingsAndInvestment}
+                            </td>
+                            <td key={product.financing} class={client.colour} data-label="client" style="align-right">
+                                {product.financing}
+                            </td>
+                            <td key={product.income} class={client.colour} data-label="client" style="align-right">
+                                {product.income}
+                            </td>
+                            <td key={product.preApproved} class={client.colour} data-label="client" style="align-right">
+                                {product.preApproved}
+                            </td>
+                            <td key={product.myBox} class={client.colour} data-label="client" style="align-center">
+                                {product.mybox}
+                            </td>
+                            <td key={product.targetAuto} class={client.colour} data-label="client" style="align-center">
+                                {product.targetAuto}
+                            </td>
+                            <td if:true={isBpr} key={product.groupField} class={client.colour} data-label="client" style="align-center">
+                                {product.groupField}
+                            </td>
+                            <td if:true={isBpr} key={product.interloc} class={client.colour} data-label="client" style="align-center">
+                                {product.interloc}
+                            </td>
+                        </tr>
+                    </template>
+                </template>
+            </template>
+        </tbody>
+    </table>
+</template>

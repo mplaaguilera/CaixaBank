@@ -1,0 +1,104 @@
+<!--
+  @description       : 
+  @author            : Jennifer Aguilera
+  @group             : 
+  @last modified on  : 04-01-2021
+  @last modified by  : Jennifer Aguilera
+  Modifications Log 
+  Ver   Date         Author              Modification
+  1.0   03-29-2021   Jennifer Aguilera   Initial Version
+  1.1   21/20/2021   Esteve Llaó         traducciones
+  1.2   09/12/2022   Esteve llaó         Modificación upload
+-->
+<template>
+    <lightning-card title="Adjuntos">
+        <lightning-button icon-name="utility:new" slot="actions" label="Nuevo" onclick={newFileUpload} variant="brand outline" disabled={cerrado} title="Crear un nuevo archivo"></lightning-button>
+        <lightning-button icon-name="utility:download" slot="actions" label="Descargar" onclick={downloadFile} variant="brand outline" class="slds-float_right slds-var-m-left_small"></lightning-button>
+        <lightning-button icon-name="utility:delete" slot="actions" label="Borrar" onclick={deleteFiles} variant="brand outline" class="slds-float_right slds-var-m-left_small" disabled={cerrado}></lightning-button>
+        <c-file-data-table
+          columns={columns}
+          key-field="latestVersionId"
+          data={files}
+          onrowaction={handleRowAction}
+          data-tablename="filestable"
+          onsave={handleSave}
+          draft-values={draftValues}
+          resizable-columns="true"
+          onresize={handleColumnResize}
+        ></c-file-data-table>
+      </lightning-card>
+      <c-dialog title={title} class="dialog" contentdata={uploadedFileData} mostrarcampos={showAttachFields} adjuntosubido ={attachmentReady} onsendvaluesevent ={handleSendValuesEvent}>
+        <span slot="body">
+          <!--<template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+          </template>-->
+          <template if:false={fileUpload}>
+            <c-file-data-table key-field="id" data={versionDetails} columns={versionColumns} data-tablename="versiontable"></c-file-data-table>
+          </template>
+          <template if:true={fileUpload}>
+            <lightning-layout multiple-rows="true" horizontal-align="end">
+                <lightning-layout-item size="12" padding="around-small">
+                    <!--<input type="file" name="file" class="file" onchange={handleFileChange} />--> 
+                  <template if:false={desactivarUpload}>
+                    <lightning-file-upload
+                          label="Adjuntar archivo"
+                          name="fileUploader"
+                          record-id={recordId}
+                          onuploadfinished={handleUploadFinished}>
+                    </lightning-file-upload>
+                  </template>
+                </lightning-layout-item>
+                <template if:true={mostrarCampos}>
+                  <lightning-layout-item size="12" padding="around-small">
+                    <lightning-input
+                      type="text"
+                      class="title"
+                      label="Título"
+                      placeholder={fileName}
+                      value={fileTitle}
+                      onchange={handleFileNameChange}
+                      required name="Título"
+                      ></lightning-input>
+                      <br/>
+                      <lightning-input
+                      type="text"
+                      class="description"
+                      label="Descripción"
+                      placeholder={fileDescription}
+                      value={fileDescr}
+                      onchange={handleFileDescriptionChange}
+                      ></lightning-input>
+                      <br/>
+                      <lightning-input
+                      type="checkbox"
+                      class="firmado"
+                      label="Firmado"
+                      placeholder={fileFirmado}
+                      value={fileFirm}
+                      onchange={handleFileFirmadoChange}
+                      ></lightning-input>
+                      <br/>
+                      <lightning-input
+                      type="text"
+                      class="gdd"
+                      label="GDD"
+                      placeholder={fileGDDPlace}
+                      value={fileGDD}
+                      onchange={handleFileGDDChange}
+                      ></lightning-input>
+                  </lightning-layout-item>
+                </template>
+                <template if:false={newFile}>
+                    <lightning-layout-item size="12" padding="around-small">
+                        <lightning-input type="text" class="reason" label="Razón para el Cambio:"></lightning-input>
+                    </lightning-layout-item>
+                </template>
+                <lightning-layout-item size="12" padding="around-small">
+                    <span><lightning-button onclick={closeModal} label="Cancelar" variant="brand outline" class="slds-float_right"></lightning-button></span>
+                    <span><lightning-button icon-name="utility:file" onclick={handleUpload} label="Adjuntar" variant="brand" class="slds-float_right" disabled={accionesDisabled}></lightning-button></span>
+                </lightning-layout-item>
+            </lightning-layout>
+          </template>
+        </span>
+      </c-dialog>
+</template>

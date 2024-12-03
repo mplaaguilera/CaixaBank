@@ -1,0 +1,1006 @@
+<template>
+    <div class="slds-grid slds-grid_vertical slds-gutters_direct-xxx-small" style="padding-left: 10px; -padding-right: 10px;">
+        <div class="slds-col cabecera slds-page-header">
+            <div class="slds-grid slds-grid slds-gutters_xx-small">
+                <div class="slds-col">
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <!--Buscador-->
+                            <div class="slds-combobox-group">
+                                <!--Tipo de búsqueda-->
+                                <div class="slds-combobox_object-switcher slds-combobox-addon_start menuTipoBusqueda">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-combobox_container slds-has-icon-only">
+                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none" title={tipoBusquedaSeleccionada.nombre}>
+                                                        <span class="slds-icon_container slds-input__icon slds-input__icon_left">
+                                                            <lightning-icon icon-name={tipoBusquedaSeleccionada.iconName} size="xx-small"></lightning-icon>
+                                                        </span>
+                                                        <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" aria-expanded="true" aria-haspopup="listbox" autocomplete="off" role="combobox" placeholder="" value="Grupos operativos" onclick={tipoBusquedaClick} onblur={tipoBusquedaBlur} />
+                                                        <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                                            <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                                        </span>
+                                                    </div>
+                                                    <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_x-small slds-dropdown_left tipoBusqueda slds-hide" role="listbox">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <li role="presentation" class="slds-listbox__item">
+                                                                <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-is-selected tipoBusquedaGruposOperativos" role="option" onmousedown={seleccionarTipoBusqueda}>
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <span class="slds-icon_container slds-current-color">
+                                                                            <lightning-icon icon-name="utility:people" size="x-small"></lightning-icon>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-truncate">Grupos operativos</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                            <!--
+                                                            <li role="presentation" class="slds-listbox__item">
+                                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small tipoBusquedaListadosCasos" role="option" onmousedown={seleccionarTipoBusqueda}>
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <span class="slds-icon_container slds-current-color">
+                                                                            <lightning-icon icon-name="utility:case" size="x-small"></lightning-icon>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-truncate">Listados de casos</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                            -->
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Campo de búsqueda-->
+                                <div class="slds-combobox_container slds-combobox-addon_end slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none" onkeydown={inputBuscarTeclaPulsada}>
+                                            <!--Sin resultado seleccionado-->
+                                            <lightning-input
+                                                class="inputBuscarGrupo"
+                                                type="search"
+                                                placeholder="Selecciona una opción..."
+                                                variant="label-hidden"
+                                                onchange={inputBuscarChange}
+                                                onmousedown={inputBuscarMousedown}
+                                            > <!--placeholder={tipoBusquedaSeleccionada.inputPlaceholder}-->
+                                            </lightning-input>
+                                            <span class="inputBuscarGrupoIconoDropdown slds-icon_container slds-input__icon slds-input__icon_right">
+                                                <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                            </span>
+                                            <!-- No es necesario mientras no se habilite el tipo de bísqueda "Listados de casos"
+                                            <div if:false={mostrarInputBuscador} onclick={resultadoSeleccionadoClick}>
+                                                <!-!-Con resultado seleccionado-!->
+                                                <span class="slds-icon_container slds-combobox__input-entity-icon" style="padding-left: 4px;">
+                                                    <lightning-icon icon-name={tipoBusquedaSeleccionada.iconNameResultado} size="x-small"></lightning-icon>
+                                                </span>
+                                                <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox" style="padding-left: 35px;">
+                                                    <span lwc:if={tipoBusquedaSeleccionadaEsListviews} class="slds-truncate">{listadoSeleccionado.nombre}</span>
+                                                </button>
+                                                <span style="position: absolute;" class="slds-icon_container slds-input__icon slds-input__icon_right">
+                                                    <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                                </span>
+                                            </div>
+                                            -->
+                                        </div>
+                                        <!--Resultados-->
+                                        <div class="resultadosBuscador" role="listbox" onmousedown={eventStopPropagation}>
+                                            <!--Opciones de resultados-->
+                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                <!-- <div if:false={tipoBusquedaSeleccionadaEsListviews}> -->
+                                                <li role="presentation" class="slds-listbox__item" style="padding-top: 2px;">
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="presentation">
+                                                        <h3 class="slds-listbox__option-header" role="presentation">Mis casos</h3>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Mis casos" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Mis casos</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Mis casos activos" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Mis casos activos</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Mis casos cerrados" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Mis casos cerrados</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Mis casos pendientes" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Mis casos pendientes</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Mis casos planificados" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Mis casos planificados</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Casos activos de mis grupos" onclick={seleccionarResultado}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning-icon icon-name="standard:people" size="small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity">Casos activos de mis grupos</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                                <li role="presentation" class="slds-listbox__item" style="padding-top: 9px;">
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="presentation">
+                                                        <h3 class="slds-listbox__option-header" role="presentation">Grupos operativos</h3>
+                                                    </div>
+                                                </li>
+                                                <!-- </div> -->
+                                                <template for:each={resultadosBusqueda} for:item="resultado">
+                                                    <div key={resultado.Id}>
+                                                        <!-- No es necesario mientras no se habilite el tipo de bísqueda "Listados de casos"
+                                                        <div lwc:if={tipoBusquedaSeleccionadaEsListviews}>
+                                                            <li role="presentation" class="slds-listbox__item" onclick={mostrarCasosMisGrupos}>
+                                                                <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <lightning-icon icon-name={tipoBusquedaSeleccionada.iconNameResultado} size="small"></lightning-icon>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-listbox__option-text_entity">{resultado.Name}</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </div>
+                                                        -->
+                                                        <!-- <div lwc:else> -->
+                                                        <li role="presentation" class="slds-listbox__item" data-tipobusqueda="Casos de los grupos seleccionados" data-id={resultado.Id} data-nombre={resultado.Name} onclick={seleccionarResultado}>
+                                                            <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" aria-disabled={resultado.disabled} title={resultado.title}>
+                                                                <span class="slds-media__figure slds-listbox__option-icon">
+                                                                    <lightning-icon icon-name={resultado.iconName} size="small" class={resultado.iconClass}></lightning-icon>
+                                                                </span>
+                                                                <span class="slds-media__body" style={resultado.mediaBodyStyle}>
+                                                                    <span class="slds-listbox__option-text_entity" style="font-weight: bold;">{resultado.Name}</span>
+                                                                    <span class="slds-listbox__option-meta slds-truncate">
+                                                                        <span lwc:if={resultado.SEG_Organizacion__c}>
+                                                                            <lightning-icon icon-name="utility:company" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px;"></lightning-icon>
+                                                                            {resultado.SEG_Organizacion__c}
+                                                                        </span>
+                                                                        <span lwc:if={resultado.mostrarSeparador} style="font-weight: 700; padding: 0px 7px 0px 7px;">•</span>
+                                                                        <span lwc:if={resultado.SEG_Zona__c}>
+                                                                            <lightning-icon icon-name="utility:checkin" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px; opacity: 0.84;"></lightning-icon>
+                                                                            {resultado.SEG_Zona__c}
+                                                                        </span>
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                        <!-- </div> -->
+                                                    </div>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <!--Panel de confirmación para salir de una búsqueda de grupos-->
+                                        <div class="confirmacionDeseleccionarGrupos" role="listbox" onmousedown={eventStopPropagation}>
+                                            <section class="slds-popover slds-popover_full-width" role="dialog">
+                                                <div class="slds-popover__body slds-popover__body_small">
+                                                    <div class="slds-media">
+                                                        <div class="slds-media__body slds-text-align_center" style="padding-top: 10px; padding-bottom: 10px;">
+                                                            <div>Se deseleccionarán los {gruposSeleccionados.grupos.length} grupos operativos actuales. ¿Quieres continuar?</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <footer class="slds-popover__footer slds-popover__footer_form" onkeydown={confirmacionDeseleccionarGruposKeyDown}>
+                                                    <lightning-button class="confirmacionDeseleccionarGruposCancelar" label="Cancelar" onclick={confirmacionDeseleccionarGruposCancelar}></lightning-button>
+                                                    <lightning-button label="Continuar" variant="brand" onclick={confirmacionDeseleccionarGruposContinuar} class="confirmacionDeseleccionarGruposContinuar slds-var-m-left_small"></lightning-button>
+                                                </footer>
+                                            </section>
+                                        </div>
+                                        <!--Grupos, zonas y filtros seleccionados-->
+                                        <div class="slds-listbox_selection-group slds-is-expanded divPills">
+                                            <ul class="slds-listbox slds-listbox_horizontal" role="listbox" aria-orientation="horizontal">
+                                                <template for:each={gruposSeleccionados.grupos} for:item="grupoSeleccionado">
+                                                    <li class="slds-listbox-item" role="presentation" key={grupoSeleccionado.Id} style="padding-bottom: 2px;">
+                                                        <span class="slds-pill pillBuscador" role="option" tabindex="0" aria-selected="true" style="padding-left: 3px;">
+                                                            <span class="slds-icon_container slds-pill__icon_container">
+                                                                <lightning-icon icon-name={tipoBusquedaSeleccionada.iconNameResultado} size="x-small"></lightning-icon>
+                                                            </span>
+                                                            <span class="slds-pill__label pillLabel">{grupoSeleccionado.Name}</span>
+                                                            <span class="slds-icon_container slds-pill__remove slds-is-relative" title="Eliminar" onclick={deseleccionarGrupo} data-idgrupo={grupoSeleccionado.Id} style="top: 0.5px">
+                                                                <lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+                                                            </span>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <template for:each={zonasFiltradas} for:item="zona">
+                                                    <li class="slds-listbox-item" role="presentation" key={zona.name} style="padding-bottom: 2px;">
+                                                        <span class="slds-pill pillBuscador" role="option" tabindex="0" aria-selected="true" style="padding-left: 3px;">
+                                                            <span class="slds-icon_container slds-pill__icon_container">
+                                                                <lightning-icon class="iconoZonaSeleccionada" icon-name="custom:custom106" size="x-small"></lightning-icon>
+                                                            </span>
+                                                            <span class="slds-pill__label pillLabel">{zona.label}</span>
+                                                            <span class="slds-icon_container slds-pill__remove slds-is-relative" title="Eliminar" onclick={deseleccionarZona} data-zona={zona.name} style="top: 0.5px">
+                                                                <lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+                                                            </span>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <template for:each={filtros} for:item="filtro">
+                                                    <li class="slds-listbox-item" role="presentation" key={filtro.id} style="padding-bottom: 2px;">
+                                                        <span class="slds-pill pillBuscador" role="option" tabindex="0" aria-selected="true" title={filtro.title} style="padding-left: 3px;">
+                                                            <span class="slds-icon_container slds-pill__icon_container">
+                                                                <lightning-icon class="iconoFiltroSeleccionado" icon-name="standard:filter" size="x-small"></lightning-icon>
+                                                            </span>
+                                                            <span class="slds-pill__label pillLabel" style="max-width: 200px;">
+                                                                {filtro.nombre}&nbsp;<span class="slds-text-color_weak">{filtro.operador}</span>&nbsp;<i>"{filtro.valor}"</i>
+                                                            </span>
+                                                            <span class="slds-icon_container slds-pill__remove slds-is-relative" title="Eliminar" onclick={deseleccionarFiltro} data-filtro-id={filtro.id} style="top: 0.5px">
+                                                                <lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+                                                            </span>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <li lwc:if={logicaFiltro} class="slds-listbox-item" role="presentation" style="padding-bottom: 2px;">
+                                                    <span class="slds-pill pillBuscador" role="option" tabindex="0" aria-selected="true" style="padding-left: 3px;" onmouseenter={pillLogicaFiltroOnmouseenter} onmouseleave={pillLogicaFiltroOnmouseleave}>
+                                                        <span class="slds-icon_container slds-pill__icon_container">
+                                                            <lightning-icon class="iconoLogicaFiltroSeleccionada" icon-name="standard:cms" size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <span class="slds-pill__label pillLabel">Lógica de filtro</span>
+                                                        <span class="slds-icon_container slds-pill__remove slds-is-relative" title="Eliminar" onclick={deseleccionarLogicaFiltro} style="top: 0.5px">
+                                                            <lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <section class="popoverPillLogicaFiltro slds-popover slds-nubbin_top" role="dialog">
+                                                            <div class="slds-popover__body">
+                                                                <p>{logicaFiltro}</p>
+                                                            </div>
+                                                        </section>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-grow-none" style="min-width: 240px;">
+                    <!--Selector de zona-->
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click comboboxZonas" onclick={eventStopPropagation}>
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left slds-input-has-icon_right" role="none">
+                                        <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="true" aria-haspopup="listbox" onclick={comboboxZonasAbrirCerrar}>
+                                            <span class="slds-text-color_weak slds-truncate">{mensajeNumeroZonasSeleccionadas}</span>
+                                        </button>
+                                        <span class="slds-icon_container slds-input__icon slds-input__icon_left" style="top: 11px; left: 10px">
+                                            <lightning-icon class="iconoZonaCombobox" icon-name="custom:custom106" size="small"></lightning-icon>
+                                        </span>
+                                    </div>
+                                    <div class="menuZonas slds-dropdown slds-dropdown_length-10" role="dialog">
+                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                            <li role="presentation" class="slds-listbox__item" onclick={verTodasLasZonas}>
+                                                <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <span if:false={zonasSeleccionadas.length} class="slds-icon_container slds-icon-utility-check slds-current-color">
+                                                            <lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+                                                        </span>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-truncate">Todas</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                            <lightning-menu-divider></lightning-menu-divider>
+                                            <template for:each={zonas} for:item="zona">
+                                                <li key={zona.name} role="presentation" class="slds-listbox__item" data-zona={zona.name} onclick={zonaOnClick}>
+                                                    <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <span lwc:if={zona.seleccionada} class="slds-icon_container slds-icon-utility-check slds-current-color">
+                                                                <lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+                                                            </span>
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-truncate">{zona.label}</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-grow-none slds-shrink-none">
+                    <!--Menú de favoritos-->
+                    <lightning-button-group>
+                        <button class={favoritoSeleccionadoAtributos.botonFavoritoClases} onclick={botonFavoritoClick} disabled={botonFavoritosDisabled} onmouseenter={animarBotonFavoritoInicio}>
+                            <lightning-icon class={botonFavoritoIconClases} icon-name="utility:favorite" size="x-small" variant={favoritoSeleccionadoAtributos.botonFavoritoIconoVariant}></lightning-icon>
+                            <span class="botonFavoritoTexto slds-truncate" title={favoritoSeleccionadoAtributos.favoritoSeleccionadoNombre}>{favoritoSeleccionadoAtributos.favoritoSeleccionadoNombre}</span>
+                        </button>
+                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open slds-button_last">
+                            <button class="botonMenuFavoritos slds-button slds-button_icon slds-button_icon-border-filled botonMenuFavoritosDisabled" aria-haspopup="true" aria-expanded="true" onclick={menuFavoritosAbrir}>
+                                <lightning-icon class="botonMenuFavoritosIcon" icon-name="utility:down" size="xx-small"></lightning-icon>
+                            </button>
+                            <div lwc:if={mostrarMenuFavoritos} class="slds-dropdown slds-dropdown_right">
+                                <ul role="menu" onclick={eventStopPropagation}>
+                                    <template for:each={favoritos} for:item="favorito">
+                                        <li key={favorito.nombre} class="slds-dropdown__item" role="presentation" style="white-space: nowrap; line-height: 1.5;" onclick={menuFavoritoClick} data-nombre-favorito={favorito.nombre}>
+                                            <a style="justify-content: initial;">
+                                                <span class={favorito.clasesIndicadorColorMenu}></span>
+                                                <span style="padding-right: 8px;">{favorito.nombre}</span>
+                                            </a>
+                                        </li>
+                                    </template>
+                                    <li class="slds-has-divider_top-space" role="separator"></li>
+                                    <li class="slds-dropdown__item" role="presentation">
+                                        <a href="#" role="menuitem" tabindex="0" onclick={clonarFavorito}>
+                                            <span class="slds-truncate">
+                                                <lightning-icon icon-name="utility:relate" size="xx-small" style="position: relative; top: -2px; margin-right: 8px;"></lightning-icon>
+                                                Clonar favorito...
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li class="slds-dropdown__item" role="presentation">
+                                        <a href="#" role="menuitem" tabindex="0" onclick={modalEditarFavoritosAbrir}>
+                                            <span class="slds-truncate">
+                                                <lightning-icon icon-name="utility:edit" size="xx-small" style="position: relative; top: -2px; margin-right: 8px;"></lightning-icon>
+                                                Editar...
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </lightning-button-group>
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <!--Menú de opciones-->
+                    <lightning-button-menu variant="border-filled" icon-name="utility:settings" menu-alignment="right" onclick={menuSettingsOnclick} onselect={menuSettingsOnselect}>
+                        <lightning-menu-subheader label="Datos"></lightning-menu-subheader>
+                        <lightning-menu-item value="refrescarDatos" label="Actualizar lista de grupos operativos" icon-name="utility:refresh"></lightning-menu-item>
+                        <lightning-menu-divider></lightning-menu-divider>
+                        <lightning-menu-subheader label="Personalización"></lightning-menu-subheader>
+                        <lightning-menu-item value="guardarPersonalizacion" label="Guardar personalización actual" icon-name="utility:builder"></lightning-menu-item>
+                        <lightning-menu-item value="cargarPersonalizacion" label="Restablecer personalización guardada" icon-name="utility:kanban"></lightning-menu-item>
+                        <lightning-menu-item value="restablecerPersonalizacionPorDefecto" label="Restablecer personalización por defecto" icon-name="utility:component_customization"></lightning-menu-item>
+                        <lightning-menu-divider></lightning-menu-divider>
+                        <lightning-menu-subheader label="Favoritos"></lightning-menu-subheader>
+                        <lightning-menu-item value="importarFavoritos" label="Importar" icon-name="utility:download"></lightning-menu-item>
+                        <lightning-menu-item value="exportarFavoritos" label="Exportar" icon-name="utility:upload"></lightning-menu-item>
+                        <lightning-menu-item value="eliminarFavoritos" label="Eliminar todos" icon-name="utility:delete"></lightning-menu-item>
+                        <!--
+                        <lightning-menu-divider></lightning-menu-divider>
+                        <lightning-menu-subheader label="Desarrollo"></lightning-menu-subheader>
+                        <lightning-menu-item value="log" label="log" icon-name="utility:bug"></lightning-menu-item>
+                        -->
+                    </lightning-button-menu>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col" style="padding-top: 13px; overflow: hidden;">
+            <div>
+                <!-- <div if:false={tipoBusquedaSeleccionadaEsListviews}> -->
+                <!--Listado de casos (tipo de búsqueda "Grupos operativos")-->
+                <article class="slds-card">
+                    <div class="slds-page-header pageHeaderBorderBottom">
+                        <div class="slds-page-header__row">
+                            <div class="slds-page-header__col-title">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure slds-is-relative" style="top: 2px;">
+                                        <lightning-icon icon-name="standard:case"></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-page-header__name">
+                                            <div class="slds-page-header__name-title">
+                                                <h1>
+                                                    <span>Casos</span>
+                                                    <span class="slds-page-header__title slds-truncate">{tipoBusquedaGetCasosGruposOperativos}</span>
+                                                </h1>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-page-header__controls">
+                                <div class="slds-page-header__control">
+                                    <lightning-button-group>
+                                        <lightning-button label="Nuevo caso" onclick={botonCrearNuevoCaso}></lightning-button>
+                                        <lightning-button label="Tomar propiedad" onclick={tomarPropiedad} disabled={accionesDisabled}></lightning-button>
+                                        <lightning-button label="Cerrar casos" onclick={cerrarCasos} disabled={accionesDisabled}></lightning-button>
+                                        <template lwc:if={usuarioEsSupervisor}>
+                                            <lightning-button label="Cambiar propietario" onclick={botonCambiarPropietarioOnClick} disabled={accionesDisabled}></lightning-button>
+                                            <lightning-button label="Rechazar" onclick={rechazarMasivo} disabled={accionesDisabled}></lightning-button>
+                                            <lightning-button label="Cambiar grupo" onclick={botonCambiarGrupoOnClick} disabled={accionesDisabled}></lightning-button>
+                                        </template>
+                                    </lightning-button-group>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-page-header__row">
+                            <div class="slds-page-header__col-meta">
+                                <div class="slds-grid slds-grid_align-spread slds-is-relative" style="top: 1px;">
+                                    <div class="slds-col">
+                                        <p class="slds-page-header__meta-text slds-text-body_small slds-var-m-left_xx-small">
+                                            <span lwc:if={datatableData.length}>{datatableData.length} de {gruposSeleccionados.totalCount} registros • Actualizado a las {gruposSeleccionados.fechaActualizacion}.</span>
+                                            <span lwc:else class="slds-text-color_weak">Sin elementos que mostrar.</span>
+                                        </p>
+                                    </div>
+                                    <div class="slds-col">
+                                        <p class="slds-page-header__meta-text slds-text-body_small slds-var-m-right_large">
+                                            <span lwc:if={datatableColumnasWidths.anchosManuales} class="slds-box slds-text-color_weak" style="padding: 0.4rem; background-color: #f7f7f7; cursor: default;">
+                                                <lightning-icon icon-name="utility:lock" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px; opacity: 0.9;"></lightning-icon>
+                                                Anchuras de columna fijas
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-page-header__col-controls">
+                                <div class="slds-grid slds-grid_vertical-align-start slds-gutters_direct-xx-small">
+                                    <div class="slds-col slds-grow-none">
+                                        <lightning-input class="inputBuscarEnLista inputShadowFocusNone" type="search" variant="label-hidden" placeholder="Buscar en esta lista..." disabled={cargandoCasos} onkeydown={inputBuscarEnListaKeydown}></lightning-input>
+                                    </div>
+                                    <div class="slds-col">
+                                        <div class="slds-page-header__controls">
+                                            <div class="slds-page-header__control">
+                                                <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                    <lightning-button-menu variant="border-filled" icon-name="utility:settings" menu-alignment="right" onselect={selectMenuSettingsDatatable}>
+                                                        <lightning-menu-item value="modalCamposAbrir" label="Seleccionar los campos que se visualizarán"></lightning-menu-item>
+                                                        <lightning-menu-item value="restablecerOrdenacion" label="Restablecer ordenación"></lightning-menu-item>
+                                                        <lightning-menu-item value="restablecerTamañoColumnas" label="Restablecer anchuras de columna"></lightning-menu-item>
+                                                    </lightning-button-menu>
+                                                </div>
+                                            </div>
+                                            <div class="slds-page-header__control">
+                                                <button class="botonActualizar slds-button slds-button_icon slds-button_icon-border-filled" onclick={datatableRefresh}>
+                                                    <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-var-m-right_small slds-var-m-left_small"></lightning-icon>
+                                                </button>
+                                            </div>
+                                            <div class="slds-page-header__control">
+                                                <lightning-button-icon class="botonFiltros" icon-name="utility:filterList" variant="border-filled" onclick={panelFiltrosAbrirCerrar} disabled></lightning-button-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background-color: #fafaf9; position: relative; display: flex;">
+                        <div class="slds-card__body slds-card__body_inner" style="margin: 0px; padding: 0px; overflow: hidden; flex-grow: 1; width: 100%;">
+                            <div class="slds-border_right">
+                                <div class="divDatatable">
+                                    <!--<lightning-datatable>-->
+                                    <c-seg_-casos_-por_-grupo_-datatable
+                                        class="datatableCasos"
+                                        columns={datatableColumnas}
+                                        data={datatableData}
+                                        key-field="Id"
+                                        onsort={datatableSort}
+                                        sorted-by={datatableSortedBy}
+                                        sorted-direction={datatableSortedDirection}
+                                        show-row-number-column
+                                        column-widths-mode="auto"
+                                        enable-infinite-loading
+                                        onloadmore={datatableLoadMore}
+                                        onrowselection={datatableRowSelection}
+                                        onresize={datatableOnresize}>
+                                    </c-seg_-casos_-por_-grupo_-datatable>
+                                    <div class="indicadorLoadMoreNoDisponible"></div>
+                                    <div lwc:if={mostarSpinner}>
+                                        <lightning-spinner class="spinnerContainerZIndex" variant="brand" alternative-text="Recuperando casos..."></lightning-spinner>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!--Panel de filtros-->
+                        <div class="panelFiltros slds-panel slds-panel_docked slds-panel_docked-right slds-border_left" aria-hidden="false">
+                            <!--Cabecera-->
+                            <div class="slds-panel__header" style="background-color: rgb(255, 255, 255);">
+                                <template if:false={filtroEditado}>
+                                    <h2 class="slds-panel__header-title slds-text-heading_small">Filtros</h2>
+                                    <lightning-button-icon icon-name="utility:close" variant="bare" title="Cerrar" onclick={panelFiltrosAbrirCerrar}></lightning-button-icon>
+                                </template>
+                                <div lwc:if={filtroEditado} class="slds-grid slds-grid_align-spread" style="width: 100%;">
+                                    <div class="slds-col">
+                                        <lightning-button label="Cancelar" onclick={descartarFiltros}></lightning-button>
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning-button-group>
+                                            <lightning-button label="Aplicar filtros" variant="brand" onclick={aplicarFiltros}></lightning-button>
+                                            <lightning-button-menu menu-alignment="right" style="top: -0.5px;" onselect={guardarFiltrosEnFavorito} disabled={botonFavoritosDisabled}>
+                                                <lightning-menu-item label="Guardar en favorito" prefix-icon-name="utility:favorite"></lightning-menu-item>
+                                            </lightning-button-menu>
+                                        </lightning-button-group>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Cuerpo (lista de filtros)-->
+                            <div class="slds-panel__body" style="background-color: rgb(255, 255, 255);">
+                                <div class="slds-filters">
+                                    <ol lwc:if={filtrosEdit.length} class="listaFiltros slds-list_vertical slds-list_vertical-space">
+                                        <template for:each={filtrosEdit} for:item="filtro">
+                                            <li key={filtro.id} data-id={filtro.id} class="slds-item slds-hint-parent liFiltro" onclick={liFiltroOnclick}>
+                                                <div class="slds-filters__item slds-grid slds-grid_vertical-align-center divFiltro" data-id={filtro.id}>
+                                                    <button class="slds-button_reset slds-grow">
+                                                        <span class="slds-show slds-text-body_small slds-text-color_weak">{filtro.nombre}</span>
+                                                        <span class="slds-show">{filtro.operador} {filtro.valor}</span>
+                                                    </button>
+                                                    <lightning-button-icon icon-name="utility:close" size="small" variant="bare" title="Eliminar" onclick={eliminarFiltroOnclick} data-id={filtro.id}></lightning-button-icon>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ol>
+                                    <div class="slds-filters__footer slds-grid slds-grid_align-spread" style="padding-bottom: 0px; padding-left: 1px; padding-right: 4px;">
+                                        <div class="slds-col">
+                                            <button class="slds-button botonAgregarFiltro" onclick={añadirFiltro}>
+                                                <lightning-icon icon-name="utility:add" size="xx-small" class="botonAgregarFiltroIcon slds-var-m-right_x-small"></lightning-icon>
+                                                Agregar filtro
+                                            </button>
+                                        </div>
+                                        <div lwc:if={filtrosEdit.length} class="slds-col">
+                                            <button class="slds-button botonesEliminar" onclick={eliminarTodosLosFiltros}>
+                                                <lightning-icon icon-name="utility:delete" size="xx-small" class="botonesEliminarIconColor slds-var-m-right_x-small"></lightning-icon>
+                                                Eliminar todos
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Lógica de filtro-->
+                            <div class="slds-var-p-around_large" style="height: inherit; background-color: rgb(250, 250, 249); border-top: 1px solid #e5e5e5;">
+                                <template lwc:if={logicaFiltrosDisponible}>
+                                    <span class="botonAnadirLogica" onclick={agregarLogicaFiltro} style="cursor: pointer;">
+                                        <lightning-icon icon-name="utility:crossfilter" size="xx-small" class="slds-var-m-right_small iconoAgregarLogicaFiltro"></lightning-icon>
+                                        <button class="slds-button_reset slds-text-link">Agregar lógica de filtro</button>
+                                    </span>
+                                    <div class="textAreaLogica">
+                                        <div class="slds-grid slds-grid_align-spread slds-gutters_direct-x-small slds-var-p-right_xx-small slds-var-m-bottom_small slds-var-p-left_xx-small">
+                                            <div class="slds-col">
+                                                <lightning-icon icon-name="utility:crossfilter" size="xx-small" class="slds-var-m-right_small iconoLogicaFiltro"></lightning-icon>
+                                                <span class="slds-var-m-right_x-small slds-is-relative">Lógica de filtro</span>
+                                                <lightning-helptext content="La lógica del filtro rige cómo y cuándo se aplican los filtros al listado de casos. Utiliza los operadores AND y OR para refinar los resultados." variant="inverse" style="position: relative; top: -3px; opacity: 0.6;"></lightning-helptext>
+                                            </div>
+                                            <div class="slds-col">
+                                                <button onclick={eliminarLogicaFiltro} class="slds-button botonesEliminar" style="height: 16px;">Eliminar</button>
+                                            </div>
+                                        </div>
+                                        <lightning-textarea class="textareaLogicaFiltros" placeholder="Haz referencia a los filtros por su índice. Combínalos mediante los operadores &quot;OR&quot;, &quot;AND&quot; y paréntesis." variant="label-hidden" onfocus={textareaLogicaFiltrosOnfocus} onblur={textareaLogicaFiltrosOnblur} onchange={textareaLogicaFiltrosOnchange}></lightning-textarea>
+                                        <div class="divLogicaActual slds-var-m-top_large">
+                                            <template lwc:if={logicaFiltro}>
+                                                <label class="slds-form-element__label slds-var-m-left_xx-small slds-var-m-bottom_xxx-small">Lógica actual</label>
+                                                <div class="slds-box slds-text-body_small slds-text-color_weak" style="opacity: 0.87; padding: 0.75rem;">{logicaFiltro}</div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            <!--Popover para editar filtro-->
+                            <div data-id="filtroEdicion" class="popoverEditarFiltro" onclick={eventStopPropagation}>
+                                <div class="popoverEditarFiltroBody">
+                                    <lightning-combobox data-id="popoverEditarComboboxCampo" label="Campo" options={filtroCamposOptions} required class="campoFiltro" onblur={popoverEditarFiltroCamposOnblur}></lightning-combobox>
+                                    <lightning-combobox data-id="popoverEditarComboboxOperador" label="Operador" options={filtroOperadoresOtions} required class="campoFiltro slds-var-m-top_small" onblur={popoverEditarFiltroCamposOnblur}></lightning-combobox>
+                                    <lightning-input data-id="popoverEditarInputValor" label="Valor" placeholder="Indica un valor" class="campoFiltro slds-var-m-top_small" onkeypress={popoverEditarFiltroInputValorOnkeypress} onblur={popoverEditarFiltroCamposOnblur}></lightning-input>
+                                    <div align="right" class="slds-var-m-top_large">
+                                        <lightning-button label="Agregar" variant="brand" class="" onclick={actualizarFiltro}></lightning-button>
+                                    </div>
+                                    <div class="popoverEditarFiltroPointer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                <!-- </div> -->
+                <!-- No es necesario mientras no se habilite el tipo de bísqueda "Listados de casos"
+                <div lwc:if={tipoBusquedaSeleccionadaEsListviews} style="padding-top: 50px; font-weight: bolder" align="center">
+                    <div style="border-style: solid; border-width: 1px; border-radius: 4px; display: inline; padding: 8px;">
+                        <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                        <span class="slds-text-color_weak" style="padding: 10px 5px 5px 5px;">&nbsp;NO DISPONIBLE&nbsp;&nbsp;:-(&nbsp;</span>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+    <!-- <div class="slds-backdrop backdropFiltro" role="presentation"></div> -->
+
+    <!--Modal para seleccionar columnas de la datatable-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalCampos" onkeydown={modalCamposTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCamposCerrar} variant="border-filled" class="slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Seleccionar los campos que se visualizarán</h2>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium" style="padding-bottom: 24px;">
+                <div style="padding-left: 24px; padding-right: 15px;">
+                    <lightning-dual-listbox class="picklistColumnas" name="camposCaso" source-label="Disponibles" selected-label="Seleccionados" options={camposCasePicklist} value={camposCaseSeleccionados} required-options={camposCaseRequired} min=1 max=15 onchange={camposCaseChange}>
+                    </lightning-dual-listbox>
+                </div>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button variant="brand" label="Guardar" onclick={modalCamposGuardar}></lightning-button>
+                <lightning-button class="slds-float_right slds-var-m-left_small botonCamposCancelar" label="Cancelar" onclick={modalCamposCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para confirmar restablecimiento de la configuración por defecto-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalRestablecerPersonalizacionPorDefecto" onkeydown={modalRestablecerPersonalizacionPorDefectoTeclaPulsada}>
+        <div class="slds-modal__container" style="width: 550px;">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalRestablecerPersonalizacionPorDefectoCerrar} variant="border-filled" class="slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Restablecer personalización por defecto</h2>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium" style="padding-top: 17px; padding-bottom: 20px;">
+                <div style="padding-left: 24px; padding-right: 15px;">
+                    Se eliminará la personalización del usuario en este equipo, incluyendo:
+                    <ul style="list-style-type: square; list-style-position: inside; padding-left: 20px; padding-top: 16px;">
+                        <li>Tipo de búsqueda seleccionado</li>
+                        <li>Grupos operativos seleccionados</li>
+                        <li>Zonas seleccionadas</li>
+                        <li>Filtros seleccionados</li>
+                        <li>Columas mostradas</li>
+                        <li>Anchuras de las columna</li>
+                        <li>Ordenación de la lista de casos</li>
+                    </ul>
+                    <div class="slds-text-color_destructive" style="padding-top: 18px">¿Quieres continuar?</div>
+                </div>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button variant="destructive" label="Restablecer" onclick={modalRestablecerPersonalizacionPorDefectoRestablecer}></lightning-button>
+                <lightning-button class="slds-float_right slds-var-m-left_small botonRestablecerPersonalizacionPorDefectoCancelar" label="Cancelar" onclick={modalRestablecerPersonalizacionPorDefectoCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para crear favorito-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalCrearFavorito" onkeydown={modalCrearFavoritoTeclaPulsada}>
+        <div class="slds-modal__container" style="width: 550px;">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCrearFavoritoCerrar} alternative-text="Cerrar" variant="border-filled" class="slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">{modalCrearFavoritoTitulo}</h2>
+                <p class="slds-var-m-top_x-small">Indica el nombre del nuevo favorito.</p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_xx-large">
+                <lightning-input class="inputCrearFavoritoNombre" label="" variant="label-hidden" onblur={inputCrearFavoritoNombreBlur} onkeydown={inputCrearFavoritoNombreKeyDown} placeholder="Nombre del nuevo favorito"></lightning-input>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button label="Guardar" variant="brand" onclick={modalCrearFavoritoGuardar}></lightning-button>
+                <lightning-button class="slds-float_right slds-var-m-left_small" label="Cancelar" onclick={modalCrearFavoritoCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para editar favoritos-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalEditarFavoritos" onkeydown={modalEditarFavoritosTeclaPulsada}>
+        <div class="slds-modal__container" style="width: 550px; z-index: 10;">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalEditarFavoritosCerrar} variant="border-filled" class="slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Editar favoritos</h2>
+                <p class="slds-var-m-top_x-small">
+                    Editar, reordenar o eliminar favoritos.<br />
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium" style="overflow: visible;">
+                <div lwc:if={favoritos.length} style="padding-left: 2px; padding-right: 2px;">
+                    <ol role="listbox" class="slds-show slds-var-m-vertical_xx-small listaFavoritos">
+                        <template for:each={favoritos} for:item="favorito">
+                            <li key={favorito.nombre} data-nombre-favorito={favorito.nombre} aria-selected="false" role="option" draggable="true" tabindex="0" class="favorito slds-var-p-top_small slds-var-p-bottom_small item slds-border_bottom" ondragstart={favoritoDragStart} ondragend={favoritoDragEnd} ondragover={favoritoDragOver} ondragleave={favoritoDragLeave} ondrop={favoritoDrop}>
+                                <span class="slds-media slds-media_center">
+                                    <div style="cursor: ns-resize; margin-left: 4px;">
+                                        <div class="slds-button slds-var-m-around_x-small slds-text-color_weak">
+                                            <lightning-icon icon-name="utility:rows" size="x-small"></lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-icon_container slds-media__figure">
+                                        <lightning-icon icon-name="custom:custom11" size="small" class="iconoEditarFavoritos"></lightning-icon>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-truncate">{favorito.nombre}</div>
+                                        <!-- Solicitan quitar la enumeración de grupos
+                                            <span class="slds-truncate slds-text-body_small slds-text-color_weak"
+                                            style="font-weight: 300; white-space: normal;">{favorito.helptext}</span>
+                                        -->
+                                    </div>
+                                    <div role="presentation" aria-hidden="true" class="slds-media__figure">
+                                        <span class="slds-is-relative" style="display: inline; top: -1px; padding-left: 4px; padding-right: 5px; cursor: pointer;">
+                                            <span class={favorito.clasesIndicadorColor} tabindex="0" title="Cambiar color" onclick={favoritoCambiarColorClick} data-id-popover={favorito.nombre}>
+                                                <!--Popover para cambiar el indicador de color-->
+                                                <section class="slds-popover slds-popover_small slds-nubbin_left popoverCustom popoverColores" role="dialog" style="display: none; top: -12px; left: 29px; height: 34px; width: max-content;" data-popover={favorito.nombre} onclick={eventStopPropagation} draggable="false">
+                                                    <div class="slds-popover__body" style="text-align: center; padding: 7px;">
+                                                        <span class="indicadorColor indicadorColorAzul" tabindex="0" onclick={favoritoCambiarColor} data-nombre-favorito={favorito.nombre} data-clase="indicadorColorAzul"></span>
+                                                        <span class="indicadorColor indicadorColorVerde" tabindex="0" onclick={favoritoCambiarColor} data-nombre-favorito={favorito.nombre} data-clase="indicadorColorVerde"></span>
+                                                        <span class="indicadorColor indicadorColorNaranja" tabindex="0" onclick={favoritoCambiarColor} data-nombre-favorito={favorito.nombre} data-clase="indicadorColorNaranja"></span>
+                                                        <span class="indicadorColor indicadorColorRojo" tabindex="0" onclick={favoritoCambiarColor} data-nombre-favorito={favorito.nombre} data-clase="indicadorColorRojo"></span>
+                                                        <lightning-button-icon icon-name="utility:close" variant="bare" title="Cerrar" data-id-popover={favorito.nombre} style="position: relative; top: -5px; padding-left: 5px; padding-right: 2px;" onclick={favoritoCambiarColorCerrar}></lightning-button-icon>
+                                                    </div>
+                                                </section>
+                                            </span>
+                                        </span>
+                                        <span style="padding-left: 4px; padding-right: 4px;">
+                                            <div style="display: inline; position: relative;" ondragstart={eventStopPropagation} onclick={eventStopPropagation} draggable="false">
+                                                <lightning-button-icon title="Cambiar nombre" icon-name="utility:edit" variant="bare" onclick={favoritoCambiarNombreClick} data-id-popover={favorito.nombre}></lightning-button-icon>
+                                                <!--Popover para renombrar-->
+                                                <section class="slds-popover slds-nubbin_left popoverCustom popoverCambiarNombre" role="dialog" style="display: none; top: -16px; left: 30px;" data-popover={favorito.nombre} ondragstart={popoverCambiarNombreDragStart} draggable="false" onclick={eventStopPropagation}>
+                                                    <div class="slds-popover__body" draggable="false">
+                                                        <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+                                                            <div class="slds-col">
+                                                                <lightning-input variant="label-hidden" onkeydown={favoritoCambiarNombreInputKeyDown} data-popover-input={favorito.nombre} draggable="false"></lightning-input>
+                                                            </div>
+                                                            <div class="slds-col slds-grow-none">
+                                                                <lightning-button-icon icon-name="utility:check" icon-class="slds-icon-text-success" variant="bare" onclick={favoritoCambiarNombreGuardar} data-id-popover={favorito.nombre}></lightning-button-icon>
+                                                            </div>
+                                                            <div class="slds-col slds-grow-none">
+                                                                <lightning-button-icon icon-name="utility:close" icon-class="slds-icon-text-error" variant="bare" onclick={favoritoCambiarNombreCerrar} data-id-popover={favorito.nombre}></lightning-button-icon>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </span>
+                                        <span style="padding-left: 4px; padding-right: 4px;" onclick={modalEditarFavoritosEliminar} data-nombre-favorito={favorito.nombre}>
+                                            <lightning-button-icon title="Eliminar" icon-name="utility:delete" variant="bare"></lightning-button-icon>
+                                        </span>
+                                    </div>
+                                </span>
+                            </li>
+                        </template>
+                    </ol>
+                </div>
+                <div lwc:else align="center" class="slds-text-color_weak" style="padding-top: 6px; padding-bottom: 6px;">
+                    Sin favoritos guardados.
+                </div>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button class="modalEditarFavoritosBotonCerrar" label="Cerrar" onclick={modalEditarFavoritosCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para importar/exportar favoritos-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalImportarExportarFavoritos" onkeydown={modalImportarExportarFavoritosTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalImportarExportarFavoritosCerrar} variant="border-filled" class="slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">
+                    <!-- Importar/exportar favoritos -->
+                    <lightning-formatted-text class="modalImportarExportarFavoritosTitulo" value="Importar/exportar favoritos"></lightning-formatted-text>
+                </h2>
+                <p class="slds-var-m-top_x-small">
+                    Exporta los favoritos como texto para importarlos más adelante.
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-top_large slds-var-p-right_xx-large slds-var-p-bottom_x-large slds-var-p-left_xx-large">
+                <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Código de definición del favorito</label>
+                <lightning-textarea class="modalImportarExportarFavoritosTextarea" variant="label-hidden" style="font-size: 11px;"></lightning-textarea>
+                <div class="modalImportarExportarFavoritosWarning slds-text-align_center slds-var-m-top_x-large slds-var-m-bottom_x-small slds-hide">
+                    <lightning-icon icon-name="utility:warning" size="xx-small" variant="warning" class="slds-var-m-right_small"></lightning-icon>
+                    <span style="font-weight: 500;">Al importar, los favoritos actuales se perderán. Esta acción no se puede deshacer.</span>
+                </div>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button class="modalImportarExportarFavoritosImportar slds-hide" icon-name="utility:download" variant="brand" label="Importar" onclick={modalImportarExportarFavoritosImportar}></lightning-button>
+                <lightning-button class="modalImportarExportarFavoritosCopiar slds-hide" icon-name="utility:copy" variant="brand" label="Copiar al portapapeles" onclick={copiarFavoritosAlPortapapeles}></lightning-button>
+                <lightning-button class="modalImportarExportarFavoritosCancelar slds-var-m-left_small" label="Cancelar" onclick={modalImportarExportarFavoritosCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <template lwc:if={renderizarModales}>
+
+        <!-- Modal para cambiar propietario-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalCambiarPropietario" onkeydown={modalCambiarPropietarioTeclaPulsada}>
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCambiarPropietarioCerrar} variant="border-filled" class="slds-modal__close" title="Cerrar" disabled={guardando}></lightning-button-icon>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Cambiar propietario</h2>
+                    <p class="slds-var-m-top_x-small">Indica el nuevo propietario para los casos seleccionados.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative" style="overflow: initial;">
+                    <div lwc:if={guardando} align="center">
+                        <lightning-spinner variant="brand" style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
+                    </div>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox-group">
+                                <!--Desplegable de tipos de búsqueda-->
+                                <div class="slds-combobox_object-switcher slds-combobox-addon_start" style="z-index: 91;">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-combobox_container slds-has-icon-only">
+                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none" title={tipoBusquedaSeleccionado.label}>
+                                                        <span class="slds-icon_container slds-input__icon slds-input__icon_left">
+                                                            <lightning-icon icon-name={tipoBusquedaSeleccionado.iconName} size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <label for="input01"></label>
+                                                        <input id="input011" type="text" class="slds-input slds-combobox__input slds-combobox__input-value" aria-expanded="true" aria-haspopup="listbox" autocomplete="off" role="combobox" placeholder="" value={tipoBusquedaSeleccionado.label} onclick={menuTipoBusquedaAbrir} onblur={menuTipoBusquedaCerrar}/>
+                                                        <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                                            <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                                        </span>
+                                                    </div>
+                                                    <!--Opciones del combobox de tipos de búsqueda-->
+                                                    <div class="menuOpcionesTipoBusqueda slds-dropdown slds-dropdown_length-5 slds-dropdown_x-small slds-dropdown_left slds-hide" role="listbox">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <!--Opción Usuario-->
+                                                            <li role="presentation" class="slds-listbox__item" data-tipo-busqueda="Usuario" onclick={menuTipoBusquedaSeleccion}>
+                                                                <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-truncate slds-var-p-left_small" title="Usuario">Usuario</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Buscador-->
+                                <div class="slds-combobox_container slds-combobox-addon_end">
+                                    <div class="menuResultados slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" id="primary-combobox-id-11">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <lightning-input class="inputBusqueda" value={selectedItem} type="search" variant="label-hidden" placeholder="Buscar..." onchange={inputBusquedaChange} onfocus={menuResultadosAbrir} onblur={menuResultadosCerrar} clear-button-visible="false" style="left: -2px; z-index: 90;"></lightning-input>
+                                        </div>
+                                        <!--Menú de resultados-->
+                                        <div lwc:if={resultados.length} id="listbox-id-201" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                <template for:each={resultados} for:item="resultado">
+                                                    <li key={resultado.Id} role="presentation" class="slds-listbox__item" data-id-resultado={resultado.Id} onclick={resultadoClick}>
+                                                        <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-media_center" role="option">
+                                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                                <span class="slds-icon_container">
+                                                                    <!-- tipoBusquedaSeleccionadoEsUsuario -->
+                                                                    <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+                                                                </span>
+                                                            </span>
+                                                            <span class="slds-media__body">
+                                                                <span class="slds-listbox__option-text_entity">{resultado.Name}</span>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning-button class="botonPropietarioGuardar" variant="brand" icon-name="utility:change_owner" label="Cambiar propietario" onclick={modalCambiarPropietarioGuardar} disabled={guardando}></lightning-button>
+                    <lightning-button class="botonPropietarioCancelar slds-var-m-left_small" label="Cancelar" onclick={modalCambiarPropietarioCerrar} disabled={guardando}></lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <!-- Modal para crear nuevo caso-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalCrearNuevoCaso" onkeydown={modalCrearNuevoCasoTeclaPulsada}>
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCrearNuevoCasoCerrar} variant="border-filled" class="slds-modal__close" title="Cerrar" disabled={guardando}></lightning-button-icon>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Crear nuevo caso</h2>
+                    <p class="slds-var-m-top_x-small">Indica los datos básicos para el nuevo caso.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative" style="overflow: initial;">
+                    <div lwc:if={guardando} align="center">
+                        <lightning-spinner variant="brand" style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters_direct-small">
+                        <div class="slds-col slds-size_3-of-5">
+                            <lightning-input data-id="modalCrearNuevoCasoRecordTypeId" label="RecordTypeId" class="slds-hide"></lightning-input>
+                            <lightning-input data-id="modalCrearNuevoCasoAsunto" label="Asunto"></lightning-input>
+                            <lightning-textarea data-id="modalCrearNuevoCasoDescripcion" label="Descripción" class="modalCrearNuevoCasoDescripcion slds-var-m-top_x-large"></lightning-textarea>
+                        </div>
+                        <div class="slds-col slds-size_2-of-5">
+                            <lightning-combobox data-id="modalCrearNuevoCasoIdioma" label="Idioma" options={modalCrearNuevoCasoIdiomaOptions} required></lightning-combobox>
+                            <lightning-combobox data-id="modalCrearNuevoCasoCanalEntrada" label="Canal de entrada" options={modalCrearNuevoCasoCanalEntradaOptions} value="Oficina" required class="slds-var-m-top_x-large"></lightning-combobox>
+                            <lightning-input data-id="modalCrearNuevoCasoNIF" label="Identificar cliente" maxlength="11" class="slds-var-m-top_x-large" onchange={modalCrearNuevoCasoNifOnchange} onblur={modalCrearNuevoCasoNifOnblur}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning-button class="botonCrearNuevoCasoGuardar" icon-name="utility:case" variant="brand" label="Crear caso" onclick={crearCaso} disabled={guardando}></lightning-button>
+                    <lightning-button class="botonCrearNuevoCasoCancelar slds-var-m-left_small" label="Cancelar" onclick={modalCrearNuevoCasoCerrar} disabled={guardando}></lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <!-- Modal para cambiar de grupo masivamente-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalCambiarGrupo" onkeydown={modalCambiarGrupoTeclaPulsada}>
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCambiarGrupoCerrar} variant="border-filled" class="slds-modal__close" title="Cerrar" disabled={guardando}></lightning-button-icon>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Cambiar Grupo</h2>
+                    <p class="slds-var-m-top_x-small">Indica el nuevo grupo para los casos seleccionados.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative" style="overflow: initial;">
+                    <div lwc:if={guardando} align="center">
+                        <lightning-spinner variant="brand" style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
+                    </div>
+                    <lightning-record-edit-form object-api-name="Case" record-id={primerRecordIdSeleccionado}>
+                        <label class="slds-form-element__label comment-label">
+                            <abbr class="slds-required">*</abbr>Nuevo grupo
+                        </label>
+                        <lightning-input-field class="inputNuevoGrupo" field-name="SEG_Grupo__c" variant="label-hidden" required></lightning-input-field>
+                        <lightning-messages></lightning-messages>
+                    </lightning-record-edit-form>
+                    <div lwc:if={cargandoModal}>
+                        <lightning-spinner variant="brand" alternative-text="Recuperando casos..."></lightning-spinner>
+                    </div>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning-button class="botonGrupoGuardar" variant="brand" icon-name="utility:change_owner" label="Cambiar Grupo" onclick={modalCambiarGrupoGuardar} disabled={guardando}></lightning-button>
+                    <lightning-button class="botonGrupoCancelar slds-var-m-left_small" label="Cancelar" onclick={modalCambiarGrupoCerrar} disabled={guardando}></lightning-button>
+                </footer>
+            </div>
+        </section>
+    </template>
+
+    <div class="slds-backdrop busquedaBackdrop"></div> <!--Backdrop para el campo de búsqueda-->
+    <div class="slds-backdrop popoverEditarFiltroBackdrop"></div> <!--Backdrop para el popover de editar filtro-->
+    <div class="slds-backdrop modalBackdrop"></div> <!--Backdrop para los modales-->
+</template>

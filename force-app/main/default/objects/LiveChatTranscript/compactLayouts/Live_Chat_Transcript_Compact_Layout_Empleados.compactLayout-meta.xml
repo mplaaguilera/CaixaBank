@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Live_Chat_Transcript_Compact_Layout_Empleados</fullName>
+    <fields>CC_Subject__c</fields>
+    <fields>CC_Idioma__c</fields>
+    <fields>CC_Canal_Procedencia__c</fields>
+    <fields>CC_Espacio__c</fields>
+    <fields>CC_Categoria__c</fields>
+    <label>Live Chat Transcript Compact Layout Empleados</label>
+</CompactLayout>

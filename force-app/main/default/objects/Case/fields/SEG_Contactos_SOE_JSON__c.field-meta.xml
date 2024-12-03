@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Contactos_SOE_JSON__c</fullName>
+    <description>JSON con la información recogida de los Contactos SOE</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>JSON con la información recogida de los Contactos SOE</inlineHelpText>
+    <label>Contactos SOE JSON</label>
+    <length>5000</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

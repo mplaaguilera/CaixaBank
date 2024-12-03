@@ -1,0 +1,93 @@
+<template>
+    <lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        <h1 slot="title" class="card-title">
+            <lightning-icon class="slds-media__figure" icon-name="custom:custom18" size="small" style="background-color: gray;"></lightning-icon>
+            Tarea finalizada
+        </h1>
+        
+        <div class="closed-form paddingTask">
+			<div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2" data-id= 'lookup1'>
+                    <c-av_-lookup class="slds-col"
+                    data-id="clookup1"
+                    selection={initialSelection}
+                    errors={errors}
+                    onsearch={handleSearchAccount}
+                    onselectionchange={handleSelectionChange}
+                    fieldlabel="Cliente"
+                    placeholder={clientPlaceholder}
+                    is-multi-entry={isMultiEntry}
+                >
+                </c-av_-lookup>
+                </div>
+                <div class="slds-col slds-size_1-of-2" data-id= 'lookup2'>
+                    <c-av_-lookup class="slds-col" 
+                        data-id="clookup2"
+                        selection={initialSelection2}
+                        errors={errors}
+                        onsearch={handleSearch}
+                        onselectionchange={handleSelectionChange}
+                        fieldlabel="Empleado"
+                        placeholder={employeePlaceholder}
+                        is-multi-entry={isMultiEntry}
+                    >
+                    </c-av_-lookup>
+                    
+                </div>
+                
+            </div>
+            <div if:true={rtClienteAccount} class="slds-grid slds-gutters divtop">
+                <div class="slds-col slds-size_1-of-2" data-id= 'lookup3'>
+                    <c-av_-lookup class="slds-col" 
+                        data-id="clookup3"
+                        selection={initialSelection3}
+                        errors={errors}
+                        onsearch={handleSearchContact}
+                        onclick={handleSearchContactClick}
+                        onselectionchange={handleSelectionChange}
+                        fieldlabel="Persona de contacto"
+                        placeholder="Buscar contacto..."
+                        is-multi-entry={isMultiEntry}
+                    >
+                    </c-av_-lookup>
+                    
+                </div>
+            </div>
+            <h2 slot="title" class="card-title paddingTask2">
+                <b>Datos de la tarea</b>
+            </h2>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-form-element slds-is-editing">
+                        <lightning-input type="text" label="Asunto" value={valueAsunto} placeholder="" onchange={handleChangeAsunto} ></lightning-input>
+                    </div>
+                </div>
+				<div class="slds-col slds-size_1-of-2">
+					<div class="slds-form-element slds-is-editing">
+                        <label class="slds-form-element__label" for="Fecha">Fecha de la gestión</label>
+						<div class="slds-form-element__control">
+							<!--<lightning-input label = 'Fecha de la gestión' type="date" id="Fecha" name="ActivityDate" date-style="short" value={valueFecha} onchange={handleChangeDate}></lightning-input>-->
+                            <p class="formattedDate">{formattedFechaGestion}</p>
+                        </div>
+					</div>
+				</div>                
+            </div>
+            <div class="slds-grid slds-gutters">
+
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-form-element slds-is-editing">
+                        <lightning-combobox name="AV_Tipo__c" id="Tipo" label="Tipo" value={valueTipo} options={optionsTaskType} onchange={handleChangeType} ></lightning-combobox>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-1">
+                    <div class="slds-form-element slds-is-editing">
+                        <lightning-textarea  label="Comentario" value={valueComentario} placeholder="" onchange={handleChangeComentario} ></lightning-textarea>
+                    </div>
+                </div>
+            </div>
+		</div>
+	</lightning-card>
+</template>

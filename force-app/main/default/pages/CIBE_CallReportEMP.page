@@ -1,0 +1,146 @@
+<apex:page renderAs="PDF" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" controller="CIBE_CallReportVFController">
+    <html>
+        <head>
+            <style>
+                @page {
+                    margin-top:     170px;
+                    margin-left:    60px;
+                    @top-center {
+                        width: 100%;
+                        content: element(header);
+                    }
+                    @bottom-center {
+                        width: 100%;
+                        content: element(footer);
+                    }
+                }
+                div.header {
+                    padding-top: 70px;
+                    padding-left: 8px;
+                    display: block;
+                    position: running(header);
+                }
+                div.footer {
+                    display: block;
+                    position: running(footer);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div style="float: right;">
+                    <apex:image url="{!$Resource.CIBE_CallReportLogo}" width="190" height="60" />
+                </div>
+                <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                    <tr>
+                        <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">Lugar de la Visita</th>
+                        <td style="padding-left: 10px; font-size: 14px;">{!eventWrapper.location}</td>
+                    </tr>
+                </table>
+                <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                    <tr>
+                        <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">Fecha</th>
+                        <td style="padding-left: 10px; font-size: 14px;">{!eventWrapper.activityDate}</td>
+                    </tr>
+                </table>
+                <apex:repeat value="{!accounts}" var="account">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">Empresa</th>
+                            <td style="padding-left: 10px; font-size: 14px;"><strong>{!account.Name}</strong></td>
+                        </tr>
+                    </table>
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">CIF</th>
+                            <td style="padding-left: 10px; font-size: 14px;">{!account.CC_Numero_Documento__c}</td>
+                        </tr>
+                    </table>
+                </apex:repeat>
+            </div>
+
+            <div class="footer">
+                <hr style="color: #02b2f7;"></hr>
+                <div>
+                    <span style="font-size: 10px;">Información Confidencial</span><span style="color: #7e7e7e; margin-left: 10px; font-size: 10px;">© Caixabank, S.A.</span>
+                </div>
+            </div>
+
+            <div class="content" style="margin-top: 300px;">
+                <apex:pageBlock rendered="{!OR(eventWrapper.attorneyAttendees.size != 0, eventWrapper.contactsAttendees.size != 0)}">
+                    <div style="page-break-inside: avoid;">
+                        <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                            <tr>
+                                <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 55%; padding-left: 10px;">Asistentes por parte del cliente</th>
+                                <th style="background-color: #D8D8D8; color: #000000; border: 1px solid #FFFFFF; width: 45%; padding-left: 10px;">Cargo</th>
+                            </tr>
+                            <apex:repeat value="{!eventWrapper.attorneyAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.CIBE_Carrec__c}</td>
+                                </tr>
+                            </apex:repeat>
+                            <apex:repeat value="{!eventWrapper.contactsAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.CIBE_Cargo__c}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:pageBlock>
+
+                <apex:pageBlock rendered="{!eventWrapper.employeeAttendees.size != 0}">
+                    <div style="page-break-inside: avoid; margin-top: 20px;">
+                        <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                            <tr>
+                                <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 55%; padding-left: 10px;">Asistentes por parte de CBK</th>
+                                <th style="background-color: #D8D8D8; color: #000000; border: 1px solid #FFFFFF; width: 45%; padding-left: 10px;">Cargo</th>
+                            </tr>
+                            <apex:repeat value="{!eventWrapper.employeeAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.AV_DescFuncion__c}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:pageBlock>
+
+                <div style="page-break-inside: avoid; margin-top: 40px;">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 125px; min-width: 125px; min-height: 100px; padding-left: 10px; vertical-align: text-top;">Propósito de la Reunión</th>
+                            <td style="padding-left: 10px; vertical-align: text-top; word-wrap: break-word; font-size: 14px;">{!eventWrapper.subject}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="page-break-inside: avoid; margin-top: 40px;">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 125px; min-width: 125px; min-height: 200px; padding-left: 10px; vertical-align: text-top;">Conclusiones</th>
+                            <td style="padding-left: 10px; vertical-align: text-top; word-wrap: break-word; font-size: 14px; word-wrap: break-word; white-space: pre-wrap;">{!eventWrapper.conclusions}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="page-break-inside: avoid; margin-top: 5px;">
+                    <div style="border: 1px solid black; width: 300px; left: 300px; float:right;">
+                        <table>
+                            <tr>
+                                <td style="padding: 7px; font-size: 14px; vertical-align: text-top;">Atte. {!eventWrapper.owner}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px; font-size: 14px; vertical-align: text-top;">CE: {!eventWrapper.center}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px; font-size: 14px; vertical-align: text-top;">Dirección: {!eventWrapper.centerAddress}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Not_owner_not_changes_status_GE_senior</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(OR($Permission.EV_Gestor_Eventos_Senior, $Permission.EV_NotChangeStatusCampaign),OwnerId !=  $User.Id,  ISCHANGED(Status))</errorConditionFormula>
+    <errorMessage>Error, no puede cambiar el estado de un evento del que no es propietario</errorMessage>
+</ValidationRule>

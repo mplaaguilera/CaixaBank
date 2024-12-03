@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_TriggerPlatformEventMac__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Mientras esté marcado no se ejecutará la lógica del trigger CSBD_AltaOportunidadMac_AI del platform event CSBD_AltaOportunidadMac__e</description>
+    <label>Bypass trigger platform event MAC</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

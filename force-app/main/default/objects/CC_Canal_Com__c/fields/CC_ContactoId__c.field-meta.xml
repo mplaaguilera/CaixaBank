@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ContactoId__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Persona de contacto relacionada</description>
+    <inlineHelpText>Persona de contacto relacionada</inlineHelpText>
+    <label>Contacto</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipName>Canales_Comunicacion</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

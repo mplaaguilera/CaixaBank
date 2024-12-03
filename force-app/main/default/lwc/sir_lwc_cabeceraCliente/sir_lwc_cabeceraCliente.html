@@ -1,0 +1,131 @@
+<template>
+    <lightning-card  variant="Narrow" title="Perfil Cliente" icon-name="standard:note">
+        <table class="slds-table slds-table_cell-buffer slds-table_header-hidden slds-table_bordered"> 
+            <template if:true={vacio}>
+                <span>No existen registros asociados.</span>
+            </template> 
+            <template for:each={wrapper} for:item="keyValue"> 
+                <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label">Tipo Persona</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.persona}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Saldo Pasivo</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha ">{keyValue.saldoPasivo}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Deuda</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaTotal}</span>
+                   </td>
+               </tr>
+               <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label">Segmento SIREC</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.segmento}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Ingresos Total</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosTotal}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Pendiente de Vencer</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaPendienteVencer}</span>
+                   </td>
+               </tr>
+               <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label">Prioridad</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.prioridad}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Nómina</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosNomina}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Vencida</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.deudaVencida}</span>
+                   </td>
+               </tr> 
+               <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label">Arquetipo</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.arquetipo}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Pensión</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosPension}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label slds-cell-wrap">Días Impago Peor Contrato</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.diasImpagoPeor}</span>
+                   </td>
+               </tr>  
+               <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label">Capacidad de Pago</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda">{keyValue.capacidadDePago}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label">Paro</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.ingresosParo}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago (últ 12 meses)</span>
+                   </td>
+                   <td>
+                         <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCliclos}</span>
+                   </td>
+               </tr>  
+               <tr key={keyValue.Id}>
+                   <td>
+                       <span class="slds-form-element__label slds-cell-wrap">Propuesta Motor Solución</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignIzquierda slds-cell-wrap">{keyValue.motorSolucion}</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label"></span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow"></span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__label slds-cell-wrap">Nº Ciclos Impago Total</span>
+                   </td>
+                   <td>
+                        <span class="slds-form-element__static slds-grow alignDerecha">{keyValue.numeroCiclosTotal}</span>
+                   </td>
+               </tr>                        
+            </template>
+        </table>
+</lightning-card>
+</template>

@@ -1,0 +1,39 @@
+<template>
+    <div class="slds-col"><!--SEARCH BOX-->
+        <div if:true={showSearchBox}>
+            <div class="slds-p-horizontal_x-small slds-p-bottom_xx-small">
+                <lightning-input label="" type="search" placeholder={label.SearchWords} variant="label-hidden" onchange={handleKeyChange}></lightning-input>
+            </div>
+        </div>
+    </div>
+    <div class="slds-grid slds-grid_horizontal-align-left">
+        <div><!--PAGE NAVIGATION-->
+            <div if:true={showPageBox}>
+                <div class="slds-list_inline slds-p-bottom_xx-small customSelect">
+                    <label class="slds-text-color_weak slds-p-horizontal_x-small" for="pageNum">Page:</label> 
+                    <div class="slds-select_container">
+                        <select class="slds-select" id="pageNum" onchange={handlePageNumberChange}>
+                            <template for:each={numeropaginas} for:item="option">
+                                <option key={option} value={option}>{option}</option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div><!--RECORDS PER PAGE-->
+            <div if:true={showPageBox}>
+                <div class="slds-list_inline slds-p-bottom_xx-small customSelect">
+                    <label class="slds-text-color_weak slds-p-horizontal_x-small" for="recordsPerPage">Page Size:</label> 
+                    <div class="slds-select_container">
+                        <select class="slds-select" id="recordsPerPage" onchange={handleRecordsPerPage}>
+                            <template for:each={pageSizeOptions} for:item="option">
+                                <option key={option} value={option}>{option}</option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

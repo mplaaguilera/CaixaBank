@@ -1,0 +1,176 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 06-23-2022
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-record-edit-form object-api-name="Opportunity" class="recordEditForm"> 
+
+        <!-- spinner -->
+        <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+        
+        <!--Estructura de 2 columnas -->    
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Fecha Estimada cierre -->
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12" >
+                        <lightning-input type="date" label={labels.fechaCierreLabel} field-level-help={labels.fechaEstimadaCierre} format="DD-MM-YY"  required="true" class="user-input-fecha"  name="fechaCierre" value={fechaCierre} onchange={handleFechaGestion}></lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+           
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Probabilidad de exito -->
+                <lightning-layout class="layout-padding">
+                    <lightning-layout-item size="12">
+                        <lightning-combobox
+                            name="Probabilidad de exito"
+                            label={labels.probabilidadExito}
+                            value={exito}
+                            required="true"
+                            options={optionsExito}
+                            onchange={handleExito}>
+                        </lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+
+                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                    <!-- Fecha Proxima Gestión -->
+                    <lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY" class="user-input-fecha"  name="fechaProxGestion" value={fechaProxGestion} onchange={handleFechaProxGestion}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                </div>
+                
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Importe -->
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <lightning-input class="textBoxLeft user-input" required="true" type="Number"  name="importeSaldo" label={labels.importe} value={importeSaldo} onchange={handleImporteSaldo} disabled={isImporte}></lightning-input>
+                        </lightning-layout-item>
+                    </lightning-layout> 
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Divisa -->
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <lightning-combobox
+                                name="divisa"
+                                label={labels.divisaLabel}
+                                value={divisa}
+                                options={optionsDivisa}
+                                onchange={handleDivisa}
+                                disabled = {isDivisa}>
+                            </lightning-combobox>
+                        </lightning-layout-item>
+                    </lightning-layout>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Importe de impacto en balance -->
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <template if:true={RT}>
+                                <lightning-input required="true" label={labels.impactoBalance} field-level-help={labels.disposicionMesCierreOportunidad} class="textBoxLeft user-input"  type="Number" disabled={isBalance} name="balance" value={balance} onchange={handleBalance}></lightning-input>
+                            </template>
+                            <template if:false={RT}>
+                                <lightning-input label={labels.impactoBalance} field-level-help={labels.disposicionMesCierreOportunidad} class="textBoxLeft user-input" type="Number" name="balance" disabled={isBalance} value={balance} onchange={handleBalance}></lightning-input>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout> 
+            </div>
+            <!--<div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                Balance FIN AÑO 
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <template if:true={RT}>
+                                <lightning-input required="true" label={labels.impactoBalFinAnio}  class="textBoxLeft user-input" type="Number" disabled={isImpBalance} value={impactoBalFinA} onchange={handleImpactoBalFinAn}></lightning-input>
+                            </template>
+                            <template if:false={RT}>
+                                <lightning-input label={labels.impactoBalFinAnio} class="textBoxLeft user-input" type="Number" name="Impacto Balance" disabled={isImpBalance} value={impactoBalFinA} onchange={handleImpactoBalFinAn}></lightning-input>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout> 
+            </div>-->
+            <div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                <!-- Comision estimada -->
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <template if:true={RT}>
+                                <lightning-input required="true" label={labels.comisionesLabel} field-level-help={labels.comisionesEstimadasMesCierreOportunidad} class="textBoxLeft user-input" type="Number" disabled={isComDivisa} value={comisiones} onchange={handleComisiones}></lightning-input>
+                            </template>
+                            <template if:false={RT}>
+                                <lightning-input label={labels.comisionesLabel} field-level-help={labels.comisionesEstimadasMesCierreOportunidad} class="textBoxLeft user-input" type="Number" name="Comisiones" disabled={isComDivisa} value={comisiones} onchange={handleComisiones}></lightning-input>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout> 
+            </div>
+            <!--<div class="slds-col slds-size_1-of-2 slds-p-horizontal_medium">
+                Comision FIN AÑO 
+                    <lightning-layout class="layout-padding">
+                        <lightning-layout-item size="12">
+                            <template if:true={RT}>
+                                <lightning-input required="true" label={labels.impactFinAn}  class="textBoxLeft user-input" type="Number" disabled={isImpComisiones} value={impactoComFinA} onchange={handleImpactoFinAn}></lightning-input>
+                            </template>
+                            <template if:false={RT}>
+                                <lightning-input label={labels.impactFinAn} class="textBoxLeft user-input" type="Number" name="Impacto Comisiones" disabled={isImpComisiones} value={impactoComFinA} onchange={handleImpactoFinAn}></lightning-input>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout> 
+            </div> -->
+        </div>    
+        <!-- Toggle -->
+        <lightning-layout class="layout-padding">
+            <lightning-layout-item size="12"> 
+                <div class="slds-grid layout-padding">
+                    <lightning-input type="toggle" class="user-input" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" onchange={handleOtraEntidad} checked={hasOtherEntity}></lightning-input>
+                    <label class="slds-form-element__label">{labels.productoEnOtraEntidad}</label>
+                </div>
+                
+                <div if:true={show}>
+
+                    <!-- Entidad/Compañia -->
+                    <div class="slds-col slds-p-horizontal_medium">
+                        <lightning-layout class="layout-padding">
+                            <lightning-layout-item size="12" >
+                                <lightning-input class="user-input" type="text" name="entidad"  label={labels.entidadLabel} value={entidad} onchange={handleEntidad}></lightning-input>
+                            </lightning-layout-item>
+                        </lightning-layout> 
+                    </div>       
+
+                    <!-- Fecha vencimiento en otra entidad -->
+                    <div class="slds-col slds-p-horizontal_medium">
+                        <lightning-layout class="layout-padding">
+                            <lightning-layout-item size="12" >
+                                <label class="slds-form-element__label"></span> {labels.fechaVtoLabel}</label>
+                                <lightning-input type="date" format="DD-MM-YY" class="user-input-fecha"  name="fechaVto" variant="label-hidden" value={fechaVto} onchange={handleFechavto}></lightning-input>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="slds-col slds-p-horizontal_medium">
+                        <lightning-layout class="layout-padding">
+                            <lightning-layout-item size="12">
+                                <lightning-input class="textBoxLeft user-input" type="Number"  label={labels.precioLabel} name="precio"  value={precio} onchange={handlePrecio}></lightning-input>
+                            </lightning-layout-item>
+                        </lightning-layout> 
+                    </div>
+
+                    <!-- Margen -->
+                    <div class="slds-col slds-p-horizontal_medium">
+                        <lightning-layout class="layout-padding">
+                            <lightning-layout-item size="12">
+                                <lightning-input class="textBoxLeft user-input" type="text"  label={labels.margenLabel} name="margen"  value={margen} onchange={handleMargen}></lightning-input>
+                            </lightning-layout-item>
+                        </lightning-layout> 
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+
+
+    </lightning-record-edit-form>
+</template>

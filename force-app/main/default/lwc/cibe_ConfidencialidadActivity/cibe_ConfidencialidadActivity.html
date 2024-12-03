@@ -1,0 +1,34 @@
+<template>
+    <lightning-card>
+        <div class= "slds-grid slds-grid_vertical-align-center slds-grid_align-center">
+            <div class="slds-col slds-m-around_medium slds-p-right_xx-large"> 
+                <lightning-input type="toggle" name="toggle" label={labels.confidencial} onchange={handleChange} checked={confidential} disabled={hasNotPermission}></lightning-input>
+                <template if:true={loading}>
+                    <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+    
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close" alternative-text={labels.cerrar} variant="inverse" size="x-small"></lightning-icon>
+                    <span class="slds-assistive-text">{labels.cancelar}</span>
+                </button>
+                <div class="slds-modal__content slds-p-around_medium slds-modal__content_headless" id="modal-content-id-1">
+                    <template if:true={confidential}>
+                        <p><strong>{labels.eventToConfidential}</strong></p>
+                    </template>
+                    <p>{labels.confirmacionCambiarConfidencialidad}</p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-button class="slds-float_left" variant="neutral" label={labels.cancelar} onclick={handleClose}></lightning-button>
+                    <lightning-button variant="brand" label={labels.guardar} onclick={handleSave}></lightning-button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

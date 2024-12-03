@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MCC__c</fullName>
+    <label>MCC</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Un deeplink se puede relacionar solamente con un MCC Motivo.</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>C - Motivo</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipName>MCC_Deeplink</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

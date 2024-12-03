@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ChangeStageNameCloseDate</fullName>
+    <active>false</active>
+    <description>No se puede cambiar el stage, name ni closeDate para recordtype que comiencen por CSBD</description>
+    <errorConditionFormula>AND(
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+AV_ByPassOpportunity_VR__c = false,
+ ISCHANGED(CloseDate),
+ ISCHANGED(Name ),
+ ISCHANGED(StageName),
+OR(
+ RecordType.DeveloperName = &quot;CSBD_Accion_Comercial&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Chat&quot;,
+ RecordType.DeveloperName = &quot;CSBD_CMB&quot;,
+ RecordType.DeveloperName = &quot;CSBD_CMN&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Compra_Estrella&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Desistimiento&quot;,
+ RecordType.DeveloperName = &quot;CSBD_DesistimientoPAI&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Hipoteca&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Prestamo&quot;,
+ RecordType.DeveloperName = &quot;CSBD_Renting&quot;,
+ RecordType.DeveloperName = &quot;CSBD_TPV&quot;
+) 
+)</errorConditionFormula>
+    <errorMessage>No es posible realizar el cambio de Stage, Name o CloseDate.</errorMessage>
+</ValidationRule>

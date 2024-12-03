@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ReclamacionCL</fullName>
+    <fields>Subject</fields>
+    <fields>Status</fields>
+    <fields>Origin</fields>
+    <fields>CC_Canal_Procedencia__c</fields>
+    <fields>SAC_SentidoResolucion__c</fields>
+    <fields>SAC_CasoEspecial__c</fields>
+    <fields>SAC_FechaVencimientoSLA__c</fields>
+    <label>SAC Reclamación compact layout</label>
+</CompactLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Sentimiento_Formula__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(CC_Sentimiento__c = &apos;0&apos;, IMAGE(&quot;/resource/1697642220000/CC_Neutro?&quot;,&apos;Neutro&apos;, 20, 40),
+IF(CC_Sentimiento__c = &apos;1&apos;, IMAGE(&quot;/resource/1697641585000/CC_Alerta?&quot;,&apos;Alerta&apos;, 20, 40),&apos;&apos;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Sentimiento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

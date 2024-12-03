@@ -1,0 +1,18 @@
+.paddingTask {
+	padding-left: 1rem;
+    padding-right: 1rem;
+	padding-bottom: 1rem;
+}
+
+.paddingTask2 {
+	padding-bottom: 0.5rem;
+}
+
+.formattedDate {
+    padding-top: var(--lwc-spacingXxSmall,0.25rem);
+    /*font-weight: bold;*/
+}
+
+.divtop {
+    margin-top: -2rem;
+}

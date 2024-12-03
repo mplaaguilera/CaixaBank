@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_AgrupacionBuzon__c</fullName>
+    <label>Agrupación buzón</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Buzón Avales Internacionales</fullName>
+                <default>false</default>
+                <label>Avales Internacionales</label>
+            </value>
+            <value>
+                <fullName>Buzón Calidad Créditos Documentarios</fullName>
+                <default>false</default>
+                <label>Calidad Créditos Documentarios</label>
+            </value>
+            <value>
+                <fullName>Buzón CC Confirming International</fullName>
+                <default>false</default>
+                <label>CC Confirming International</label>
+            </value>
+            <value>
+                <fullName>Buzón CCI Holabank</fullName>
+                <default>false</default>
+                <label>CCI Holabank</label>
+            </value>
+            <value>
+                <fullName>Buzón Comercio Exterior</fullName>
+                <default>false</default>
+                <label>Comercio Exterior</label>
+            </value>
+            <value>
+                <fullName>Buzón Contact Center Confirming</fullName>
+                <default>false</default>
+                <label>Contact Center Confirming</label>
+            </value>
+            <value>
+                <fullName>Buzón Contact Center International</fullName>
+                <default>false</default>
+                <label>Contact Center International</label>
+            </value>
+            <value>
+                <fullName>Buzón Crédito Stock</fullName>
+                <default>false</default>
+                <label>Crédito Stock</label>
+            </value>
+            <value>
+                <fullName>Buzón Efectivo COPS</fullName>
+                <default>false</default>
+                <label>Efectivo COPS</label>
+            </value>
+            <value>
+                <fullName>Buzón Export Finance</fullName>
+                <default>false</default>
+                <label>Export Finance</label>
+            </value>
+            <value>
+                <fullName>Buzón Export Online</fullName>
+                <default>false</default>
+                <label>Export Online</label>
+            </value>
+            <value>
+                <fullName>Buzón Factoring Sindicados</fullName>
+                <default>false</default>
+                <label>Factoring Sindicados</label>
+            </value>
+            <value>
+                <fullName>Buzón Financiación Comex</fullName>
+                <default>false</default>
+                <label>Financiación Comex</label>
+            </value>
+            <value>
+                <fullName>Buzón Inditex Suppliers</fullName>
+                <default>false</default>
+                <label>Inditex Suppliers</label>
+            </value>
+            <value>
+                <fullName>Buzón International Operations</fullName>
+                <default>false</default>
+                <label>International Operations</label>
+            </value>
+            <value>
+                <fullName>Buzón International Support</fullName>
+                <default>false</default>
+                <label>International Support</label>
+            </value>
+            <value>
+                <fullName>Buzón KYC Renewal</fullName>
+                <default>false</default>
+                <label>KYC Renewal</label>
+            </value>
+            <value>
+                <fullName>Buzón Operativa Comex</fullName>
+                <default>false</default>
+                <label>Operativa Comex</label>
+            </value>
+            <value>
+                <fullName>Buzón Service Desk</fullName>
+                <default>false</default>
+                <label>Service Desk</label>
+            </value>
+            <value>
+                <fullName>Buzón Servicio Firma</fullName>
+                <default>false</default>
+                <label>Servicio Firma</label>
+            </value>
+            <value>
+                <fullName>Buzón UAFE</fullName>
+                <default>false</default>
+                <label>UAFE</label>
+            </value>
+            <value>
+                <fullName>Buzón UAFE Express</fullName>
+                <default>false</default>
+                <label>UAFE Express</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

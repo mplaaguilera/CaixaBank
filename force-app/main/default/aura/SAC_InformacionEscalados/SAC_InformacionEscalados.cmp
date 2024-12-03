@@ -1,0 +1,21 @@
+<aura:component controller="SAC_Interaccion"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    <aura:attribute name="mensaje" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:if isTrue="{!not(empty(v.mensaje))}">
+
+    <div class="c-container">
+        <div class="slds-box" style="padding: 10px;background-color: #16325c;" >
+            <lightning:layout>
+                <lightning:layoutItem>
+                    <lightning:icon iconName="utility:warning" variant="warning" size="medium" />
+                </lightning:layoutItem>
+                <lightning:layoutItem>
+                    <p style="padding-top: 10px; padding-left:10px; color: white;">{!v.mensaje}</p>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </div>
+    </aura:if>
+</aura:component>

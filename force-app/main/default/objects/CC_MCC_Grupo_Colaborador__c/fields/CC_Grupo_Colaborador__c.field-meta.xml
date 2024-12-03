@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Grupo_Colaborador__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Grupo Colaborador</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>4 OR ((2 AND 1) OR 3)</booleanFilter>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.SAC_EndToEnd__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>SAC_GrupoProveedores</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>SAC_Letrados</value>
+        </filterItems>
+        <filterItems>
+            <field>$Profile.Name</field>
+            <operation>notEqual</operation>
+            <value>SAC_General</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>MCC Grupos Colaboradores</relationshipLabel>
+    <relationshipName>MCC_Grupos_Colaboradores</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,21 @@
+.THIS  .cc_divInfoCasoOrigen {
+    border-radius: 4px;
+}
+
+.THIS button.slds-button.slds-button_neutral,
+.THIS button.slds-button.slds-button_destructive,
+.THIS button.slds-button.slds-button_text-destructive,
+.THIS button.slds-combobox__input,
+.THIS textarea.slds-textarea,
+.THIS select.slds-select,
+.THIS input.slds-input,
+.THIS div.slds-combobox__input,
+.THIS div.slds-lookup__menu,
+.THIS div.slds-dropdown,
+.THIS ul.slds-dropdown,
+.THIS button.slds-button_icon:not(.slds-button_icon-bare),
+.THIS span.slds-pill,
+.THIS button.slds-button_icon-border-filled,
+.THIS span.slds-checkbox_faux {
+    border-color: rgb(201, 201, 201);
+}

@@ -1,0 +1,9 @@
+.buttonStyle {
+    padding: 5px;
+    background-color: #007eb2;
+    color: white;
+}
+.buttonStyleDisabled {
+    padding: 5px;
+    color: white;
+}

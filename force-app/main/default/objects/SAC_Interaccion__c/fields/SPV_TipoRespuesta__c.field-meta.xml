@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_TipoRespuesta__c</fullName>
+    <description>Campo para elegir el tipo de respuesta de los escalados de SPV</description>
+    <label>Tipo de respuesta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SPV_Aceptado</fullName>
+                <default>false</default>
+                <label>Aceptado</label>
+            </value>
+            <value>
+                <fullName>SPV_AceptadoConModificaciones</fullName>
+                <default>false</default>
+                <label>Aceptado con modificaciones</label>
+            </value>
+            <value>
+                <fullName>SPV_Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

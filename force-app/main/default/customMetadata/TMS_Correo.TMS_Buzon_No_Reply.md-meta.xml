@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón No Reply - TMS</label>
+    <protected>false</protected>
+    <values>
+        <field>TMS_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Testamentarias</value>
+    </values>
+    <values>
+        <field>TMS_Cola_Procedencia__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>TMS_Correo__c</field>
+        <value xsi:type="xsd:string">atencion.cliente@testamentarias.caixabank.com</value>
+    </values>
+    <values>
+        <field>TMS_Email__c</field>
+        <value xsi:type="xsd:string">atencion.cliente@testamentarias.caixabank.com</value>
+    </values>
+</CustomMetadata>

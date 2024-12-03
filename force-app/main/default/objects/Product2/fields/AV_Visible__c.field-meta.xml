@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Visible__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Para evitar que se creen nuevas oportunidades con un cierto producto que se quiera anular sin eliminar todo el producto.</description>
+    <label>Visible Alta Oportunidad</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

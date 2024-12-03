@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Experience__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Vertical (disfrutar de la vida, pensar en el futuro, dormir trnquilo y disfrutar de la vida)</description>
+    <label>Experiencia-Negocio</label>
+    <referenceTo>AV_ExperienceBusiness__c</referenceTo>
+    <relationshipLabel>Customer journeys</relationshipLabel>
+    <relationshipName>Customer_journeys</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

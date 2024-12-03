@@ -1,0 +1,18 @@
+<aura:component controller="SAC_LCMP_FichaDocumentoEnvio" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+
+<aura:attribute name="idDocumento" type="String" />
+
+ <!--Init-->
+ <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+ <!--refreshView-->
+ <aura:handler event="force:refreshView" action="{! c.init}" />
+
+    <div class="slds-col slds-box"
+    style="padding: 14px; margin: 9px; text-align:center; width:400px;">
+        <div style="margin: auto">
+            <lightning:fileCard fileId="{!v.idDocumento}" />
+        </div>
+    </div>
+
+</aura:component>

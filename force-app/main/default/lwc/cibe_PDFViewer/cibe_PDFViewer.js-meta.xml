@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>57.0</apiVersion>
+    <masterLabel>PDF Viewer</masterLabel>
+    <description>Parent component that shows a PDF in a modal from its correspondent visualforce. It returns pdf content as base64 if "Save" button is clicked.</description>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="label" type="String" label="Button and Modal Label"/>
+            <property name="visualforceName" type="String" label="VisualForce API Name"/>
+            <property name="hasRecordId" type="Boolean" label="¿RecordId as parameter?"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

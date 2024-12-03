@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Caso_No_Tabulado</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				ISCHANGED(Status),
+ISPICKVAL(Status,&quot;Cerrado&quot;),
+NOT(ISPICKVAL(Origin,&quot;Propuestas de mejora&quot;)),
+NOT(ISPICKVAL(Origin,&quot;Email - Revisar&quot;)),
+NOT(RecordType.DeveloperName = &quot;SEG_Cliente&quot;),
+OR(
+								ISBLANK(CC_MCC_Tematica__c),				ISBLANK(CC_MCC_ProdServ__c),				ISBLANK(CC_MCC_Motivo__c)),
+NOT(ISPICKVAL(Canal_del_Empleado__c, &quot;Hidden&quot;)),
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Pretension&quot;,
+RecordType.DeveloperName  &lt;&gt; &quot;AM_Parent_Case&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Pretension&quot;
+)</errorConditionFormula>
+    <errorMessage>No se puede cerrar un caso que no esté clasificado.</errorMessage>
+</ValidationRule>

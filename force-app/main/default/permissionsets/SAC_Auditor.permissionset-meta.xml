@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>SAC_Auditor</name>
+    </customPermissions>
+    <description>Permission Set auditor dedicado a los usuarios administradores del grupo colaborador COPS</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Case.SAC_ValidacionMCC__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SAC_Accion__c.SAC_FechaSolitudProrroga__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SAC_Accion__c.SAC_FechaVencimientoInicial__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SAC_Auditor</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SAC_Accion__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <recordTypeVisibilities>
+        <recordType>PersonAccount.SAC_NoCliente_PA</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+</PermissionSet>

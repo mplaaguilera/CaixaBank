@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_MiembroPrueba__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador que diferencia a los miembros de campaña reales (invitados al evento) de los miembros los cuales son target de las pruebas de creatividades únicamente.</description>
+    <label>Miembro de prueba</label>
+    <type>Checkbox</type>
+</CustomField>

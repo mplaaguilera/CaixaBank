@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All1</fullName>
+    <columns>NAME</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_FAQ__c.CC_Aplicaciones,CC_FAQ__c.CC_Categoria,CC_FAQ__c.CC_Espacios,CC_FAQ__c.CC_FAQ</value>
+    </filters>
+    <label>All</label>
+</ListView>

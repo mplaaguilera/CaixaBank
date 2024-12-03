@@ -1,0 +1,83 @@
+.chev-icon{
+	vertical-align: top;
+}
+.opp-title{
+	display: block;
+    line-height: normal;
+}
+.opp-stage{
+	color: rgb(45 86 116);
+	font-size: 12px;
+	font-style: italic;
+	padding-bottom: 0.4rem;
+	position: relative;
+	display: inline;
+}
+.opp-name{
+	padding-top: 0.4rem;
+}
+.button-label{
+	color: #006dcc;
+	vertical-align: sub;
+	cursor: pointer;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	font-size: 12px;
+}
+.main-icon{
+	margin-top: 0.1rem;
+}
+.main-label{
+	vertical-align: sub;
+	padding-left: 0.5rem;
+	font-size: 12px;
+}
+.last-opp-button{
+	padding-right: 0.7rem;
+	margin-right: 0.3rem;
+	background-image: linear-gradient(#4e4e4e 33%, rgba(255, 255, 255, 0) 0%);
+	background-position: right;
+	background-size: 0.1rem 0.25rem;
+	background-repeat: repeat-y;
+}
+.section-div{
+	display: grid;
+	/*overflow: auto;*/
+	margin: 1rem;
+	/*padding-bottom: 0.3rem;
+	padding-top: 0.3rem;*/
+}
+.opp-form{
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+.opp-link{
+	text-decoration: none;
+}
+.help-text-icon{
+	padding-left: 0.2rem;
+}
+.read-only-field{
+	padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+	margin-bottom: var(--lwc-spacingXSmall,0.5rem);
+}
+.read-only-label{
+	padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+}
+.header-layout{
+	height: 3rem;
+}
+.button-group{
+	position: relative;
+    top: 10%;
+}
+.span-button{
+    vertical-align: middle;
+}
+.center-buttons{
+	margin-top: auto;
+    margin-bottom: auto;
+}
+.chever-buttons{
+	margin-right: 1rem;
+}

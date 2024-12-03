@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIREC__SIREC_fld_sitMorosidade__c</fullName>
+    <deprecated>false</deprecated>
+    <label>Situación administrativa</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>000</fullName>
+                <default>false</default>
+                <label>REGULARIZADO</label>
+            </value>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>IMPAGADO</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>PRE-CONTENCIOSO OFICINA</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>PRE-CONTENCIOSO DELEGACION GENE</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>PROCEDIMIENTO JUDICIAL</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>CANCELADO POR CONSIGNACION JUDI</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>CANCELADO POR ADJUDICACION PROP</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>CANCELADO POR FALLIDO</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>CANCELADO CON QUEBRANTO</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <label>CANCELADO POR ADJUDICACION TERC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_usoFechaSysModTimestamp__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si se utilizará la fecha de la última actualización del registro para el purgado(en caso negativo se utilizará la fecha de creación)</description>
+    <label>Uso Fecha SysModTimestamp</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaVtoFinDeSemana</fullName>
+    <active>true</active>
+    <description>Comprobar que la fecha de vencimiento no cae en fin de semana</description>
+    <errorConditionFormula>IF(OR(WEEKDAY(SAC_FechaVencimientoProrroga__c) = 1, WEEKDAY(SAC_FechaVencimientoProrroga__c) = 7), true, false)</errorConditionFormula>
+    <errorMessage>Ha seleccionado sábado o domingo como fecha de vencimiento</errorMessage>
+</ValidationRule>

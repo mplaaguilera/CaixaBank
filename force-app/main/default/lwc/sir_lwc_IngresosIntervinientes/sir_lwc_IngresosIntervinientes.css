@@ -1,0 +1,65 @@
+th{
+    background-color: rgb(250, 250, 249);
+    color: rgb(81, 79, 77);
+    padding: 0.25rem 0.5rem;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.negrita {
+    font-weight: bold;
+}
+
+.negritaSuave {
+    font-weight: 600;
+}
+
+
+.bordeGris {
+    border-right: 1px solid lightgray;
+}
+.ancho {
+    width: 150px;
+}
+
+.colorBlanco{
+    background-color: white;
+}
+
+:host {
+    --sds-c-input-text-align: end;
+}
+
+.bordeIzquierda {
+    border-left: var(--lwc-borderWidthThin,1px) solid var(--lwc-colorBorder,rgb(229, 229, 229));
+}
+
+.bordeDerecha {
+    border-right: var(--lwc-borderWidthThin,1px) solid var(--lwc-colorBorder,rgb(229, 229, 229));
+}
+
+.textoAdap {
+    max-width: 300px;  
+    white-space: break-spaces;
+}
+
+.divImporte {
+    max-width: 150px;    
+}
+
+.tdImporte{
+    text-align: -webkit-center;
+}
+
+.fondoAzul {
+    background-color: #359CD5;
+    color: white;
+}

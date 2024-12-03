@@ -1,0 +1,25 @@
+.THIS .hrStyle {
+	margin: 3px;
+}
+.THIS .highlight {
+    /*height: 40px;*/
+	background-color: #F5F5FF;
+}
+.THIS .highlightDark {
+    /*height: 40px;*/
+    background-color:#e6e6F1;
+}
+.THIS .slds-listbox__option {
+    /*height: 40px;*/
+    line-height:24px;
+}
+
+.THIS .slds-media__figure {
+    margin-top: 1px !important;
+    line-height:0px;
+}
+
+.THIS .slds-media__body {
+    padding-top: 4px;
+	line-height: 24px;
+}

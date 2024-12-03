@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Salida</fullName>
+    <columns>NAME</columns>
+    <columns>NamedCredential__c</columns>
+    <columns>CBK_IsInput__c</columns>
+    <columns>RegistroTrazaIntegracion__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CBK_IsInput__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <label>Salida</label>
+    <language>en_US</language>
+</ListView>

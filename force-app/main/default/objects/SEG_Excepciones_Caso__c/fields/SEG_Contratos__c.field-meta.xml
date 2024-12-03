@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Contratos__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Contratos</label>
+    <referenceTo>SEG_Contratos__c</referenceTo>
+    <relationshipLabel>Excepciones</relationshipLabel>
+    <relationshipName>Excepciones_Contrato</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

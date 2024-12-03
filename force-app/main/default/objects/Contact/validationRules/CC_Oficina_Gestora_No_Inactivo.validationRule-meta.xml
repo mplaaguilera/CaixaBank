@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Oficina_Gestora_No_Inactivo</fullName>
+    <active>true</active>
+    <errorConditionFormula>PRIORVALUE( CC_OficinaGestoraId__c ) != CC_OficinaGestoraId__c &amp;&amp;
+ CC_OficinaGestoraId__r.CC_Inactivo__c</errorConditionFormula>
+    <errorDisplayField>CC_OficinaGestoraId__c</errorDisplayField>
+    <errorMessage>La oficina gestora no debe estar marcada como inactiva.</errorMessage>
+</ValidationRule>

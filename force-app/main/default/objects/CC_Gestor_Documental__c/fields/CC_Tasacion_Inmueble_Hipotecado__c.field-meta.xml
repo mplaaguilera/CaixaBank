@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tasacion_Inmueble_Hipotecado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Cuando solicita la tasación del inmueble hipotecado</inlineHelpText>
+    <label>Tasación del inmueble hipotecado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

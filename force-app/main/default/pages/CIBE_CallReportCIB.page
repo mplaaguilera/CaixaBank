@@ -1,0 +1,131 @@
+<apex:page renderAs="PDF" showHeader="false" sidebar="false" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" controller="CIBE_CallReportVFControllerCIB">
+    <html>
+        <head>
+            <style>
+                @page {
+                    margin-top:     170px;
+                    margin-left:    60px;
+                    @top-center {
+                        width: 100%;
+                        content: element(header);
+                    }
+                    @bottom-center {
+                        width: 100%;
+                        content: element(footer);
+                    }
+                }
+                div.header {
+                    padding-top: 70px;
+                    padding-left: 8px;
+                    display: block;
+                    position: running(header);
+                }
+                div.footer {
+                    display: block;
+                    position: running(footer);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div style="float: right;">
+                    <apex:image url="{!$Resource.CIBE_CallReportLogoCIB}" width="170" height="60" />
+                </div>
+
+                <apex:repeat value="{!accounts}" var="account">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">{!$Label.CIBE_Date}</th>
+                            <td style="padding-left: 10px; font-size: 14px;"><strong>{!eventWrapper.activityDate}</strong></td>
+                        </tr>
+                    </table>
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">{!$Label.CIBE_Company}</th>
+                            <td style="padding-left: 10px; font-size: 14px;"><strong>{!account.Name}</strong></td>
+                        </tr>
+                    </table>
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">{!$Label.CIBE_AppointmentType}</th>
+                            <td style="padding-left: 10px; font-size: 14px;">{!eventWrapper.type}</td>
+                        </tr>
+                    </table>
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 150px; padding-left: 10px;">{!$Label.CIBE_CustomerId}</th>
+                            <td style="padding-left: 10px; font-size: 14px;">{!account.CC_Numero_Documento__c}</td>
+                        </tr>
+                    </table>
+                </apex:repeat>
+            </div>
+
+            <div class="footer">
+                <hr style="color: #02b2f7;"></hr>
+                <div>
+                    <span style="font-size: 10px;">{!$Label.CIBE_ConfidentialInformation}</span><span style="color: #7e7e7e; margin-left: 10px; font-size: 10px;">© Caixabank, S.A.</span>
+                </div>
+            </div>
+
+            <div class="content" style="margin-top: 300px;">
+                <apex:pageBlock rendered="{!OR(eventWrapper.attorneyAttendees.size != 0, eventWrapper.contactsAttendees.size != 0)}">
+                    <div style="page-break-inside: avoid;">
+                        <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                            <tr>
+                                <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 55%; padding-left: 10px;">{!$Label.CIBE_Attendees}</th>
+                                <th style="background-color: #D8D8D8; color: #000000; border: 1px solid #FFFFFF; width: 45%; padding-left: 10px;">{!$Label.CIBE_Responsability}</th>
+                            </tr>
+                            <apex:repeat value="{!eventWrapper.attorneyAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.CIBE_Carrec__c}</td>
+                                </tr>
+                            </apex:repeat>
+                            <apex:repeat value="{!eventWrapper.contactsAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.CIBE_Cargo__c}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:pageBlock>
+
+                <apex:pageBlock rendered="{!eventWrapper.employeeAttendees.size != 0}">
+                    <div style="page-break-inside: avoid; margin-top: 20px;">
+                        <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                            <tr>
+                                <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 55%; padding-left: 10px;">{!$Label.CIBE_AttendeesCaixabank}</th>
+                                <th style="background-color: #D8D8D8; color: #000000; border: 1px solid #FFFFFF; width: 45%; padding-left: 10px;">{!$Label.CIBE_Responsability}</th>
+                            </tr>
+                            <apex:repeat value="{!eventWrapper.employeeAttendees}" var="attendee">
+                                <tr>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.Name}</td>
+                                    <td style="padding-left: 10px; font-size: 14px;">{!attendee.AV_DescFuncion__c}</td>
+                                </tr>
+                            </apex:repeat>
+                        </table>
+                    </div>
+                </apex:pageBlock>
+
+                <div style="page-break-inside: avoid; margin-top: 40px;">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 125px; min-width: 125px; min-height: 40px; padding-left: 10px; vertical-align: text-top;">{!$Label.CIBE_Purpose}</th>
+                            <td style="padding-left: 10px; vertical-align: text-top; word-wrap: break-word; font-size: 14px;">{!eventWrapper.subject}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="page-break-inside: avoid; margin-top: 30px;">
+                    <table style="border-collapse: collapse; border: 1px solid #FFFFFF; width: 100%;">
+                        <tr>
+                            <th style="background-color: #2E74B5; color: #FFFFFF; border: 1px solid #FFFFFF; width: 125px; min-width: 125px; min-height: 200px; padding-left: 10px; vertical-align: text-top;">{!$Label.CIBE_CustomerMainPoints}</th>
+                            <td style="padding-left: 10px; vertical-align: text-top; word-wrap: break-word; font-size: 14px; word-wrap: break-word; white-space: pre-wrap;">{!eventWrapper.conclusions}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page>

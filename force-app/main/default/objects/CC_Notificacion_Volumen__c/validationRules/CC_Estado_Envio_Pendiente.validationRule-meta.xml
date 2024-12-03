@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado_Envio_Pendiente</fullName>
+    <active>false</active>
+    <errorConditionFormula>NOT(ISPICKVAL(CC_Estado__c, &quot;Envío pendiente&quot;))</errorConditionFormula>
+    <errorMessage>No se pueden editar actualizaciones de volumen con estado distinto a &quot;Envío pendiente&quot;.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_IncidenciaRetransmision</fullName>
+    <active>true</active>
+    <errorConditionFormula>IF( 
+    ISPICKVAL( EV_Notification__c , &apos;004&apos;) &amp;&amp;
+    OR(
+        ISPICKVAL(Status, &apos;001&apos;),
+        ISPICKVAL(Status, &apos;002&apos;),
+        ISPICKVAL(Status, &apos;003&apos;),
+        ISPICKVAL(Status, &apos;006&apos;),
+        ISPICKVAL(Status, &apos;007&apos;),
+        ISPICKVAL(Status, &apos;008&apos;),
+        ISPICKVAL(Status, &apos;009&apos;),
+        ISPICKVAL(Status, &apos;010&apos;),
+        ISPICKVAL(Status, &apos;011&apos;)
+     ), 
+    TRUE, 
+    FALSE
+)</errorConditionFormula>
+    <errorMessage>El estado de la campaña debe ser en curso o finalizado para poder notificar incidencia</errorMessage>
+</ValidationRule>

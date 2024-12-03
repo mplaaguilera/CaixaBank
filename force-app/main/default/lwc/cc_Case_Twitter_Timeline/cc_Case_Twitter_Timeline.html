@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title="Histórico de Interacciones">     
+        <article class="slds-card">
+            <div class="body_component">
+                <ul class="slds-timeline">
+                    <template if:true={interacciones.data}>
+                        <template for:each={interacciones.data} for:item="msg">   
+                            <c-cc_-timeline_-item key={msg.Id} msg={msg} isexpanded=true></c-cc_-timeline_-item>
+                        </template>
+                    </template>
+                    
+                </ul>
+            </div>
+        </article>
+    </lightning-card>
+</template>

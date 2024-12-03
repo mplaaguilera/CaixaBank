@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="checkboxRedaccion" type="Boolean"/>
+    <aura:attribute name="procedencia" type="String"/>
+    <aura:attribute name="etapa1" type="Boolean"/>
+    <aura:attribute name="etapa2" type="Boolean"/>
+    <aura:attribute name="etapa3" type="Boolean"/>
+</aura:event>

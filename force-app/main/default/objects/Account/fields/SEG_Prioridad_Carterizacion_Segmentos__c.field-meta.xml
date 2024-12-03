@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Prioridad_Carterizacion_Segmentos__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Al marcar esta opción se indica que la carterización de los campos informados en Oficina Gestora (Segmentos) y Empleado gestor (Segmentos) prevalecen sobre los campos de carterización de Alfabético</inlineHelpText>
+    <label>Prioridad Carterización Segmentos</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

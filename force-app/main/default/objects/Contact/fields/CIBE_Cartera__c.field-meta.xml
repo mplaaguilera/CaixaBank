@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Cartera__c</fullName>
+    <label>Cartera</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CIBE_Sector__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Energy Corporates</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Energy Renewables</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Construction &amp; Infraestructure I</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Construction  &amp; Infraestructure II</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Real Estate</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>TMTs</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>Engineering &amp; Environmental</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>Auto, Shipping &amp; Logistics</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <label>Retail, Consumer Goods &amp; Logistics</label>
+            </value>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <label>Transport, Building Materials &amp; IT</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <label>Healthcare</label>
+            </value>
+            <value>
+                <fullName>012</fullName>
+                <default>false</default>
+                <label>Food &amp; Beverage</label>
+            </value>
+            <value>
+                <fullName>013</fullName>
+                <default>false</default>
+                <label>FIG</label>
+            </value>
+            <value>
+                <fullName>014</fullName>
+                <default>false</default>
+                <label>Bancos - Latam y Europa</label>
+            </value>
+            <value>
+                <fullName>015</fullName>
+                <default>false</default>
+                <label>Bancos - Asia y Oriente Medio</label>
+            </value>
+            <value>
+                <fullName>016</fullName>
+                <default>false</default>
+                <label>Bancos - Africa y Norteamerica</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>001</controllingFieldValue>
+            <valueName>001</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>001</controllingFieldValue>
+            <valueName>002</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>002</controllingFieldValue>
+            <valueName>003</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>002</controllingFieldValue>
+            <valueName>004</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>002</controllingFieldValue>
+            <valueName>005</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>003</controllingFieldValue>
+            <valueName>006</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>003</controllingFieldValue>
+            <valueName>007</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>004</controllingFieldValue>
+            <valueName>008</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>004</controllingFieldValue>
+            <valueName>009</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>004</controllingFieldValue>
+            <valueName>010</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>005</controllingFieldValue>
+            <valueName>011</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>005</controllingFieldValue>
+            <valueName>012</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>006</controllingFieldValue>
+            <valueName>013</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>006</controllingFieldValue>
+            <valueName>014</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>006</controllingFieldValue>
+            <valueName>015</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>006</controllingFieldValue>
+            <valueName>016</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

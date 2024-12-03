@@ -1,0 +1,41 @@
+.THIS .slds-button.boton_estrecho {
+    height: 28px;
+}
+
+.THIS .rojo svg {
+    background-color: #f77e75 !important;
+}
+
+.THIS .divScrollVertical {
+    max-height: 820px;
+    overflow-y: scroll;
+    margin-top: 0px;
+}
+
+.THIS .cc_blink {
+    animation-name: cc_blink_keyframes;
+    animation-iteration-count: 2;
+    animation-duration: 0.4s;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+}
+
+@keyframes cc_blink_keyframes {
+    50% { opacity: 0.3; }
+}
+
+.THIS ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 2px;
+}
+
+.THIS ::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: rgb(43, 96, 133, .6);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.THIS .botonFFEE{
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 132px;
+}

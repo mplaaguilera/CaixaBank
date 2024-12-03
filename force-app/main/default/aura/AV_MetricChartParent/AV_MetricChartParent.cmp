@@ -1,0 +1,35 @@
+<!--********************************************************************************************************************
+Name:	  AV_MetricChartParent
+Copyright © 2022  CaixaBank
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Proposito: This component has LWC av_MetricChartWrapper embedded and refreshes it when current tab is focused
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY			AUTHOR				DATE			Description
+1.0			Org. Health    		Víctor Santiago		31/03/2022		Init version
+
+*********************************************************************************************************************-->
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+
+    <!-- ATTRIBUTES FROM DESIGN -->
+    <aura:attribute name="hasHeader"        default="false" type="Boolean" access="global"/>
+    <aura:attribute name="headerIcon"       default="standard:dashboard" type="String" access="global"/>
+    <aura:attribute name="headerTitle"      default="" type="String" access="global"/>
+    <aura:attribute name="headerSubtitle"   default="" type="String" access="global"/>
+    <aura:attribute name="listDatasets"     default="" type="String" access="global"/>
+    
+    <!-- INIT AURA COMPONENT -->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler event="lightning:tabFocused" action="{!c.onTabFocused}"/>
+    <c:av_MetricChartsWrapper
+        aura:id="mcchild"
+        hasHeader="{!v.hasHeader}"
+        headerIcon="{!v.headerIcon}"
+        headerTitle="{!v.headerTitle}"
+        headerSubtitle="{!v.headerSubtitle}"
+        listDatasets="{!v.listDatasets}"
+        recordId="{!v.recordId}"
+    />
+
+</aura:component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EmailEntrante__c</fullName>
+    <description>Indica el email desde el que se van a recibir los correos electrónicos y mediante el cual se va a realizar la parametrización.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Indica el email desde el que se van a recibir los correos electrónicos y mediante el cual se va a realizar la parametrización.</inlineHelpText>
+    <label>Email entrante</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Email</type>
+    <unique>false</unique>
+</CustomField>

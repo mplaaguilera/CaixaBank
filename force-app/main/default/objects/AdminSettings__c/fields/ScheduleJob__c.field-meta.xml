@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ScheduleJob__c</fullName>
+    <description>Framework de BACTH APEX JOBS: minutos entre planificaciones del CORE</description>
+    <externalId>false</externalId>
+    <label>ScheduleJob</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_DetallesSegmentos</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Tematica__c</columns>
+    <columns>CC_Fecha_Vigencia_Inicio__c</columns>
+    <columns>CC_Fecha_Vigencia_Fin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.SEG_Detalle</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Segmentos</value>
+    </filters>
+    <label>Detalles Segmentos</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

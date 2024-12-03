@@ -1,0 +1,34 @@
+.current_filter {
+    color: rgb(8, 7, 7);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.25;
+    display: block;
+    cursor: pointer;
+}
+ 
+
+.current_filter:hover {
+    text-decoration: underline;
+}
+ 
+.custom_list_view {
+    max-width:  400px;
+}
+ 
+.list_view_container {
+    max-width:  max-content;
+}
+ 
+.list_view_and_table_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.overflow-text{
+    text-overflow: ellipsis;
+}

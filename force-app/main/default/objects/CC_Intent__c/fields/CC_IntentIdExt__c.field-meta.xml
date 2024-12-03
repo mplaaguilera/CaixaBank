@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IntentIdExt__c</fullName>
+    <description>Identificador externo del Intent</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>Identificador externo del Intent</inlineHelpText>
+    <label>Intent Id Externo</label>
+    <length>100</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

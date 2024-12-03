@@ -1,0 +1,442 @@
+.contenedor {
+	margin-top: 0px;
+	height: var(--contenedor-height);
+	display: flex;
+	gap: 3px;
+}
+
+.columnaAcciones {
+	min-width: 517px;
+	width: 517px;
+}
+
+.columnaLog {
+	padding-top: 5px;
+	flex: 1;
+}
+
+.bannerEstadoSuscripcion {
+	border-radius: 7px;
+	padding: 9px 9px 9px 20px;
+	will-change: background-color, color;
+	transition: background-color 800ms ease, color 800ms ease;
+	cursor: default;
+}
+
+.bannerEstadoSuscripcion.slds-theme_success {
+	background-color: #1fb373;
+}
+
+.bannerEstadoSuscripcion.pendienteApex {
+	background-color: #e58a59;
+	color: white;
+}
+
+.logDiv {
+	padding: 8px 12px 8px 2px;
+	background-color: #fafafa;
+	border: 1px solid rgb(201, 201, 201);
+	/* height: 100%⁄; */
+	height: calc(100vh - 150px);
+	min-height: 334px;
+	/* max-height: calc(100vh - 170px); */
+	border-radius: 5px;
+	overflow-y: auto;
+}
+
+.logDiv div:last-of-type hr:last-of-type {
+	display: none;
+}
+
+.log {
+	overflow: hidden;
+	max-height: 3px;
+	will-change: max-height;
+	animation: expand 210ms 1 normal forwards;
+	animation-timing-function: cubic-bezier(0.56, 0.09, 0.92, 0.77);
+}
+
+@keyframes expand {
+	from {max-height: 3px;}
+	to {max-height: 1600px;}
+}
+
+.logMensajeCabecera {
+	display: block;
+	/* @sldsValidatorIgnore */
+	font-size: 12px;
+	font-weight: 500;
+	opacity: 0.1;
+	will-change: opacity;
+	animation: fadeIn 170ms 1 normal forwards;
+	cursor: default;
+}
+
+.logMensajeCabecera.logMensajeCabeceraEvento .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #5097d1;
+}
+
+.logMensajeCabecera.logMensajeCabeceraError .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #e46160;
+}
+
+.logMensajeCabecera.logMensajeCabeceraInfo .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #a3a3a3;
+}
+
+.logMensajeCabecera.logMensajeCabeceraApex .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #e58a59;
+}
+
+.logMensajeCabecera.logMensajeCabeceraRespuestaApex .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #1cb473;
+}
+
+.logMensajeCabecera.logMensajeCabeceraCustomAttributes .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #b090d1;
+}
+
+.logMensajeCabecera.logMensajeCabeceraApiPurecloud .logMensajeCabeceraIcono {
+	--slds-c-icon-color-foreground-default: #34aab9;
+}
+
+.logMensajeCabeceraIcono {
+	position: relative;
+	top: -1px;
+}
+
+.logMensaje {
+	margin-bottom: 2px;
+	opacity: 0.1;
+	will-change: opacity;
+	animation: fadeIn 180ms 1 normal forwards;
+	cursor: default;
+}
+
+.logMensajeDetalle {
+	/* @sldsValidatorIgnore */
+	font-size: 11.5px;
+	color: #e75512;
+}
+
+.logMensajeDetalleIcono {
+	position: relative;
+	top: 1px;
+	--slds-c-icon-color-foreground-default: #f48341;
+}
+
+.logMensajeDetalleIconoFlecha {
+	--slds-c-icon-color-foreground-default: darkgray;
+}
+
+@keyframes fadeIn {
+	from {opacity: 0.1;}
+	to {opacity: 1;}
+}
+
+.logError {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 0px 10px;
+	padding: 6px 4px 8px 8px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #e5615f;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logEvento {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 0px 10px;
+	padding: 6px 4px 8px 8px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #5097d1;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logInfo {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 10px 0px;
+	padding: 9px 4px 9px 10px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #a3a3a3;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logApex {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 10px 0px;
+	padding: 9px 4px 9px 10px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #e58a59;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logRespuestaApex {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 10px 0px;
+	padding: 9px 4px 9px 10px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #1cb473;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logCustomAttributes {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 10px 0px;
+	padding: 9px 4px 9px 10px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #b090d1;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms linear;
+}
+
+.logApiPurecloud {
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 10.3px;
+	line-height: 15.8px;
+	margin: 6px 1px 8px 12px;
+	border-radius: 10px 10px 10px 0px;
+	padding: 9px 4px 9px 10px;
+	word-break: break-all;
+	white-space: pre-wrap;
+	background-color: #34aab9;
+	color: white;
+	will-change: filter;
+	transition: filter 90ms ease-in-out;
+}
+
+.logError:hover,
+.logEvento:hover,
+.logInfo:hover,
+.logApex:hover,
+.logRespuestaApex:hover,
+.logCustomAttributes:hover,
+.logApiPurecloud:hover {
+	filter: brightness(94%) saturate(130%);
+}
+
+.botonCopiarLog {
+	visibility: hidden;
+	opacity: 0;
+	position: absolute;
+	top: 6px;
+	right: 11px;
+	--slds-c-icon-color-foreground: #eeeeee;
+	--slds-c-icon-color-foreground-default: #eeeeee;
+	--slds-c-button-text-color-hover: white;
+	transition: visibility 70ms linear, opacity 70ms linear;
+}
+
+.logEvento:hover + .botonCopiarLog,
+.logInfo:hover + .botonCopiarLog,
+.logApex:hover + .botonCopiarLog,
+.logApex:hover + .botonCopiarLog,
+.logRespuestaApex:hover + .botonCopiarLog,
+.logCustomAttributes:hover + .botonCopiarLog,
+.logApiPurecloud:hover + .botonCopiarLog {
+	visibility: visible;
+	opacity: 1;
+}
+
+.botonCopiarLog:hover {
+	visibility: visible;
+	opacity: 1;
+}
+
+.logSeparador {
+	border-color: #d8d8d8;
+	margin: 11px 6px 10px 21px;
+}
+
+.labelSeccion {
+	font-weight: 500;
+	margin-bottom: 4px;
+}
+
+.grupoBotones {
+	width: 100%;
+}
+
+.botonMetodoApex {
+	will-change: background-color;
+	flex: 1;
+	justify-content: start;
+	border-color: rgb(201, 201, 201);
+	transition: background-color 100ms ease-in-out;
+	padding: 0px 9px 0px 11px;
+}
+
+.botonMetodoApex.botonMetodoApexBlink {
+	animation-name: botonMetodoApexBlinkKf;
+	animation-duration: 3s;
+}
+
+@keyframes botonMetodoApexBlinkKf {
+	0% {background-color: unset;}
+	9% {background-color: #ffd9bf;}
+	100% {background-color: unset;}
+}
+
+.botonMetodoApexAcciones {
+	border-color: rgb(201, 201, 201);
+	will-change: background-color, color;
+	transition: background-color 100ms ease-in-out;
+}
+
+.botonMetodoApex:hover,
+.botonMetodoApexAcciones:hover {
+	background-color: rgb(229, 238, 249);
+	border-color: rgb(190, 190, 190);
+	color: #194a67;
+}
+
+.botonMetodoApexInputsIcono {
+	scale: 0.9;
+	--slds-c-icon-color-foreground-default: #929292;
+}
+
+.botonMetodoApexAcciones:hover .botonMetodoApexInputsIcono {
+	--slds-c-icon-color-foreground-default: #696969;
+}
+
+.botonMetodoApexAcciones {
+	--slds-c-icon-color-foreground-default: #134a66;
+}
+
+.modalModificarInputApex,
+.modalSimularRecepcionEvento {
+	padding-top: 12px;
+	padding-bottom: 16px;
+}
+
+.textareaJsonInputApex,
+.textareaJsonInputApexText,
+.textareaJsonSimularApiPurecloud {
+	--sds-c-textarea-sizing-min-height: 160px;
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 11px;
+}
+
+.textareaJsonSimularEvento {
+	--sds-c-textarea-sizing-min-height: 190px;
+	font-family: monospace;
+	/* @sldsValidatorIgnore */
+	font-size: 11px;
+}
+
+.modalBackdrop {
+	background-color: rgb(8, 7, 7, 0.18);
+	border-radius: 4px;
+}
+
+.negrita {
+	font-weight: 600;
+}
+
+.iconoSeleccionable {
+	--slds-c-icon-color-foreground: #989898;
+	--slds-c-button-text-color-hover: #596c78;
+}
+
+.iconoBorrar {
+	--slds-c-icon-color-foreground: #df5e5e;
+	--slds-c-button-text-color-hover: #c91111;
+}
+
+.iconoSeleccionable.iconoSeleccionado {
+	--slds-c-icon-color-foreground: #04659d;
+	--slds-c-button-text-color-hover: #0c4d72;
+}
+
+.spanIdInteraccion {
+	line-height: 29px;
+	width: 100%;
+	padding: 0px 16px 0px 12px;
+	display: inline-block;
+	border: var(--lwc-borderWidthThin,1px) solid var(--slds-c-input-color-border, var(--sds-c-input-color-border, var(--slds-g-color-border-base-4, var(--lwc-colorBorderInput,rgb(201, 201, 201)))));
+	border-radius: 4px;
+	background-color: whitesmoke;
+	color: var(--lwc-colorTextPlaceholder,rgb(116, 116, 116));
+}
+
+.slds-modal .slds-backdrop {
+	will-change: opacity;
+}
+
+.logTitulo {
+	font-family: system-ui;
+	/* @sldsValidatorIgnore */
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.divLogTipo {
+	position: relative;
+	/* @sldsValidatorIgnore */
+	font-size: 11px;
+	font-weight: var(--lwc-fontWeightRegular, 400);
+	text-transform: uppercase;
+	top: 0.5px;
+}
+
+.logMensaje .logTitulo + .logTexto {
+	margin-top: 8px;
+	margin-left: 6px;
+}
+
+.inputBordeGris {
+	--slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+.buttonIconBordeGris {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+.buttonBordeGris {
+	--slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}

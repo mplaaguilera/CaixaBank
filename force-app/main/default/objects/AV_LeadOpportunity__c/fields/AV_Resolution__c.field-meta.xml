@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Resolution__c</fullName>
+    <label>Resolucion</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Elige otra entidad por precio</fullName>
+                <default>false</default>
+                <label>Elige otra entidad por precio</label>
+            </value>
+            <value>
+                <fullName>Elige otra entidad características por producto</fullName>
+                <default>false</default>
+                <label>Elige otra entidad características por producto</label>
+            </value>
+            <value>
+                <fullName>No le interesa por precio</fullName>
+                <default>false</default>
+                <label>No le interesa por precio</label>
+            </value>
+            <value>
+                <fullName>No le interesa por las características del producto</fullName>
+                <default>false</default>
+                <label>No le interesa por las características del producto</label>
+            </value>
+            <value>
+                <fullName>Perfil cliente inadecuado</fullName>
+                <default>false</default>
+                <label>Perfil cliente inadecuado</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Venta desestimada</fullName>
+                <default>false</default>
+                <label>Venta desestimada</label>
+            </value>
+            <value>
+                <fullName>Denegada/Automáticamente por Now</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Automáticamente por Now</label>
+            </value>
+            <value>
+                <fullName>Denegada/Endeudamiento</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Endeudamiento</label>
+            </value>
+            <value>
+                <fullName>Denegada/Finalidad no acreditable</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Finalidad no acreditable</label>
+            </value>
+            <value>
+                <fullName>Denegada/Ingresos Inestables</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Ingresos Inestables</label>
+            </value>
+            <value>
+                <fullName>Denegada/Morosidad</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Morosidad</label>
+            </value>
+            <value>
+                <fullName>Denegada/No contratable por Now</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/No contratable por Now</label>
+            </value>
+            <value>
+                <fullName>Denegada/Operativa inadecuada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Operativa inadecuada</label>
+            </value>
+            <value>
+                <fullName>Denegada/Perfil de Riesgo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Perfil de Riesgo</label>
+            </value>
+            <value>
+                <fullName>Denegada/Reestructuración de deudas vigentes</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Reestructuración de deudas vigentes</label>
+            </value>
+            <value>
+                <fullName>Denegada/Sin ahorros</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Denegada/Sin ahorros</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Competencia, Precio</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Competencia, Precio</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Documentación no recibida</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Documentación no recibida</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/En trámite o Decide ir a oficina</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/En trámite o Decide ir a oficina</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/No localizado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/No localizado</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Por el cliente en Now</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Por el cliente en Now</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Sin vivienda</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Sin vivienda</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Solicitud pospuesta</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Solicitud pospuesta</label>
+            </value>
+            <value>
+                <fullName>Desistido cliente/Sondeo concesión o Sol. información</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desistido cliente/Sondeo concesión o Sol. información</label>
+            </value>
+            <value>
+                <fullName>Lead PHD No Viable</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Lead PHD No Viable</label>
+            </value>
+            <value>
+                <fullName>Traspasada Consumo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Traspasada Consumo</label>
+            </value>
+            <value>
+                <fullName>Traspasada HolaBank</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Traspasada HolaBank</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

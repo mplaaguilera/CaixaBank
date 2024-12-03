@@ -1,0 +1,57 @@
+<aura:component controller= "CC_SeleccionarGC_CI_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	
+    <!--Atributos-->
+    <aura:attribute name="optionsGrupo" type="List" />
+    <aura:attribute name="grupoSeleccionadoValue" type="String" />
+    <aura:attribute name="grupoSeleccionadoName" type="String" />
+    <aura:attribute name="defaultValue" type="String"  default=""/>
+    <aura:attribute name="opcionSeleccionada" type="Boolean" default="false"/>
+    
+    <!--Handler-->
+    <aura:handler name="init" value="{! this }" action="{! c.iniciar }"/>
+    
+    <!--Card-->
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="Grupo de Comunicación Informativa">
+                        <lightning:icon iconName="standard:picklist_choice" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Grupo de Comunicación Informativa">
+                            <span>Grupo de Comunicación Informativa</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+    
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+            
+            <!--Desplegable Grupos Colaboradores-->
+            <div>
+                <lightning:combobox aura:id="grupoColaboradorDesplegable"
+                                    name="grupo_Colaborador_Desplegable"
+                                    label="Grupo de Comunicación Informativa"
+                                    placeholder="{!v.defaultValue}"
+                                    value=""
+                                    dropdownAlignment="right"
+                                    options="{!v.optionsGrupo}"
+									onchange="{!c.seleccionaGrupoColaborador}"/>
+            </div>
+        </div>
+        
+        <!--Footer-->
+        <footer class="slds-card__footer">
+            <aura:if isTrue="{!v.opcionSeleccionada}">
+            	<lightning:button variant ="brand" class="slds-button slds-float_right" label="Guardar" title="Guardar" onclick="{!c.guardar}"/>
+            </aura:if> 
+            <div style="height:33px;"/>
+        </footer>
+    </article>
+</aura:component>

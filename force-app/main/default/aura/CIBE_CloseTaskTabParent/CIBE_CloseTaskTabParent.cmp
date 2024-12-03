@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="appEvent" type="c:AV_ReportAppEvent"/>
+    <c:cibe_CloseTaskTab onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:cibe_CloseTaskTab>
+</aura:component>

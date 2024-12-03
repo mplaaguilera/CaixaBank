@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_esRona2__c</fullName>
+    <description>Campo que se utiliza para extraer los chat de agentes desconectados o con pérdida de conexión</description>
+    <formula>IF(  AND( OR(ISPICKVAL(Status, &apos;Unavailable&apos;),ISPICKVAL(Status, &apos;Canceled&apos;))  ,OR (ISNULL(PushTimeoutDateTime), ISBLANK(PushTimeoutDateTime) )), true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Rona 2</label>
+    <type>Checkbox</type>
+</CustomField>

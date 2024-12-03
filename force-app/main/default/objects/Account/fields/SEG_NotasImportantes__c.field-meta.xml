@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_NotasImportantes__c</fullName>
+    <description>Las notas incluidas en este campo se heredarán en la SR.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Notas Empresa en SR</label>
+    <length>1000</length>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

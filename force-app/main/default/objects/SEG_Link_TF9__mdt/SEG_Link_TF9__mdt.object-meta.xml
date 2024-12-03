@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Custom setting que contiene los parametros de la url del link operativo tf9, muestra si esta activo, y la sección donde queremos mostrar se tiene que mostrar.</description>
+    <label>SEG_Link_TF9</label>
+    <pluralLabel>SEG_Link_TF9s</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

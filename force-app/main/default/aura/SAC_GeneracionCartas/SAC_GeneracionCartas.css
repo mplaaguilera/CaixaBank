@@ -1,0 +1,18 @@
+.THIS .TextAreaFull:last-child .slds-rich-text-area__content{
+    height: 83vh;
+    max-height: 100vh;
+}
+.THIS .slds-checkbox_toggle [type=checkbox]:checked+.slds-checkbox_faux_container .slds-checkbox_faux{
+    border-color: rgb(53 185 255) !important;
+    background-color: rgb(53 185 255) !important;
+}
+
+
+.THIS .slds-checkbox_toggle .slds-form-element__label{
+    color: white !important;
+}
+.THIS .slds-checkbox_on{
+    color: white !important;
+}.THIS .slds-checkbox_off{
+    color: white !important;
+}

@@ -1,0 +1,179 @@
+<template >
+
+
+<div class="slds-m-bottom_xx-large">
+
+    <lightning-card title="Oficinas afectadas" icon-name="standard:account">
+        <div slot="actions">
+          <div class="slds-float_right">              
+              <lightning-button-icon
+                  icon-name="utility:refresh"
+                  title="Refrescar"
+                  onclick={handleRecargarOficinas}>
+              </lightning-button-icon>
+          </div>
+        </div>
+
+
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+
+
+                <!-- <template for:each={oficinasAfectadas} for:item="oficina"  >
+
+                    <div class="slds-grid slds-wrap tarjetaObjIntermedio" key={oficina.Id} >
+
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-icon  icon-name="standard:store_group" alternative-text="oficina" title="Oficina afectada" size="medium" class="mi-icono" ></lightning-icon>
+                            <lightning-button variant="base" label={oficina.SPV_OficinaAfectada_Lookup__r.Name} onmouseover={handleMouseOver} onmousemove={handleMouseOver} onmouseleave={handleMouseLeave} name={oficina.SPV_OficinaAfectada_Lookup__c} onclick={verOficinaAfectadaClick} key={oficina.Id} data-target-id={oficina.SPV_OficinaAfectada_Lookup__c} ></lightning-button>
+                        </div>
+
+
+                        <div class="slds-col slds-size_1-of-3">
+                        <lightning-record-edit-form object-api-name="SAC_ImagenDocumento__c" record-id={oficina.Id}>
+                                <lightning-output-field field-name="SPV_DAN_OficinaAfectada__c" value={oficina.SPV_DAN_OficinaAfectada__c}></lightning-output-field>
+                        </lightning-record-edit-form>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-button class="slds-float_right" variant="brand" name={oficina.Id} id={oficina.Id} label="Eliminar" onclick={handleEliminarOficinaAfectada}> </lightning-button>
+                            
+                        </div>
+                        <br><br/>
+
+                    </div>  -->
+
+
+                 <!--   <lightning-record-edit-form object-api-name="SAC_ImagenDocumento__c" key={oficina.Id} record-id={oficina.Id} onsubmit={handleSubmit} onsuccess={handleSucces}>
+                        <div class="slds-form__item" role="listitem" >
+                            <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                                <div class="slds-grid slds-wrap">
+
+                                    <div class="slds-size_2-of-2">
+                                        <lightning-button class="slds-float_right" variant="brand" id={oficina.Id} label="Eliminar">
+                                        </lightning-button>
+                                    </div>
+                                    
+                                    <div class="slds-size_1-of-2">
+                                        <lightning-output-field field-name="SPV_OficinaAfectada_Lookup__c" value={oficina.SPV_OficinaAfectada_Lookup__c}>
+                                        </lightning-output-field>
+                                    </div>
+                                 
+                                </div> 
+                            </div>
+                        </div>      
+                        
+                    
+                    </lightning-record-edit-form> -->
+
+
+
+                   <template for:each={oficinasAfectadas} for:item="oficina"  >
+
+                    <div class="slds-card__body slds-card__body_inner" key={oficina.Id}>
+                      <div class="slds-grid slds-wrap slds-grid_vertical-align-center tarjetaObjIntermedio" key={oficina.Id} >
+
+                        <div class="slds-col slds-size_2-of-2">
+                            <lightning-icon  icon-name="standard:store_group" alternative-text="oficina" title="Oficina afectada" size="x-small" ></lightning-icon>
+                            <lightning-button variant="base" class="botonAccount" label={oficina.SPV_OficinaAfectada_Lookup__r.Name} onmouseover={handleMouseOver} onmousemove={handleMouseOver} onmouseleave={handleMouseLeave} name={oficina.SPV_OficinaAfectada_Lookup__c} onclick={verOficinaAfectadaClick} key={oficina.Id} data-target-id={oficina.SPV_OficinaAfectada_Lookup__c} ></lightning-button>
+                        </div>
+
+ 
+                        <div class="slds-col slds-size_1-of-2 slds-text-body_small">
+                        <lightning-record-edit-form object-api-name="SAC_ImagenDocumento__c" record-id={oficina.Id}>
+                                <lightning-output-field field-name="SPV_DAN_OficinaAfectada__c" class="sinPadding" value={oficina.SPV_DAN_OficinaAfectada__c}></lightning-output-field>
+                                
+                        </lightning-record-edit-form>
+                        </div>
+
+                        <div class="slds-col slds-align-bottom slds-size_1-of-2">
+                        <lightning-button class="slds-float_right miboton-segundo" variant="brand" name={oficina.Id} id={oficina.Id} label="Eliminar" onclick={handleEliminarOficinaAfectada}> </lightning-button>
+                        </div>
+
+                        <div class="slds-size_2-of-2">
+                            <hr class="separador">
+                        </div>
+
+                       </div> 
+                   </div> 
+
+                   
+
+                </template> 
+                
+            
+
+            </lightning-card> 
+             </div>
+
+                <!--Popover para las accounts-->
+                <!--<template if:true={mostrarPopUp} >
+                    <section aria-describedby="dialog-body-id-110" aria-label="Dialog Title" class="slds-popover slds-popover_feature slds-nubbin_left-top" style={posicionCursor} role="dialog">
+                        <div class="slds-popover__body">
+                            
+                              
+                                            <lightning-record-view-form object-api-name="Account" record-id={idPopUp}>
+                                                <div class="headerClass">
+                                                    <P><lightning-output-field field-name={nameField} variant="label-hidden" class="wololo"></lightning-output-field></P>
+                                                </div>
+                                                <div class="contenidoClass">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-col slds-size_2-of-2">
+                                                            <lightning-output-field field-name={CC_Numero_Documento__cField}></lightning-output-field>
+                                                            <lightning-output-field field-name={PhoneField}></lightning-output-field>
+                                                            <lightning-output-field field-name={PersonMobilePhoneField}></lightning-output-field>
+                                                            <lightning-output-field field-name={PersonEmailField}></lightning-output-field>
+                                                            <lightning-output-field field-name={BillingAddressField}></lightning-output-field>
+                                                        </div>
+   
+                                                    </div>
+                                                </div>
+                                            </lightning-record-view-form>
+                                     
+                          
+                        </div>
+                    </section>
+                </template>-->
+
+
+                  <!--Popover para las accounts SI EL COMPONENTE VA EN LA COLUMNA DE LA DERECHA-->
+                <template if:true={mostrarPopUp} >
+                    <section aria-describedby="dialog-body-id-110" aria-label="Dialog Title" class="slds-popover slds-popover_feature slds-nubbin_right" style={posicionCursor} role="dialog">
+                        <div class="slds-popover__body">
+                            
+                              
+                                            <lightning-record-view-form object-api-name="Account" record-id={idPopUp}>
+                                                <div class="headerClass">
+                                                    <P><lightning-output-field field-name={nameField} variant="label-hidden" class="wololo"></lightning-output-field></P>
+                                                </div>
+                                                <div class="contenidoClass">
+                                                    <div class="slds-grid">
+                                                        <div class="slds-col slds-size_1-of-2">
+                                                            <lightning-output-field field-name={PersonEmailField}></lightning-output-field>
+                                                            <lightning-output-field field-name={PhoneField}></lightning-output-field>
+                                                            <lightning-output-field field-name={BillingAddressField}></lightning-output-field>
+                                                        </div>
+
+                                                        <div class="slds-col slds-size_1-of-2">
+                                                            <lightning-output-field field-name={OficinaPadreField}></lightning-output-field>
+                                                            <lightning-output-field field-name={ManagerField}></lightning-output-field>
+                                                        </div>
+
+   
+                                                    </div>
+                                                </div>
+                                            </lightning-record-view-form>
+                                     
+                          
+                        </div>
+                    </section>
+                </template>
+
+
+
+</template>

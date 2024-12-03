@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_URL_EncuestaEnviada__c</fullName>
+    <description>Checkbox para saber si se ha enviado una encuesta LimeSurvey o no</description>
+    <formula>NOT(ISBLANK(CC_URL_Encuesta_3N__c))</formula>
+    <label>URL Encuesta Enviada</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

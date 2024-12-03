@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ListaPadre__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Lista padre</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Lista_Valores__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CC_Lista_Valores</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Lista_Valores__c</referenceTo>
+    <relationshipLabel>Listas de valores hijas</relationshipLabel>
+    <relationshipName>CC_ListasHijas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

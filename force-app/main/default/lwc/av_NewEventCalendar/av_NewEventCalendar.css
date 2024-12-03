@@ -1,0 +1,98 @@
+.container-div {
+	/*height: 600px;*/
+	overflow: hidden;
+}
+.work-time {
+	overflow-y: scroll;
+	height: 100%;
+}
+::-webkit-scrollbar {
+	width: 0px;
+	background: transparent; /* make scrollbar transparent */
+}
+.calendar-cell-color {
+	background-color: rgb(241 241 241);
+}
+.new-event-color {
+	background-color: #FFFFAB;
+}
+.ext-event-color {
+	background-color: #cccccc;
+}
+.event-div {
+	padding: 0;
+	position: relative;
+	width: 98%;
+	margin: 0 auto;
+}
+tr:nth-child(odd) {
+	background-color: rgb(241 241 241);
+}
+.cell-white {
+	background-color: white;
+}
+.main-table {
+	position: relative;
+}
+.header-div {
+	margin-bottom: 1rem;
+	margin-top: -0.5rem;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+}
+.header-item {
+	float: left;
+}
+.date-field {
+	top: -0.5rem;
+	margin-left: 0.5rem;
+}
+.clickable-time {
+	text-align-last: justify;
+	padding-right: 10%;
+	padding-left: 10%;
+	cursor: pointer;
+}
+.overflow-div {
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+.main-calendar {
+	position: relative;
+}
+.disabled-sel {
+	pointer-events: none;
+	background-color: #d3d3d3;
+	color: #6d6d6d;
+	cursor: not-allowed;
+}
+.selected-worktime{
+	background-color: rgb(216, 237, 255);
+	border-color: rgb(0, 112, 210);
+	
+}
+.cell-size {
+	height: 2rem;
+}
+.hidden-button {
+	display: none;
+}
+.display-flex{
+	display: flex;
+}
+.preview-button{
+	/*padding-top: 1.35rem;*/
+	vertical-align: bottom;
+    padding-left: 0.5rem;
+}
+.preview-button2{
+	padding-top: 1.05rem;
+    padding-left: 0.5rem;
+}
+.labelTime{
+    font-size: 0.6rem;
+}

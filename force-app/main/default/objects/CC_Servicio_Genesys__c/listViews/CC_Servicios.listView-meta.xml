@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Servicios</fullName>
+    <columns>NAME</columns>
+    <columns>CBK_Negocio__c</columns>
+    <columns>CC_Codigo__c</columns>
+    <columns>CC_Activo_Salesforce__c</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>KIN_Cola_Id_GC__c</columns>
+    <columns>CC_Encuesta__c</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Servicio_Genesys__c.CC_Servicio</value>
+    </filters>
+    <label>Servicios</label>
+</ListView>

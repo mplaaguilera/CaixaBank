@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_PFNotInformed</fullName>
+    <active>true</active>
+    <description>No está permitido crear Oportunidades sin producto asociado</description>
+    <errorConditionFormula>AND(
+ISNEW(),
+ISBLANK(AV_PF__c),
+OR (RecordType.DeveloperName = &quot;AV_Iniciativa&quot;,
+RecordType.DeveloperName = &quot;AV_Sugerencia&quot;,
+RecordType.DeveloperName = &quot;AV_Propuesta&quot;,
+RecordType.DeveloperName = &quot;AV_AlertaComercial&quot;)
+)</errorConditionFormula>
+    <errorMessage>El Alta de Oportunidades debe de hacerse desde la Ficha del Cliente</errorMessage>
+</ValidationRule>

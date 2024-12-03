@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_PendingReason__c</fullName>
+    <label>Motivo pendiente</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Propuesta: Enviada</fullName>
+                <default>false</default>
+                <label>Propuesta: Enviada</label>
+            </value>
+            <value>
+                <fullName>Documentación: Cliente no localizado</fullName>
+                <default>false</default>
+                <label>Documentación: Cliente no localizado</label>
+            </value>
+            <value>
+                <fullName>Documentación: Pendiente OK cliente</fullName>
+                <default>false</default>
+                <label>Documentación: Pendiente OK cliente</label>
+            </value>
+            <value>
+                <fullName>Documentación: Pendiente de documentación</fullName>
+                <default>false</default>
+                <label>Documentación: Pendiente de documentación</label>
+            </value>
+            <value>
+                <fullName>Documentación: Solicitada CIRBE/Nota Simple</fullName>
+                <default>false</default>
+                <label>Documentación: Solicitada CIRBE/Nota Simple</label>
+            </value>
+            <value>
+                <fullName>Estudio Econ.: Traslado CARP</fullName>
+                <default>false</default>
+                <label>Estudio Econ.: Traslado CARP</label>
+            </value>
+            <value>
+                <fullName>Estudio Econ.: Traslado Tarifa</fullName>
+                <default>false</default>
+                <label>Estudio Econ.: Traslado Tarifa</label>
+            </value>
+            <value>
+                <fullName>Estudio Econ.: Tasación</fullName>
+                <default>false</default>
+                <label>Estudio Econ.: Tasación</label>
+            </value>
+            <value>
+                <fullName>Estudio Econ.: Homologación Tasación</fullName>
+                <default>false</default>
+                <label>Estudio Econ.: Homologación Tasación</label>
+            </value>
+            <value>
+                <fullName>Firma: Pendiente FEIN</fullName>
+                <default>false</default>
+                <label>Firma: Pendiente FEIN</label>
+            </value>
+            <value>
+                <fullName>Firma: Provis. Fondos</fullName>
+                <default>false</default>
+                <label>Firma: Provis. Fondos</label>
+            </value>
+            <value>
+                <fullName>Firma: Acta Notarial</fullName>
+                <default>false</default>
+                <label>Firma: Acta Notarial</label>
+            </value>
+            <value>
+                <fullName>Firma: Pendiente Escriturar</fullName>
+                <default>false</default>
+                <label>Firma: Pendiente Escriturar</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

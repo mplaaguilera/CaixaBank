@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ParentId</fullName>
+    <inlineHelpText>En el caso de que este evento se haya creado a partir de un evento catálogo, este campo lo indica</inlineHelpText>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 AND 3) OR (2 AND 4) OR (5 AND 6)</booleanFilter>
+        <errorMessage>Es necesario que el padre del evento figure en el catálogo</errorMessage>
+        <filterItems>
+            <field>Campaign.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Catálogo Evento Físico</value>
+        </filterItems>
+        <filterItems>
+            <field>Campaign.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Catálogo Evento virtual</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Evento físico</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Evento virtual</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Evento Híbrido</value>
+        </filterItems>
+        <filterItems>
+            <field>Campaign.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Catálogo Evento Híbrido</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Alerta__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup para que cuando se mande un email debido a una SAC_Alerta, se vincule a esta</description>
+    <label>Alerta</label>
+    <referenceTo>SAC_Alerta__c</referenceTo>
+    <relationshipLabel>Emails</relationshipLabel>
+    <relationshipName>Email_Messages</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

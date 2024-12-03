@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>CBK_DMLUtility</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_DMLUtility_Test</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>Permission Set para la clase CBK_DMLUtility que se utiliza para ejecutar llamadas DML.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>CBK_DML_WithoutSharing</label>
+</PermissionSet>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Semaforo_SLA__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(OR(RecordType.DeveloperName = &apos;SEG_Cliente&apos;,RecordType.DeveloperName = &apos;SEG_Seguimiento&apos;),
+	IF(TEXT(SEG_Prioridad_SLA__c) = &apos;Low&apos;,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+		IF(TEXT(SEG_Prioridad_SLA__c) = &apos;Medium&apos;,IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+		IF(TEXT(SEG_Prioridad_SLA__c) = &apos;High&apos;,IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),null))), null)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Semáforo SLA</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

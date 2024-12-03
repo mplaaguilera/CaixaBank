@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>51.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <!-- <apiVersion>54.0</apiVersion>
+    <isExposed>false</isExposed> -->
+    <targetConfigs>
+     <targetConfig targets="lightning__RecordPage">
+        <property
+            name="objectApiName"
+            type="String"
+            label="Object Name"
+            description="Automatically bind the page's object name to the component variable"
+            default="{!objectApiName}" />
+        <property name="typeOfPea" type="String" default="" label="Type Of Pea" required="true" description="Tipo de PEA" />
+        
+
+      </targetConfig>
+   </targetConfigs>
+
+</LightningComponentBundle>

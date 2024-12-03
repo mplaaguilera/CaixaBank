@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PendienteAsignar_SAC_Interaccion</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_CasoEscalado__c</columns>
+    <columns>SAC_Titulo__c</columns>
+    <columns>SAC_Pregunta__c</columns>
+    <columns>SAC_EmailRespuesta__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <filterScope>Queue</filterScope>
+    <label>Pte. Asignar</label>
+    <queue>SAC_PendienteAsignar</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

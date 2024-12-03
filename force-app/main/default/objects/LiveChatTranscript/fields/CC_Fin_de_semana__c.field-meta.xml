@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fin_de_semana__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(WEEKDAY(DATE( YEAR( datevalue(RequestTime)), MONTH( datevalue(RequestTime) ), DAY( datevalue(RequestTime) )) ), 
+1, &quot;Sí&quot;, 
+2, &quot;No&quot;, 
+3, &quot;No&quot;, 
+4, &quot;No&quot;, 
+5, &quot;No&quot;, 
+6, &quot;No&quot;, 
+7, &quot;Sí&quot;, 
+&quot;&quot;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Fín de semana</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

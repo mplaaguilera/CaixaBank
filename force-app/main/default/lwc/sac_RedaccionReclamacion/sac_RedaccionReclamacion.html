@@ -1,0 +1,132 @@
+<!--
+    INI - INS: 28/07/2021 -> Luis Mesa García -> :US248482
+  Envio Reclamante:
+
+  DESC: Lightning web component que contiene la funcionalidad de rellenar la redacción de la Reclamación
+-->
+<template>
+
+    <!-- spinner -->
+    <template if:true={isLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+
+    <br />
+    <!-- Carta de respuesta -->
+    <div class="c-container">
+        <div class="slds-grid slds-align-center slds-box" style="padding-bottom: 8px">
+            <div style="padding-top: 14px; padding-right: 8px;" class="slds-col slds-size_12-of-12">
+                <h1 style="padding: 8px; font-size: 15px"><b>Carta de respuesta:</b></h1>
+                <div class="slds-float_left">
+                    <lightning-button label="Importar Redacción Pretensiones" slot="actions" variant="brand"
+                        onclick={handleClickValicion}>
+                    </lightning-button>
+                </div>
+                <div class="slds-float_right">
+                    <lightning-button label="Guardar Redacción" slot="actions" variant="brand" onclick={guardarRed}>
+                    </lightning-button>
+                </div>
+                <div style="padding-top: 48px;">
+                    <lightning-input-rich-text placeholder="Escriba o cargue el cuerpo de la redacción..." value={myVal}
+                        id='RTF' onchange={escritura}>
+                    </lightning-input-rich-text>
+
+                </div>
+            </div>
+        </div>
+        <br />
+        <!-- Sentido resolución -->
+        <div class="slds-box" style="padding-top: 12px">
+            <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Sentido resolución:</b></h1>
+            <div class="slds-grid slds-align-center" style="padding-top: 14px; padding-bottom: 8px">
+                <div class="slds-col slds-size_6-of-12" style="padding: 8px">
+
+                    <lightning-combobox label="Sentido de Resolución" required options={options} onchange={sentidoRes}
+                        value={senRes} placeholder="Seleccione una de las opciones."></lightning-combobox>
+
+                </div>
+                <div class="slds-col slds-size_6-of-12" style="padding: 8px">
+
+                    <lightning-textarea name="argumentoResolucion" value={argRes} label="Argumento de Resolución"
+                        maxlength="240" message-when-too-long="Número máximo de carácteres alcanzado."
+                        onchange={argumentoRes}></lightning-textarea>
+                </div>
+
+            </div>
+            <div class="slds-col slds-size_12-of-12" style="padding: 8px">
+                <lightning-button label="Guardar Sentido Resolución" slot="actions" variant="brand"
+                    onclick={guardarResolucion}>
+                </lightning-button>
+            </div>
+        </div>
+        <br />
+        <div class="slds-box" style="padding-top: 12px">
+            <h1 style="padding: 8px; font-size: 15px"><b>Fecha de resolución: <lightning-formatted-date-time
+                        year="numeric" month="numeric" day="numeric" value={fechaRes}></lightning-formatted-date-time>
+                    </b></h1>
+
+            <lightning-button label="Resolver" slot="actions" variant="brand"
+                style="padding: 8px; margin: 8px; padding-bottom: 30px;" onclick={setModal}>
+            </lightning-button>
+        </div>
+    </div>
+
+    <br />
+
+    <!--Pop Up -->
+    <template if:true={modal}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={setModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Envío reclamante</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <template if:true={necesitaEscalado}>
+                        <p>No es posible resolver esta reclamación dado que requiere de escalado obligatorio.</p>
+                    </template>
+                    <template if:false={necesitaEscalado}>
+                        <template if:true={aplicaTareas}>
+                            <p>Está a punto de pasar a estado ejecución la reclamación y cerrar sus pretensiones.</p>
+                            <p>Se va a proceder al envío de la resolución al reclamante, ¿Desea continuar?</p>
+                        </template>
+                        <template if:false={aplicaTareas}>
+                            <p>Está a punto de finalizar la reclamación y se va a proceder al envío de la resolución al reclamante.</p>
+                            <p><b>Hemos detectado que no existe ninguna tarea de ejecución asociada, ¿Desea continuar?</b>
+                            </p>
+                            <br />
+                        </template>
+                        <p>Esta acción supone la resolución de la reclamación y cierre del SLA regulatorio. A continuación,
+                            se enviará la carta de respuesta al reclamante y, en caso necesario,
+                            se lanzará las tareas de ejecución pertinentes.</p>
+                    </template>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <template if:true={necesitaEscalado}>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick={setModal} title="OK">OK</button>
+                    </footer>
+                </template>
+                <template if:false={necesitaEscalado}>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={setModal} title="Cancel">Cancelar</button>
+                        <button class="slds-button slds-button_brand" onclick={submitModal} title="OK">OK</button>
+                    </footer>
+                </template>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

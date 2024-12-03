@@ -1,0 +1,8 @@
+.titulo .slds-table_tree .slds-tree__item a, .slds-table--tree .slds-tree__item a {
+    color: #216186 !important;
+}
+
+
+.titulo .slds-text-heading_small, .slds-text-heading--small{
+	font-size: 14px !important;
+}

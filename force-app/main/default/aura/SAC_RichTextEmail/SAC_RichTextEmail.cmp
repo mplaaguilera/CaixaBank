@@ -1,0 +1,9 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome,lightning:availableForFlowScreens" access="global">
+
+    <!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="mensajeEmail"  type="String"/>
+
+    <!-- INPUT RICH TEXT -->
+    <lightning:inputRichText value="{!v.mensajeEmail}"/>
+
+</aura:component>

@@ -1,0 +1,19 @@
+<template>
+	<lightning-card title={newTitle} icon-name={icon}>
+        <h5>
+            <lightning-icon icon-name="utility:info" size="x-small" title="info"></lightning-icon>
+            {message}
+        </h5>
+        <div class="slds-theme_default slds-p-left_xx-large slds-p-top_medium slds-p-bottom_medium" >
+            <template if:true={hasLinks} for:each={listLinks} for:item="link">
+                <div key={link} class="slds-grid slds-col" >
+                    <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" class=" slds-m-top_x-small slds-p-right_small" size="x-small" style="margin-top: 0.8em;"></lightning-icon>
+                    <a href={link.url} title={link.label} class="slds-dl_horizontal__label slds-p-around_small" style="width: 50rem;padding-left:0.0;" target="_blank">{link.label}</a>
+                </div>
+            </template>
+            <p if:false={hasLinks} class="slds-grid slds-col" style="width: 50rem;">
+                <span class="slds-dl_horizontal__label">{noDataFound}</span>
+            </p>
+        </div>
+	</lightning-card>
+</template>

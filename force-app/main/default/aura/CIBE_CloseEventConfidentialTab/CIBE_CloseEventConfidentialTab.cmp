@@ -1,0 +1,8 @@
+<aura:component controller="CIBE_ConfidencialidadActivityController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <lightning:card variant="Narrow" title="{!$Label.c.CIBE_EventConfidential}" iconName="utility:warning">
+    </lightning:card>
+
+</aura:component>

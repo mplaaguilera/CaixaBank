@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MCC__c</fullName>
+    <label>CC_MCC</label>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Grupos Colaboradores</relationshipLabel>
+    <relationshipName>MCC_Grupos_Colaboradores</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

@@ -1,0 +1,333 @@
+<aura:component controller="SEG_Asignacion_Plantillas" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="opcionesPlantillaCastellano" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaCastellanoFiltro" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaCatalan" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaCatalanFiltro" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaIngles" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaInglesFiltro" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaEuskera" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaEuskeraFiltro" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaGallego" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaGallegoFiltro" type="List" default="[]" />
+    <aura:attribute name="plantillaCastellano" type="Object" default="null"/>
+    <aura:attribute name="plantillaCatalan" type="Object" />
+    <aura:attribute name="plantillaIngles" type="Object" />
+    <aura:attribute name="plantillaEuskera" type="Object" />
+    <aura:attribute name="plantillaGallego" type="Object" />
+    <aura:attribute name="mostrarResultadosCastellano" type="Boolean" default="false" />
+    <aura:attribute name="mostrarResultadosCatalan" type="Boolean" default="false" />
+    <aura:attribute name="mostrarResultadosIngles" type="Boolean" default="false" />
+    <aura:attribute name="mostrarResultadosEuskera" type="Boolean" default="false" />
+    <aura:attribute name="mostrarResultadosGallego" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <button tabindex="1" style="opacity: 0; position: absolute; cursor: initial"/> <!--Evita que se abra el primer desplegble al iniciar-->
+
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="custom:custom23"/>
+            &nbsp;
+            Asociar plantillas
+        </aura:set>
+        
+        <br/>
+
+        <!--Castellano-->
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <aura:if isTrue="{!empty(v.plantillaCastellano)}">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <!--Buscador-->
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input aura:id="inputCastellano" type="search" label="Castellano" placeholder="Buscar plantilla en castellano" onfocus="{!c.inputFocus}" onblur="{!c.inputBlur}" onchange="{!c.inputChange}"/>
+                            </div>
+                            <!--Resultados-->
+                            <aura:if isTrue="{!v.mostrarResultadosCastellano}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="min-width: 100%;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.opcionesPlantillaCastellanoFiltro}" var="plantilla">
+                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.seleccionarPlantilla}" data-idioma="castellano" data-idplantilla="{!plantilla.id}">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" id="{!plantilla.value}" name="{!plantilla.label}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:template" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!plantilla.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <!--Resultado seleccionado-->
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Castellano</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon">
+                                                <lightning:icon iconName="standard:template" size="x-small"/>
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaCastellano.label}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.deseleccionarPlantilla}" data-idioma="castellano">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <!--Catalán-->
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <aura:if isTrue="{!empty(v.plantillaCatalan)}">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <!--Buscador-->
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input aura:id="inputCatalan" type="search" label="Catalán" placeholder="Buscar plantilla en catalán" onfocus="{!c.inputFocus}" onblur="{!c.inputBlur}" onchange="{!c.inputChange}"/>
+                            </div>
+                            <!--Resultados-->
+                            <aura:if isTrue="{!v.mostrarResultadosCatalan}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="min-width: 100%;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.opcionesPlantillaCatalanFiltro}" var="plantilla">
+                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.seleccionarPlantilla}" data-idioma="catalán" data-idplantilla="{!plantilla.id}">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" id="{!plantilla.value}" name="{!plantilla.label}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:template" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!plantilla.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <!--Resultado seleccionado-->
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Catalán</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon">
+                                                <lightning:icon iconName="standard:template" size="x-small"/>
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaCatalan.label}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.deseleccionarPlantilla}" data-idioma="catalán">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <!--Inglés-->
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <aura:if isTrue="{!empty(v.plantillaIngles)}">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <!--Buscador-->
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input aura:id="inputIngles" type="search" label="Inglés" placeholder="Buscar plantilla en inglés" onfocus="{!c.inputFocus}" onblur="{!c.inputBlur}" onchange="{!c.inputChange}"/>
+                            </div>
+                            <!--Resultados-->
+                            <aura:if isTrue="{!v.mostrarResultadosIngles}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="min-width: 100%;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.opcionesPlantillaInglesFiltro}" var="plantilla">
+                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.seleccionarPlantilla}" data-idioma="inglés" data-idplantilla="{!plantilla.id}">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" id="{!plantilla.value}" name="{!plantilla.label}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:template" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!plantilla.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <!--Resultado seleccionado-->
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Inglés</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon">
+                                                <lightning:icon iconName="standard:template" size="x-small"/>
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaIngles.label}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.deseleccionarPlantilla}" data-idioma="inglés">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <!--Euskera-->
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <aura:if isTrue="{!empty(v.plantillaEuskera)}">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <!--Buscador-->
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input aura:id="inputEuskera" type="search" label="Euskera" placeholder="Buscar plantilla en euskera" onfocus="{!c.inputFocus}" onblur="{!c.inputBlur}" onchange="{!c.inputChange}"/>
+                            </div>
+                            <!--Resultados-->
+                            <aura:if isTrue="{!v.mostrarResultadosEuskera}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="min-width: 100%;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.opcionesPlantillaEuskeraFiltro}" var="plantilla">
+                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.seleccionarPlantilla}" data-idioma="euskera" data-idplantilla="{!plantilla.id}">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" id="{!plantilla.value}" name="{!plantilla.label}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:template" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!plantilla.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <!--Resultado seleccionado-->
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Euskera</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon">
+                                                <lightning:icon iconName="standard:template" size="x-small"/>
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaEuskera.label}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.deseleccionarPlantilla}" data-idioma="euskera">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <!--Gallego-->
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <aura:if isTrue="{!empty(v.plantillaGallego)}">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <!--Buscador-->
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input aura:id="inputGallego" type="search" label="Gallego" placeholder="Buscar plantilla en gallego" onfocus="{!c.inputFocus}" onblur="{!c.inputBlur}" onchange="{!c.inputChange}"/>
+                            </div>
+                            <!--Resultados-->
+                            <aura:if isTrue="{!v.mostrarResultadosGallego}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="min-width: 100%;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.opcionesPlantillaGallegoFiltro}" var="plantilla">
+                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.seleccionarPlantilla}" data-idioma="gallego" data-idplantilla="{!plantilla.id}">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" id="{!plantilla.value}" name="{!plantilla.label}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:template" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!plantilla.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <!--Resultado seleccionado-->
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label">Gallego</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon">
+                                                <lightning:icon iconName="standard:template" size="x-small"/>
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaGallego.label}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.deseleccionarPlantilla}" data-idioma="gallego">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <div align="right">
+            <lightning:button aura:id="botonCancelar" label="Cancelar" onclick="{!c.cancelar}" />&nbsp;
+            <lightning:button variant="brand" label="Asociar plantillas" onclick="{!c.asociar}"/>
+        </div>
+    </lightning:card>
+</aura:component>

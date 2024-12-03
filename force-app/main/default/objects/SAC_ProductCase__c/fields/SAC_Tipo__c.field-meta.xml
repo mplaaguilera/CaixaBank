@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Banca particulares</fullName>
+                <default>false</default>
+                <label>Banca particulares</label>
+            </value>
+            <value>
+                <fullName>Banca Personal</fullName>
+                <default>false</default>
+                <label>Banca Personal</label>
+            </value>
+            <value>
+                <fullName>Caixabank Now</fullName>
+                <default>false</default>
+                <label>Caixabank Now</label>
+            </value>
+            <value>
+                <fullName>Cartera gestionada</fullName>
+                <default>false</default>
+                <label>Cartera gestionada</label>
+            </value>
+            <value>
+                <fullName>Contrato no aplica</fullName>
+                <default>false</default>
+                <label>Contrato no aplica</label>
+            </value>
+            <value>
+                <fullName>Contrato no localizado</fullName>
+                <default>false</default>
+                <label>Contrato no localizado</label>
+            </value>
+            <value>
+                <fullName>Decesos</fullName>
+                <default>false</default>
+                <label>Decesos</label>
+            </value>
+            <value>
+                <fullName>Dental</fullName>
+                <default>false</default>
+                <label>Dental</label>
+            </value>
+            <value>
+                <fullName>Dia a dia</fullName>
+                <default>false</default>
+                <label>Dia a dia</label>
+            </value>
+            <value>
+                <fullName>Disfrutar de la vida</fullName>
+                <default>false</default>
+                <label>Disfrutar de la vida</label>
+            </value>
+            <value>
+                <fullName>Domicil. recibos</fullName>
+                <default>false</default>
+                <label>Domicil. recibos</label>
+            </value>
+            <value>
+                <fullName>Dormir tranquilo</fullName>
+                <default>false</default>
+                <label>Dormir tranquilo</label>
+            </value>
+            <value>
+                <fullName>Fondos</fullName>
+                <default>false</default>
+                <label>Fondos</label>
+            </value>
+            <value>
+                <fullName>Hipoteca</fullName>
+                <default>false</default>
+                <label>Hipoteca</label>
+            </value>
+            <value>
+                <fullName>Hogar</fullName>
+                <default>false</default>
+                <label>Hogar</label>
+            </value>
+            <value>
+                <fullName>Nómina</fullName>
+                <default>false</default>
+                <label>Nómina</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Pensar en el futuro</fullName>
+                <default>false</default>
+                <label>Pensar en el futuro</label>
+            </value>
+            <value>
+                <fullName>Pensión</fullName>
+                <default>false</default>
+                <label>Pensión</label>
+            </value>
+            <value>
+                <fullName>Planes de pensiones</fullName>
+                <default>false</default>
+                <label>Planes de pensiones</label>
+            </value>
+            <value>
+                <fullName>Préstamo</fullName>
+                <default>false</default>
+                <label>Préstamo</label>
+            </value>
+            <value>
+                <fullName>Protección senior</fullName>
+                <default>false</default>
+                <label>Protección senior</label>
+            </value>
+            <value>
+                <fullName>Rentas vitalicias</fullName>
+                <default>false</default>
+                <label>Rentas vitalicias</label>
+            </value>
+            <value>
+                <fullName>Renting</fullName>
+                <default>false</default>
+                <label>Renting</label>
+            </value>
+            <value>
+                <fullName>Salud</fullName>
+                <default>false</default>
+                <label>Salud</label>
+            </value>
+            <value>
+                <fullName>Seguros ahorro</fullName>
+                <default>false</default>
+                <label>Seguros ahorro</label>
+            </value>
+            <value>
+                <fullName>ServiCuentas</fullName>
+                <default>false</default>
+                <label>ServiCuentas</label>
+            </value>
+            <value>
+                <fullName>Seviam</fullName>
+                <default>false</default>
+                <label>Seviam</label>
+            </value>
+            <value>
+                <fullName>Sistemas seguridad</fullName>
+                <default>false</default>
+                <label>Sistemas seguridad</label>
+            </value>
+            <value>
+                <fullName>Tarjeta crédito</fullName>
+                <default>false</default>
+                <label>Tarjeta crédito</label>
+            </value>
+            <value>
+                <fullName>Tarjeta débito</fullName>
+                <default>false</default>
+                <label>Tarjeta débito</label>
+            </value>
+            <value>
+                <fullName>Tarjeta prepago</fullName>
+                <default>false</default>
+                <label>Tarjeta prepago</label>
+            </value>
+            <value>
+                <fullName>Tarjeta revolving</fullName>
+                <default>false</default>
+                <label>Tarjeta revolving</label>
+            </value>
+            <value>
+                <fullName>Tributos</fullName>
+                <default>false</default>
+                <label>Tributos</label>
+            </value>
+            <value>
+                <fullName>Valores Renta Variable</fullName>
+                <default>false</default>
+                <label>Valores Renta Variable</label>
+            </value>
+            <value>
+                <fullName>Vida</fullName>
+                <default>false</default>
+                <label>Vida</label>
+            </value>
+            <value>
+                <fullName>Vista y plazo</fullName>
+                <default>false</default>
+                <label>Vista y plazo</label>
+            </value>
+            <value>
+                <fullName>Wivai</fullName>
+                <default>false</default>
+                <label>Wivai</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

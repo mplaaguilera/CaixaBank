@@ -1,0 +1,14 @@
+.buttonStyle {
+    padding: 5px;
+    background-color: #007eb2;
+    color: white;
+}
+.buttonStyleDisabled {
+    padding: 5px;
+    color: white;
+}
+.accordion{
+    background-color:#F3F3F3;
+    font-size:120%; 
+    font-weight: bold;
+}

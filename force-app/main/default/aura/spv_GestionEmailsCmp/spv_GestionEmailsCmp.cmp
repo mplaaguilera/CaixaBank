@@ -1,0 +1,278 @@
+<aura:component controller="SPV_LCMP_GestionEmails"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="copia" type="String" />
+    <aura:attribute name="copiaOculta" type="String" />
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="subject" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="consulta"  type="SAC_Interaccion__c"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="stringRed" type="String" default="AdjuntoRedaccion" />
+    <aura:attribute name="procedencia" type="String" />
+    <aura:attribute name="muestraModal" type="Boolean" default="false" />
+    <aura:attribute name="modalValidar" type="Boolean" default="false" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+    <aura:attribute name="documentosSubidosEstaEjecucion" type="String[]" />
+    <aura:attribute name="ficherosBorrados" type="String[]" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+    <aura:attribute name="derivarAQuien" type="String" />
+    <aura:attribute name="seleccionarReclamacion" type="Boolean" default="false"/>
+    <aura:attribute name="modalParaProrrogar" type="Boolean" default="false" />
+    <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
+
+    <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
+    <aura:attribute name="adjuntosDerivar" type="Boolean"/>
+
+    <aura:registerEvent name="cmpEvent" type="c:SAC_ResolverConsultaEvt"/>
+    <!--doInit-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.usarComponente}">
+        <div class="c-container" style="padding-top: 12px">
+            <div class="slds-box">
+                <aura:if isTrue="{!and(v.usarComponente, v.derivarAQuien == null)}">
+                    <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Envío correo electrónico:</b></h1>
+                </aura:if>
+                <aura:if isTrue="{!and(v.usarComponente, v.derivarAQuien == 'grupo')}">
+                    <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Envío correo electrónico al grupo:</b></h1>
+                </aura:if>
+                <aura:if isTrue="{!and(v.usarComponente, v.derivarAQuien == 'cliente')}">
+                    <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Envío correo electrónico al cliente:</b></h1>
+                </aura:if>
+                <div>
+                    <lightning:input name="para" value='{!v.para}' label="Para" maxlength="2400"
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaPara}' required="true">
+                    </lightning:input>
+
+                    <lightning:input name="CC" value='{!v.copia}' label="CC" maxlength="2400"
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopia}'>
+                    </lightning:input>
+
+                    <lightning:input name="CCO" value='{!v.copiaOculta}' label="CCO" maxlength="2400"
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaCopiaOculta}'>
+                    </lightning:input>
+
+                    <lightning:input name="asunto" value='{!v.asunto}' label="Asunto" maxlength="2400"
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.cambiaAsunto}'>
+                    </lightning:input>
+                    <!-- OCS Inicio prueba temporal archivos adjuntos -->
+                    <c:SAC_AdjuntosEmail aura:id="adjuntosComponent" idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" caseId="{!v.caso.Id}" seleccionarReclamacion="{!v.seleccionarReclamacion}" adjuntosDerivar="{!v.adjuntosDerivar}" derivarAQuien="{!v.derivarAQuien}" procedencia="{!v.procedencia}"/> 
+                    <!-- OCS FIN prueba temporal archivos adjuntos -->
+                    <!-- LMG - INI - Boton plantillas -->
+                    
+                    <c:spv_RecuperarPlantillas recordId="{!v.caso.Id}" recordIdAux="{!v.consulta.Id}" subjectPlantilla="{!v.asunto}" cuerpoPlantilla="{!v.cuerpo}"/>
+    
+                    <!-- LMG - FIN - Boton plantillas -->
+                    <div style="padding-top: 8px;">
+                    <!--    <lightning:inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"> -->
+                            <!-- onchange='{!c.cambiaCuerpo}' -->
+                    <!--   </lightning:inputRichText>-->
+                    <c:SAC_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="true" title="Cuerpo"/>
+
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <aura:if isTrue="{!not(or(v.procedencia == 'derivar',v.procedencia == 'subsanacion'))}">
+                        <div class="slds-col slds-size_6-of-12 slds-float_right" style="padding: 8px;">
+                            <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.muestraModal}" /> <!-- muestraModalValidar -->
+                        </div>
+                    </aura:if>
+                    <!-- OCS SE ELIMINA LA INSERCION DE ADJUNTOS
+
+                    <div class="slds-col slds-size_6-of-12 slds-float_left" style="padding: 8px;">
+                        <lightning:fileUpload label="Adjuntar archivos adicionales" name="fileUploader" multiple="true"
+                            fileFieldName="SAC_StringRedaccion_fileupload__c" fileFieldValue="{!v.stringRed}"
+                            accept="{!v.filetype}" recordId="{!v.caso.Id}"
+                            onuploadfinished="{!c.handleUploadFinished}" />
+                    </div>-->
+                    <!--<aura:if isTrue="{v.procedencia=='Redaccion'}">
+                    
+                </aura:if> -->
+
+                
+                </div>
+                <!-- OCS SE ELIMINA LA INSERCION DE ADJUNTOS
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_12-of-12 slds-float_left" style="padding: 8px;">
+                        <h1 style="padding-top: 12px; font-size: 15px; padding-bottom: 8px"><b>Archivos Adjuntos:</b>
+                        </h1>
+                        <br />
+                        <aura:iteration items="{!v.ficherosAdjuntos}" var="item">
+                            <div class="slds-grid">
+                                <div class="slds-col">
+                                    <div>
+                                        <lightning:icon iconName="doctype:attachment" alternativeText="Adjunto"
+                                            title="Adjunto" size="small" />
+                                        <lightning:badge label="{!item.Title}" />    
+                                        <div class="slds-float_right">
+                                            <lightning:button variant="base" label="Borrar" title="Borrar"
+                                                onclick="{!c.borrarAdjunto}" name="{!item.Id}" />
+                                            <lightning:button variant="base" label="Visualizar" title="Visualizar"
+                                                onclick="{!c.previsualizarDoc}" name="{!item.ContentDocumentId}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:iteration>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </aura:if>
+
+     <!-- Modal para informar de que hay elementos por validar-->
+     <aura:if isTrue="{!and(v.procedencia=='SAC_003',v.modalValidar)}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{!c.ocultaModalValidar}" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                       Elementos sin validar</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Tienes documentación sin validar en la sección "Elementos no validados" de la etapa 3</p>
+                    <br/>
+                        <p>¿Deseas continuar con el envío de la resolución sin validarlos?
+                        </p> 
+                    <br/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Volver" title="volver"
+                        onclick="{!c.ocultaModalValidar}" />
+                        <lightning:button variant="brand" label="Continuar" title="Continuar" onclick="{!c.muestraModal}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- Modal para la llamada en la redaccion e Inadmisión-->
+    <aura:if isTrue="{!and(or(v.procedencia=='SAC_003',v.procedencia=='Inadmision'), v.muestraModal)}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Para <b>garantizar la seguridad e integridad de la información </b> en materia de protección de datos, <u>recuerde realizar las siguientes validaciones</u>:</p><br/>
+                    <p>&ensp;&ensp;1. La <b>carta de respuesta </b>y demás <b>documentación adjunta</b> se corresponde con el reclamante</p>
+                    <p>&ensp;&ensp;2. El envío se realiza al <b>destinatario correcto</b></p>
+                    <br/>
+                    <lightning:input type="checkbox" label="Confirmo que he realizado las validaciones" value="{!v.checkConfirmacionValidacion}" checked="{!v.checkConfirmacionValidacion}" />
+                    <br/>
+                    <aura:if isTrue="{!v.procedencia=='SAC_003'}">
+                        <p>Va a proceder a enviar la respuesta a la reclamación, a cerrar el plazo de resolución (SLA) y
+                            a lanzar las tareas a los grupos resolutores.
+                            <b>¿Está seguro de que quiere ejecutar la operación?</b>
+                        </p> 
+                    </aura:if>
+                    <!--Mensaje para la Inadmisión-->
+                    <aura:if isTrue="{!v.procedencia=='Inadmision'}">
+                        <p>Va a proceder a enviar el correo electrónico al reclamante y a cerrar la reclamación por Inadmisión                           
+                           <b>¿Está seguro de que quiere ejecutar la operación?</b>
+                       </p>
+                    </aura:if>
+                    <br/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick="{! c.ocultaModal }" />
+                        <lightning:button variant="brand" label="OK" title="OK" onclick="{!c.validarDocumentacion}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- Modal para la llamada del componente en las consultas -->
+    <aura:if isTrue="{!and(or(v.procedencia=='Consulta',v.procedencia=='Resolver'), v.muestraModal)}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <aura:if isTrue="{!v.procedencia=='Consulta'}">
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>Va a proceder a enviar el correo electrónico. <b>¿Desea continuar?</b></p>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.procedencia=='Resolver'}">
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>Va a proceder a enviar el correo electrónico y a pasar a Gestionada la Consulta. <b>¿Desea continuar?</b>
+                        </p>
+                    </div>
+                </aura:if>                  
+                <footer class="slds-modal__footer"> 
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.ocultaModal }" /> 
+                    <lightning:button variant="brand" label="OK" title="OK" onclick="{!c.comprobarEmails}" />
+                </footer>              
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- Modal para la llamada del componente en las consultas de las reclamaciones (SAC_Interaccion) y Boton Prorrogar Case Operativas -->
+    <aura:if isTrue="{!and(or(v.procedencia=='ConsultaDeReclamacion',v.procedencia=='Prorrogar'), v.muestraModal)}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="Cerrar"
+                    variant="bare-inverse" class="slds-modal__close" />
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                    Confirme la operación</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <p>Va a proceder a enviar el correo electrónico. <b>¿Desea continuar?</b></p>
+            </div>
+                              
+            <footer class="slds-modal__footer"> 
+                <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.ocultaModal }" />
+                 <aura:if isTrue="{!v.procedencia=='ConsultaDeReclamacion'}">
+                    <lightning:button variant="brand" label="OK" title="OK" onclick="{!c.comprobarEmails}" />
+                    <aura:set attribute="else">
+                        <lightning:button variant="brand" label="Enviar y Prorrogar" title="Enviar y Prorrogar" onclick="{!c.comprobarEmails}" />
+                    </aura:set>
+                </aura:if>
+            </footer>              
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

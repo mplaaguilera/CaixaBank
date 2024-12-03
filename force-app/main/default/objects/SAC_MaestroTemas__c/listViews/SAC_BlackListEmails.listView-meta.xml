@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_BlackListEmails</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SAC_MaestroTemas__c.SAC_BlackListEmails</value>
+    </filters>
+    <label>BlackList Emails</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,104 @@
+<aura:component controller="SPV_LCMP_RecuperarPlantillas" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="recordIdAux" type="String" />
+    <aura:attribute name="modalPlantillas" type="Boolean" default="false"/>
+    <aura:attribute name="valuePlantilla" type="String"/>
+    <!-- <aura:attribute name="optionsPlantilla" type="String[]"/> -->
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <!-- <aura:attribute name="selected" type="String" default=""/> -->
+    <aura:attribute name="subjectPlantilla" type="String" /> 
+    <aura:attribute name="cuerpoPlantilla" type="String" /> 
+    <aura:attribute name="items" type="List" default="[]" access="PRIVATE" />
+    <aura:attribute name="ruta" type="List" default="[]" />
+    <aura:attribute name="noEsPlantilla" type="Boolean" default="true" />
+    <aura:attribute name="idPadre" type="String" />
+    <aura:attribute name="idRaiz" type="String" />
+    <aura:attribute name="puedeVolver" type="Boolean" default="true" />
+
+
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" /> 
+
+    <!--refreshView-->
+    <aura:handler event="force:refreshView" action="{! c.init}" />
+
+    <aura:if isTrue="{! v.isLoading }">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Cargando" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <div class="slds-form-element">
+        <div class="slds-form-element__control">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <lightning:button class="slds-float_right" variant="brand" label="Cambiar plantilla" onclick="{!c.abrirModalPlantillas}"></lightning:button>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aura:if isTrue="{!v.modalPlantillas}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalPlantillas }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Directorio de plantillas</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-grid slds-gutters ">
+                        <div class="slds-col slds-size_1-of-3"> 
+                            <lightning:layout verticalAlign="stretch">
+                                <lightning:layoutItem>
+                                    <lightning:verticalNavigation class="slds-nowrap">
+                                        <lightning:verticalNavigationSection class="myClass" label="Ubicación">
+                                            <aura:iteration items="{!v.ruta}" var="elemento">
+                                                <div style="margin-left: 40px; padding-top: 2px; padding-bottom: 2px">
+                                                    <lightning:button name="{!elemento.value}" variant="base" label="{!elemento.label}" onclick="{!c.selectorArbol}"/>
+                                                </div>
+                                            </aura:iteration>
+                                        </lightning:verticalNavigationSection>
+                                    </lightning:verticalNavigation>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                        
+                        <div class="slds-col slds-size_2-of-3 slds-scrollable" style="border-left:medium solid rgb(98, 98, 98); left: 50%; max-height: 25rem;">
+                            <aura:iteration items="{!v.items}" var="item">
+                                <div style="padding-top: 2px; padding-bottom: 2px">
+                                    <aura:if isTrue="{!item.esCarpeta}">
+                                        <lightning:button name="{!item.name}" variant="base" iconName="utility:open_folder" label="{!item.label}" onclick="{!c.handleSelect}"> </lightning:button>
+                                        <aura:set attribute="else">
+                                            <div class="slds-grid">
+                                                <div class="slds-col">
+                                                    <lightning:button name="{!item.name}" variant="base" label="{!item.label}" onclick="{!c.handleSelect}"> </lightning:button>
+                                                </div>
+                                                <div class="slds-col">
+                                                    
+                                                </div>
+                                            </div>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                </div>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalPlantillas }" title="Cancelar">Cancelar</lightning:button>
+                    <lightning:button variant="brand" onclick="{! c.volverAtras }" title="Volver" disabled="{!v.puedeVolver}">Volver</lightning:button>
+                    <lightning:button variant="brand" onclick="{! c.aplicarCambio }" title="Aplicar" disabled="{!v.noEsPlantilla}">Aplicar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

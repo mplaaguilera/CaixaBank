@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CreacionCasoSinOrgZona</fullName>
+    <active>true</active>
+    <description>Control para que un caso no se pueda crear con CR sin asignar una organizacion y zona</description>
+    <errorConditionFormula>AND(
+     NOT(ISNEW()),
+				 BEGINS(RecordType.DeveloperName, &apos;SEG_&apos;),
+     ISCHANGED(SEG_ClasificacionRapida__c),
+				 SEG_ClasificacionRapida__c != &apos;&apos;,
+				 ISPICKVAL(SEG_Organizacion__c, &apos;&apos;),
+					ISPICKVAL(SEG_Zona__c, &apos;&apos;)
+				)</errorConditionFormula>
+    <errorMessage>Tienes que asignar una organización y zona para establecer una Clasificación Rápida</errorMessage>
+</ValidationRule>

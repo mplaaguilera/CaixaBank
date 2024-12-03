@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_IdiomaAdobe__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE( EV_Idioma__c ,
+     &quot;021&quot;,	&quot;ar&quot;,
+&quot;003&quot;,	&quot;eu_es&quot;,
+&quot;005&quot;,	&quot;bil&quot;,
+&quot;022&quot;,	&quot;bg&quot;,
+&quot;001&quot;,	&quot;ca_es&quot;,
+&quot;020&quot;,	&quot;zh&quot;,
+&quot;028&quot;,	&quot;cs&quot;,
+&quot;024&quot;,	&quot;da&quot;,
+&quot;016&quot;,	&quot;nl&quot;,
+&quot;010&quot;,	&quot;en&quot;,
+&quot;026&quot;,	&quot;fi&quot;,
+&quot;011&quot;,	&quot;fr&quot;,
+&quot;004&quot;,	&quot;gl_es&quot;,
+&quot;012&quot;,	&quot;de&quot;,
+&quot;029&quot;,	&quot;el&quot;,
+&quot;031&quot;,	&quot;hu&quot;,
+&quot;013&quot;,	&quot;it&quot;,
+&quot;027&quot;,	&quot;ja&quot;,
+&quot;025&quot;,	&quot;no_NO&quot;,
+&quot;017&quot;,	&quot;pl&quot;,
+&quot;014&quot;,	&quot;pt&quot;,
+&quot;018&quot;,	&quot;ro&quot;,
+&quot;023&quot;,	&quot;ru&quot;,
+&quot;030&quot;,	&quot;sk&quot;,
+&quot;002&quot;,	&quot;es&quot;,
+&quot;015&quot;,	&quot;sv&quot;,
+&quot;032&quot;,	&quot;tr&quot;,
+&quot;006&quot;,	&quot;va_es&quot;,&quot;&quot;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Idioma Adobe</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

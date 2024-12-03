@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Requerir_Fecha_Cierre_Al_Cerrar</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISPICKVAL(CC_Estado__c, &apos;Cerrado&apos;), OR(CC_Fecha_Cierre__c = NULL, ISBLANK(CC_Fecha_Cierre__c)))</errorConditionFormula>
+    <errorDisplayField>CC_Fecha_Cierre__c</errorDisplayField>
+    <errorMessage>Es necesario informar la fecha de cierre al cerrar un agrupador.</errorMessage>
+</ValidationRule>

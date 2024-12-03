@@ -1,0 +1,14 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes"  controller="AV_MassReassignOwnerOpps_Controller">
+ 	<lightning:workspaceAPI aura:id="workspace" />
+	 <aura:attribute name="fromHome"        type="String" access="global"/>
+     <aura:attribute name="isBPR"        type="Boolean" access="global"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }"/>
+
+    <aura:if isTrue="{!v.isBPR}">
+        <c:av_MassReassignOwnerOppsBPR/>
+        <aura:set attribute="else">
+            <c:av_MassReassignOwnerOpps/>
+        </aura:set>
+    </aura:if> 
+</aura:component>

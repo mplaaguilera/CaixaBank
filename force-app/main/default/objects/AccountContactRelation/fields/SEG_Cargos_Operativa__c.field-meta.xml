@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Cargos_Operativa__c</fullName>
+    <description>Cargos asociados a Contactos (Operativa)</description>
+    <label>Cargos contactos (Operativa)</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>AVALES</fullName>
+                <default>false</default>
+                <label>AVALES</label>
+            </value>
+            <value>
+                <fullName>AVALES CANCELACION</fullName>
+                <default>false</default>
+                <label>AVALES CANCELACION</label>
+            </value>
+            <value>
+                <fullName>Avales cancelación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Avales cancelación</label>
+            </value>
+            <value>
+                <fullName>AVALES EMISION</fullName>
+                <default>false</default>
+                <label>AVALES EMISION</label>
+            </value>
+            <value>
+                <fullName>Avales emisión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Avales emisión</label>
+            </value>
+            <value>
+                <fullName>AVALES INTERNACIONALES</fullName>
+                <default>false</default>
+                <label>AVALES INTERNACIONALES</label>
+            </value>
+            <value>
+                <fullName>AVALES NACIONALES</fullName>
+                <default>false</default>
+                <label>AVALES NACIONALES</label>
+            </value>
+            <value>
+                <fullName>AVALES RECLAMACION CEAS</fullName>
+                <default>false</default>
+                <label>AVALES RECLAMACION CEAS</label>
+            </value>
+            <value>
+                <fullName>Avales reclamación CEAS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Avales reclamación CEAS</label>
+            </value>
+            <value>
+                <fullName>BASTANTEO</fullName>
+                <default>false</default>
+                <label>BASTANTEO</label>
+            </value>
+            <value>
+                <fullName>BDR</fullName>
+                <default>false</default>
+                <label>BDR</label>
+            </value>
+            <value>
+                <fullName>CALL BACK</fullName>
+                <default>false</default>
+                <label>CALL BACK</label>
+            </value>
+            <value>
+                <fullName>CEF</fullName>
+                <default>false</default>
+                <label>CEF</label>
+            </value>
+            <value>
+                <fullName>CERTIFICADOS</fullName>
+                <default>false</default>
+                <label>CERTIFICADOS</label>
+            </value>
+            <value>
+                <fullName>CHEQUES</fullName>
+                <default>false</default>
+                <label>CHEQUES</label>
+            </value>
+            <value>
+                <fullName>COBERTURAS</fullName>
+                <default>false</default>
+                <label>COBERTURAS</label>
+            </value>
+            <value>
+                <fullName>COBROS Y PAGOS</fullName>
+                <default>false</default>
+                <label>COBROS Y PAGOS</label>
+            </value>
+            <value>
+                <fullName>COMERCIOS</fullName>
+                <default>false</default>
+                <label>COMERCIOS</label>
+            </value>
+            <value>
+                <fullName>COMEX</fullName>
+                <default>false</default>
+                <label>COMEX</label>
+            </value>
+            <value>
+                <fullName>COMEX-EXPORTACION</fullName>
+                <default>false</default>
+                <label>COMEX-EXPORTACION</label>
+            </value>
+            <value>
+                <fullName>COMEX-IMPORTACION</fullName>
+                <default>false</default>
+                <label>COMEX-IMPORTACION</label>
+            </value>
+            <value>
+                <fullName>COMEX-Importación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>COMEX-Importación</label>
+            </value>
+            <value>
+                <fullName>COMISIONES</fullName>
+                <default>false</default>
+                <label>COMISIONES</label>
+            </value>
+            <value>
+                <fullName>COMPRA CHEQUE EXTRANJERO</fullName>
+                <default>false</default>
+                <label>COMPRA CHEQUE EXTRANJERO</label>
+            </value>
+            <value>
+                <fullName>COMPRA DIVISA</fullName>
+                <default>false</default>
+                <label>COMPRA DIVISA</label>
+            </value>
+            <value>
+                <fullName>CONFIRMING</fullName>
+                <default>false</default>
+                <label>CONFIRMING</label>
+            </value>
+            <value>
+                <fullName>CONTRATOS</fullName>
+                <default>false</default>
+                <label>CONTRATOS</label>
+            </value>
+            <value>
+                <fullName>CUENTAS</fullName>
+                <default>false</default>
+                <label>CUENTAS</label>
+            </value>
+            <value>
+                <fullName>DERIVADOS</fullName>
+                <default>false</default>
+                <label>DERIVADOS</label>
+            </value>
+            <value>
+                <fullName>Devolución transferencias</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Devolución transferencias</label>
+            </value>
+            <value>
+                <fullName>DIFERENCIAS CAJERO</fullName>
+                <default>false</default>
+                <label>DIFERENCIAS CAJERO</label>
+            </value>
+            <value>
+                <fullName>EDITRAN</fullName>
+                <default>false</default>
+                <label>EDITRAN</label>
+            </value>
+            <value>
+                <fullName>EFECTIVO</fullName>
+                <default>false</default>
+                <label>EFECTIVO</label>
+            </value>
+            <value>
+                <fullName>EMBARGOS</fullName>
+                <default>false</default>
+                <label>EMBARGOS</label>
+            </value>
+            <value>
+                <fullName>FACTORING</fullName>
+                <default>false</default>
+                <label>FACTORING</label>
+            </value>
+            <value>
+                <fullName>FICHA AUDITORIA</fullName>
+                <default>false</default>
+                <label>FICHA AUDITORIA</label>
+            </value>
+            <value>
+                <fullName>Ficha auditoría</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Ficha auditoría</label>
+            </value>
+            <value>
+                <fullName>FICHEROS</fullName>
+                <default>false</default>
+                <label>FICHEROS</label>
+            </value>
+            <value>
+                <fullName>FICHEROS NOW</fullName>
+                <default>false</default>
+                <label>FICHEROS NOW</label>
+            </value>
+            <value>
+                <fullName>FINANCIACION</fullName>
+                <default>false</default>
+                <label>FINANCIACION</label>
+            </value>
+            <value>
+                <fullName>Financiación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Financiación</label>
+            </value>
+            <value>
+                <fullName>FINANCIACION COMERCIO EXTERIOR</fullName>
+                <default>false</default>
+                <label>FINANCIACION COMERCIO EXTERIOR</label>
+            </value>
+            <value>
+                <fullName>Financiación comercio exterior</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Financiación comercio exterior</label>
+            </value>
+            <value>
+                <fullName>FINANCIACION NACIONAL</fullName>
+                <default>false</default>
+                <label>FINANCIACION NACIONAL</label>
+            </value>
+            <value>
+                <fullName>Financiación nacional</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Financiación nacional</label>
+            </value>
+            <value>
+                <fullName>FIRMAS Y PODERES</fullName>
+                <default>false</default>
+                <label>FIRMAS Y PODERES</label>
+            </value>
+            <value>
+                <fullName>FONDOS</fullName>
+                <default>false</default>
+                <label>FONDOS</label>
+            </value>
+            <value>
+                <fullName>FOTOCOPIAS DE COMERCIOS</fullName>
+                <default>false</default>
+                <label>FOTOCOPIAS DE COMERCIOS</label>
+            </value>
+            <value>
+                <fullName>IMPUESTOS</fullName>
+                <default>false</default>
+                <label>IMPUESTOS</label>
+            </value>
+            <value>
+                <fullName>INCIDENCIAS OFICINA</fullName>
+                <default>false</default>
+                <label>INCIDENCIAS OFICINA</label>
+            </value>
+            <value>
+                <fullName>IPF</fullName>
+                <default>false</default>
+                <label>IPF</label>
+            </value>
+            <value>
+                <fullName>JUSTIFICANTES</fullName>
+                <default>false</default>
+                <label>JUSTIFICANTES</label>
+            </value>
+            <value>
+                <fullName>LIQUIDACIONES DE TESOREIA</fullName>
+                <default>false</default>
+                <label>LIQUIDACIONES DE TESOREIA</label>
+            </value>
+            <value>
+                <fullName>Liquidaciones de tesorería</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Liquidaciones de tesorería</label>
+            </value>
+            <value>
+                <fullName>NOMINAS</fullName>
+                <default>false</default>
+                <label>NOMINAS</label>
+            </value>
+            <value>
+                <fullName>Nóminas</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Nóminas</label>
+            </value>
+            <value>
+                <fullName>NOTARIA</fullName>
+                <default>false</default>
+                <label>NOTARIA</label>
+            </value>
+            <value>
+                <fullName>NOW</fullName>
+                <default>false</default>
+                <label>NOW</label>
+            </value>
+            <value>
+                <fullName>OID</fullName>
+                <default>false</default>
+                <label>OID</label>
+            </value>
+            <value>
+                <fullName>OMF</fullName>
+                <default>false</default>
+                <label>OMF</label>
+            </value>
+            <value>
+                <fullName>OPERACION SINDICADA</fullName>
+                <default>false</default>
+                <label>OPERACION SINDICADA</label>
+            </value>
+            <value>
+                <fullName>Operación sindicada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Operación sindicada</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA</fullName>
+                <default>false</default>
+                <label>OPERATIVA</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA COMERCIO EXTERIOR</fullName>
+                <default>false</default>
+                <label>OPERATIVA COMERCIO EXTERIOR</label>
+            </value>
+            <value>
+                <fullName>OPERATIVA NACIONAL</fullName>
+                <default>false</default>
+                <label>OPERATIVA NACIONAL</label>
+            </value>
+            <value>
+                <fullName>Operativas comercio exterior</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Operativas comercio exterior</label>
+            </value>
+            <value>
+                <fullName>PAG</fullName>
+                <default>false</default>
+                <label>PAG</label>
+            </value>
+            <value>
+                <fullName>PAGARES</fullName>
+                <default>false</default>
+                <label>PAGARES</label>
+            </value>
+            <value>
+                <fullName>Pagarés</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pagarés</label>
+            </value>
+            <value>
+                <fullName>PGT</fullName>
+                <default>false</default>
+                <label>PGT</label>
+            </value>
+            <value>
+                <fullName>RECHAZOS CEF</fullName>
+                <default>false</default>
+                <label>RECHAZOS CEF</label>
+            </value>
+            <value>
+                <fullName>RECIBOS</fullName>
+                <default>false</default>
+                <label>RECIBOS</label>
+            </value>
+            <value>
+                <fullName>RENTING</fullName>
+                <default>false</default>
+                <label>RENTING</label>
+            </value>
+            <value>
+                <fullName>SEGUROS DE CAMBIO</fullName>
+                <default>false</default>
+                <label>SEGUROS DE CAMBIO</label>
+            </value>
+            <value>
+                <fullName>SEGUROS SOCIALES</fullName>
+                <default>false</default>
+                <label>SEGUROS SOCIALES</label>
+            </value>
+            <value>
+                <fullName>SEPA</fullName>
+                <default>false</default>
+                <label>SEPA</label>
+            </value>
+            <value>
+                <fullName>SNAD</fullName>
+                <default>false</default>
+                <label>SNAD</label>
+            </value>
+            <value>
+                <fullName>STR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>STR</label>
+            </value>
+            <value>
+                <fullName>SWIFT</fullName>
+                <default>false</default>
+                <label>SWIFT</label>
+            </value>
+            <value>
+                <fullName>TALONARIOS</fullName>
+                <default>false</default>
+                <label>TALONARIOS</label>
+            </value>
+            <value>
+                <fullName>TARJETAS</fullName>
+                <default>false</default>
+                <label>TARJETAS</label>
+            </value>
+            <value>
+                <fullName>TDI</fullName>
+                <default>false</default>
+                <label>TDI</label>
+            </value>
+            <value>
+                <fullName>TDI recibidas</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TDI recibidas</label>
+            </value>
+            <value>
+                <fullName>TEMAS URGENTES</fullName>
+                <default>false</default>
+                <label>TEMAS URGENTES</label>
+            </value>
+            <value>
+                <fullName>TESORERIA</fullName>
+                <default>false</default>
+                <label>TESORERIA</label>
+            </value>
+            <value>
+                <fullName>Tesorería</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tesorería</label>
+            </value>
+            <value>
+                <fullName>TIR</fullName>
+                <default>false</default>
+                <label>TIR</label>
+            </value>
+            <value>
+                <fullName>TODAS LAS OPERATIVAS</fullName>
+                <default>false</default>
+                <label>TODAS LAS OPERATIVAS</label>
+            </value>
+            <value>
+                <fullName>TPV</fullName>
+                <default>false</default>
+                <label>TPV</label>
+            </value>
+            <value>
+                <fullName>TRF</fullName>
+                <default>false</default>
+                <label>TRF</label>
+            </value>
+            <value>
+                <fullName>TRU</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TRU</label>
+            </value>
+            <value>
+                <fullName>VIA T</fullName>
+                <default>false</default>
+                <label>VIA T</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>6</visibleLines>
+</CustomField>

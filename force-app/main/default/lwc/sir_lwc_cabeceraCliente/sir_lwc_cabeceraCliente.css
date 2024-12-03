@@ -1,0 +1,33 @@
+/*th{
+    padding-left:15px;
+    padding-bottom:8px;
+    padding-top:8px;
+}
+
+td{
+    padding-top:4px;
+    padding-bottom:8px;
+    padding-left:15px;
+}
+    
+span{
+    text-align: center;
+    min-height: 17px;
+}
+
+.newrow{
+    padding-top:10px;
+    font-size: 0.75rem;
+}
+.tamaño{
+    font-size: 0.75rem;
+}
+*/
+
+.alignDerecha{
+    text-align: right !important;
+}
+
+.alignIzquierda{
+    text-align: left !important;
+}

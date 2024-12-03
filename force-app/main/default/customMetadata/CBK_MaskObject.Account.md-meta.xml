@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Account</label>
+    <protected>false</protected>
+    <values>
+        <field>CBK_BatchSize__c</field>
+        <value xsi:type="xsd:double">1000.0</value>
+    </values>
+    <values>
+        <field>CBK_CheckMaskRecord__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CBK_ChunkSize__c</field>
+        <value xsi:type="xsd:double">0.0</value>
+    </values>
+    <values>
+        <field>CBK_ObjectMaskDateField__c</field>
+        <value xsi:type="xsd:string">AV_FechaEnmascaramiento__c</value>
+    </values>
+    <values>
+        <field>CBK_ObjectMaskFlagField__c</field>
+        <value xsi:type="xsd:string">AV_RecordToMask__c</value>
+    </values>
+    <values>
+        <field>CBK_Objeto__c</field>
+        <value xsi:type="xsd:string">Account</value>
+    </values>
+    <values>
+        <field>CBK_Orden__c</field>
+        <value xsi:type="xsd:double">2.0</value>
+    </values>
+    <values>
+        <field>CBK_ParallelBatch__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+</CustomMetadata>

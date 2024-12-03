@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Motivo_Pendiente_Interno__c</fullName>
+    <label>Motivo pendiente interno</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Aprobada pte. Escritura</fullName>
+                <default>false</default>
+                <label>Aprobada pte. Escritura</label>
+            </value>
+            <value>
+                <fullName>Aprobada pte. FEIN</fullName>
+                <default>false</default>
+                <label>Aprobada pte. FEIN</label>
+            </value>
+            <value>
+                <fullName>Aprobada pte. Homologación</fullName>
+                <default>false</default>
+                <label>Aprobada pte. Homologación</label>
+            </value>
+            <value>
+                <fullName>Aprobada pte. OK cliente</fullName>
+                <default>false</default>
+                <label>Aprobada pte. OK cliente</label>
+            </value>
+            <value>
+                <fullName>Aprobada pte. Tasación</fullName>
+                <default>false</default>
+                <label>Aprobada pte. Tasación</label>
+            </value>
+            <value>
+                <fullName>Cliente no localizado</fullName>
+                <default>false</default>
+                <label>Cliente no localizado</label>
+            </value>
+            <value>
+                <fullName>Esperando llamada cliente</fullName>
+                <default>false</default>
+                <label>Esperando llamada cliente</label>
+            </value>
+            <value>
+                <fullName>Interno</fullName>
+                <default>false</default>
+                <label>Interno</label>
+            </value>
+            <value>
+                <fullName>Pendiente acta notarial</fullName>
+                <default>false</default>
+                <label>Pendiente acta notarial</label>
+            </value>
+            <value>
+                <fullName>Pendiente contactar oficina</fullName>
+                <default>false</default>
+                <label>Pendiente contactar oficina</label>
+            </value>
+            <value>
+                <fullName>Pendiente de aprobación</fullName>
+                <default>false</default>
+                <label>Pendiente de aprobación</label>
+            </value>
+            <value>
+                <fullName>Pendiente de documentación</fullName>
+                <default>false</default>
+                <label>Pendiente de documentación</label>
+            </value>
+            <value>
+                <fullName>Pendiente de firma</fullName>
+                <default>false</default>
+                <label>Pendiente de firma</label>
+            </value>
+            <value>
+                <fullName>Pendiente de tasación</fullName>
+                <default>false</default>
+                <label>Pendiente de tasación</label>
+            </value>
+            <value>
+                <fullName>Pendiente escrituración</fullName>
+                <default>false</default>
+                <label>Pendiente escrituración</label>
+            </value>
+            <value>
+                <fullName>Pendiente informe</fullName>
+                <default>false</default>
+                <label>Pendiente informe</label>
+            </value>
+            <value>
+                <fullName>Pendiente iniciar SIA</fullName>
+                <default>false</default>
+                <label>Pendiente iniciar SIA</label>
+            </value>
+            <value>
+                <fullName>Pendiente muro</fullName>
+                <default>false</default>
+                <label>Pendiente muro</label>
+            </value>
+            <value>
+                <fullName>Pendiente OK cliente</fullName>
+                <default>false</default>
+                <label>Pendiente OK cliente</label>
+            </value>
+            <value>
+                <fullName>Propuesta viable enviada</fullName>
+                <default>false</default>
+                <label>Propuesta viable enviada</label>
+            </value>
+            <value>
+                <fullName>SIA en trámite</fullName>
+                <default>false</default>
+                <label>SIA en trámite</label>
+            </value>
+            <value>
+                <fullName>Solicitada Prov. de Fondos CV/Hip.</fullName>
+                <default>false</default>
+                <label>Solicitada Prov. de Fondos CV/Hip.</label>
+            </value>
+            <value>
+                <fullName>Solicitar Emisión Cheques Bancarios</fullName>
+                <default>false</default>
+                <label>Solicitar Emisión Cheques Bancarios</label>
+            </value>
+            <value>
+                <fullName>Solicitud CIRBE/Nota Simple</fullName>
+                <default>false</default>
+                <label>Solicitud CIRBE/Nota Simple</label>
+            </value>
+            <value>
+                <fullName>Trasladada CARP</fullName>
+                <default>false</default>
+                <label>Trasladada CARP</label>
+            </value>
+            <value>
+                <fullName>Trasladada DT Tarifa</fullName>
+                <default>false</default>
+                <label>Trasladada DT Tarifa</label>
+            </value>
+            <value>
+                <fullName>Trasladada oficina</fullName>
+                <default>false</default>
+                <label>Trasladada oficina</label>
+            </value>
+            <value>
+                <fullName>Opendesk enviado</fullName>
+                <default>false</default>
+                <label>Opendesk enviado</label>
+            </value>
+            <value>
+                <fullName>Pendiente llamada</fullName>
+                <default>false</default>
+                <label>Pendiente llamada</label>
+            </value>
+            <value>
+                <fullName>Pendiente onboarding nacional</fullName>
+                <default>false</default>
+                <label>Pendiente onboarding nacional</label>
+            </value>
+            <value>
+                <fullName>Pendiente MAF/Checklist</fullName>
+                <default>false</default>
+                <label>Pendiente MAF/Checklist</label>
+            </value>
+            <value>
+                <fullName>Documentación</fullName>
+                <default>false</default>
+                <label>Documentación</label>
+            </value>
+            <value>
+                <fullName>Pendiente documentación</fullName>
+                <default>false</default>
+                <label>Pendiente documentación</label>
+            </value>
+            <value>
+                <fullName>Pendiente nota simple</fullName>
+                <default>false</default>
+                <label>Pendiente nota simple</label>
+            </value>
+            <value>
+                <fullName>Pendiente CIRBE</fullName>
+                <default>false</default>
+                <label>Pendiente CIRBE</label>
+            </value>
+            <value>
+                <fullName>Pendiente valija electrónica</fullName>
+                <default>false</default>
+                <label>Pendiente valija electrónica</label>
+            </value>
+            <value>
+                <fullName>Pendiente informe CCI</fullName>
+                <default>false</default>
+                <label>Pendiente informe CCI</label>
+            </value>
+            <value>
+                <fullName>Pendiente nueva doc CCI</fullName>
+                <default>false</default>
+                <label>Pendiente nueva doc CCI</label>
+            </value>
+            <value>
+                <fullName>Traslado aprobación tarifa</fullName>
+                <default>false</default>
+                <label>Traslado aprobación tarifa</label>
+            </value>
+            <value>
+                <fullName>Traslado aprobación CARP</fullName>
+                <default>false</default>
+                <label>Traslado aprobación CARP</label>
+            </value>
+            <value>
+                <fullName>Aprobada pendiente tasación</fullName>
+                <default>false</default>
+                <label>Aprobada pendiente tasación</label>
+            </value>
+            <value>
+                <fullName>Pendiente onboarding internacional</fullName>
+                <default>false</default>
+                <label>Pendiente onboarding internacional</label>
+            </value>
+            <value>
+                <fullName>Validación tasación homologada</fullName>
+                <default>false</default>
+                <label>Validación tasación homologada</label>
+            </value>
+            <value>
+                <fullName>Tasación en curso</fullName>
+                <default>false</default>
+                <label>Tasación en curso</label>
+            </value>
+            <value>
+                <fullName>Pendiente provisión de fondos</fullName>
+                <default>false</default>
+                <label>Pendiente provisión de fondos</label>
+            </value>
+            <value>
+                <fullName>Aprobada pendiente FEIN</fullName>
+                <default>false</default>
+                <label>Aprobada pendiente FEIN</label>
+            </value>
+            <value>
+                <fullName>Aprobada pendiente fecha</fullName>
+                <default>false</default>
+                <label>Aprobada pendiente fecha</label>
+            </value>
+            <value>
+                <fullName>Aprobada pendiente escritura</fullName>
+                <default>false</default>
+                <label>Aprobada pendiente escritura</label>
+            </value>
+            <value>
+                <fullName>Pendiente firma SUA</fullName>
+                <default>false</default>
+                <label>Pendiente firma SUA</label>
+            </value>
+            <value>
+                <fullName>Contactado</fullName>
+                <default>false</default>
+                <label>Contactado</label>
+            </value>
+            <value>
+                <fullName>No Contactado</fullName>
+                <default>false</default>
+                <label>No Contactado</label>
+            </value>
+            <value>
+                <fullName>En trámite</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>En trámite</label>
+            </value>
+            <value>
+                <fullName>Enviando documentación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Enviando documentación</label>
+            </value>
+            <value>
+                <fullName>Pendiente Tasación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente Tasación</label>
+            </value>
+            <value>
+                <fullName>Pendiente aprobación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente aprobación</label>
+            </value>
+            <value>
+                <fullName>Pendiente contacto</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente contacto</label>
+            </value>
+            <value>
+                <fullName>Pendiente firma</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente firma</label>
+            </value>
+            <value>
+                <fullName>Pendiente recibir documentación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente recibir documentación</label>
+            </value>
+            <value>
+                <fullName>Pendiente sanción CAR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente sanción CAR</label>
+            </value>
+            <value>
+                <fullName>Pendiente tarifa DT</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente tarifa DT</label>
+            </value>
+            <value>
+                <fullName>Solicitada documentacion</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Solicitada documentacion</label>
+            </value>
+            <value>
+                <fullName>Trasladada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Trasladada</label>
+            </value>
+            <value>
+                <fullName>Trasladada DT</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Trasladada DT</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

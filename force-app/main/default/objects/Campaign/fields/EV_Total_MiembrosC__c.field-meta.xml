@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Total_MiembrosC__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Campo que contea el numero total de miembros de campaña de EV_CampaignMemberC__c sin filtros</description>
+    <externalId>false</externalId>
+    <label>Total Miembros Evento</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

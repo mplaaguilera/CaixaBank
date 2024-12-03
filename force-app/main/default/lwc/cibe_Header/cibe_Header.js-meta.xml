@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>54.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="showHeader" type="Boolean" default="false" label="Show Header" required="true" description="If true header appears."/>
+            <property name="showBody" type="Boolean" default="false" label="Show Body" required="true" description="If true body appears."/>
+            <property name="fieldName" type="String" default="" label="Field of Object's name" description="Field Name. Required if showHeader is true."/>
+            <property name="icon" type="String" default="" label="Icon Name" description="API Icon Name. Required if showHeader is true."/>
+            <property name="title" type="String" default="" label="Title" description="Title. Required if showHeader is true."/>
+            <property name="showHierarchy" type="Boolean" default="false" label="Show Hierarchy" description="If true hierarchy button appears. Supported objects: Account."/>
+            <property name="actionSetting" type="String" default="" label="Flow Action Setting" description="Flow Action Setting from custom metadata."/>
+            <property name="fieldSetName" type="String" default="" label="FieldSet Name" description="FieldSet Name. Required if showBody is true."/>
+            <property name="filterObject" type="String" default="" label="Object API Name" description="Object API Name. Required if showBody is true."/>
+            <property name="fieldSearch" type="String" default="" label="FieldSearch API Name" description="API name of the field to search in fieldSetName."/>
+            <property name="helpField" type="String" default="" label="Help field API Name" description="API name of the field to show in helptext."/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

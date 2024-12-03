@@ -1,0 +1,13 @@
+<template>
+    <c-av_-home-header title={headerTitle} subtitle={headerSubtitle} header-icon={headerIcon} has-header={hasHeader}></c-av_-home-header>
+    <div class="c-container">
+        <lightning-layout multiple-rows>
+            <template if:true={listCharts} for:each={listCharts} for:item="chart">
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="3" large-device-size="2" flexibility="auto" padding="around-small" key={chart}>
+                    <c-cibe_-metric-chart metadata-chart-name={chart} onrefreshinfo={updateLasRefreshInfo}></c-cibe_-metric-chart>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+    <div lwc:dom="manual"></div>
+</template>

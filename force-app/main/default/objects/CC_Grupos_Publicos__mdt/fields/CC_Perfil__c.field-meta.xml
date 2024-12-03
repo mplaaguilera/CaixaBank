@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Perfil__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Perfil</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>CC_Analista_CCO</fullName>
+                <default>false</default>
+                <label>CC_Analista_CCO</label>
+            </value>
+            <value>
+                <fullName>CC_Analista_Cliente</fullName>
+                <default>false</default>
+                <label>CC_Analista_Cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Analísta y 2º nivel CCO</fullName>
+                <default>false</default>
+                <label>CC_Analísta y 2º nivel CCO</label>
+            </value>
+            <value>
+                <fullName>CC_Analísta y 2º nivel MVP2</fullName>
+                <default>true</default>
+                <label>CC_Analísta y 2º nivel MVP2</label>
+            </value>
+            <value>
+                <fullName>CC_Gestor_Conocimiento</fullName>
+                <default>false</default>
+                <label>CC_Gestor_Conocimiento</label>
+            </value>
+            <value>
+                <fullName>CC_Observador</fullName>
+                <default>false</default>
+                <label>CC_Observador</label>
+            </value>
+            <value>
+                <fullName>CC_Observador MVP2</fullName>
+                <default>false</default>
+                <label>CC_Observador MVP2</label>
+            </value>
+            <value>
+                <fullName>CC_Operador_CCO</fullName>
+                <default>false</default>
+                <label>CC_Operador_CCO</label>
+            </value>
+            <value>
+                <fullName>CC_Operador_Cliente</fullName>
+                <default>false</default>
+                <label>CC_Operador_Cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Operador básico CCO</fullName>
+                <default>false</default>
+                <label>CC_Operador básico CCO</label>
+            </value>
+            <value>
+                <fullName>CC_Operador básico MVP2</fullName>
+                <default>false</default>
+                <label>CC_Operador básico MVP2</label>
+            </value>
+            <value>
+                <fullName>CC_Tercer_Nivel_CBKNow</fullName>
+                <default>false</default>
+                <label>CC_Tercer_Nivel_CBKNow</label>
+            </value>
+            <value>
+                <fullName>CC_Tercer_Nivel_CBKNow_MVP2</fullName>
+                <default>false</default>
+                <label>CC_Tercer_Nivel_CBKNow_MVP2</label>
+            </value>
+            <value>
+                <fullName>EV_Administrador de eventos</fullName>
+                <default>false</default>
+                <label>EV_Administrador de eventos</label>
+            </value>
+            <value>
+                <fullName>EV_Ejecutor de eventos</fullName>
+                <default>false</default>
+                <label>EV_Ejecutor de eventos</label>
+            </value>
+            <value>
+                <fullName>System Administrator</fullName>
+                <default>false</default>
+                <label>System Administrator</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

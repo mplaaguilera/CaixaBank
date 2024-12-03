@@ -1,0 +1,54 @@
+.headerClass {   
+    color: white;
+    margin-bottom: 15px;
+    text-align: center;
+    text-decoration: underline;
+}
+
+.mi-icono {
+    margin-right: 3px;
+}
+
+/*Este de debajo para si es el componente en la derecha*/
+.miboton-segundo {
+    margin-bottom: 10px;
+
+}
+
+.texto-form {
+    font-size: xx-small;
+    
+}
+
+.botonAccount {
+    margin-left: 3px;
+}
+
+.sinPadding {
+    padding: 0;
+}
+
+.separador {
+    height: 1px;
+    width: 80%;         /*Tamaño de un 50% de lo que lo contiene*/
+    border: none;
+    background-color: #c3e3ff;
+    margin: 5px auto 0 auto;
+    
+}
+
+.tarjetaObjIntermedio {
+    margin-top: 5px;
+}
+
+.contenidoClass .slds-form-element .slds-form-element__label{     
+    color: #ddd;
+}
+.contenidoClass .slds-form-element .slds-form-element__control .slds-form-element__static {   
+    color: white;
+    text-decoration:none;
+}
+.contenidoClass .slds-form-element .slds-form-element__control .slds-form-element__static a{   
+    color: white;
+    text-decoration:none;
+}

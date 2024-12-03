@@ -1,0 +1,18 @@
+<aura:component implements="lightning:isUrlAddressable">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="rtName" type="String"></aura:attribute>
+    <aura:attribute name="isCIB" type="Boolean"></aura:attribute>
+
+    <lightning:workspaceAPI aura:id="workspace" />
+        <aura:if isTrue="{!v.isCIB}">    
+            <c:cibe_ClientesPriorizadosCIB 
+                clickFilter="{!v.rtName}">
+            </c:cibe_ClientesPriorizadosCIB>
+        <aura:set attribute="else">
+            <c:cibe_ClientesPriorizados 
+                clickFilter="{!v.rtName}">
+            </c:cibe_ClientesPriorizados>
+        </aura:set>
+        </aura:if>
+    
+</aura:component>

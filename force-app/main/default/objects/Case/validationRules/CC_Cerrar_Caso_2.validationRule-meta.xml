@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Caso_2</fullName>
+    <active>true</active>
+    <description>Comprueba que se han informado todos los campos requeridos a nivel de cierre de caso.</description>
+    <errorConditionFormula>AND(
+				ISCHANGED(Status),
+				ISCHANGED(CC_Cerrado_Operativa__c),
+				NOT(ISBLANK(CC_Cerrado_Operativa__c)),
+				ISPICKVAL(Status,&quot;Cerrado&quot;),
+				NOT(ISPICKVAL(Origin,&quot;Propuestas de mejora&quot;)), 
+				NOT(ISPICKVAL(Origin,&quot;Email - Revisar&quot;)),
+				OR(ISPICKVAL(Origin, &quot;&quot;),
+				    ISPICKVAL(CC_Canal_Procedencia__c,&quot;&quot;),
+				    ISPICKVAL(CC_Idioma__c,&quot;&quot;),
+				    ISPICKVAL(CC_Tipo_Contacto__c,&quot;&quot;),
+				    ISPICKVAL(CC_Canal_Operativo__c,&quot;&quot;),
+				    ISBLANK(CC_MCC_Causa__c),
+				    ISBLANK(CC_MCC_Solucion__c)
+			 )
+)</errorConditionFormula>
+    <errorMessage>Debes informar los campos Canal de entrada, Canal de procedencia, Idioma, Tipo de contacto, Canal operativo, Causa y Solución para poder cerrar el caso.</errorMessage>
+</ValidationRule>

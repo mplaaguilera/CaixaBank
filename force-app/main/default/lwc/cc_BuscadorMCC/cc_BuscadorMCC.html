@@ -1,0 +1,198 @@
+<template>
+    <lightning-card title="Buscador de clasificaciones" icon-name="custom:custom64">
+        <div class="slds-grid slds-wrap slds-gutters slds-p-horizontal_small">
+            <div class="slds-col slds-size_1-of-2">
+                <!-- Selector de temática -->
+                <label class="slds-form-element__label">Temática</label>
+                <div class="slds-combobox_container">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning-input name="buscadorTematica" class="inputBox" placeholder="Seleccione una temática" onblur={blurTematica} onclick={mostrarOpcTematica} onkeyup={filtrarOpcTematica} value={searchInputTematica} autocomplete="off" variant="label-hidden" id="combobox-id-1" ></lightning-input>
+                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones temática -->
+                        <template if:true={mostrarOpcionesTematica}>
+                            <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                                <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                    <template if:false={message} >
+                                        <div  class="scroll-container">
+                                            <template for:each={filteredResultsTematica} for:item="option">
+                                                <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectTematica} class="slds-listbox__item eachItem">
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"> 
+                                                        <div class="slds-grid slds-has-flexi-truncate">
+                                                            <p class="slds-truncate" title={option.Name}>{option.Name}</p>
+                                                        </div>
+                                                        <lightning-helptext if:true={option.CC_Detalle__c} style="position:relative; top:-4px;" content={option.CC_Detalle__c}></lightning-helptext>
+                                                    </span>
+                                                </li>
+                                            </template>
+                                            <div if:true={hayMasResultados} class="fixed-div">
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template if:true={message} >
+                                        <li class="slds-listbox__item">
+                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <!-- Selector de producto -->
+                <label class="slds-form-element__label" for="single-form-element-id-03">Producto/Servicio</label>
+                <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning-input disabled={disabledProducto} name="buscadorProducto" class="inputBox" placeholder="Seleccione un producto/servicio" onblur={blurProducto} onclick={mostrarOpcProducto} onkeyup={filtrarOpcProducto} value={searchInputProducto} autocomplete="off" variant="label-hidden" id="combobox-id-2" ></lightning-input>
+                                <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                            </div>
+                            <!-- Mostrar opciones producto -->
+                            <template if:true={mostrarOpcionesProducto}>
+                                <div id="listbox-id-2" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                                    <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                        <template if:false={message} >
+                                            <div  class="scroll-container">
+                                                <template for:each={filteredResultsProducto} for:item="option">
+                                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectProducto} class="slds-listbox__item eachItem">
+                                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"> 
+                                                            <div class="slds-grid slds-has-flexi-truncate">
+                                                                <p class="slds-truncate" title={option.Name}>{option.Name}</p>
+                                                            </div>
+                                                            <lightning-helptext if:true={option.CC_Detalle__c} style="position:relative; top:-3px;" content={option.CC_Detalle__c}></lightning-helptext>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <div if:true={hayMasResultados} class="fixed-div">
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={message} >
+                                            <li class="slds-listbox__item">
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <!-- Selector de motivo -->
+                <label class="slds-form-element__label" for="single-form-element-id-02">Motivo</label>
+                <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning-input disabled={disabledMotivo} name="buscadorMotivo" class="inputBox" placeholder="Seleccione un motivo" onblur={blurMotivo} onclick={mostrarOpcMotivo} onkeyup={filtrarOpcMotivo} value={searchInputMotivo} autocomplete="off" variant="label-hidden" id="combobox-id-3" ></lightning-input>
+                                <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                            </div>
+                            <!-- Mostrar opciones motivo -->
+                            <template if:true={mostrarOpcionesMotivo}>
+                                <div id="listbox-id-3" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                                    <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                        <template if:false={message} >
+                                            <div  class="scroll-container">
+                                                <template for:each={filteredResultsMotivo} for:item="option">
+                                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectMotivo} class="slds-listbox__item eachItem">
+                                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"> 
+                                                            <div class="slds-grid slds-has-flexi-truncate">
+                                                                <p class="slds-truncate" title={option.Name}>{option.Name}</p>
+                                                            </div>
+                                                            <lightning-helptext if:true={option.CC_Detalle__c} style="position:relative; top:-3px;" content={option.CC_Detalle__c}></lightning-helptext>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <div if:true={hayMasResultados} class="fixed-div">
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={message} >
+                                            <li class="slds-listbox__item">
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <!-- Buscador de detalle -->
+                <label class="slds-form-element__label" for="single-form-element-id-03">Detalle</label>
+                <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning-input disabled={disabledDetalle} name="buscadorDetalle" class="inputBox" placeholder="Seleccione un detalle" onblur={blurDetalle} onclick={mostrarOpcDetalle} onkeyup={filtrarOpcDetalle} value={searchInputDetalle} autocomplete="off" variant="label-hidden" id="combobox-id-4" ></lightning-input>
+                                <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                            </div>
+                            <!-- Mostrar opciones detalle -->
+                            <template if:true={mostrarOpcionesDetalle}>
+                                <div id="listbox-id-4" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                                    <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                        <template if:false={message} >
+                                            <div  class="scroll-container">
+                                                <template for:each={filteredResultsDetalle} for:item="option">
+                                                    <li key={option.id} data-value={option.Id} data-name={option.Name} value={option} onmousedown={selectDetalle} class="slds-listbox__item eachItem">
+                                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"> 
+                                                            <div class="slds-grid slds-has-flexi-truncate">
+                                                                <p class="slds-truncate" title={option.Name}>{option.Name}</p>
+                                                            </div>
+                                                            <lightning-helptext if:true={option.CC_Detalle__c} style="position:relative; top:-3px;" content={option.CC_Detalle__c}></lightning-helptext>
+                                                        </span>
+                                                    </li>
+                                                </template>
+                                                <div if:true={hayMasResultados} class="fixed-div">
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template if:true={message} >
+                                            <li class="slds-listbox__item">
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_2-of-3" style="margin-top:10px">
+                <!-- Texto que muestra el/los grupos colaboradores relacionados con el detalle -->
+                <template if:true={mostrarGruposDetalle}>
+                    <p><strong><lightning-formatted-text value="Grupos colaboradores detalle: " ></lightning-formatted-text></strong><lightning-formatted-text value={cadenaGrupos}></lightning-formatted-text></p></p>
+                </template>
+                <template if:true={mostrarMensajeNoGrupos}>
+                    <p><lightning-formatted-text value="El detalle no tiene grupo colaboradores asignados." ></lightning-formatted-text></p>
+                </template>
+            </div>
+            <div class="slds-col slds-size_1-of-3">
+                <!-- Botón para añadir el MCC seleccionado -->
+                <lightning-button if:true={nuevaPretension} variant="brand" label="Añadir" disabled={mostrarBotonAnadir} onclick={handleClickAnadir} class="slds-button slds-float_right slds-m-top_small"></lightning-button>
+                <!-- Botón para cambiar el MCC -->
+                <lightning-button if:true={cambioMCC} variant="brand" label="Guardar" disabled={mostrarBotonGuardar} onclick={handleClickGuardar} class="slds-button slds-float_right slds-m-top_small"></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

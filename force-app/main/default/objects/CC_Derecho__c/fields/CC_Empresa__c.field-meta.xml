@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Empresa__c</fullName>
+    <description>Empresa por la que se solicita el derecho.</description>
+    <label>Empresa</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>ASOCIACIÓN DE VOLUNTARIOS DE CAIXABANK</fullName>
+                <default>false</default>
+                <label>ASOCIACIÓN DE VOLUNTARIOS DE CAIXABANK</label>
+            </value>
+            <value>
+                <fullName>BANKIA HABITAT, S.L.</fullName>
+                <default>false</default>
+                <label>BANKIA HABITAT, S.L.</label>
+            </value>
+            <value>
+                <fullName>BUILDINGCENTER, S.A.U.</fullName>
+                <default>false</default>
+                <label>BUILDINGCENTER, S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK ASSET MANAGEMENT</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK ASSET MANAGEMENT</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK ASSET MANAGEMENTCAIXABANK EQUIPMENT FINANCE, S.A.U.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK ASSET MANAGEMENTCAIXABANK EQUIPMENT FINANCE, S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK ASSET MANAGEMENT SGIIC S.A.U.</fullName>
+                <default>false</default>
+                <label>CAIXABANK ASSET MANAGEMENT SGIIC S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK BUSINESS INTELLIGENCE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK BUSINESS INTELLIGENCE</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK BUSINESS INTELLIGENCE S.A.</fullName>
+                <default>false</default>
+                <label>CAIXABANK BUSINESS INTELLIGENCE S.A.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK DIGITAL BUSINESS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK DIGITAL BUSINESS</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK ELECTRONIC MONEY EDE, S.L.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK ELECTRONIC MONEY EDE, S.L.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK EQUIPMENT FINANCE S.A.U.</fullName>
+                <default>false</default>
+                <label>CAIXABANK EQUIPMENT FINANCE S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK FACILITIES MANAGEMENT</fullName>
+                <default>false</default>
+                <label>CAIXABANK FACILITIES MANAGEMENT</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK NOTAS MINORISTAS</fullName>
+                <default>false</default>
+                <label>CAIXABANK NOTAS MINORISTAS</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK OPERATIONAL SERVICES S.A.</fullName>
+                <default>false</default>
+                <label>CAIXABANK OPERATIONAL SERVICES S.A.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK PAYMENTS &amp; CONSUMER</fullName>
+                <default>false</default>
+                <label>CAIXABANK PAYMENTS &amp; CONSUMER</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK S.A.</fullName>
+                <default>true</default>
+                <label>CAIXABANK S.A.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK TECH S.L.</fullName>
+                <default>false</default>
+                <label>CAIXABANK TECH S.L.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK TITULIZACIÓN</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAIXABANK TITULIZACIÓN</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK TITULIZACION S.G.F.T. S.A.U.</fullName>
+                <default>false</default>
+                <label>CAIXABANK TITULIZACION S.G.F.T. S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAJA SAN FERNANDO FINANCE, S.A.U.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CAJA SAN FERNANDO FINANCE, S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CENTRO DE SERVICIOS OPERATIVOS E INGENIERÍA DE PROCESOS, S.L.U</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CENTRO DE SERVICIOS OPERATIVOS E INGENIERÍA DE PROCESOS, S.L.U</label>
+            </value>
+            <value>
+                <fullName>CENTRO DE SERVICIOS OPERATIVOS E INGENIERÍA DE PROCESOS, S.L.U.</fullName>
+                <default>false</default>
+                <label>CENTRO DE SERVICIOS OPERATIVOS E INGENIERÍA DE PROCESOS, S.L.U.</label>
+            </value>
+            <value>
+                <fullName>COMERCIA GLOBAL PAYMENTS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>COMERCIA GLOBAL PAYMENTS</label>
+            </value>
+            <value>
+                <fullName>COMERCIA GLOBAL PAYMENTS, ENTIDAD DE PAGO S.L.</fullName>
+                <default>false</default>
+                <label>COMERCIA GLOBAL PAYMENTS, ENTIDAD DE PAGO S.L.</label>
+            </value>
+            <value>
+                <fullName>CORPORACIÓN HIPOTECARIAL MUTUAL, S.A., E.F.C</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CORPORACIÓN HIPOTECARIAL MUTUAL, S.A., E.F.C</label>
+            </value>
+            <value>
+                <fullName>CORPORACION HIPOTECARIA MUTUAL, S.A.U., ESTABLECIMIENTO FINANCIERO DE CREDITO</fullName>
+                <default>false</default>
+                <label>CORPORACION HIPOTECARIA MUTUAL, S.A.U., ESTABLECIMIENTO FINANCIERO DE CREDITO</label>
+            </value>
+            <value>
+                <fullName>CREDIFIMO, S.A.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CREDIFIMO, S.A.</label>
+            </value>
+            <value>
+                <fullName>GDS CUSA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>GDS CUSA</label>
+            </value>
+            <value>
+                <fullName>GEROCAIXA ENTIDAD DE PREVISION SOCIAL VOLUNTARIA INDIVIDUAL</fullName>
+                <default>false</default>
+                <label>GEROCAIXA ENTIDAD DE PREVISION SOCIAL VOLUNTARIA INDIVIDUAL</label>
+            </value>
+            <value>
+                <fullName>GEROCAIXA EPSV INDIVIDUAL</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>GEROCAIXA EPSV INDIVIDUAL</label>
+            </value>
+            <value>
+                <fullName>GEROCAIXA PRIVADA PENSIONES ENTIDAD DE PREVISION SOCIAL VOLUNTARIA ASOCIADA</fullName>
+                <default>false</default>
+                <label>GEROCAIXA PRIVADA PENSIONES ENTIDAD DE PREVISION SOCIAL VOLUNTARIA ASOCIADA</label>
+            </value>
+            <value>
+                <fullName>GEROCAIXA PRIVADA PENSIONES EPSV</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>GEROCAIXA PRIVADA PENSIONES EPSV</label>
+            </value>
+            <value>
+                <fullName>GEROCAIXA PYME EPSV DE EMPLEO</fullName>
+                <default>false</default>
+                <label>GEROCAIXA PYME EPSV DE EMPLEO</label>
+            </value>
+            <value>
+                <fullName>GLOBAL PAYMENTS MONEYTOPAY, EDE S.L.</fullName>
+                <default>false</default>
+                <label>GLOBAL PAYMENTS MONEYTOPAY, EDE S.L.</label>
+            </value>
+            <value>
+                <fullName>HIPOTECAIXA 2, S.L.</fullName>
+                <default>false</default>
+                <label>HIPOTECAIXA 2, S.L.</label>
+            </value>
+            <value>
+                <fullName>IMAGINERSGEN S.A.</fullName>
+                <default>false</default>
+                <label>IMAGINERSGEN S.A.</label>
+            </value>
+            <value>
+                <fullName>LIDERES DE EMPRESA SXXI</fullName>
+                <default>false</default>
+                <label>LIDERES DE EMPRESA SXXI</label>
+            </value>
+            <value>
+                <fullName>LIVINGCENTER ACTIVOS INMOBILIARIOS, S.A.</fullName>
+                <default>false</default>
+                <label>LIVINGCENTER ACTIVOS INMOBILIARIOS, S.A.</label>
+            </value>
+            <value>
+                <fullName>LIVINGCENTER ACTIVOS INMOBILIARIOS, S.A.U.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>LIVINGCENTER ACTIVOS INMOBILIARIOS, S.A.U.</label>
+            </value>
+            <value>
+                <fullName>NUEVO MICRO BANK DE &apos;LA CAIXA’</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>NUEVO MICRO BANK DE &apos;LA CAIXA’</label>
+            </value>
+            <value>
+                <fullName>NUEVO MICRO BANK S.A.U.</fullName>
+                <default>false</default>
+                <label>NUEVO MICRO BANK S.A.U.</label>
+            </value>
+            <value>
+                <fullName>PROMO CAIXA, S.A.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>PROMO CAIXA, S.A.</label>
+            </value>
+            <value>
+                <fullName>PUERTO TRIANA, S.A.</fullName>
+                <default>false</default>
+                <label>PUERTO TRIANA, S.A.</label>
+            </value>
+            <value>
+                <fullName>SERVICIO DE PREVENCIÓN MANCOMUNADO</fullName>
+                <default>false</default>
+                <label>SERVICIO DE PREVENCIÓN MANCOMUNADO</label>
+            </value>
+            <value>
+                <fullName>SILC INMUEBLES</fullName>
+                <default>false</default>
+                <label>SILC INMUEBLES</label>
+            </value>
+            <value>
+                <fullName>SILK APLICACIONES</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SILK APLICACIONES</label>
+            </value>
+            <value>
+                <fullName>TELEFÓNICA CONSUMER FINANCE, E.F.C., S.A.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TELEFÓNICA CONSUMER FINANCE, E.F.C., S.A.</label>
+            </value>
+            <value>
+                <fullName>TELEFONICA CONSUMER FINANCE ESTABLECIMIENTO FINANCIERO DE CREDITO S.A.</fullName>
+                <default>false</default>
+                <label>TELEFONICA CONSUMER FINANCE ESTABLECIMIENTO FINANCIERO DE CREDITO S.A.</label>
+            </value>
+            <value>
+                <fullName>UNION DE CREDITO PARA LA FINANCIACION MOBILIARIA E INMOBILIARIA, CREDIFIMO ESTABLECIMIENTO FINANCIERO DE CREDITO S.A.U.</fullName>
+                <default>false</default>
+                <label>UNION DE CREDITO PARA LA FINANCIACION MOBILIARIA E INMOBILIARIA, CREDIFIMO ESTABLECIMIENTO FINANCIERO DE CREDITO S.A.U.</label>
+            </value>
+            <value>
+                <fullName>VIDACAIXA, S.A. DE SEGUROS Y REASEGUROS</fullName>
+                <default>false</default>
+                <label>VIDACAIXA, S.A. DE SEGUROS Y REASEGUROS</label>
+            </value>
+            <value>
+                <fullName>VIDACAIXA MEDIACIÓN SOCIEDAD DE AGENCIA DE SEGUROS VINCULADA, S.A.U</fullName>
+                <default>false</default>
+                <label>VIDACAIXA MEDIACIÓN SOCIEDAD DE AGENCIA DE SEGUROS VINCULADA, S.A.U</label>
+            </value>
+            <value>
+                <fullName>WIVAI SELECTPLACE S.A.U.</fullName>
+                <default>false</default>
+                <label>WIVAI SELECTPLACE S.A.U.</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

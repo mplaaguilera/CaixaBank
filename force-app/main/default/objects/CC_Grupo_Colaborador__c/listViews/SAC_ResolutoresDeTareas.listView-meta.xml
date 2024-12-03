@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ResolutoresDeTareas</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.SAC_GrupoResponsableAccion</value>
+    </filters>
+    <label>Resolutores de tareas</label>
+    <sharedTo>
+        <roleAndSubordinates>SAC_General</roleAndSubordinates>
+    </sharedTo>
+</ListView>

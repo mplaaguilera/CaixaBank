@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_EmailMessage_Check_Whitelist__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>CBK EmailMessage Check Whitelist</label>
+    <referenceTo>CBK_EmailMessage_Check_Whitelist__mdt</referenceTo>
+    <relationshipLabel>CBK_EmailMessage_Check</relationshipLabel>
+    <relationshipName>CBK_EmailMessage_Check</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,21 @@
+.formulario{
+    margin: 5% 10% 5% 10%;
+}
+.titulo{
+    font-weight: bold;
+    font-size: 14px;
+    padding-bottom: 2%;
+}
+.slds-form-element__label{
+    padding-bottom: 1%;
+}
+.responseSEL{
+    margin-left: 2%;
+    margin-right: 2%;
+}
+.fieldsDAT{
+    width: fit-content;
+}
+.error{
+    margin: 3% 0% 3% 0%;
+}

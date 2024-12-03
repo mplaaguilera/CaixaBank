@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GrupoVolverEscalar__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para almacenar el grupo que tenía el escalado en el momento de devolverlo al nivel anterior</description>
+    <label>Grupo volver a escalar</label>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Interacciones (Grupo volver a escalar)</relationshipLabel>
+    <relationshipName>Interacciones</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

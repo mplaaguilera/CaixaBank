@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Task__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>Tarea asociada a (Cabecera-Tarea)</description>
+    <label>Tarea Asociada</label>
+    <referenceTo>AV_HeaderCustomActivity__c</referenceTo>
+    <relationshipLabel>Tareas</relationshipLabel>
+    <relationshipName>Tareas</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

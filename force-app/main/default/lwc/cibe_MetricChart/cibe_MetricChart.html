@@ -1,0 +1,135 @@
+<template>
+
+	<lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+
+	<!--dashboards sin donut charts-->
+	<template if:false={showDonutCharts}>
+		<article class="slds-card slds-is-relative min-size card-temp" style="position: relative;
+		padding: 0.5rem;
+		border: 1px solid rgb(221, 219, 218);
+		border-radius: 0.25rem;
+		background-clip: padding-box;
+		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);" onclick={navigateToReport}>
+			<div class="card-title min-size-title slds-text-align_center" title={title}>{title} </div><!-- cursor-default -->
+			<div class="slds-card__body slds-card__body_inner num-records-container">
+				<span class="cursor-default no-select">{numRecords}</span>
+			</div>
+		</article>
+	</template>
+
+	<!--dashboards con donut charts-->
+	<template if:true={showDonutCharts}>
+		<lightning-layout>
+			<lightning-layout-item  >
+				<div class="custom-box">
+					<template if:false={showNumbers}>    
+						<article class="slds-card  card-temp-donut-chart" style="position: relative;
+						padding: 0.5rem;
+						border: 1px solid rgb(221, 219, 218);
+						border-radius: 0.25rem;
+						background-clip: padding-box;
+						box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);">
+							<div class="slds-grid slds-grid_vertical "> 
+								<article class="slds-card ">
+									<div class="card-title min-size-title slds-text-align_center" title={title}>{title}<!-- cursor-default --></div>
+									<div class="slds-grid_vertical-align-center ">
+										<canvas name={metadataChartName} height="100rem" width="200rem" lwc:dom="manual"></canvas>	
+									</div>
+								</article>
+								<div>
+									<template if:true={showLegendClientsCIB} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Gestionar Priorizados CIB">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.gestionarPri}>{labels.gestionarPri}</div> <br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Experiencia Cliente CIB">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.expCli}>{labels.expCli}</div><br>
+										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a CIB">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.iniciativaGes}>{labels.iniciativaGes} </div><br>
+										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Alerta Comercial CIB" >  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.alertaComercial}>{labels.alertaComercial} </div><br>
+										<div class="dot-lighter-blue" onclick={navigateToReportWithFilterLegend} data-id="Onboarding CIB" >  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.onboarding}>{labels.onboarding}</div>
+									</template>
+									<template if:true={showLegendClientsEMP} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Gestionar Priorizados EMP">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.gestionarPri}>{labels.gestionarPri}</div> <br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Experiencia Cliente EMP">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.expCli}>{labels.expCli}</div><br>
+										<!-- <div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a EMP">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.iniciativaGes}>{labels.iniciativaGes} </div><br> -->
+										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Alerta Comercial EMP" >  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.alertaComercial}>{labels.alertaComercial} </div><br>
+										<div class="dot-lighter-blue" onclick={navigateToReportWithFilterLegend} data-id="Onboarding EMP" >  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.onboarding}>{labels.onboarding}</div>
+									</template>
+									<template if:true={showLegendNotify} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Llamadas">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id={labels.llamadas}>{labels.llamadas}</div> <br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Muro">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.muro}>{labels.muro}</div><br>
+										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Stop&Go">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.stopandgo}>{labels.stopandgo} </div><br>
+										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Operaciones pendientes de firma" >  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id={labels.opPendFir}>{labels.opPendFir} </div><br>
+									</template>
+									<template if:true={showLegendAppointments}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Salida','001">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend} data-id={labels.origenCli}>{labels.origenCli}</div><br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Entrada','002">  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id={labels.origenGes}>{labels.origenGes}</div>
+									</template>
+									<template if:true={showLegendTasks7daysCIB}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a CIB">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Iniciativa Gestor/a CIB">{labels.tareas}</div> <br>
+									</template>
+									<template if:true={showLegendTasks7daysEMP}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a EMP">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Iniciativa Gestor/a EMP">{labels.tareas}</div> <br>
+									</template>
+									<template if:true={showLegendWarningsCIB}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Avisos CIB">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Avisos CIB">{labels.avisos}</div> <br>
+									</template>
+									<template if:true={showLegendWarningsEMP}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Avisos EMP">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Avisos EMP">{labels.avisos}</div> <br>
+									</template>
+									<div if:true={showButton} class= "custom_button">
+										<button class = "inner_button"   
+										onclick={goMassReassign}><a>{labels.buscador}</a></button>
+							<!-- <lightning-button variant="brand-outline" label="No asignados" onclick={handleClick} ></lightning-button> -->
+
+									</div>
+								</div>
+							</div>
+						</article>
+					</template>
+					<template if:true={showNumbers}>   
+						<article class="slds-card  card-temp-donut-chart" style="position: relative;
+							padding: 0.5rem;
+							border: 1px solid rgb(221, 219, 218);
+							border-radius: 0.25rem;
+							background-clip: padding-box;
+							box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);" onclick={navigateToReport}>
+								<div class="card-title min-size-title slds-text-align_center" title={title}>{title} </div><!-- cursor-default -->
+								<div class="slds-card__body slds-card__body_inner num-records-container">
+									<span class="cursor-default no-select">{numRecords}</span>
+								</div>
+						
+		
+
+						</article>
+					</template>
+					<!-- <template if:true={showButton}> -->
+						<!-- <lightning-layout> -->
+							<!-- <lightning-button variant="brand-outline" label="Brand Outline" title="Primary action with lighter look" onclick={handleClick} class="slds-m-left_x-small"></lightning-button> -->
+				
+						<!-- </lightning-layout>	 -->
+					<!-- </template> -->
+	
+				</div>
+			</lightning-layout-item>
+		
+		</lightning-layout>
+	</template>
+
+</template>

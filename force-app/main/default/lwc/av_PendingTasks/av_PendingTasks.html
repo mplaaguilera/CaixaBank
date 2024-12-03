@@ -1,0 +1,33 @@
+<template>
+    <lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        <h1 slot="title" class="card-title">
+            <lightning-icon class="slds-media__figure" icon-name="standard:task" size="small" style="background-color: gray;"></lightning-icon>
+            Otras Tareas pendientes del cliente
+        </h1>
+        
+        <div class="closed-form">
+            <div class="slds-grid slds-gutters borderHe" style="background-color: #f3f2f2; color: #514f4d">
+                <div class="slds-col slds-size_3-of-8 slds-p-around_x-small">
+                    <b>ASUNTO</b>
+                </div>
+                <div class="slds-col slds-size_1-of-8 slds-p-around_x-small">
+                    <b>ORIGEN</b>
+                </div>
+                <div class="slds-col slds-size_4-of-8 slds-p-around_x-small">
+                    <b>FECHA DE VENCIMIENTO</b>
+                </div>
+            </div>
+            <template if:true={data}>
+                <template for:each={listTasks} for:item="task">
+                    <div key={task.idRecord}>
+                        <c-av_-pending-task task={task} ondata={sendData}></c-av_-pending-task>
+                    </div>
+                </template>
+            </template>
+            <template if:false={data}>
+                {error}
+            </template>
+		</div>
+	</lightning-card>
+</template>

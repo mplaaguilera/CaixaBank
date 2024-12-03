@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_OrdenPrelacion__c</fullName>
+    <description>Campo único que asociado a una marca indica el orden de prelación de esta</description>
+    <externalId>false</externalId>
+    <label>Orden</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>true</unique>
+</CustomField>

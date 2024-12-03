@@ -1,0 +1,109 @@
+<aura:component controller="CC_LiveAgent_FAQ_Controller" access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+	<lightning:conversationToolkitAPI aura:id="conversationKit" /> 
+    <aura:handler event="c:CC_LiveAgent_Event" action="{!c.getValueFromApplicationEvent }" />
+    <!-- attributes -->
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="search" type="String"/>
+    <aura:attribute name="idioma" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="maxRowSelection" type="Integer" default="1"/>
+    <aura:attribute name="SelectedRows" type="List"/>
+    <aura:attribute name="selectedRowsList" type="List" /> 
+    <aura:attribute name="envioDisabled" type="boolean" default="true" /> 
+    <aura:attribute name="isActive" type="Boolean" default="false" required="true" />
+
+    
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    
+    <aura:attribute name="objDetail" type="contact" default="{'sobjectType' : 'CC_FAQ__c'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Espacio__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Categor_a__c" description="store field API name of dependent field"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:renderIf isTrue="{!v.isActive}">
+            <lightning:card variant="Narrow">
+                <p class="slds-p-horizontal_small">
+                    <lightning:tabset selectedTabId="faq">
+                        <lightning:tab class="tabHeader" label="FAQS" id="faq">
+                            <lightning:card variant="Narrow" title="F.A.Q." iconName="standard:question_feed" >
+                                <p class="slds-p-horizontal_small">
+                                    <lightning:button variant="Neutral" label="Enviar FAQ" disabled="{!v.envioDisabled}" title="Enviar" onclick="{! c.sendFAQ }"/>
+                                    <lightning:button variant="Neutral" label="Cerrar" title="Enviar" onclick="{! c.handleClose }"/>
+                                    <!--<table class="slds-table slds-table_cell-buffer ">
+                                        <tr>
+                                            <td>-->
+                                                <!--<lightning:layoutItem size="12" padding="around-small">    
+                                                    <lightning:select aura:id="idiomaselect" name="idioma" label="Idioma" required="true" onchange  ="{!c.onIdiomaChange}">
+                                                        <option value="Es">Castellano</option>
+                                                        <option value="Ca">Català</option>
+                                                    </lightning:select>
+                                                </lightning:layoutItem>-->
+                                            <!--</td>
+                                            <td>-->
+                                                <lightning:layoutItem size="12" padding="around-small">    
+                                                    <lightning:select name="espacio"
+                                                                      value="{!v.objDetail.Espacio__c}"
+                                                                      label="Espacio"
+                                                                      onchange="{!c.onControllerFieldChange}">
+                                                        <aura:iteration items="{!v.listControllingValues}" var="val">
+                                                            <option value="{!val}">{!val}</option>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </lightning:layoutItem>
+                                             <!--</td>
+                                            <td>-->                                   
+                                                <lightning:layoutItem size="12" padding="around-small">
+                                                    <lightning:select name="categoria"
+                                                                      value="{!v.objDetail.Categor_a__c}"
+                                                                      label="Categoría"
+                                                                      disabled="{!v.bDisabledDependentFld}"
+                                                        			  onchange="{!c.searchKeyChange}">
+                                                        <aura:iteration items="{!v.listDependingValues}" var="val">
+                                                            <option value="{!val}">{!val}</option>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </lightning:layoutItem>
+                                           <!-- </td>
+                                        </tr>
+                                        <tr>    
+                                        	<td>-->
+                                                <lightning:input value="{!v.search}" type="search" onchange="{!c.searchKeyChange}" placeholder="Buscar "/>
+                                            <!--</td>
+                                        </tr>
+                                    </table>-->
+                                    <br></br>
+                                    <div class="slds-scrollable--y">
+                                        <!--<h1>Filas seleccionadas: {!v.selectedRowsCount }</h1>-->
+                                        <lightning:datatable aura:id="FAQs"
+                                                             columns="{! v.columns }"
+                                                             data="{! v.data }"
+                                                             keyField="FAQ"
+                                                             hideCheckboxColumn= "false"
+                                                             maxRowSelection="{! v.maxRowSelection }"
+                                                             onrowselection="{! c.updateSelectedText }"
+                                                             selectedRows="{! v.SelectedRows}" />
+                                    </div>
+                                </p>
+                                <br></br>
+                            </lightning:card>
+                        </lightning:tab>
+                        <!--<lightning:tab label="Documentación" id="documentacion">
+                            Documentación
+                        </lightning:tab>
+                        <lightning:tab label="Catálogo" id="catalogo">
+                            Catálogo
+                        </lightning:tab>-->
+                    </lightning:tabset>
+                </p>
+            </lightning:card>
+        </aura:renderIf>
+</aura:component>

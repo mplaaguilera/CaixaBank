@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_VerificacionDatos</fullName>
+    <active>true</active>
+    <description>Valida que se haya marcado el check conforme se han verificado los datos del cliente.</description>
+    <errorConditionFormula>CC_DatosClienteVerificados__c  &lt;&gt; true</errorConditionFormula>
+    <errorMessage>Para poder enviar el formulario es requerido confirmar que se han verificado los datos del cliente.</errorMessage>
+</ValidationRule>

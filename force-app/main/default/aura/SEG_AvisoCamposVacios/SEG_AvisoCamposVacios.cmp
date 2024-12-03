@@ -1,0 +1,29 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome">
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="bAviso" type="Boolean" default="false"/>
+    <aura:attribute name="aviso" type="String"/>
+    <aura:attribute name="errorLds" type="String"/>
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="ContactId, SEG_Grupo__c, SEG_Zona__c" 
+        targetFields="{!v.caso}" targetError="{!v.errorLds}" recordUpdated="{!c.casoUpdatedDataService}"/>
+
+    <!--Interfaz-->
+    <aura:if isTrue="{!v.bAviso}">
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner" style="padding-left: 9px; padding-right: 9px;">
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" style="border-radius: 4px; line-height: 16px; background-color: #e94141;">
+                    <span class="slds-icon_container slds-icon-utility-use" style="padding-right: 10px;">
+                        <lightning:icon iconName="utility:warning" size="xx-small" variant="inverse"/>
+                    </span>
+                    <h2>{!v.aviso}</h2>
+                    <div class="slds-notify__close">
+                        <lightning:buttonIcon iconName="utility:close" size="small" onclick="{!c.cerrarAviso}" alternativeText="Cerrar" variant="border-filled" />
+                    </div>
+                </div>
+            </div>
+        </article>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarOrdenPrelacion</fullName>
+    <active>true</active>
+    <description>Validar que las marcas tienen el campo  orden de prelación informado</description>
+    <errorConditionFormula>IF(RecordType.DeveloperName == &apos;SAC_Temas&apos; &amp;&amp; SAC_Activo__c = true  &amp;&amp; ISNULL(SAC_OrdenPrelacion__c), true, false)</errorConditionFormula>
+    <errorMessage>Debe informar el orden de prelación de la marca si esta activa</errorMessage>
+</ValidationRule>

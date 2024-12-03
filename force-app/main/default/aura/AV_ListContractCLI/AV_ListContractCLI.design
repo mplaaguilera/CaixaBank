@@ -1,0 +1,8 @@
+<design:component >
+	<design:attribute name="titleCard" label="Title Card"
+					  description="Title component"
+					  required="false"/>
+	<design:attribute name="iconCard" label="Image card"
+					  description="Image of the component related with the title"
+					  required="false" default="standard:work_order_item"/>
+</design:component>

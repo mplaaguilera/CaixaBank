@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_Limite_Resolucion__c</fullName>
+    <description>Campo donde tendrá la fecha límite de resolución para AC, Preventivas y PromoCaixa y poder calcular los SLAs.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Límite Resolución</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

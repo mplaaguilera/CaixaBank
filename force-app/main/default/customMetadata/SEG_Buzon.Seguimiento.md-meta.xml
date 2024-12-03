@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>FFEE_Seguimiento</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">seguimiento.ffee@ffee.caixabank.com</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">seg_emailservice@fop1lbxckqywv73xie11gikf2ns05jn8ftpqyezu93dya1unz.1t-x4n6eaa.eu33.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">MCC SEGUIMIENTO FFEE</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Financiación Estructurada</value>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:type="xsd:string">Seguimiento</value>
+    </values>
+</CustomMetadata>

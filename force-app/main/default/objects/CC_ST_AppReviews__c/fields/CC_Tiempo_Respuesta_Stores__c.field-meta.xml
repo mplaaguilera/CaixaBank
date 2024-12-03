@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tiempo_Respuesta_Stores__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF( 
+NOT( 
+ISBLANK(Fecha__c) 
+), 
+IF( 
+NOT( 
+ISBLANK(Case__r.CC_Fecha_Respuesta_Stores__c) 
+), 
+(Case__r.CC_Fecha_Respuesta_Stores__c - Fecha__c)*24, 
+(NOW() - Fecha__c)*24 
+),0 
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tiempo Respuesta Stores</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

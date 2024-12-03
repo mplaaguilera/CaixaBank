@@ -1,0 +1,32 @@
+<template>
+    <lightning-card>
+        <div class="margin">
+            <header slot="title" class="slds-page-header slds-page-header_record-home" onclick={toggleShow}>
+                <lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+                <lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+                <label class="nameAccordation">Gestionar Evento</label>
+            </header>
+            <div if:true={preventClick} class="prevent-click"></div>
+            <lightning-tabset active-tab-value="" if:true={showDetail} class="margin">
+                <lightning-tab label="✏️ Cerrar Evento + Informar Oportunidad" data-id="cerrarInformar" value="CerrarInformar">
+                    <template if:false={isCustomPermission}>
+                        <div if:false={disableBtn} class="buttonAlign">
+                            <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableBtn}  onclick={navigateToTab}>Cerrar Evento y reportar oportunidad</button>
+                        </div>
+                        <div if:true={disableBtn} class="buttonAlign">
+                            <button type="submit" class="slds-button slds-button_stretch buttonStyle buttonStyleDisabled" disabled={disableBtn}  onclick={navigateToTab}>Cerrar Evento y reportar oportunidad</button>
+                        </div>
+                    </template>
+                    <template if:true={isCustomPermission}>
+                        <div if:false={disableBtn} class="buttonAlign">
+                            <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableBtn}  onclick={navigateToTabVersion2}>Cerrar Evento y reportar oportunidad</button>
+                        </div>
+                        <div if:true={disableBtn} class="buttonAlign">
+                            <button type="submit" class="slds-button slds-button_stretch buttonStyle buttonStyleDisabled" disabled={disableBtn}  onclick={navigateToTabVersion2}>Cerrar Evento y reportar oportunidad</button>
+                        </div>
+                    </template>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

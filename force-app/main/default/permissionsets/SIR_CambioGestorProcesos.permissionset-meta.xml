@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Da visibilidad a la Tab llamada &apos;Cambio Gestor Procesos&apos; la cual permite cambiar de gestor a los Procesos.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Cambio Gestor Procesos</label>
+    <license>Salesforce</license>
+    <tabSettings>
+        <tab>SIR_CambioGestorProcesos</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>

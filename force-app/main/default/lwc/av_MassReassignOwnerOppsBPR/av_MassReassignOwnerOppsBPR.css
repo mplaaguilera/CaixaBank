@@ -1,0 +1,190 @@
+.assign-lookup {
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+
+.filter-card {
+	margin-bottom: 0.5rem;
+}
+.table-container {
+	height: 25rem;
+}
+.total-data-text {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+	display: flex;
+	flex-direction: column;
+	direction: rtl;
+	padding: 0 0.5rem 0.5rem 0;
+}
+.select-obj {
+	width: 100%;
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+.footer-filter {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+}
+
+/* .slds-form-element{
+	margin-left: 5em;
+} */
+
+ .filters_row_1 .lookup-cmp:first-of-type {
+	padding-left: 5em;
+}
+
+.filters_row_1 lightning-combobox:first-of-type {
+	padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_1 lightning-combobox:nth-of-type(2) {
+	padding: 0 1.25em 0 1.25em;
+}
+
+.filters_row_1 lightning-combobox:nth-of-type(3) {
+	padding: 0 2.5em 0 1.25em;
+}
+
+.filters_row_1 c-av_-lookup:last-of-type {
+	padding-right: 5em;
+}
+/*
+.filters_row_2 lightning-input:first-of-type {
+	padding-left: 5em;
+}
+
+.filters_row_2 lightning-input:nth-of-type(2),.inputAbove {
+	padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_2 lightning-input:nth-of-type(3) {
+	padding: 0 2.5em 0 1.25em;
+}
+
+.filters_row_2 lightning-combobox {
+	padding-right: 5em;
+}
+
+ .filters_row_3 lightning-combobox:first-of-type {
+ /* .filters_row_3 lightning-combobox{ 
+	padding-left: 5em;
+} 
+.filters_row_3 lightning-combobox {
+	/* padding: 0 2.5em 0 1.25em; 
+	padding-left: 2.5em;
+} */
+
+/*
+.filters_row_3 lightning-combobox:nth-of-type(2),lightning-combobox:nth-of-type(3) {
+	padding: 0 1.25em 0 2.5em;
+}
+.filters_row_3  {
+	padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_3 c-av_-lookup {
+	/* padding: 0 2.5em 0 1.25em; 
+} */
+
+.another-office {
+	padding: 0 0.5em 0 1.25em;
+}
+
+.slds-form-element_horizontal .slds-form-element__control, .slds-form_horizontal .slds-form-element .slds-form-element__control, .slds-form_stacked .slds-form-element_horizontal .slds-form-element__control {
+    padding-left: 25%;
+    clear: none;
+}
+
+.buttonAlign{
+    text-align: right;
+    margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+
+.buttonStyle{
+	margin-top: 1.5rem;
+    margin-right: 1rem;
+}
+
+.divPadding{
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	/* padding: 0 5em; */
+}
+.fixPaddings,.fixPaddingsIndi{
+	padding:1em 5em; 
+	
+}
+.fixPaddings div{
+
+	padding:0 2.5em 0 0;
+}
+.divPadding-first {
+	padding: 1rem 0 0.33rem 0;
+}
+
+/* .inputAbove{
+
+} */
+
+.title{
+	font-weight: bold;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+    vertical-align: -webkit-baseline-middle;
+}
+
+.dt-outer{
+	height: 90%!important;
+}
+
+.table-container-paginacion{
+	margin-bottom: 60px;
+}
+
+.help-text p {
+	font-size: 0.7rem;
+    font-style: italic;
+}
+
+.emp-select,.product-select {
+	/* margin-left: 1em; */
+	margin-right: 1em;
+}
+
+/* .emp-select:first-of-type,.product-select:first-of-type {
+	margin-left: 5em;
+	background-color: red;
+} */
+
+.lookup-cmp {
+	padding-left: 5em;
+}
+
+.moreFilters {
+	margin: 0 1rem 1rem 0;
+	justify-content: right;
+	text-align: right;
+	text-decoration: underline;
+	color:blue;
+}
+
+.delete{
+	display:none;
+}
+
+.margin-fix {
+	margin-left:5em;
+}
+
+.cliDropDown lightning-combobox{
+	max-height: 1rem;
+}
+.slds-listbox_vertical{
+	color:red;
+	max-height: 1rem;
+}

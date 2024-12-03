@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_HardDelete__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador de que tras el borrado de los registros, se realice la eliminación de los mismos de la papelera de reciclaje</description>
+    <label>Eliminación de la papelera de reciclaje</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

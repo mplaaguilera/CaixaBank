@@ -1,0 +1,11 @@
+:host {
+    --sds-c-textarea-sizing-min-height: 120px;
+}
+
+.slds-modal__content{
+    height: 660px;
+}
+
+.notify__content{
+    height: 300px;
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Record_Type_Oportunidad__c</fullName>
+    <label>Tipo de oportunidad</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CSBD_Prestamo</fullName>
+                <default>false</default>
+                <label>Préstamo</label>
+            </value>
+            <value>
+                <fullName>CSBD_Compra_Estrella</fullName>
+                <default>false</default>
+                <label>Compra Estrella</label>
+            </value>
+            <value>
+                <fullName>CSBD_Hipoteca</fullName>
+                <default>false</default>
+                <label>Hipoteca</label>
+            </value>
+            <value>
+                <fullName>CSBD_Renting</fullName>
+                <default>false</default>
+                <label>Renting</label>
+            </value>
+            <value>
+                <fullName>CC_Chat</fullName>
+                <default>false</default>
+                <label>Chat</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMN</fullName>
+                <default>false</default>
+                <label>CMN</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMB</fullName>
+                <default>false</default>
+                <label>CMB</label>
+            </value>
+            <value>
+                <fullName>CSBD_Accion_Comercial</fullName>
+                <default>false</default>
+                <label>Acción comercial</label>
+            </value>
+            <value>
+                <fullName>CSBD_TPV</fullName>
+                <default>false</default>
+                <label>TPV</label>
+            </value>
+            <value>
+                <fullName>CSBD_Desistimiento</fullName>
+                <default>false</default>
+                <label>Desistimiento</label>
+            </value>
+            <value>
+                <fullName>CSBD_DesistimientoPAI</fullName>
+                <default>false</default>
+                <label>Desistimiento PAI</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

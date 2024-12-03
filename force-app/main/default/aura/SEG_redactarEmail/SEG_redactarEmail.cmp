@@ -1,0 +1,399 @@
+<aura:component controller="SEG_redactarEmail_Controller">
+
+    <!--Atributos heredados-->
+    <aura:attribute name="parent" type="Aura.Component" required="true"/>
+    <aura:attribute name="datosEmail" type="EmailMessage" />
+    <aura:attribute name="datosEmailInicial" type="EmailMessage" required="true"/>
+    <aura:attribute name="eTemplate" type="String" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="isBusqueda" type="boolean" />
+    <aura:attribute name="isRedactar" type="boolean" />
+    <aura:attribute name="idPlantilla" type="String" />
+    <aura:attribute name="idPlanIdioma" type="String" />
+    <aura:attribute name="idPlantillaOrg" type="String" />
+    <aura:attribute name="checkCerrar" type="boolean" default="false" />
+    <aura:attribute name="aPara" type="List" />
+    <aura:attribute name="otroDestinatario" type="boolean" />
+    <aura:attribute name="asunto" type="String" default=""/>
+    <aura:attribute name="cuerpo" type="String" default=""/>
+    <aura:attribute name="nuevoEmail" type="Boolean" />
+    <aura:attribute name="datContact" type="Contact" />
+    <aura:attribute name="idRecord" type="String" />
+    <aura:attribute name="infoContacto" type="Contact" />
+    <aura:attribute name="destinatario" type="List" />
+    <aura:attribute name="mostrarBotonesAnyadirManual" type="Boolean" default="false" />
+    <aura:attribute name="contactId" type="String" />
+    <aura:attribute name="contactNombre" type="String" />
+    <aura:attribute name="contactPrincipal" type="Contact" />
+    <aura:attribute name="botonPulsado" type="String" />
+    <aura:attribute name="notasTipificadas" type="List" />
+    <aura:attribute name="selectedNotasTip" type="String" default="Sin notas" />
+    <aura:attribute name="observacText" type="String" />
+    <aura:attribute name="casoYaPlanificado" type="Boolean" default="false"/>
+    <aura:attribute name="fechaPlanificacion" type="DateTime" />
+    <aura:attribute name="fechaPlanificacionAux" type="DateTime" />
+    <aura:attribute name="fechaPlanificacionMin" type="DateTime" />
+    <aura:attribute name="eTemplateAlone" type="String" />
+    <!-- <aura:attribute name="refreshEmails" type="Aura.Action" /> -->
+    <aura:attribute name="paraContacts" type="List" />
+    <aura:attribute name="copiaContacts" type="List" />
+    <aura:attribute name="ccoContacts" type="List" />
+    <aura:attribute name="dataAnexos" type="List" default="[]" />
+    <aura:attribute name="dataAnexosMostrar" type="List" default="[]" />
+    <aura:attribute name="columnasAnexos" type="List" default="[]"/>
+    <aura:attribute name="currentSelectedRowsAnexos" type="List" default="[]" />
+    <aura:attribute name="hasAnexos" type="boolean" default="true" />
+    <aura:attribute name="hasAnexosSelected" type="boolean" default="false" />
+    <aura:attribute name="addmail" type="String" default=""/>
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="botonAnadir" type="String" />
+    <aura:attribute name="tipoDestinatarioPrincipal" type="String" default=""/>
+    <aura:attribute name="nombreGrupoColaboradorPrincipal" type="String" />
+    <aura:attribute name="resultados" type="List" default="[]"/>
+    <aura:attribute name="selectedResul" type="String"/>
+    <aura:attribute name="currentEmail" type="EmailMessage" />
+    <aura:attribute name="recordLoadError" type="String"/>
+    <aura:attribute name="record" type="Case" default="{'sobjectType': 'Case' }" />
+    <aura:attribute name="numOperacionesCaso" type="Integer" default="0"/>
+    <aura:attribute name="isLoadingNotas" type="Boolean" default="false"/>
+    <aura:attribute name="destinatariosNoIncluidos" type="boolean" default="false" />
+    <aura:attribute name="listDestinatariosNoIncluidos" type="String"/>
+    <aura:attribute name="getLimitDirecciones" type="boolean" default="false" />
+    <aura:attribute name="criterioImputacion" type="String" />
+    <force:recordData aura:id="forceRecord"
+                        layoutType="COMPACT"
+                        recordId="{!v.caseId}"
+                        fields="SEG_N_operaciones_del_caso__c, SEG_Detalle__r.SEG_Criterio_imputacion_operaciones__c, CC_MCC_Motivo__r.SEG_Criterio_imputacion_operaciones__c, CC_MCC_ProdServ__r.SEG_Criterio_imputacion_operaciones__c, CC_MCC_Tematica__r.SEG_Criterio_imputacion_operaciones__c"
+                        targetFields="{!v.record}"
+                        targetError="{!v.recordLoadError}"
+                        mode="VIEW"
+                        />
+
+
+    <!-- Control botón Num.Operaciones Cambios -->
+    <aura:attribute name="numOperacionesCambio" type="boolean" default="false"/>
+
+    <!--Init-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="init" value="{!this}" action="{!c.dataAnexos}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarNotasTipificadas}" />
+
+    <!-- Spinner -->
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-var-p-around_x-large">
+            <lightning:spinner alternative-text="Enviando correo..." size="medium" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div aura:id="backdrop" class="slds-backdrop" />
+
+    <article class="slds-card slds-card_boundary">
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-text-title_caps slds-text-align_center" style="font-weight: 700;">Opciones</div>
+            <div class="slds-grid slds-grid_vertical-align-center slds-wrap" style="padding-bottom: 1rem;">
+                <div class="slds-col slds-size_2-of-12 slds-grow-none">
+                    <!--Cerrar caso-->
+                    <label class="slds-form-element__label">Cerrar caso</label>
+                    &nbsp;&nbsp;&nbsp;
+                    <lightning:input type="toggle" name="checkSR" onchange="{!c.toggleCerrarCasoChange}" messageToggleActive="" messageToggleInactive="" variant="label-hidden" />
+                </div>
+                <div class="slds-col slds-size_6-of-12 slds-shrink-none slds-grow-none">
+                    <!--Fecha de planificación-->
+                    <label class="slds-form-element__label">Fecha de planificación</label>                    
+                    <lightning:input
+                        aura:id="inputFechaPlanificacion"
+                        type="datetime"
+                        dateStyle="short"
+                        value="{!v.fechaPlanificacion}"
+                        variant="label-hidden"
+                        min="{!v.fechaPlanificacionMin}"
+                        disabled="{!v.checkCerrar || v.casoYaPlanificado}"
+                        message-when-range-underflow="La fecha debe ser posterior a la actual"
+                        onchange="{!c.inputFechaPlanificacionChange}"/>
+                </div>
+                <div class="slds-col slds-size_4-of-12 slds-shrink-none slds-grow-none" style="padding-top: 16px;">
+                    <!--Botones cancelar/enviar-->
+                    <lightning:button label="Cerrar" iconName="utility:close" onclick="{!c.cerrarRedactar}" />&nbsp;
+                    <lightning:button label="Enviar" iconName="utility:send" variant="brand" onclick="{!c.sendEmail}" disabled="{!empty(v.paraContacts)}"/>
+                </div>
+            </div>
+            <footer class="slds-card__footer">
+                <div class="slds-text-title_caps" style="font-weight: 700; padding-bottom: 15px;">Destinatarios</div>
+                <!-- EDC US617581 - Se muestra este mensaje si no se han podido incluir todos los destinatarios -->
+                <aura:if isTrue="{!v.botonPulsado == 'RespMultiple'}">
+                    <aura:if isTrue="{!v.destinatariosNoIncluidos}">
+                        <div class="slds-text" style="color: red;">
+                            No se han podido incluir a todos los destinatarios por superar el límite de caracteres del campo. En el Chatter se encuentran las direcciones excluídas.
+                        </div>
+                    </aura:if>
+                </aura:if>
+                <!-- Fin EDC US617581 - -->
+                <div class="slds-grid slds-wrap" align="left">
+                    <!--<div class="slds-col slds-size_12-of-12">
+                        <aura:if isTrue="{!v.otroDestinatario}">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small" style="padding-left: 55px; padding-bottom: 4px;" title="Destinatario principal">
+                                <div class="slds-col slds-grow-none slds-gutters_x-small">
+                                    <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Grupo colaborador'}">
+                                        <lightning:icon iconName="action:new_group" size="x-small" class="rojo" style="background-color: #f77e75;" title="Grupo colaborador"/>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Colaborador'}">
+                                                <lightning:icon iconName="action:user" size="x-small" class="rojo" style="background-color: #f77e75;" title="Colaborador"/>
+                                                <aura:set attribute="else">
+                                                    <lightning:icon iconName="action:add_contact" size="x-small" title="Contacto"/>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-col slds-grow-none">
+                                    <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Grupo colaborador'}">
+                                        <span class="slds-listbox__option-text_entity"><b>{!v.nombreGrupoColaboradorPrincipal}</b></span>
+                                        <aura:set attribute="else">
+                                            <span class="slds-listbox__option-text_entity para-size"><b>{!v.contactPrincipal.Name}</b></span>
+                                            <span class="slds-listbox__option-meta para-size" style="{!empty(v.contactPrincipal.Email) ? 'color: darkred;' : ''}">{!!empty(v.contactPrincipal.Email) ? v.contactPrincipal.Email : 'Sin correo'}</span>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            <aura:set attribute="else">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small" style="padding-left: 55px; padding-bottom: 4px;" title="Destinatario principal">
+                                    <div class="slds-col slds-grow-none slds-gutters_x-small">
+                                        <lightning:icon iconName="action:add_contact" size="x-small"/>
+                                    </div>
+                                    <div class="slds-col slds-grow-none">
+                                        <span class="slds-listbox__option-text_entity para-size"><b>{!v.datosEmail.FromName}&nbsp;</b></span>
+                                        <span class="slds-listbox__option-meta para-size">{!v.datosEmail.FromAddress}&nbsp;</span>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </div>-->
+                    <div class="slds-col slds-size_12-of-12">
+                        <br></br>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col slds-size_1-of-12 slds-grow-none">
+                                Para<abbr class="slds-required">*</abbr>
+                            </div>
+                            <div class="slds-col">
+                                <!-- <input id="paras" value="{!v.paraContacts}" disabled="true" variant="label-hidden" class="slds-input" style="background-color: #fcfbfa;"/> -->
+                                <div class="slds-pill_container slds-pill_container_color">
+                                    <aura:iteration items="{!v.paraContacts}" var="paraContact">
+                                        <span data-lista="paraContacts" data-text="{!paraContact}">
+                                            <lightning:pill label="{!paraContact}" onremove="{!c.eliminarDireccion}" name="{!'paraContacts|' + paraContact}">
+                                                <aura:set attribute="media">
+                                                    <lightning:icon iconName="standard:people" size="x-small"/>
+                                                </aura:set>
+                                            </lightning:pill>
+                                        </span>
+                                    </aura:iteration>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <br></br>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col slds-size_1-of-12 slds-grow-none">
+                                CC
+                            </div>
+                            <div class="slds-col">
+                                <!-- <input id="ccs" value="{!v.copiaContacts}" disabled="true" variant="label-hidden" class="slds-input" style="background-color: #fcfbfa;"/> -->
+                                <div class="slds-pill_container slds-pill_container_color">
+                                    <aura:iteration items="{!v.copiaContacts}" var="copiaContact">
+                                        <span data-lista="copiaContacts" data-text="{!copiaContact}">
+                                            <lightning:pill label="{!copiaContact}" onremove="{!c.eliminarDireccion}" name="{!'copiaContacts|' + copiaContact}">
+                                                <aura:set attribute="media">
+                                                    <lightning:icon iconName="standard:people" size="x-small"/>
+                                                </aura:set>
+                                            </lightning:pill>
+                                        </span>
+                                    </aura:iteration>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <br></br>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col slds-size_1-of-12 slds-grow-none">
+                                CCO
+                            </div>
+                            <div class="slds-col">
+                                <!-- <input id="ccos" value="{!v.ccoContacts}" disabled="true" variant="label-hidden" class="slds-input" style="background-color: #fcfbfa;"/> -->
+                                <div class="slds-pill_container slds-pill_container_color">
+                                    <aura:iteration items="{!v.ccoContacts}" var="ccoContact">
+                                        <span data-lista="ccoContacts" data-text="{!ccoContact}">
+                                            <lightning:pill label="{!ccoContact}" onremove="{!c.eliminarDireccion}" name="{!'ccoContacts|' + ccoContact}">
+                                                <aura:set attribute="media">
+                                                    <lightning:icon iconName="standard:people" size="x-small"/>
+                                                </aura:set>
+                                            </lightning:pill>
+                                        </span>
+                                    </aura:iteration>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--ELB : Crear input text box para poder añadir correos en el PARA, CC y CCO del componente de email-->
+                    <div class="slds-col slds-size_12-of-12">
+                        <div class="slds-grid slds-grid_vertical-align-center" style="padding-top: 10px;">
+                            <div class="slds-col slds-grow-none">
+                                Nuevos destinatarios
+                            </div>
+                            <div class="slds-col">
+                                <lightning:textarea type="email" value="{!v.addmail}" placeholder="Inserte los nuevos destinatarios separados por una coma y un espacio." onchange="{!c.textareaOnChange}" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <aura:if isTrue="{!v.mostrarBotonesAnyadirManual}">
+                        <div class="slds-col slds-size_12-of-12">
+                            <br></br>
+                            <div align="right" style="padding-right: 20px;">
+                                Añadir Para:
+                                <lightning:buttonIcon aura:id="BotonPara" iconName="utility:adduser" title="Añadir a Para" disabled = "{!v.getLimitDirecciones}" onclick="{!c.addListaPara}" />
+                                &nbsp;&nbsp;&nbsp;
+                                Añadir CC:
+                                <lightning:buttonIcon aura:id="BotonCc" iconName="utility:adduser" title="Añadir a CC" onclick="{!c.addListaCC}" />
+                                &nbsp;&nbsp;&nbsp;
+                                Añadir CCO:
+                                <lightning:buttonIcon aura:id="BotonCco" iconName="utility:adduser" title="Añadir a CCO" onclick="{!c.addListaCCO}" />
+                            </div>
+                        </div>
+                    </aura:if>
+
+                </div>
+            </footer>
+            <footer class="slds-card__footer">
+                <div class="slds-text-title_caps" style="font-weight: 700;">Adjuntos</div>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_12-of-12" style="height: 40px;">
+                        <!--Upload Files -->
+                        <div class="slds-grid slds-gutters_direct-x-small slds-grid_align-center slds-var-m-around_large">
+                            <div class="slds-col slds-is-relative "  style="top: -19px">
+                                <lightning:fileUpload multiple="true" recordId="{!v.caseId}" onuploadfinished="{!c.openfileUpload}"/>
+                            </div>
+                            <aura:if isTrue="{!v.hasAnexosSelected}">
+                            <div class="slds-col">
+                                <lightning:button label="Modificar adjuntos seleccionados" aura:id="BotonAdjuntos" iconName="utility:upload" title="Adjuntar archivos al correo" onclick="{!c.modalAdjuntarArchivosAbrir}" />
+                            </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-col">
+                                        <lightning:button label="Incluir adjuntos del caso" aura:id="BotonAdjuntos" iconName="utility:upload" title="Adjuntar archivos al correo" onclick="{!c.modalAdjuntarArchivosAbrir}" />
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        <!--datatable movida a modal-->
+                    </div>
+                    <aura:if isTrue="{!v.hasAnexosSelected}">
+                        <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="margin-top: 18px; max-height: 37.5rem; border-color: #dddbda; border-radius: 4px;">
+                            <lightning:datatable aura:id="dataTbselected" columns="{!v.columnasAnexos}" data="{!v.dataAnexosMostrar}" keyField="ContentDocumentId" hideCheckboxColumn='true'  /><!--onrowselection="{!c.selectedRowsAnexos}" -->
+                        </div>
+                    </aura:if>
+                </div>
+            </footer>
+            <footer class="slds-card__footer" style="padding-left: 0; padding-right: 0;">
+                <div class="slds-text-title_caps" style="font-weight: 700;">Redactar</div>
+                <div class="slds-grid slds-wrap" align="left" style="margin-top: 8px;">
+                    <div class="slds-col">
+                        <!--Asunto-->
+                        <div class="slds-grid slds-grid_vertical-align-center slds-gutters_xx-small">
+                            <div class="slds-col slds-grow-none">
+                                <label class="slds-form-element__label" style="padding-right: 0px;">Asunto</label><abbr class="slds-required">*</abbr>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:input aura:id="inputAsunto" label="Asunto" value="{!v.asunto}" variant="label-hidden" required="true"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="overflow:auto" class="slds-col" id="escrituraCorreo2">
+                        <!--Cuerpo-->
+                        <br/>
+                        <lightning:inputRichText value="{!v.cuerpo}" shareWithEntityId="{!v.caseId}" class="canEnter"><!--<lightning:insertImageButton/>--></lightning:inputRichText> <!--shareWithEntityId='5005r000003BD7rAAG'-->
+                        <!--<c:SEG_inputRichText value='{!v.cuerpo}' label="Cuerpo" labelVisible="false" title="Cuerpo" />-->
+                        <div align="right" style="opacity: .4;">
+                            <lightning:buttonIcon iconName="utility:arrowup" size="small" variant="bare" class="slds-var-m-top_small slds-var-m-right_xx-small" title="Volver al principio de la página" onclick="{!c.scrollToTop}" tabindex="-1"/>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </article>
+
+    <!--Modal notas-->
+    <section aura:id="modalAsignarNotasEnvio" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalNotasEnvioTeclaPulsada}">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalNotasEnvioCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close" />
+                <aura:if isTrue="{!v.checkCerrar}">
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Añadir observaciones y operaciones</h2>
+                    <p class="slds-var-m-top_x-small">Añadir comentarios relacionados con el envío de mail y nº operaciones del caso</p>
+                    <aura:set attribute="else">
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Añadir observaciones</h2>
+                        <p class="slds-var-m-top_x-small">Añadir comentarios relacionados con el envío de mail</p>
+                    </aura:set>
+                </aura:if>
+            </header>
+            <div aura:id="divInputResultados" class="slds-modal__content slds-var-p-around_xx-large slds-is-relative">
+                <aura:if isTrue="{!v.isLoadingNotas}">
+                    <div class="slds-spinner_container ">
+                        <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                            <span class="slds-assistive-text">Creando operaciones...</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div> 
+                </aura:if> 
+                <lightning:combobox aura:id="notasTipificadas" name="Notas tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}" />
+                <br />
+                <lightning:textarea label="Observaciones" type="text" aura:id="idObservacion" placeholder="Observaciones..." />
+                
+            </div>
+            <div aura:id="divBotonesNumOperaciones" class="slds-modal__content slds-var-p-around_xx-large slds-hide">
+                <aura:if isTrue="{!v.checkCerrar}">
+                    <lightning:input label="Num. operaciones del caso" aura:id="idNumOperaciones" value="{!v.numOperacionesCaso}"/>
+                    <br/>
+                    <p class="slds-var-m-top_x-small">Criterio imputación de num. operaciones del caso:</p>
+                    <aura:unescapedHtml value="{!v.criterioImputacion}" />
+                    <br/>
+                </aura:if>
+            </div>
+            <footer class="slds-modal__footer">
+                <aura:if isTrue="{!v.checkCerrar}">
+                    <lightning:button label="Añadir" variant="brand" iconName="utility:email_open" onclick="{!c.notasEnvioCorreo}" />
+                    <aura:set attribute="else">
+                        <lightning:button label="Añadir observaciones" variant="brand" iconName="utility:email_open" onclick="{!c.notasEnvioCorreo}" />
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!v.numOperacionesCambio}">
+                    <lightning:button aura:id="modalBotonSiguiente" label="Siguiente" variant="brand" onclick="{!c.cerrarSiguiente}" iconName="utility:forward"/>
+                            <aura:set attribute="else">
+                                <lightning:button aura:id="modalEnvioNotasBotonCancelar" label="Cancelar" onclick="{!c.modalNotasEnvioCerrar}" />
+                            </aura:set>
+                </aura:if>
+            </footer>
+        </div>
+    </section>
+    <!--Nuevo desarrollo-->
+    <!--Modal Adjuntar archivos-->
+    <section aura:id="modalAdjuntarArchivos" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalNotasEnvioTeclaPulsada}">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAdjuntarArchivosCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close" />
+                <h2 class="slds-text-heading_medium slds-hyphenate">Añadir adjuntos al correo</h2>
+            </header>
+            <div class="slds-modal__content slds-var-p-around_xx-large">
+                <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="margin-top: 9px; max-height: 37.5rem; border-color: #dddbda; border-radius: 4px;">
+                    <lightning:datatable aura:id="dataTb" columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/><!--onrowselection="{!c.selectedRowsAnexos}" -->
+                </div>
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button label="Adjuntar seleccionados" variant="brand" iconName="utility:upload" onclick="{!c.adjuntarArchivos}" disabled=""/>
+                <lightning:button aura:id="modalAdjuntarArchivosCancelar" label="Cancelar" onclick="{!c.modalAdjuntarArchivosCerrar}" />
+            </footer>
+        </div>
+    </section>
+</aura:component>

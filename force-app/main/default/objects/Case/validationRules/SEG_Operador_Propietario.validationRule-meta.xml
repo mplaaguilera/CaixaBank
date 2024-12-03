@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Operador_Propietario</fullName>
+    <active>true</active>
+    <description>Un operador no podrá tomar en propiedad un caso que pertenezca a otro usuario.</description>
+    <errorConditionFormula>AND(
+				AND(
+								!$Permission.CBK_BypassValidationRules,
+								!$Permission.SEG_BypassValidationRules
+				),
+OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;),
+ISCHANGED(OwnerId),
+NOT($Permission.SEG_SaltarValidationRulesRobot),
+NOT($Profile.Name = &quot;System Administrator&quot;),
+NOT($Permission.SEG_Supervisor),
+BEGINS(PRIORVALUE(OwnerId), &quot;005&quot;),
+    BEGINS(OwnerId, &quot;005&quot;),
+    $User.Id = OwnerId
+)</errorConditionFormula>
+    <errorMessage>No puedes tomar en propiedad este caso ya que es propiedad de otro compañero en este momento</errorMessage>
+</ValidationRule>

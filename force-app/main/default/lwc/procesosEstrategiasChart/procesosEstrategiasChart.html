@@ -1,0 +1,11 @@
+<template>
+    <lightning-card>
+        <h2 class="titulo">Procesos-Estrategias</h2>
+        <div class="graficoAltura">
+            <template if:true={chartConfiguration}>
+                <c-sir_lwc_chart-js chart-config={chartConfiguration}></c-sir_lwc_chart-js>
+            </template>
+        </div>
+    </lightning-card>
+    <span class="textoVerInformeProcesosEstrategias"><lightning-formatted-url value={informeProcesosEstrategias} label="Ver Informe Procesos-Estrategias" tooltip="Ver Informe Procesos-Estrategias" ></lightning-formatted-url></span>                       
+</template>

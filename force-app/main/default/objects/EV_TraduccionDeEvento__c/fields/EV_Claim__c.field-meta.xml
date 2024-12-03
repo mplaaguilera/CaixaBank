@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Claim__c</fullName>
+    <description>Campo que recoge una descripción corta para el carrusel de portal</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Debe tener entre 140 y 160 caracteres. Las frases deben estar acabadas.</inlineHelpText>
+    <label>Claim Portal</label>
+    <length>160</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

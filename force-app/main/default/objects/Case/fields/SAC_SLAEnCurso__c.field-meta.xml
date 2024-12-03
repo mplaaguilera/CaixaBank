@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_SLAEnCurso__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo check para informar si el caso posee un MCC. Se usa de manera interna para calcular los milestones.</description>
+    <label>SLA en curso</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Grupos_Tercer_Nivel</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Queue_Traslado__c</columns>
+    <columns>OS_GrupoTrabajo__c</columns>
+    <columns>CC_Tipo_cliente__c</columns>
+    <columns>OS_Negocio__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.CC_Grupo_Tercer_Nivel</value>
+    </filters>
+    <filters>
+        <field>OS_Negocio__c</field>
+        <operation>equals</operation>
+        <value>HDT</value>
+    </filters>
+    <label>Grupos Tercer Nivel HDT</label>
+    <sharedTo>
+        <role>HDT</role>
+    </sharedTo>
+</ListView>

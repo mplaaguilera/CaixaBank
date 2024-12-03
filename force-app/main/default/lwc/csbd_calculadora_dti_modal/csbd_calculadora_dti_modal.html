@@ -1,0 +1,637 @@
+<template>
+
+<section role="dialog" tabindex="-1" aria-modal="true" class="nuevoModal slds-modal slds-fade-in-open" onkeydown={nuevoModalOnkeydown}>
+    <div class="slds-modal__container" style="max-width: none; width: 80%; height: 100%; padding: 30px;">
+        <header class="slds-modal__header" style="border: 1px solid #e8e8e8; padding: 14px 20px 10px 20px; border-top-left-radius: 9px; border-top-right-radius: 9px;">
+            <div class="camposCabecera slds-text-color_weak slds-var-m-top_small slds-var-m-bottom_x-large">
+                <template lwc:if={camposCabecera}>
+                    <div class="slds-grid slds-gutters_direct-small slds-grid_vertical-align-center">
+                        <div class="slds-col slds-truncate" title={camposCabecera.tipoOperacionUsoVivienda}>
+                            <lightning-icon icon-name="utility:key" size="x-small" class="tipoOperacionUsoVivienda slds-var-m-right_small"></lightning-icon>
+                            <span>{camposCabecera.tipoOperacion} de {camposCabecera.usoVivienda}</span>
+                        </div>
+                        <div class="slds-col slds-grow-none slds-truncate" title={camposCabecera.tipoConstruccion}>
+                            <lightning-icon icon-name="utility:custom_apps" size="x-small" class="tipoConstruccion slds-var-m-right_small"></lightning-icon>
+                            <span>{camposCabecera.tipoConstruccion}</span>
+                        </div>
+                        <template lwc:if={camposCabecera.direccion}>
+                            <div class="slds-col slds-truncate" title={camposCabecera.direccion}>
+                                <lightning-icon icon-name="utility:checkin" size="x-small" class="direccion slds-var-m-right_small"></lightning-icon>
+                                <span>{camposCabecera.direccion}</span>
+                            </div>
+                            <!-- "Ver en el mapa"
+                        <div class="slds-col slds-grow-none" style="padding-left: 0;">
+                            <lightning-button-icon class="botonModalMapaAbrir slds-is-relative" icon-name="utility:location" size="small" tooltip="Ver en el mapa" onclick={modalMapaAbrir} style="top: -2px;"></lightning-button-icon>
+                        </div>
+                        -->
+                        </template>
+                    </div>
+
+                    <template lwc:if={modalMapaAbierto}>
+                        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_medium modalMapa" onkeydown={modalOnkeydown}>
+                            <div class="slds-modal__container">
+                                <header class="slds-modal__header">
+                                    <lightning-button-icon icon-name="utility:close" size="large" onclick={modalMapaCerrar} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                                    <h2 class="slds-text-heading_medium slds-hyphenate">Situación de la vivienda</h2>
+                                </header>
+                                <div class="slds-modal__content slds-var-p-vertical_large slds-var-p-horizontal_x-large">
+                                    <div style="border: 1px solid rgb(201, 201, 201); border-radius: 5px;">
+                                        <lightning-map map-markers={camposCabecera.mapMarkers} options={camposCabecera.mapOptions} zoom-level=15 selected-marker-value="inmueble"></lightning-map>
+                                    </div>
+                                </div>
+                                <footer class="slds-modal__footer">
+                                    <lightning-button class="botonModalMapaCerrar" label="Cerrar" onclick={modalMapaCerrar}></lightning-button>
+                                </footer>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop"></div>
+                    </template>
+                </template>
+            </div>
+
+            <!-- <div class="slds-card__body slds-card__body_inner slds-var-p-bottom_large"> -->
+            <div class="slds-grid slds-grid_vertical">
+                <!--Sección de indicadores de viabilidad -->
+                <div class="slds-col slds-var-m-bottom_small">
+                    <div class="divCalculos">
+                        <div lwc:if={data} class="slds-grid slds-grid_vertical-align-center slds-is-relative slds-gutters_direct-x-small" style="top: -2px;">
+                            <div class="slds-col slds-align_absolute-center divCalculoViabilidad slds-hide">
+                                <span lwc:if={datatableData.calculos}>
+                                    <template lwc:if={data.hipotecaViable}>
+                                        <lightning-icon icon-name="utility:success" size="x-small" class="iconoSuccess"></lightning-icon>
+                                        <span class="slds-var-m-left_small viabilidadLabel" style="color: forestgreen;">Viable</span>
+                                    </template>
+                                    <template lwc:else>
+                                        <lightning-icon icon-name="utility:ban" size="x-small" class="iconoError"></lightning-icon>
+                                        <span class="slds-var-m-left_small viabilidadLabel" style="color: firebrick;">No viable</span>
+                                    </template>
+                                </span>
+                            </div>
+                            <div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="ltv">
+                                <div class="slds-grid slds-grid_vertical" style="text-align: center;">
+                                    <div class="slds-col">
+                                        <span class="slds-var-m-right_small calculoLabel">LTV</span>
+                                    </div>
+                                    <div class="slds-col" style="margin-top: 4px;">
+                                        <span lwc:if={datatableData.calculos} class="calculoValue">
+                                            <template lwc:if={datatableData.calculos.ltv.valor}>
+                                                {datatableData.calculos.ltv.valor}
+                                                <span class="calculoValuePercent">%</span>
+                                            </template>
+                                            <span lwc:else class="calculoValueDesconocido">?</span>
+                                            <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small slds-hide" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiNomina">
+                                <div class="slds-grid slds-grid_vertical" style="text-align: center;">
+                                    <div class="slds-col">
+                                        <span class="slds-var-m-right_small calculoLabel">DTI Nómina</span>
+                                    </div>
+                                    <div class="slds-col" style="margin-top: 4px;">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+                                            <div class="slds-col">
+                                                <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                                    <div class="slds-col">
+                                                        <span class="calculoLabel subtitulo">Sin bonificar</span>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <span lwc:if={datatableData.calculos} class="calculoValue sinBonificar">
+                                                            <template lwc:if={datatableData.calculos.dtiNomina.valor}>
+                                                                {datatableData.calculos.dtiNomina.valor}
+                                                                <span class="calculoValuePercent">%</span>
+                                                            </template>
+                                                            <span lwc:else class="calculoValueDesconocido">?</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col">
+                                                <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                                    <div class="slds-col">
+                                                        <span class="calculoLabel subtitulo">Bonificado</span>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <span lwc:if={datatableData.calculos} class="calculoValue">
+                                                            <template lwc:if={datatableData.calculos.dtiNominaBonificado.valor}>
+                                                                {datatableData.calculos.dtiNominaBonificado.valor}
+                                                                <span class="calculoValuePercent">%</span>
+                                                            </template>
+                                                            <span lwc:else class="calculoValueDesconocido">?</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext> -->
+                                </div>
+                            </div>
+                            <div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiIrpf">
+                                <div class="slds-grid slds-grid_vertical" style="text-align: center;">
+                                    <div class="slds-col">
+                                        <span class="slds-var-m-right_small calculoLabel">DTI IRPF</span>
+                                    </div>
+                                    <div class="slds-col" style="margin-top: 4px;">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+                                            <div class="slds-col">
+                                                <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                                    <div class="slds-col">
+                                                        <span class="calculoLabel subtitulo">Sin bonificar</span>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <span lwc:if={datatableData.calculos} class="calculoValue sinBonificar">
+                                                            <template lwc:if={datatableData.calculos.dtiIrpf.valor}>
+                                                                {datatableData.calculos.dtiIrpf.valor}
+                                                                <span class="calculoValuePercent">%</span>
+                                                            </template>
+                                                            <span lwc:else class="calculoValueDesconocido">?</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-col">
+                                                <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                                    <div class="slds-col">
+                                                        <span class="calculoLabel subtitulo">Bonificado</span>
+                                                    </div>
+                                                    <div class="slds-col">
+                                                        <span lwc:if={datatableData.calculos} class="calculoValue">
+                                                            <template lwc:if={datatableData.calculos.dtiIrpfBonificado.valor}>
+                                                                {datatableData.calculos.dtiIrpfBonificado.valor}
+                                                                <span class="calculoValuePercent">%</span>
+                                                            </template>
+                                                            <span lwc:else class="calculoValueDesconocido">?</span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-grow-none divColHelpTextGeneral">
+                                <lightning-helptext icon-name="utility:info_alt" content="El LTV (Loan To Value) mide la relación entre el importe de la hipoteca y el valor de la tasación de la vivienda. El DTI (Debt To Income) mide la relación entre la deuda total y los ingresos del cliente." class="helpTextGeneral"></lightning-helptext>
+                            </div>
+                        </div>
+
+                        <!--
+                            <div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiIrpf">
+                                <span class="slds-var-m-right_small calculoLabel">IRPF: DTI sin bonificar</span>
+                                <div lwc:if={datatableData.calculos} class="calculoValue">
+                                    <template lwc:if={datatableData.calculos.dtiIrpf.valor}>
+                                        {datatableData.calculos.dtiIrpf.valor}
+                                        <span class="calculoValuePercent">%</span>
+                                    </template>
+                                    <span lwc:else class="calculoValueDesconocido">?</span>
+                                </div>
+                                <lightning-helptext icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content="No viable. Debe de estar dentro del rango 0%-35%."></lightning-helptext>
+                            </div>
+                            <div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiIrpf">
+                                <span class="slds-var-m-right_small calculoLabel">IRPF: DTI bonificado</span>
+                                <div lwc:if={datatableData.calculos} class="calculoValue">
+                                    <template lwc:if={datatableData.calculos.dtiIrpf.valor}>
+                                        {datatableData.calculos.dtiIrpf.valor}
+                                        <span class="calculoValuePercent">%</span>
+                                    </template>
+                                    <span lwc:else class="calculoValueDesconocido">?</span>
+                                </div>
+                                <lightning-helptext icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content="No viable. Debe de estar dentro del rango 0%-35%."></lightning-helptext>
+                            </div>
+                            -->
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="slds-modal__content slds-var-p-horizontal_small">
+            <div class="spinnerContainer slds-is-relative" style="height: 150px;">
+                <lightning-spinner class="slds-is-absolute" variant="brand" size="small"></lightning-spinner>
+            </div>
+
+            <article class="cardCalculadoraDti slds-card slds-var-m-top_small noVisible transparente">
+                <div class="slds-card__body slds-card__body_inner" style="padding: 2px; 20px 0px 20px;">
+                    <!--Tablas-->
+                    <div class="slds-col slds-var-m-top_large">
+                        <div class="slds-grid slds-wrap slds-gutters_direct-medium slds-grid_vertical-stretch">
+                            <div class="gridColDatatable slds-col slds-size_1-of-2">
+                                <div class="tituloTabla slds-var-m-bottom_small">
+                                    <lightning-icon icon-name="utility:database" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+                                    Importe
+                                </div>
+                                <div class="datatableContainer">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableImporte sinNumerosFilas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.importe}
+                                                         data={datatableData.importe}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="importe">
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                            <div class="gridColDatatable slds-col slds-size_1-of-2">
+                                <div class="tituloTabla slds-var-m-bottom_small">
+                                    <lightning-icon icon-name="utility:paste" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+                                    General
+                                </div>
+                                <div class="datatableContainer">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableGeneral1 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.general1}
+                                                         data={datatableData.general1}
+                                                         hide-checkbox-column
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="general1">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableGeneral2 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.general2}
+                                                         data={datatableData.general2}
+                                                         hide-checkbox-column
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="general2">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableGeneral3 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.general3}
+                                                         data={datatableData.general3}
+                                                         hide-checkbox-column
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="general3">
+                                    </lightning-datatable>
+                                </div>
+                                <span class="slds-var-m-top_x-small" style="display: block; text-align: end; font-size: 11px; opacity: 0.8; text-overflow: ellipsis;">
+                                    <lightning-icon icon-name="utility:warning" size="xx-small" variant="warning" class="slds-var-m-right_x-small slds-is-relative" style="top: -1px;"></lightning-icon>
+                                    "DTI bonificado" se eliminará próximamente si nadie pide lo contrario.
+                                </span>
+                            </div>
+                            <div class="gridColDatatable slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+                                <div class="tituloTabla slds-var-m-bottom_small">
+                                    <lightning-icon icon-name="utility:chart" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -2px;"></lightning-icon>
+                                    Cuota mensual
+                                </div>
+                                <div class="datatableContainer">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual1 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual1}
+                                                         data={datatableData.cuotaMensual1}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         data-datatable="cuotaMensual1">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual2 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual2}
+                                                         data={datatableData.cuotaMensual2}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="cuotaMensual2">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual3 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual3}
+                                                         data={datatableData.cuotaMensual3}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="cuotaMensual3">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual4 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual4}
+                                                         data={datatableData.cuotaMensual4}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         data-datatable="cuotaMensual4">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual5 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual5}
+                                                         data={datatableData.cuotaMensual5}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         data-datatable="cuotaMensual5">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableCuotaMensual6 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.cuotaMensual6}
+                                                         data={datatableData.cuotaMensual6}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         data-datatable="cuotaMensual6">
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                            <div class="gridColDatatable slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+                                <div>
+                                    <div class="tituloTabla slds-var-m-bottom_small" style="display: inline-block;">
+                                        <lightning-icon icon-name="utility:case" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+                                        Fondos propios (mensual)
+                                    </div>
+                                    <span class="popoverTiposBonificadosContainer slds-is-relative">
+                                        <lightning-icon class="iconoTiposBonificados slds-var-m-left_small" icon-name="utility:metrics" size="x-small"></lightning-icon>
+                                        <section class="popoverTiposBonificados slds-popover slds-nubbin_left slds-is-absolute" role="dialog">
+                                            <div class="slds-popover__body">
+                                                <template for:each={datatableTiposBonificados.data} for:item="tipo">
+                                                    <div key={tipo.nombre}>
+                                                        <div class="slds-text-title_caps slds-var-m-top_x-small slds-var-p-bottom_small" style="font-weight: 500;">{tipo.nombre}</div>
+                                                        <div class="datatableContainerTiposBonificados">
+                                                            <lightning-datatable
+                                                                                 class="datatableTiposBonificados"
+                                                                                 key-field="tipo"
+                                                                                 columns={tipo.columns}
+                                                                                 data={tipo.data}
+                                                                                 hide-checkbox-column
+                                                                                 hide-table-header
+                                                                                 onrowaction={datatableTiposBonificadosOnrowaction}>
+                                                            </lightning-datatable>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <div lwc:if={datatableTiposBonificados.data.mostrarFooter} class="popoverTiposBonificadosTextoFooter slds-var-m-top_large slds-var-m-bottom_xxx-small slds-text-color_weak">
+                                                    1% adicional de gastos.
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </span>
+                                </div>
+                                <div class="datatableContainer">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableFondosPropios1 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.fondosPropios1}
+                                                         data={datatableData.fondosPropios1}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="fondosPropios1">
+                                    </lightning-datatable>
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableFondosPropios2 sinNumerosFilas listaTablas"
+                                                         key-field="id"
+                                                         columns={datatableColumns.fondosPropios2}
+                                                         data={datatableData.fondosPropios2}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         hide-table-header
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="fondosPropios2">
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                            <div class="gridColDatatable primerTitular slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+                                <div class="slds-grid slds-grid_vertical" style="height: 100%">
+                                    <div class="slds-col slds-grow-none slds-var-m-bottom_small">
+                                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                            <div class="slds-col slds-shrink-none">
+                                                <div class="tituloTabla">
+                                                    <lightning-icon icon-name="utility:user" size="xx-small" class="tituloTablaIcono slds-var-m-right_small"></lightning-icon>
+                                                    Primer titular
+                                                </div>
+                                            </div>
+                                            <div lwc:if={oportunidad} class="slds-col" style="overflow: hidden;">
+                                                <span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__c.value} class="pillCliente slds-truncate" title={oportunidad.fields.CSBD_ContactoTitular1__r.displayValue} onclick={navegarDetalleRegistro} data-record-id={oportunidad.fields.CSBD_ContactoTitular1__c.value}>
+                                                    <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                                    <span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular1__r.displayValue}</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div lwc:if={oportunidad} class="datosTitular slds-var-m-bottom_large slds-var-m-right_xx-small slds-text-color_weak">
+                                        <template lwc:if={oportunidad.fields.CSBD_ContactoTitular1__c.value}>
+                                            <span title="Escala maestra">EM&nbsp;</span>
+                                            <template lwc:if={oportunidad.fields.CSBD_Contact__c.value}>
+                                                <span lwc:if={oportunidad.fields.CSBD_Contact__r.value.fields.CSBD_Escala_Maestra__c.value} class="valor">{oportunidad.fields.CSBD_Contact__r.value.fields.CSBD_Escala_Maestra__c.value}</span>
+                                                <span lwc:else>?</span>
+                                            </template>
+                                            <span lwc:else>?</span>
+                                            <span class="separadorTexto"></span>
+                                            <span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Edad__c.value} class="valor">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Edad__c.value}</span>
+                                            <span lwc:else>?</span>
+                                            <span>&nbsp;años</span>
+                                            <span class="separadorTexto"></span>
+                                            <span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Estado_Civil__c.value} style="font-weight: 400;">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Estado_Civil__c.value}</span>
+                                            <span lwc:else>Estado civil desconocido</span>
+                                            <span class="separadorTexto"></span>
+                                            <template lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Numero_Hijos__c.value}>
+                                                <span class="valor">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Numero_Hijos__c.value}</span>
+                                                <span>&nbsp;hijos</span>
+                                            </template>
+                                            <span lwc:else>Sin hijos</span>
+                                        </template>
+                                        <span lwc:else>Sin primer titular</span>
+                                    </div>
+                                    <div class="slds-col">
+                                        <div class="datatableContainer" style="height: 100%;">
+                                            <!-- sldsValidatorIgnoreNextLine -->
+                                            <lightning-datatable
+                                                                 class="datatablePrimerTitular"
+                                                                 key-field="id"
+                                                                 columns={datatableColumns.titular}
+                                                                 data={datatableData.primerTitular}
+                                                                 hide-checkbox-column
+                                                                 column-widths-mode="auto"
+                                                                 suppress-bottom-bar
+                                                                 wrap-text-max-lines="2"
+                                                                 oncellchange={datatableOncellchange}
+                                                                 data-datatable="primerTitular">
+                                            </lightning-datatable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gridColDatatable segundoTitular slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+                                <div class="slds-grid slds-grid_vertical" style="height: 100%">
+                                    <div class="slds-col slds-grow-none slds-var-m-bottom_small">
+                                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                                            <div class="slds-col slds-shrink-none">
+                                                <div class="tituloTabla">
+                                                    <lightning-icon icon-name="utility:people" size="xx-small" class="tituloTablaIcono slds-var-m-right_small"></lightning-icon>
+                                                    Segundo titular
+                                                </div>
+                                            </div>
+                                            <div lwc:if={oportunidad} class="slds-col" style="overflow: hidden;">
+                                                <span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__c.value} class="pillCliente slds-truncate" title={oportunidad.fields.CSBD_ContactoTitular2__r.displayValue} onclick={navegarDetalleRegistro} data-record-id={oportunidad.fields.CSBD_ContactoTitular2__c.value}>
+                                                    <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                                    <span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular2__r.displayValue}</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div lwc:if={oportunidad} class="datosTitular slds-var-m-bottom_large slds-var-m-right_x-small slds-text-color_weak" style="text-align: end;">
+                                        <template lwc:if={oportunidad.fields.CSBD_ContactoTitular2__c.value}>
+                                            <span title="Escala maestra">EM&nbsp;</span>
+                                            <template lwc:if={oportunidad.fields.CSBD_Contact_2__c.value}>
+                                                <span lwc:if={oportunidad.fields.CSBD_Contact_2__r.value.fields.CSBD_Escala_Maestra__c.value} class="valor">{oportunidad.fields.CSBD_Contact_2__r.value.fields.CSBD_Escala_Maestra__c.value}</span>
+                                                <span lwc:else>?</span>
+                                            </template>
+                                            <span lwc:else>?</span>
+                                            <span class="separadorTexto"></span>
+                                            <span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Edad__c.value} class="valor">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Edad__c.value}</span>
+                                            <span lwc:else>?</span>
+                                            <span>&nbsp;años</span>
+                                            <span class="separadorTexto"></span>
+                                            <span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Estado_Civil__c.value} style="font-weight: 400;">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Estado_Civil__c.value}</span>
+                                            <span lwc:else>Estado civil desconocido</span>
+                                            <span class="separadorTexto"></span>
+                                            <template lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Numero_Hijos__c.value}>
+                                                <span class="valor">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Numero_Hijos__c.value}</span>
+                                                <span>&nbsp;hijos</span>
+                                            </template>
+                                            <span lwc:else>Sin hijos</span>
+                                        </template>
+                                        <span lwc:else>Sin segundo titular</span>
+                                    </div>
+                                    <div class="slds-col">
+                                        <div class="datatableContainer" style="height: 100%;">
+                                            <!-- sldsValidatorIgnoreNextLine -->
+                                            <lightning-datatable
+                                                                 class="datatableSegundoTitular"
+                                                                 key-field="id"
+                                                                 columns={datatableColumns.titular}
+                                                                 data={datatableData.segundoTitular}
+                                                                 hide-checkbox-column
+                                                                 column-widths-mode="auto"
+                                                                 suppress-bottom-bar
+                                                                 wrap-text-max-lines="2"
+                                                                 oncellchange={datatableOncellchange}
+                                                                 data-datatable="segundoTitular">
+                                            </lightning-datatable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <template lwc:if={data}>
+                                <div lwc:if={data.dosTitulares} class="gridColDatatable slds-col slds-size_1-of-1 slds-var-m-top_large">
+                                    <div class="divSumaIngresosTitulares">
+                                        <lightning-icon icon-name="utility:new" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+                                        Suma de ingresos anuales por nómina de los titulares:
+                                        <lightning-formatted-number value={data.totalIngresosTitulares} format-style="currency" currency-code="EUR" class="slds-var-m-left_small" style="font-weight: 500;"></lightning-formatted-number>
+                                        <span class="slds-var-m-left_medium">
+                                            &#40;<lightning-formatted-number value={data.primerTitular.totalIngresos} format-style="currency" currency-code="EUR"></lightning-formatted-number>&nbsp;+&nbsp;
+                                            <lightning-formatted-number value={data.segundoTitular.totalIngresos} format-style="currency" currency-code="EUR"></lightning-formatted-number>&#41;
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class="gridColDatatable slds-col slds-size_1-of-1 slds-var-m-top_xx-large">
+                                <div class="tituloTabla slds-var-m-bottom_small">
+                                    <lightning-icon icon-name="utility:offline_briefcase" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -2px;"></lightning-icon>
+                                    Deuda
+                                </div>
+                                <div class="datatableContainer">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-datatable
+                                                         class="datatableDeuda"
+                                                         key-field="id"
+                                                         columns={datatableColumns.deuda}
+                                                         data={datatableData.deuda}
+                                                         hide-checkbox-column
+                                                         column-widths-mode="auto"
+                                                         suppress-bottom-bar
+                                                         oncellchange={datatableOncellchange}
+                                                         data-datatable="deuda">
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <footer class="slds-modal__footer" style="border-width: 1px; border-bottom-left-radius: 9px; border-bottom-right-radius: 9px;">
+            <div class="slds-grid slds-grid_align-spread slds-gutters_direct-x-small" style="text-align: initial;">
+                <div class="slds-col">
+                    <lightning-button-icon icon-name="utility:arrow_top" onclick={scrollToTop} variant="border-filled" tooltip="Desplazarse al inicio" class="slds-var-m-right_small"></lightning-button-icon>
+
+                    <lightning-button-menu class="botonesFooter" icon-name="utility:settings"  menu-alignment="bottom-left" tooltip="Opciones" onselect={menuSettingsOnselect}>
+                        <lightning-menu-subheader label="Datos guardados"></lightning-menu-subheader>
+                        <lightning-menu-item label="Borrar datos guardados" prefix-icon-name="utility:delete" value="borrarDatosGuardados"></lightning-menu-item>
+                        <lightning-menu-divider></lightning-menu-divider>
+                        <lightning-menu-subheader label="Desarrollo"></lightning-menu-subheader>
+                        <lightning-menu-item label="Iniciar depuración en consola" prefix-icon-name="utility:apex" value="debugger"></lightning-menu-item>
+                        <lightning-menu-item label="console.log()" prefix-icon-name="utility:bug" value="log"></lightning-menu-item>
+                    </lightning-button-menu>
+                </div>
+                <div class="slds-col">
+                    <lightning-button label="Descartar" icon-name="utility:undo" class="botonesFooter" onclick={botonCancelarOnclick}></lightning-button>
+                    <lightning-button label="Guardar" variant="brand" class="botonGuardar botonesFooter slds-var-m-left_medium" onclick={botonGuardarOnclick}></lightning-button>
+                </div>
+            </div>
+        </footer>
+    </div>
+</section>
+
+
+
+
+	<section role="dialog" tabindex="-1" aria-modal="true" class="modalBorrarDatosGuardados slds-modal" onkeydown={modalBorrarDatosGuardadosTeclaPulsada}>
+		<div class="slds-modal__container">
+			<header class="slds-modal__header">
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={modalBorrarDatosGuardadosACerrar} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+				<h2 class="slds-text-heading_medium slds-hyphenate">Borrar datos guardados</h2>
+				<p class="slds-var-m-top_x-small">Subtítulo del modal</p>
+			</header>
+			<div class="slds-modal__content slds-var-p-vertical_large slds-var-p-horizontal_x-large">
+				<div>¿Quieres borrar los datos guardados? Se perderán todas las modificaciones realizadas desde la recepción de la oportunidad. Atención, los datos de campos modificables fuera de la pestaña "Entrevista" conservarán su valor.</div>
+			</div>
+			<footer class="slds-modal__footer">
+				<lightning-button label="Aceptar" variant="brand" onclick={nuevoModalAceptar}></lightning-button>
+				<lightning-button label="Cancelar" onclick={modalBorrarDatosGuardadosACerrar} class="slds-var-m-left_small"></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<div class="slds-backdrop slds-backdrop--open"></div>
+
+</template>

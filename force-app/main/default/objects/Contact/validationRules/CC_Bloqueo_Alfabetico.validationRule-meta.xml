@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo_Alfabetico</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    NOT(ISCHANGED(CSBD_Actualizacion_Datos_Riesgo__c)),
+    $Setup.AdminSettings__c.Validaciones__c,
+    !$Permission.CC_Modificar_Cuenta_Contacto_ALF = true,
+				!OR(
+				  ISNEW(),
+        !OR(
+            ISBLANK(CC_NumPerso__c),
+            ISBLANK(CC_NumPersoAsoc__c)
+        ),
+  		  ISBLANK(CC_FechaRefresco__c),
+  		  ISBLANK(PRIORVALUE(CC_FechaRefresco__c)),								
+      CC_FechaRefresco__c != PRIORVALUE(CC_FechaRefresco__c)
+				)
+)</errorConditionFormula>
+    <errorMessage>No se permite actualizar el registro</errorMessage>
+</ValidationRule>

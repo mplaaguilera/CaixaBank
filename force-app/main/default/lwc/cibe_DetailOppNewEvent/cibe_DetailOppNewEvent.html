@@ -1,0 +1,143 @@
+<template>
+    <template if:true={editable}>
+        <article class="slds-card slds-m-top_x-small">
+            <lightning-record-edit-form record-id={oppid} object-api-name='Opportunity' density="comfy" onsuccess={handleOppSuccess} onerror={handleOppError}>
+                <div class="slds-card__header slds-grid slds-theme_shade slds-m-bottom_none slds-p-bottom_x-small">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <lightning-button-icon if:true={showDetail} variant="border-filled" icon-name="utility:chevrondown" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                            <lightning-button-icon if:false={showDetail} variant="border-filled" icon-name="utility:chevronright" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <div class="slds-grid slds-grid_vertical">
+                                    <div class="slds-col">
+                                        <lightning-icon if:true={principal} icon-name="utility:favorite" size="x-small" variant="warning" class="main-icon" title={labels.oppPrincipal}></lightning-icon>
+                                        <span class="opptask-title" onclick={handleNavigateOpp}>
+                                            {currentName}
+                                        </span>
+                                    </div>
+                                </div>
+                            </h2>
+                        </div>
+                        <div class="slds-no-flex">
+                            <lightning-button-icon if:false={principal} icon-name="utility:favorite" icon-class="slds-icon-text-warning" variant="border-inverse" alternative-text={labels.marcarPrincipal} class="slds-m-left_xx-small linked-opptask-button last-opptask-button" title={labels.marcarPrincipal} onclick={updateMainOppTask}></lightning-button-icon>
+                            <lightning-button-icon if:true={showVincular} icon-name="utility:link" alternative-text={labels.desvincularOportunidad} class="slds-m-left_xx-small" title={labels.desvincularOportunidad} variant="brand" onclick={handleUnlink}></lightning-button-icon>
+                        </div>
+                    </header>
+                </div>
+                <footer class="slds-card__footer slds-m-top_none">
+                    <template if:true={showDetail}>
+                        <div slot="footer">
+                            <div class="slds-m-left_x-small slds-text-align_left">
+                                <div class="slds-grid slds-wrap">
+                                    <div class="slds-col slds-size_2-of-2">
+                                        <div class="slds-box slds-box_small slds-m-bottom_xx-small">
+                                            <div class="slds-col slds-size_3-of-3">
+                                                <span class="slds-m-left_xxx-small">{labels.etapa}</span>
+                                                <c-av_-custom-path all-stages={allStages} current-stage={status} edit-mode={editMode} onchangenew={handleStageName}></c-av_-custom-path>
+                                            </div>
+                                            <div class="slds-grid slds-wrap">
+                                                
+                                                <template if:true={isCerradoNegativo}>
+                                                    <div class="slds-col slds-size_2-of-2">
+                                                        <lightning-input-field field-name="CIBE_CerradoNegativo__c" required onchange={handleCerradoNegativo} disabled={isOppTeamMember}></lightning-input-field>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="AV_PF__c"></lightning-output-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CloseDate" onchange={handleCloseDate} disabled={isOppTeamMember}></lightning-input-field> 
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CIBE_ProbabilidadExito__c" required onchange={handleExito} disabled={isOppTeamMember}></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="CIBE_AmountDivisa__c" onchange={handleAmount} disabled={isOppTeamMember}></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-2">
+                                        <lightning-input-field class="comentarios" field-name="AV_Comentarios__c" onchange={handlelastComent} disabled={isOppTeamMember}></lightning-input-field> 
+                                    </div>
+                                    <lightning-input-field field-name="StageName" value={status} style="display: none;" disabled={isOppTeamMember}></lightning-input-field>
+                                    <lightning-button class="slds-float_right"
+                                            variant="brand"
+                                            type="submit"
+                                            name="save"
+                                            label="Guardar"
+                                            if:false={isOppTeamMember}
+                                        >
+                                        </lightning-button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </footer>
+            </lightning-record-edit-form>
+            <template if:true={showSpinner}> 
+                <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+            </template>
+        </article>
+    </template>
+    <template if:false={editable}>
+        <article class="slds-card slds-m-top_x-small">
+            <div class="slds-card__header slds-grid slds-theme_shade slds-m-bottom_none slds-p-bottom_x-small">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-button-icon if:true={showDetail} variant="border-filled" icon-name="utility:chevrondown" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                    <lightning-button-icon if:false={showDetail} variant="border-filled" icon-name="utility:chevronright" size="small" onclick={toggleShowOpp}></lightning-button-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                    <div class="slds-grid slds-grid_vertical">
+                        <div class="slds-col" onclick={handleNavigateOpp}>
+                            <span class="opptask-title">{currentName}</span>
+                        </div>
+                    </div>
+                    </h2>
+                </div>
+                <div class="slds-no-flex">
+                    <lightning-button-icon icon-name="utility:link" alternative-text={labels.vincularOportunidad} class="slds-m-left_xx-small linked-opptask-button last-opptask-button" title={labels.vincularOportunidad} variant="border-filled" onclick={handlelink}></lightning-button-icon>
+                </div>
+                </header>
+            </div>
+            <footer class="slds-card__footer slds-m-top_none">
+                <template if:true={showDetail}>
+                    <div slot="footer">
+                        <lightning-record-view-form record-id={oppid} object-api-name='Opportunity' density="comfy">
+                            <div class="slds-m-left_x-small slds-text-align_left">
+                                <div class="slds-grid slds-wrap">
+                                    <div class="slds-col slds-size_3-of-3">
+                                        <span class="slds-m-left_xxx-small">{labels.etapa}</span>
+                                        <c-av_-custom-path all-stages={allStages} current-stage={status}></c-av_-custom-path>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="AV_PF__c"></lightning-output-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="CloseDate"></lightning-output-field> 
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="CIBE_ProbabilidadExito__c" required></lightning-output-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-output-field field-name="Amount"></lightning-output-field>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-2">
+                                        <lightning-output-field field-name="AV_Comentarios__c"></lightning-output-field> 
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-record-view-form>
+                    </div>
+                </template>
+            </footer>
+            <template if:true={showSpinner}> 
+                <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+            </template>
+        </article>
+    </template>
+</template>

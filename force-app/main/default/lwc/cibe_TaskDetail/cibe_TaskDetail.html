@@ -1,0 +1,38 @@
+<template>
+    <lightning-card title={labels.tarea} icon-name="standard:task" class="margin-table">
+        <div class="scrollbar style-3">
+            <div class="force-overflow">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                    <div class="slds-truncate" title="Asunto">{labels.asunto}</div>
+                    </th>
+                    <th class="" scope="col">
+                    <div class="slds-truncate" title="Cliente">{labels.cliente}</div>
+                    </th>
+                    <th class="" scope="col">
+                    <div class="slds-truncate" title="Vencimiento">{labels.vencimiento}</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="slds-hint-parent">
+                    <td data-label="asunto">
+                        <div class="slds-truncate">{subject}</div>
+                    </td>
+                    <td data-label="cliente">
+                    <div class="slds-truncate">{client}</div>
+                    </td>
+                    <td data-label="vencimiento">
+                        <div class="slds-truncate">
+                            <lightning-formatted-date-time value={startdate} year="numeric" month="numeric" day="numeric" ></lightning-formatted-date-time>
+                        </div>    
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </lightning-card>
+</template>

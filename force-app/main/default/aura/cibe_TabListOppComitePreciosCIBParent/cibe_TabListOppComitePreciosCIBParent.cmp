@@ -1,0 +1,4 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+    <c:cibe_TabListOppComitePreciosCIB onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:cibe_TabListOppComitePreciosCIB>
+</aura:component>

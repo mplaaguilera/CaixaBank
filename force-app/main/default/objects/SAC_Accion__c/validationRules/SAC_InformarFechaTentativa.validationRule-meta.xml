@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_InformarFechaTentativa</fullName>
+    <active>true</active>
+    <description>En caso de que el campo Tercero este informado, se debe informar la fecha tentativa</description>
+    <errorConditionFormula>AND(
+ NOT(ISPICKVAL(SAC_Tercero__c, &apos;&apos;)),
+	ISBLANK(SAC_FechaTentativa__c)
+)</errorConditionFormula>
+    <errorDisplayField>SAC_FechaTentativa__c</errorDisplayField>
+    <errorMessage>Debe informar una fecha tentativa</errorMessage>
+</ValidationRule>

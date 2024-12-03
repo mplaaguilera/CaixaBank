@@ -1,0 +1,19 @@
+<template>    
+    <template if:true={showLoadingSpinner}>
+        <div style="z-index: 10000 !important;">
+            <lightning-spinner alternative-text="Cargando..." size="medium" style="z-index: 10000 !important;"></lightning-spinner>
+        </div>
+    </template>
+    <lightning-card title="Subir archivos">
+        <div align="center">
+            <div>
+                <lightning-input label="" name="file uploader" onchange={handleFilesChange} type="file" multiple></lightning-input>
+            </div><br/>
+            <div class="slds-text-body_small slds-text-color_default">{fileName}
+            </div><br/>
+            <div>
+                <lightning-button class="slds-m-top--medium" label={UploadFile} onclick={handleSave} variant="brand" disabled={isTrue}></lightning-button>
+            </div>
+        </div><br/><br/>
+    </lightning-card>
+</template>

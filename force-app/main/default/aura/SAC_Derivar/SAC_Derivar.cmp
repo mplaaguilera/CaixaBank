@@ -1,0 +1,255 @@
+<aura:component controller="SAC_LCMP_Derivar"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="grupos" type="CC_Grupo_Colaborador__c[]"/>
+    <aura:attribute name="isLoading" type="Boolean"/>
+    <aura:attribute name="numeroPantalla" type="Integer" default="1"/>
+    <aura:attribute name="derivar" type="Boolean"/>
+    <aura:attribute name="nombreGrupoSeleccionado" type="String"/>
+    <aura:attribute name="idGrupoSeleccionado" type="String"/>
+    <aura:attribute name="confirmEmailCliente" type="Boolean"/>
+    <aura:attribute name="idTemplateGrupo" type="String"/>
+    <aura:attribute name="idTemplateCliente" type="String"/>
+    <aura:attribute name="metodoEnvio" type="String"/>
+
+    <!--Atributos para el componente SAC_GestionEmails-->
+    <aura:attribute name="CC"  type="String"/>
+    <aura:attribute name="CCO"  type="String"/>
+    <aura:attribute name="CCCliente"  type="String"/>
+    <aura:attribute name="CCOCliente"  type="String"/>
+    <aura:attribute name="paraGrupo"  type="String"/>
+    <aura:attribute name="paraCliente"  type="String"/>
+    <aura:attribute name="asuntoGrupo"  type="String"/>
+    <aura:attribute name="asuntoCliente"  type="String"/>
+    <aura:attribute name="cuerpoGrupo"  type="String"/>
+    <aura:attribute name="cuerpoCliente"  type="String"/>
+    <aura:attribute name="procedencia"  type="String" default="derivar"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="idsFicherosAdjuntosCliente" type="String[]" />
+    <aura:attribute name="idsFicherosAdjuntosGrupo" type="String[]" />
+    <aura:attribute name="ficherosAdjuntosGrupo" type="ContentVersion[]" />
+    <aura:attribute name="ficherosAdjuntosCliente" type="ContentVersion[]" />
+    <aura:attribute name="idsFicherosBorradosCliente" type="String[]" />
+    <aura:attribute name="idsFicherosBorradosGrupo" type="String[]" />
+
+    <aura:attribute name="nombreClientePostal" type="String" />
+    <aura:attribute name="direccionEnvioPostal" type="String" />
+    <aura:attribute name="callePostal" type="String" />
+    <aura:attribute name="codigoPostal" type="String" />
+
+    <aura:attribute name="options" type="List"/>
+    <aura:attribute name="value" type="String" default="" />
+    <aura:attribute name="label" type="string" default="Selecciona el grupo al que va a derivar"/>
+    <aura:attribute name="labelOficina" type="string" default="Selecciona la oficina a la que va a derivar"/>
+    <aura:attribute name="caracteresMin" type="Integer" default="1" />
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="cerrar" type="Integer" default="0" />
+    <aura:attribute name="mostrarGrupos" type="Boolean" default="false"/>
+    <aura:attribute name="cadenaVacia" type="Boolean" default="true"/>
+    <aura:attribute name="grupoAbuscar"   type="String" default=""/>
+    <aura:attribute name="grupoAbuscarId"   type="String" default=""/>
+    <aura:attribute name="mensaje"   type="String" default="" />
+
+    <!-- US545410 atributos para el nuevo buscador de oficinas -->
+    <aura:attribute name="activarBuscadorOficinas" type="Boolean" default="false"/>
+    <aura:attribute name="oficinaSeleccionada"   type="String" default=""/>
+    <aura:attribute name="emailOficina" type="String" default=""/>
+    <aura:attribute name="idOfiSeleccionada"   type="String" default=""/>
+
+    <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
+    <aura:attribute name="adjuntosDerivar" type="Boolean" default="true"/>
+
+
+    <!--doInit-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <!--Spinner-->
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-is-relative">
+            <lightning:spinner alternative-text="Cargando" size="small" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <!--Pantallas-->
+    <!--Pantalla 1, pantalla grupos (cuenta no informada o picklist. Depende de si hay cuenta informada o no)-->
+    <aura:if isTrue="{!v.numeroPantalla == 1}">
+        <div>
+     <!--       <aura:if isTrue="{!not(empty(v.caso.AccountId))}">-->
+                <aura:if isTrue="{!empty(v.grupos)}">
+                    Actualmente no existe ningún grupo que permita la derivación. Por favor, compruebe que existe un grupo proveedor con el check 'Permite derivación' activado.
+                    <div class="slds-float--right slds-p-top_x-large">
+                        <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+                    </div>
+                </aura:if>
+
+                <aura:if isTrue="{!not(empty(v.grupos))}">   
+                    <div class="c-container"  >
+                        <aura:if isTrue="{!!empty(v.label)}">
+                            <label class="slds-form-element__label">{!v.label}</label>
+                            <lightning:helptext content="Este campo es obligatorio."/>
+                        </aura:if>
+                        <div class="slds-combobox_container">
+                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                    <lightning:input   disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Escriba o seleccione el grupo deseado..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!v.grupoAbuscar}" autoComplete="off" variant="label-hidden" id="combobox-id-2" required="true" name="buscadorGrupos"/>
+                                </div>    
+                            </div>
+                        </div>   
+                        <!-- Lista de grupos -->
+                        <aura:if isTrue="{!v.mostrarGrupos}">
+                            <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" >
+                                <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                    <aura:if isTrue="{!empty(v.mensaje)}" >
+                                        <!-- Mostrar los grupos -->
+                                        <aura:iteration items="{!v.options}" var="option" >
+                                            <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                            </li>
+                                        </aura:iteration>
+                                        <!-- Mostrar mensaje de grupo no encontrado -->
+                                        <aura:set attribute="else">
+                                            <li class="slds-listbox__item">
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                            </li>
+                                        </aura:set>
+                                    </aura:if>
+                                </ul>      
+                            </div> 
+                        </aura:if>      
+                    </div>
+
+                    <!-- Buscador de oficinas, cuando derivamos en una reclamacion en estado alta,y el grupo seleccionado es un grupo oficina -->
+                    <aura:if isTrue="{!v.activarBuscadorOficinas}">
+                        <br></br>
+                        <div class="c-container">
+                            <aura:if isTrue="{!!empty(v.label)}">
+                                <label class="slds-form-element__label">{!v.labelOficina}</label>
+                                <lightning:helptext content="Este campo es obligatorio."/>
+                            </aura:if>
+                            <div class="slds-combobox_container">
+                                <lightning:recordEditForm aura:id="editForm" recordId="" objectApiName="SAC_Interaccion__c">
+                                    <lightning:messages />
+                                        <lightning:inputField aura:id="miCampoOficina" fieldName="SAC_Oficina__c" onchange="{!c.seleccionarOficina}" variant="label-hidden" value = "{!v.idOfiSeleccionada}" > </lightning:inputField>
+                                </lightning:recordEditForm>
+                            </div>  
+                        </div>
+                    </aura:if>
+
+                    <!--Botón siguiente-->
+                    <div class="slds-float--right slds-p-top_x-large">
+                        <lightning:button variant="brand" label="Siguiente" title="Siguiente" onclick="{! c.siguientePantalla }" />
+                    </div>
+                    <!--Botón cerrar-->
+                    <div class="slds-float--left slds-p-top_x-large">
+                        <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+                    </div>
+                </aura:if>
+             <!--else (la cuenta no está informada)-->
+             <!--<aura:set attribute="else">
+                No tiene ningún cliente informado en el caso, no se puede derivar.
+                <div class="">
+                    <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+                </div>
+            </aura:set>
+            </aura:if> -->
+        </div>
+    </aura:if>
+
+    <!--Pantalla 2, envío email al grupo-->
+    <aura:if isTrue="{!v.numeroPantalla == 2}">
+        <div>
+            <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
+            <!--Llamada al componente SAC_GestionEmails-->
+            <c:SAC_GestionEmails para="{!v.paraGrupo}" copia="{!v.CC}" copiaOculta="{!v.CCO}" asunto="{!v.asuntoGrupo}" cuerpo="{!v.cuerpoGrupo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='grupo' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosGrupo}" ficherosAdjuntos="{!v.ficherosAdjuntosGrupo}" ficherosBorrados="{!v.idsFicherosBorradosGrupo}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}"/>
+            <!--Botón siguiente-->
+            <div class="slds-float--right slds-p-top_x-large">
+                <lightning:button variant="brand" label="Siguiente" title="Siguiente" onclick="{! c.validarEnvioGrupo }" />
+            </div>
+            <!--Botón anterior-->
+            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                <lightning:button variant="brand" label="Anterior" title="Anterior" onclick="{! c.anteriorPantalla }" />
+            </div>
+            <!--Botón cerrar-->
+            <div class="slds-float--left slds-p-top_x-large">
+                <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+            </div>
+        </div>
+    </aura:if>
+
+    <!--Pantalla 3, advertencia si se quiere enviar mail al reclamante-->
+    <aura:if isTrue="{!v.numeroPantalla == 3}">
+        <div>
+            <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
+            <p>¿Comunicar al cliente la derivación de la reclamación?</p>
+            <!--Botón confirmar-->
+            <div class="slds-float--right slds-p-top_x-large">
+                <lightning:button variant="brand" label="Si" title="Si" onclick="{! c.confirmarEmailReclamante }" />
+            </div>
+            <!--Botón negar-->
+            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                <lightning:button variant="brand" label="No" title="No" onclick="{! c.negarEmailReclamante }" />
+            </div>
+            <!--Botón anterior-->
+            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                <lightning:button variant="brand" label="Anterior" title="Anterior" onclick="{! c.anteriorPantalla }" />
+            </div>
+            <!--Botón cerrar-->
+            <div class="slds-float--left slds-p-top_x-large">
+                <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+            </div>
+        </div>
+    </aura:if>
+
+    <!--Pantalla 4, envío de email al reclamante-->
+    <aura:if isTrue="{!v.numeroPantalla == 4}">
+        <div>
+            <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
+            <!--Llamada al componente SAC_GestionEmails-->
+            <aura:if isTrue="{!v.metodoEnvio == 'Email'}">
+                <c:SAC_GestionEmails para="{!v.paraCliente}" copia="{!v.CCCliente}" copiaOculta="{!v.CCOCliente}" asunto="{!v.asuntoCliente}" cuerpo="{!v.cuerpoCliente}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}" derivarAQuien='cliente' idsFicherosAdjuntos="{!v.idsFicherosAdjuntosCliente}" ficherosAdjuntos="{!v.ficherosAdjuntosCliente}" ficherosBorrados="{!v.idsFicherosBorradosCliente}" recordId="{!v.recordId}" adjuntosDerivar="{!v.adjuntosDerivar}"/>
+            </aura:if>
+            <!--Llamada al componente SAC_EnvioCartaPostal-->
+            <aura:if isTrue="{!v.metodoEnvio == 'SAC_CartaPostal'}">
+                <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" nombreTitular="{!v.nombreClientePostal}" direccionEnvio="{!v.callePostal}" poblacionEC="{!v.direccionEnvioPostal}" codigoPostalEC="{!v.codigoPostal}" procedencia="derivación"/>
+            </aura:if>
+            <!--Botón siguiente-->
+            <div class="slds-float--right slds-p-top_x-large">
+                <lightning:button variant="brand" label="Siguiente" title="Siguiente" onclick="{! c.validarEnvioCliente }" />
+            </div>
+            <!--Botón anterior-->
+            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                <lightning:button variant="brand" label="Anterior" title="Anterior" onclick="{! c.anteriorPantalla }" />
+            </div>
+            <!--Botón cerrar-->
+            <div class="slds-float--left slds-p-top_x-large">
+                <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+            </div>
+        </div>
+    </aura:if>
+
+    <!--Pantalla 5, envío de email al reclamante-->
+    <aura:if isTrue="{!v.numeroPantalla == 5}">
+        <div>
+            <p><strong>Grupo seleccionado: {!v.nombreGrupoSeleccionado}</strong></p>
+            <p>Va a finalizar la derivación, cerrando el expediente y efectuando las comunicaciones pertinentes</p>
+            <p><strong>¿Desea confirmar la derivación?</strong></p>
+            <!--Botón confirmar-->
+            <div class="slds-float--right slds-p-top_x-large">
+                <lightning:button variant="brand" label="Confirmar derivación" title="Confirmar derivación" onclick="{! c.finalizarDerivar }" />
+            </div>
+            <!--Botón anterior-->
+            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                <lightning:button variant="brand" label="Anterior" title="Anterior" onclick="{! c.anteriorPantalla }" />
+            </div>
+            <!--Botón cerrar-->
+            <div class="slds-float--left slds-p-top_x-large">
+                <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDerivacion }" />
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

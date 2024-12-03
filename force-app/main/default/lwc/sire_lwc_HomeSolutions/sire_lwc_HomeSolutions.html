@@ -1,0 +1,9 @@
+<template>
+    <article class="slds-card slds-is-relative min-size card-temp styleCard" onclick={goToHome} slot="actions">
+        <div class="card-title min-size-title slds-text-align_center" title={title}>{title}</div><!-- cursor-default -->
+        <div class="slds-card__body slds-card__body_inner num-records-container">
+            <span class="cursor-default no-select">{numRecords}</span>
+        </div>
+        <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+    </article>
+</template>

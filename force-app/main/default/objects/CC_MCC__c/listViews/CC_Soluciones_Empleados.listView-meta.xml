@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Soluciones_Empleados</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Causa__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Solucion</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Empleado,Prejubilado,Proveedor / Empleado</value>
+    </filters>
+    <filters>
+        <field>CC_Fecha_Vigencia_Inicio__c</field>
+        <operation>greaterOrEqual</operation>
+        <value>8/1/2022 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>NAME</field>
+        <operation>notContain</operation>
+        <value>KN -</value>
+    </filters>
+    <label>Soluciones Empleados</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

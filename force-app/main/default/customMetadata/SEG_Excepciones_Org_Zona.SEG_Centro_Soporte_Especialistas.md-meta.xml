@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Centro Soporte Especialistas</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Centro Soporte Especialistas</value>
+    </values>
+    <values>
+        <field>SEG_Zonas__c</field>
+        <value xsi:type="xsd:string">CSE</value>
+    </values>
+</CustomMetadata>

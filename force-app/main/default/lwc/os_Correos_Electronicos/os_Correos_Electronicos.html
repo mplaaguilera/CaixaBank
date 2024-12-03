@@ -1,0 +1,20 @@
+<template>
+        <div style="height: 250px;">        
+                <lightning-datatable 
+                        record-id={recordId} 
+                        key-field="Id" 
+                        data={correos} 
+                        columns={columns} 
+                        hide-checkbox-column 
+                        show-row-number-column
+                        sorted-by={sorted_by}  
+                        onsort={sortColumns} 
+                        sorted-direction={sorted_direction}
+                        >
+                </lightning-datatable>
+                <template if:false={tieneCorreos}>
+                        <div style = 'position: absolute; top: 50%; left: 50%; margin-left: -7%'>No hay elementos para mostrar.</div>
+                </template>
+        </div>
+
+</template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FinalizarTarea</fullName>
+    <active>true</active>
+    <description>Si no eres el propietario de la tarea no puedes cambiar a finalizada o finalizada incompleta</description>
+    <errorConditionFormula>AND(
+				OR( ISPICKVAL(SAC_Estado__c, &apos;SAC_FinalizadaIncompleta&apos;),
+							ISPICKVAL(SAC_Estado__c, &apos;SAC_Finalizada&apos;)
+						),
+						$User.Username != Owner:User.Username,
+  			 NOT(ISCHANGED(SAC_SaltarValidacion__c)),
+				  $Profile.Name != &apos;API Only&apos;
+    )</errorConditionFormula>
+    <errorMessage>No eres el propietario de esta tarea</errorMessage>
+</ValidationRule>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_VisibleFormula__c</fullName>
+    <formula>IF(!ISBLANK(TEXT(EV_Fechadespublicacion__c)) &amp;&amp; EV_Fechadespublicacion__c &gt;= TODAY(), true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Visible Portal</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

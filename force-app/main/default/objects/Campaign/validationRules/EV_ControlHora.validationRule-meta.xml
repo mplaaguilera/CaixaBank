@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ControlHora</fullName>
+    <active>true</active>
+    <description>Controlar que la hora de inicio sea siempre inferior a la hora de fin, y que al menos el evento tenga 15 minutos de duración.</description>
+    <errorConditionFormula>AND(OR(EV_HoraInicio__c &gt; EV_HoraFin__c, EV_Duracion__c &lt; 15),
+			AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.EV_ByPassValidationRules
+))</errorConditionFormula>
+    <errorMessage>Un evento debe tener una duración mínima de 15 minutos. La hora fin no puede ser inferior a la hora de inicio.</errorMessage>
+</ValidationRule>

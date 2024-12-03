@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Horas_Fin_Reclamacion__c</fullName>
+    <label>Horas Fin Rec.</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>24</fullName>
+                <default>false</default>
+                <label>24</label>
+            </value>
+            <value>
+                <fullName>48</fullName>
+                <default>false</default>
+                <label>48</label>
+            </value>
+            <value>
+                <fullName>72</fullName>
+                <default>false</default>
+                <label>72</label>
+            </value>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>1</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>2</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>3</label>
+            </value>
+            <value>
+                <fullName>0</fullName>
+                <default>false</default>
+                <label>0</label>
+            </value>
+            <value>
+                <fullName>4</fullName>
+                <default>false</default>
+                <label>4</label>
+            </value>
+            <value>
+                <fullName>6</fullName>
+                <default>false</default>
+                <label>6</label>
+            </value>
+            <value>
+                <fullName>168</fullName>
+                <default>false</default>
+                <label>168 (7 dias)</label>
+            </value>
+            <value>
+                <fullName>336</fullName>
+                <default>false</default>
+                <label>336 (14 dias)</label>
+            </value>
+            <value>
+                <fullName>504</fullName>
+                <default>false</default>
+                <label>504 (21 dias)</label>
+            </value>
+            <value>
+                <fullName>720</fullName>
+                <default>false</default>
+                <label>720 (30 dias)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

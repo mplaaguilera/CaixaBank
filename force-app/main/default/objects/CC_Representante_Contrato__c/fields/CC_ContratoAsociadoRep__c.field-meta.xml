@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ContratoAsociadoRep__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Contrato asociado al representante</description>
+    <inlineHelpText>Contrato asociado al representante</inlineHelpText>
+    <label>Contrato asociado</label>
+    <referenceTo>Contract</referenceTo>
+    <relationshipLabel>Representantes y Contratos</relationshipLabel>
+    <relationshipName>Representantes_y_Contratos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,97 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="SAC_LCMP_Reclamantes" access="global">
+
+<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+<aura:attribute name="comunicationList" type="EmailMessage[]" default="[]" />
+<aura:attribute name="firstPartURL" type="String"/>
+<aura:attribute name="thirdPartURL" type="String"/>
+
+<article class="slds-card slds-card_boundary headerBottomBorder forceRelatedListCardDesktop" aria-describedby="header_1:622;a" data-aura-class="forceRelatedListCardDesktop">
+
+    <div class="slds-grid slds-page-header forceRelatedListCardHeader" data-aura-class="forceRelatedListCardHeader">
+        <header class="slds-media slds-media--center slds-has-flexi-truncate" >
+            <div class="slds-media__figure stencil slds-avatar slds-avatar_small" aria-hidden="true" data-aura-rendered-by="19:622;a">
+                <div class="extraSmall forceEntityIcon" style="background-color: #F2CF5B" data-aura-class="forceEntityIcon">
+                    <span class="uiImage" data-aura-class="uiImage">
+                    <lightning:icon iconName="standard:avatar" alternativeText="Reclamante" title="Reclamante" /></span>
+                </div>
+            </div>
+        <!--Heading-->
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title" id="header_1:622;a">
+                <!-- <a class="slds-card__header-link baseCard__header-title-container" href="{!'/lightning/r/'+v.recordId+'/related/EmailMessage/view'}"> -->
+                <span class="slds-truncate slds-m-right--xx-small" title="Cases">Comunicaciones con el reclamante</span>
+                <span class="slds-shrink-none slds-m-right--xx-small" title="">({!v.comunicationList.length}+)</span> <!--</a>--> </h2>
+            </div>
+        </header>
+    </div>
+
+    <div class="slds-hide">
+        <div force-placeholder2_listpreview="" class="slds-p-around_xxx-small">
+            <div class="field">
+                <div class="text text-primary"></div>
+                <div class="text text-secondary"></div>
+            </div>
+            <div class="field">
+            <div class="text text-primary"></div>
+            <div class="text text-secondary">
+            </div>
+        </div>
+    </div>
+</div>
+<aura:if isTrue="{!not(empty(v.comunicationList))}">
+    <ul class="uiAbstractList">
+    <li class="slds-var-p-horizontal_medium slds-var-p-vertical_xx-small desktop forceImageRelatedListStencil forceRecordLayout" data-aura-class="forceImageRelatedListStencil forceRecordLayout">
+    <br />
+        <div class="tabla" >
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col">
+                            <div class="slds-truncate" title="Id">Id</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="MCC">Asunto</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Id">FromAddress</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Id">ToAddress</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Id">Fecha/Hora creación</div>
+                        </th>
+                    </tr>
+                </thead>
+            <tbody>
+        <aura:iteration items="{!v.comunicationList}" var="com">
+            <tr class="slds-hint-parent">
+                <td data-label="Id">
+                    <div class="slds-truncate" title=""><a class="outputLookupLink slds-truncate ;a forceOutputLookup" href="{!v.firstPartURL + com.Id + v.thirdPartURL}" title="{!com.Id}" data-aura-class="forceOutputLookup">{!com.Id}</a></div>
+                </td>
+                <td data-label="Asunto">
+                    <div class="slds-truncate" title="">{!com.Subject}</div>
+                </td>
+                <td data-label="FromAddress">
+                    <div class="slds-truncate" title="">{!com.FromAddress}</div>
+                </td>
+                <td data-label="ToAddress" >
+                    <div class="toAddress" title="">{!com.ToAddress}</div>
+                </td>
+                <td data-label="CreatedDate">
+                    <div class="slds-truncate" title="">
+                        <span class="uiOutputDateTime" data-aura-class="uiOutputDateTime">
+                            <lightning:formattedDateTime value="{!com.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" />
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </aura:iteration>
+        </tbody>
+        </table>
+        </div>
+    </li>
+    </ul>
+    </aura:if>
+</article>
+</aura:component>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ActivityDateModified</fullName>
+    <active>false</active>
+    <description>El Campo ActivityDate no puede ser modificado si el RT no es ninguno de los siguientes: &apos;Iniciativa Gestor/a&apos;</description>
+    <errorConditionFormula>AND(
+$Profile.Name =&quot;AV_Usuario_CaixaBank&quot;,
+ISCHANGED( ActivityDate ),
+RecordType.DeveloperName != &apos;AV_Otros&apos;,
+NOT($Permission.AV_AvoidBulkApi)
+)</errorConditionFormula>
+    <errorDisplayField>ActivityDate</errorDisplayField>
+    <errorMessage>Información no editable</errorMessage>
+</ValidationRule>

@@ -1,0 +1,74 @@
+.texto {
+    text-decoration:solid;
+}
+
+p {
+    display: inline;
+}
+
+.contenedor {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.nombreCampo {
+    text-decoration: underline;
+}
+
+/*.subrayado {
+    display:inline-block;
+    position: relative;
+}
+
+.subrayado::after{
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    height: 1px;
+    left: 0;
+    right: 0;
+    background-color: black;
+}*/
+
+.titulo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.marca {
+    height: 7px;
+    width: 7px;
+    background-color: #c3e3ff;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    align-items: center;
+}
+
+.marca-triangulo::before{
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 3px solid transparent;
+    border-left: 6px solid #02203a;
+    border-bottom: 3px solid transparent;
+    right:100%;
+    display: inline-block;
+    vertical-align: middle;
+    align-items: center;
+
+    
+}
+.marca-triangulo{
+    display: inline-block;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.primeraCol {
+    margin-left: 20px;
+    vertical-align: middle;
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarPasoNegociacion</fullName>
+    <active>true</active>
+    <description>Validar que un caso ha pasado por el estado Negociación</description>
+    <errorConditionFormula>IF(AND($Permission.SAC_Auditor,
+							ISPICKVAL(Status, &apos;Cerrado&apos;), 
+							AND(SAC_NegociacionFinalizada__c == false, SAC_CasoNegociado__c == false),
+				   RecordType.DeveloperName == &apos;SAC_Pretension&apos;, 
+							OR(ISCHANGED(SAC_ResultadoNegociacion__c),ISCHANGED(SAC_DetalleResultadoNegociacion__c))
+					  ),
+			true, 
+			false)</errorConditionFormula>
+    <errorMessage>No se puede modificar ya que el caso no ha pasado por negociación</errorMessage>
+</ValidationRule>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>SAC ConsultaSAC AI</label>
+    <protected>false</protected>
+    <values>
+        <field>CBKL_TriggerEvent__c</field>
+        <value xsi:type="xsd:string">afterInsert</value>
+    </values>
+    <values>
+        <field>CBK_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CBK_Email__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CBK_HandlerClassName__c</field>
+        <value xsi:type="xsd:string">SAC_EmailMessage_AI_TRHan</value>
+    </values>
+    <values>
+        <field>CBK_ObjectAPIName__c</field>
+        <value xsi:type="xsd:string">Case</value>
+    </values>
+    <values>
+        <field>CBK_RecordType__c</field>
+        <value xsi:type="xsd:string">SAC_ConsultaSAC</value>
+    </values>
+    <values>
+        <field>CBK_Type__c</field>
+        <value xsi:type="xsd:string">Salida</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,6 @@
+<aura:component controller="SAC_InteraccionOperativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+    <aura:attribute name="interaccion" type="SAC_Interaccion__c"/>
+    <aura:attribute name="user" type="String"/>
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+</aura:component>

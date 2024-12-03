@@ -1,0 +1,46 @@
+<apex:page renderAs="pdf" applyBodyTag="false" showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" standardController="Case">
+
+	<head>
+		<style type="text/css" media="print">
+			@page {
+				margin-top: 3cm;
+				margin-bottom: 5cm;
+				margin-left: 3cm;
+				margin-right: 2.5cm;
+				line-height: normal;
+
+				@top-center {
+					width: 100%;
+					content: element(header);
+				}
+
+				@bottom-left {
+					width: 100%;
+					content: element(footer);
+				}
+			}
+
+			.pagenumber:before {
+				content: counter(page);
+			}
+
+			.pagecount:before {
+				content: counter(pages);
+			}
+
+			p {
+				margin-bottom: 0;
+				margin-top: 0;
+			}
+		</style>
+	</head>
+
+	<div class="content">
+		<div>
+			<apex:image url="{!$Resource.Logo_Caixa_Mail_ES}"/>
+		</div>
+		<div>
+			<apex:outputText value="{!Case.CC_GenerarDocumentoHtml__c}" escape="false"></apex:outputText>
+		</div>
+	</div>
+</apex:page>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Capacidad_No_Negativa</fullName>
+    <active>true</active>
+    <errorConditionFormula>CC_Capacidad__c&lt;0</errorConditionFormula>
+    <errorDisplayField>CC_Capacidad__c</errorDisplayField>
+    <errorMessage>No se pueden añadir porcentajes negativos.</errorMessage>
+</ValidationRule>

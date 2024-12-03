@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Producto</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Producto&apos;,
+   OR (
+      ISBLANK(OB_Parametrizacion_Padre__c),
+      ISBLANK(OB_Codigo_Externo__c),
+      OB_Fecha_Expiracion__c &lt;=  OB_Fecha_Activacion__c
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

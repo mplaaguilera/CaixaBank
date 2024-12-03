@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ValidarNegocioPromotor</fullName>
+    <active>true</active>
+    <description>Validamos si en el campo Negocio promotor figura &apos;Otros&apos; para tener que rellenar el campo de URL Negocio Promotor</description>
+    <errorConditionFormula>AND(EV_URLNegocioPromotor__c = null, ISPICKVAL(EV_Evento__r.EV_NegocioPromotor__c, &apos;009&apos;))</errorConditionFormula>
+    <errorDisplayField>EV_URLNegocioPromotor__c</errorDisplayField>
+    <errorMessage>Debe rellenar el campo URL Negocio Promotor</errorMessage>
+</ValidationRule>

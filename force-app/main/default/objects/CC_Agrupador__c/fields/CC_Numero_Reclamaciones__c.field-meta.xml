@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Numero_Reclamaciones__c</fullName>
+    <label>Número de reclamaciones</label>
+    <summaryForeignKey>CC_Agrupador_Reclamacion__c.CC_Agrupador_Id__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

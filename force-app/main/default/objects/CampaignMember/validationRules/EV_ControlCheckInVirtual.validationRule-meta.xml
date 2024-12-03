@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ControlCheckInVirtual</fullName>
+    <active>true</active>
+    <description>Se controla el número de veces que el usuario puede acceder a la página de check in de portal.</description>
+    <errorConditionFormula>AND(EV_ContadorCheckInVirtual__c &gt; Campaign.EV_LimiteRegistrosVirtuales__c,OR( Campaign.RecordType.DeveloperName = $Label.EV_EventoVirtual, AND(Campaign.RecordType.DeveloperName = $Label.EV_EventoHibrido, TEXT(EV_FormatoDeAsistencias__c) = &apos;002&apos; )), !$Permission.EV_ByPassVR )</errorConditionFormula>
+    <errorMessage>Se ha sobrepasado el límite de accesos al evento.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ClaseVenta__c</fullName>
+    <description>Clase de venta</description>
+    <label>Operación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>Cancelación</label>
+            </value>
+            <value>
+                <fullName>O</fullName>
+                <default>false</default>
+                <label>Operativa</label>
+            </value>
+            <value>
+                <fullName>V</fullName>
+                <default>false</default>
+                <label>Venta</label>
+            </value>
+            <value>
+                <fullName>AC</fullName>
+                <default>false</default>
+                <label>Anulación cancelación</label>
+            </value>
+            <value>
+                <fullName>AV</fullName>
+                <default>false</default>
+                <label>Anulación venta</label>
+            </value>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>Anulación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

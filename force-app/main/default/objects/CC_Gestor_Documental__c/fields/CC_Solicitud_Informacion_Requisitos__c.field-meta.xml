@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Solicitud_Informacion_Requisitos__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si solicita información sobre los requisitos que debe cumplir</inlineHelpText>
+    <label>Información de requisitos a cumplir</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

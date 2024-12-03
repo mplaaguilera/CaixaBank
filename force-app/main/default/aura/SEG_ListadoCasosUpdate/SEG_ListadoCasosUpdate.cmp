@@ -1,0 +1,56 @@
+<aura:component controller="SEG_ListadoCasosUpdate_Controller" implements="flexipage:availableForAllPageTypes" access="global" >
+    <lightning:workspaceAPI aura:id="workspace"/>
+     
+    
+    <aura:attribute name="User" type="String"/>
+  	<aura:attribute name="caseList" type="List"/>  
+    
+    
+   	<aura:attribute name="columnasAnexos" type="List" />
+    <aura:attribute name="dataAnexos" type="Object" />
+    <aura:attribute name="currentSelectedRowsAnexos" type="List" default="0" />
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.getUser}" />
+    <aura:handler name="init" value="{!this}" action="{!c.setCaseData}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	
+ 
+
+    <div aura:id="backdropDiv" class="slds-modal-backdrop slds-modal-backdrop--closed"></div>
+    <!-- /div -->
+    <p></p>
+    <br></br>
+    <button class="slds-button slds-button--neutral slds-button slds-button_neutral" type="button" onclick="{!c.closeTab}"> 
+        <span>Salir</span>
+    </button>
+    
+    
+    <br></br><br></br>
+    
+    <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="width: 100%; max-width: initial;">             
+        <ul class="slds-listbox slds-listbox_vertical" role="presentation">                     
+            <aura:iteration items="{!v.caseList}" var="gr">               
+                <li role="presentation" class="slds-listbox__item">              
+                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" id="{!gr.value}" name="{!gr.label}">      
+                        <span class="slds-media__figure slds-listbox__option-icon">
+                            <lightning:icon iconName="custom:custom15" size="small"/>        
+                        </span>              
+                        <span class="slds-media__body" onclick="{!c.viewCase}" data-value="{!gr.value}">    
+                            <span class="slds-listbox__option-text_entity">{!gr.label}</span>          
+                        </span>            
+                        <span class="slds-media__body">
+                        	<button class="slds-button slds-button_destructive" type="button" onclick="{!c.dejarDeSeguir}" data-value="{!gr.value}"> 
+      						  <span>Dejar de Seguir</span>
+   							</button>
+                        </span>            
+                    </div>            
+                </li>     
+            </aura:iteration>         
+        </ul>      
+    </div>
+    
+    
+
+
+</aura:component>

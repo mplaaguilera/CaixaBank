@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Parametrizacion_Padre__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Parametrización padre</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 OR (2 AND 3) OR (4 AND 5) OR (6 AND 7)</booleanFilter>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>notEqual</operation>
+            <value>Relación Campaña - Producto, Producto, Plantilla por tipo e idioma</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Relación Campaña - Producto</value>
+        </filterItems>
+        <filterItems>
+            <field>OB_Parametrizacion__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Campaña</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Producto</value>
+        </filterItems>
+        <filterItems>
+            <field>OB_Parametrizacion__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Familia de producto</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Plantilla por tipo e idioma</value>
+        </filterItems>
+        <filterItems>
+            <field>OB_Parametrizacion__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Agrupador de plantillas</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>OB_Parametrizacion__c</referenceTo>
+    <relationshipLabel>Parametrizaciones hijas</relationshipLabel>
+    <relationshipName>OB_Parametrizaciones_Hijas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

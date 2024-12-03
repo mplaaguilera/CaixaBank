@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>CC_ConnId__c</columns>
+    <columns>CC_Servicio_Genesys__c</columns>
+    <columns>CC_Asunto__c</columns>
+    <columns>CC_Cuenta__c</columns>
+    <columns>CC_Contacto__c</columns>
+    <columns>OWNER.ALIAS</columns>
+    <columns>CC_Fecha_Inicio__c</columns>
+    <columns>CC_Fecha_Fin__c</columns>
+    <columns>CC_Tipo_Cierre__c</columns>
+    <columns>CC_Id_Cognitivo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CREATED_DATE</field>
+        <operation>greaterThan</operation>
+        <value>5/1/2024 12:00 AM</value>
+    </filters>
+    <label>Todas las llamadas</label>
+</ListView>

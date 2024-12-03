@@ -1,0 +1,23 @@
+.etapaFinal {
+    margin-right: 10px;
+}
+
+.toggleInternacional {
+    transform: scale(0.94) translateZ(0);
+}
+
+.divSubetapas {
+    transform-origin: left center;
+    transform: scale(0.92) translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+}
+
+.botonActualizar {
+    display: inline-block;
+    transform: scale(0.95) translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}

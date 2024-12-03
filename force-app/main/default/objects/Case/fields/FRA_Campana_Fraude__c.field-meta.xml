@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_Campana_Fraude__c</fullName>
+    <label>Campaña Fraude</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Estafa: Cartas nigerianas</fullName>
+                <default>false</default>
+                <label>Estafa: Cartas nigerianas</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso empleado CaixaBank</fullName>
+                <default>false</default>
+                <label>Estafa: Falso empleado CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso empleado de la Seguridad Social</fullName>
+                <default>false</default>
+                <label>Estafa: Falso empleado de la Seguridad Social</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso operador de telefonía</fullName>
+                <default>false</default>
+                <label>Estafa: Falso operador de telefonía</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso  prestamista</fullName>
+                <default>false</default>
+                <label>Estafa: Falso  prestamista</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso técnico de gas/agua/luz</fullName>
+                <default>false</default>
+                <label>Estafa: Falso técnico de gas/agua/luz</label>
+            </value>
+            <value>
+                <fullName>Estafa: Falso ténico Microsoft</fullName>
+                <default>false</default>
+                <label>Estafa: Falso ténico Microsoft</label>
+            </value>
+            <value>
+                <fullName>Estafa: Fraude al CEO</fullName>
+                <default>false</default>
+                <label>Estafa: Fraude al CEO</label>
+            </value>
+            <value>
+                <fullName>Estafa: Fraude comercial</fullName>
+                <default>false</default>
+                <label>Estafa: Fraude comercial</label>
+            </value>
+            <value>
+                <fullName>Fraude facturas</fullName>
+                <default>false</default>
+                <label>Fraude facturas</label>
+            </value>
+            <value>
+                <fullName>Estafa: Inversiones</fullName>
+                <default>false</default>
+                <label>Estafa: Inversiones</label>
+            </value>
+            <value>
+                <fullName>Estafa: Lotería</fullName>
+                <default>false</default>
+                <label>Estafa: Lotería</label>
+            </value>
+            <value>
+                <fullName>Estafa: NS/NC</fullName>
+                <default>false</default>
+                <label>Estafa: NS/NC</label>
+            </value>
+            <value>
+                <fullName>Estafa: Romance Scam</fullName>
+                <default>false</default>
+                <label>Estafa: Romance Scam</label>
+            </value>
+            <value>
+                <fullName>Estafa: Suplantación Identidad</fullName>
+                <default>false</default>
+                <label>Estafa: Suplantación Identidad</label>
+            </value>
+            <value>
+                <fullName>Malware: Móvil</fullName>
+                <default>false</default>
+                <label>Malware: Móvil</label>
+            </value>
+            <value>
+                <fullName>Malware: Rat Brasil</fullName>
+                <default>false</default>
+                <label>Malware: Rat Brasil</label>
+            </value>
+            <value>
+                <fullName>Otros:Cliente Mula</fullName>
+                <default>false</default>
+                <label>Otros:Cliente Mula</label>
+            </value>
+            <value>
+                <fullName>Otros:NS/NC</fullName>
+                <default>false</default>
+                <label>Otros:NS/NC</label>
+            </value>
+            <value>
+                <fullName>Operación realizada bajo coacción</fullName>
+                <default>false</default>
+                <label>Operación realizada bajo coacción</label>
+            </value>
+            <value>
+                <fullName>Otros:Pérdida elemento posesión</fullName>
+                <default>false</default>
+                <label>Otros:Pérdida elemento posesión</label>
+            </value>
+            <value>
+                <fullName>Otros:Proximidad</fullName>
+                <default>false</default>
+                <label>Otros:Proximidad</label>
+            </value>
+            <value>
+                <fullName>Otros: Robo elemento de posesión</fullName>
+                <default>false</default>
+                <label>Otros: Robo elemento de posesión</label>
+            </value>
+            <value>
+                <fullName>Otros: Skimming</fullName>
+                <default>false</default>
+                <label>Otros: Skimming</label>
+            </value>
+            <value>
+                <fullName>Otros:Suplantación identidad oficina</fullName>
+                <default>false</default>
+                <label>Otros:Suplantación identidad oficina</label>
+            </value>
+            <value>
+                <fullName>Phishing:Caixers x-pay</fullName>
+                <default>false</default>
+                <label>Phishing:Caixers x-pay</label>
+            </value>
+            <value>
+                <fullName>Phising: Campañaenrollment CaixabankSign</fullName>
+                <default>false</default>
+                <label>Phising: Campañaenrollment CaixabankSign</label>
+            </value>
+            <value>
+                <fullName>Phising: Campaña Phishing Bizum</fullName>
+                <default>false</default>
+                <label>Phising: Campaña Phishing Bizum</label>
+            </value>
+            <value>
+                <fullName>Phising: Genérica</fullName>
+                <default>false</default>
+                <label>Phising: Genérica</label>
+            </value>
+            <value>
+                <fullName>Phising: Imagin</fullName>
+                <default>false</default>
+                <label>Phising: Imagin</label>
+            </value>
+            <value>
+                <fullName>Phising: NS/NC</fullName>
+                <default>false</default>
+                <label>Phising: NS/NC</label>
+            </value>
+            <value>
+                <fullName>Phising: SIM SWAP</fullName>
+                <default>false</default>
+                <label>Phising: SIM SWAP</label>
+            </value>
+            <value>
+                <fullName>Phising: Smishing</fullName>
+                <default>false</default>
+                <label>Phising: Smishing</label>
+            </value>
+            <value>
+                <fullName>No aplica</fullName>
+                <default>false</default>
+                <label>No aplica</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

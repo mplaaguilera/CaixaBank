@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Importe_Revisado__c</fullName>
+    <description>Importe revisado por parte de DXC por si el importe resuelto no fuera correcto</description>
+    <inlineHelpText>Si se rellena este importe, este importe tendrá prioridad ante el importe resuelto en el cálculo del importe a abonar</inlineHelpText>
+    <label>Importe Revisado</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_EstadoCaso__c</fullName>
+    <label>Estado del Caso</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>New</fullName>
+                <default>false</default>
+                <label>New</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Activo</fullName>
+                <default>false</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Pendiente Colaborador</fullName>
+                <default>false</default>
+                <label>Pendiente Colaborador</label>
+            </value>
+            <value>
+                <fullName>Pendiente Cliente</fullName>
+                <default>false</default>
+                <label>Pendiente Cliente</label>
+            </value>
+            <value>
+                <fullName>Pendiente Incidencia</fullName>
+                <default>false</default>
+                <label>Pendiente Incidencia</label>
+            </value>
+            <value>
+                <fullName>Pendiente Interno</fullName>
+                <default>false</default>
+                <label>Pendiente Interno</label>
+            </value>
+            <value>
+                <fullName>Pendiente Revisión</fullName>
+                <default>false</default>
+                <label>Pendiente Revisión</label>
+            </value>
+            <value>
+                <fullName>Pendiente Alerta</fullName>
+                <default>false</default>
+                <label>Pendiente Alerta</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

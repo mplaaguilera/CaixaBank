@@ -1,0 +1,19 @@
+<aura:component controller="SAC_LCMP_EmailRedaccion" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="correoCaso" type="String"/>
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="checkActivado" type="Boolean" />
+    <aura:attribute name="procedencia" type="String" />
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" default="[]"/>
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <aura:handler event="c:SAC_PertimiteEmailRedaccion" action="{!c.handleApplicationEvent}"/>
+    <aura:if isTrue="{!v.checkActivado}">
+        <c:SAC_GestionEmails ficherosAdjuntos="{!v.ficherosAdjuntos}" para="{!v.para}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" caso="{!v.caso}" procedencia="{!v.procedencia}"/>        
+    </aura:if>
+
+</aura:component>

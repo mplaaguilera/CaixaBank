@@ -1,0 +1,81 @@
+.THIS.divClasificacionActual {
+	padding-top: 6px;
+	padding-bottom: 7px;
+	padding-left: 0.2rem;
+	background-color: #fafbff;
+	border-radius: 5px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #d2d5d5;
+	cursor: pointer;
+}
+
+.THIS .hrStyle {
+	margin: 3px;
+}
+
+.THIS .highlight {
+	/*height: 40px;*/
+	background-color: #F5F5FF;
+}
+
+.THIS .highlightDark {
+	/*height: 40px;*/
+	background-color:#e6e6F1;
+}
+
+.THIS .slds-listbox__option {
+	/*height: 40px;*/
+	line-height:24px;
+}
+
+.THIS .slds-media__figure {
+	margin-top: 4px !important;
+	line-height: 0px;
+}
+
+.THIS .slds-media__body {
+	padding-top: 4px;
+	line-height: 24px;
+}
+
+.THIS .cc_flecha {
+	padding-left: 6px;
+	padding-right: 7px;
+	font-size: 18px;
+	position: relative;
+	top: 2px;
+	font-weight: 300;
+}
+
+.THIS .cc-azul-mcc {
+	background-color: #6b92dc !important;
+}
+
+.THIS .cc-fade-out {
+	animation-name: cc_fade_out;
+	animation-duration: 0.3s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes cc_fade_out {
+	from {opacity: 1;}
+	to {opacity: 0;}
+
+	from {z-index: 9999;}
+	to {z-index: 9999;}
+}
+
+.THIS .cc-fade-in {
+	animation-name: cc_fade_in;
+	animation-duration: 0.3s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes cc_fade_in {
+	from {opacity: 0;}
+	to {opacity: 1;}
+
+	from {z-index: 9999;}
+	to {z-index: 9999;}
+}

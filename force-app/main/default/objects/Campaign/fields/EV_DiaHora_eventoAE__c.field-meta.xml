@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_DiaHora_eventoAE__c</fullName>
+    <description>Dia hora del evento 30 minutos antes</description>
+    <formula>EV_DiaHora_evento__c-( 30/1440)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Dia hora del evento 30 minutos antes</inlineHelpText>
+    <label>EV DiaHora eventoAE</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

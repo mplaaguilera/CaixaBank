@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Encuesta__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Servicio Genesys de encuesta al que se ha enviado al finalizar la llamada</description>
+    <label>Encuesta</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Servicio_Genesys__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Encuesta</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Servicio_Genesys__c</referenceTo>
+    <relationshipLabel>Llamadas (Encuesta)</relationshipLabel>
+    <relationshipName>Llamadas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,23 @@
+<aura:component>
+	<aura:attribute name="object" type="Object"/>
+    <aura:attribute name="alternateFieldList" type="String[]"/>
+    <aura:attribute name="alternateFieldValueList" type="String[]"/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+
+        <aura:iteration items="{!v.alternateFieldValueList}" var="field" indexVar="ind">
+            <!--Temática-->
+            <aura:if isTrue="{!ind == 0 &amp;&amp; field != null &amp;&amp; field != undefined}">
+                <c:CC_MCC_Buscador_Badge_Backup text="{!field}" enteredValue="{!v.enteredValue}"/>
+            </aura:if>
+
+            <!--Producto/Servicio o Motivo (precedidos por flecha)-->
+            <aura:if isTrue="{!ind > 0 &amp;&amp; field != null &amp;&amp; field != undefined}">
+                &nbsp;&#8594;&nbsp;<c:CC_MCC_Buscador_Badge_Backup text="{!field}" enteredValue="{!v.enteredValue}"/>
+            </aura:if>
+        </aura:iteration>
+	</span>
+</aura:component>

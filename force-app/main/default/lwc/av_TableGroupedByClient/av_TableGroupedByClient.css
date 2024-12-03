@@ -1,0 +1,93 @@
+h1 {
+    color: rgb(0, 112, 210);
+}
+
+p {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    color: rgb(62, 62, 60);
+}
+
+.app {
+    background-color: #fafaf9;
+    height: 100vh;
+    overflow: scroll;
+}
+
+.bgcWhite{
+    background-color: #fafaf9;
+}
+.bgColor {
+    background-color: rgb(243, 243, 243);
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.row-height {
+    height: 2.5em;
+}
+
+td {
+    height: 2.5em;
+}
+
+th {
+    height: 2.5em;
+    border-right: 1px solid rgb(229, 229, 229);
+}
+
+
+.filters_row_1 lightning-input:first-of-type {
+    padding-left: 5em;
+}
+
+.filters_row_1 lightning-combobox:first-of-type {
+    padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_1 lightning-combobox:nth-of-type(2) {
+    padding: 0 2.5em 0 1.25em;
+}
+
+.filters_row_1 lightning-combobox:last-of-type {
+    padding-right: 5em;
+}
+
+.divPadding {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
+
+.buttonAlign {
+    text-align: right;
+    padding-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.buttonStyle {
+    margin-top: 0.5rem;
+    margin-right: 1rem;
+    flex-grow: 1;
+}
+
+.size-icon {
+    zoom: 50%;
+    margin-right: 0.5em;
+}
+
+.align-icon {
+    display: flex;
+    align-items: center;
+}
+
+/* table tr:nth-child(odd) td{
+    background-color: #f3f3f3;
+}
+table tr:nth-child(even) td{
+    background-color: white;
+} */

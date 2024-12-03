@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_AccionistaEventoHibrido</fullName>
+    <active>true</active>
+    <description>Error: El tipo Evento Hibrido tiene que tener informado los campos: Numero de plazas Virtuales, limite de registros virtuales, URL del Evento Virtual, URL chat virtual, Aforo espacio físico y Lugar de Celebración</description>
+    <errorConditionFormula>AND(RecordType.DeveloperName=&apos;EV_Eventos_Accionistas&apos;, ISPICKVAL(EV_TipoEvento__c, &quot;003&quot;),  ISPICKVAL(Status, &quot;009&quot;), OR(EV_NumeroDePlazas__c&lt;0,EV_LimiteRegistrosVirtuales__c&lt;0,EV_URLChatVirtual__c=null, EV_URLDelEventoVirtual__c=null, EV_Aforo_espacio_fisico__c&lt;0,EV_LugarDeCelebracion__c=null))</errorConditionFormula>
+    <errorMessage>Error: El tipo Evento Hibrido tiene que tener informado los campos: Numero de plazas Virtuales, limite de registros virtuales, URL del Evento Virtual, URL chat virtual, Aforo espacio físico y Lugar de Celebración</errorMessage>
+</ValidationRule>

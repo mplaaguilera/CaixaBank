@@ -1,0 +1,92 @@
+<template>
+    <template if:true={esCOPSAJ}>
+        <div class="slds-clearfix">
+            <div class="">
+                <button class="slds-button slds-button_brand slds-button_stretch" style="height:60px;font-size:medium" onclick={comprobarEstadoCaso}>Forzar cierre reclamacion</button>
+            </div>
+        </div>
+    </template> 
+
+    
+
+    <!-- Modal Crear Acción -->
+    <template if:true={modalForzarResolucion}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!-- Botón cerrar superior y cabecera -->
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalForzarCierre}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Forzar cierre reclamación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_large">
+                    <div if:false={tieneAsociados}> <!-- style="text-align:center;" -->
+                        <strong>¡Atención!</strong> Va a cerrar la reclamación. ¿Está usted seguro?
+                    </div>
+                    <div if:true={tieneAsociados}> <!-- style="text-align:center;" -->
+                        <strong>¡Atención!</strong> La reclamación que va a cerrar tiene los siguientes asuntos pendientes: 
+                        <br><br>
+                        <div if:true={escaladosAsociados}>
+                            - Escalados pendientes.
+                            <br>
+                        </div>
+                        <div if:true={consultasAsociadas}>
+                            - Consultas pendientes.
+                            <br>
+                        </div>
+                        <div if:true={tareaAsociadas}>
+                            - Tareas pendientes.
+                            <br>
+                        </div>
+                        <br>
+                        Por favor, revise los asuntos pendientes detallados. Si continúa el progreso pasarán a estado "Finalizado". ¿Está usted seguro de cerrar la reclamación?  
+                    </div>
+                    
+                    <br>  </br>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <lightning-textarea label='* Indique el motivo de cierre' placeholder='Motivo de cierre...' value={motivoCierre} onchange={handleChange}></lightning-textarea>
+                        </div>
+                        <div if:true={requerido} style="color:red">
+                            Por favor, debe introducir un motivo.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones cancelar y siguiente -->
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancelar" onclick={cerrarModalForzarCierre} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Confirmar" onclick={confirmarForzarCierre} class="slds-m-left_x-small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+     <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Cerrando la reclamación... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+
+</template>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Colas_Segundo_nivel__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Colas Segundo nivel</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Cola Soporte Activo</fullName>
+                <default>true</default>
+                <label>Cola Soporte Activo</label>
+            </value>
+            <value>
+                <fullName>Cola Soporte Tarjetas</fullName>
+                <default>false</default>
+                <label>Cola Soporte Tarjetas</label>
+            </value>
+            <value>
+                <fullName>Cola Analista Servicios Generales</fullName>
+                <default>false</default>
+                <label>Cola Analista Servicios Generales</label>
+            </value>
+            <value>
+                <fullName>Cola Analista Pasivo y Valores</fullName>
+                <default>false</default>
+                <label>Cola Analista Pasivo y Valores</label>
+            </value>
+            <value>
+                <fullName>Cola Analista Recaudación</fullName>
+                <default>false</default>
+                <label>Cola Analista Recaudación</label>
+            </value>
+            <value>
+                <fullName>Cola Soporte Marketing</fullName>
+                <default>false</default>
+                <label>Cola Soporte Marketing</label>
+            </value>
+            <value>
+                <fullName>Cola Soporte Alfabético</fullName>
+                <default>false</default>
+                <label>Cola Soporte Alfabético</label>
+            </value>
+            <value>
+                <fullName>Cola 2N Domiciliaciones</fullName>
+                <default>false</default>
+                <label>Cola 2N Domiciliaciones</label>
+            </value>
+            <value>
+                <fullName>Cola Soporte CBNOW</fullName>
+                <default>false</default>
+                <label>Cola Soporte CBNOW</label>
+            </value>
+            <value>
+                <fullName>Cola Soporte Extranjero</fullName>
+                <default>false</default>
+                <label>Cola Soporte Extranjero</label>
+            </value>
+            <value>
+                <fullName>Cola Analista Building</fullName>
+                <default>false</default>
+                <label>Cola Analista Building</label>
+            </value>
+            <value>
+                <fullName>Cola 2N RRHH</fullName>
+                <default>false</default>
+                <label>Cola 2N RRHH</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

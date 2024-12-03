@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" 
+                controller="EV_ConfirmarAsistencia_Controller">
+    <aura:attribute name="botonVisible" type="Boolean" default="false"/>
+    <aura:handler name="init" action="{!c.iniciar}" value="{!this}" />
+    
+    <div class="slds-float_right">
+        <lightning:button class="slds-button slds-button_brand" disabled="{!not(v.botonVisible)}" label="Confirmar Asistencia" onclick="{!c.handleConfirmarAsistencia}"/>
+    </div>
+</aura:component>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_AuditoriasProgramadas</fullName>
+    <columns>NAME</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_NombreAuditoria__c</columns>
+    <columns>SAC_SLACalidad__c</columns>
+    <columns>SAC_FechaCierre__c</columns>
+    <columns>SAC_Activo__c</columns>
+    <columns>SAC_FechaInicio__c</columns>
+    <columns>SAC_FechaFin__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SEG_Auditoria__c.SAC_AuditoriaAutomatica</value>
+    </filters>
+    <label>SAC- Todas las auditorías programadas</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

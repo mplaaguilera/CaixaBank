@@ -1,0 +1,11 @@
+<aura:component implements="flexipage:availableForAllPageTypes" extensible="true">
+
+    <aura:attribute name="chatCerrado" type="Boolean" default="false"/>
+
+    <aura:if isTrue="{!v.chatCerrado}">
+        <div class="slds-box">
+            <lightning:icon iconName="utility:clock" size= "small" class="slds-var-m-right_small"/>
+            <span>Chat cerrado por inactividad del cliente.</span>
+        </div>
+    </aura:if>
+</aura:component>

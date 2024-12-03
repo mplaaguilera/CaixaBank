@@ -1,0 +1,45 @@
+<apex:page standardController="Case" recordSetVar="accs" extensions="SAC_RechazarReclamacionMasiva_Controller">
+    <apex:includeLightning />
+    <apex:slds />
+    <div id="example-container"  class="slds-scope">
+      <apex:form >
+        <div id="spinner" class="slds-spinner_container slds-is-relative" style="z-index:1000;position:fixed;">
+          <div role="status" class="slds-spinner slds-spinner--large slds-spinner--brand">
+              <div class="slds-spinner__dot-a"></div>
+              <div class="slds-spinner__dot-b"></div>
+          </div>
+      </div>
+      </apex:form>
+      <div id="lwc-container"></div>
+    </div>
+    <script>
+      var getIDs= '{!updateIds}';
+
+      // Para que se muestren los toast del componente sac_RechazarReclamacionMasiva
+      document.addEventListener('lightning__showtoast', event => {
+        sforce.one.showToast(event.toastAttributes);
+      });
+      
+      if (!getIDs){
+        sforce.one.showToast({
+          "title":"Aviso",
+          "message":"Seleccione las reclamaciones, por favor",
+          "type":"warning"
+        })
+       window.history.back();
+      }else{
+        if (getIDs.split(',').length > 0){
+          setTimeout(function(){ document.getElementById('spinner').className += ' slds-hide' }, 6000);
+          $Lightning.use("c:SAC_RechazarReclamacionMasivaApp", function() {
+            $Lightning.createComponent("c:sac_RechazarReclamacionMasiva",
+              { casos : getIDs },
+              "lwc-container",
+              function(cmp) {
+                
+              }
+            );
+          });
+        }
+      }
+    </script>
+</apex:page>

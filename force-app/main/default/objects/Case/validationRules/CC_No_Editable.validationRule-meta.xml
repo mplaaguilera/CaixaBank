@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_No_Editable</fullName>
+    <active>false</active>
+    <errorConditionFormula>IF(OR(OwnerId != $User.Id, ISPICKVAL(PRIORVALUE(Status), &apos;Cerrado&apos;)), TRUE, FALSE)</errorConditionFormula>
+    <errorMessage>Solo el propietario de un caso no cerrado puede editarlo.</errorMessage>
+</ValidationRule>

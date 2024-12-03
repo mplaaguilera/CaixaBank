@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AV_Comercial_Name</label>
+    <protected>false</protected>
+    <values>
+        <field>CIBE_Link_Reference__c</field>
+        <value xsi:type="xsd:string">AV_Comercial_Name</value>
+    </values>
+    <values>
+        <field>CIBE_Section_Reference__c</field>
+        <value xsi:type="xsd:string">AV_Account_Buttons</value>
+    </values>
+</CustomMetadata>

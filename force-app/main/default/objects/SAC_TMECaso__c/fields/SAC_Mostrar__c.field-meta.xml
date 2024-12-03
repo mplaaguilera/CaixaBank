@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Mostrar__c</fullName>
+    <formula>IF(Name = &apos;TMO PreAlta&apos;, false, 
+                                    NOT(
+			    	                                AND(
+				    	                               INCLUDES(SAC_Parametrizacion__r.SAC_Estados__c, &apos;SAC_008&apos;), 
+				    	                               ISPICKVAL(SAC_Caso__r.Status,&apos;SAC_008&apos;) 
+				    	                                     )
+																																								)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Mostrar</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

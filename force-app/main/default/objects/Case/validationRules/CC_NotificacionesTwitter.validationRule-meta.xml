@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NotificacionesTwitter</fullName>
+    <active>true</active>
+    <description>Validación del canal de notificación Twitter.</description>
+    <errorConditionFormula>AND(TEXT(Origin) &lt;&gt; &apos;Twitter&apos;, TEXT(CC_CanalNotifCli__c) = &apos;Twitter&apos;, OR(TEXT(CC_AcuseRecibo__c) = &apos;1&apos;, TEXT(CC_SegOperativa__c) = &apos;1&apos;, TEXT(CC_NotIncidencia__c) = &apos;1&apos;))</errorConditionFormula>
+    <errorMessage>No se puede seleccionar un canal de notificación vía Twitter para casos que no provienen de Twitter.</errorMessage>
+</ValidationRule>

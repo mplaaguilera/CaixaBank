@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Detalle__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Detalle</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Se debe añadir un Detalle del Tipo Segmentos.</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Detalle</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Tipo_Cliente__c</field>
+            <operation>equals</operation>
+            <value>Segmentos, Segmentos FFEE, Segmentos CSE, Segmentos BC CE INST</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.SEG_Motivo__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Motivo__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Clasificación Rápida (Detalle)</relationshipLabel>
+    <relationshipName>SEG_ClasificacionRapida_Detalle</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

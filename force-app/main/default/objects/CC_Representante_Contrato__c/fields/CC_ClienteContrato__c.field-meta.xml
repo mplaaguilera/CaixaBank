@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ClienteContrato__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Cliente asociado al contrato.</description>
+    <label>Cliente</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Contrato</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Contratos</relationshipLabel>
+    <relationshipName>CC_Contratos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

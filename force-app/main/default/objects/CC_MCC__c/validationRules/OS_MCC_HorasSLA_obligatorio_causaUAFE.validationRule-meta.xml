@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_MCC_HorasSLA_obligatorio_causaUAFE</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(RecordType.DeveloperName = &apos;CC_Causa&apos;,
+    OR(OS_Departamento_tematica__c=&apos;EFECTIVO&apos;, OS_Departamento_tematica__c=&apos;HOLABANK&apos;),
+OR(TEXT(CC_Tipo_Cliente__c)=&apos;Cliente (COPS)&apos;,
+TEXT(CC_Tipo_Cliente__c)=&apos;Empleado (COPS)&apos;,
+TEXT(CC_Tipo_Cliente__c)=&apos;Cliente (COPS)/Empleado (COPS)&apos;
+     ),
+ISBLANK(TEXT((OS_Horas_SLA__c)))
+)</errorConditionFormula>
+    <errorMessage>Es obligatorio informar el Horas SLA en el alta de una causa COPS (EFECTIVO Y HOLABANK).</errorMessage>
+</ValidationRule>

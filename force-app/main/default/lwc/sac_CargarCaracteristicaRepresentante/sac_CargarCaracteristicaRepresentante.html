@@ -1,0 +1,105 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <lightning-card title={tituloTabla} icon-name="standard:shipment">
+            <div slot="actions">
+                <div class="slds-float_right">
+                    
+                    <lightning-button
+                        icon-name="utility:refresh"
+                        title="Refrescar"
+                        class="btnRefrescar"
+                        onclick={handleRefreshClick}>
+                    </lightning-button>
+
+                    <lightning-button 
+                        label="Nuevo"
+                        title="Nuevo" 
+                        onclick={handleNuevaAsignacion}> 
+                    </lightning-button>
+                </div>
+            </div>
+            <div>
+                <lightning-datatable
+                        key-field="Id"
+                        show-row-number-column
+                        data={asignaciones}
+                        columns={columns}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortData}
+                        onrowaction={handleRowAction}>
+                </lightning-datatable>
+            </div>
+        </lightning-card>
+        <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+    </div>
+
+    <template if:true={modalEditar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={cerrarModalEditar}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Editar asignación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-input label="Identificador a editar:" placeholder="Introduce un identificador" onchange={changeIdentificador} value={valorAsignacion}></lightning-input>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={cerrarModalEditar} class="slds-var-p-right_small"></lightning-button>
+                    <lightning-button variant="brand" label="Guardar" title="Guardar" onclick={handleEditarIdentificador}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={modalNuevaAsignacion}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={cerrarModalNuevaAsignacion}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Nueva asignación</h2>
+                </header>
+                <template if:true={primerPasoCreacion}>
+                    <div class="slds-modal__content slds-p-around_medium centrar-elementos" id="modal-content-id-9">
+                        <p>Seleccione el tipo de valor que desea añadir:</p><br/>
+                        <div class="contenedor-botones">
+                            <button data-id="cif" class="slds-button slds-button_brand" onclick={onclickCif}>CIF</button> 
+                            <button data-id="despacho" class="slds-button slds-button_brand" onclick={onclickDespacho}>Despacho representante</button> 
+                        </div>
+                    </div>
+                </template>
+                <template if:true={mostrarCif}>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-10">
+                        <lightning-input label="Introduzca el CIF deseado." placeholder="Introduce un CIF..." onchange={changeCif} value={valorAsignacion}></lightning-input>
+                    </div>
+                </template>
+                <template if:true={mostrarDespacho}>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-11">
+                        <lightning-combobox name="despachorepresentantes" label="Seleccione el despacho deseado." placeholder=" - Select -"  onchange={handleChangeDespacho} options={picklistDespachoValues}></lightning-combobox>
+                    </div>
+                </template>
+                
+                <footer class="slds-modal__footer">
+                    <template if:true={primerPasoCreacion}>
+                        <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={cerrarModalNuevaAsignacion} class="slds-var-p-right_small"></lightning-button>
+                    </template>
+                    <template if:false={primerPasoCreacion}>
+                        <lightning-button variant="neutral" label="Volver" title="Volver" onclick={volverPasoUno} class="slds-var-p-right_small"></lightning-button>
+                        <lightning-button variant="brand" label="Guardar" title="Guardar" onclick={handleCrearAsignacion}></lightning-button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

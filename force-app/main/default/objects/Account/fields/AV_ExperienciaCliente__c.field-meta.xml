@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ExperienciaCliente__c</fullName>
+    <description>Carita que representa la satisfacción del cliente</description>
+    <externalId>false</externalId>
+    <formula>CASE(AV_Satisfaccion__c, 
+     &quot;1&quot;, IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconContento__c,    $Setup.AV_IconsFSC__c.AV_LabelContento__c,    25, 25), 
+     &quot;2&quot;, IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconNeutral__c,     $Setup.AV_IconsFSC__c.AV_LabelNeutral__c,     25, 25),
+     &quot;3&quot;, IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconDescontento__c, $Setup.AV_IconsFSC__c.AV_LabelDescontento__c, 25, 25),
+     IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconNoEncuesta__c, $Setup.AV_IconsFSC__c.AV_LabelNoEncuesta__c, 25, 25)						
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Experiencia Cliente</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,335 @@
+<template>
+    <lightning-card>
+        <div if:false={viewNoDataFound}>
+            <b class="slds-text-heading_small">Perfil del cliente <span class="slds-badge">{tipoCliente}</span></b><br><br>
+            <b class="slds-text-heading_small textColor">Relación digital</b><br><br>
+            <div class='marginData'>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconNowApp} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Now/Imagin APP <span class="textColor">{usaIosAndroid}</span></b><br>
+                                <p if:true={viewAcciones}>{acciones}</p>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Prefiere:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{prefiere}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último acceso:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{nowLastVisit}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosNowApp} class="slds-size_1-of-2 rigthData">
+                                        <p>{imaginNowNumberDays} días</p>
+                                    </div>
+                                    <div if:false={accesosNowApp} class="slds-size_1-of-2 rigthData">
+                                        <p>{imaginNowNumberDays} día</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconNowWeb} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Now WEB</b><br>  
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último acceso:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{webLastVisit}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" >
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosWeb} class="slds-size_1-of-2 rigthData">
+                                        <p>{webNumberDays} días</p>
+                                    </div>
+                                    <div if:false={accesosWeb} class="slds-size_1-of-2 rigthData">
+                                        <p>{webNumberDays} día</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconR2B} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Ready2Buy</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último acceso:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>-</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 12 meses:</p>
+                                    </div>
+                                    <div if:true={accesosR2B} class="slds-size_1-of-2 rigthData">
+                                        <p>{signedR2B} firmas</p>
+                                    </div>
+                                    <div if:false={accesosR2B} class="slds-size_1-of-2 rigthData">
+                                        <p>{signedR2B} firma</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconSign} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">App Sign</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Última firma:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>-</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 12 meses:</p>
+                                    </div>
+                                    <div if:true={accesosSignApp} class="slds-size_1-of-2 rigthData">
+                                        <p>{signLogins} firmas</p>
+                                    </div>
+                                    <div if:false={accesosSignApp} class="slds-size_1-of-2 rigthData">
+                                        <p>{signLogins} firma</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconPay} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">App Pay</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último acceso:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>-</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosPay} class="slds-size_1-of-2 rigthData">
+                                        <p>{cxbPayLogins} accesos</p>
+                                    </div>
+                                    <div if:false={accesosPay} class="slds-size_1-of-2 rigthData">
+                                        <p>{cxbPayLogins} acceso</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                     
+                    </div>
+                </div>
+            </div>
+            <br>
+            <b class="slds-text-heading_small textColor">Relación física</b><br><br>
+            <div class='marginData'>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconVisitasOficina} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Visitas oficina</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Última visita:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{lastOfficeVisit}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosVisitaOficina} class="slds-size_1-of-2 rigthData">
+                                        <p>{officeAccessNumberDays} visitas</p>
+                                    </div>
+                                    <div if:false={accesosVisitaOficina} class="slds-size_1-of-2 rigthData">
+                                        <p>{officeAccessNumberDays} visita</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconCita} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Cita previa origen cliente</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Última cita:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{lastAppointment}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 12 meses:</p>
+                                    </div>
+                                    <div if:true={accesosCitas} class="slds-size_1-of-2 rigthData">
+                                        <p>{appointmentNumberDays} días</p>
+                                    </div>
+                                    <div if:false={accesosCitas} class="slds-size_1-of-2 rigthData">
+                                        <p>{appointmentNumberDays} día</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconCajero} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Cajero</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último acceso:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{atmLastVisit}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosCajero} class="slds-size_1-of-2 rigthData">
+                                        <p>{atmNumberDays} días</p>
+                                    </div>
+                                    <div if:false={accesosCajero} class="slds-size_1-of-2 rigthData">
+                                        <p>{atmNumberDays} día</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconMuro} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Muro</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Último mensaje:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>-</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 6 meses:</p>
+                                    </div>
+                                    <div if:true={accesosMuro} class="slds-size_1-of-2 rigthData">
+                                        <p>{wallMessagesFromClient} mensajes</p>
+                                    </div>
+                                    <div if:false={accesosMuro} class="slds-size_1-of-2 rigthData">
+                                        <p>{wallMessagesFromClient} mensaje</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-8"></div>
+                    <div class="slds-col slds-size_2-of-8">
+                        <div class="slds-grid">
+                            <div class="slds-size_1-of-12">
+                                <img src={iconVideollamada} alt="iconVideollamada" class="customIcon">
+                            </div>
+                            <div class="slds-size_11-of-12">
+                                <b class="slds-text-heading_small">Videollamada</b><br>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Última llamada:</p>
+                                    </div>
+                                    <div class="slds-size_1-of-2 rigthData">
+                                        <p>{lastVideoConference}</p>
+                                    </div>
+                                </div>
+                                <div class="slds-grid">
+                                    <div class="slds-size_1-of-2">
+                                        <p class="slds-text-title">Últimos 12 meses:</p>
+                                    </div>
+                                    <div if:true={accesosVideollamada} class="slds-size_1-of-2 rigthData">
+                                        <p>{videoConferenceNumberDays} videollamadas</p>
+                                    </div>
+                                    <div if:false={accesosVideollamada} class="slds-size_1-of-2 rigthData">
+                                        <p>{videoConferenceNumberDays} videollamada</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div if:true={viewSpinner}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </div>
+        <div if:true={viewNoDataFound}>
+            {noDataFound}
+        </div>
+    </lightning-card>
+</template>

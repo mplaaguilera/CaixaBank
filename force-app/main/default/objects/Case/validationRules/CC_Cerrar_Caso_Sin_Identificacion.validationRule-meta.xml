@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cerrar_Caso_Sin_Identificacion</fullName>
+    <active>true</active>
+    <description>Comprueba que se han informado todos los campos requeridos a nivel de cierre de caso.</description>
+    <errorConditionFormula>AND(
+				ISCHANGED(Status),				
+				ISPICKVAL(Status,&quot;Cerrado&quot;),
+				CC_No_Identificado__c = false,
+				OR(ISBLANK(AccountId),
+				ISBLANK(ContactId)),
+				NOT(ISPICKVAL(Origin,&apos;Twitter&apos;)),
+				NOT(ISPICKVAL(Origin,&apos;Comentarios Stores&apos;)),
+NOT(ISPICKVAL(Canal_del_Empleado__c, &quot;Hidden&quot;)),
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SAC_Pretension&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SEG_Cliente&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SEG_Seguimiento&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;AM_Parent_Case&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Reclamacion&quot;,
+RecordType.DeveloperName &lt;&gt; &quot;SPV_Pretension&quot;
+)</errorConditionFormula>
+    <errorMessage>No se permite cerrar el caso si no tiene la cuenta y el contacto informado o por el contrario el cliente no se ha identificado.</errorMessage>
+</ValidationRule>

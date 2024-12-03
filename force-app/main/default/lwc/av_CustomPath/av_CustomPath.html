@@ -1,0 +1,34 @@
+<template>
+    <div class="slds-hide">
+        {currentStage} 
+    </div>
+    <div> <!--  class="main-div" -->
+        <div class="slds-card" style="z-index: 1;">
+            <div class="slds-card__body slds-card__body_inner">
+                <div class="slds-path">
+                    <div class="slds-grid slds-path__track">
+                        <div class="slds-grid slds-path__scroller-container">
+                            <div class="slds-path__scroller" role="application">
+                                <div class="slds-path__scroller_inner">
+                                    <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                                        <template for:each={allStages} for:item="stage">
+                                            <li class="slds-path__item slds-is-incomplete" role="presentation" key={stage.value} data-identifier="pathstage" data-key={stage.value}>
+                                                <a aria-selected="false" class="slds-path__link lower-text" role="option" tabindex="-1" name={stage.value} onclick={changeStage}>
+                                                    <!--<span class="slds-path__stage">    
+                                                        <lightning-icon icon-name="utility:check" size="x-small"></lightning-icon>
+                                                        <span class="slds-assistive-text">Stage Complete</span>
+                                                    </span>-->
+                                                    <span class="slds-path__title">{stage.label}</span>
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

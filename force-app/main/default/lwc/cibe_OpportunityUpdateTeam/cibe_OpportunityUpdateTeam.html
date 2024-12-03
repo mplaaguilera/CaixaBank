@@ -1,0 +1,269 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <div class="slds-card__header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">   
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:team_member" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{labels.teamOppo} ({teamOpp.length})</span>
+                    </h2>
+                    
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__controls">
+                      <div class="slds-page-header__control" if:true={isShowAddMemberButton}>
+                        <ul class="slds-button-group-list">
+                          <li>
+                            <button class="slds-button slds-button_neutral" onclick={openModal} disabled={isDisabled}>{labels.anadirParticipante}</button>
+                          </li>
+                          <li>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div style="max-height: 300px;">
+                <lightning-datatable
+                        key-field="id"
+                        hide-checkbox-column=”true”
+                        data={teamOpp}
+                        columns={columns}
+                        sorted-by={sortBy}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortData}
+                        default-sort-direction={defaultSort}
+                        onrowaction={handleRowAction}
+                        resize-column-disabled
+                        >
+                </lightning-datatable>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ADD MODAL -->
+    <template  if:true={isModalOpen} >
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container ">
+                
+                <template if:true={isShowSpinner}> 
+                    <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+                </template>
+
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideAddMember}></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{labels.addOppTM}</h1>
+                </div>
+
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form slds-m-around_medium">
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small">
+                            <div class="slds-form-element__control">
+                                <c-av_-lookup class="lookup-cmp"
+                                    data-id="clookup1"
+                                    fieldlabel={labels.otrosGestores}
+                                    selection={initialSelection}
+                                    errors={errors}
+                                    onsearch={handleSearch}
+                                    onclick={handleSearchClick}
+                                    onselectionchange={handleSelectionChange}
+                                    required={required}
+                                    placeholder={labels.buscaParticipantes}>
+                                </c-av_-lookup>
+                              </div>
+                        </div>
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small">
+                                <lightning-dual-listbox
+                                    data-id={selected}
+                                    label={labels.clientTeam}
+                                    source-label={labels.availableOptions}
+                                    selected-label={labels.selecedOptions}
+                                    options={teamAccount}
+                                    value={selected}
+                                    onchange={handleChange}
+                                    size="5">
+                                </lightning-dual-listbox>
+                        </div>
+
+                        <div class="slds-card__body slds-card__body_inner ">
+                            <template for:each={data} for:item="member" >
+                                <div key={member.id} class="slds-form-element__control slds-form-element_stacked slds-m-around_small">
+                                    <div class="slds-box slds-box_x-small slds-m-around_xxx-small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.participante}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{member.nombre}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.centro}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{member.centro}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-6">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.funcion}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{member.funcion}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.oppAccess}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-combobox
+                                                            value={member.permiso}
+                                                            data-id={member.id}
+                                                            onchange={handlePermiso}
+                                                            options={options} 
+                                                            variant='label-hidden'
+                                                            dropdown-alignment="auto"
+                                                            data-field="acces">
+                                                        </lightning-combobox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds_col slds-size_1-of-10 slds-p-top_large">
+                                                <lightning-button-icon icon-name="utility:delete" size="24px" title="Delete" class="slds-button_icon-large" aria-hidden="true" variant="container" alternative-text="Delete"
+                                                    onclick={removeMember}
+                                                    data-id={member.id}>
+                                                </lightning-button-icon>
+                                            </div>  
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={closeModal}>Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetails}>Ok</button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <!-- DELETE MODAL -->
+    <template if:true={isShowDeleteMember}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+
+                <template if:true={isShowSpinner}> 
+                    <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+                </template>
+
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideDeleteMember}></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{labels.eliminarParticipante}</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                    <div class="slds-form slds-m-around_medium">
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small slds-text-align_center">
+                            {labels.validacionBorrado}
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={hideDeleteMember}>{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={handleDeleteMember}>{labels.eliminar}</button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <!-- EDIT MODAL -->
+    <template if:true={isShowEditMember}>
+
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-02" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideEditMember}></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">{labels.editarParticipante}</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <div class="slds-form slds-m-around_medium">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <template for:each={_editedRecord} for:item="member" >
+                                <div key={member.Id} class="slds-form-element__control">
+                                    <div class="slds-box slds-box_x-small slds-m-around_xxx-small">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.participante}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{participanteEdit}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.centro}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{centronEdit}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-6">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.funcion}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <span>{funcionEdit}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                
+                                            <div class="slds_col slds-size_1-of-4">
+                                                <div class="slds-form-element slds-p-around_xx-small">
+                                                    <label class="slds-form-element__label">{labels.oppAccess}</label>
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-combobox
+                                                            value={accesoEdit}
+                                                            data-id={member.id}
+                                                            onchange={handleEditAccesChange}
+                                                            options={options} 
+                                                            variant='label-hidden'
+                                                            dropdown-alignment="auto"
+                                                            data-field="acces">
+                                                        </lightning-combobox>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" aria-label="Cancel and close" onclick={hideEditMember}>{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={handleEditMember}>Ok</button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+  </template>

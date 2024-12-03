@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:hasSObjectName" access="global">
+    <aura:attribute name="isrefreshing" type="Boolean" default="false"/>
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:handler event="c:AV_ReportAppEvent" action="{!c.handleApplicationEvent}"/>
+
+    <aura:if isTrue="{!v.isrefreshing}">
+        <c:aV_TaskTabs recid="{!v.recordId}"></c:aV_TaskTabs>
+        <aura:set attribute="else">
+            <c:aV_TaskTabs recid="{!v.recordId}"></c:aV_TaskTabs>
+        </aura:set>
+    </aura:if> 
+    
+</aura:component>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Canal_de_Entrada__c</columns>
+    <columns>CC_Canal_Operativo__c</columns>
+    <columns>CC_Fecha_Fin_Vigencia__c</columns>
+    <columns>CC_Fecha_Inicio_Vigencia__c</columns>
+    <columns>CC_Canal_de_Procedencia__c</columns>
+    <columns>CC_Tematica__c</columns>
+    <columns>CC_Producto__c</columns>
+    <columns>CC_Area_Negocio__c</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <label>Todos los catálogos</label>
+    <sharedTo>
+        <group>CC_Coordinadores</group>
+        <group>Coordinadores</group>
+    </sharedTo>
+</ListView>

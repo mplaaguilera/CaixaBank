@@ -1,0 +1,53 @@
+<aura:component controller="CC_WS_Methods_Maximo" access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader">
+    
+    <!-- Atributos -->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="sMensaje" type="String" default=""/>
+    <aura:attribute name="bWebServ" type="Boolean" default="false"/>
+    <aura:attribute name="bError" type="Boolean" default="true"/>
+    <aura:attribute name="bEspera" type="Boolean" default="true"/>
+    
+
+    <!-- Método para inicializar. --> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+        
+    <!--UI--> 
+    <aura:renderIf isTrue="{!v.bEspera}">
+        <div role="status" class="slds-spinner slds-spinner_brand slds-spinner_medium">
+            <span class="slds-assistive-text">Loading</span>
+            <div class="slds-spinner__dot-a"></div>
+            <div class="slds-spinner__dot-b"></div>
+        </div>
+    </aura:renderIf>
+    
+    <article class="slds-card">
+        <aura:renderIf isTrue="{!v.bWebServ}">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Resultado envío agrupador">
+                            <aura:renderIf isTrue="{!v.bError}">
+                                <lightning:icon iconName="utility:warning" size="small"/>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!not(v.bError)}">
+                                <lightning:icon iconName="utility:info" size="small"/>
+                            </aura:renderIf>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <aura:renderIf isTrue="{!v.bError}">Error envío. </aura:renderIf><ui:outputText value="{!v.sMensaje}"/>
+                        </h2>
+                    </div>
+                </header>
+            </div>    
+            <div>
+                <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                    <lightning:button variant="neutral" label="Aceptar" title="Aceptar" onclick="{!c.cerrarDialogo}"/>
+                </lightning:layout>
+            </div>
+        </aura:renderIf>
+    </article>
+
+</aura:component>

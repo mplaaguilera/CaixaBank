@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EquipoResponsable__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup a Grupo, este será el responsable de la acción.</description>
+    <label>Equipo responsable</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 AND 2 AND 4) OR (3 AND 2 AND 5)</booleanFilter>
+        <errorMessage>Value does not exist or does not match filter criteria.</errorMessage>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Grupo Responsable de la acción</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.SAC_PermiteTareas__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Grupo de tareas</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Maestro de tareas, Otras Tareas</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>SPV Acciones, SPV Maestro de tareas</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Acciones</relationshipLabel>
+    <relationshipName>SAC_AccionesGrupo</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

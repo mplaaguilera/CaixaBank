@@ -1,0 +1,24 @@
+.THIS .slds-accordion__section {
+	padding: 0;
+}
+.THIS .slds-accordion__summary-action {
+	background: rgb(243, 242, 242);
+	width: 100%;
+	padding: 0 .5rem;
+    height: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+.THIS .slds-accordion__content {
+    visibility: visible;
+    opacity: 1;
+    height: 0;
+    transition: height .5s ease-in-out;
+}
+.THIS .slds-is-open > .slds-accordion__summary {
+    margin-bottom: 0;
+}
+.THIS .slds-is-open > .slds-accordion__content {
+    overflow: hidden;
+    height: auto;
+}

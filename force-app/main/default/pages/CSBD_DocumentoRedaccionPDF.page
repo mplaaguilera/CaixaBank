@@ -1,0 +1,42 @@
+<apex:page renderAs="pdf" applyBodyTag="false" showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" standardController="Opportunity">
+
+	<html>
+		<head>
+			<style type="text/css" media="print">
+			<!--
+				@page {
+					margin-top: 3cm;
+					margin-bottom: 5cm;
+					/* margin-left: 3cm; */
+					/* margin-right: 2.5cm; */
+					line-height: normal;
+
+					@top-center {
+						width: 100%;
+						content: element(header);
+					}
+
+					@bottom-left {
+						width: 100%;
+						content: element(footer);
+					}
+				}
+
+				div.offer {
+					border-radius: 8px;
+				}
+			-->
+			</style>
+		</head>
+		<div class="content">
+			<!--
+			<div>
+				<apex:image url="{!$Resource.Logo_Caixa_Mail_ES}"/>
+			</div>
+			-->
+			<div>
+				<apex:outputText value="{!Opportunity.CSBD_GenerarDocumentoHtml__c}" escape="false"></apex:outputText>
+			</div>
+		</div>
+	</html>
+</apex:page>

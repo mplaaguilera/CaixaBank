@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLRegistro__c</fullName>
+    <description>URL de registro añadiendo el id de Miembro de campaña para las invitaciones.</description>
+    <externalId>false</externalId>
+    <formula>IF(  Campaign.RecordType.DeveloperName  == &apos;EV_Eventos_Accionistas&apos;,  $CustomMetadata.EV_URL_portal__mdt.URLs.urlAccionistaPortal__c , $CustomMetadata.EV_URL_portal__mdt.URLs.urlPortal__c )  &amp; IF( Campaign.RecordType.DeveloperName  == &apos;EV_Eventos_Accionistas&apos;, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_index__c, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_Inscripcion__c) &amp; 
+IF(ISBLANK(LeadId), 
+	IF(ISBLANK(ContactId),IF(ISBLANK(AccountId),&apos;es&apos;,CASE(Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)), CASE(Contact.Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
+	CASE(Lead.EV_Idiomas__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)) 
+	&amp; $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_html__c &amp; &apos;?idEvento=&apos; &amp; Campaign.EV_ExternalID__c &amp; &apos;&amp;idInvitacion=&apos;&amp;  EV_ExternalID__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>URL de Registro</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidationStageClose</fullName>
+    <active>false</active>
+    <description>Validacion de cuando la lead opportunity se cierra negativo es obligatorio rellenar el campo resolucion.</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.AV_AvoidBulkApi),
+    $Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+    ISPICKVAL(AV_StatusLeadOpp__c , &quot;Cerrada Negativa&quot;),
+    ISPICKVAL(AV_Resolution__c , &quot;&quot;)
+)</errorConditionFormula>
+    <errorDisplayField>AV_Resolution__c</errorDisplayField>
+    <errorMessage>Por favor indica un motivo de resolución del cierre negativo.</errorMessage>
+</ValidationRule>

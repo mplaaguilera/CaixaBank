@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ControlEstadoInicial</fullName>
+    <active>false</active>
+    <description>Validation Rule para controlar que el estado inicial sea siempre Nuevo menos cuando creamos el registro el día del evento.</description>
+    <errorConditionFormula>AND(
+	ISNEW(),
+	NOT ISBLANK(TEXT(Status)),
+	NOT ISPICKVAL(Status, &apos;Invitación enviada&apos;),
+	NOT(EV_DirectoEvento__c)
+)</errorConditionFormula>
+    <errorMessage>El estado inicial debe ser Nuevo</errorMessage>
+</ValidationRule>

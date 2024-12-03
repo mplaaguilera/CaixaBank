@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Async_Apex_Job</fullName>
+    <columns>NAME</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>createdBy__c</columns>
+    <columns>Apex_Class__c</columns>
+    <columns>state__c</columns>
+    <columns>Project__c</columns>
+    <columns>TotalJobItems__c</columns>
+    <columns>JobItemsProcessed__c</columns>
+    <columns>NumberOfErrors__c</columns>
+    <columns>BatchSize__c</columns>
+    <columns>Log_Message__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_Log__c.Async_Apex_Job</value>
+    </filters>
+    <label>Async Apex Job</label>
+</ListView>

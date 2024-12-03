@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Procedencia__c</fullName>
+    <label>Canal de procedencia</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Origin</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>CC_Canal_Procedencia</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>SAC_Formulario</controllingFieldValue>
+            <controllingFieldValue>SAC_CartaPostal</controllingFieldValue>
+            <controllingFieldValue>SAC_FormularioOficina</controllingFieldValue>
+            <controllingFieldValue>SAC_CXBNow</controllingFieldValue>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Otros</controllingFieldValue>
+            <valueName>Castilla la Mancha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Formulario</controllingFieldValue>
+            <controllingFieldValue>SAC_CartaPostal</controllingFieldValue>
+            <controllingFieldValue>SAC_FormularioOficina</controllingFieldValue>
+            <controllingFieldValue>SAC_CXBNow</controllingFieldValue>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Otros</controllingFieldValue>
+            <valueName>Junta Andalucia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email - Revisar</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CCO CSI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email - Revisar</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>HDT CSI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email - Revisar</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Seguros CSI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Accionista</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Backend</controllingFieldValue>
+            <valueName>Testamentarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Whatsapp</controllingFieldValue>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CaixaBankNow</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Whatsapp</controllingFieldValue>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>ImaginBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CC</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Contact Center</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Fax</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Redsys-Sermepa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Solicitud de subasta</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>SACH</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Atención al Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Atención Cliente Sénior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Bloqueos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Cajeros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>M2P Asistencia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Now In Teléfono Único</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Pago Móvil</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Postventa CompraEstrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Soporte Clientes CompraEstrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Soporte PSU</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Tarjetas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Backoffice</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Emisiones PromoCaixa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Valija digital</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>FAQ</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Gestión FAQs</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Activo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Banca Digital CNow</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Domiciliaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Extranjero</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Incidencias Técnicas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Marketing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Pasivo y Valores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Recaudación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>RRHH</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Servicios Generales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>SmartPhones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Tarjetas y Comercios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Virtualización de Proveedores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón CCI Holabank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Clases Pasivas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Now in Sales-MAC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Servicios Centrales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono CC Confirming</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono CCI HOLABANK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS Avales Internacionales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS Bancos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS atención clientes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS Internacional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS atención empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono COPS Oficinas C2C</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono Crédito Stock</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono Efectivo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Banca Internacional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE CaixaBankNow</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Canal Oficina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Perfilado Clientes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Seguridad Operativa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Tarjetas Consumer</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono FRAUDE Tarjetas Payments</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono Inditex Internacional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono Inditex Nacional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono Servicio Firma</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono UAFE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Teléfono UAFE Especialistas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CAIXARENTING / CAIXABANK EQUIPMENT FINANCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-COMERCIA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CREDIFIMO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-IMAGIN</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-BUILDING CENTER</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CAIXABANK PAYMENTS &amp; CONSUMER</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-GDS / CAIXABANK OPERATIONAL SERVICES</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-GESTICAIXA / CAIXABANK TITULACION</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-HABITATGE ASSEQUIBLE / INMOCAIXA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-MICROBANK</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-MONEY TO PAY</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-PROMOCAIXA / WIVAI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-PTR / PUERTO TRIANA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-SUMASA / CAIXABANK FACILITIES MANAGEMENT</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-TCF / TELEFONICA CONSUMER FINANCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-VDC / VIDACAIXA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CBI / CAIXA BUSINESS INTELLIGENCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-BANKIA MEDIACIÓN</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-OpenWealth</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CAM / CAIXABANK ASSET MANAGEMENT</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CAM PORTUGAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG-CAM LUXEMBURGO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG - Dualiza</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>EDG - Externos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Avales Internacionales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Calidad Créditos Documentarios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Carteras</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón CC Confirming International</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Comercio Exterior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Contact Center Confirming</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Contact Center International</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Crédito Stock</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Efectivo COPS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Export Finance</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Export Online</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Factoring Sindicados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Financiación Comex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Fondos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Inditex Suppliers</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón International Operations</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón International Support</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón KYC Renewal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Operativa Comex</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón SAC y corretaje</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Service Desk</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Servicio Firma</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón UAFE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón UAFE Express</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Buzón Valores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Caixabank Talks</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Código de Buenas Prácticas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Formulario Consultas Operativas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Formulario web</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Microbank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Oficina Feedback</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Oficina Preventiva</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Soporte Empleados CompraEstrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>3N</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Comentarios Stores</controllingFieldValue>
+            <valueName>Apple App Store</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Asociación Consumidores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Banca Premier</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Banca Privada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CaixaBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CaixabankAm</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Cartera de Efectos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CECA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>App</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Chat GINA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Web</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Chat NOA WhatsApp</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>COPS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>CXB</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Dirección</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Externos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Formulario Web AC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Comentarios Stores</controllingFieldValue>
+            <valueName>Google Play Store</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Comentarios Stores</controllingFieldValue>
+            <valueName>Huawei App Store</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>NTTDATA</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Número A</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Número B</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Oficina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <valueName>Omic</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

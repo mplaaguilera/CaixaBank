@@ -1,0 +1,23 @@
+.buttonIconVerde {
+    --slds-c-button-color-background: rgb(69, 198, 90);
+    --slds-c-button-color-background-hover: rgb(69, 198, 90);
+    --slds-c-icon-color-foreground: rgb(255, 255, 255) !important;
+}
+
+.buttonIconRojo {
+    --slds-c-button-color-background: rgb(186, 5, 23);
+    --slds-c-button-color-background-hover: rgb(186, 5, 23);
+    --slds-c-icon-color-foreground: rgb(255, 255, 255) !important;
+}
+
+.buttonIcon {
+	--slds-g-color-border-base-4: rgb(186, 186, 186);
+    --slds-c-icon-color-foreground: rgb(161, 161, 161);
+}
+.slds-form-element__control {
+    margin-left: 1rem; 
+}
+
+.slds-text-body_regular {
+    font-size: 0.875rem; 
+}

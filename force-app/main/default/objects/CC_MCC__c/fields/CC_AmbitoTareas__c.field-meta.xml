@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_AmbitoTareas__c</fullName>
+    <description>Campo utilizado para controlar a quien se manda la tarea del gestor</description>
+    <label>Ámbito tareas</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Oficina</fullName>
+                <default>false</default>
+                <label>Oficina</label>
+            </value>
+            <value>
+                <fullName>Ventas</fullName>
+                <default>false</default>
+                <label>Ventas</label>
+            </value>
+            <value>
+                <fullName>Cambio de Oficina</fullName>
+                <default>false</default>
+                <label>Cambio de Oficina</label>
+            </value>
+            <value>
+                <fullName>Cambio de Gestor</fullName>
+                <default>false</default>
+                <label>Cambio de Gestor</label>
+            </value>
+            <value>
+                <fullName>Fraude</fullName>
+                <default>false</default>
+                <label>Fraude</label>
+            </value>
+            <value>
+                <fullName>Cajeros</fullName>
+                <default>false</default>
+                <label>Cajeros</label>
+            </value>
+            <value>
+                <fullName>No clientes</fullName>
+                <default>false</default>
+                <label>No clientes</label>
+            </value>
+            <value>
+                <fullName>Testamentaria</fullName>
+                <default>false</default>
+                <label>Testamentaria</label>
+            </value>
+            <value>
+                <fullName>Cajeros Incidencias</fullName>
+                <default>false</default>
+                <label>Cajeros Incidencias</label>
+            </value>
+            <value>
+                <fullName>Enrollment Sign</fullName>
+                <default>false</default>
+                <label>Enrollment Sign</label>
+            </value>
+            <value>
+                <fullName>CSBD No Contratar</fullName>
+                <default>false</default>
+                <label>CSBD No Contratar</label>
+            </value>
+            <value>
+                <fullName>CSBD Contratar</fullName>
+                <default>false</default>
+                <label>CSBD Contratar</label>
+            </value>
+            <value>
+                <fullName>CSBD 3N</fullName>
+                <default>false</default>
+                <label>CSBD 3N</label>
+            </value>
+            <value>
+                <fullName>Vidacaixa</fullName>
+                <default>false</default>
+                <label>Vidacaixa</label>
+            </value>
+            <value>
+                <fullName>CaixaBank Talks</fullName>
+                <default>false</default>
+                <label>CaixaBank Talks</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

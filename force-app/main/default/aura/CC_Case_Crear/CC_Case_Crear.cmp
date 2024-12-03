@@ -1,0 +1,136 @@
+<aura:component controller="CC_Case_Crear_Controller" implements="lightning:actionOverride,lightning:hasPageReference,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId">
+
+    <!--Atributos-->
+    <aura:attribute name="spinner" type="Boolean" default="true"/>
+    <aura:attribute name="mostrarRecordEditForm" type="Boolean" default="false"/>
+    <aura:attribute name="userDepartment" type="List"/>
+    <aura:attribute name="procedenciasCops" type="Boolean" default="false"/>
+    <aura:attribute name="grupoTrabajoCops" type="Boolean" default="false"/>
+    <aura:attribute name="casoSegmentos" type="Boolean" default="false"/> <!-- US713663 - Segmentos - Crear caso nuevo incorporando el NIF del cliente -->
+    <aura:attribute name="esClienteCC" type="Boolean" default="false"/>
+    <aura:attribute name="esClienteTMS" type="Boolean" default="false"/>
+    <aura:attribute name="esClienteGRR" type="Boolean" default="false"/>
+    <aura:attribute name="opcionesProcedencia" type="List" default="[]"/>
+    <aura:attribute name="negocio" type="String"/>
+    <aura:attribute name="nombreRol" type="String"/>
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="recordTypeId" type="Id"/>
+    <aura:attribute name="canalProcedenciaRequired" type="Boolean" default="false"/>
+    <aura:attribute name="valorContacto" type="String" />
+    <aura:attribute name="opcionesGT" type="List" default="[]"/>
+    <aura:attribute name="valorProcedencia" type="String" />
+    <aura:attribute name="nif" type="String" />
+    <aura:attribute name="org" type="String" />
+    <aura:attribute name="zona" type="String" />
+    <aura:attribute name="valorGRR" type="String"/> 
+    <aura:attribute name="esCasoSPV" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!--Workspace API para gestión de las pestañas de la consola-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--UI-->
+    <!--Card-->
+    <article class="slds-card">
+        <!--Spinner-->
+        <aura:if isTrue="{!v.spinner}">
+            <div>
+                <lightning:spinner variant="brand" size="medium" alternativeText=""/>
+            </div>
+        </aura:if>
+
+        <!--Cuerpo-->
+        <div class="slds-card__body slds-card__body_inner">
+            <!--Título-->
+            <div class="forceChangeRecordType" style="border-color: #dddbda; color: #dddbda; border-bottom-color: #dddbda; border-bottom: solid; border-width: 1px;">
+                <h2 class="slds-var-p-top_large slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-text-heading_medium" style="color: black;">
+                    Nuevo caso
+                </h2>
+            </div>
+        </div>
+
+        <!--Footer-->
+        <div class="slds-card__body slds-card__body_inner" style="padding-top: 5px; width: 100%;">
+            <div class="slds-form__item slds-align_absolute-center" role="listitem">
+                <aura:if isTrue="{!and(v.mostrarRecordEditForm == true &amp;&amp; v.esCasoSPV == false)}">
+                    <lightning:recordEditForm
+                        aura:id="formulario"
+                        recordId=""
+                        objectApiName="Case"
+                        onload="{!c.load}"
+                        onsubmit="{!c.submit}"
+                        onsuccess="{!c.success}"
+                        onerror="{!c.error}"
+                        recordTypeId="{!v.recordTypeId}"
+                    >
+                        <lightning:messages/> <!--Mensajes de error al guardar-->
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:inputField fieldName="Subject"/>
+                                <lightning:inputField fieldName="Description" class="cc_textarea_alto"/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <aura:if isTrue="{!not(v.esClienteGRR)}">
+                                    <lightning:inputField fieldName="CC_Idioma__c" required="true"/>
+                                </aura:if>
+                                <aura:if isTrue="{!v.procedenciasCops}">
+                                    <!--Si el caso es de COPS, el usuario tiene perfil COPS y tiene departamento-->
+                                    <lightning:inputField aura:id="canalEntrada" fieldName="Origin" value="" required="true" onchange="{!c.getCanalesProcedencia}"/>
+                                    <lightning:combobox aura:id="desplegableProcedencia" label="Canal de procedencia" placeholder="--Ninguno--" variant="label-stacked" options="{!v.opcionesProcedencia}" onchange="{!c.grabarProcedenciaUno}" required="true" />
+                                    <lightning:inputField aura:id="CC_Canal_Procedencia__c" fieldName="CC_Canal_Procedencia__c" class="slds-hide" required="true" />
+                                    <lightning:inputField fieldName="CC_Tipo_Contacto__c" value="{!v.valorContacto}" />
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.esClienteTMS}">
+                                            <lightning:inputField fieldName="TMS_Numexp__c" required="true"/>
+                                        </aura:if>
+                                        <lightning:inputField aura:id="canalEntradaElse" fieldName="Origin" value="{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General' ? 'SAC_Manual' :''}" required="true" disabled = "{!v.nombreRol == 'SAC General' || v.nombreRol == 'Testamentarías' || v.nombreRol == 'SPV General'}"/>
+                                        <aura:if isTrue="{!v.esClienteCC}">
+                                            <lightning:inputField fieldName="CC_Canal_Operativo__c" required="true"/>
+                                        </aura:if>
+                                        <aura:if isTrue="{!not(v.esClienteGRR)}">
+                                            <lightning:inputField aura:id="desplegableProcedenciaDos" fieldName="CC_Canal_Procedencia__c" required="{!v.canalProcedenciaRequired}" onchange="{!c.grabarProcedenciaDos}"/>
+                                            <lightning:inputField fieldName="CC_Tipo_Contacto__c" />
+                                        </aura:if>
+                                        <aura:if isTrue="{!v.esClienteGRR}">
+                                            <lightning:inputField aura:id="desplegableProcedenciaDos" fieldName="CC_Canal_Procedencia__c" required="{!v.canalProcedenciaRequired}" value="{!v.valorGRR}" onchange="{!c.grabarProcedenciaDos}"/>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                                <aura:if isTrue="{!v.grupoTrabajoCops}">
+                                    <!--Si el caso es de COPS y el usuario tiene o perfil COPS o de admin-->
+                                    <lightning:combobox aura:id="desplegableGT" label="Grupo de Trabajo" options="{!v.opcionesGT}" required="true" onchange="{!c.grabarGrupoTrabajo}"/> <!--value="{!v.valorGrupoTrabajo}"-->
+                                    <lightning:inputField aura:id="OS_GrupoTrabajo__c" fieldName="OS_GrupoTrabajo__c" class="slds-hide" required="true" />
+                                </aura:if>
+                                
+                                <!-- US713663 - Segmentos - Crear caso nuevo incorporando el NIF del cliente onchange="{!c.identificarNIF}"-->
+                                <aura:if isTrue="{!v.casoSegmentos}">
+                                    <lightning:input  aura:id="modalCrearNuevoCasoNIF" label="Identificar cliente" />
+                                    <p style="font-size:x-small" aura:id="resultNIF"></p>
+                                    <br></br>
+                                    <lightning:button  label="Comprobar NIF" onclick="{!c.identificarNIF}"></lightning:button>
+                                    <lightning:inputField  aura:id="orgSegmentos" fieldName="AccountId" class="slds-hidden" value="{!v.nif}"/>
+                                    <lightning:inputField  aura:id="zonaSegmentos" fieldName="SEG_Organizacion__c" class="slds-hidden" value="{!v.org}"/>
+                                    <lightning:inputField  aura:id="cuentaSegmentos" fieldName="SEG_Zona__c" class="slds-hidden" value="{!v.zona}"/>
+                                </aura:if> 
+                                <!-- FIN - US713663 - Segmentos - Crear caso nuevo incorporando el NIF del cliente -->
+
+                                <lightning:inputField fieldName="SAC_Naturaleza__c" value="{!v.nombreRol == 'SAC General' ? 'SAC_004' : ''}" class="slds-hidden" />
+                            </div>
+                        </div>
+                        <lightning:layout horizontalAlign="end" class="slds-var-m-top_large">
+                            <lightning:button label="Cancelar" onclick="{!c.cerrarTab}"/>&nbsp;
+                            <lightning:button variant="brand" label="Guardar" type="submit" onclick="{!c.comprobacion}"/>
+                        </lightning:layout>
+                        <div style="height: 1rem;"/>
+                    </lightning:recordEditForm>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.esCasoSPV}">
+                           <c:spv_CrearCaso onsenddata="{!c.handleRecSPVChange}" idRecordType="{!v.recordTypeId}"/>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+    </article>
+</aura:component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Login_GMT__c</fullName>
+    <formula>IF (DATEVALUE(LoginTime) &gt;= DATE( YEAR (DATEVALUE(LoginTime)),03,31) - MOD(DATE ( YEAR (DATEVALUE(LoginTime)),03,31) - DATE (1900,1,7),7)
+&amp;&amp; DATEVALUE(LoginTime) &lt; DATE( YEAR (DATEVALUE(LoginTime)),10,31) - MOD(DATE ( YEAR (DATEVALUE(LoginTime)),10,31) - DATE (1900,1,7),7),
+LoginTime  + (2/24),
+LoginTime  + (1/24))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Login GMT</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo</fullName>
+    <active>true</active>
+    <errorConditionFormula>$Setup.CC_Social_Perm__c.Bloqueo__c</errorConditionFormula>
+    <errorMessage>No tiene permisos para modificar el registro</errorMessage>
+</ValidationRule>

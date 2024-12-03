@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_3_Reclamacion_Auto__c</fullName>
+    <description>Fecha calculada por el sistema que indica cuándo se debe hacer la 3ª reclamación automática de la tarea</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha 3ª Reclamación Automática</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

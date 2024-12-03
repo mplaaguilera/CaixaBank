@@ -1,0 +1,107 @@
+<template>
+    <div class="slds-clearfix">
+        <template if:false={existeEscalado}>
+            <div class="slds-float_right">
+                <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarPropietario} disabled={isEstadoEscalado}></lightning-button>
+            </div>
+        </template>
+        <template if:true={existeEscalado}>
+            <div class="slds-box" style="padding: 10px;background-color: #16325c;" >
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_8-of-12">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <span class="slds-avatar">
+                                    <lightning-icon icon-name="utility:warning" alternative-text="Approved" title="Approved" size="medium" variant="warning"></lightning-icon>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p style="padding-top: 10px; padding-left:10px; color: white;"> {mensaje}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_4-of-12">
+                        <div class="slds-float_right">
+                            <lightning-button variant="brand" label="Nuevo escalado" onclick={comprobarPropietario} disabled="true"></lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div> 
+
+    <!--Modal introducir escalado-->
+    <template if:true={modalInsertarEscalado}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalInsertarEscalado}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Crear Escalado</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-1">
+                    <lightning-input type="text" name="input" label="Título" placeholder="Título" required="true" onchange={handleTituloChange}></lightning-input>
+                    <lightning-input name="input" label="Motivo" placeholder="Motivo" read-only="true" value={motivoLabel}></lightning-input>
+                    <lightning-combobox name="Equipo" label="Equipo" 
+                        required="true"
+                        value={valueEquipo}
+                        options={options}
+                        onchange={handleChangeEquipo} >
+                    </lightning-combobox>
+                    <lightning-textarea name="input" label="Propuesta Letrado" placeholder="Introduce la propuesta..." required="true" onchange={handlePropuestaChange}></lightning-textarea>
+                    <lightning-textarea name="inputObservaciones" label="Observaciones" onchange={handleObservacionesChange}></lightning-textarea>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarModalInsertarEscalado} title="Cancelar">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={insertarEscalado} title="Crear">Crear Escalado</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal warning-->
+    <template if:true={modalWarning}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalWarning}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Denegado</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <p>¡No puedes crear un escalado si no eres el propietario de la reclamación o alguna de sus pretensiones!</p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick={cerrarModalWarning} title="OK">OK</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

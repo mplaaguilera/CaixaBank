@@ -1,0 +1,295 @@
+<aura:component controller="SAC_LCMP_HomeOficina" implements="flexipage:availableForAllPageTypes" access="global">
+
+    <aura:attribute type="Case[]" name="caseList"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute type="Object[]" name="atrList"/>
+    <aura:attribute name="mycolumnsATR" type="List"/>
+    <aura:attribute name="accountId" type="String"/>
+    <aura:attribute name="showContacts" type="Boolean" default="false"/>
+    <aura:attribute name="selectedSearch" type="String"/>
+    <aura:attribute name="sTipoBusquedaOficina" type="String" default="ambas"/>
+    <aura:attribute name="activeSections" type="List" default="['A','B']" />
+
+    <aura:attribute name="bError" type="Boolean" default="false" />
+    <aura:attribute name="sMensErr" type="String" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="sBusqueda" type="String" default="" />
+    <aura:attribute name="sBusquedaDesde" type="Date" default="" />
+    <aura:attribute name="sBusquedaHasta" type="Date" default="" />
+    <aura:attribute name="sTipoBusqueda" type="String" default="idCaso" />
+    <aura:attribute name="sTipoBusquedaOptions" type="List"
+        default="[{'label': 'Identificador del caso', 'value': 'idCaso'}, {'label': 'NIF', 'value': 'nif'}, {'label': 'Nombre cliente', 'value': 'nombreCliente'},  {'label': 'Rango fechas recepción', 'value': 'fechaRecep'}]" />
+    
+    <aura:handler name="change" value="{!v.accountId}" action="{!c.getData}"/>
+    <aura:handler name="change" value="{!v.selectedSearch}" action="{!c.changeColumns}"/>
+
+    <div class="slds-page-header slds-page-header_record-home">
+     
+    <div class="slds-grid slds-wrap slds-gutters_x-small">
+        <div class="slds-col slds-size_6-of-12">
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-opportunity">
+                    <lightning:icon iconName="standard:case" alternativeText="Case" title="Case" />
+                </span>
+                </div>
+                <div class="slds-media__body">
+                <div class="slds-page-header__name">
+                    <div class="slds-page-header__name-title">
+                    <h1>
+                        <span>Reclamaciones</span>
+                        <span class="slds-page-header__title slds-truncate" title="Recently Viewed">Visualización usuario oficina</span>
+                    </h1>
+                    </div>
+                    <div class="slds-page-header__name-switcher">
+                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                        <button class="slds-button slds-button_icon slds-button_icon-small" aria-haspopup="true" title="Switch list view">      
+                        <span class="slds-assistive-text">Switch list view</span>
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_6-of-12 slds-float--right">
+            <div class="slds-page-header__col-actions slds-float--right">
+                <div class="slds-page-header__controls">
+                    <div class="slds-page-header__control ">
+                        <c:SAC_CreacionReclamacionOficina/>
+                        &nbsp;&nbsp;&nbsp;
+                        <lightning:buttonGroup>
+                            <aura:if isTrue="{!v.selectedSearch == 'Oficina'}">
+                                <lightning:button variant="brand" label="Buscar por oficina" title="Buscar por oficina" onclick="{! c.buscarPorOficina }" />
+                                <aura:set attribute="else">
+                                    <lightning:button variant="brand-outline" label="Buscar por oficina" title="Buscar por oficina" onclick="{! c.buscarPorOficina }" />
+                                </aura:set>
+                            </aura:if>
+                            <aura:if isTrue="{!v.selectedSearch == 'Cliente'}">
+                                <lightning:button variant="brand" label="Buscar por cliente" title="Buscar por cliente" onclick="{! c.buscarPorCliente }" />
+                                <aura:set attribute="else">
+                                    <lightning:button variant="brand-outline" label="Buscar por cliente" title="Buscar por cliente" onclick="{! c.buscarPorCliente }" />
+                                </aura:set>
+                            </aura:if>
+                            <aura:if isTrue="{!v.selectedSearch == 'Reclamacion'}">
+                                <lightning:button variant="brand" label="Buscar reclamacion" title="Buscar reclamacion" onclick="{! c.buscarPorReclamacion }" />
+                                <aura:set attribute="else">
+                                    <lightning:button variant="brand-outline" label="Buscar reclamacion" title="Buscar reclamacion" onclick="{! c.buscarPorReclamacion }" />
+                                </aura:set>
+                            </aura:if>
+                        </lightning:buttonGroup>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_8-of-12">
+            <aura:if isTrue="{!v.selectedSearch == 'Cliente'}">
+                <c:SAC_BusquedaClienteOficina cuentaId="{!v.accountId}" showContacts="{!v.showContacts}" />
+            </aura:if>
+            <aura:if isTrue="{!v.selectedSearch == 'Oficina'}">
+                <c:SAC_BusquedaReclamacionOficina accountId="{!v.accountId}" sTipoBusqueda="{!v.sTipoBusquedaOficina}"/>
+            </aura:if>
+            <aura:if isTrue="{!v.selectedSearch == 'Reclamacion'}">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta" />
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+                                    <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Identificar reclamación</span>
+                                </h2>
+                            </div>
+                        </header>
+                    </div>
+                    <!--Cuerpo de la card-->
+                    <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+                        <div class="slds-grid slds-gutters slds-grid_pull-padded-small slds-grid_vertical-align-end">
+                            <!--Tipo de búsqueda-->
+                            <div class="slds-col slds-size--6-of-12">
+                                <lightning:combobox aura:id="tipoBusqueda" name="tipoBusqueda" label="Tipo de búsqueda"
+                                    value="{!v.sTipoBusqueda}" options="{!v.sTipoBusquedaOptions}" onchange="{!c.handleChange}"/>
+                            </div>
+                            <!--Valor de búsqueda-->
+                           
+                            <aura:if isTrue="{!v.sTipoBusqueda == 'fechaRecep'}">
+                                <div class="slds-col slds-size--2-of-12 slds-gutters_x-small">
+                                    <!-- <ui:inputDate aura:id="valorBusqueda" label="Desde" class="field" value="{!v.sBusquedaDesde}" displayDatePicker="true" /> -->
+                                    <lightning:input type="date" name="inputDesde" label="Desde" value="{!v.sBusquedaDesde}"/>   
+                                </div>
+                                <div style="width: 10px; display: inline-block;"></div>
+                                <div class="slds-col slds-size--2-of-12 slds-gutters_x-small">
+                                    <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
+                                        <!-- <ui:inputDate aura:id="valorBusqueda" label="Hasta" class="field" value="{!v.sBusquedaHasta}" displayDatePicker="true" />  -->
+                                        <lightning:input type="date" name="inputHasta" label="Hasta" value="{!v.sBusquedaHasta}"/>
+                                    </span>
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-col slds-size--5-of-12 slds-gutters_x-small">
+                                        <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
+                                            <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda" label="Valor"
+                                            value="{!v.sBusqueda}" spellcheck="false"
+                                            placeholder="Valor a buscar" />
+                                        </span>
+                                    </div>
+                                </aura:set>
+                            </aura:if>      
+                                
+                            
+                            <!--Botón para iniciar búsqueda-->
+                            <div class="slds-col slds-grow-none">
+                                <lightning:buttonIcon iconName="utility:search" variant="brand" title="Identificar"
+                                onclick="{!c.buscarAlfabetico}" alternativeText="Buscar en Alfabético"
+                                disabled="{!and(v.sBusqueda == null, or(v.sBusquedaDesde == null, v.sBusquedaHasta == null))}" />
+                            </div>
+                            
+                        </div>
+                        <br/>
+                    </div>
+                    <div style="height:0.4rem;" />
+
+                    <aura:if isTrue="{!v.bError}">
+                        <!--Sección de error-->
+                        <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                            <lightning:icon iconName="utility:warning" size="x-small" variant="error" />
+                            &nbsp;&nbsp;{!v.sMensErr}
+                        </div>
+                    </aura:if>
+                </article> 
+            </aura:if>
+        </div>
+        <div class="slds-col slds-size_4-of-12">
+            
+            <aura:If isTrue="{!v.accountId !=  null}">
+
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta" />
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+                                    <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Reclamante seleccionado</span>
+                                </h2>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+                        <div class="slds-grid slds-gutters slds-grid_pull-padded-small slds-grid_vertical-align-end">
+
+                            <lightning:recordForm
+                                onerror="{!c.handleError}"
+                                recordId="{!v.accountId}"
+                                objectApiName="Account"
+                                layoutType="Compact"
+                                columns="4"
+                                mode="readonly" >
+                                <lightning:messages />
+                            </lightning:recordForm>
+                        </div>
+                    </div>
+
+                </article>
+            </aura:If>
+        </div>
+    </div>
+
+        <div class="slds-page-header__row slds-page-header__row_gutters slds-page-header__detail-row">
+            <div class="slds-page-header__col-details ">
+                <aura:if isTrue="{!empty(v.caseList)}">
+                    <div class="slds-illustration slds-illustration_small" aria-hidden="true">
+                        <img src="/img/chatter/OpenRoad.svg" class="slds-illustration__svg" alt=""/>
+                        <div class="slds-text-color_weak">
+                            <h3 class="slds-text-heading_medium">Informe unos criterios de busqueda validos</h3>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.selectedSearch=='Cliente'}">
+
+                            
+                            <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{! v.activeSections }">
+                                <lightning:accordionSection name="A" label="Reclamaciones con origen Salesforce">
+                                    <aura:if isTrue="{! !empty(v.caseList)}">
+                                        <lightning:datatable data="{! v.caseList }" 
+                                        columns="{! v.mycolumns }" 
+                                        keyField="id"
+                                        hideCheckboxColumn="true"
+                                        onrowaction="{! c.handleRowAction }"
+                                        class="slds-page-header__detail-row "
+                                        />
+                                        <aura:set attribute="else">
+                                            <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                                <span class="slds-assistive-text">error</span>
+                                                <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                  <lightning:icon iconName="utility:error" size="small" class="iconoBlanco" />
+                                                </span>
+                                                <h2>No se han encontrado reclamaciones del cliente seleccionado en Salesforce</h2>
+                                              </div>
+                                        </aura:set>
+                                    </aura:if>
+                                </lightning:accordionSection>
+                                <lightning:accordionSection name="B" label="Reclamaciones con origen sistemas externos">
+                                    <aura:if isTrue="{! !empty(v.atrList)}">
+                                        <lightning:datatable data="{! v.atrList }" 
+                                        columns="{! v.mycolumnsATR }" 
+                                        keyField="id"
+                                        hideCheckboxColumn="true"
+                                        onrowaction="{! c.handleRowAction }"
+                                        class="slds-page-header__detail-row "
+                                        />
+                                        <aura:set attribute="else">
+                                            <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                                <span class="slds-assistive-text">error</span>
+                                                <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                  <lightning:icon iconName="utility:error" size="small" class="iconoBlanco" />
+                                                </span>
+                                                <h2>No se han encontrado reclamaciones del cliente seleccionado en sistemas externos a Salesforce</h2>
+                                              </div>
+                                        </aura:set>
+                                    </aura:if>
+                                </lightning:accordionSection>
+                            </lightning:accordion>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{! !empty(v.caseList)}">
+                                    <lightning:datatable data="{! v.caseList }" 
+                                    columns="{! v.mycolumns }" 
+                                    keyField="id"
+                                    hideCheckboxColumn="true"
+                                    onrowaction="{! c.handleRowAction }"
+                                    class="slds-page-header__detail-row "
+                                    />
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+ 
+            </div>
+        </div> 
+
+    </div>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Identificando reclamaciones... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+                         
+</aura:component>

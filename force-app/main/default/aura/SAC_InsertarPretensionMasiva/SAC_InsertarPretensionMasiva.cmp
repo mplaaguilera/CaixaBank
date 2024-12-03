@@ -1,0 +1,156 @@
+<aura:component controller="SAC_LCMP_InsertarPretension" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="tienePermisosEditar" type="Boolean" default="false" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="modalPretensiones" type="Boolean" default="false" />
+    <aura:attribute name="modalReemplazarPrincipal" type="Boolean" default="false" />
+    <aura:attribute name="listMCC" type="Object[]" />
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <!--refreshView-->
+    <aura:handler event="force:refreshView" action="{! c.init}" />
+
+    <div class="slds-clearfix">
+        <div class="slds-float_right">
+            <aura:if isTrue= "{!and(or(v.caso.Status=='SAC_001',v.caso.Status=='SAC_002'), v.tienePermisosEditar)}">
+                <lightning:button variant="brand" label="Nueva pretensión" onclick="{!c.abrirModalPretensiones}"></lightning:button>
+            <aura:set attribute="else">
+                <lightning:button variant="brand" label="Nueva pretensión" disabled="true" ></lightning:button>
+            </aura:set>
+            </aura:if>
+        </div>
+    </div>
+
+    <!--Modal pretensiones-->
+    <aura:if isTrue="{!v.modalPretensiones}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container modal_pretensiones">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalPretensiones }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Nueva pretensión</h2>
+                    </header>
+                    <div class="slds-modal__content modal_pretensiones_content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="buscador">
+                            <!-- <c:SAC_MCC_Buscador recordId="{!v.recordId}" listMCC="{!v.listMCC}"/> -->
+                            <c:sac_BuscadorMCC aura:id="lwcBusquedaMCC" onsenddata="{!c.receiveLWCData}" nuevaPretension="false"/>
+                        </div>
+                        <div class="tabla">
+                            <table id="tablaId" class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Id"></div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Temática">Temática</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Producto/Servicio">Producto/Servicio</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Motivo">Motivo</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Detalle">Detalle</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="PrincipalTitle" title="Principal">Principal</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Id"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <aura:iteration items="{!v.listMCC}" var="a" indexVar="index">
+                                        <tr class="slds-hint-parent">
+                                            <td style="font-weight: bold">
+                                                <b>{!index + 1}.</b>
+                                            </td>
+                                            <td data-label="Tematica" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.CC_Tematica_Formula__c}">{!a.CC_Tematica_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Prod/Serv" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.CC_Producto_Servicio_Formula__c}">{!a.CC_Producto_Servicio_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Motivo" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.SEG_Motivo_Formula__c}">{!a.SEG_Motivo_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Detalle" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.Name}">{!a.Name}</div>
+                                            </td>
+                                            <td data-label="Principal">
+                                                <div class="Principal">
+                                                    <input type="checkbox" id="miElementoCheckbox" data-index="{!index}" />
+                                                  </div>
+                                            </td>
+                                            <td data-label="Borrar"> 
+                                                <a onclick="{!c.eliminarRegistro}" data-record="{!index}">
+                                                    <lightning:icon iconName="utility:delete" size="x-small" alternativeText="Delete"/>
+                                                    <span class="slds-assistive-text">Delete</span>
+                                                </a>                                            
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalPretensiones }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.generarPretensiones }" title="Generar">Generar pretensiones</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal existe pretension principal-->
+        <aura:if isTrue="{!v.modalReemplazarPrincipal}">
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small" id="modal_ExistePret">
+                <div class="slds-modal__container_existe_principal">
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Ya existe una pretensión principal</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p style="text-align: center;">Ya existe una pretensión principal para esta reclamación. ¿Desea cambiar la pretensión principal?</p>
+                </div>
+                <div class="slds-modal__footer slds-modal__footer_directional">
+                    <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalReemplazarPretension }" title="Atrás">Atrás</lightning:button>
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.generarPretensiones }" title="botonReemplazar">Sí</lightning:button>
+                </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </aura:if>
+
+    <!--Loading-->
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                <b>Creando las pretensiones... por favor espere.</b>
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+	
+</aura:component>

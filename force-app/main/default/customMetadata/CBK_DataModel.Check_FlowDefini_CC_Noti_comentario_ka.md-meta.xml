@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Check_FlowDefini_CC_Noti_comentario_ka</label>
+    <protected>false</protected>
+    <values>
+        <field>CBK_Tipo_de_control__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>ClassName__c</field>
+        <value xsi:type="xsd:string">FlowDefinition.CC_Noti_comentario_ka</value>
+    </values>
+</CustomMetadata>

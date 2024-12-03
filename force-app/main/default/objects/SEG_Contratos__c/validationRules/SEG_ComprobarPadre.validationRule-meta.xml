@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ComprobarPadre</fullName>
+    <active>true</active>
+    <description>Mira que el Owner del caso padre sea el mismo que el Owner Id del que está cambiando el caso al intentar cambiar el Estado.</description>
+    <errorConditionFormula>AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.SEG_BypassValidationRules, 
+ISCHANGED(SEG_Estado__c),
+$User.Id &lt;&gt; SEG_SR_Seguimiento__r.OwnerId
+)</errorConditionFormula>
+    <errorMessage>No puedes realizar este cambio, debes ser el propietario del caso de seguimiento.</errorMessage>
+</ValidationRule>

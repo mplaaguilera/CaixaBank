@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cuenta_No_Inactivo</fullName>
+    <active>true</active>
+    <errorConditionFormula>PRIORVALUE( AccountId ) != AccountId  &amp;&amp;
+ Account.CC_Inactivo__c = TRUE</errorConditionFormula>
+    <errorDisplayField>AccountId</errorDisplayField>
+    <errorMessage>La cuenta seleccionada no debe esatr marcada como inactiva</errorMessage>
+</ValidationRule>

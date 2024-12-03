@@ -1,0 +1,120 @@
+<!--********************************************************************************************************************
+Name:	  AV_TaskDataObject
+Copyright © 2020  CaixaBank
+________________________________________________________________________________________________________________________
+Proposito: Component to show related SObject information based on fieldset.
+________________________________________________________________________________________________________________________
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY			AUTHOR				DATE				Description
+1.0			Display Data		Jashanpreet			13/02/2021			Init version
+1.1			Display Data		Carolina Alonso		12/05/2021			Comment RefreshView in Helper because of conflicts with Analytics' Home
+
+
+*********************************************************************************************************************-->
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:hasSObjectName,force:lightningQuickActionWithoutHeader" description="Display data from SObject" controller="AV_SObjectRelatedInfoCController"  access="global">
+
+    	<!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="objectApiName"	type="String"/>
+	<aura:attribute name="filterType"	   	type="String"/>
+	<aura:attribute name="filterField"	  	type="String"/>
+	<aura:attribute name="fieldSetName"	 	type="String"/>
+	<aura:attribute name="displayLabel"	 	type="String"/>
+	<aura:attribute name="columnNum"		type="String"/>
+	<aura:attribute name="readOnly"		 	type="Boolean"/>
+	<aura:attribute name="allowEditMode"	type="Boolean"/>
+	<aura:attribute name="density"		  	type="String"/>
+	<aura:attribute name="textStyle"		type="String"/>
+	<aura:attribute name="contentStyle"	 	type="String"/>
+	<aura:attribute name="interlocutor"	 	type="Boolean"/>
+
+	<!-- PRIVATE FOR COMPONENT -->
+	<aura:attribute name="filterObjectId"   type="String"/>
+	<aura:attribute name="fields"		   	type="FieldSetMember[]"/>
+	<aura:attribute name="numberColumns"	type="Integer" default="12"/>
+    <aura:attribute name="labelTask"	 	type="String"/>
+    <aura:attribute name="canEdit"	 	    type="Boolean"/>
+    <aura:attribute name="subjectBreakline" type="Boolean"/>
+
+	<!-- INIT AURA COMPONENT -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!-- INSTANTIATE COMPONENT EVENT -->
+    <aura:registerEvent name="interlocutorEvent" type="c:AV_SObjectRelatedEvent"/>
+
+    <!-- CONTENT -->
+	<div class="c-container">
+		<lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+
+		<!-- RECORD EDIT FORM -->
+		<aura:if isTrue="{!!v.readOnly}">
+            <div class="position-button">
+                <!--<lightning:button label="X" variant="base" title="Close" onclick="{!c.handleCancelEdit}"/>-->
+                <lightning:buttonIcon iconName="utility:close" class="slds-col_bump-left" iconClass="slds-button__icon_hint"
+                                                                          variant="bare" onclick="{!c.handleCancelEdit}"/>
+            </div>
+            <div style="height: 300px;">
+                <lightning:flow aura:id="AV_TaskLookUp" onstatuschange="{!c.handleStatusChange}"/>
+            </div>
+		</aura:if>
+		
+		<!-- RECORD VIEW FORM -->
+		<aura:if isTrue="{!v.readOnly}">
+			<aura:if isTrue="{!or(v.filterType == 'Task', v.filterType == 'Event')}">
+                <lightning:layout horizontalAlign="stretch" verticalAlign="stretch" multipleRows="true">
+                    <aura:iteration items="{!v.fields}" var="field">
+                            <lightning:layoutItem size="{!v.numberColumns}" class="{!v.filterType == 'Event' ? 'slds-p-around--xx-small clase' : 'slds-p-around--xx-small'}">
+                                <div>
+                                    <aura:if isTrue="{!field.valueName != ''}">
+                                        <aura:if isTrue="{!v.labelTask != ''}">
+                                            <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">{!v.labelTask}</label>
+                                            <aura:set attribute="else">
+                                                <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">{!field.label}</label>
+                                            </aura:set>
+                                        </aura:if>
+                                        <lightning:workspaceAPI aura:id="workspace" />
+                                        <p>
+                                            <a href="{!'/one/one.app?#/sObject/'+ field.value +'/view'}" target="_self">
+                                                {!field.valueName}
+                                            </a>
+                                            <!--a onclick="{!c.openTabWithSubtab}">
+                                                {!field.valueName}
+                                            </a-->
+                                        </p>
+                                        	
+                                        <aura:if isTrue="{!and(v.allowEditMode,!v.canEdit)}">
+                                            <div aura:id="divEditButton" class="slds-clearfix slds-p-around--x-small">
+                                                <div class="slds-float_right">
+                                                    <lightning:buttonIcon iconName="utility:edit" class="slds-col_bump-left" iconClass="slds-button__icon_hint"
+                                                                          variant="bare" alternativeText="{!$Label.c.AV_CMP_EditRecord}" onclick="{!c.editToogle}"/>
+                                                </div>
+                                            </div>
+                                        </aura:if>
+                                        <aura:set attribute="else">
+                                            
+                                            <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">{!field.label}</label>
+                                            <p>{!field.value}</p>
+                                            <aura:if isTrue="{!OR(field.label == 'Persona Contactada', field.label == 'Contacted Person')}">
+                                                <a href="{!'/lightning/r/Contact/0031X00000uRmwSQAS/view'}" target="_self">
+                                                    {!field.value}
+                                                </a>
+                                            </aura:if>
+                                            <!--<a href="/lightning/r/Account/"+ {!CC_Empleado_Gestor__c} +"/view'" target = "_self">{!field.valueName}</a>
+                                                 <p>
+                                                    <a href="{!'/one/one.app?#/sObject/'+ field.value +'/view'}" target="_self">
+                                                        {!field.valueName}
+                                                    </a>
+                                                </p>-->
+                                        </aura:set>
+                                        
+                                    </aura:if>
+                                </div>
+                                <!--<a href="{!'/one/one.app?#/sObject/'+ field.value + '/view'}" target="_blank">{!field.value} </a>
+                                <ui:outputText  aura:id="text-input-id-1" class="field" value="{!field.value}"/>-->		
+                            </lightning:layoutItem>
+                    </aura:iteration>
+                </lightning:layout>
+			</aura:if>   
+		</aura:if>
+	</div>
+</aura:component>

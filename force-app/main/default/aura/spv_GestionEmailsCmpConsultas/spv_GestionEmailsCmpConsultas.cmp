@@ -1,0 +1,44 @@
+<aura:component controller= "SPV_LCMP_GestionEmailsConsultas" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    
+    <!--Atributos para el componente SAC_GestionEmails-->
+    <aura:attribute name="copia"  type="String"/>
+    <aura:attribute name="CCCliente"  type="String"/>
+    <aura:attribute name="paraGrupo"  type="String"/>
+    <aura:attribute name="paraCliente"  type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="asuntoGrupo"  type="String"/>
+    <aura:attribute name="noEsOficinas"  type="Boolean" default="true"/>
+    <aura:attribute name="asuntoCliente"  type="String"/>
+    <aura:attribute name="cuerpoGrupo"  type="String"/>
+    <aura:attribute name="consulta"  type="SAC_Interaccion__c"/>
+    <aura:attribute name="cuerpoCliente"  type="String"/>
+    <aura:attribute name="casoRelacionado"  type="Case"/>
+    <aura:attribute name="procedencia"  type="String" default="ConsultaDeReclamacion"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="idsFicherosAdjuntosCliente" type="String[]" />
+    <aura:attribute name="idsFicherosAdjuntosGrupo" type="String[]" />
+    <aura:attribute name="ficherosAdjuntosGrupo" type="ContentVersion[]" />
+    <aura:attribute name="ficherosAdjuntosCliente" type="ContentVersion[]" />
+    <aura:attribute name="idsFicherosBorradosCliente" type="String[]" />
+    <aura:attribute name="idsFicherosBorradosGrupo" type="String[]" />
+
+
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+    <aura:attribute name="ficherosBorrados" type="String[]" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+
+
+
+    <!--doInit-->
+    <aura:handler name="init" value="{!this}" action="{!c.inicio}" />
+    <aura:handler event="force:refreshView" action="{! c.inicio}" />
+
+    <c:spv_GestionEmailsCmp usarComponente="{!v.usarComponente}"
+        procedencia="{!v.procedencia}" para="{!v.paraGrupo}" copia="{!v.copia}"
+        cuerpo="{!v.cuerpoGrupo}" asunto="{!v.asuntoGrupo}" caso="{!v.casoRelacionado}" consulta="{!v.consulta}"
+        ficherosAdjuntos="{!v.ficherosAdjuntos}"
+        ficherosBorrados="{!v.ficherosBorrados}"
+        idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" 
+        recordId="{!v.recordId}"/>
+
+</aura:component>

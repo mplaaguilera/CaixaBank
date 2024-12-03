@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Fecha_Envio_Gestor__c</fullName>
+    <description>Fecha Prevista después de agotadas reclamaciones para enviar los contratos no recibidos firmados al destino decidido en la configuración de la Organización y Zona.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha reclamaciones agotadas</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

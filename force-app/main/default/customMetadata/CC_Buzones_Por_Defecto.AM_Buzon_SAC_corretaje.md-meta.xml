@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón SAC y corretaje</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Buzón SAC y corretaje</value>
+    </values>
+    <values>
+        <field>CC_Direccion_Correo__c</field>
+        <value xsi:type="xsd:string">cincidencias@mercados.caixabank.com</value>
+    </values>
+    <values>
+        <field>CC_Idioma__c</field>
+        <value xsi:type="xsd:string">Castellano</value>
+    </values>
+    <values>
+        <field>OS_Departamento__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

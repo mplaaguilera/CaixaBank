@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Ultima_Interaccion__c</fullName>
+    <label>Última interacción</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CC_Canal_Procedencia__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Respuesta de colaborador</fullName>
+                <default>false</default>
+                <label>Respuesta de colaborador</label>
+            </value>
+            <value>
+                <fullName>Respuesta de solicitud de información</fullName>
+                <default>false</default>
+                <label>Respuesta de solicitud de información</label>
+            </value>
+            <value>
+                <fullName>Nuevo</fullName>
+                <default>true</default>
+                <label>Nuevo</label>
+            </value>
+            <value>
+                <fullName>Respuesta de cliente</fullName>
+                <default>false</default>
+                <label>Respuesta de cliente</label>
+            </value>
+            <value>
+                <fullName>Reasignación del caso</fullName>
+                <default>false</default>
+                <label>Reasignación del caso</label>
+            </value>
+            <value>
+                <fullName>Fin reclamación</fullName>
+                <default>false</default>
+                <label>Fin reclamación</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Buzón Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Teléfono Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Buzón Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Buzón Comercio Exterior</controllingFieldValue>
+            <controllingFieldValue>Buzón Contact Center International</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Online</controllingFieldValue>
+            <controllingFieldValue>Buzón International Support</controllingFieldValue>
+            <controllingFieldValue>Buzón KYC Renewal</controllingFieldValue>
+            <controllingFieldValue>Buzón Service Desk</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS atención empleados</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Finance</controllingFieldValue>
+            <controllingFieldValue>Buzón Operativa Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Financiación Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Calidad Créditos Documentarios</controllingFieldValue>
+            <valueName>Respuesta de colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Buzón Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Teléfono Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Buzón Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Buzón Comercio Exterior</controllingFieldValue>
+            <controllingFieldValue>Buzón Contact Center International</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Online</controllingFieldValue>
+            <controllingFieldValue>Buzón International Support</controllingFieldValue>
+            <controllingFieldValue>Buzón KYC Renewal</controllingFieldValue>
+            <controllingFieldValue>Buzón Service Desk</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS atención empleados</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Finance</controllingFieldValue>
+            <controllingFieldValue>Buzón Operativa Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Financiación Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Calidad Créditos Documentarios</controllingFieldValue>
+            <valueName>Respuesta de solicitud de información</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Buzón Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Teléfono Servicio Firma</controllingFieldValue>
+            <controllingFieldValue>Buzón Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS Avales Internacionales</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <controllingFieldValue>Buzón Comercio Exterior</controllingFieldValue>
+            <controllingFieldValue>Buzón Contact Center International</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Online</controllingFieldValue>
+            <controllingFieldValue>Buzón International Support</controllingFieldValue>
+            <controllingFieldValue>Buzón KYC Renewal</controllingFieldValue>
+            <controllingFieldValue>Buzón Service Desk</controllingFieldValue>
+            <controllingFieldValue>Teléfono COPS atención empleados</controllingFieldValue>
+            <controllingFieldValue>Buzón Export Finance</controllingFieldValue>
+            <controllingFieldValue>Buzón Operativa Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Financiación Comex</controllingFieldValue>
+            <controllingFieldValue>Buzón Calidad Créditos Documentarios</controllingFieldValue>
+            <valueName>Nuevo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <valueName>Respuesta de cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Teléfono FRAUDE Banca Internacional</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE CaixaBankNow</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Canal Oficina</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Perfilado Clientes</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Seguridad Operativa</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Consumer</controllingFieldValue>
+            <controllingFieldValue>Teléfono FRAUDE Tarjetas Payments</controllingFieldValue>
+            <valueName>Reasignación del caso</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

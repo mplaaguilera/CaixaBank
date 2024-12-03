@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CambioStageName</fullName>
+    <active>false</active>
+    <description>El gestor no puede cambiar el estado a &quot;Vencido&quot;, &quot;Con venta&quot; y &quot;Potencial&quot;, ni modificar estado de &quot;Con Venta&quot;.</description>
+    <errorConditionFormula>AND(
+ISCHANGED(StageName),
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+OR(
+		RecordType.DeveloperName = &quot;AV_Iniciativa&quot;,
+		RecordType.DeveloperName = &quot;AV_AlertaComercial&quot;,
+		RecordType.DeveloperName = &quot;AV_Propuesta&quot;,
+		RecordType.DeveloperName = &quot;AV_Sugerencia&quot;,
+		RecordType.DeveloperName = &quot;AV_CallMe&quot;	
+	),
+	OR(
+ISPICKVAL(StageName, &quot;Con venta&quot;),
+ISPICKVAL(StageName, &quot;Potencial&quot;),
+ISPICKVAL(StageName, &quot;Vencido&quot;)
+),
+NOT($Permission.AV_AvoidBulkApi),
+NOT(ISPICKVAL(AV_OrigenApp__c,&quot;AV_BackReport&quot;)),
+				AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
+)</errorConditionFormula>
+    <errorMessage>No es posible realizar el cambio de etapa. Las etapas Potencial, Vencida y Con venta son etapas automáticas.</errorMessage>
+</ValidationRule>

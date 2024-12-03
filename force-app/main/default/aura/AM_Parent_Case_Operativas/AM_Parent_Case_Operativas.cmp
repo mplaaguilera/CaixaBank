@@ -1,0 +1,458 @@
+<aura:component controller="AM_Parent_Case_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="ldsError" type="String"/>
+    <aura:attribute name="primerRenderizadoFinalizado" type="Boolean" default="false"/>
+    <aura:attribute name="otrasOperativasTimeout" type="String"/>
+    <aura:attribute name="procesando" type="Boolean" default="false"/>
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="tipoOperativa" type="String"/>
+    <aura:attribute name="esPropietario" type="Boolean" default="false"/>
+
+    <!--Renderizar modales-->
+    <aura:attribute name="renderModalColab" type="Boolean" default="false"/>
+    <aura:attribute name="renderModalSolInfo" type="Boolean" default="false"/>
+    <aura:attribute name="renderModalResponder" type="Boolean" default="false"/>
+    <aura:attribute name="renderModalColabCorreo" type="Boolean" default="false"/>
+    <aura:attribute name="renderModalResponderCorreo" type="Boolean" default="false"/>
+    <aura:attribute name="renderModalSolInfoCorreo" type="Boolean" default="false"/>
+
+
+    <!--Trasladar a colaborador-->
+    <aura:attribute name="verTodosLosGrupos" type="Boolean" default="false"/>
+    <aura:attribute name="gruposClasificacionOptions" type="List" description="Opciones para el combobox de grupos"/>
+    <aura:attribute name="gruposClasificacionValue" type="String" description="Valor del combobox de grupos"/>
+    <aura:attribute name="literalBusquedaGrupo" type="String" description="Literal del input de búsqueda de grupos"/>
+    <aura:attribute name="grupoSeleccionado" type="CC_Grupo_Colaborador__c" description="Grupo seleccionado en los resultados del buscador"/>
+    <aura:attribute name="verTodasLasPlantillas" type="Boolean" default="false"/>
+    <aura:attribute name="plantillasGrupoOptions" type="List" description="Opciones para el combobox de plantillas"/>
+    <aura:attribute name="plantillasGrupoValue" type="String" description="Valor del combobox de plantillas"/>
+    <aura:attribute name="literalBusquedaPlantilla" type="String" description="Literal del input de búsqueda de plantillas"/>
+    <aura:attribute name="plantillaSeleccionadaColab" type="EmailTemplate" description="Plantilla seleccionada en los resultados del buscador"/>
+    <aura:attribute name="plantillaSeleccionadaValue" type="String"/>
+    <aura:attribute name="plantillaSeleccionadaName" type="String"/>
+    <aura:attribute name="subjectPlantilla" type="String"/>
+    <aura:attribute name="cuerpoPlantilla" type="String"/>
+    <aura:attribute name="plantillaSubject" type="String"/>
+    <aura:attribute name="plantillaCuerpo" type="String"/>
+
+    <!--Solicitud de información/Responder a cliente-->
+    <aura:attribute name="optionsPlantillaResponder" type="List"/>
+    <aura:attribute name="opcionesIdiomaCarpeta" type="List" default="[]"/>
+    <aura:attribute name="opcionesTratamientoCarpeta" type="List" default="[]"/>
+    <aura:attribute name="idiomaPlantilla" type="String"/>
+    <aura:attribute name="tratamiento" type="String"/>
+    <aura:attribute name="listOfSearchRecords" type="CC_Grupo_Colaborador__c[]"/>
+    <aura:attribute name="listOfSearchRecordsPlantilla" type="EmailTemplate[]"/>
+    <aura:attribute name="mostrarToggleCerrarCaso" type="Boolean" default="true"/> 
+    <aura:attribute name="toggleCerrarCaso" type="Boolean" default="false"/> 
+
+    <!--Cerrar y Reactivar-->
+    <aura:attribute name="botonCerrarActivo" type="Boolean"/>
+    <aura:attribute name="botonReactivarActivo" type="Boolean"/>
+    
+    <!--Handlers-->
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}"/>
+    <aura:handler name="oSelectedAccountEvent" event="c:CC_SelectedAccountEvent" action="{!c.seleccionarResultadoGrupo}"/>
+    <aura:handler name="oSelectedPlantillaEvent" event="c:CC_SelectedPlantillaEvent" action="{!c.seleccionarResultadoPlantilla}"/>
+
+    <!--WorkspaceAPI-->
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <!--Acceso a las quick actions-->
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="FULL"
+        fields="RecordTypeId, RecordType.DeveloperName, RecordType.Name, OwnerId, IsClosed, CaseNumber, Origin, CC_Canal_Procedencia__c,
+        Contact.Phone, Status, CC_Idioma__c, CC_Canal_Respuesta__c, 
+        OS_Tiene_Casos_Relacionados__c"
+        targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}" mode="EDIT"/>
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div class="slds-backdrop" aura:id="backdrop"/>
+
+    <!--Botones-->
+    <div style="padding-top: 4px" align="center">
+        <lightning:button aura:id="botonResponder" label="Responder" iconName="action:email" onclick="{!c.iniciarOperativa}" disabled="{!v.caso.Status != 'Activo' || !v.esPropietario}"/>
+        <lightning:button aura:id="Solicitud Info Email" label="Solicitar información" iconName="action:email" onclick="{!c.iniciarOperativa}" disabled="{!v.caso.Status != 'Activo' || !v.esPropietario}"/>
+        <lightning:button aura:id="Trasladar Colaborador" label="Trasladar a colaborador" iconName="action:email" onclick="{!c.iniciarOperativa}" disabled="{!v.caso.Status != 'Activo' || !v.esPropietario}"/>
+
+        <aura:if isTrue="{!and(v.primerRenderizadoFinalizado, !v.esPropietario)}">
+            <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner" onclick="{!c.tomarPropiedad}"/>
+        </aura:if>
+        <aura:if isTrue="{!!v.caso.IsClosed}">
+            <lightning:button aura:id="botonCerrar" label="Cerrar" iconName="action:close" onclick="{!c.casoCerrar}" disabled="{!!v.botonCerrarActivo}"/>
+            <aura:set attribute="else">
+                <lightning:button aura:id="botonReactivar" label="Reactivar" iconName="utility:undo" onclick="{!c.casoReactivar}" disabled="{!!v.botonReactivarActivo}"/>
+            </aura:set>
+        </aura:if>
+    </div>
+
+    <!--Modales-->
+    <!--Modal para trasladar a colaborador-->
+    <aura:if isTrue="{!v.renderModalColab}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="modalColab" onkeydown="{!c.modalColabTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalColabCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.tipoOperativa == 'trasladar' ? 'Trasladar a grupo colaborador' : 'Remitir a grupo colaborador'}</h2>
+                    <p class="slds-var-m-top_x-small">{!v.tipoOperativa == 'trasladar' ? 'Seleccione el grupo colaborador al que trasladar la gestión del caso.' : 'Seleccione el grupo colaborador al que remitir el caso.'}</p>
+                </header>
+
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <!--Grupo colaborador-->
+                        <div class="slds-grid slds-gutters slds-gutters_x-small">
+                            <div class="slds-col slds-grow-none">
+                                <lightning:icon iconName="custom:custom15" style="margin-top: 21px;"/>
+                            </div>
+                            <div class="slds-col">
+                                <!--Buscador de todos los grupos-->
+                                <div aura:id="grupoResultados" class="slds-form-element slds-lookup" data-select="single">
+                                    <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Grupo colaborador</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-input-has-icon slds-input-has-icon_right">
+                                            <div aura:id="pillGrupoSeleccionado" class="slds-pill-container slds-hide">
+                                                <span class="slds-pill">
+                                                    <span class="slds-pill__label" id="GrupoSeleccionado">{!v.grupoSeleccionado.Name}</span>&nbsp;
+                                                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarGrupoColaborador}" alternativeText="Cerrar"/>
+                                                </span>
+                                            </div>
+                                            <div aura:id="lookupField" class="slds-show">
+                                                <lightning:input type="search" aura:id="inputBuscarColab" onchange="{!c.teclaPulsadaLookupGrupoColaborador}" value="{!v.literalBusquedaGrupo}" placeholder="buscar grupo colaborador..." required="true" variant="label-hidden" onfocus="{!c.inputBuscarColabFocus}" onblur="{!c.inputBuscarColabBlur}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Resultados del buscador de todos los grupos-->
+                                    <div class="slds-lookup__menu slds slds-float_left">
+                                        <aura:if isTrue="{!v.listOfSearchRecords.length == 0}">
+                                            <span><center>No existen grupos con este nombre.</center></span>
+                                        </aura:if>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                                <c:CC_CustomLookupResult grupo="{!singleRec}"/>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Plantilla-->
+                        <div class="slds-grid slds-gutters slds-gutters_x-small" style="height: 2rem;">
+                            <div class="slds-col slds-grow-none">
+                                <lightning:icon iconName="standard:email" style="margin-top: 21px;"/>
+                            </div>
+                            <div class="slds-col" style="padding-top: 5px;">
+                                <aura:if isTrue="{!!v.verTodasLasPlantillas}">
+                                    <!--Desplegable de plantillas del grupo seleccionado-->
+                                    <lightning:combobox aura:id="plantillaSeleccionada" label="Plantilla relacionada con el grupo" placeholder="--Plantilla de correo--" options="{!v.plantillasGrupoOptions}" value="{!v.plantillasGrupoValue}" onchange="{!c.seleccionarOpcionPlantilla}" required="true" disabled="{!and(empty(v.grupoSeleccionado), empty(v.gruposClasificacionValue))}"/>
+
+                                    <!--Buscador de todas las plantillas-->
+                                    <aura:set attribute="else">
+                                        <div aura:id="plantillaResultados" class="slds-form-element slds-lookup" data-select="single">
+                                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-input-has-icon slds-input-has-icon_right">
+                                                    <div aura:id="pillPlantillaSeleccionada" class="slds-pill-container slds-hide">
+                                                        <span class="slds-pill">
+                                                            <span class="slds-pill__label">{!v.plantillaSeleccionadaColab.Name} </span>&nbsp;
+                                                            <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarPlantilla}" alternativeText="Cerrar"/>
+                                                        </span>
+                                                    </div>
+                                                    <div aura:id="lookupFieldPlantilla" class="slds-show">
+                                                        <lightning:input type="search" aura:id="inputBuscarPlantillaColab" onchange="{!c.teclaPulsadaLookupPlantilla}" value="{!v.literalBusquedaPlantilla}" placeholder="buscar plantilla de correo..." required="true" variant="label-hidden" onfocus="{!c.inputBuscarPlantillaColabFocus}" onblur="{!c.inputBuscarPlantillaColabBlur}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="slds-lookup__menu slds slds-float_left">
+                                                <ul class="slds-lookup__list" role="listbox">
+                                                    <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                        <c:CC_CustomLookupResultPlantilla oPlantilla="{!singleRecPlantilla}"/>
+                                                    </aura:iteration>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </div>
+                        <!--Toggle para cambiar entre ver las plantillas del colaborador seleccionado o todas-->
+                        <div class="slds-grid slds-grid_align-end" style="padding-top: 7px">
+                            <div class="slds-col">
+                                <lightning:input aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Mostrar todas las plantillas" checked="{!v.verTodasLasPlantillas}" messageToggleActive="" messageToggleInactive="" style="margin-top: 36px;"/>
+                            </div>
+                        </div>
+
+                    </lightning:layoutItem>
+                </div>
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Generar borrador" variant="brand" iconName="utility:email" onclick="{!c.trasladarColaborador}"
+                        disabled="{!v.procesando || (and(empty(v.gruposClasificacionValue), empty(v.grupoSeleccionado.Name)) || and(empty(v.plantillasGrupoValue), empty(v.plantillaSeleccionadaColab.Name)))}"/>
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalColabCerrar}"/>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+    <!--Modal Traslado Colaborador Email-->
+    <aura:if isTrue="{!v.renderModalColabCorreo}">
+        <section role="dialog" aura:id="modalColabCorreo" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalColabCorreoTeclaPulsada}">
+            <!--Cabecera del modal-->
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCorreoColabCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Envío Email Colaborador</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_medium slds-is-relative">
+                    <div style="margin:10px;">
+                        <div style="margin-top:10px;">
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:textarea aura:id = "plantillaSubject" name="plantillaSubject" required="true" label="Asunto" value="{!v.subjectPlantilla}"/>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:inputRichText aura:id = "plantillaCuerpo" required="true" label="Cuerpo" value="{!v.cuerpoPlantilla}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Enviar" variant="brand" iconName="utility:email" onclick="{!c.enviarCorreoColab}"/>
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalCorreoColabCerrar}"/>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+    <!--Modal para solicitud de información-->
+    <aura:if isTrue="{!v.renderModalSolInfo}">
+        <section role="dialog" tabindex="-1" aura:id="ModalboxSolicitarInfo" aria-modal="true" class="slds-modal" onkeydown="{!c.modalSolicitarInfoTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalSolicitarInfo}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Solicitar información</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Seleccione la plantilla de correo a usar para la solicitud de información al cliente.<br/>
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <div class="slds-grid slds-gutters slds-gutters_x-small">
+                            <div class="slds-col slds-grow-none">
+                                <lightning:icon iconName="standard:email" style="margin-top: 21px;"/>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:combobox aura:id="selectItemIdiomaSol" name="idioma" label="Idioma" placeholder="--Idioma--" required="true"
+                                    messageWhenValueMissing="Debe seleccionar un idioma" onchange="{!c.handleCarpetaIdiomaSeleccionada}" options="{!v.opcionesIdiomaCarpeta}" value="{!v.idiomaPlantilla}"/>
+                                <br/>
+                                <lightning:combobox aura:id="selectItemTratamientoSol" name="tratamiento" label="Tratamiento"
+                                                placeholder="--Tratamiento--"
+                                                required="true"
+                                                messageWhenValueMissing="Debe seleccionar un tratamiento"
+                                                onchange="{!c.handleCarpetaTratamientoSeleccionada}"
+                                                options="{!v.opcionesTratamientoCarpeta}"
+                                                value="{!v.tratamiento}"
+                                                disabled="{!empty(v.idiomaPlantilla)}"/>
+                                <br/>
+                                <lightning:combobox aura:id="selectItemPlantillaSol" label="Plantilla" placeholder="--Plantilla de correo--" required="true"
+                                                    messageWhenValueMissing="Debe seleccionar una plantilla"
+                                                    onchange="{!c.seleccionarOpcionPlantilla}"
+                                                    options="{!v.optionsPlantillaResponder}"
+                                                    disabled="{!empty(v.tratamiento)}"/>
+                                <br/>
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                </div>
+
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Generar borrador" iconName="utility:email" onclick="{!c.solicitarInfo}" disabled="{!v.plantillaSeleccionadaValue == null || v.procesando}"/>
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalSolicitarInfo}" />
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+    <!--Modal Solicitud de Información Email-->
+    <aura:if isTrue="{!v.renderModalSolInfoCorreo}">
+        <section role="dialog" aura:id="modalSolInfoCorreo" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalSolInfoCorreoTeclaPulsada}">
+            <!--Cabecera del modal-->
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCorreoSolInfoCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Envío Solicitud de Información</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_medium slds-is-relative">
+                    <div style="margin:10px;">
+                        <div style="margin-top:10px;">
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:textarea aura:id = "plantillaSubject" name="plantillaSubject" required="true" label="Asunto" value="{!v.subjectPlantilla}"/>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:inputRichText aura:id = "plantillaCuerpo" required="true" label="Cuerpo" value="{!v.cuerpoPlantilla}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Enviar" variant="brand" iconName="utility:email" onclick="{!c.enviarCorreoRespInfo}"/>
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalCorreoSolInfoCerrar}"/>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+
+    <!--Modal para responder a cliente-->
+    <aura:if isTrue="{!v.renderModalResponder}">
+        <section role="dialog" tabindex="-1" aura:id="ModalboxResponderCliente" aria-modal="true" class="slds-modal" onkeydown="{!c.modalResponderClienteTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalResponderCliente}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Responder cliente</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Seleccione la plantilla de correo a usar para responder al cliente.<br/>
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <div class="slds-grid slds-gutters slds-gutters_x-small">
+                            <div class="slds-col slds-grow-none">
+                                <lightning:icon iconName="standard:email" style="margin-top: 21px;"/>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:combobox aura:id="selectItemIdioma" name="idioma" label="Idioma" placeholder="--Idioma--" messageWhenValueMissing="Debe seleccionar un idioma"
+                                    onchange="{!c.handleCarpetaIdiomaSeleccionada}" options="{!v.opcionesIdiomaCarpeta}" value="{!v.idiomaPlantilla}" disabled="{!v.verTodasLasPlantillas}"/>
+                                <br/>
+                                <lightning:combobox aura:id="selectItemTratamiento" name="tratamiento" label="Tratamiento" placeholder="--Tratamiento--" messageWhenValueMissing="Debe seleccionar un tratamiento"
+                                    onchange="{!c.handleCarpetaTratamientoSeleccionada}" options="{!v.opcionesTratamientoCarpeta}" value="{!v.tratamiento}" disabled="{!empty(v.idiomaPlantilla) || v.verTodasLasPlantillas}"/>
+                                <br/>
+
+                                <aura:if isTrue="{!!v.verTodasLasPlantillas}">
+                                    <!--Desplegable de plantillas-->
+                                    <lightning:combobox aura:id="selectItemPlantilla" label="Plantilla" placeholder="--Plantilla de correo--" required="true"
+                                        messageWhenValueMissing="" onchange="{!c.seleccionarOpcionPlantilla}" options="{!v.optionsPlantillaResponder}" disabled="{!empty(v.tratamiento)}"/>
+
+                                    <!--Buscador de plantillas-->
+                                    <aura:set attribute="else">
+                                        <div aura:id="plantillaResultadosResponder" class="slds-form-element slds-lookup" data-select="single">
+                                            <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-input-has-icon slds-input-has-icon_right">
+                                                    <div aura:id="pillPlantillaSeleccionadaResponder" class="slds-pill-container slds-hide">
+                                                        <span class="slds-pill">
+                                                            <span class="slds-pill__label">{!v.plantillaSeleccionadaColab.Name}</span>&nbsp;
+                                                            <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarPlantilla}" alternativeText="Cerrar"/>
+                                                        </span>
+                                                    </div>
+                                                    <div aura:id="lookupFieldPlantillaResponder" class="slds-show">
+                                                        <lightning:input aura:id="inputBuscarPlantillaResponder" type="search" onchange="{!c.teclaPulsadaLookupPlantilla}" value="{!v.literalBusquedaPlantilla}" placeholder="buscar plantilla de correo..." required="true" variant="label-hidden" onfocus="{!c.inputBuscarPlantillaResponderFocus}" onblur="{!c.inputBuscarPlantillaResponderBlur}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--Resultados del buscador de todas las plantillas-->
+                                            <div class="slds-lookup__menu slds slds-float_left">
+                                                <ul class="slds-lookup__list" role="listbox">
+                                                    <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                        <c:CC_CustomLookupResultPlantilla oPlantilla="{!singleRecPlantilla}"/>
+                                                    </aura:iteration>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-grid_align-end" style="padding-top: 7px">
+                            <div class="slds-col">
+                                <lightning:input aura:id="checkboxPlantilla" type="toggle" label="Mostrar todas las plantillas" checked="{!v.verTodasLasPlantillas}" messageToggleActive="" messageToggleInactive=""/>
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <div class="slds-grid">
+                        <div class="slds-col" style="padding-top: 4px; padding-left: 6px;">
+                            <aura:if isTrue="{!v.mostrarToggleCerrarCaso}">
+                                <lightning:input aura:id='responderCerrar' type="toggle" label="Cerrar caso tras enviar correo" messageToggleActive="" messageToggleInactive="" checked="true"/>
+                            </aura:if>
+                        </div>
+                        <div class="slds-col">
+                            <lightning:button variant="brand" label="Generar borrador" iconName="utility:email" onclick="{!c.responderCliente}" disabled="{!v.procesando || (and(!v.plantillaSeleccionadaColab.Name, empty(v.plantillaSeleccionadaValue)))}"/>
+                            <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalResponderCliente}"/>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+    <!--Modal Responder a Cliente Email-->
+    <aura:if isTrue="{!v.renderModalResponderCorreo}">
+        <section role="dialog" aura:id="modalResponderCorreo" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalResponderCorreoTeclaPulsada}">
+            <!--Cabecera del modal-->
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCorreoResponderCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Envío Email Responder a Cliente</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_medium slds-is-relative">
+                    <div style="margin:10px;">
+                        <div style="margin-top:10px;">
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:textarea aura:id = "plantillaSubject" name="plantillaSubject" required="true" label="Asunto" value="{!v.subjectPlantilla}"/>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-2">
+                                    <lightning:inputRichText aura:id = "plantillaCuerpo" required="true" label="Cuerpo" value="{!v.cuerpoPlantilla}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Enviar" variant="brand" iconName="utility:email" onclick="{!c.enviarCorreoRespInfo}"/>
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.modalCorreoResponderCerrar}"/>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+
+</aura:component>

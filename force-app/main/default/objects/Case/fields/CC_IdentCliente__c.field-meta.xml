@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_IdentCliente__c</fullName>
+    <defaultValue>&apos;0&apos;</defaultValue>
+    <description>Tipo de identificación del cliente asociado al caso</description>
+    <inlineHelpText>Tipo de identificación del cliente asociado al caso</inlineHelpText>
+    <label>Identificación cliente</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>CC_IdentCliente</valueSetName>
+    </valueSet>
+</CustomField>

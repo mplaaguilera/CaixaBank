@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_Fin_Peticion__c</fullName>
+    <description>Para Acción Alta:
+Fecha de final prevista petición, si no informada SLA de la petición. Formato AAAAMMDD
+Para Acción F
+Fecha de final petición, si no informada fecha del dia.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <label>Fecha Fin Petición</label>
+    <length>8</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

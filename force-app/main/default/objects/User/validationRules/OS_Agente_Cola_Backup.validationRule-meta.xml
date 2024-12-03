@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Agente_Cola_Backup</fullName>
+    <active>true</active>
+    <errorConditionFormula>OS_Agente_Backup__c != NULL &amp;&amp; 
+OR(
+				ISPICKVAL(OS_Cola_Backup__c,&apos;2N CREDITO STOCK&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;2N UAFE CNF&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;2N SINDICADOS FAG&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;2N GGCC FAG&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón Export Online&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón Contact Center International&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón Comercio Exterior&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón Service Desk&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón KYC Renewal&apos;),				
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón International Support&apos;),				
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Buzón Valija digital&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;International Operations Indra&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;UAFE Clasificador&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;Efectivo COPS&apos;),
+				ISPICKVAL(OS_Cola_Backup__c,&apos;CCI Holabank&apos;)
+)</errorConditionFormula>
+    <errorMessage>No está permitido informar &apos;Agente Backup&apos; y &apos;Cola Backup&apos; al mismo tiempo.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tiempo_Gestion_h__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(NOT(ISNULL(CC_Fecha_creacion_MAXIMO__c)), IF(NOT(ISNULL(CC_Fecha_Asociacion_Caso__c)) &amp;&amp; CC_Fecha_creacion_MAXIMO__c &gt; CC_Fecha_Asociacion_Caso__c,(CC_Fecha_creacion_MAXIMO__c - CC_Fecha_Asociacion_Caso__c)*24,IF(CC_Fecha_creacion_MAXIMO__c &gt; CreatedDate,(CC_Fecha_creacion_MAXIMO__c - CreatedDate)*24,0)), IF(NOT(ISNULL(CC_Fecha_Asociacion_Caso__c)),(NOW()-CC_Fecha_Asociacion_Caso__c)*24,(NOW()-CreatedDate)*24))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tiempo gestión horas</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

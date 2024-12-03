@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Visión E2E TaskConnect</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SEG_Link_Name__c</field>
+        <value xsi:type="xsd:string">https://bpm85baipro01.lacaixa.es/app/kibana#/dashboard/883869e0-2e4e-11ef-85cb-c154797a9819?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-1y,to:now))&amp;_a=(description:&apos;&apos;,filters:!((&apos;$state&apos;:(store:appState),meta:(alias:!n,disabled:!f,index:dba-process-summaries-timestamp,key:data.TG_TaskConnect_Actividad.idActividad.integer,negate:!f,params:(query:&apos;{caseN}&apos;),type:phrase),query:(match_phrase:(data.TG_TaskConnect_Actividad.idActividad.integer:&apos;{caseN}&apos;)))))</value>
+    </values>
+    <values>
+        <field>SEG_Link__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SEG_Orden__c</field>
+        <value xsi:type="xsd:double">4.0</value>
+    </values>
+    <values>
+        <field>SEG_Seccion__c</field>
+        <value xsi:type="xsd:string">Case,Account,Task,Event,Opportunity,AV_ProductClient__c</value>
+    </values>
+    <values>
+        <field>SEG_VisibleDinamica__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SEG_trazadoNif__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+</CustomMetadata>

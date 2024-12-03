@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_CodigoT13__c</fullName>
+    <description>Código T13 para la clasificación del Banco de España</description>
+    <externalId>false</externalId>
+    <formula>TEXT(SAC_AgrupacionesFamilias__c) + TEXT(SAC_ServicioInversion__c) + TEXT(SAC_MotivoReclamacion__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Código T13</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

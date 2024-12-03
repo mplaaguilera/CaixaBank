@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Registro_de_escrito__c</fullName>
+    <label>Registro de escrito</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Buzón SAC</fullName>
+                <default>false</default>
+                <label>Buzón SAC</label>
+            </value>
+            <value>
+                <fullName>Formulario Web con adjunto</fullName>
+                <default>false</default>
+                <label>Formulario Web con adjunto</label>
+            </value>
+            <value>
+                <fullName>Formulario Web sin adjunto</fullName>
+                <default>false</default>
+                <label>Formulario Web sin adjunto</label>
+            </value>
+            <value>
+                <fullName>Valija electrónica</fullName>
+                <default>false</default>
+                <label>Valija electrónica</label>
+            </value>
+            <value>
+                <fullName>Carta física</fullName>
+                <default>false</default>
+                <label>Carta física</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

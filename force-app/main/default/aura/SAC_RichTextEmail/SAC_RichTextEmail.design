@@ -1,0 +1,5 @@
+<design:component >
+    <design:attribute name="mensajeEmail" label="Mensaje"
+    description="Mensaje para enviar el email"
+    default=""/>
+</design:component>

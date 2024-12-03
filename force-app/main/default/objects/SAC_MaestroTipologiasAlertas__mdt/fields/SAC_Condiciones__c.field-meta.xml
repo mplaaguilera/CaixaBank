@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Condiciones__c</fullName>
+    <description>Condiciones por las que una alerta se debe seleccionar</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Condiciones</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

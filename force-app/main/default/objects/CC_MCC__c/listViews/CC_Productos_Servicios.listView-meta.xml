@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Productos_Servicios</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Tematica__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Producto_Servicio</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente</value>
+    </filters>
+    <filters>
+        <field>CC_Activo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Productos/Servicios</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

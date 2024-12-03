@@ -1,0 +1,66 @@
+<template>
+    <div class="slds-section__title slds-theme_shade section-div">
+        <lightning-layout>
+            <lightning-layout-item class="center-buttons chever-buttons">
+                <lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+                <lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item>
+                <label class="opp-name opp-title">{opp.Name}</label>
+                <small if:true={opp.AV_PF__c}>{opp.AV_PF__r.Name} | </small><small class="opp-stage">{opp.StageName}</small>
+            </lightning-layout-item>
+            <lightning-layout-item alignment-bump="left" class="center-buttons">
+                <div class="button-group" onclick={handleLink}>
+                    <lightning-button-icon icon-name="utility:link" alternative-text="Vincular oportunidad a la tarea" class="slds-m-left_xx-small" title="Vincular oportunidad a la tarea" variant="border-filled" label="Vincular" size="medium"></lightning-button-icon>
+                    <span class="button-label span-button">Vincular</span>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div> 
+    <div if:true={showDetail} class="opp-form">
+        <lightning-record-view-form
+            record-id={opp.Id}
+            object-api-name="Opportunity"
+            columns="3">
+
+            <lightning-layout multiple-rows>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4" padding="around-small">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label read-only-label">{label.productFieldLabel}</label>
+                        <p if:true={opp.AV_PF__c}  class="read-only-field">{opp.AV_PF__r.Name}</p>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-output-field field-name="AV_Potencial__c" variant="label-stacked">
+                        </lightning-output-field>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4" padding="around-small">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label read-only-label">Empleado/a Asignado</label>
+                        <p if:true={opp.AV_Gestor__c}  class="read-only-field">{opp.AV_Gestor__r.Name}</p>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-output-field field-name="AV_FechaProximoRecordatorio__c" variant="label-stacked">
+                        </lightning-output-field>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4" padding="around-small">
+                    <div class="slds-col">
+                        <label class="slds-form-element__label read-only-label">{label.recordtypeFieldLabel}</label>
+                        <p if:true={opp.RecordTypeId}  class="read-only-field">{opp.RecordType.Name}</p>
+                    </div>
+                    <div class="slds-col">
+                        <lightning-output-field field-name="AV_Tenencia__c" variant="label-stacked">
+                        </lightning-output-field>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+
+        </lightning-record-view-form>
+    </div>
+
+	<!-- CONFIRMATION ACTION MODAL -->
+	<div if:true={isModalOpen}>
+		<c-av_-task-opp-modal is-modal-open={isModalOpen} action-type={actionType} onclosemodal={handleCloseModal} onconfirm={doAction}></c-av_-task-opp-modal>
+	</div>
+</template>

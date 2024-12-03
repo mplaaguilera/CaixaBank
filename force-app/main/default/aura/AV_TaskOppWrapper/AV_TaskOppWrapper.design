@@ -1,0 +1,18 @@
+<design:component label="Oportunidades vinculadas">
+    <design:attribute name="newRecord" label="¿Vincular oportunidad?" description="" />
+    <design:attribute name="isEvent" label="¿Es evento?" description="" />
+    <design:attribute name="subject" label="Event Subject" description="" />
+    <design:attribute name="startDate" label="Event StartDate" description="" />
+    <design:attribute name="clientName" label="Client" description="" />
+    <design:attribute name="recId" label="Record Id" description="" />
+    <design:attribute name="recTaskId" label="Task Record Id" description="Task origin record id" />
+    <design:attribute name="taskDate" label="Task Due Date" description="" />
+    <design:attribute name="taskPriority" label="Task Priority" description="" />
+    <design:attribute name="obj" label="Object API Name" description="" />
+    <design:attribute name="controlEventNoPla" label="¿Evento no planificado?" description="" />
+    <design:attribute name="errorFlow" label="Error Flow" description="Muestra el error al vincular una oportunidad" />
+    <design:supportedFormFactors>
+		<design:supportedFormFactor type="Large"/>
+		<design:supportedFormFactor type="Small"/>
+	</design:supportedFormFactors>
+</design:component>

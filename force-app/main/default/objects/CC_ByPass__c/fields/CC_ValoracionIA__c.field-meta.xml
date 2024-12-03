@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ValoracionIA__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Activo si aplica la VR para no permitir cerrar el caso si no se informa el campo CC_ValoracionIA del caso.</description>
+    <label>CC_ValoracionIA</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

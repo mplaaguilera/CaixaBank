@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Producto__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Producto</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Se debe añadir un Producto perteneciente a la Temática seleccionada</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>B - Producto/Servicio</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.CC_Tematica__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Tematica__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Catálogos Facturación (Producto)</relationshipLabel>
+    <relationshipName>CatalogosFacturacion_Producto</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

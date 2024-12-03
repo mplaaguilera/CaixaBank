@@ -1,0 +1,115 @@
+<!--<template>
+    <div class="slds-grid slds-grid_vertical slds-p-around_medium">
+        <div class="slds-box slds-theme_default slds-m-bottom_medium">
+            <div class="slds-chat">
+                <div class="slds-chat-list">
+                    <template for:each={messages} for:item="message">
+                        <div key={message.id} class="slds-chat-listitem">
+                            <div class={message.class}>
+                                <div class="slds-chat-message__text">
+                                    <span>{message.text}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-grid_align-spread slds-m-top_small">
+            <lightning-input class="slds-col" type="text" value={userInput} onchange={handleInputChange} placeholder="Type your message"></lightning-input>
+            <lightning-button class="slds-col" label="Send" onclick={handleSend}></lightning-button>
+        </div>
+    </div>
+</template>-->
+
+<template>
+    <!-- <div class="slds-m-bottom_xx-large">
+        <lightning-card  class="slds-m-bottom_xx-large">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+        <lightning-formatted-rich-text
+                                                value={resumenProducto}
+                                                ></lightning-formatted-rich-text>
+            <div slot="footer">
+                <lightning-button class="slds-col" label="refrescar" onclick={handleRefrescar}></lightning-button>
+            </div>
+        </lightning-card>
+    </div> -->
+    <div>
+        <lightning-card>
+            <h2 slot="title">
+                <lightning-icon icon-name="utility:einstein" size="medium"></lightning-icon>
+                Custom ChatGPT
+            </h2>
+            <!-- para que se haga el renderedCallback cuando se modifique el valor del campo -->
+            <template if:true={primerRender}>
+                <p>{historicoChat}</p>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <div hidden>
+                <p>{historicoChat}</p>
+            </div>
+            <section role="log" class="slds-chat">
+                <div class="chat-body-container" data-id="chat-container">  
+                    <ul class="slds-chat-list">
+                        <li class="slds-chat-listitem slds-chat-listitem_bookend">
+                            <div class="slds-chat-bookend">
+                            <span class="slds-icon_container slds-icon-utility-chat slds-chat-icon">
+                                <svg class="slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#chat"></use>
+                                </svg>
+                            </span>
+                            <p>Iniciado el chat del producto con IA</p>
+                            </div>
+                        </li>
+                        
+                        <template for:each={messages} for:item="message">
+                            <li key={message.id} class={message.class2}>
+                                <div class="slds-chat-message">
+                                    <div class="slds-chat-message__body">             
+                                        <template lwc:if={message.escribiendo}>
+                                            <span class="slds-icon-typing slds-is-animated" title="Escribiendo...">
+                                                <span class="slds-icon-typing__dot"></span>
+                                                <span class="slds-icon-typing__dot"></span>
+                                                <span class="slds-icon-typing__dot"></span>
+                                            </span>
+                                        </template>
+                                        <template lwc:else>
+                                            <div class={message.class} role={message.alert}>
+                                                <lightning-formatted-rich-text
+                                                    value={message.text}
+                                                    ></lightning-formatted-rich-text>        
+                                            </div>
+                                        </template>
+                                        <div class="slds-chat-message__meta">{message.user}</div>
+                                    </div>
+                                </div>
+                            </li>     
+                        </template>
+                    </ul>
+                </div>
+            </section>
+        
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_5-of-5 slds-m-bottom_x-small">
+                    <lightning-input 
+                        class="slds-col" 
+                        type="text" 
+                        value={userInput} 
+                        onkeydown={handleEnter} 
+                        onchange={handleInputChange} 
+                        placeholder="Escribe tu pregunta..."
+                        disabled={bloquearTexto}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-5">
+                    <lightning-button class="slds-col" label="Enviar" disabled={bloquearTexto} onclick={handleSend}></lightning-button>
+                    <!--<lightning-button class="slds-col" label="Limpiar" onclick={handleEliminarHist}></lightning-button>-->
+                </div>
+                <div class="slds-col slds-size_1-of-5">
+                    <lightning-button class="slds-col" label="Limpiar" disabled={bloquearTexto} onclick={handleEliminarHist}></lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </div>
+</template>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_de_Registro__c</fullName>
+    <description>Nos indica el tipo de registro que estamos creando</description>
+    <label>Tipo de Registro</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Alta</fullName>
+                <default>false</default>
+                <label>Alta</label>
+            </value>
+            <value>
+                <fullName>Baja</fullName>
+                <default>false</default>
+                <label>Baja</label>
+            </value>
+            <value>
+                <fullName>Recepcion</fullName>
+                <default>false</default>
+                <label>Recepción</label>
+            </value>
+            <value>
+                <fullName>Asignacion</fullName>
+                <default>false</default>
+                <label>Asignación</label>
+            </value>
+            <value>
+                <fullName>Aviso</fullName>
+                <default>false</default>
+                <label>Aviso</label>
+            </value>
+            <value>
+                <fullName>Resolucion</fullName>
+                <default>false</default>
+                <label>Resolución</label>
+            </value>
+            <value>
+                <fullName>Cierre</fullName>
+                <default>false</default>
+                <label>Cierre</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

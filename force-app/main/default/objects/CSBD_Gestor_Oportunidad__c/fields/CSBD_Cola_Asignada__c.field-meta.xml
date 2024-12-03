@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Cola_Asignada__c</fullName>
+    <description>Lista para seleccionar el tipo de cola asignada a la oportunidad</description>
+    <label>Cola Asignada</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CSBD_CMN</fullName>
+                <default>false</default>
+                <label>CSBD - CMN</label>
+            </value>
+            <value>
+                <fullName>CSBD_CMB</fullName>
+                <default>false</default>
+                <label>CSBD - CMB</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_I</fullName>
+                <default>false</default>
+                <label>CSBD - Préstamos I</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_II</fullName>
+                <default>false</default>
+                <label>CSBD - Préstamos II</label>
+            </value>
+            <value>
+                <fullName>CSBD_Prestamos_III</fullName>
+                <default>false</default>
+                <label>CSBD - Préstamos III</label>
+            </value>
+            <value>
+                <fullName>CSBD_Turno_contacto</fullName>
+                <default>false</default>
+                <label>CSBD - Turno de contacto</label>
+            </value>
+            <value>
+                <fullName>CSBD_Otras_oportunidades</fullName>
+                <default>false</default>
+                <label>CSBD - Otras oportunidades</label>
+            </value>
+            <value>
+                <fullName>CSBD_Hipotecas</fullName>
+                <default>false</default>
+                <label>CSBD - Hipotecas</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

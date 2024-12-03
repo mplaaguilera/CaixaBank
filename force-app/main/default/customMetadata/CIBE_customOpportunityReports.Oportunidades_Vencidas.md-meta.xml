@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Oportunidades Vencidas</label>
+    <protected>false</protected>
+    <values>
+        <field>CIBE_Nombre_Objeto__c</field>
+        <value xsi:type="xsd:string">Report</value>
+    </values>
+    <values>
+        <field>CIBE_Perfil__c</field>
+        <value xsi:type="xsd:string">CIB,EMP,CIBE_CIBEmpresas</value>
+    </values>
+    <values>
+        <field>CIBE_Report_Cabecera__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CIBE_Report_DeveloperName__c</field>
+        <value xsi:type="xsd:string">CIBE_Mis_oportunidades_vencidas</value>
+    </values>
+</CustomMetadata>

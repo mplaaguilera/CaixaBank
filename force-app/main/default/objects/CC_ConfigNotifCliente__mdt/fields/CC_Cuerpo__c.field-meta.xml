@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cuerpo__c</fullName>
+    <description>Cuerpo de la notificación de seguimiento a cliente (SMS, RRSS).</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Cuerpo de la notificación de seguimiento a cliente (SMS, RRSS).</inlineHelpText>
+    <label>Cuerpo notificación</label>
+    <required>false</required>
+    <type>TextArea</type>
+</CustomField>

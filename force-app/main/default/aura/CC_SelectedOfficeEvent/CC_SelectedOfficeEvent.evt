@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Event template" >
+    <aura:attribute name="officeByEvent" type="Account"/>
+    <aura:attribute name="segundaOficina" type="Boolean" default="false"/>
+</aura:event>

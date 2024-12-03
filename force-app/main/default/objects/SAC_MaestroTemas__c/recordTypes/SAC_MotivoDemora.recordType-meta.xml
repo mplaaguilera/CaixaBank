@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MotivoDemora</fullName>
+    <active>true</active>
+    <description>Record Type para la creación de motivos de demora en el maestro temas</description>
+    <label>Motivo Demora</label>
+    <picklistValues>
+        <picklist>SAC_TipoAuditoria__c</picklist>
+        <values>
+            <fullName>SAC_Altas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Ejecucion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Resolucion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Subsanacion</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_TipoFastTrack__c</picklist>
+        <values>
+            <fullName>SAC_Completo</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+</RecordType>

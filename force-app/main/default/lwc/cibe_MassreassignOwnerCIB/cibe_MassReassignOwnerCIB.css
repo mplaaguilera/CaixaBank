@@ -1,0 +1,146 @@
+.assign-lookup {
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+
+.filter-card {
+	margin-bottom: 0.5rem;
+}
+.table-container {
+	height: 0 auto;
+}
+.total-data-text {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+	display: flex;
+	flex-direction: column;
+	direction: rtl;
+	padding: 0 5rem 5rem 0;
+}
+.select-obj {
+	width: 100%;
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+.footer-filter {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+}
+
+.filters_row_2 lightning-input:first-of-type {
+	padding: 0 5em 0 5em;
+}
+
+.filters_row_2 lightning-input:nth-of-type(2) {
+	padding: 0 5em 0 0;
+}
+
+.filters_row_2 lightning-input:nth-of-type(3) {
+	padding: 0 5em 0 0;
+}
+
+.filters_row_2 lightning-combobox {
+	padding: 0 5em 0 0;
+}
+
+.filters_row_3 lightning-combobox:first-of-type {
+	padding-left: 5em;
+}
+
+.filters_row_3 lightning-combobox:nth-of-type(2) {
+	padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_3 c-av_-lookup {
+	padding: 0 2.5em 0 1.25em;
+}
+
+.slds-form-element_horizontal .slds-form-element__control, .slds-form_horizontal .slds-form-element .slds-form-element__control, .slds-form_stacked .slds-form-element_horizontal .slds-form-element__control {
+    padding-left: 25%;
+    clear: none;
+}
+
+.buttonAlign{
+    text-align: right;
+    margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+
+.buttonStyle{
+	margin-top: 1.5rem;
+    margin-right: 1rem;
+}
+.padding-top {
+	padding: 0.5rem 0 0 0;
+}
+.maxCampo {
+	max-width: 400px;
+}
+.divPadding{
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+
+.divPadding-first {
+	padding: 1rem 0 0.33rem 0;
+}
+.title{
+	font-weight: bold;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+    vertical-align: -webkit-baseline-middle;
+}
+
+.dt-outer{
+	height: 90%!important;
+}
+
+.table-container-paginacion{
+	/*margin-bottom: 60px;*/
+	margin-bottom: 2%;
+
+}
+
+.help-text p {
+	font-size: 0.7rem;
+    font-style: italic;
+}
+.moreFilters{
+	float:right;
+	margin-right: 1rem;
+	justify-content: right;
+	text-align: right;
+	text-decoration: underline;
+	color:blue;
+}
+.emp-select,.status-select {
+	margin-right: 1em;
+}
+/* .emp-select:first-of-type,.status-select:first-of-type {
+	margin-left: 5em;
+} */
+.lookup-cmp {
+	padding-left: 5em;
+}
+.delete{
+	display: none;
+}
+.margin-fix{
+	margin-left:5em;
+}
+.margin-ending{
+	margin-right:1em;
+}
+.flota{
+	float:right;
+	padding-right:10em;
+}
+.form2alinear{
+	margin: center;
+	padding-left: 5%;
+}
+.recuperarbotones{
+	padding-top: 33.5em;
+}

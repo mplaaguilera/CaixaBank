@@ -1,0 +1,15 @@
+.slds-timeline__item_opportunity:before{
+    background: rgb(252 185 91);
+}
+.layout-item-pad-top{
+    padding-top: 0.25rem;
+}
+.tm-div{
+    margin-left: 1.1rem;
+}
+.div-inline{
+    display: inline;
+}
+.va-top{
+    vertical-align: top;
+}

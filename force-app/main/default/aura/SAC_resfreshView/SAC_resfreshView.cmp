@@ -1,0 +1,28 @@
+<aura:component controller="SAC_refreshView" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    <aura:attribute name="progress" type="Integer" default="0"/>
+    <aura:attribute name="isProgressing" type="Boolean" default="false"/>
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="stado" type="String" default="Inicio"/>
+
+    <aura:handler event="force:refreshView" action="{! c.refrescado}" />
+    <article class="slds-card" style="margin-bottom: -18px; background-color: rgb(244 151 86);
+    border-color: rgb(244 151 86);">
+
+        <div class="slds-card__header slds-grid slds-grid_align-end" style="padding-right: 6px !important;
+        padding: 0;">
+        <div class="slds-float_right">
+
+
+            <lightning:buttonIcon iconName="utility:sync"  alternativeText="Forzar refresco" title="Forzar refresco" onclick="{! c.forzarRefresco }" size="small" variant="bare-inverse"/>
+            </div>
+        </div>
+    </article>
+<!--
+    <lightning:progressBar value="{! v.progress }" />
+    <p>{!v.stado}</p>
+    
+    <p>{!v.caso.Status}</p>
+    <lightning:button label="{! v.isProgressing ? 'Stop' : 'Start' }" onclick="{! c.toggleProgress }" class="slds-m-top_medium"/>   
+-->
+
+</aura:component>

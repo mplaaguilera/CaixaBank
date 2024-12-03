@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permission set para ver los Dashboards de Analytics y con permisos de descarga</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>AV_Analytics</label>
+    <license>EinsteinAnalyticsPlusPsl</license>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>InsightsAppUser</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>WaveTabularDownload</name>
+    </userPermissions>
+</PermissionSet>

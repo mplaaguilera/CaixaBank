@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Relaciones_Campanya_Producto</fullName>
+    <columns>NAME</columns>
+    <columns>OB_Tipo_Validacion__c</columns>
+    <columns>OB_Agrupador_Plantillas__c</columns>
+    <columns>OB_Envio_GDD__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>OB_Parametrizacion__c.OB_Relacion_Campanya_Producto</value>
+    </filters>
+    <label>Relaciones Campaña - Producto</label>
+</ListView>

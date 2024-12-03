@@ -1,0 +1,36 @@
+.THIS .fileClass{
+    width:100% !important;
+    height: 300px !important;
+  }
+  
+  
+  .THIS .fileClass .slds-file-selector{
+    width:100% !important;
+    height: 300px !important;
+  }
+  
+  .THIS  .fileClass .slds-file-selector__dropzone{
+    width:100% !important;
+    height: 300px !important;
+  }
+  
+  .THIS  .fileClass .slds-file-selector__dropzone slot{
+    display: inline-block;
+    width:100% !important;
+    height: 300px !important;
+    padding-top:2%;
+    padding-bottom:2%
+  }
+  
+  .THIS  .fileClass .slds-file-selector__dropzone slot .slds-file-selector__body{
+    margin-left: 41% !important;
+  }
+
+  .THIS .cc_textarea_alto .slds-textarea {
+    height: 100px;
+  }
+
+  .THIS .iconoBlanco{
+      color: white;
+      --sds-c-icon-color-foreground-default: white;
+  }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Auditor__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check para saber si el colaborador del grupo puede realizar auditorias</description>
+    <label>Auditor</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Motivo_BDE__c</fullName>
+    <description>Campo necesario circular del Banco de España</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Motivo Banco de España</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>TextArea</type>
+</CustomField>

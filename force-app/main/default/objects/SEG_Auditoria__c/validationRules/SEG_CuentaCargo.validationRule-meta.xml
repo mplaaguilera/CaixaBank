@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CuentaCargo</fullName>
+    <active>true</active>
+    <errorConditionFormula>NOT(
+ OR(
+  LEN (SEG_CuentaCargo__c) = 0,
+  REGEX(SEG_CuentaCargo__c, &quot;[0-9]{4}-[0-9]{2}-[0-9]{8}&quot;)
+ )
+)</errorConditionFormula>
+    <errorDisplayField>SEG_CuentaCargo__c</errorDisplayField>
+    <errorMessage>El formato para la cuenta cargo debe ser siempre &quot;XXXX-XX-XXXXXXXX&quot;.</errorMessage>
+</ValidationRule>

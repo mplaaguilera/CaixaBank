@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_SLA_cliente_case__c</fullName>
+    <description>Usamos este campo para recoger el SLA del MCC que aplica en este caso</description>
+    <label>SLA Mcc</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Máximo 2h después recepción</fullName>
+                <default>false</default>
+                <label>Máximo 2h después recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 4h después recepción</fullName>
+                <default>false</default>
+                <label>Máximo 4h después recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 2 días hábiles desde la recepción</fullName>
+                <default>false</default>
+                <label>Máximo 2 días hábiles desde la recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 3 días hábiles desde la recepción</fullName>
+                <default>false</default>
+                <label>Máximo 3 días hábiles desde la recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 4 días hábiles desde la recepción</fullName>
+                <default>false</default>
+                <label>Máximo 4 días hábiles desde la recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 5 días hábiles desde la recepción</fullName>
+                <default>false</default>
+                <label>Máximo 5 días hábiles desde la recepción</label>
+            </value>
+            <value>
+                <fullName>Máximo 1 semana</fullName>
+                <default>false</default>
+                <label>Máximo 1 semana</label>
+            </value>
+            <value>
+                <fullName>Máximo 1 mes</fullName>
+                <default>false</default>
+                <label>Máximo 1 mes</label>
+            </value>
+            <value>
+                <fullName>Mismo día recepción</fullName>
+                <default>false</default>
+                <label>Mismo día recepción</label>
+            </value>
+            <value>
+                <fullName>Día siguiente recepción</fullName>
+                <default>false</default>
+                <label>Día siguiente recepción</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

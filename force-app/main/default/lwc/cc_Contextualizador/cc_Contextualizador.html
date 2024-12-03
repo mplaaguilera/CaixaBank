@@ -1,0 +1,31 @@
+<template>
+    <div>
+        <lightning-card title="Journey Cognitive" icon-name="standard:bot" style="font-weight: bold;">
+            <div class="slds-m-around_medium" style="font-weight: normal;">
+                <div class="slds-m-around_medium">
+                    <template if:false={infoMostrar}>
+                        <p>No hay información para mostrar</p>
+                    </template>
+                    <template if:true={infoMostrar}>
+                        <!-- <template if:true={context.Fecha}>
+                            <p><b style="font-weight: bold;">Fecha movimiento:</b> {context.Fecha}</p>
+                        </template>
+                        <template if:true={context.Comercio}>
+                            <p><b style="font-weight: bold;">Comercio:</b> {context.Comercio}</p>
+                        </template>
+                        <template if:true={context.Importe}>
+                            <p><b style="font-weight: bold;">Importe:</b> &euro; {context.Importe}</p>
+                        </template> -->
+                        <template if:true={context.MotivoDenegacion}>
+                            <p><b style="font-weight: bold;">Motivo denegación:</b> {context.MotivoDenegacion}</p>
+                        </template>
+                        <!-- <template if:true={context.CategoriaDenegacion}>
+                            <p><b style="font-weight: bold;">Categoría denegación:</b> {context.CategoriaDenegacion}</p>
+                        </template> -->
+
+                    </template>
+                </div>
+            </div>
+        </lightning-card>
+    </div>
+</template>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Integracion_Adjuntos_Pesados__c</fullName>
+    <description>EN este campo se define el sistema de integración al que deben de ir los casos que contentan documentos que superen el límite en el campo Tamaño Máximo Adjuntos</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Especifíca el Sistema (Azure, OpenServices, etc) por el que van a ir los casos con adjuntos que superen el límite introducido en el campo Tamaño Máximo Adjuntos.Por defecto irá por Azure si no está relleno y se supera el límite.</inlineHelpText>
+    <label>Integración Adjuntos Pesados</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

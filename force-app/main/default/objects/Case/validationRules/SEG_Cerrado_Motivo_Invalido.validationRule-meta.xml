@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Cerrado_Motivo_Invalido</fullName>
+    <active>true</active>
+    <description>No se permite cerrar casos con Motivos que sean FIRMA OK o FIRMA NOK</description>
+    <errorConditionFormula>AND(
+!($Profile.Name == &apos;System Administrator&apos;),
+!ISNEW(),
+OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;, RecordType.DeveloperName == &apos;SEG_Seguimiento&apos;),  
+ISCHANGED(Status),
+ISPICKVAL(Status, &apos;Cerrado&apos;),
+OR(CC_MCC_Motivo__r.Name == &apos;FIRMA OK&apos;, CC_MCC_Motivo__r.Name == &apos;FIRMA NOK&apos;)
+)</errorConditionFormula>
+    <errorMessage>No se permite cerrar casos con el motivo Firma OK/Firma NOK</errorMessage>
+</ValidationRule>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_RelativeClientProfSeg__c</fullName>
+    <description>Campo para la segmentación dinámica</description>
+    <label>Relative Profitability Clnt Segmentation</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>Alta</label>
+            </value>
+            <value>
+                <fullName>MA</fullName>
+                <default>false</default>
+                <label>Media Alta</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Media</label>
+            </value>
+            <value>
+                <fullName>MB</fullName>
+                <default>false</default>
+                <label>Media Baja</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>Baja</label>
+            </value>
+            <value>
+                <fullName>MOR</fullName>
+                <default>false</default>
+                <label>Morosos</label>
+            </value>
+            <value>
+                <fullName>IN</fullName>
+                <default>false</default>
+                <label>Inactivos</label>
+            </value>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>Project Finance</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

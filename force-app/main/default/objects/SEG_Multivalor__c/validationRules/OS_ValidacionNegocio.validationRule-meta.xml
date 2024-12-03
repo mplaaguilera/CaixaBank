@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_ValidacionNegocio</fullName>
+    <active>true</active>
+    <description>Regla de validación para evitar que puedan poner un valor de otro negocio sin querer y dejen de ver el registro por las Sharing Rules.</description>
+    <errorConditionFormula>AND(
+					ISPICKVAL(SEG_Reglas_Clasificacion__r.CBK_Negocio__c, &quot;Cops&quot;) ,
+				 OR(ISCHANGED(CBK_Negocio__c ) , ISNEW() ),
+	    NOT( ISPICKVAL(CBK_Negocio__c , &quot;Cops&quot;) ) 
+	)</errorConditionFormula>
+    <errorMessage>El negocio informado no es correcto, se ha de seleccionar el valor Cops.</errorMessage>
+</ValidationRule>

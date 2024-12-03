@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Responder accionista es formal</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Canal_procedencia__c</field>
+        <value xsi:type="xsd:string">Accionista</value>
+    </values>
+    <values>
+        <field>CC_Nombre_plantilla_cabecera__c</field>
+        <value xsi:type="xsd:string">Cabecera_es_formal_accionista</value>
+    </values>
+    <values>
+        <field>CC_Nombre_plantilla_pie__c</field>
+        <value xsi:type="xsd:string">Pie_es_formal_accionista</value>
+    </values>
+    <values>
+        <field>CC_Operativa__c</field>
+        <value xsi:type="xsd:string">responder</value>
+    </values>
+    <values>
+        <field>CC_Tipo_Registro__c</field>
+        <value xsi:type="xsd:string">CC_Cliente</value>
+    </values>
+    <values>
+        <field>CC_Tratamiento__c</field>
+        <value xsi:type="xsd:string">CC_Responder_Accionista_es_formal</value>
+    </values>
+</CustomMetadata>

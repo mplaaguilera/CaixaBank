@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Lookup_Espacio__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Lookup Espacio</label>
+    <referenceTo>CC_FAQ__c</referenceTo>
+    <relationshipLabel>FAQs (Lookup Espacio)</relationshipLabel>
+    <relationshipName>FAQs1</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

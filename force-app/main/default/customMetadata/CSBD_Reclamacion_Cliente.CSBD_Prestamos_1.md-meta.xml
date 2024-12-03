@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Préstamos - 1a reclamación</label>
+    <protected>false</protected>
+    <values>
+        <field>CSBD_Numero_Reclamacion__c</field>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>CSBD_Plantilla_CBK_Castellano__c</field>
+        <value xsi:type="xsd:string">Préstamos - Reclamación SMS CaixaBank Castellano</value>
+    </values>
+    <values>
+        <field>CSBD_Plantilla_CBK_Catalan__c</field>
+        <value xsi:type="xsd:string">Préstamos - Reclamación SMS CaixaBank Catalán</value>
+    </values>
+    <values>
+        <field>CSBD_Plantilla_IMG_Castellano__c</field>
+        <value xsi:type="xsd:string">Préstamos - Reclamación SMS imaginBank Castellano</value>
+    </values>
+    <values>
+        <field>CSBD_Plantilla_IMG_Catalan__c</field>
+        <value xsi:type="xsd:string">Préstamos - Reclamación SMS imaginBank Catalán</value>
+    </values>
+    <values>
+        <field>CSBD_Tipo__c</field>
+        <value xsi:type="xsd:string">Enviar SMS</value>
+    </values>
+</CustomMetadata>

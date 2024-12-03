@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Actualizar evento</fullName>
+                <default>false</default>
+                <label>Actualizar evento</label>
+            </value>
+            <value>
+                <fullName>Mensaje VRU</fullName>
+                <default>false</default>
+                <label>Mensaje VRU</label>
+            </value>
+            <value>
+                <fullName>Notificación</fullName>
+                <default>false</default>
+                <label>Notificación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

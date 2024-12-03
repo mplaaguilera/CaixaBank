@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Idiomas__c</fullName>
+    <description>Idioma de no cliente (MVP: proviene de portal, idioma con el que se registra el usuario)</description>
+    <label>Idioma</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>AV_IdiomasGlobal</valueSetName>
+    </valueSet>
+</CustomField>

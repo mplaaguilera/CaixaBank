@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Solicitud__c</fullName>
+    <label>Solicitud</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION</fullName>
+                <default>true</default>
+                <label>SOLICITUD DOCUMENTACIÓN</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION NO TITULAR</fullName>
+                <default>false</default>
+                <label>SOLICITUD DOCUMENTACIÓN NO TITULAR</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION PRESTAMO HIPOTECARIO</fullName>
+                <default>false</default>
+                <label>SOLICITUD DOCUMENTACIÓN PRÉSTAMO HIPOTECARIO</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION TARJETA</fullName>
+                <default>false</default>
+                <label>SOLICITUD DOCUMENTACIÓN TARJETA</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION AHORRO A LA VISTA</fullName>
+                <default>false</default>
+                <label>SOLICITUD DOCUMENTACIÓN AHORRO A LA VISTA</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DOCUMENTACION CAIXABANK CONSUMER</fullName>
+                <default>false</default>
+                <label>SOLICITUD DOCUMENTACIÓN CAIXABANK CONSUMER</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

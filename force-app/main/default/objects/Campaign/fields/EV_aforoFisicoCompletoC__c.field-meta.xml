@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_aforoFisicoCompletoC__c</fullName>
+    <description>Campo boolean para conocer si se ha sobrepasado el espacio del aforo fisico</description>
+    <formula>EV_Aforo_espacio_fisico__c &lt;= EV_InscritosFisicosC__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Aforo Fisico Completo Evento</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

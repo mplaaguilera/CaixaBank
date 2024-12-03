@@ -1,0 +1,14 @@
+<apex:page showHeader="false" controller="SAC_CaseControllerVF" contentType="application/msword#Redacción resolución.doc" sidebar="false" standardStylesheets="false" applyHtmlTag="false" applyBodyTag="false">
+    <meta charset="utf-8"/>
+    <style>   
+        body { font-family: 'Arial Unicode MS'; }
+    </style>
+    
+    <apex:pageBlock >
+        <apex:pageMessages />
+        <p>{!reclamacion}</p>
+        <br />
+        <p>{!pretensiones}</p>
+    </apex:pageBlock>
+
+</apex:page>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_EstadoVolumenPublicoObjetivo__c</fullName>
+    <label>Estado Volumen Publico Objetivo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>No solicitado</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Solicitado</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Confirmado</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>Finalizado</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Publico objetivo recibido</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Error query</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

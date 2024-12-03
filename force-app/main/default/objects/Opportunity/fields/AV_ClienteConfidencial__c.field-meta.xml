@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ClienteConfidencial__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador para comprobar si el cliente asociado es confidencial o no.
+Se actualiza desde el Batch de Confidenciales</description>
+    <label>Cliente confidencial</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

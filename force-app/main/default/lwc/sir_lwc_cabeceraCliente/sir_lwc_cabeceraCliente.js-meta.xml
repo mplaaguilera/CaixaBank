@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+     <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <!--Nombre de la label en la sandbox-->
+    <masterLabel>sir_lwc_cabeceraCliente</masterLabel>
+     <!--Vincular variables a JS @api-->
+     <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="tipoFicha" type="Boolean" default="false" label="Tipo de Ficha" description="Ficha - Cliente ( true) , Ficha - Proceso ( false)"/>
+        </targetConfig>
+    </targetConfigs>
+
+</LightningComponentBundle>

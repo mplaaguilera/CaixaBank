@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Duracion</fullName>
+    <active>true</active>
+    <description>La duración de la parametrización no puede ser menor o igual que 0</description>
+    <errorConditionFormula>SAC_Duracion__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>SAC_Duracion__c</errorDisplayField>
+    <errorMessage>La duración de la parametrización no puede ser menor o igual que 0</errorMessage>
+</ValidationRule>

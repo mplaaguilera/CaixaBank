@@ -1,0 +1,91 @@
+<template>
+    <lightning-card  variant="Narrow"  title="Asuntos pendientes" icon-name="utility:note" size="small">
+        <div class="slds-grid slds-gutters myclass">
+            <div class="slds-col slds-size_2-of-3">
+                Comprobar si hay escalados, consultas y/o tareas pendientes                
+            </div>
+            <template if:true={mostrarComprobar}>
+                <div class="slds-col slds-size_1-of-3 ">
+                    <div class="slds-float_right">
+                        <lightning-button variant="brand"
+                            label="Comprobar"
+                            title="Comprobar pendientes"
+                            onclick={comprobarClick}
+                            class="slds-m-left_x-small">
+                            </lightning-button>
+                    </div>                
+                </div>  
+            </template>
+            <template if:true={mostrarOcultar}>
+                <div class="slds-col slds-size_1-of-3 ">
+                    <div class="slds-float_right">
+                        <lightning-button variant="brand"
+                            label="Ocultar"
+                            title="Ocultar resultados"
+                            onclick={ocultarClick}
+                            class="slds-m-left_x-small">
+                            </lightning-button>
+                    </div>                
+                </div>  
+            </template>                                 
+        </div>    
+        
+        <div class="myclass">
+            <template if:true={mostrarMensaje}>
+                <div class="slds-col slds-size_3-of-3 myclass sinResultadosClass">
+                    {mensaje}
+                </div>                
+            </template>
+            <template if:true={mostrarTareas}> 
+                <div class="slds-col slds-size_3-of-3">
+                    <lightning-datatable
+                    key-field="id"
+                    data={dataTareas}
+                    columns={columnasTareas}
+                    hide-checkbox-column
+                    default-sort-direction={defaultSortDirection}
+                    sorted-direction={sortDirectionTareas}
+                    sorted-by={sortedBy}
+                    onsort={onHandleSortTareas}
+                    onrowaction={navigateToRecordViewPage}>
+                </lightning-datatable>
+                </div>
+                <div class="space"></div>
+            </template>  
+            
+    
+            <template if:true={mostrarConsultas}> 
+                <div class="slds-col slds-size_3-of-3">
+                    <lightning-datatable
+                    key-field="id"
+                    data={dataConsultas}
+                    columns={columnasConsultas}
+                    hide-checkbox-column
+                    default-sort-direction={defaultSortDirection}
+                    sorted-direction={sortDirectionConsultas}
+                    sorted-by={sortedBy}
+                    onsort={onHandleSortConsultas}>
+                </lightning-datatable>
+                </div>
+                <div class="space"></div>
+            </template>             
+            
+            <template if:true={mostrarEscalados}> 
+                <div class="slds-col slds-size_3-of-3">
+                    <lightning-datatable
+                    key-field="id"
+                    data={dataEscalados}
+                    columns={columnasEscalado}
+                    hide-checkbox-column
+                    default-sort-direction={defaultSortDirection}
+                    sorted-direction={sortDirectionEscalados}
+                    sorted-by={sortedBy}
+                    onsort={onHandleSortEscalados}>
+                </lightning-datatable>
+                </div>
+                <div class="space"></div>
+            </template>  
+        </div>
+        
+    </lightning-card>        
+</template>

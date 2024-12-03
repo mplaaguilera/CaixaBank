@@ -1,0 +1,35 @@
+.avisoPlanificacion {
+    border-radius: 6px;
+    /* max-width: 510px; */
+    /* background-color: rgba(0, 67, 255, 0.12); */
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(0, 35, 223, 0.12);
+    font-weight: 300;
+    --slds-c-alert-color-background: #9acff53d;
+}
+
+.iconoAzul {
+    --slds-c-icon-color-foreground: black;
+}
+
+.blink {
+    animation-name: blinkKeyFrames;
+    animation-iteration-count: infinite;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+}
+
+@keyframes blinkKeyFrames {
+    50% { opacity: 0.3; }
+}
+
+lightning-button, lightning-button-icon, lightning-button-menu, lightning-combobox {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+    --slds-c-input-color-border-focus: rgb(201, 201, 201);
+}

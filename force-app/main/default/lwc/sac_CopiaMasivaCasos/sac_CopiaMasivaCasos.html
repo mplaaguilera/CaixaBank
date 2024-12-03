@@ -1,0 +1,60 @@
+<template>
+    <!--Pantalla 1, pregunta si se quiere continuar-->
+    <template if:true={pantalla1}>
+        <div class="slds-align_absolute-center">
+            <!--<p>Insertar número de copias a generar</p>-->
+            <template lwc:if={esCops}>
+                <lightning-input type="number" name="input3" label="Insertar número de copias a generar (Máximo de 300)" placeholder="Insertar aquí..." onchange={handleNumberChange}></lightning-input>
+            </template>
+            <template lwc:else>
+                <lightning-input type="number" name="input3" label="Insertar número de copias a generar (Máximo de 3)" placeholder="Insertar aquí..." onchange={handleNumberChange}></lightning-input>
+            </template>
+        </div>
+        <br/><br/>
+        <lightning-button variant="brand" label="Cancelar" onclick={cerrarModalPadre} class="slds-float_left"></lightning-button>
+        <lightning-button variant="brand" label="Continuar" onclick={abrirPantalla2} class="slds-float_right"></lightning-button>
+    </template>
+
+    <!--Pantalla 2, pide el número de copias deseado-->
+    <template if:true={pantalla2}>
+        <div class="slds-align_absolute-center">
+            <p><strong>Esta acción realizará {numeroCopias} copias de esta reclamación, con sus pretensiones y adjuntos, desea continuar?</strong></p>
+        </div>
+        <br/><br/>
+        <lightning-button variant="brand" label="Cancelar" onclick={cerrarModalPadre} class="slds-float_left"></lightning-button>
+        <lightning-button variant="brand" label="Generar copias" onclick={generarCopias} class="slds-float_right"></lightning-button>
+    </template>
+
+    <!--Pantalla 3, mensaje al acabar la operación-->
+    <template if:true={pantalla3}>
+        <div class="slds-align_absolute-center">
+            <p><strong>Proceso generado con éxito.</strong></p>
+        </div>
+        <br/><br/>
+        <lightning-button variant="brand" label="Cerrar" onclick={cerrarModalPadreRefresh} class="slds-float_right"></lightning-button>
+    </template>
+
+    <!--Spinner-->
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                <br/>
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </div>
+                            <br/>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

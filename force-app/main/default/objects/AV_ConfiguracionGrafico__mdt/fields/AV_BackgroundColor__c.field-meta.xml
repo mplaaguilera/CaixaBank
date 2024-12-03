@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_BackgroundColor__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>BackgroundColor</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>rgba(0, 151, 212,0.5)</fullName>
+                <default>false</default>
+                <label>blueCaixa</label>
+            </value>
+            <value>
+                <fullName>rgba(0, 151, 245,0.5)</fullName>
+                <default>false</default>
+                <label>blue2</label>
+            </value>
+            <value>
+                <fullName>rgba(33, 127, 190,0.5)</fullName>
+                <default>false</default>
+                <label>blue3</label>
+            </value>
+            <value>
+                <fullName>rgba(37, 102, 151,0.5)</fullName>
+                <default>false</default>
+                <label>blue4</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

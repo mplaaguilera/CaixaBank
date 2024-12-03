@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Margen_Facturacion</fullName>
+    <active>true</active>
+    <label>Margen Facturacion</label>
+    <picklistValues>
+        <picklist>CC_Area_de_Negocio__c</picklist>
+        <values>
+            <fullName>ACCIONISTAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ATENCION AL CLIENTE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CAIXABANKNOW</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CAJEROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CCO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CONTACT CENTER</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IMAGINBANK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MICROBANK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGUROS Y PLANES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TARJETAS CPC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TARJETAS M2P</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TELEFONO UNICO %2B AIO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WIVAI</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

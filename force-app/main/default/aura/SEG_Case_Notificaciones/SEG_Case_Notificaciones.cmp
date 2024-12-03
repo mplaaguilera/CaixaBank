@@ -1,0 +1,19 @@
+<aura:component controller="SEG_MostrarExcepciones" implements="force:hasRecordId,flexipage:availableForRecordHome">
+    
+	<aura:attribute name="recordId" type="String"/>
+
+	<aura:attribute name="caseRecord" type="Case"/>
+	<aura:attribute name="recordLoadError" type="String"/>
+  
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <force:recordData aura:id="recordLoader" 
+      recordId="{!v.recordId}"
+      fields="OwnerId,SEG_Grupo__c,SEG_Grupo_colaborador_Externo__c,Status,SEG_Subestado__c,SEG_Organizacion__c,SEG_ClasificacionRapida__c,AccountId"
+      targetFields="{!v.caseRecord}"
+      targetError="{!v.recordLoadError}"
+      recordUpdated="{!c.recordUpdated}"
+    />  
+	
+</aura:component>

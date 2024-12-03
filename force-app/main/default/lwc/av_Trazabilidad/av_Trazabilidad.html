@@ -1,0 +1,32 @@
+<template>
+    <lightning-card>
+        <lightning-datatable
+            key-field="id"
+            columns={columns}
+            data={items}
+            hide-checkbox-column
+            default-sort-direction={defaultSortDirection}
+            sorted-direction={sortDirection}
+            sorted-by={sortedBy}
+            onsort={onHandleSort}
+            onrowaction={callRowAction}> 
+        </lightning-datatable>
+        <br/>
+        <div if:true={isMultipagina}>
+            <lightning-layout horizontal-align="space">
+                <lightning-layout-item flexibility="auto">
+                    <lightning-button if:true={goBack} label="Anterior" icon-name="utility:chevronleft" onclick={previousHandler}>
+                    </lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="auto">
+                    Página {pagekey}
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="auto">
+                    <lightning-button if:true={nextPage} label="Posterior" icon-name="utility:chevronright" icon-position="right"
+                        onclick={nextHandler}></lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </lightning-card>
+    <lightning-spinner if:true={showSpinner} alternative-text="Cargando" size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+</template>

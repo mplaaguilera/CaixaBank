@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Zona__c</fullName>
+    <label>Zona</label>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SEG_Organizacion__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetName>SEG_Zona_Segmentos</valueSetName>
+        <valueSettings>
+            <controllingFieldValue>Banca Corporativa</controllingFieldValue>
+            <valueName>Corporativa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Andalucía</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Barcelona</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Castilla La Mancha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Madrid</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Valencia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Norte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Baleares</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Castilla y León</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Ebro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Murcia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Centro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Este</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Norte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Sur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Soporte Especialistas</controllingFieldValue>
+            <valueName>CSE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Créditos Sindicados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Operaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Seguimiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Soporte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Export Finance</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 1</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 2</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 3</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 4</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banca Internacional</controllingFieldValue>
+            <valueName>Sucursales Internacionales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banca Internacional</controllingFieldValue>
+            <valueName>Oficinas Representación</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

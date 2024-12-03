@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Auditoria_IZO__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si se ha seleccionado este usuario para las auditorias IZO. Uso interno</description>
+    <label>Auditoría IZO (interno)</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

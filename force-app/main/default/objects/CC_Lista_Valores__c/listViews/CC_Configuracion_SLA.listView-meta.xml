@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Configuracion_SLA</fullName>
+    <columns>CC_Lista__c</columns>
+    <columns>CC_Activa__c</columns>
+    <columns>NAME</columns>
+    <columns>CC_Valor__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Lista__c</field>
+        <operation>contains</operation>
+        <value>SLA</value>
+    </filters>
+    <label>Configuración de SLA</label>
+</ListView>

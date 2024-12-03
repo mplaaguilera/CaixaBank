@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Clasificacion_Maximo_Compact_Layout</fullName>
+    <fields>CC_Nivel_1__c</fields>
+    <fields>CC_Nivel_2__c</fields>
+    <fields>CC_Nivel_3__c</fields>
+    <fields>CC_Nivel_4__c</fields>
+    <fields>CC_Nivel_5__c</fields>
+    <label>Clasificación Maximo Compact Layout</label>
+</CompactLayout>

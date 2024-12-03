@@ -1,0 +1,71 @@
+<template>   
+    <div class="slds-grid slds-wrap formulario">
+        <div class="slds-size_1-of-4">
+            <div class=" slds-m-around_x-small">
+                <lightning-combobox name="miembros" label="Miembros totales unidad familiar" placeholder="Seleccione una opción" value={miembrosUnidad} options={optionsMiembros} onchange={changeMiembros} style="width:200px;"></lightning-combobox>
+            </div>
+        </div>
+        <div class="slds-size_3-of-4">            
+        </div>      
+    </div>
+
+    <div class="slds-section slds-is-open">
+        <h3 class="slds-section__title slds-theme_shade">
+            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Gastos que tienen el carácter de necesarios (cargas no financieras)</span>
+        </h3>
+    </div>
+    <div class="slds-grid slds-wrap formulario">
+        <div class="slds-size_1-of-4">
+            <div class="slds-m-around_x-small">
+                <table>
+                    <tr>
+                        <td class="slds-form-element__label slds-no-flex">Importe mínimo subsistencia </td>
+                        <td class="ancho">
+                            <lightning-input type="number" label="" variant="label-hidden" formatter="currency" read-only="true" disabled="true" value={impMin}></lightning-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="slds-form-element__label slds-no-flex">Alquiler mensual vivienda habitual </td>
+                        <td class="ancho">
+                            <lightning-input type="number" class="derecha" label="" variant="label-hidden" formatter="currency" step=".01" value={alquiler} onchange={changeAlquiler}></lightning-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="slds-form-element__label slds-no-flex">Pensión mensual alimenticia </td>
+                        <td class="ancho">
+                            <lightning-input type="number" label="" variant="label-hidden" formatter="currency" step=".01" value={pension} onchange={changePension}></lightning-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="slds-form-element__label slds-no-flex">Otros gastos mensuales</td>
+                        <td class="ancho">
+                            <lightning-input type="number" label="" variant="label-hidden" formatter="currency" step=".01" value={otros} onchange={changeOtros}></lightning-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="slds-form-element__label slds-no-flex" style="font-weight: bold;">Total </td>
+                        <td class="ancho">
+                            <lightning-input style="font-weight: bold;" type="number" label="" variant="label-hidden" formatter="currency" read-only="true" disabled="true" value={totalGastos} ></lightning-input>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="slds-size_1-of-4">            
+        </div>
+        <div class="slds-size_2-of-4">
+            <div class="slds-m-around_x-small">
+                <lightning-textarea label ="Justificar otros gastos mensuales" value={justificarOtros} onchange={changeOtrosGastos}></lightning-textarea>
+            </div>
+        </div>       
+    </div>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-size_2-of-2">
+            <div class="slds-m-around_x-small">
+                <button class="slds-button slds-button_brand" onclick={guardar}>Guardar</button>
+            </div>
+        </div>       
+    </div>
+
+  
+</template>

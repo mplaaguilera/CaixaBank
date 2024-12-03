@@ -1,0 +1,27 @@
+Account oficina = new Account();
+oficina.RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('CC_CentroCaixaBank').getRecordTypeId();
+oficina.Name = '00615 - STORE DOS DE MAIG-ROSSELLO';
+oficina.BillingCity = 'BARCELONA';
+oficina.BillingCountry = 'ESPAÑA';
+oficina.BillingPostalCode = '08025';
+oficina.BillingState = 'BARCELONA';
+oficina.BillingStreet = 'C. DOS DE MAIG, 278';
+oficina.CC_CodAutonomia__c = '009';
+oficina.CC_Email__c = '0615@caixabank.com.test';
+oficina.CC_Idioma_Oficina__c = '001';
+oficina.CC_Numero_Empresa__c = '001';
+oficina.CC_Numero_Oficina__c = '00615';
+oficina.CC_Numero_Oficina_Empresa__c = '001-00615';
+oficina.CC_Tipo_Centro__c = 'OF';
+oficina.CC_Tipo_Oficina__c = '8';
+oficina.Phone = '933056430';
+insert oficina;
+
+Contact empleado = new Contact();
+empleado.RecordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('CC_Empleado').getRecordTypeId();
+empleado.AccountId = oficina.Id;
+empleado.FirstName = 'TREVOR';
+empleado.LastName = 'SMART';
+empleado.Email = 'trevor.smart@caixabank.com.test';
+empleado.Phone = '933056430';
+insert empleado;

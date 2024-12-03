@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_Pendiente_Escalado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Este campo estará checked (True) cuando la reclamación tenga un escalado que esté pendiente de resolución. En caso contrario, si no hay escalado o ya está resuelto, estará unchecked</description>
+    <label>Pendiente Escalado</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

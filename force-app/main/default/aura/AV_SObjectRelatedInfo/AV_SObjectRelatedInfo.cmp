@@ -1,0 +1,119 @@
+<!--********************************************************************************************************************
+Name:	  AV_SObjectRelatedInfo
+Copyright © 2020  CaixaBank
+=======================================================================================================================
+Proposito: Component to show related SObject information based on fieldset.
+=======================================================================================================================
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY	   AUTHOR				DATE				Description
+1.0			Display Data	 Carolina Alonso	   27/03/2020		  Init version
+1.1			Display Data	 David Rufo			14/04/2020		  Split in 2 components: AV_DataObject + AV_SObjectRelatedInfo
+
+*********************************************************************************************************************-->
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" description="Related data of an Object" access="global">
+
+	<!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="objectApiName"	type="String"/>
+	<aura:attribute name="filterType"		type="String"/>
+	<aura:attribute name="filterField"		type="String"/>
+	<aura:attribute name="fieldSetName"		type="String"/>
+	<aura:attribute name="displayLabel"		type="String"/>
+	<aura:attribute name="columnNum"		type="String"/>
+	<aura:attribute name="readOnly"			type="Boolean"/>
+	<aura:attribute name="allowEditMode"	type="Boolean"/>
+	<aura:attribute name="density"			type="String"/>
+	<aura:attribute name="textStyle"		type="String"/>
+	<aura:attribute name="contentStyle"		type="String"/>
+	<aura:attribute name="titleAccordion"   type="String"/>
+	<aura:attribute name="expandAccordion"  type="Boolean"/>
+	<aura:attribute name="titleCard"		type="String"/>
+	<aura:attribute name="iconCard"			type="String"/>
+	<aura:attribute name="interlocutor"		type="Boolean"	default="true"/>
+
+	<!-- PRIVATE FOR COMPONENT -->
+	<aura:attribute name="valueTitleCard"   type="String"/>
+	<aura:attribute name="valueTitleAccordion"   type="String"/>
+	<aura:attribute name="filterObjectId"   type="String"/>
+	<aura:attribute name="fields"		   type="FieldSetMember[]"/>
+	<aura:attribute name="numberColumns"	type="Integer"  default="12"/>
+	<aura:attribute name="activeSections"   type="String"   default="defaultAccordionSection" />
+
+	<!-- INIT AURA COMPONENT -->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<!-- CAPTURE COMPONENT EVENT FROM CHILD -->
+	<aura:handler name="interlocutorEvent" event="c:AV_SObjectRelatedEvent" action="{!c.handleComponentEvent}"/>
+
+	<!-- CONTENT -->
+	<aura:if isTrue="{!v.interlocutor}">
+	<lightning:card>
+		<aura:set attribute="title">
+			<aura:if isTrue="{!not(empty(v.iconCard))}">
+				<lightning:icon alternativeText="IconCard" iconName="{!v.iconCard}"/>
+			</aura:if>
+			<aura:if isTrue="{!not(empty(v.titleCard))}">
+				<span class="slds-m-around--small">{!v.valueTitleCard}</span>			
+			</aura:if>
+		</aura:set>
+		
+		
+			<div class = "slds-p-around--x-small">
+				<!-- DATA WITH ACCORDION -->
+				<aura:if isTrue = "{!not(empty(v.titleAccordion))}">
+					<lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{! v.expandAccordion ? v.activeSections : '' }">
+						<lightning:accordionSection name="defaultAccordionSection" label="{!v.valueTitleAccordion}">
+							<aura:if isTrue ="{!and(v.filterType != 'Task', v.filterType != 'Event')}">
+								<c:AV_DataObject
+									recordId="{!v.recordId}"					 objectApiName="{!v.objectApiName}"
+									filterType="{!v.filterType}"				 filterField="{!v.filterField}"
+									fieldSetName="{!v.fieldSetName}"			 displayLabel="{!v.displayLabel}"
+									columnNum="{!v.columnNum}"				   readOnly="{!v.readOnly}"
+									allowEditMode="{!v.allowEditMode}"		   density="{!v.density}"
+									textStyle="{!v.textStyle}"				   contentStyle="{!v.contentStyle}"
+								/>
+								<aura:set attribute="else">
+									<c:AV_TaskDataObject
+									recordId="{!v.recordId}"					 objectApiName="{!v.objectApiName}"
+									filterType="{!v.filterType}"				 filterField="{!v.filterField}"
+									fieldSetName="{!v.fieldSetName}"			 displayLabel="{!v.displayLabel}"
+									columnNum="{!v.columnNum}"				   readOnly="{!v.readOnly}"
+									allowEditMode="{!v.allowEditMode}"		   density="{!v.density}"
+									textStyle="{!v.textStyle}"				   contentStyle="{!v.contentStyle}"
+									interlocutor="{!v.interlocutor}"
+									/>
+								</aura:set>
+							</aura:if>
+						</lightning:accordionSection>
+					</lightning:accordion>
+				</aura:if>
+
+				<!-- DATA WITHOUT ACCORDION -->
+				<aura:if isTrue = "{!empty(v.titleAccordion)}">
+					<aura:if isTrue ="{!and(v.filterType != 'Task', v.filterType != 'Event')}">
+						<c:AV_DataObject
+							recordId="{!v.recordId}"					 objectApiName="{!v.objectApiName}"
+							filterType="{!v.filterType}"				 filterField="{!v.filterField}"
+							fieldSetName="{!v.fieldSetName}"			 displayLabel="{!v.displayLabel}"
+							columnNum="{!v.columnNum}"				   readOnly="{!v.readOnly}"
+							allowEditMode="{!v.allowEditMode}"		   density="{!v.density}"
+							textStyle="{!v.textStyle}"				   contentStyle="{!v.contentStyle}"
+						/>
+						<aura:set attribute="else">
+							<c:AV_TaskDataObject
+							recordId="{!v.recordId}"					 objectApiName="{!v.objectApiName}"
+							filterType="{!v.filterType}"				 filterField="{!v.filterField}"
+							fieldSetName="{!v.fieldSetName}"			 displayLabel="{!v.displayLabel}"
+							columnNum="{!v.columnNum}"				   readOnly="{!v.readOnly}"
+							allowEditMode="{!v.allowEditMode}"		   density="{!v.density}"
+							textStyle="{!v.textStyle}"				   contentStyle="{!v.contentStyle}"
+							/>
+						</aura:set>
+
+					</aura:if>
+				</aura:if>
+			</div>
+		
+	</lightning:card>
+</aura:if>
+</aura:component>

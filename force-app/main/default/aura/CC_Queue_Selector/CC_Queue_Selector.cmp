@@ -1,0 +1,34 @@
+<aura:component controller="CC_Queue_Selector_Controler" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global">
+     <lightning:utilityBarAPI aura:id="utilitybar" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:attribute name="opcionesCola" type="List" default="[]"/>
+    <aura:attribute name="cola" type="String" default="Todas"/>
+    <aura:attribute name="itemsCola" type="List" default="[]"/>
+    <aura:attribute name="colaSeleccionada" type="Boolean" default="false"/>
+    <aura:handler name="refrescar" event="c:CC_Queue_Selector_Event" action="{!c.refreshColaSeleccionada}"/>
+    
+    <div class="content">
+        <lightning:card  >
+            <lightning:combobox aura:id="selectCola" name="colalst" 
+                                        	placeholder="-Selecciona una cola-"
+                                        	value=""
+                                        	required="false"
+                                        	dropdownAlignment="right"
+                                        	variant="standard"
+                                        	onchange="{!c.handleColaSeleccionada}"
+                                        	options="{!v.opcionesCola}"/>
+        </lightning:card>
+        
+        
+        <!-- Lista -->
+        <div class="slds-container_fluid slds-scrollable_y content">
+          <aura:iteration items="{!v.itemsCola}" var="caso">
+              <c:CC_Queue_Selector_Item caso="{!caso}" />
+          </aura:iteration>
+        </div>
+        
+        
+    </div>   
+</aura:component>

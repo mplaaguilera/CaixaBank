@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_DuracionOpcional__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>No mostrar la duración del evento en las comunicaciones enviadas a cliente</inlineHelpText>
+    <label>Ocultar duración</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

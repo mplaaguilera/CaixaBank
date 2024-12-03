@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TipoVenta__c</fullName>
+    <inlineHelpText>Tipo de venta</inlineHelpText>
+    <label>Descripción</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <label>Primera aportacion</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <label>Nueva aportacion</label>
+            </value>
+            <value>
+                <fullName>012</fullName>
+                <default>false</default>
+                <label>Aportacion periodica</label>
+            </value>
+            <value>
+                <fullName>013</fullName>
+                <default>false</default>
+                <label>Traspaso externo</label>
+            </value>
+            <value>
+                <fullName>020</fullName>
+                <default>false</default>
+                <label>Limite de riesgo inicial</label>
+            </value>
+            <value>
+                <fullName>021</fullName>
+                <default>false</default>
+                <label>Cambio limite de riesgo</label>
+            </value>
+            <value>
+                <fullName>030</fullName>
+                <default>false</default>
+                <label>Primera disposicion de riesgo</label>
+            </value>
+            <value>
+                <fullName>031</fullName>
+                <default>false</default>
+                <label>Nueva disposicion de riesgo</label>
+            </value>
+            <value>
+                <fullName>040</fullName>
+                <default>false</default>
+                <label>Subrogacion</label>
+            </value>
+            <value>
+                <fullName>100</fullName>
+                <default>false</default>
+                <label>Alta producto</label>
+            </value>
+            <value>
+                <fullName>101</fullName>
+                <default>false</default>
+                <label>Cambio condiciones</label>
+            </value>
+            <value>
+                <fullName>102</fullName>
+                <default>false</default>
+                <label>Alta titular</label>
+            </value>
+            <value>
+                <fullName>110</fullName>
+                <default>false</default>
+                <label>Activacion de Tarjeta Stock</label>
+            </value>
+            <value>
+                <fullName>111</fullName>
+                <default>false</default>
+                <label>Alta Seguro Garantía de Compra</label>
+            </value>
+            <value>
+                <fullName>112</fullName>
+                <default>false</default>
+                <label>Alta Seguro Garantía Mensual</label>
+            </value>
+            <value>
+                <fullName>113</fullName>
+                <default>false</default>
+                <label>Alta Seguro Saldo Pendiente</label>
+            </value>
+            <value>
+                <fullName>130</fullName>
+                <default>false</default>
+                <label>Alta contrato prima única</label>
+            </value>
+            <value>
+                <fullName>131</fullName>
+                <default>false</default>
+                <label>Alta contrato prima periódica</label>
+            </value>
+            <value>
+                <fullName>132</fullName>
+                <default>false</default>
+                <label>Cancelación contrato prima única</label>
+            </value>
+            <value>
+                <fullName>133</fullName>
+                <default>false</default>
+                <label>Cancelación contrato prima periódica</label>
+            </value>
+            <value>
+                <fullName>150</fullName>
+                <default>false</default>
+                <label>Alta Préstamo Promocaixa</label>
+            </value>
+            <value>
+                <fullName>151</fullName>
+                <default>false</default>
+                <label>Alta Tarjeta Promocaixa</label>
+            </value>
+            <value>
+                <fullName>152</fullName>
+                <default>false</default>
+                <label>Alta Mybox Promocaixa</label>
+            </value>
+            <value>
+                <fullName>153</fullName>
+                <default>false</default>
+                <label>CompraEstrella con Suscripción tarjeta</label>
+            </value>
+            <value>
+                <fullName>200</fullName>
+                <default>false</default>
+                <label>Cancelación contrato</label>
+            </value>
+            <value>
+                <fullName>202</fullName>
+                <default>false</default>
+                <label>Baja titular</label>
+            </value>
+            <value>
+                <fullName>210</fullName>
+                <default>false</default>
+                <label>Amortización capital</label>
+            </value>
+            <value>
+                <fullName>211</fullName>
+                <default>false</default>
+                <label>Baja Seguro Garantía de Compra</label>
+            </value>
+            <value>
+                <fullName>212</fullName>
+                <default>false</default>
+                <label>Baja Seguro Garantía Mensual</label>
+            </value>
+            <value>
+                <fullName>213</fullName>
+                <default>false</default>
+                <label>Baja Seguro Saldo Pendiente</label>
+            </value>
+            <value>
+                <fullName>220</fullName>
+                <default>false</default>
+                <label>Activación Tarjeta</label>
+            </value>
+            <value>
+                <fullName>221</fullName>
+                <default>false</default>
+                <label>Baja tarjeta</label>
+            </value>
+            <value>
+                <fullName>222</fullName>
+                <default>false</default>
+                <label>Alta plástico</label>
+            </value>
+            <value>
+                <fullName>223</fullName>
+                <default>false</default>
+                <label>Activación TPV</label>
+            </value>
+            <value>
+                <fullName>230</fullName>
+                <default>false</default>
+                <label>Cancelación producto</label>
+            </value>
+            <value>
+                <fullName>240</fullName>
+                <default>false</default>
+                <label>Renegociación margen</label>
+            </value>
+            <value>
+                <fullName>250</fullName>
+                <default>false</default>
+                <label>Renovación automática</label>
+            </value>
+            <value>
+                <fullName>260</fullName>
+                <default>false</default>
+                <label>Vencimiento del producto</label>
+            </value>
+            <value>
+                <fullName>270</fullName>
+                <default>false</default>
+                <label>Entrega capital</label>
+            </value>
+            <value>
+                <fullName>280</fullName>
+                <default>false</default>
+                <label>Rescate parcial</label>
+            </value>
+            <value>
+                <fullName>290</fullName>
+                <default>false</default>
+                <label>Rescate total</label>
+            </value>
+            <value>
+                <fullName>300</fullName>
+                <default>false</default>
+                <label>Alta de remesa</label>
+            </value>
+            <value>
+                <fullName>400</fullName>
+                <default>false</default>
+                <label>Traspaso interno de Fondo a Cartera</label>
+            </value>
+            <value>
+                <fullName>410</fullName>
+                <default>false</default>
+                <label>Traspaso interno de Cartera a Fondo</label>
+            </value>
+            <value>
+                <fullName>420</fullName>
+                <default>false</default>
+                <label>Reintegro</label>
+            </value>
+            <value>
+                <fullName>501</fullName>
+                <default>false</default>
+                <label>Activación tarjetas secundarias</label>
+            </value>
+            <value>
+                <fullName>502</fullName>
+                <default>false</default>
+                <label>Cancelaciones tarjetas secundarias</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

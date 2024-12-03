@@ -1,0 +1,21 @@
+<template>
+    <div class="slds-form-element slds-m-bottom_x-small">
+        <label class="slds-form-element__label" for="text-input-id-5">
+            <template if:true={required}>
+                <abbr class="slds-required" title="required">*</abbr>
+            </template>
+            {label}
+        </label>
+        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+            <template if:true={hasIcon}>
+                <lightning-icon size="small" class="slds-combobox__input-entity-icon" icon-name={icon}></lightning-icon>
+            </template>
+            <input id="text-input-id-5" class="slds-input"
+                type={type}
+                placeholder={placeholder}
+                value={value}
+                required={required}
+                disabled={disabled}/>
+        </div>
+    </div>
+</template>

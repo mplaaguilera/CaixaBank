@@ -1,0 +1,11 @@
+.slds-page-header lightning-icon.iconoCabecera {
+    --slds-c-icon-color-background: #8b85f9;
+}
+
+div.slds-card__body div.datatableContainer {
+    height: 150px;
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}

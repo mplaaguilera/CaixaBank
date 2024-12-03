@@ -1,0 +1,201 @@
+<aura:component controller="SAC_LCMP_HomeOficina" implements="force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:attribute type="Object[]" name="ConsultasList" />
+    <aura:attribute name="mycolumns" type="List" />
+    <aura:attribute name="consultaId" type="Id" />
+    <aura:attribute name="jerarquiaId" type="List" />
+    <aura:attribute name="cargando" type="Boolean" default="true" />
+    <aura:attribute name="sortedBy" type="String" default="SAC_Fecha_Vencimiento__c"/>
+    <aura:attribute name="sortedDirection" type="string" default="asc" />
+
+    <aura:attribute name="selectedSearch" type="Boolean" default="false"/>
+    <aura:attribute name="sTipoBusqueda" type="String" default="idConsulta" />
+    <aura:attribute name="sTipoBusquedaOptions" type="List"
+        default="[{'label': 'Identificador de consulta', 'value': 'idConsulta'}, {'label': 'Título', 'value': 'asunto'},  {'label': 'Rango fechas creación', 'value': 'fechaCreacion'}, {'label': 'Estado', 'value': 'estado'}]" />
+    <aura:attribute name="sBusqueda" type="String" default="" />
+    <aura:attribute name="sBusquedaDesde" type="Date" default="" />
+    <aura:attribute name="sBusquedaHasta" type="Date" default="" />
+    <aura:attribute name="porDefecto" type="Boolean" default="true"/>
+    <aura:attribute name="bError" type="Boolean" default="false" />
+    <aura:attribute name="sMensErr" type="String" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="optionsEstado" type="List"/>
+    <aura:attribute name="esHome" type="String" />
+
+
+    <aura:handler name="init" value="{! this }" action="{! c.getData }" />
+	<aura:handler name="change" value="{!v.jerarquiaId}" action="{!c.recallGetConsultas}"/>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <div class="slds-col slds-size_6-of-12">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-opportunity">
+                            <lightning:icon iconName="standard:task" alternativeText="Case" title="Case" />
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">                           
+                                <h1>
+                                    <span>Consultas</span>
+                                    <div class="slds-grid slds-gutter">
+                                        <div class="slds-col">
+                                            <span class="slds-page-header__title" title="Recently Viewed">Consultas de mi oficina</span>
+                                        </div>
+                                        <div class="slds-col">
+                                            <aura:if isTrue="{! v.cargando }">
+                                                <lightning:spinner alternativeText="Loading" />
+                                            </aura:if> 
+                                        </div>
+                                        
+                                    </div>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            </div>
+            <aura:if isTrue="{!v.esHome == true}">
+                <div class="slds-col slds-size_6-of-12">
+                    <div class="slds-page-header__col-actions slds-float--right">
+                        <aura:if isTrue="{!and(v.selectedSearch == true)}"> <!-- , v.recordId != undefined -->
+                            <lightning:button variant="brand" label="Buscar consulta" title="Buscar consulta" onclick="{! c.buscarConsulta }" />
+                            <aura:set attribute="else">
+                                <lightning:button variant="brand-outline" label="Buscar consulta" title="Buscar consulta" onclick="{! c.buscarConsulta }" />
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </aura:if>
+
+        </div>
+
+        <aura:if isTrue="{!v.selectedSearch == true}">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta" />
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Identificar consulta</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <!--Cuerpo de la card-->
+                <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+                    <div class="slds-grid slds-gutters slds-grid_pull-padded-small slds-grid_vertical-align-end">
+                        <!--Tipo de búsqueda-->
+                        <div class="slds-col slds-size--4-of-12">
+                            <lightning:combobox aura:id="tipoBusqueda" name="tipoBusqueda" label="Tipo de búsqueda"
+                                value="{!v.sTipoBusqueda}" options="{!v.sTipoBusquedaOptions}" onchange="{!c.handleChange}"/>
+                        </div>
+                        <!--Valor de búsqueda-->
+                        <aura:if isTrue="{!v.sTipoBusqueda == 'fechaCreacion'}">
+                            <div class="slds-col slds-size--3-of-12 slds-gutters_x-small">
+                                <!-- <ui:inputDate aura:id="valorBusqueda" label="Desde" class="field" value="{!v.sBusquedaDesde}" displayDatePicker="true" />    -->
+                                <lightning:input type="date" name="inputDesde" label="Desde" value="{!v.sBusquedaDesde}"/>
+                            </div>
+                            <div style="width: 10px; display: inline-block;"></div>
+                            <div class="slds-col slds-size--3-of-12 slds-gutters_x-small">
+                                <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
+                                    <!-- <ui:inputDate aura:id="valorBusqueda" label="Hasta" class="field" value="{!v.sBusquedaHasta}" displayDatePicker="true" />  -->
+                                    <lightning:input type="date" name="inputHasta" label="Hasta" value="{!v.sBusquedaHasta}"/>
+                                </span>
+                            </div>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.sTipoBusqueda == 'estado'}">
+                                    <div class="slds-col slds-size--7-of-12 slds-gutters_x-small">
+                                        <lightning:combobox name="general" label="Valor" placeholder="Seleccione un estado.." options="{! v.optionsEstado }" onchange="{! c.handlePicklistChange }" value="{!v.sBusqueda}"/>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="slds-col slds-size--7-of-12 slds-gutters_x-small">
+                                            <span onkeypress="{!c.valorBusquedaTeclaPulsada}">
+                                                <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda" label="Valor"
+                                                value="{!v.sBusqueda}" spellcheck="false"
+                                                placeholder="Valor a buscar" />
+                                            </span>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>      
+                            </aura:set>
+                        </aura:if>          
+                        <!--Botón para iniciar búsqueda-->
+                        <div class="slds-col slds-grow-none">
+                            <lightning:buttonIcon iconName="utility:search" variant="brand" title="Identificar"
+                            onclick="{!c.buscarAlfabetico}" alternativeText="Buscar en Alfabético"
+                            disabled="{!and(v.sBusqueda == null, or(v.sBusquedaDesde == null, v.sBusquedaHasta == null))}" />
+                        </div>
+                    </div>
+                    <br/>
+                </div>
+                <div style="height:0.4rem;" />
+
+                <aura:if isTrue="{!v.bError}">
+                    <!--Sección de error-->
+                    <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                        <lightning:icon iconName="utility:warning" size="x-small" variant="error" />
+                        &nbsp;&nbsp;{!v.sMensErr}
+                    </div>
+                </aura:if>
+            </article> 
+        </aura:if>
+
+        <div class="slds-card__body">
+                <aura:if isTrue="{!empty(v.ConsultasList)}">
+                    <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+                        <img src="/img/chatter/OpenRoad.svg" class="slds-illustration__svg" alt="" />
+                        <div class="slds-text-color_weak">
+                            <aura:if isTrue="{!v.porDefecto == true}">
+                                <aura:if isTrue="{!v.esHome == true}">
+                                    <h3 class="slds-text-heading_medium">Su oficina no tiene consultas pendientes de realización
+                                    </h3>
+                                    <aura:set attribute="else">
+                                        <h3 class="slds-text-heading_medium">Su oficina no tiene consultas asociadas a esta reclamación
+                                        </h3>
+                                    </aura:set>
+                                </aura:if>        
+                            </aura:if>
+                        </div>
+                    </div>
+                    <aura:set attribute="else">
+                        <lightning:datatable 
+                            data="{! v.ConsultasList }" 
+                            columns="{! v.mycolumns }" 
+                            keyField="id"
+                            hideCheckboxColumn="true"
+                            onsort="{!c.sortColumn}"
+                            sortedDirection="{!v.sortedDirection}"
+                            sortedBy="{!v.sortedBy}"
+                            onrowaction="{! c.handleRowAction }"
+                            class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_fixed-layout" />
+                    </aura:set>
+                </aura:if>
+        </div>
+    </article>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Identificando consultas... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

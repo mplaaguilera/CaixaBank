@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_SalesOld__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Esto activara los metodos Old de en el trigger de Ventas y quitara la funcionalidad nueva</description>
+    <inlineHelpText>Esto activara los metodos Old de en el trigger de Ventas y quitara la funcionalidad nueva</inlineHelpText>
+    <label>Ventas Old</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

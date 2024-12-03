@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_Cliente__c</fullName>
+    <label>Tipo cliente</label>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Cliente</fullName>
+                <default>false</default>
+                <label>Cliente</label>
+            </value>
+            <value>
+                <fullName>Empleado</fullName>
+                <default>false</default>
+                <label>Empleado</label>
+            </value>
+            <value>
+                <fullName>Cliente/Empleado</fullName>
+                <default>false</default>
+                <label>Cliente/Empleado</label>
+            </value>
+            <value>
+                <fullName>Prejubilado</fullName>
+                <default>false</default>
+                <label>Prejubilado</label>
+            </value>
+            <value>
+                <fullName>Proveedor / Empleado</fullName>
+                <default>false</default>
+                <label>Proveedor / Empleado</label>
+            </value>
+            <value>
+                <fullName>Cliente (COPS)</fullName>
+                <default>false</default>
+                <label>Cliente (COPS)</label>
+            </value>
+            <value>
+                <fullName>Empleado (COPS)</fullName>
+                <default>false</default>
+                <label>Empleado (COPS)</label>
+            </value>
+            <value>
+                <fullName>Cliente (COPS)/Empleado (COPS)</fullName>
+                <default>false</default>
+                <label>Cliente (COPS)/Empleado (COPS)</label>
+            </value>
+            <value>
+                <fullName>Cliente (CAM)</fullName>
+                <default>false</default>
+                <label>Cliente (CAM)</label>
+            </value>
+            <value>
+                <fullName>Empleado (CAM)</fullName>
+                <default>false</default>
+                <label>Empleado (CAM)</label>
+            </value>
+            <value>
+                <fullName>Cliente (CAM)/Empleado (CAM)</fullName>
+                <default>false</default>
+                <label>Cliente (CAM)/Empleado (CAM)</label>
+            </value>
+            <value>
+                <fullName>CSI Bankia</fullName>
+                <default>false</default>
+                <label>CSI Bankia</label>
+            </value>
+            <value>
+                <fullName>SAC</fullName>
+                <default>false</default>
+                <label>SAC</label>
+            </value>
+            <value>
+                <fullName>Segmentos</fullName>
+                <default>false</default>
+                <label>Segmentos</label>
+            </value>
+            <value>
+                <fullName>Cliente (SACH)</fullName>
+                <default>false</default>
+                <label>Cliente (SACH)</label>
+            </value>
+            <value>
+                <fullName>Cliente (FRA)</fullName>
+                <default>false</default>
+                <label>Cliente (FRA)</label>
+            </value>
+            <value>
+                <fullName>HDT Empleado</fullName>
+                <default>false</default>
+                <label>Empleado (HDT)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

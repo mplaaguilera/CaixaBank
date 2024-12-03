@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>SEG_DETIDI</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_Password__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Username__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ACTION__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_AFFECTEDEMAIL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_AFFECTEDPHONE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ALF_CliConf__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Activa__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Body__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CLASS__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Certificado__c</field>
+        <value xsi:type="xsd:string">Cert_SEG_ApiGW_PRE_2023</value>
+    </values>
+    <values>
+        <field>CC_CharSet__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CliConfiErr__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CC_ContentType__c</field>
+        <value xsi:type="xsd:string">application/json;charset=UTF-8</value>
+    </values>
+    <values>
+        <field>CC_ConvAmbito__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_DiasRef__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_EXTERNALSYSTEM__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_EndPoint__c</field>
+        <value xsi:type="xsd:string">https://api.tst.private.cer.caixabank.com/detidi/predictscores</value>
+    </values>
+    <values>
+        <field>CC_HttpRequest__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_ITD_ITNINCIDENTINCI__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNESCENARIO__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNEVENTO__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNINCTYPE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNRELEVANTE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNROL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Aplicacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Canal__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Usuario__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ORGID__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_REPORTEDEMAIL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_REPORTEDPHONE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_SITEID__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_SoapAction__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TimeOut__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TipoPeticion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TrazaActiva__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_TrazaEntrada__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_TrazaSalida__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_WORKLOG_ACTION__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_WORKLOG_LOGTYPE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

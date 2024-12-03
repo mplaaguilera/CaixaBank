@@ -1,0 +1,90 @@
+<aura:component controller="EV_AsignarPlantilla_Controller" 
+                implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+    <aura:attribute name="recordId" type="Id" />    
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
+    <aura:attribute name="plantillaSeleccionada" type="Boolean" default="false"/>
+    
+    <aura:attribute name="opcionesOperativaFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaTipoComunicacionSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaTipoComunicacion" type="String"/>
+
+    <aura:attribute name="opcionesCanalComunicacionFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaCanalSeleccionado" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaCanalComunicacion" type="String"/>
+
+    <aura:attribute name="opcionesIdiomaComunicacionFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaIdiomaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaIdiomaComunicacion" type="String"/>
+    
+    <aura:attribute name="procesoFinalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaFinal" type="String"/>
+    
+    <aura:attribute name="templateName" type="String"/>
+    <aura:attribute name="templateId" type="String"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.iniciar }"/>
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="action:description" size="normal"/>
+            &nbsp;&nbsp;
+            Asignar una plantilla
+        </aura:set>
+        <br/>
+        <lightning:combobox aura:id="selectItem" name="operativa" label="Tipo de comunicación"
+                                    placeholder="- Selecciona un tipo de comunicación -"
+                                    value=""
+                                    required="false"
+                                    dropdownAlignment="right"
+                                    variant="standard"
+                                    onchange="{!c.handleCarpetaOperativaSeleccionada}"
+                                    options="{!v.opcionesOperativaFolder}"/>
+        
+        <aura:if isTrue="{!v.carpetaTipoComunicacionSeleccionada}">
+            <br/>
+            <lightning:combobox aura:id="selectItem" name="canal" label="Canal de comunicación"
+                                        placeholder="- Selecciona un canal de comunicación -"
+                                        value="{!v.carpetaCanalComunicacion}"
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handleCanalSeleccionado}"
+                                        options="{!v.opcionesCanalComunicacionFolder}"/>
+
+        </aura:if>
+
+        <aura:if isTrue="{!v.carpetaCanalSeleccionado}">
+            <br/>
+            <lightning:combobox aura:id="selectItem" name="canal" label="Idioma de comunicación"
+                                        placeholder="- Selecciona un idioma de comunicación -"
+                                        value="{!v.carpetaIdiomaComunicacion}"
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handleIdiomaSeleccionado}"
+                                        options="{!v.opcionesIdiomaComunicacionFolder}"/>
+
+        </aura:if>
+        
+        <aura:if isTrue="{!v.procesoFinalSeleccion}">
+            <br/>
+            <lightning:combobox aura:id="selectItem" name="plantilla" label="Plantilla"
+                                        placeholder="- Selecciona una plantilla -"
+                                        value=""
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handlePlantillaSeleccionada}"
+                                        options="{!v.opcionesPlantilla}"/>
+        </aura:if>
+
+        <br/>
+        
+        <div class="slds-float_right">
+            <aura:if isTrue="{!v.plantillaSeleccionada}">
+                <lightning:button class="slds-button slds-button_brand" label="Asignar" onclick="{!c.handleClickAceptar}" />
+            </aura:if>
+            <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.handleClickCancelar}"/>
+        </div>
+        
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ValidarProgramaEventos</fullName>
+    <active>false</active>
+    <description>Validamos si en el campo Programa de eventos figura &apos;Otros&apos; para tener que rellenar el campo de URL Imagen Cabecera</description>
+    <errorConditionFormula>AND(EV_ImagenCabecera__c = null, ISPICKVAL(EV_Evento__r.EV_ProgramaDeEventos__c, &apos;005&apos;))</errorConditionFormula>
+    <errorDisplayField>EV_ImagenCabecera__c</errorDisplayField>
+    <errorMessage>Debe rellenar el campo URL Imagen Cabecera</errorMessage>
+</ValidationRule>

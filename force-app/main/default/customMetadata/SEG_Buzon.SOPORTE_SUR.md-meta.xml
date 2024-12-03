@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Soporte Sur</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">soporte.sur@empresas.caixabank.com.invalid</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">invalid.seg_emailservice@5-2xaoxqxz9juesz6c8sp5b9x91qq9jxabvnxnvskyp17ebwl8z.1t-x4n6eaa.eu33.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">MCC SUR EMP</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Centro Empresas</value>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:type="xsd:string">Empresas Andalucía Occidental-Extremadura</value>
+    </values>
+</CustomMetadata>

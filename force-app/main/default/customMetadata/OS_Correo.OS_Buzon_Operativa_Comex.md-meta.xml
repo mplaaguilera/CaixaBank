@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón Operativa Comex</label>
+    <protected>false</protected>
+    <values>
+        <field>OS_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Buzón Operativa Comex</value>
+    </values>
+    <values>
+        <field>OS_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">OS_Operativa_Comex_DXC</value>
+    </values>
+    <values>
+        <field>OS_Correo__c</field>
+        <value xsi:type="xsd:string">operativacomex@comex.caixabankops.com</value>
+    </values>
+    <values>
+        <field>OS_Email__c</field>
+        <value xsi:type="xsd:string">operativacomex@2ozxaqo3shn0k1y9fc941mce1dn5s8wfbffl02v6w93m18nixb.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>OS_Recordtype_Caso_Defecto__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

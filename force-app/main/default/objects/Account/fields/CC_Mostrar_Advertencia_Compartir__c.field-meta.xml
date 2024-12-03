@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Mostrar_Advertencia_Compartir__c</fullName>
+    <formula>IF(AND(CC_Tipo_Centro__c != &apos;OF&apos;, CC_Tipo_Centro__c != &apos;GC&apos;), TRUE, FALSE)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Mostrar advertencia compartir (interno)</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

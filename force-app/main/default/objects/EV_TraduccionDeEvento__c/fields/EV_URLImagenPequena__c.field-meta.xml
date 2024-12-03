@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenPequena__c</fullName>
+    <description>Carruseles inferiores del Portal, calendario (tanto listado como elemento flotante) y resultados de buscador. Tamaño imagen (265x149)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Carruseles inferiores del Portal, calendario y resultados de buscador (265x149px)</inlineHelpText>
+    <label>URL Imagen Pequeña</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

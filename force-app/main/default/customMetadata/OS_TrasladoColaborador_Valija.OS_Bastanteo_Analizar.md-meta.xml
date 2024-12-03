@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Bastanteo Analizar</label>
+    <protected>false</protected>
+    <values>
+        <field>OS_Grupo_Colaborador__c</field>
+        <value xsi:type="xsd:string">Servicio bastanteo</value>
+    </values>
+    <values>
+        <field>OS_Nombre_Proceso__c</field>
+        <value xsi:type="xsd:string">Bastanteo Analizar</value>
+    </values>
+    <values>
+        <field>OS_Plantilla__c</field>
+        <value xsi:type="xsd:string">OS_Servicio_Bastanteo</value>
+    </values>
+</CustomMetadata>

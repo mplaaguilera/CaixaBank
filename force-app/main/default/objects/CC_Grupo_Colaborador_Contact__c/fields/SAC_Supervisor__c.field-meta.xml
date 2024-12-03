@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Supervisor__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check para informar si el usuario que pertenece al grupo es supervisor.</description>
+    <label>Supervisor</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

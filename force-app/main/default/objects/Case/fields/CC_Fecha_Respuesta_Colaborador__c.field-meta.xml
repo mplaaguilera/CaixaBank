@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_Respuesta_Colaborador__c</fullName>
+    <description>Fecha de respuesta del colaborador para el report de Stores</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Respuesta Colaborador</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

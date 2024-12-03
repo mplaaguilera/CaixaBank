@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Busqueda colas grupos nivel 2">
+    <aura:attribute name="groupByEvent" type="group"/>
+</aura:event>

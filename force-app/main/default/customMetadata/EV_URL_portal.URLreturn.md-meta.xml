@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>URLreturn</label>
+    <protected>false</protected>
+    <values>
+        <field>URL_param_Anonimo__c</field>
+        <value xsi:type="xsd:string">&amp;anonimo=S</value>
+    </values>
+    <values>
+        <field>URL_param_Baja__c</field>
+        <value xsi:type="xsd:string">baja_</value>
+    </values>
+    <values>
+        <field>URL_param_Inscripcion__c</field>
+        <value xsi:type="xsd:string">inscripcion_</value>
+    </values>
+    <values>
+        <field>URL_param_Streaming__c</field>
+        <value xsi:type="xsd:string">streaming_</value>
+    </values>
+    <values>
+        <field>URL_param_html__c</field>
+        <value xsi:type="xsd:string">.html</value>
+    </values>
+    <values>
+        <field>URL_param_index__c</field>
+        <value xsi:type="xsd:string">detalle_</value>
+    </values>
+    <values>
+        <field>urlAccionistaPortal__c</field>
+        <value xsi:type="xsd:string">https://www.caixabank.es/apl/talks/</value>
+    </values>
+    <values>
+        <field>urlComunidadEncuestas__c</field>
+        <value xsi:type="xsd:string">https://caixabankcc.my.site.com/OpinaCaixabank</value>
+    </values>
+    <values>
+        <field>urlPortal__c</field>
+        <value xsi:type="xsd:string">https://www.caixabank.es/apl/talks/</value>
+    </values>
+    <values>
+        <field>urlStreamingAccionistaPortal__c</field>
+        <value xsi:type="xsd:string">https://www.caixabank.es/apl/talks/</value>
+    </values>
+    <values>
+        <field>urlStreamingPortal__c</field>
+        <value xsi:type="xsd:string">https://www.caixabank.es/apl/talks/</value>
+    </values>
+</CustomMetadata>

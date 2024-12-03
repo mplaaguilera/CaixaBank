@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Campanyas</fullName>
+    <columns>NAME</columns>
+    <columns>OB_Activo__c</columns>
+    <columns>OB_Codigo_Externo__c</columns>
+    <columns>OB_Fecha_Activacion__c</columns>
+    <columns>OB_Fecha_Expiracion__c</columns>
+    <columns>OB_Multimes__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>OB_Parametrizacion__c.OB_Campanya</value>
+    </filters>
+    <label>Campañas</label>
+</ListView>

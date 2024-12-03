@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agente_CajerosIncidencias_CA_stopGo_DXC_LiveChatTranscript</fullName>
+    <filterScope>Queue</filterScope>
+    <label>CC_Agente_CajerosIncidencias_ca_DXC</label>
+    <queue>CC_Agente_CajerosIncidencias_CA_stopGo_DXC</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

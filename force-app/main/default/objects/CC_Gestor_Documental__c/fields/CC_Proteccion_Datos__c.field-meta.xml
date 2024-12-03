@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Proteccion_Datos__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;), 
+&quot;Considerem les dades de caràcter personal que ens proporciones com teves, exactes i certes.  Seran tractades per CaixaBank, o per l&apos;empresa del grup que correspongui amb la finalitat de gestionar la teva sol·licitud. Pots ampliar la informació i exercir els teus drets en www.caixabank.es/privacidad.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;es&quot;), 
+&quot;Consideramos los datos de carácter personal que nos proporcionas como tuyos, exactos y ciertos.  Serán tratados por CaixaBank, o por la empresa del grupo que corresponda con la finalidad de gestionar tu solicitud. Puedes ampliar la información y ejercer tus derechos en www.caixabank.es/privacidad.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;en&quot;), 
+&quot;We consider the personal data you provide to us to be yours, accurate, and true.  Your data will be processed by CaixaBank, or by the corresponding group company, for the purpose of managing your request. You can obtain further information and exercise your rights at www.caixabank.es/privacidad.&quot;,
+
+&quot;Consideramos los datos de carácter personal que nos proporcionas como tuyos, exactos y ciertos.  Serán tratados por CaixaBank, o por la empresa del grupo que corresponda con la finalidad de gestionar tu solicitud. Puedes ampliar la información y ejercer tus derechos en www.caixabank.es/privacidad.&quot;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Protección de datos</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

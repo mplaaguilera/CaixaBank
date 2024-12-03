@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Cartera - Gestor</label>
+    <protected>false</protected>
+    <values>
+        <field>EV_API_Salesforce__c</field>
+        <value xsi:type="xsd:string">EV_CarteraGestor__c</value>
+    </values>
+    <values>
+        <field>EV_TipoDeVariable__c</field>
+        <value xsi:type="xsd:string">Texto</value>
+    </values>
+    <values>
+        <field>EV_VariableAdobeCampaign__c</field>
+        <value xsi:type="xsd:string">Recipient.Client.ClientBusiness</value>
+    </values>
+</CustomMetadata>

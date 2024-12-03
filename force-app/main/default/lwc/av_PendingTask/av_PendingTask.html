@@ -1,0 +1,26 @@
+<template>
+    <div class="slds-grid slds-gutters borderTask">
+        <div class="slds-col slds-size_3-of-8 taskinfo">
+            <a class="sizeinfo" onclick={viewRecord}>{task.subject}</a>
+        </div>
+        <div class="slds-col slds-size_1-of-8 taskinfo">
+            <span class="sizeinfo" style="color: #080707;">{task.origenAv}</span>
+        </div>
+        <div class="slds-col slds-size_2-of-8 taskinfo">
+            <span class="sizeinfo" style="color: #080707;">{task.activityDate}</span>
+        </div>
+        <div class="slds-col slds-size_2-of-8">
+            <lightning-combobox name="Status" value={valueEstado} options={optionsEstado} onchange={handleChangeEstado}></lightning-combobox>
+        </div>
+    </div>
+    <div class="slds-grid slds-gutters borderTaskComment">
+        <div if:true={cambioEstado} class="slds-col">
+            <div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
+                <label class="slds-form-element__label" for="Fecha">Comentario:</label>
+                <div class="slds-form-element__control">
+                    <lightning-input maxlength="150" type="text" name="Comentario" value={comentario} onchange={handleChangeComentario}></lightning-input>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

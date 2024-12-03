@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Categoria__c</fullName>
+    <label>Categoria</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Cultura y sociedad</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Desarrolla tu potencial</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Emprendimiento</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Gestión de las finanzas</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Gestión de las inversiones</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>Impacto Social</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>Innovación</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>Mundo empresarial</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <label>Protección y seguridad</label>
+            </value>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <label>Salud y bienestar</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <label>Tecnología y mundo digital</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

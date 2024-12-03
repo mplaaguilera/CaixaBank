@@ -1,0 +1,19 @@
+ol.listaEnlaces {
+    margin-top: 10px;
+}
+
+ol.listaEnlaces > li {
+    margin-bottom: 10px;
+}
+
+ol.listaEnlaces > li:last-child {
+    margin-bottom: 0px;
+}
+
+ol.listaEnlaces span.enlace {
+    cursor: pointer;
+}
+
+ol.listaEnlaces span.enlace:hover > span {
+    border-bottom: var(--lwc-borderWidthThin, 1px) solid;
+}

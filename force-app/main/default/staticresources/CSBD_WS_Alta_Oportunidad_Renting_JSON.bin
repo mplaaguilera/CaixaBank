@@ -1,0 +1,29 @@
+{
+    "solicitudes": [
+        {
+            "apellido2": "CLARAMUNT",
+            "CP1Tit": "17820",
+            "apellido1": "PALAU",
+            "idioma": "CAS",
+            "plazo": "48",
+            "numPagas": "12",
+            "cuota": "488,08 EUR",
+            "telefonoContacto": "636922497",
+            "emailContacto": "pruebas@caixabank.com",
+            "canal": "WEB",
+            "nombreProducto": "Renting Coche",
+            "nombre": "JUANA",
+            "KMs": "10.000",
+            "tipoSolicitud": "renting",
+            "horarioContacto": "11-14h",
+            "catalogo": "1",
+            "nombreSolicitante": "JUANA PALAU CLARAMUNT",
+            "oferta": "12747674",
+            "referencia_usuario": "REN20210112090842735",
+            "NIFSolicitante": "12312312K",
+            "Pobl1Tit": "BANYOLES",
+            "ingresosMensuales": "1.500,00 EUR",
+            "vehiculo": "VOLKSWAGEN Transporter furgon corto TN 2.0TDI 81kW (110CV) BMT"
+        }
+    ]
+}

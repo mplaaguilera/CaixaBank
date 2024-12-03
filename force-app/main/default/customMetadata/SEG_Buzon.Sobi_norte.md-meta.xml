@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Sobi_norte</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">sobi.norte@instituciones.caixabank.com</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">seg_emailservice@5-1qc1k7gcckbomxjdrat7xbu86eh9p119cc7vcgze9p2ybwz3wn.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">MCC INST NORTE</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Instituciones</value>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:type="xsd:string">Instituciones Norte</value>
+    </values>
+</CustomMetadata>

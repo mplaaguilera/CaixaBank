@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Caracteristicas</fullName>
+    <columns>NAME</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>RECORDTYPE</columns>
+    <columns>CC_Descripcion__c</columns>
+    <columns>CC_Numero_Asignaciones__c</columns>
+    <columns>CC_Prioridad__c</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Fecha_vigencia_inicio__c</columns>
+    <columns>CC_Fecha_vigencia_fin__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Características</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

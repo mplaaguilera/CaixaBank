@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_DevolucionCSBD__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo utilizado para los casos que nos devuelve CSBD al generar un error al crear la oportunidad</description>
+    <label>Devolución CSBD</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

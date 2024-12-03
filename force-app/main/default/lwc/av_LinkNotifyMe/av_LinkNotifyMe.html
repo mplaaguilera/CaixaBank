@@ -1,0 +1,19 @@
+<template>
+	<lightning-card title="Enlace / PEA" icon-name="standard:link">
+
+        <div class="slds-theme_default slds-p-left_xx-large slds-p-top_medium slds-p-bottom_medium" >
+            <template if:true={hasLink}>
+                <div class="slds-grid slds-col" >
+                    <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" 
+                                    class=" slds-m-top_x-small slds-p-right_small" size="x-small" style="margin-top: 0.8em;"></lightning-icon>
+                    <a href={url} title={titleURL} class="slds-dl_horizontal__label slds-p-around_small" style="width: 50rem;padding-left:0.0;">
+                        {labelLinkNotifyMe}: {origen}
+                    </a>
+                </div>
+            </template>
+            <p if:false={hasLink} class="slds-grid slds-col" style="width: 50rem;">
+                <span class="slds-dl_horizontal__label">{noDataFound}</span>
+            </p>
+        </div>
+	</lightning-card>
+</template>

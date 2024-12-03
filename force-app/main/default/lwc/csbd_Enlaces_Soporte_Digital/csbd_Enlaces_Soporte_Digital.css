@@ -1,0 +1,58 @@
+div.slds-card__header {
+    border-bottom: 1px solid #e3e3e3;
+    border-radius: 4px 4px 0px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+    cursor: pointer;
+}
+
+header > div.botonExpandirContraer {
+    transition: transform 105ms linear;
+}
+
+header > div.botonExpandirContraer.expandido {
+    transform: rotate(-90deg);
+}
+
+.enlace {
+    cursor: pointer;
+}
+
+.enlace:hover > span {
+    text-decoration: underline;
+}
+
+.enlace .iconoEnlace {
+    position: relative;
+    top: -2px;
+}
+
+.enlace .iconoEnlace.warning {
+    top: -2px;
+    will-change: opacity, transform, --slds-c-icon-color-foreground-default;
+    animation-name: blinkKeyframes;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+	animation-duration: 310ms;
+}
+
+@keyframes blinkKeyframes {
+	from {
+        opacity: 0.3;
+        transform: scale(1);
+        --slds-c-icon-color-foreground-default: orange;
+    }
+	to {
+        opacity: 1;
+        transform: scale(1.12);
+        --slds-c-icon-color-foreground-default: rgb(235, 160, 84);
+    }
+}
+
+lightning-button-icon {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}

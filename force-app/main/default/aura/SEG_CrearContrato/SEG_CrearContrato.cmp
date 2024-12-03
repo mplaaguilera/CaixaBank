@@ -1,0 +1,268 @@
+<aura:component controller="SEG_CrearContrato_Controller" implements="flexipage:availableForAllPageTypes,force:hasRecordId,lightning:actionOverride,lightning:hasPageReference,lightning:isUrlAddressable"> 
+    
+    <lightning:workspaceAPI aura:id="workspace"/>
+    
+    <aura:attribute name="abrirSR" type="boolean"/>
+    <!-- Contrato Creado -->
+    <aura:attribute name="recordId" type="String" />    
+    <!-- Caso Relacionado -->
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name ="caseNumber" type="String"/>
+    <aura:attribute name="hasCase" type="boolean" default="false"/>
+    <!-- Accounts -->
+    <aura:attribute name="accounts" type="List"/>
+    <aura:attribute name="accountName" type="String" default=""/>
+    <aura:attribute name="mostrarAccounts" type="boolean" default="true"/> 
+    <!-- Clientes -->
+    <aura:attribute name="contacts" type="List"/>
+    <aura:attribute name="contactName" type="String" default=""/>
+    <aura:attribute name="mostrarContacts" type="boolean" default="true"/> 
+    <aura:attribute name="searchAvailable" type="boolean" default="false"/>
+    <!-- Clasificacion Rapida-->
+    <aura:attribute name="CRs" type="List"/>
+    <aura:attribute name="crName" type="String" default=""/>
+    <aura:attribute name="mostrarCR" type="boolean" default="false"/>
+    <!--Atributos de Estados-->
+    <aura:attribute name="estados" type="List" default="" />
+    <aura:attribute name="selectedEstado" type="String" />
+    <!-- Variables para crear el contrato-->
+    <aura:attribute name="contractId" type="String" default=""/>
+    <aura:attribute name="FechaContrato" type="Date" default=""/>
+    <aura:attribute name="FechaRecepcion" type="Date" default=""/>
+    <aura:attribute name="contactId" type="String" default=""/>
+    <aura:attribute name="accountId" type="String" default=""/>
+    <aura:attribute name="descripcion" type="String" default=""/>
+    <aura:attribute name="numeroOps" type="Integer" default=""/>
+    <aura:attribute name="crId" type="String" default=""/>
+    <aura:attribute name="searchTimeoutId" type="String"/>
+    
+    <!-- init lightning view-->
+    <aura:handler name="init" value="{!this}" action="{!c.inicializar}"/>
+    
+    <!--Lightning Data Service-->
+    <aura:attribute name="errorLds" type="String"/>
+    <aura:attribute name="casoPadre" type="Case"/>
+    <aura:if isTrue="{!v.hasCase}">
+        <force:recordData aura:id="caseData" recordId="{!v.caseId}" layoutType="COMPACT"
+                          fields="AccountId, ContactId, Account.Name, Contact.Name"
+                          targetFields="{!v.casoPadre}" targetError="{!v.errorLds}" recordUpdated="{!c.casoUpdatedDataService}"/>
+    </aura:if>
+    
+    
+    <!--create a component attributs -->
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->   
+    
+    <!-- ////  CREAR CONTRATO Y CREAR CASO DE SEGUIMIENTO RELACIONADO -->
+    <!--  /// CONTRATO ///-->
+    
+    <h2 class="inlineTitle slds-var-p-top_large slds-var-p-horizontal_medium slds-text-heading_medium">Nuevo contrato</h2>
+    <aura:if isTrue="{!v.hasCase}">
+        <h2 class="inlineTitle slds-var-p-top_large slds-var-p-horizontal_medium ">Relacionado con el caso {!v.caseNumber}</h2>
+    </aura:if>
+    <hr></hr>
+    <div class="slds-grid slds-grid_align-center">
+        <div class="slds-col slds-size_2-of-6">
+            <div class="inlineTitle slds-var-p-horizontal_medium slds-text-heading_small">
+                <div class="slds-text-color_weak">Datos del contrato</div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-6">            
+        </div>
+    </div>
+    <br></br>
+    <div class="slds-grid slds-grid_align-center">
+        <div class="slds-col slds-size_1-of-6">
+            <lightning:input required="true" type="text" name="input1" label="Número de contrato" value="{!v.contractId}"/><br></br>
+            <lightning:textarea name="input1" label="Descripción" value="{!v.descripcion}"/><br></br>            
+            <lightning:combobox aura:id="Estados" name="Estados" label="Estado" 
+                                placeholder="Seleccionar estado..."
+                                value="{!v.selectedEstado}"
+                                options="{!v.estados}"/>            
+            <br></br>
+            <br></br>            
+        </div>
+        <div class="slds-col slds-size_1-of-12">
+        </div>
+        <div class="slds-col slds-size_1-of-6">            
+            <lightning:input type="date" name="input1" label="Fecha de recepción original" value="{!v.FechaRecepcion}"/><br></br>
+            <lightning:input type="date" name="input1" label="Fecha del contrato" value="{!v.FechaContrato}"/><br></br>
+            <br></br>
+            <br></br> 
+        </div>
+    </div>    
+    
+    <!-- render solo si esta relacioniado con un caso de seguimiento existente-->
+    <aura:if isTrue="{!(!v.hasCase)}">
+        <div class="slds-grid slds-grid_align-center">
+            <div class="slds-col slds-size_2-of-6">
+                <div class="inlineTitle slds-var-p-top_large slds-var-p-horizontal_medium slds-text-heading_small">
+                    <div class="slds-text-color_weak">Datos del caso de seguimiento</div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-6">
+            </div>
+        </div>
+        <br></br>        
+        <div class="slds-grid slds-grid_align-center">
+            <div class="slds-col slds-size_2-of-5">
+                <p style="padding-bottom: 7px;">Identificación de cuenta y contacto:</p>
+                <aura:if isTrue="{!v.accountName != ''}">
+                    <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                        <lightning:icon iconName="utility:success" size="x-small" variant="success"/>
+                        &nbsp;&nbsp;<p style="display: inline-block;">Cuenta: <b>{!v.accountName}</b></p>
+                    </div>
+                    <aura:set attribute="else">
+                        <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                            <lightning:icon iconName="utility:warning" size="x-small" variant="warning"/>
+                            &nbsp;&nbsp;<p style="display: inline-block;">Cuenta: <b>NO IDENTIFICADA</b></p>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!v.contactName != ''}">
+                    <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                        <lightning:icon iconName="utility:success" size="x-small" variant="success"/>
+                        &nbsp;&nbsp;<p style="display: inline-block;">Contacto: <b>{!v.contactName}</b></p>
+                    </div>
+                    <aura:set attribute="else">
+                        <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                            <lightning:icon iconName="utility:warning" size="x-small" variant="warning"/>
+                            &nbsp;&nbsp;<p style="display: inline-block;">Contacto: <b>NO IDENTIFICADO</b></p>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                
+                <!--Botón para iniciar búsqueda-->
+                <div style="padding-top: 0.9rem; padding-bottom: 6px;">
+                    <lightning:button label="Identificar cliente" iconName="utility:search" onclick="{!c.abrirModalBusqueda}"/>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-grid slds-grid_align-center">
+            <div class="slds-col slds-size_1-of-6">                   
+                <br></br>
+                <!--  Clasificación Rápida  -->
+                <div class="slds-combobox_container slds-combobox-addon_end">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning:input required="true" aura:id="cRapidaName" type="search" label="Clasificación rápida" value="{!v.crName}"
+                                onchange="{!c.getCR}" autocomplete="off" placeholder="Buscar..."/>
+                        </div>
+                        <aura:if isTrue="{!v.mostrarCR}">
+                            <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="max: 133px;">
+                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                    <aura:iteration items="{!v.CRs}" var="cr">
+                                        <li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+                                            <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option" id="{!cr.value}" name="{!cr.label}" onclick="{!c.seleccionarCR}" title="{!cr.label}">
+                                                <span class="slds-media__figure slds-listbox__option-icon">
+                                                    <lightning:icon iconName="custom:custom9" size="small"/>
+                                                </span>
+                                                <span class="slds-media__body">
+                                                    <span class="slds-listbox__option-text_entity">{!cr.label}</span>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-12"/>
+            <div class="slds-col slds-size_1-of-6">
+                <br></br>
+                <lightning:input type="number" name="input1" value="{!v.numeroOps}" label="Número de operaciones"/>
+                <br></br>
+            </div>
+        </div>
+        <aura:set attribute="else">
+            <div class="slds-grid slds-grid_align-center">
+                <div class="slds-col slds-size_2-of-6">
+                    <div class="slds-border_bottom">
+                        <div class="inlineTitle slds-var-p-top_large slds-var-p-horizontal_medium slds-text-heading_small">
+                            <div class="slds-text-color_weak">Datos del caso de seguimiento</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-6">
+                </div>
+            </div>
+            <br></br>        
+            <div class="slds-grid slds-grid_align-center">
+                <div class="slds-col slds-size_2-of-5">
+                    <p style="padding-bottom: 7px;">Identificación de cuenta y contacto:</p>
+                    <aura:if isTrue="{!v.accountName != ''}">
+                        <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                            <lightning:icon iconName="utility:success" size="x-small" variant="success"/>
+                            &nbsp;&nbsp;<p style="display: inline-block;">Cuenta: <b>{!v.accountName}</b></p>
+                        </div>
+                        <aura:set attribute="else">
+                            <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                                <lightning:icon iconName="utility:warning" size="x-small" variant="warning"/>
+                                &nbsp;&nbsp;<p style="display: inline-block;">Cuenta: <b>NO IDENTIFICADA</b></p>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                    <aura:if isTrue="{!v.contactName != ''}">
+                        <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                            <lightning:icon iconName="utility:success" size="x-small" variant="success"/>
+                            &nbsp;&nbsp;<p style="display: inline-block;">Contacto: <b>{!v.contactName}</b></p>
+                        </div>
+                        <aura:set attribute="else">
+                            <div align="left" class="slds-text-body_regular" style="padding:3px 0px 3px 0px">
+                                <lightning:icon iconName="utility:warning" size="x-small" variant="warning"/>
+                                &nbsp;&nbsp;<p style="display: inline-block;">Contacto: <b>NO IDENTIFICADO</b></p>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+        </aura:set>
+    </aura:if>
+    
+    <div class="forceChangeRecordTypeFooter">        
+        <lightning:button label="Cancelar" onclick="{!c.closeTab}"/>&nbsp;
+        <lightning:button label="Guardar" variant="brand" onclick="{!c.crearCasoSeguimiento}"/>    
+    </div>
+    
+    <!--Modales-->
+    
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div aura:id="backdrop" class="slds-backdrop"/>
+
+    <section aura:id="modalBuscador" name="modalBuscador" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalBusqueda}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Identificar cliente</h2>
+            </header>
+            <div class="slds-modal__content slds-var-p-around_large" style="padding-top: 0px; padding-bottom: 0px;">
+                <c:SEG_BuscadorClientes
+                    recordId=""
+                    tipoBuscador="crearContrato"
+                    searchAccountId="{!v.accountId}"
+                    searchContactId="{!v.contactId}" 
+                    searchAccountName="{!v.accountName}"
+                    searchContactName="{!v.contactName}"
+                    divResultadosStyle=""
+                />
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button aura:id="modalBuscadorBotonCancelar" label="Cerrar" onclick="{!c.cerrarModalBusqueda}"/>
+            </footer>
+        </div>
+    </section>
+    
+</aura:component>

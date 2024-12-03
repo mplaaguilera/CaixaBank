@@ -1,0 +1,25 @@
+<design:component >
+    <design:attribute name="registroActual"
+    label="Mostrar únicamente el registro actual"
+    description="Este atributo permite utlizar el componente únicamente para el registro actual,
+    sin contar con un registro 'padre' (necesario para las Reclamaciones)"/>
+
+    <design:attribute name="mostrarOculto"
+    label="Mostrar Oculto" 
+    description="Este atributo permite ocultar o mostrar los archivos adjuntos ocultos"/>
+
+    <design:attribute name="permitirEdicion"
+    label="Permitir Edición" 
+    description="Este atributo permite la edición de los archivos adjuntos del registro"/>
+
+    <design:attribute name="recordName"
+    label="Nombre del registro" 
+    description="Este atributo devuelve el nombre del registro actual" required="true"/>
+
+    <design:attribute name="objectApiName"
+    label="Nombre Api del objeto" required="true"/>
+
+    <design:attribute name="fieldApiName"
+    label="Nombre Api del campo" required="true"/>
+    
+</design:component>

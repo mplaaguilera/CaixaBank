@@ -1,0 +1,52 @@
+<template>
+    <p>hola</p>
+    <section role="dialog" tabindex="-1" aria-modal="true" class="modal slds-modal">
+        <div class="slds-modal__container">
+            <!-- sldsValidatorIgnoreNextLine -->
+            <lightning-button-icon variant="border-filled" icon-name="utility:close" size="large" class="slds-button_icon slds-modal__close"></lightning-button-icon>
+            <div class="slds-modal__header">
+                <h1 class="slds-modal__title slds-hyphenate">Cancelar cita</h1>
+            </div>
+            <div class="slds-modal__content slds-var-p-vertical_large slds-var-p-horizontal_xx-large" style="text-align: start;overflow: visible;">
+                <div class="slds-form-element slds-form-element_stacked">
+					<div class="slds-grid slds-gutters_direct-xxx-small slds-grid_vertical-align-center">
+						<div class="slds-col" style="text-align: end; font-weight: 500;">
+							<label class="slds-form-element__label">Buscar citas desde</label>
+						</div>
+						<div class="slds-col slds-grow-none slds-is-relative" style="top: 2px; width: 280px;">
+							<lightning-input class="inputFechaDesde" type="datetime" value={fechasBusqueda.desde} variant="label-hidden"></lightning-input>
+						</div>
+						<div class="slds-col slds-grow-none" style="text-align: end; font-weight: 500;">
+							<label class="slds-form-element__label slds-var-m-left_medium">Hasta</label>
+						</div>
+						<div class="slds-col slds-grow-none slds-is-relative" style="top: 2px; width: 280px;">
+							<lightning-input class="inputFechaHasta" type="datetime" value={fechasBusqueda.hasta} variant="label-hidden"></lightning-input>
+						</div>
+						<div class="slds-col slds-grow-none slds-var-m-left_small">
+							<lightning-button-icon icon-name="utility:search" variant="brand" onclick={buscarCitas}></lightning-button-icon>
+						</div>
+					</div>
+				</div>
+
+                <!--<div class="datatableContainer">
+                    <div>
+                <lightning-datatable
+							key-field="Id"
+							columns={datatableColumns}
+							data={datatableData}
+							column-widths-mode="auto"
+							sorted-by="CreatedDate"
+							sorted-direction="asc"
+							onrowselection={datatableOnrowselection}>
+						</lightning-datatable>
+                    </div>
+                    </div>-->
+            </div>
+            <div class="slds-modal__footer">
+                <!--<lightning-button variant="brand" label="Cancelar cita" icon-name="utility:send" onclick={cancelarCita} disabled={botonCancelarDisabled}></lightning-button>
+                <lightning-button class="slds-var-m-left_small" label="Cancelar" onclick={cerrarModal}></lightning-button>-->
+            </div>
+        </div>
+    </section>
+    <div class="backdrop slds-backdrop"></div>
+</template>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activa__c</columns>
+    <columns>CC_Centro__c</columns>
+    <columns>CC_Empresa__c</columns>
+    <columns>CC_TipoCentro__c</columns>
+    <columns>CC_CentroCaixaBank__c</columns>
+    <columns>CC_Conexion__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>CC_NombreCentro__c</columns>
+    <columns>CC_Provincia__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All</label>
+</ListView>

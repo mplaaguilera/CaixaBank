@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Comunicaciones_informativas_de_Marca</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Marca__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Record_Type_Name__c</field>
+        <operation>equals</operation>
+        <value>Comunicación Informativa de Marca</value>
+    </filters>
+    <label>Comunicaciones informativas de Marca</label>
+</ListView>

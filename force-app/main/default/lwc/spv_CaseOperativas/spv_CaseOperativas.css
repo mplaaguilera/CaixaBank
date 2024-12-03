@@ -1,0 +1,12 @@
+.centrar-elementos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenedor-botones {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Espacio entre los botones */
+}

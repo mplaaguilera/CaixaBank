@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EstadoRed__c</fullName>
+    <externalId>false</externalId>
+    <formula>CASE(SAC_StatusAuxiliar__c, 
+					&quot;SAC_001&quot;, &quot;En Gestión&quot;,
+					&quot;SAC_006&quot;, &quot;En Gestión&quot;,
+					&quot;SAC_002&quot;, &quot;En Gestión&quot;,
+					&quot;SAC_007&quot;, &quot;En Gestión&quot;, 
+					&quot;SAC_003&quot;, &quot;En Gestión&quot;, 
+					&quot;SAC_010&quot;, &quot;En Gestión&quot;, 
+					&quot;SAC_004&quot;, &quot;Ejecución&quot;,
+					&quot;SAC_008&quot;, &quot;Derivación&quot;,
+					&quot;SAC_011&quot;, &quot;En Gestión&quot;,
+					&quot;SAC_012&quot;, &quot;Gestionada&quot;,
+					&quot;SAC_013&quot;, &quot;Descartada&quot;,
+				&quot;Baja&quot;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Estado Red</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

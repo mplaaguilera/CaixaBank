@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Tipo_de_oportunidad__c</fullName>
+    <description>campo indicando tipo de oportunidad.</description>
+    <label>Tipos de oportunidad</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Acción comercial</fullName>
+                <default>false</default>
+                <label>Acción comercial</label>
+            </value>
+            <value>
+                <fullName>Chat</fullName>
+                <default>false</default>
+                <label>Chat</label>
+            </value>
+            <value>
+                <fullName>CMB</fullName>
+                <default>false</default>
+                <label>CMB</label>
+            </value>
+            <value>
+                <fullName>CMN</fullName>
+                <default>false</default>
+                <label>CMN</label>
+            </value>
+            <value>
+                <fullName>Wivai</fullName>
+                <default>false</default>
+                <label>Wivai</label>
+            </value>
+            <value>
+                <fullName>Desistimiento</fullName>
+                <default>false</default>
+                <label>Desistimiento</label>
+            </value>
+            <value>
+                <fullName>Desistimiento PAI</fullName>
+                <default>false</default>
+                <label>Desistimiento PAI</label>
+            </value>
+            <value>
+                <fullName>Hipoteca</fullName>
+                <default>false</default>
+                <label>Hipoteca</label>
+            </value>
+            <value>
+                <fullName>Préstamo</fullName>
+                <default>false</default>
+                <label>Préstamo</label>
+            </value>
+            <value>
+                <fullName>Renting</fullName>
+                <default>false</default>
+                <label>Renting</label>
+            </value>
+            <value>
+                <fullName>TPV</fullName>
+                <default>false</default>
+                <label>TPV</label>
+            </value>
+            <value>
+                <fullName>PRO Automática</fullName>
+                <default>false</default>
+                <label>PRO Automática</label>
+            </value>
+            <value>
+                <fullName>Llamada Servicio</fullName>
+                <default>false</default>
+                <label>Llamada Servicio</label>
+            </value>
+            <value>
+                <fullName>Feedback</fullName>
+                <default>false</default>
+                <label>Feedback</label>
+            </value>
+            <value>
+                <fullName>Soporte digital</fullName>
+                <default>false</default>
+                <label>Soporte digital</label>
+            </value>
+            <value>
+                <fullName>MAC</fullName>
+                <default>false</default>
+                <label>MAC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

@@ -1,0 +1,86 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId,force:appHostable,flexipage:availableForAllPageTypes" controller="CSBD_Opp_AltaCMBIntouch_Controller" access="global">
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="nombreCliente" type="String"/>
+    <aura:attribute name="DNICliente" type="String"/>
+    <aura:attribute name="fechaContacto" type="date"/>
+    <aura:attribute name="tramoHorario" type="time"/>
+    <aura:attribute name="codigoProducto" type="String"/>
+    <aura:attribute name="operativa" type="String"/>
+    <aura:attribute name="numeroContrato" type="String"/>
+    <aura:attribute name="descripcion" type="String"/>
+
+    <aura:attribute name="today" type="Date" />
+
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+
+    <div style="max-width: 750px; margin:2%">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate" >
+            <div class="slds-media__figure">
+                <lightning:icon iconName="standard:opportunity" size="small"/>
+            </div>
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Alta Oportunidad Centro 4223</span>
+                </h2>
+            </div>
+        </header>
+
+        <div style="margin-top:20px;">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning:input aura:id = "nombreCliente" name="nombreCliente" required="true" label="Nombre y apellidos del cliente" maxlength="255"/>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <lightning:input aura:id = "DNICliente" name="DNICliente" required="true" maxlength="9" label="DNI del cliente" />
+                </div>
+            </div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning:input aura:id = "fechaContacto" type="date" name="fechaContacto" label="Fecha de contacto" required="true" value="{!v.today}"/>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <lightning:select aura:id ="tramoHorario" name="tramoHorario" label="Tramo horario de contacto" required="true" >
+                        <option value="">Selecciona una opción...</option>
+                        <option value="8h-10h">8h-10h</option>
+                        <option value="10h-12h">10h-12h</option>
+                        <option value="12h-14h">12h-14h</option>
+                        <option value="14h-16h">14h-16h</option>
+                        <option value="16h-18h">16h-18h</option>
+                        <option value="18h-20h">18h-20h</option>
+                    </lightning:select>
+                </div>
+            </div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning:input aura:id = "numeroContrato" name="numeroContrato" required="true" label="Número de contrato" maxlength="225" />            
+                </div>  
+                <div class="slds-col slds-size_1-of-3">
+                    <lightning:select aura:id ="codigoProducto" name="codigoProducto" label="Producto" required="true" >
+                        <option value="">Selecciona una opción...</option>
+                        <option value="Auto_intouch">Auto</option>
+                        <option value="CaixaFuturo_intouch">Caixa Futuro</option>
+                        <option value="Hogar_intouch">Hogar</option>
+                        <option value="MyBoxVida_intouch">MyBox Vida</option>
+                        <option value="PIAS_intouch">Pias</option>
+                        <option value="PrestamosPersonales_intouch">Préstamos Personales</option>
+                        <option value="PrestamosHipotecarios_intouch">Préstamos Hipotecarios</option>
+                        <option value="Salud_intouch">Salud</option>
+                        <option value="Seviam_intouch">Seviam</option>
+                        <option value="SeviamEmpresas_intouch">Seviam Empresas</option>
+                        <option value="SIALP_intouch">SIALP</option>
+                        <option value="Tarjetas_intouch">Tarjetas</option>
+                        <option value="VCXNegocios_intouch">VCX Negocios</option>
+                        <option value="VidaFamiliar_intouch">Vida Familiar</option>
+                    </lightning:select>
+                </div>
+            </div>
+            <lightning:input aura:id = "operativa" name="operativa" required="true" label="Operativa" />            
+            <lightning:textarea aura:id = "descripcion" name="descripcion" required="true" label="Descripción" />
+        </div>
+
+        <footer class="slds-card__footer" style="text-align: right;">
+            <lightning:button aura:id = "botonEnviar" variant="brand" label="Enviar" onclick="{!c.enviar}" />
+        </footer>
+    </div>
+</aura:component>

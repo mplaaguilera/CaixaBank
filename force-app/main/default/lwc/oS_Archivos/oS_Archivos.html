@@ -1,0 +1,21 @@
+<template>
+        <div style="height: 310px;">
+
+                <lightning-datatable 
+                    record-id={recordId} 
+                    key-field="id" 
+                    data={archivos} 
+                    columns={columns} 
+                    hide-checkbox-column 
+                    show-row-number-column
+                    sorted-by={sorted_by}  
+                    onsort={sortColumns} 
+                    sorted-direction={sorted_direction}
+                    onheaderaction={handleHeaderAction}>
+                </lightning-datatable>
+                <template if:false={tieneArchivos}>
+                        <div style = 'position: absolute; top: 50%; left: 50%; margin-left: -7%'>No hay elementos para mostrar.</div>
+                </template>
+        </div>
+
+</template>

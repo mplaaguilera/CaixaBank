@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_VolverVerEvento</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( ISPICKVAL( EV_Notification__c , &apos;005&apos;), NOT( ISPICKVAL( Status , &apos;005&apos;) ) )</errorConditionFormula>
+    <errorMessage>Finaliza el evento para volver a ver.</errorMessage>
+</ValidationRule>

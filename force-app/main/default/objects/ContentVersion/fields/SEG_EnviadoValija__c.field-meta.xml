@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_EnviadoValija__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca si el fichero ha sido enviado a Valija</description>
+    <inlineHelpText>Marca si el fichero ha sido enviado a Valija</inlineHelpText>
+    <label>Fichero enviado a Valija</label>
+    <trackHistory>true</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

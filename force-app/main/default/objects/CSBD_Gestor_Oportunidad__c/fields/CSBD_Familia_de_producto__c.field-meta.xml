@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Familia_de_producto__c</fullName>
+    <label>Familia de producto</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Ahorro</fullName>
+                <default>false</default>
+                <label>Ahorro</label>
+            </value>
+            <value>
+                <fullName>Alta Cliente</fullName>
+                <default>false</default>
+                <label>Alta Cliente</label>
+            </value>
+            <value>
+                <fullName>Alta Cliente Digital</fullName>
+                <default>false</default>
+                <label>Alta Cliente Digital</label>
+            </value>
+            <value>
+                <fullName>Alta Cuenta</fullName>
+                <default>false</default>
+                <label>Alta Cuenta</label>
+            </value>
+            <value>
+                <fullName>Alta Cuenta Multi Titular</fullName>
+                <default>false</default>
+                <label>Alta Cuenta Multi Titular</label>
+            </value>
+            <value>
+                <fullName>Back Office</fullName>
+                <default>false</default>
+                <label>Back Office</label>
+            </value>
+            <value>
+                <fullName>Convenio CA Andalucia</fullName>
+                <default>false</default>
+                <label>Convenio CA Andalucia</label>
+            </value>
+            <value>
+                <fullName>Convenio CA Extremadura</fullName>
+                <default>false</default>
+                <label>Convenio CA Extremadura</label>
+            </value>
+            <value>
+                <fullName>Convenio CA Madrid</fullName>
+                <default>false</default>
+                <label>Convenio CA Madrid</label>
+            </value>
+            <value>
+                <fullName>Convenio Castilla y Leon</fullName>
+                <default>false</default>
+                <label>Convenio Castilla y Leon</label>
+            </value>
+            <value>
+                <fullName>Convenio CA Valencia</fullName>
+                <default>false</default>
+                <label>Convenio CA Valencia</label>
+            </value>
+            <value>
+                <fullName>Convenio Ibavi</fullName>
+                <default>false</default>
+                <label>Convenio Ibavi</label>
+            </value>
+            <value>
+                <fullName>Cuenta</fullName>
+                <default>false</default>
+                <label>Cuenta</label>
+            </value>
+            <value>
+                <fullName>Cuentas</fullName>
+                <default>false</default>
+                <label>Cuentas</label>
+            </value>
+            <value>
+                <fullName>Depósitos</fullName>
+                <default>false</default>
+                <label>Depósitos</label>
+            </value>
+            <value>
+                <fullName>Depósitos Bonificados</fullName>
+                <default>false</default>
+                <label>Depósitos Bonificados</label>
+            </value>
+            <value>
+                <fullName>Domiciliaciones</fullName>
+                <default>false</default>
+                <label>Domiciliaciones</label>
+            </value>
+            <value>
+                <fullName>Domiciliaciones Colectivos</fullName>
+                <default>false</default>
+                <label>Domiciliaciones Colectivos</label>
+            </value>
+            <value>
+                <fullName>Fondos</fullName>
+                <default>false</default>
+                <label>Fondos</label>
+            </value>
+            <value>
+                <fullName>Fondos de inversión</fullName>
+                <default>false</default>
+                <label>Fondos de inversión</label>
+            </value>
+            <value>
+                <fullName>Genérico 1</fullName>
+                <default>false</default>
+                <label>Genérico 1</label>
+            </value>
+            <value>
+                <fullName>Genérico 10</fullName>
+                <default>false</default>
+                <label>Genérico 10</label>
+            </value>
+            <value>
+                <fullName>Genérico 2</fullName>
+                <default>false</default>
+                <label>Genérico 2</label>
+            </value>
+            <value>
+                <fullName>Genérico 3</fullName>
+                <default>false</default>
+                <label>Genérico 3</label>
+            </value>
+            <value>
+                <fullName>Genérico 4</fullName>
+                <default>false</default>
+                <label>Genérico 4</label>
+            </value>
+            <value>
+                <fullName>Genérico 5</fullName>
+                <default>false</default>
+                <label>Genérico 5</label>
+            </value>
+            <value>
+                <fullName>Genérico 6</fullName>
+                <default>false</default>
+                <label>Genérico 6</label>
+            </value>
+            <value>
+                <fullName>Genérico 7</fullName>
+                <default>false</default>
+                <label>Genérico 7</label>
+            </value>
+            <value>
+                <fullName>Genérico 8</fullName>
+                <default>false</default>
+                <label>Genérico 8</label>
+            </value>
+            <value>
+                <fullName>Genérico 9</fullName>
+                <default>false</default>
+                <label>Genérico 9</label>
+            </value>
+            <value>
+                <fullName>Hipoteca CaixaBank Digital</fullName>
+                <default>false</default>
+                <label>Hipoteca CaixaBank Digital</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Convenios</fullName>
+                <default>false</default>
+                <label>Hipoteca Convenios</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Eficiente</fullName>
+                <default>false</default>
+                <label>Hipoteca Eficiente</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Imagin Digital</fullName>
+                <default>false</default>
+                <label>Hipoteca Imagin Digital</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Internacional</fullName>
+                <default>false</default>
+                <label>Hipoteca Internacional</label>
+            </value>
+            <value>
+                <fullName>Hipoteca PHD</fullName>
+                <default>false</default>
+                <label>Hipoteca PHD</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Plataformas</fullName>
+                <default>false</default>
+                <label>Hipoteca Plataformas</label>
+            </value>
+            <value>
+                <fullName>Hipotecas</fullName>
+                <default>false</default>
+                <label>Hipotecas</label>
+            </value>
+            <value>
+                <fullName>Hipotecas subrogación</fullName>
+                <default>false</default>
+                <label>Hipotecas subrogación</label>
+            </value>
+            <value>
+                <fullName>HolaBank</fullName>
+                <default>false</default>
+                <label>HolaBank</label>
+            </value>
+            <value>
+                <fullName>ICO Familias</fullName>
+                <default>false</default>
+                <label>ICO Familias</label>
+            </value>
+            <value>
+                <fullName>ICO Jovenes</fullName>
+                <default>false</default>
+                <label>ICO Jovenes</label>
+            </value>
+            <value>
+                <fullName>Imagin</fullName>
+                <default>false</default>
+                <label>Imagin</label>
+            </value>
+            <value>
+                <fullName>Impagos</fullName>
+                <default>false</default>
+                <label>Impagos</label>
+            </value>
+            <value>
+                <fullName>Inmuebles</fullName>
+                <default>false</default>
+                <label>Inmuebles</label>
+            </value>
+            <value>
+                <fullName>Inversión</fullName>
+                <default>false</default>
+                <label>Inversión</label>
+            </value>
+            <value>
+                <fullName>Jubilación</fullName>
+                <default>false</default>
+                <label>Jubilación</label>
+            </value>
+            <value>
+                <fullName>LO Shop</fullName>
+                <default>false</default>
+                <label>LO Shop</label>
+            </value>
+            <value>
+                <fullName>Microbank</fullName>
+                <default>false</default>
+                <label>Microbank</label>
+            </value>
+            <value>
+                <fullName>Nómina</fullName>
+                <default>false</default>
+                <label>Nómina</label>
+            </value>
+            <value>
+                <fullName>Otra</fullName>
+                <default>false</default>
+                <label>Otra</label>
+            </value>
+            <value>
+                <fullName>Pack Digital</fullName>
+                <default>false</default>
+                <label>Pack Digital</label>
+            </value>
+            <value>
+                <fullName>Planes</fullName>
+                <default>false</default>
+                <label>Planes</label>
+            </value>
+            <value>
+                <fullName>Préstamo</fullName>
+                <default>false</default>
+                <label>Préstamo</label>
+            </value>
+            <value>
+                <fullName>Préstamos</fullName>
+                <default>false</default>
+                <label>Préstamos</label>
+            </value>
+            <value>
+                <fullName>Préstamos empresas</fullName>
+                <default>false</default>
+                <label>Préstamos empresas</label>
+            </value>
+            <value>
+                <fullName>Préstamos VO</fullName>
+                <default>false</default>
+                <label>Préstamos VO</label>
+            </value>
+            <value>
+                <fullName>Previsión</fullName>
+                <default>false</default>
+                <label>Previsión</label>
+            </value>
+            <value>
+                <fullName>Renting</fullName>
+                <default>false</default>
+                <label>Renting</label>
+            </value>
+            <value>
+                <fullName>Renting CaixaBank</fullName>
+                <default>false</default>
+                <label>Renting CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Seguro Mascotas</fullName>
+                <default>false</default>
+                <label>Seguro Mascotas</label>
+            </value>
+            <value>
+                <fullName>Seguros</fullName>
+                <default>false</default>
+                <label>Seguros</label>
+            </value>
+            <value>
+                <fullName>Seguros Accidentes</fullName>
+                <default>false</default>
+                <label>Seguros Accidentes</label>
+            </value>
+            <value>
+                <fullName>Seguros Alarmas</fullName>
+                <default>false</default>
+                <label>Seguros Alarmas</label>
+            </value>
+            <value>
+                <fullName>Seguros Coches</fullName>
+                <default>false</default>
+                <label>Seguros Coches</label>
+            </value>
+            <value>
+                <fullName>Seguros de ahorro</fullName>
+                <default>false</default>
+                <label>Seguros de ahorro</label>
+            </value>
+            <value>
+                <fullName>Seguros Decesos</fullName>
+                <default>false</default>
+                <label>Seguros Decesos</label>
+            </value>
+            <value>
+                <fullName>Seguros Empresas</fullName>
+                <default>false</default>
+                <label>Seguros Empresas</label>
+            </value>
+            <value>
+                <fullName>Seguros Especializados</fullName>
+                <default>false</default>
+                <label>Seguros Especializados</label>
+            </value>
+            <value>
+                <fullName>Seguros Hogar</fullName>
+                <default>false</default>
+                <label>Seguros Hogar</label>
+            </value>
+            <value>
+                <fullName>Seguros Jubilación</fullName>
+                <default>false</default>
+                <label>Seguros Jubilación</label>
+            </value>
+            <value>
+                <fullName>Seguros Salud</fullName>
+                <default>false</default>
+                <label>Seguros Salud</label>
+            </value>
+            <value>
+                <fullName>Seguros Viajes</fullName>
+                <default>false</default>
+                <label>Seguros Viajes</label>
+            </value>
+            <value>
+                <fullName>Seguros Vida</fullName>
+                <default>false</default>
+                <label>Seguros Vida</label>
+            </value>
+            <value>
+                <fullName>Seviam</fullName>
+                <default>false</default>
+                <label>Seviam</label>
+            </value>
+            <value>
+                <fullName>Shop</fullName>
+                <default>false</default>
+                <label>Shop</label>
+            </value>
+            <value>
+                <fullName>Smart Money</fullName>
+                <default>false</default>
+                <label>Smart Money</label>
+            </value>
+            <value>
+                <fullName>Tarjetas</fullName>
+                <default>false</default>
+                <label>Tarjetas</label>
+            </value>
+            <value>
+                <fullName>Tarjetas 2</fullName>
+                <default>false</default>
+                <label>Tarjetas 2</label>
+            </value>
+            <value>
+                <fullName>TPV</fullName>
+                <default>false</default>
+                <label>TPV</label>
+            </value>
+            <value>
+                <fullName>Wivai</fullName>
+                <default>false</default>
+                <label>Wivai</label>
+            </value>
+            <value>
+                <fullName>Wivai Kit digital</fullName>
+                <default>false</default>
+                <label>Wivai Kit digital</label>
+            </value>
+            <value>
+                <fullName>Wivai Muebles</fullName>
+                <default>false</default>
+                <label>Wivai Muebles</label>
+            </value>
+            <value>
+                <fullName>Wivai Solar</fullName>
+                <default>false</default>
+                <label>Wivai Solar</label>
+            </value>
+            <value>
+                <fullName>Wivai Tecnología</fullName>
+                <default>false</default>
+                <label>Wivai Tecnología</label>
+            </value>
+            <value>
+                <fullName>Wivai teléfono</fullName>
+                <default>false</default>
+                <label>Wivai teléfono</label>
+            </value>
+            <value>
+                <fullName>Wivai TV</fullName>
+                <default>false</default>
+                <label>Wivai TV</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

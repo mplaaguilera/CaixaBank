@@ -1,0 +1,58 @@
+<template>
+    <lightning-card variant="narrow" icon-name={icon}>
+        <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls"
+        style="z-index: 3;"></lightning-spinner>
+        <h1 slot="title" style="color: inherit;font-weight: var(--lwc-cardFontWeight,700);">{titleLabel} ({numRecords})</h1>
+        <lightning-button-icon  size="large" icon-name="utility:refresh" alternative-text="Reload" slot="actions" onclick={retrieveData}></lightning-button-icon>
+         
+    <div>
+
+        <c-aV_-interlocution-group-datatable-custom-type 
+         data={recordsToDisplay}
+        columns={columns} 
+            key-field="Id"
+            sorted-by={sortedBy}
+            sorted-direction={sortDirection}
+            onsort={handleSortdata}
+            column-widths-mode ={columnMode}
+            min-column-width={minWidthColOppo}
+            hide-checkbox-column
+            resize-column-disabled>
+        </c-aV_-interlocution-group-datatable-custom-type>
+
+        <!-- <c-aV_-interlocution-group-datatable-custom-type 
+     
+        if:true={isOppo}
+         data={recordsToDisplay}
+        columns={columns} 
+            key-field="Id"
+            sorted-by={sortedBy}
+            sorted-direction={sortDirection}
+            onsort={handleSortdata}
+            hide-checkbox-column
+            min-column-width="150"
+            column-widths-mode = "fixed"
+            resize-column-disabled>
+        </c-aV_-interlocution-group-datatable-custom-type> -->
+
+        <div class="slds-form_inline slds-p-around_xx-small" style="margin:.5rem 0 .5rem .5rem" if:true={isMultipagina}>
+            <div class="slds-form-element">
+                <div class="slds-form-element__label">
+                    <label class="slds-form-element__label" for="Page">Page </label>
+                </div>
+                <div class="slds-form-element__control slds-grow">
+                    <lightning-combobox class="comboSize" name="Page" id="Page" value={page} options={optionsPage} placeholder={page} onchange={handleChangePage} ></lightning-combobox>
+                </div>
+            </div>  
+            <div class="slds-form-element">
+                <div class="slds-form-element__label">
+                    <label for="PageSize">Page Size </label>
+                </div>
+                <div class="slds-form-element__control slds-grow">
+                    <lightning-combobox class="comboSize" name="PageSize" id="PageSize" value={pageSize} options={optionsPageSize} placeholder={pageSize} onchange={handleChangePageSize}></lightning-combobox>
+                </div>
+            </div>
+        </div>
+    </div>
+</lightning-card>
+</template>

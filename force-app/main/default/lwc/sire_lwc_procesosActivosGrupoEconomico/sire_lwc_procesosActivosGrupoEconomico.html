@@ -1,0 +1,15 @@
+<template>
+    <lightning-card variant="Narrow" title={titulo} icon-name="custom:custom55">
+        <lightning-button label="Expandir Todo" slot="actions" onclick={clickToExpandAll} style="margin-right: 15px;"></lightning-button>
+        <lightning-button label="Contraer Todo" slot="actions" onclick={clickToCollapseAll}></lightning-button>               
+        <div style="padding-right: 10px; padding-left: 10px; padding-bottom: 10px;">
+            <lightning-tree-grid
+                columns={gridColumns}
+                data={procesos}
+                key-field="nombreEmpresa"
+                hide-checkbox-column="true"
+                resize-column-disabled="false"
+            ></lightning-tree-grid>   
+        </div>     
+    </lightning-card>     
+</template>

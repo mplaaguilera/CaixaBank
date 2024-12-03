@@ -1,0 +1,38 @@
+<template>
+    <lightning-card  variant="Narrow"  title="Categorización MCC" icon-name="standard:picklist_type">
+        <div class="slds-grid slds-card__body slds-card__body_inner slds-wrap">
+            <div class="slds-col slds-size_1-of-2">
+                <span class="slds-form-element__label">Tematica</span>  
+                <div class="slds-form-element__control">    
+                    <lightning-formatted-text value={mccTematica}>
+                    </lightning-formatted-text> 
+                </div>
+                <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <span class="slds-form-element__label">Producto/Servicio</span>  
+                <div class="slds-form-element__control">    
+                    <lightning-formatted-text value={mccProducto}>
+                    </lightning-formatted-text> 
+                </div>
+                <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <span class="slds-form-element__label">Motivo</span>  
+                <div class="slds-form-element__control">    
+                    <lightning-formatted-text value={mccMotivo}>
+                    </lightning-formatted-text> 
+                </div>
+                <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <span class="slds-form-element__label">Detalle</span>  
+                <div class="slds-form-element__control">    
+                    <lightning-formatted-text value={mccDetalle}>
+                    </lightning-formatted-text> 
+                </div>
+                <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+            </div>            
+        </div>
+    </lightning-card>
+</template>

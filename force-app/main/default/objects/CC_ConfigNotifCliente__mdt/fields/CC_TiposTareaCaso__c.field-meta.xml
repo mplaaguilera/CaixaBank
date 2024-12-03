@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TiposTareaCaso__c</fullName>
+    <description>Tipos de tarea a tener en cuenta para notificar al cliente del seguimiento</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Tipos de tarea a tener en cuenta para notificar al cliente del seguimiento</inlineHelpText>
+    <label>Tipos de tarea</label>
+    <required>false</required>
+    <type>TextArea</type>
+</CustomField>

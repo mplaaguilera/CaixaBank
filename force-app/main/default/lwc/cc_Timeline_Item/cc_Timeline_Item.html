@@ -1,0 +1,112 @@
+<template>
+
+	<li>
+		<div class={item.timelineItemClass} data-item-id={item.RecordId}>
+			<div class="slds-media" style="padding-right: 4px;">
+				<div class="slds-media__figure">
+					<span class="botonExpandirContraerItem">
+						<span lwc:if={item.Detail}>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-button-icon icon-name="utility:switch" variant="bare" class="slds-var-m-top_x-small" onclick={expandirContraerItem} data-id={item.RecordId}></lightning-button-icon>
+						</span>
+					</span>
+
+					<div class="slds-icon_container slds-timeline__icon slds-var-m-left_small">
+						<lightning-icon lwc:if={isTask} icon-name="standard:task" size="small" title="Tarea"></lightning-icon>
+						<lightning-icon lwc:elseif={isCase} icon-name="standard:case" size="small" title="Caso"></lightning-icon>
+						<lightning-icon lwc:elseif={isChat} icon-name="standard:live_chat" size="small" title="Chat"></lightning-icon>
+						<lightning-icon lwc:elseif={isMailInbound} icon-name="custom:custom105" size="small" title="Correo entrante" class="iconoCorreoEntrante"></lightning-icon>
+						<lightning-icon lwc:elseif={isMailOutbound} icon-name="standard:email" size="small" title="Correo saliente"></lightning-icon>
+						<lightning-icon lwc:elseif={isSocial}  icon-name="standard:social" size="small" title="Social"></lightning-icon>
+						<img lwc:elseif={isTwitter} class="iconoTwitter slds-icon_small" src="/img/social/icon/twitter.svg" title="Twitter">
+					</div>
+				</div>
+				<div class="slds-media__body slds-is-relative" style="top: 1px;">
+					<div class="slds-grid slds-grid_align-spread slds-timeline__trigger" style="padding-left: 0px;">
+						<div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+							<span lwc:if={item.Subject} title={item.Subject} class="slds-truncate">
+								<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.RecordId}>{item.Subject}</a>
+							</span>
+							<span lwc:else class="slds-truncate" style="font-style: italic;">
+								<a href="#" class="slds-text-link slds-text-color_weak" onclick={navigate} data-record-id={item.RecordId}>Sin asunto</a>
+							</span>
+						</div>
+						<div class="slds-timeline__actions_inline">
+							<p class="slds-timeline__date" style="padding-right: 0px;">{item.ShortDate}</p>
+						</div>
+					</div>
+
+					<div lwc:if={isCase}>
+						<div class="slds-text-body_small">
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+							&nbsp;creó el caso&nbsp;
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+						</div>
+					</div>
+					<div lwc:elseif={isChat}>
+						<div class="slds-text-body_small">
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+							&nbsp;atendió un chat en el caso&nbsp;
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+						</div>
+					</div>
+					<div lwc:elseif={isMailInbound} class="slds-text-body_small">
+						<div class="slds-truncate">
+							Se recibió un correo en el caso&nbsp;
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+						</div>
+						<div class="slds-var-m-top_x-small" title={item.senders}>
+							<span class="slds-text-color_weak slds-var-m-right_x-small">De:</span>
+							<span style="font-style: italic;">{item.senders}</span>
+						</div>
+						<div class="slds-var-m-top_x-small" title={item.Recipients}>
+							<span class="slds-text-color_weak slds-var-m-right_x-small">Para:</span>
+							<span style="font-style: italic;">{item.Recipients}</span>
+						</div>
+					</div>
+					<div lwc:elseif={isMailOutbound} class="slds-text-body_small">
+						<div class="slds-truncate">
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+							&nbsp;envió un correo en el caso&nbsp;
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+						</div>
+						<div class="slds-truncate slds-var-m-top_x-small" title={item.senders}>
+							<span class="slds-text-color_weak slds-var-m-right_x-small">De:</span>
+							<span style="font-style: italic;">{item.senders}</span>
+						</div>
+						<div class="slds-truncate slds-var-m-top_x-small" title={item.Recipients}>
+							<span class="slds-text-color_weak slds-var-m-right_x-small">Para:</span>
+							<span style="font-style: italic;">{item.Recipients}</span>
+						</div>
+					</div>
+					<div lwc:elseif={isSocial}>
+						<div class="slds-text-body_small">
+							<div lwc:if={incoming}>
+								<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+								&nbsp;atendió un post en el caso&nbsp;
+								<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+							</div>
+							<div lwc:else>
+								<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+								&nbsp;respondió a un post en el caso&nbsp;
+								<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+							</div>
+						</div>
+					</div>
+					<div lwc:elseif={isTwitter}>
+						<div class="slds-text-body_small">
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.AssignedId}>{item.Assigned}</a>
+							&nbsp;atendió un twit en el caso&nbsp;
+							<a href="#" class="slds-text-link" onclick={navigate} data-record-id={item.CaseId}>{item.CaseNumber}</a>.
+						</div>
+					</div>
+
+					<article class="slds-box slds-timeline__item_details slds-theme_shade slds-var-m-top_x-small slds-var-m-horizontal_xx-small slds-var-m-bottom_small" aria-hidden="true">
+						<lightning-formatted-rich-text value={item.Detail}></lightning-formatted-rich-text>
+					</article>
+				</div>
+			</div>
+		</div>
+	</li>
+
+</template>

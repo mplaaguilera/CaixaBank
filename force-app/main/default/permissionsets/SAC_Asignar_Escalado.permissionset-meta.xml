@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>SAC_ReasignacionInteraccionMasiva_LWC_VF</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SAC_Asignar_Escalado</label>
+    <pageAccesses>
+        <apexPage>SAC_ReasignacionInteraccionMasivaLWC</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+</PermissionSet>

@@ -1,0 +1,70 @@
+<template>
+    <div>
+        <span> 
+            <lightning-icon size="small" icon-name="standard:opportunity"></lightning-icon><strong>&nbsp;&nbsp; Oportunidades (Vinculadas {opposCount})</strong>
+        </span>
+    </div>
+    <lightning-spinner if:true={showSpinner} alternative-text="Loading" class = "customSpinner" size="large"  style="z-index: 3;"></lightning-spinner>
+    <div class = "cardMargin">
+        <div class="basicContainer cardMargin">
+            <div class="slds-grid">
+                <c-av_-lookup data-id="clookup1" class="productNew"
+                selection={initialSelection} 
+                errors={errors} 
+                onsearch={handleSearchProduct}
+                onselectionchange={handleSelectionChange} 
+                fieldlabel="Añadir oportunidad"
+                placeholder="Buscar producto..." >
+                </c-av_-lookup>
+                <lightning-button class="buttonAñadir" label="Añadir" disabled={productToAdd} onclick={handleAddOppo}></lightning-button>
+            </div>
+        </div>
+        <div if:true={particularOpportunity} class="cardMargin">
+
+            <div class="slds-text-body_regular" style="margin:1rem auto">
+                <div style="margin:1rem 0 .6rem 0">Oportunidad vinculada</div> 
+                <c-av_-detail-opportunity-appointment 
+                oppo={particularOpportunity} 
+                onvinculateaction={handleVinculation}
+                onmainclick={handleMainOpp}
+                onsenddatafromoppo={buildOppoObj}
+                onnotifyagended={evaluateAgendeds}
+                data-id={particularOpportunity.Id}
+                oppislinked="true"
+                resolutionlist={resolutionList}
+                potentiallist={potentialList}
+                style="margin-top:.5rem"
+            ></c-av_-detail-opportunity-appointment>
+            </div>
+        </div>
+        <div if:true={otherOpposLabel} style="margin:2rem 0 -.6rem 0">Otras oportunidades disponibles</div>
+        <template for:each={oppoList} for:item="opp">
+            <div key={opp.Id} class="cardMargin"> 
+                <c-av_-detail-opportunity-appointment 
+                oppo={opp} 
+                onvinculateaction={handleVinculation}
+                onmainclick={handleMainOpp}
+                onsenddatafromoppo={buildOppoObj}
+                    onnotifyagended={evaluateAgendeds}
+                    data-id={opp.Id}
+                    resolutionlist={resolutionList}
+                    potentiallist={potentialList}
+                    ></c-av_-detail-opportunity-appointment>
+                </div>
+            </template>
+        <template for:each={oppoNewList} for:item="opp">
+            <div key={opp.Id} class="cardMargin"> 
+                <c-av_-detail-opportunity-appointment 
+                    oppo={opp} 
+                    onvinculateaction={handleVinculation}
+                    onmainclick={handleMainOpp}
+                    onsenddatafromoppo={buildOppoObj}
+                    onnotifyagended={evaluateAgendeds}
+                    data-id={opp.Id}
+                    resolutionlist={resolutionList}
+                    potentiallist={potentialList}
+                ></c-av_-detail-opportunity-appointment>
+            </div>
+        </template>
+    </div>
+</template>

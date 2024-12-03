@@ -1,0 +1,84 @@
+<template>
+    <div class="slds-page-header">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-opportunity">
+                            <lightning-icon icon-name="standard:opportunity" alternative-text="Opportunity" title="Opportunity" size="medium"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">           
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span>{label.oportunidades}</span>
+                                    <span class="slds-page-header__title slds-truncate">{label.listadoOportunidades}</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <article class="slds-card slds-m-top_small">
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-m-top_medium slds-float_right">
+                <lightning-button class="slds-m-horizontal_medium" label={label.reiniciar} onclick={resetFilters}></lightning-button>
+                <lightning-button class="slds-m-horizontal_medium" variant="brand" label={label.exportar} onclick={exportData} disabled={exportDisabled}></lightning-button>
+            </div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-input disabled={disabledDate} type="date" name="startDateInterval" label={label.fechaAprobacionPrecioDesde} min={validateDate} value={fechaDesde} onchange={handleChangeDateDesde}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-input disabled={disabledDate} type="date" name="startDateInterval" label={label.fechaAprobacionPrecioHasta} min={validateDate} value={fechaHasta} onchange={handleChangeDateHasta}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-input disabled={disabledDates}  type="date" name="startDateInterval" label={label.fechaAprobacionPrecio} min={validateDate} value={fecha} onchange={handleChangeDate}></lightning-input>
+                </div>
+            </div>
+            <div class="slds-m-around_medium">
+                <div class="slds-grid">
+                    <div class="slds-col slds-col slds-size_1-of-3 slds-border_right" style={height}>
+                        <c-cibe_-custom-datatable
+                            key-field="Id"
+                            data={data}
+                            errors={errors}
+                            columns={staticColumns}
+                            draft-values={values} 
+                            show-row-number-column
+                            hide-checkbox-column>
+                        </c-cibe_-custom-datatable>
+                    </div>
+                    <div class="slds-col slds-size_2-of-3" style={height}>
+                        <c-cibe_-custom-datatable
+                            key-field="Id"
+                            data={data}
+                            errors={errors}
+                            columns={columns} 
+                            draft-values={values} 
+                            onsave={handleSave}
+                            oncancel={handleCancel}
+                            min-column-width="150"
+                            hide-checkbox-column>
+                        </c-cibe_-custom-datatable>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <lightning-layout horizontal-align="space">
+                    <lightning-layout-item flexibility="auto">
+                        <lightning-button label={label.anterior} icon-name="utility:chevronleft" onclick={previousHandler} disabled={getHasPrevius}></lightning-button>
+                    </lightning-layout-item>
+                    <lightning-layout-item flexibility="auto">
+                        <lightning-button label={label.posterior} icon-name="utility:chevronright" onclick={nextHandler} disabled={getHasNext} icon-position="right"></lightning-button>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+        </div>
+        <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
+    </article>
+</template>

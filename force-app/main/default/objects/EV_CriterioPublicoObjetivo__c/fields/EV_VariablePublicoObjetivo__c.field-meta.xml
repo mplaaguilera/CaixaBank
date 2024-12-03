@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_VariablePublicoObjetivo__c</fullName>
+    <description>Relación a la variable del público objetivo</description>
+    <label>Variable público objetivo</label>
+    <referenceTo>EV_VariablePublicoOjetivo__c</referenceTo>
+    <relationshipName>EV_VariablesPublicoObjetivo</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="urn:metadata.tooling.soap.sforce.com" fqn="cbk_ParseJson_View">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+    <description>Viewer Json</description>
+    <masterLabel>cbk_ParseJson_View</masterLabel>
+    <targets>
+	  	<target>lightning__AppPage</target>
+	  	<target>lightning__RecordPage</target>
+		<target>lightning__HomePage</target>
+  	</targets>
+      <targetConfigs>
+        <targetConfig targets="lightning__RecordPage,lightning__AppPage,lightning__HomePage">
+            <property name="inputField" type="String" label="Input Field:" />
+			<property name="inputPageSize" type="String" label="Input Size:" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

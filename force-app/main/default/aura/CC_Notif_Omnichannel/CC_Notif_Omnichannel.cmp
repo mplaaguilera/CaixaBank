@@ -1,0 +1,20 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="CC_Caracteristica" access="global" >
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    <aura:attribute name="recordId" type="String" default="" />
+    
+    <lightning:omniToolkitAPI aura:id="omniToolkit" />  
+    <aura:handler event="lightning:omniChannelWorkAssigned" action="{! c.onWorkAssigned }"/>
+    <aura:handler event="lightning:omniChannelWorkAccepted" action="{! c.onWorkAccepted }"/>
+    <aura:handler event="lightning:omniChannelLogout" action="{! c.onLogout }"/>
+    <aura:handler event="lightning:omniChannelStatusChanged" action="{! c.onStatusChanged }"/>   
+    
+    <!--Por ahora no utilizamos los eventos DCE-->
+    <!--<lightning:empApi aura:id="empApi"/>-->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   
+    
+    <ltng:require styles="{!$Resource.CC_ToastMessage}" />
+    <!--<lightning:workspaceAPI aura:id="workspace"/>-->
+
+</aura:component>

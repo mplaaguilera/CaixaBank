@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PurgeProcess_BatchSizeRangeValue</fullName>
+    <active>true</active>
+    <description>VR para controlar que el valor informado en el tamaño del batch sea adecuado</description>
+    <errorConditionFormula>OR((CBK_BatchSize__c &lt; 1),(CBK_BatchSize__c &gt; 2000))</errorConditionFormula>
+    <errorMessage>Se debe especificar un valor válido para el tamaño del batch (intervalo 1-2000)</errorMessage>
+</ValidationRule>

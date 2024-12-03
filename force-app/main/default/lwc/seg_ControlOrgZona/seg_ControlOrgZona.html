@@ -1,0 +1,18 @@
+<template>
+    <template if:true={discrepancia}>
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner" style="padding-left: 9px; padding-right: 9px;">
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" style="border-radius: 4px; line-height: 16px; background-color: #e94141;"
+                    title={tituloCard}>
+                    <span class="slds-icon_container slds-icon-utility-use" style="padding-right: 10px;">
+                        <lightning-icon icon-name="utility:warning" size="xx-small" variant="inverse"></lightning-icon>
+                    </span>
+                    <h2>Organización y Zona del caso no coinciden con el peticionario.</h2>
+                    <div class="slds-notify__close">
+                        <lightning-button-icon icon-name="utility:close" size="small"  variant="border-filled" onclick={cerrarAviso} alternative-text="Cerrar"></lightning-button-icon>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </template>
+</template>

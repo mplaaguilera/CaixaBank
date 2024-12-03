@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_CasoNegociado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check para indicar cuando un caso a pasado por negociación y así poder controlar el cierre de los case milestone</description>
+    <label>Caso negociado</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo_Alfabetico</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+AND(ISCHANGED(Name) &amp;&amp; RecordType.DeveloperName == &apos;CC_Cliente&apos; &amp;&amp; $Permission.SEG_EditarAccount,
+!OR(
+ISNEW(),
+ISBLANK(SEG_FechaRefresco__c),
+ISBLANK(PRIORVALUE(SEG_FechaRefresco__c)),
+SEG_FechaRefresco__c != PRIORVALUE(SEG_FechaRefresco__c)
+)
+),
+AND(
+NOT(ISCHANGED(OS_Modificacion_Campos_COPS__c)),
+NOT(ISCHANGED(CSBD_Actualizacion_Datos_Riesgo__pc)),
+NOT(ISCHANGED(CC_MarcaSenior__c)),
+NOT(ISCHANGED(CC_Telefono_Unico__c)),
+$Setup.AdminSettings__c.Validaciones__c,
+!$Permission.CC_Modificar_Cuenta_Contacto_ALF = true,
+!$Permission.SEG_EditarAccount,
+!OR(
+ISNEW(),
+AND(ISBLANK(CC_NumPerso__c) &amp;&amp; $Profile.Name!= &apos;SEG_Usuario_CaixaBank&apos;),
+AND(ISBLANK(CC_FechaRefresco__c) &amp;&amp; $Profile.Name!= &apos;SEG_Usuario_CaixaBank&apos;),
+AND(ISBLANK(PRIORVALUE(CC_FechaRefresco__c)) &amp;&amp; $Profile.Name!= &apos;SEG_Usuario_CaixaBank&apos;),
+ISBLANK(CC_NumPerso__c),
+ISBLANK(CC_FechaRefresco__c),
+ISBLANK(PRIORVALUE(CC_FechaRefresco__c)),
+CC_FechaRefresco__c != PRIORVALUE(CC_FechaRefresco__c)
+)
+)
+)</errorConditionFormula>
+    <errorMessage>No se permite actualizar el registro</errorMessage>
+</ValidationRule>

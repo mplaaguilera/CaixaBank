@@ -1,0 +1,78 @@
+<template>
+	<div class="container-div slds-p-around_small">
+		<div class="cardMargin">
+			<c-cibe_-finished-task ondatareport={handleDataPadre} record-id={recordId} editable="true"></c-cibe_-finished-task>
+		</div>
+		<div class="cardMargin">
+			<div class="slds-box messageWarning cardMargin slds-align_absolute-center">
+				<div>
+					<p>{labels.paraReportar}</p>
+					<ol class="slds-list_ordered slds-is-nested">
+						<li>{labels.actualizarListado}</li>
+						<li>{labels.informarEstado}</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		<div class="cardMargin">
+			<lightning-button if:false={isShowFlowActionOpp} label={labels.createOpportunity} title="Crear oportunidad" 
+					icon-name="utility:add" class="slds-m-left_x-small" onclick={handleComboBoxChange} >
+					</lightning-button>
+
+			<template if:true={isShowFlowActionOpp}>
+				<lightning-card>				
+					<div class="slds-modal__header">
+						<h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
+					</div>
+					<lightning-button-icon icon-name="utility:close" alternative-text="Cancelar creación de oportunidad"
+					class="slds-m-left_xx-small close-button" title="Cancelar creación de oportunidad" onclick={handelCancelNewOpp}>
+					</lightning-button-icon>
+					<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+						<div class="slds-is-relative">
+							<lightning-flow flow-api-name={flowName} flow-input-variables={inputVariables}
+							onstatuschange={handleStatusChangeOpp}> </lightning-flow>
+						</div>
+					</div>
+				</lightning-card>
+			</template>
+		</div>		
+		<div class="cardMargin">
+			<c-cibe_-List-Opportunities recid={recordId} sobjname="Task" ondatareport={handleDataAbuelo} editable="true"></c-cibe_-List-Opportunities>
+		</div>
+
+		<template if:true ={launchFlow}>
+            <section  tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container" >
+				<header class="slds-modal__header " >
+					<div class="title " >{flowHeader}</div>
+					<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+						title="Close" onclick={handleClose}>
+						<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"></lightning-icon>
+						<span class="slds-assistive-text">Close</span>
+					</button>
+				</header>
+				<div class="scrollbar style-3">
+					<div class="force-overflow">
+						<div>
+							<lightning-flow 
+								flow-api-name={actionSetting}  flow-input-variables={inputVariables} onstatuschange={handleStatusChange}>
+							</lightning-flow> 
+						</div>
+					</div>
+				</div>
+			</div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+		<div class="slds-docked-form-footer">
+			<lightning-button variant="brand" label={labels.grabarReporte} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+			<lightning-button variant="brand" if:true ={roleEmp} label={labels.cerrarTareaAltaCita} onclick={handleSaveCreateMeeting} class="slds-m-left_x-small"></lightning-button>
+			<lightning-button variant="brand" if:true ={roleEmp} label={labels.cerrarTareaAltaTarea} onclick={handleSaveCreateTask} class="slds-m-left_x-small"></lightning-button>
+			<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="small" class="spin-cls" ></lightning-spinner>
+		</div>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" ></lightning-spinner>
+	</div>
+	
+</template>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_RatingConLetra__c</fullName>
+    <externalId>false</externalId>
+    <formula>AV_Rating__c + &apos; (&apos; + CIBE_RatingLetra__c + &apos;)&apos;</formula>
+    <inlineHelpText>The Rating provides an assessment of credit risk through a scale indicator (ranging from 0 -best- to 10 -worst-) that predicts the probability of default (delinquency of more than 90 days) in the next 12 months for current asset transactions.  The letter (from A -best- to F -worst-) indicates the risk segment, that is, the relative position of this customer with respect to the segment to which they belong (individual, self-employed, microenterprise, etc.).</inlineHelpText>
+    <label>Rating</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

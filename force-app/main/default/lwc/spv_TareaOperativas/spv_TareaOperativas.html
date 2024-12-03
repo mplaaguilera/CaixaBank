@@ -1,0 +1,155 @@
+<template>
+    <!--Botonera-->
+    <template if:false={mostrarBotoneraGGH}>
+        <div class="slds-align_absolute-center">
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="tomarPropiedad" label="Tomar propiedad" icon-name="utility:change_owner" onclick={handleTomarPropiedad} disabled={disableBotonTomarPropiedad}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="devolverTarea" label="Devolver tarea al grupo" icon-name="utility:skip" onclick={handleDevolverTarea} disabled={disableBotonDevolverTarea}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="devolverTareaGestorLetrado" label="Devolver tarea al gestor/letrado" icon-name="utility:undo" onclick={handleAbrirModalDevolverGestorLetrado} disabled={disableBotonDevolverGestorLetrado}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="enviarTarea" label="Enviar tarea" icon-name="utility:send" onclick={handleEnviarTarea} disabled={disableBotonEnviar}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="prorrogarTarea" label="Prorrogar" icon-name="utility:event" onclick={handleAbrirModalProrrogar} disabled={disableBotonProrrogar}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="notificarTarea" label="Notificar" icon-name="utility:alert" onclick={handleAbrirModalNotificar} disabled={disableBotonNotificar}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="finalizarTarea" label="Finalizar tarea" icon-name="utility:switch" onclick={handleAbrirModalFinalizarConBotonesPrincipales} disabled={disableBotonFinalizar}></lightning-button>
+            </div>
+        </div>
+    </template>
+
+    <!--Botonera GGH-->
+    <template if:true={mostrarBotoneraGGH}>
+        <div class="slds-align_absolute-center">
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="enviarTarea" label="Enviar tarea a GGH" icon-name="utility:send" onclick={handleEnviarTareaGGH} disabled={disableBotonesGGH}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="finalizarTarea" label="Finalizar tarea" icon-name="utility:switch" onclick={handleFinalizarTareaGGH} disabled={disableBotonesGGH}></lightning-button>
+            </div>
+        </div>
+    </template>
+
+    <!--Spinner-->
+    <template if:true={mostrarSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+
+    <!--Modal devolver tarea gestor/letrado-->
+    <template if:true={mostrarModalDevolverGestorLetrado}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={handleCerrarModalDevolverGestorLetrado}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver al gestor/letrado</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-textarea name="inputMotivo" value={motivoDevolver} onchange={changeMotivoDevolver} label="Indique el motivo de la devolución:" required></lightning-textarea>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalDevolverGestorLetrado} class="slds-var-p-right_small"></lightning-button>
+                    <lightning-button variant="brand" label="Devolver" title="Devolver" onclick={handleDevolverTareaGestorLetrado}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal prorrogar tarea-->
+    <template if:true={mostrarModalProrrogar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={handleCerrarModalProrrogar}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Marcar nuevo plazo de prórroga</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <lightning-input type="date" name="input1" label="Fecha vto prórroga" onchange={changeFechaProrroga}></lightning-input>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalProrrogar} class="slds-var-p-right_small"></lightning-button>
+                    <lightning-button variant="brand" label="Prorrogar" title="Prorrogar" onclick={handleProrrogarTarea} class="slds-var-p-right_small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal finalizar tarea-->
+    <template if:true={mostrarModalFinalizar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={handleCerrarModalFinalizarTotal}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">¿Cómo quiere finalizar la tarea?</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                    <template if:true={mostrarComentarios}>
+                        <lightning-textarea name="inputComentarios" value={comentariosFinalizarTarea} onchange={changeComentarios} label="Por favor, deje aquí sus comentarios"></lightning-textarea>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <!--Botón cancelar-->
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalFinalizarTotal} class="slds-float_left"></lightning-button>
+                    <template if:true={mostrarBotonesPrincipalesFinalizar}>
+                        <!--Botón descartar-->
+                        <lightning-button variant="neutral" label="Descartar" title="Descartar" onclick={handleAbrirDescartar} class="slds-var-p-right_small"></lightning-button>
+                        <!--Botón finalizada incompleta-->
+                        <lightning-button variant="neutral" label="Finalizada incompleta" title="Finalizada incompleta" onclick={handleAbrirFinalizadaIncompleta} class="slds-var-p-right_small"></lightning-button>
+                        <!--Botón finalizada-->
+                        <lightning-button variant="neutral" label="Finalizada" title="Finalizada" onclick={handleAbrirFinalizada}></lightning-button>
+                    </template>
+                    <template if:true={mostrarBotonesDescartar}>
+                        <!--Botón descartar-->
+                        <lightning-button variant="brand" label="Descartar" title="Descartar" onclick={handleDescartarTarea}></lightning-button>
+                    </template>
+                    <template if:true={mostrarBotonesFinalizadaIncompleta}>
+                        <!--Botón Finalizar incompleta-->
+                        <lightning-button variant="brand" label="Finalizar incompleta" title="Finalizada incompleta" onclick={handleFinalizarIncompleta}></lightning-button>
+                    </template>
+                    <template if:true={mostrarBotonesFinalizada}>
+                        <!--Botón Finalizar-->
+                        <lightning-button variant="brand" label="Finalizar" title="Finalizada" onclick={handleFinalizarTarea}></lightning-button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal notificar tarea-->
+    <template if:true={mostrarModalNotificar}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={handleCerrarModalNotificar}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Notificar tarea al resolutor</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                    <lightning-textarea name="inputComentariosNotificar" value={comentariosNotificar} onchange={changeComentariosNotificar} label="Por favor, deje aquí sus comentarios"></lightning-textarea>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={handleCerrarModalNotificar} class="slds-var-p-right_small"></lightning-button>
+                    <lightning-button variant="brand" label="Notificar" title="Notificar" onclick={handleNotificarTarea} class="slds-var-p-right_small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

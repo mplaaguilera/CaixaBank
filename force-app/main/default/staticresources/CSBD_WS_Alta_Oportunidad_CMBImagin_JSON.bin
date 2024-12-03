@@ -1,0 +1,41 @@
+{
+    "solicitudes": [
+        {
+            "referencia_usuario": "PST20190724235415408",
+            "tipoSolicitud": "cmb",
+            "nombre": "JOSE MARIA FERNANDEZ MARTIN",
+            "telefono": "680707336",
+            "idProducto": "Auto_imaginBank",
+            "idioma": "2",
+            "tipollamada": "1",
+            "horaIni": "10",
+            "minIni": "0",
+            "horaFin": "12",
+            "minFin": "0",
+            "origen": "contratacion",
+            "nombre2": "JOSE MARIA",
+            "apellidos": "FERNANDEZ",
+            "nif": "29801742K",
+            "canal": "portal",
+            "colectivo": "",
+            "numperso": "",
+            "subproducto_1": "CMN_Suri",
+            "apellidos_2": "MARTIN",
+            "timestamp": "20190725092425",
+            "proceso": "CTO/1",
+            "tipoCliente": "L",
+            "tipoContacto": "C",
+            "agenteSolicitud": "",
+            "boton": "CMN_Suri",
+            "codProducto": "",
+            "tipoPago": "",
+            "fraccionamiento": "",
+            "importeTotal": "",
+            "margen": "",
+            "indInTouch": "N",
+            "agenteInTouch": "",
+            "reserva1": "",
+            "reserva2": ""
+        }
+    ]
+}

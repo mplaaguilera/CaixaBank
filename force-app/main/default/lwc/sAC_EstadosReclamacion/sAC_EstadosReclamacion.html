@@ -1,0 +1,620 @@
+<!--
+  
+  INI - INS: 03/05/2021 -> Luis Mesa Garcia -> :US213188
+  Componente de cambios de estado en la reclamación:
+
+  DESC: Lightning web component que contiene la funcionalidad de mover los estados en los que se encuentra una reclamación.
+  
+  MOD - INS: 14/05/2021 -> Luis Mesa Garcia -> :US219267
+  Componente de cambios de estado en la pretensión:
+
+  MOD - INS: 29/06/2021 -> Luis Mesa Garcia -> 
+  Añadir botón de reabrir casos en reclamaciones y pretensiones:
+
+  MOD - INS: 30/06/2021 -> Marcela Neira -> :US242676
+  Actualización cambios estado y mensajes:
+  DESC: PopUp para recoger el motivo de cambio de estado de Análisis a Alta
+
+  MOD - INS: 22/07/2021 -> Esteve Llaó -> Defect
+  Añadido metodo para controlar el cambio desde el estado inicial al resto sin pretensiones.
+
+  MOD - INS: 26/07/2021 -> Esteve Llaó -> US254502
+  Añadido componente prorroga.
+
+  MOD - INS: 13/10/2021 -> Daniel Benito -> US271706
+  Añadido modal última pretensión.
+    
+  MOD - INS: 29/10/2021 -> Daniel Benito -> US271700
+  Añadido modal Inadmisión
+-->
+
+<template>
+
+    <!--Modal última pretensión-->
+    <template if:true={isModalUltimaPretension}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">Reclamación sin pretensiones</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                    <p><b>Por favor, tenga en cuenta que está dando de baja la única pretensión de la reclamación. 
+                        Si pulsa en Aceptar, se efectuará la baja de la pretensión y será necesario que cree una nueva pretensión antes de avanzar a la fase de Análisis.
+                    </b></p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={mantenerPretension} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={setBaja} title="OK">Aceptar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <div class="slds-grid slds-wrap">
+
+        <div>
+
+            <template if:true={isLoading}>
+                <div class="slds-p-around_x-large">
+                    <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                </div>
+            </template>
+        </div>
+
+        <template if:true={existenDatos}>
+            <template if:true={propietario}>
+                <!--Botones de Reclamacion-->
+                <template if:true={recordType}>
+                    <div style="padding-top: 4px; width: 100%" align="Center">
+                        
+                        <template if:true={alta}>                            
+                           <!--<lightning-button style="padding-left:8px" label="Subsanación" iconname="" onclick={clickReclamacion}
+                            id="SAC_006">
+                            </lightning-button>-->
+
+                            <!-- <lightning-button style="padding-left:8px" label="Análisis" iconname="" onclick={clickReclamacion}
+                                id="SAC_002">
+                            </lightning-button>   
+                            
+                            <lightning-button style="padding-left:8px" label="Rechazar" iconname="" onclick={openModalRechazar}
+                            id="Rechazado">
+                            </lightning-button>
+                            <template if:true={pretConMcc}>
+                                <lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={openModalInadmision} id="Inadmisión">
+                                </lightning-button>
+                            </template> -->
+
+                            <lightning-button style="padding-left:8px" label="Análisis" iconname="" onclick={mostrarAvisoIdioma}
+                                id="SAC_002">
+                            </lightning-button>   
+                            
+                            <lightning-button style="padding-left:8px" label="Rechazar" iconname="" onclick={openModalRechazar}>
+                            </lightning-button>
+                            <template if:true={pretConMcc}>
+                                <lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={mostrarAvisoIdioma} id="Inadmisión">
+                                </lightning-button>
+                            </template>
+
+                            <!--<lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={clickReclamacion}
+                                id="SAC_005">
+                            </lightning-button>-->
+                        </template>
+
+                        <template if:true={subsanacion}>
+
+                            <template if:true={esAlta}>
+
+                                <lightning-button style="padding-left:8px" label="Subsanación resuelta" iconname=""
+                                    onclick={setBack}>
+                                </lightning-button>
+
+                                <lightning-button style="padding-left:8px" label="Inadmisión" iconname=""
+                                    onclick={openModalInadmision}>
+                                </lightning-button>
+
+                            </template>
+
+                        </template>
+                        
+                        <template if:true={analisis}>
+                            <template if:true={esAltaAutomatica}>
+                                <lightning-button style="padding-left:8px" label="Alta automática" disabled="true" variant="brand"></lightning-button>               
+                            </template>
+
+                            <template if:false={esAltaAutomatica}>
+                                <lightning-button style="padding-left:8px" label="Alta" iconname="" onclick={openModal}
+                                id="SAC_001"></lightning-button>               
+                            </template>
+
+                            <lightning-button style="padding-left:8px" label="Inadmisión" iconname=""
+                                onclick={openModalInadmision}>
+                            </lightning-button>
+
+                            <lightning-button style="padding-left:8px" label="Rechazar" iconname="" onclick={openModalRechazar}>
+                            </lightning-button>
+                            
+                        </template>
+                        <template if:true={negociacion}>
+                            <template if:true={finalizarNegociacion}>
+                                <template if:true={tieneFechaResolucion}>
+                                    <lightning-button style="padding-left:8px" label="Fin Negociación" iconname=""
+                                    onclick={mostrarAvisoFinNegociacion}>
+                                    </lightning-button>
+                                </template>
+                                <template if:false={tieneFechaResolucion}>
+                                    <lightning-button style="padding-left:8px" label="Fin Negociación" iconname=""
+                                    onclick={setAnalisisReclamacion}>
+                                    </lightning-button>
+                                    <!-- <lightning-button style="padding-left:8px" label="Ir a Resolución" iconname=""
+                                        onclick={setRedaccionReclamacion}>
+                                    </lightning-button> -->
+                                </template>
+                            </template>
+                        </template>
+
+                        <template if:true={ejecucion}>
+                            <lightning-button style="padding-left:8px" label="Negociación" iconname="" onclick={setNegociacionReclamacion}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={inadmision}>
+                            <lightning-button style="padding-left:8px" label="Reabrir" iconname="" onclick={setBack}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={cerrado}>
+                            <lightning-button style="padding-left:8px" label="Reabrir" iconname="" onclick={setBack}>
+                            </lightning-button>
+                        </template>
+                    </div>
+                </template>
+
+                <!--Botones de Pretension-->
+                <template if:false={recordType}>
+
+                    <div style="padding-top: 4px;" align="center">
+
+                        <template if:true={baja}>
+                            <lightning-button style="padding-left:8px" label="Deshacer Baja" iconname=""
+                                onclick={setBack}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={alta}>
+                            <lightning-button style="padding-left:8px" label="Baja" iconname="" onclick={bajaPretensionAlta}
+                                id="SAC_009">
+                            </lightning-button>
+                            
+                            <lightning-button style="padding-left:8px" label="Inadmisión" iconname="" onclick={openModalInadmision}>
+                            </lightning-button>
+        
+                            <!--<lightning-button style="padding-left:8px" label="Subsanación" iconname=""
+                                onclick={openModalSubsanacion}>
+                            </lightning-button>-->
+
+                            <!--<lightning-button style="padding-left:8px" label="Inadmisión" iconname=""
+                                onclick={openModalInadmision}>
+                            </lightning-button>-->
+                        </template>
+
+                        <template if:true={analisis}>
+
+                            <lightning-button style="padding-left:8px" label="Baja" iconname="" onclick={bajaPretensionAlta}>
+                            </lightning-button>
+
+                            <!--<lightning-button style="padding-left:8px" label="Subsanación" iconname=""
+                                onclick={openModalSubsanacion}>
+                            </lightning-button>-->
+
+                            <lightning-button style="padding-left:8px" label="Negociación" iconname="" onclick={clickPretension}
+                            id="SAC_007">
+                            </lightning-button>
+
+                            <lightning-button style="padding-left:8px" label="Resolución" onclick={mostrarAvisoInfoCualitativa}>
+                            </lightning-button>
+                            
+                           
+                            <lightning-button style="padding-left:8px" label="Inadmisión" onclick={openModalInadmision}>
+                            </lightning-button>
+
+                        </template>
+
+                        <!-- <template if:true={negociacion}>
+                            <lightning-button style="padding-left:8px" label="Análisis" iconname=""
+                                onclick={setAnalisis}>
+                            </lightning-button>
+                        </template> -->
+
+                        <template if:true={redaccion}>
+                            <lightning-button style="padding-left:8px" label="Análisis" iconname=""
+                                onclick={setAnalisis}>
+                            </lightning-button>
+                            <!--
+                        <lightning-button style="padding-left:8px" label="Envío Parcial" iconname="">
+                        </lightning-button>
+                        -->
+                        </template>
+                        <template if:true={subsanacion}>
+                            <lightning-button style="padding-left:8px" label="Subsanación resuelta" iconname=""
+                                onclick={setBack}>
+
+                            </lightning-button>
+                            <lightning-button style="padding-left:8px" label="Inadmisión" iconname=""
+                                onclick={openModalInadmision}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={inadmision}>
+                            <lightning-button style="padding-left:8px" label="Reabrir" iconname="" onclick={setBack}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={cerrado}>
+                            <lightning-button style="padding-left:8px" label="Redacción" iconname=""
+                                onclick={setRedaccion}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={cerrado}>
+                            <lightning-button style="padding-left:8px" label="Reabrir" iconname="" onclick={setBack}>
+                            </lightning-button>
+                        </template>
+
+                        <template if:true={negociacionReclamacion}>
+                            <template if:true={estadoCerrado}>
+                                <lightning-button style="padding-left:8px" label="Negociación" iconname="" onclick={setNegociacion}>
+                                </lightning-button>
+                            </template>
+                        </template>
+                        
+                    </div>
+                </template>
+
+
+                <!--Modal de Análisis a Alta-->
+                <template if:true={isModalOpen}> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h3 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Por favor, explique el motivo del cambio de estado</h3>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                                <lightning-textarea  data-my-id="textoParaChatter" label="Introduzca el motivo" minlength="5" required="true" value=""></lightning-textarea>
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={comprobarTexto} title="OK">Guardar</button> 
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!--Modal de Rechazar-->
+                <template if:true={isModalOpenRechazar}> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalRechazar}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <h3 id="modal-heading-05" class="slds-text-heading_medium slds-hyphenate">Rechazar</h3>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+                                <div class="slds-combobox_container">
+                                    <lightning-combobox
+                                    name="motivoRechazo"
+                                    label="Motivo Rechazo"
+                                    value={valueMotivoRechazo}
+                                    placeholder="Seleccione un motivo"
+                                    options={listaMotivoRechazo.data.values}
+                                    onchange={handleChangeRechazo} 
+                                    required="true"></lightning-combobox>
+                                </div> 
+                                <template if:true={otros}>
+                                    <br>
+                                        <lightning-textarea  data-my-id="textoParaChatterRechazar" label="Comentario" minlength="5" required="true" value=""></lightning-textarea>
+                                    </br>
+                                </template>                  
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModalRechazar} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={clickRechazar} title="OK">Rechazar</button> 
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!-- Modal de prorroga -->
+                <template if:true={isModalOpenProrroga}>  
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalProrroga}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Prorrogar</h2>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->        
+                            <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                                <lightning-input-rich-text data-id="richText" value = {motivoProrroga} placeholder="Introducir información..." onchange={handleMotivoProrroga}>
+                                </lightning-input-rich-text>   
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModalProrroga} title="Cancelar">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={clickProrroga} title="OK">Prorrogar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>   
+                </template>
+
+                 <!--Modal de Subsanación-->
+                 <template if:true={isModalOpenSubsanacion}>
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={closeModalSub}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Cerrar</span>
+                                </button>
+                                <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Tipo de Subsanación y reclamar datos</h2>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                                <div class="slds-combobox_container">
+                                    <lightning-combobox
+                                    name="tipoSubsanacion"
+                                    label="Tipo Susbsanación"
+                                    value={value}
+                                    placeholder="Seleccione un tipo"
+                                    options={listaTipoSubsanacion.data.values}
+                                    onchange={handleChange} 
+                                    required="true"></lightning-combobox>
+                                </div>                                
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModalSub} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={setSubsanacion} title="OK">Subsanar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!--Modal Botón Inadmisión para introducir motivo de inadmisión-->
+                <template if:true={isModalOpenInadmision}> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open ">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalInadmision}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h3 id="modal-heading-inadmision" class="slds-text-heading_medium slds-hyphenate">Por favor, explique el motivo de la Inadmisión</h3>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-inadmision">
+                                <div class="slds-combobox_container">
+                                    <lightning-combobox
+                                    name="motivoInadmision"
+                                    label="Motivo Inadmisión"
+                                    value={value}
+                                    placeholder="Seleccione un motivo"
+                                    options={listaOpcionesInadmision.data.values}
+                                    onchange={handleChange} 
+                                    required="true"></lightning-combobox>
+                                </div>                                
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModalInadmision} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={guardarInadmision} title="OK">Guardar</button> 
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!--Modal de Fast track-->
+                <template if:true={esFastTrack}>
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalFastTrack}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                            </header>
+                            <template if:true={isLoadingFT}>
+                                <div class="slds-spinner_container slds-is-fixed slds-is-relative">
+                                    <div class="slds-spinner--brand slds-spinner slds-spinner_large">
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-fastTrack">
+                                <h3 id="modal-heading-fastTrack" class="slds-text-heading_medium slds-hyphenate">Atención, va a ejecutar un fast track automático.</h3>
+                                <br></br>
+                                <lightning-combobox name="picklistMarcaFT" 
+                                                    label="Seleccionar una marca de fast track"
+                                                    value={selectedValue} 
+                                                    placeholder="-Seleccione una opción-" 
+                                                    options={listaMarcasFT} 
+                                                    onchange={handlePicklistMarcaFTChange}></lightning-combobox>
+                                <br></br>
+                                <p><strong>Antes de proceder con la operación, asegurese de cumplir los siguientes requisitos:</strong></p>
+                                <p>- La reclamación debe ser unipretensión</p>
+                                <p>- Debe haber informado el sentido de resolución en la pretensión y tener marcado el check "listo para la redacción final"</p>
+                                <p>- El canal de respuesta debe ser "Email" o "Carta postal"</p>
+                                <p>- Si el canal de respuesta es "Email", debe tener informado el correo del caso</p>
+                                <p>- Si el canal de respuesta es "Carta postal", debe tener informada la "Dirección postal de notificación"</p>
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeModalFastTrack} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={lanzarFastTrack} title="OK">Guardar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!--Aviso de fin de negociacion-->
+                <template if:true={avisoFinNegociacion}>
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAvisoFinNegociacion}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h3 id="modal-heading-avisoNegociacion" class="slds-text-heading_medium slds-hyphenate">Atención, va a finalizar el proceso de negociación.</h3>
+                            </header>
+                            <template if:true={isLoadingFT}>
+                                <div class="slds-spinner_container slds-is-fixed slds-is-relative">
+                                    <div class="slds-spinner--brand slds-spinner slds-spinner_large">
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-avisoNegociacion">
+                                <p>Antes de proceder con la operación, asegurese de tener dadas de alta las tareas necesarias</p>
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeAvisoFinNegociacion} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={resolverNegociacion} title="OK">Continuar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+                <!--Modal de aviso revisar MCCs-->
+                <template if:true={avisoInfoCualitativa}> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAvisoInfoCualitativa}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h3 id="modal-heading-06" class="slds-text-heading_medium slds-hyphenate">Revisión de información cualitativa</h3>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-avisoInfoCualitativa">
+                                <p>Apreciado, por favor, asegúrese de cumplimentar la información cualitativa de la reclamación antes de su cierre.
+                                    En caso de no hacerlo podría incurrir en una penalización a nivel de servicio. Gracias.
+                                    </p>
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeAvisoInfoCualitativa} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={clickPretension} title="OK" id="SAC_003">Aceptar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+
+                <!--Modal de aviso revisar idioma-->
+                <template if:true={avisoIdioma}> 
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAvisoIdioma}>
+                                    <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h3 id="modal-heading-07" class="slds-text-heading_medium slds-hyphenate">Revisión del idioma de la reclamación</h3>
+                            </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-avisoIdioma">
+                                <p>Para <b>asegurar la correcta finalización del alta </b> , recuerde realizar las siguientes validaciones:</p><br/>
+                                <p>&ensp;&ensp;1. El campo <b>IDIOMA </b>de la pestaña <b>Detalles</b> se corresponde con el idioma del escrito del reclamante.</p>
+                                <template if:true={acuseReciboEnviado}>
+                                    <p>&ensp;&ensp;2. Se ha enviado el acuse de recibo en el idioma del escrito del reclamante.</p>
+                                </template>  
+                                <br/>
+                                <lightning-input type="checkbox" label="Confirmo que he realizado las validaciones" value={checkConfirmacionValidacion} onchange={handleChangeIdioma} checked={checkConfirmacionValidacion} ></lightning-input>
+                                <br/>
+                                <template if:true={acuseReciboEnviado}>
+                                    <p>Se va a finalizar el alta y pasar el caso al siguiente estado.<br/></p>
+                                </template>
+                                <template if:false={acuseReciboEnviado}>
+                                    <p>Se va a finalizar el alta, se procederá al envío del acuse de recibo y se pasará el caso al siguiente estado.<br/></p>
+                                </template>
+                                <p>
+                                    <b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b>
+                                </p> 
+                            </div>
+                            <!-- Modal/Popup Box LWC footer starts here -->
+                            <footer class="slds-modal__footer">
+                                <button class="slds-button slds-button_neutral" onclick={closeAvisoIdioma} title="Cancel">Cancelar</button>
+                                <button class="slds-button slds-button_brand" onclick={aceptarAvisoIdioma} title="OK">Aceptar</button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+
+            </template>
+        </template>
+    </div>
+</template>

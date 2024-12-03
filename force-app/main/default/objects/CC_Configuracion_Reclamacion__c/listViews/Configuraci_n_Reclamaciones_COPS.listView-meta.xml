@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Configuraci_n_Reclamaciones_COPS</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OS_Negocio__c</field>
+        <operation>equals</operation>
+        <value>COPS</value>
+    </filters>
+    <label>Configuración Reclamaciones COPS</label>
+    <sharedTo>
+        <group>OS_Responsables</group>
+    </sharedTo>
+</ListView>

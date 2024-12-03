@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Destinatario_CCO_sin_valor</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+   TEXT(SEG_Reglas_Clasificacion__r.CBK_Negocio__c) = &apos;Cops&apos;,
+   ISPICKVAL(SEG_TipodeValor__c, &apos;Destinatario CCO&apos;),
+   NOT(ISBLANK(SEG_Valor__c))
+)</errorConditionFormula>
+    <errorDisplayField>SEG_Valor__c</errorDisplayField>
+    <errorMessage>Para &quot;Destinatario CCO&quot; no aplica indicar valor. El multivalor se cumplirá si el buzón al que llega el correo no está en los destinatarios ni en los destinatarios en copia.</errorMessage>
+</ValidationRule>

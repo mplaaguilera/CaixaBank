@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_TipoEEFF__c</fullName>
+    <description>Detalla el Tipo de Fuente obtenido para el Estado Financiero.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Tipo de Fuente donde se ha obtenido el Estado Financiero.</inlineHelpText>
+    <label>Fuente datos contables</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

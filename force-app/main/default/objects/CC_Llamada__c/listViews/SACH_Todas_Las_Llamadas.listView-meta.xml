@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SACH_Todas_Las_Llamadas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Tipo__c</columns>
+    <columns>CC_Fecha_Inicio__c</columns>
+    <columns>CC_Fecha_Fin__c</columns>
+    <columns>CC_Cuenta__c</columns>
+    <columns>CC_ANI__c</columns>
+    <columns>CC_DNIS__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Llamada__c.SACH_Cliente</value>
+    </filters>
+    <label>SACH - Todas las llamadas</label>
+    <sharedTo>
+        <role>SACH</role>
+    </sharedTo>
+</ListView>

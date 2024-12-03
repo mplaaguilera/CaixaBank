@@ -1,0 +1,104 @@
+<!--
+@description       : 
+@author            : ChangeMeIn@UserSettingsUnder.SFDoc
+@group             : 
+@last modified on  : 06-23-2022
+@last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-record-edit-form object-api-name="Opportunity"> 
+
+        <!-- spinner -->
+        <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+        
+        <!--Estructura de 2 columnas -->    
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <!-- Fecha Estimada cierre -->
+                <lightning-input type="date" label={labels.fechaCierreLabel} field-level-help={labels.fechaEstimadaCierre} format="DD-MM-YY"  required="true" class="user-input-fecha"  name="fechaCierre" value={fechaCierre} onchange={handleFechaGestion}></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <!-- Divisa -->
+                <lightning-combobox
+                    name="divisa"
+                    label={labels.divisaLabel}
+                    value={divisa}
+                    options={optionsDivisa}
+                    onchange={handleDivisa}>
+                </lightning-combobox>
+            </div>
+
+
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <!-- Fecha Proxima Gestión -->
+                <lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY"  required="true" class="user-input-fecha"  name="fechaProxGestion" value={fechaProxGestion} onchange={handleFechaProxGestion}></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+            </div>
+
+            <div class="slds-col">
+                <c-cibe_-Product-Fields-Opportunity importesaldo={importeSaldo} numerounidades={numeroUnidades} producto={productoid} ondatareport={handleDataHijo}></c-cibe_-Product-Fields-Opportunity>
+            </div>
+
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <lightning-combobox
+                    name="Probabilidad de exito"
+                    label={labels.probabilidadExito}
+                    value={exito}
+                    required="true"
+                    options={optionsExito}
+                    onchange={handleExito}>
+                </lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <!-- Importe de impacto en balance -->
+                <template if:true={RT}>
+                    <lightning-input required="true" label={labels.impactoBalance} field-level-help={labels.disposicionMesCierreOportunidad} class="textBoxLeft user-input"  type="Number"  name="balance" value={balance} onchange={handleBalance}></lightning-input>
+                </template>
+                <template if:false={RT}>
+                    <lightning-input label={labels.impactoBalance} field-level-help={labels.disposicionMesCierreOportunidad} class="textBoxLeft user-input" type="Number" name="balance"  value={balance} onchange={handleBalance}></lightning-input>
+                </template>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                <!-- Comision estimada -->
+                <template if:true={RT}>
+                    <lightning-input required="true" label={labels.comisionesLabel} field-level-help={labels.comisionesEstimadasMesCierreOportunidad} class="textBoxLeft user-input" type="Number"  value={comisiones} onchange={handleComisiones}></lightning-input>
+                </template>
+                <template if:false={RT}>
+                    <lightning-input label={labels.comisionesLabel} field-level-help={labels.comisionesEstimadasMesCierreOportunidad} class="textBoxLeft user-input" type="Number" name="Comisiones"  value={comisiones} onchange={handleComisiones}></lightning-input>
+                </template>
+            </div>
+        </div>
+
+        <!-- Toggle -->
+        <div class="slds-grid slds-m-top_small">
+            <lightning-input type="toggle" class="user-input" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" onchange={handleOtraEntidad} checked={hasOtherEntity}></lightning-input>
+            <label class="slds-form-element__label">{labels.productoEnOtraEntidad}</label>
+        </div>
+        
+        <div if:true={show}>
+            <div class="slds-grid slds-wrap">
+                <!-- Entidad/Compañia -->
+                <div class="slds-col slds-size_1-of-1 slds-p-around_x-small">
+                    <lightning-input class="user-input" type="text" name="entidad" label={labels.entidadLabel} value={entidad} onchange={handleEntidad}></lightning-input>
+                </div>       
+
+                <!-- Fecha vencimiento en otra entidad -->
+                <div class="slds-col slds-size_1-of-1 slds-p-around_x-small">
+                    <label class="slds-form-element__label">{labels.fechaVtoLabel}</label>
+                    <lightning-input type="date" format="DD-MM-YY" class="user-input-fecha"  name="fechaVto" variant="label-hidden" value={fechaVto} onchange={handleFechavto}></lightning-input>
+                </div>
+
+                <!-- Precio -->
+                <div class="slds-col slds-size_1-of-1 slds-p-around_x-small">
+                    <lightning-input class="textBoxLeft user-input" type="Number"  label={labels.precioLabel} name="precio"  value={precio} onchange={handlePrecio}></lightning-input>
+                </div>
+
+                <!-- Margen -->
+                <div class="slds-col slds-size_1-of-1 slds-p-around_x-small">
+                    <lightning-input class="textBoxLeft user-input" type="text"  label={labels.margenLabel} name="margen"  value={margen} onchange={handleMargen}></lightning-input>
+                </div>
+            </div>
+        </div>
+    </lightning-record-edit-form>
+</template>

@@ -1,0 +1,36 @@
+<template>
+    <div>
+        <lightning-card>
+            <h2 slot="title">
+                <!-- <lightning-icon icon-name="utility:einstein" size="medium"></lightning-icon> -->
+                Analisis Sentimiento
+            </h2>
+            <div class="slds-m-horizontal_small">
+                <template lwc:if={analisisSentimiento}>
+                    <lightning-formatted-rich-text
+                    value={analisisSentimiento}
+                    ></lightning-formatted-rich-text>
+                </template>
+                <template lwc:elseif={error}>
+                    <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+                        <img src="/img/globalnav/NoNavItems.svg" class="slds-illustration__svg" alt=""/>
+                        <div class="slds-text-color_weak">
+                            <h3 class="slds-text-heading_small">Ha habido un error en la generación del analisis del sentimiento</h3>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:else>
+                    <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+                        <img src="/projRes/ui-home-private/emptyStates/noEvents.svg" class="slds-illustration__svg" alt=""/>
+                        <div class="slds-text-color_weak">
+                            <h3 class="slds-text-heading_small">El análisis del sentimiento se realizará cuando se complete el chat.</h3>
+                        </div>
+                    </div>
+                    <div>
+                        <p>{analisisSentimiento}</p>
+                    </div>
+                </template>
+            </div>
+        </lightning-card>
+    </div>
+</template>

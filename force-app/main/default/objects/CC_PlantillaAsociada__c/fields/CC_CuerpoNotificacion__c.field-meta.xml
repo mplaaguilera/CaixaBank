@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_CuerpoNotificacion__c</fullName>
+    <description>Texto a incorporar en la notificación del cierre de la incidencia</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Texto a incorporar en la notificación del cierre de la incidencia</inlineHelpText>
+    <label>Cuerpo notificación</label>
+    <length>4000</length>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>30</visibleLines>
+</CustomField>

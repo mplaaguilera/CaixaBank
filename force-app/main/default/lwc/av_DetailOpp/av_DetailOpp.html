@@ -1,0 +1,180 @@
+<template>
+	
+	<div>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+		<div if:true={isBrowser} class="slds-section__title slds-theme_shade section-div">
+			<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+			<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+			<span class="opp-title"><a class="opp-link" onclick={handleNavigateOpp}>{opp.Name}</a></span>
+			<lightning-button-icon if:false={listformat} icon-name="utility:link" alternative-text="Vincular oportunidad a la tarea" class="slds-m-right_xx-small linked-opp-button" title="Vincular oportunidad a la tarea" variant="border-filled" onclick={handleLink}></lightning-button-icon>
+		</div>
+		<div if:false={isBrowser} class="slds-section__title slds-theme_shade section-divMobile">
+			<lightning-layout>
+				<lightning-layout-item class="center-buttons chever-buttons">
+					<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+					<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container" onclick={toggleShowOpp}></lightning-button-icon>
+				</lightning-layout-item>
+				<lightning-layout-item>
+					<label class="opptask-name opptask-titleMobile" onclick={handleNavigateOpp}>{opp.Name}</label>
+					<small if:true={opp.AV_PF__r}>{opp.AV_PF__r.Name} | </small><small class="opptask-stage">{opp.StageName}</small>
+				</lightning-layout-item>
+				<lightning-button-menu if:false={listformat} class="lgc-bg" alternative-text="Show menu" variant="border-filled" menu-alignment="right">
+					<lightning-menu-item value="MenuItemOne" prefix-icon-name="utility:link"  onclick={handleLink} label={label.link}></lightning-menu-item>
+				</lightning-button-menu>
+			</lightning-layout>
+		</div> 
+		<div if:true={showDetail} class="opp-form">
+			<lightning-record-view-form
+						record-id={opp.Id}
+						object-api-name="Opportunity"
+						columns="3">
+				<!-- Formulario sólo lectura -->
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept">{label.productFieldLabel}</label>
+    					<p if:true={opp.AV_PF__c}>{opp.AV_PF__r.Name}</p>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="CloseDate" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept">{label.recordtypeFieldLabel}</label>
+    					<p if:true={opp.RecordTypeId}>{opp.RecordType.Name}</p>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_Potencial__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_FechaProximoRecordatorio__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<div class="slds-grid">
+							<lightning-input type="toggle" name="incluir" class="toggle-input" onchange={handleIncluir} variant="label-hidden" message-toggle-active="" message-toggle-inactive="" checked={opp.AV_IncludeInPrioritizingCustomers__c} disabled=true></lightning-input>
+							<label class="slds-form-element__label label-priorizador">Incluir la oportunidad en "Clientes Priorizados" la semana de "próxima gestión"</label>
+						</div>
+					</div>
+					<div if:false={isBrowser} class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="StageName" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_3-of-3">
+						<label class="slds-form-element__label value-concept">Empleado/a Asignado</label>
+    					<p if:true={opp.AV_Gestor__c}>{opp.AV_Gestor__r.Name}</p>
+					</div>
+				</div>
+				
+				<!-- SECTION VALOR - CONCEPTO -->
+				<div class="slds-grid slds-wrap">
+					<div if:true={opp.AV_Concepto1__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.conceptFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Concepto1__c}</p>
+					</div>
+					<div if:true={opp.AV_Valor1__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.valueFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Valor1__c}</p>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div if:true={opp.AV_Concepto2__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.conceptFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Concepto2__c}</p>
+					</div>
+					<div if:true={opp.AV_Valor2__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.valueFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Valor2__c}</p>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div if:true={opp.AV_Concepto3__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.conceptFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Concepto3__c}</p>
+					</div>
+					<div if:true={opp.AV_Valor3__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.valueFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Valor3__c}</p>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div if:true={opp.AV_Concepto4__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.conceptFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Concepto4__c}</p>
+					</div>
+					<div if:true={opp.AV_Valor4__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.valueFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Valor4__c}</p>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div if:true={opp.AV_Concepto5__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.conceptFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Concepto5__c}</p>
+					</div>
+					<div if:true={opp.AV_Valor5__c} class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept" >{label.valueFieldLabel}</label>
+    					<p class="value-concept">{opp.AV_Valor5__c}</p>
+					</div>
+				</div>
+
+
+				<!-- Path de estados -->
+				<div if:true={isBrowser}>
+					<c-av_-custom-path all-stages={allStages} current-stage={opp.StageName} ></c-av_-custom-path>
+				</div>
+
+				<!-- Formulario sólo lectura -->
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_Tenencia__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_Entidad__c"  variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_FechaVencimiento__c"  variant="label-stacked">
+						</lightning-output-field>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_Cuota__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="Amount" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_TipoInteres__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_1-of-3">
+						<lightning-output-field field-name="AV_LicensePlate__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap">
+					<div class="slds-col slds-size_3-of-3">
+						<lightning-output-field field-name="AV_Comentarios__c" variant="label-stacked">
+						</lightning-output-field>
+					</div>
+				</div>
+			</lightning-record-view-form>
+		</div>
+	</div>
+
+	<!-- CONFIRMATION ACTION MODAL -->
+	<div if:true={isModalOpen}>
+		<c-av_-task-opp-modal is-modal-open={isModalOpen} action-type={actionType} onclosemodal={handleCloseModal} onconfirm={doAction}></c-av_-task-opp-modal>
+	</div>
+</template>

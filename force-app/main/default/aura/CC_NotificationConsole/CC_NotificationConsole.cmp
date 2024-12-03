@@ -1,0 +1,71 @@
+<aura:component controller="CC_PushTopic" implements="flexipage:availableForAllPageTypes" access="global">
+	<aura:attribute name="channel" type="String" default="/event/Notification__e"/>
+	<aura:attribute name="channelAvisosAgrupador" type="String" default="/event/CC_Aviso_Coordinador_Cases_Agrupador__e"/>
+    <aura:attribute name="channelAvisosCase" type="String" default="/event/CC_Aviso_Case__e"/>
+	<aura:attribute name="channelNotificacionAgrupador" type="String" default="/event/CC_Aviso_Agrupador__e"/>
+	<aura:attribute name="subscription" type="Map"/>
+	<aura:attribute name="subscriptionAvisosAgrupador" type="Map"/>
+    <aura:attribute name="subscriptionAvisosCase" type="Map"/>
+	<aura:attribute name="subscriptionNotificacionAgrupador" type="Map"/>
+	<aura:attribute name="options" type="List" default="[
+		{'label': 'Aviso', 'value': 'warning'},
+		{'label': 'Información', 'value': 'info'},
+		{'label': 'Error', 'value': 'error'},
+		{'label': 'Solución', 'value': 'success'}]"/>
+	<aura:attribute name="notifications" type="List" default="[]"/>
+	<aura:attribute name="isMuted" type="Boolean" default="false"/>
+	<aura:attribute name="isVisible" type="Boolean" default="true"/>
+	<aura:attribute name="userInfo" type="user"/>
+
+	<lightning:empApi aura:id="empApi"/>
+	<lightning:utilityBarAPI aura:id="utilityBar"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+	<aura:registerEvent name="toastEvent" type="force:showToast"/>
+
+	<div class="container">
+		<!-- Header -->
+		<div class="slds-p-around_x-small slds-border_bottom slds-theme_shade">
+			<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+				<div>
+					<span class="slds-badge">{!v.notifications.length}</span>
+				</div>
+				<div>
+					<!-- <lightning:buttonIcon onclick="{!c.onClear}" iconName="utility:delete" title="Borrar notificaciones"
+						alternativeText="Borrar notificationes" variant="border-filled"/> -->
+						<!-- <lightning:buttonIcon onclick="{!c.onToggleMute}"
+							iconName="{!v.isMuted ? 'utility:volume_off' : 'utility:volume_high'}"
+							title="{!v.isMuted ? 'Activar notificaciones' : 'Desactivar notificaciones'}"
+							alternativeText="Toggle mute" variant="border-filled"/> -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Insert text alert -->
+		<aura:if isTrue="{!v.isVisible}">
+			<div class="container">
+				<div class="slds-utility-panel__header slds-p-around_x-small slds-border_bottom slds-theme_default">
+					<!-- Text alert -->
+					<lightning:textarea aura:id="motivoText" name="Motivo" label="Motivo notificación" value="" placeholder="Introduce el texto aquí..."/>
+					<lightning:combobox aura:id="comboType" name="Tipo" label="Tipo de notificación" value="warning" placeholder="Selecciona tipo" options="{! v.options }"/>
+					<!-- Button send alert -->
+					<br/>
+					<!-- <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.onSendNotification}"/> -->
+					<lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.onSendEvent}"/>
+				</div>
+			</div>
+		</aura:if>
+
+		<!-- Notification list -->
+		<div class="slds-container_fluid slds-scrollable_y content">
+			<aura:iteration items="{!v.notifications}" var="notification">
+				<div class="slds-p-around_small slds-border_top">
+					<div class="slds-grid slds-grid_align-spread slds-has-flexi-truncate">
+						<p>{!notification.message}</p>
+						<p class="slds-text-color_weak slds-p-left_x-small">{!notification.createdTime}</p>
+					</div>
+				</div>
+			</aura:iteration>
+		</div>
+	</div>
+</aura:component>

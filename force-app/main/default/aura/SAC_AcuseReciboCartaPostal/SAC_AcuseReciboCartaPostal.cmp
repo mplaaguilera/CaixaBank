@@ -1,0 +1,212 @@
+<aura:component controller="SAC_LCMP_AcuseReciboCartaPostal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="botonPulsado" type="Boolean" />
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="procedenciaManual" type="Boolean" default="false" />
+    <aura:attribute name="noTieneEmail" type="Boolean" />
+    <aura:attribute name="noTieneDireccionPostal" type="Boolean" />
+
+    <!--PARA CartaPostal-->
+    <aura:attribute name="nombreContacto" type="String" />
+    <aura:attribute name="direccion" type="String" />
+    <aura:attribute name="poblacion" type="String" />
+    <aura:attribute name="provincia" type="String" />
+    <aura:attribute name="pais" type="String" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+    <aura:attribute name="codigoPostal" type="String" />
+    <aura:attribute name="options" type="String[]" />
+
+    <!--Modals -->
+    <aura:attribute name="envioCartaPostal" type="Boolean" default="false" />
+    <aura:attribute name="envioEmail" type="Boolean" default="false" />
+    <aura:attribute name="envioAcusePulsado" type="Boolean" default="false" />
+    <aura:attribute name="modalAcuseYaEnviado" type="Boolean" default="false" />
+
+    <!--PARA GestionEmails-->
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="procedencia" type="String" default="subsanacion" />
+    <aura:attribute name="usarComponente" type="Boolean" default="true" />
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+    <aura:attribute name="ficherosBorrados" type="String[]" />
+    <aura:attribute name="copia" type="String" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+
+
+    <aura:handler name="init" value="{! this }" action="{! c.doInit }" />
+    <aura:handler event="force:refreshView" action="{! c.doInit}" />
+
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">  
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span> 
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+
+    <lightning:button variant="brand" label="Enviar Acuse de Recibo" title="Enviar"
+        onclick="{!c.enviarAcuse}" />
+
+    <aura:if isTrue="{!v.envioAcusePulsado}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.cerrar }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
+
+                    <p style="text-align: center;">
+                        ¿Cómo desea efectuar el acuse de recibo?
+                    </p>
+                    <br />
+
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_6-of-12" style="margin: 2px;">
+                            <lightning:button variant="brand" class="slds-float_right" label="Vía Email" title="Enviar"
+                                onclick="{!c.enviarAcuseEmail}" disabled="{!v.noTieneEmail}" />
+                        </div>
+
+                        <div class="slds-col slds-size_6-of-12" style="margin: 2px;">
+                            <lightning:button variant="brand" class="slds-float_left" label="Vía Carta" title="Enviar"
+                                onclick="{!c.enviarAcuseCarta}" disabled="{!v.noTieneDireccionPostal}" />
+                        </div>
+                    </div>
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick="{! c.cerrar }" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.envioCartaPostal}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.cerrar }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
+                    <span>{!v.nombreContacto}</span>
+
+                    <lightning:input name="input1" label="Dirección" required="true" value="{!v.direccion}" />
+                    <lightning:input name="input2" label="Código postal" required="true" value="{!v.codigoPostal}" />
+                    <lightning:input name="input3" label="Población" required="true" value="{!v.poblacion}" />
+                    <lightning:input name="input4" label="Provincia" required="true" value="{!v.provincia}" />
+
+                    <aura:if isTrue="{!or(v.pais == 'España', v.pais == 'españa', v.pais == 'ESPAÑA')}">
+                        <lightning:combobox aura:id="selectorPais" name="status" label="País" required="true"
+                            placeholder="-Seleccione un país-" value="011" onchange="{!c.cambioPais}"
+                            options="{!v.options}" /> 
+
+                        <aura:set attribute="else">
+                            <lightning:combobox aura:id="selectorPais" name="status" label="País" required="true"
+                                placeholder="-Seleccione un país-" value="{!v.paisSeleccionado}" onchange="{!c.cambioPais}"
+                                options="{!v.options}" /> 
+                        </aura:set>
+                    </aura:if>
+                    <br />
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar" 
+                        onclick="{! c.cerrar }" />
+                    <lightning:button variant="neutral" label="Volver" title="Volver"
+                        onclick="{! c.volver }" />
+                    <lightning:button variant="brand" label="Enviar" title="OK" onclick="{!c.guardarDatos}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.modalAcuseYaEnviado}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.cerrar }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Acuse de Recibo</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
+
+                    <p style="text-align: center;">
+                        El acuse ya ha sido enviado anteriormente, ¿desea continuar?
+                    </p>
+                    <br />
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick="{! c.cerrar }" />
+                    <lightning:button variant="brand" label="Aceptar" title="OK" onclick="{!c.enviarNuevoAcuse}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+<!--    
+    <aura:if isTrue="{!v.envioEmail}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    <c:SAC_GestionEmails usarComponente="{!v.usarComponente}"
+                    procedencia="{!v.procedencia}" para="{!v.para}" copia="{!v.copia}"
+                    cuerpo="{!v.cuerpo}" asunto="{!v.asunto}" caso="{!v.caso}"
+                    ficherosAdjuntos="{!v.ficherosAdjuntos}"
+                    ficherosBorrados="{!v.ficherosBorrados}"
+                    idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" />
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick="{! c.cerrar }" />
+                    <lightning:button variant="neutral" label="Volver" title="Volver"
+                        onclick="{! c.volver }" />
+                    <lightning:button variant="brand" label="Enviar" title="OK" onclick="{!c.guardarDatosEmail}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+-->
+</aura:component>

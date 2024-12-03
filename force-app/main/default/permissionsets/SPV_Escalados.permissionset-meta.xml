@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permission set que se asignará de manera automática a 
+todos aquellos usuarios que entren en el grupo AJ y que dará acceso a la 
+respuesta y validación de los escalados realizados por los letrados</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SPV_Escalados</label>
+</PermissionSet>

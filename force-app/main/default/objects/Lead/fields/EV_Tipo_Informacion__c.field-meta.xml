@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Tipo_Informacion__c</fullName>
+    <label>Tipo Informacion</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Informe semanal</fullName>
+                <default>false</default>
+                <label>Informe semanal</label>
+            </value>
+            <value>
+                <fullName>Informe mensual</fullName>
+                <default>false</default>
+                <label>Informe mensual</label>
+            </value>
+            <value>
+                <fullName>Newsletter Accionistas CaixaBank</fullName>
+                <default>false</default>
+                <label>Newsletter Accionistas CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Informe de gestion</fullName>
+                <default>false</default>
+                <label>Informe de gestion</label>
+            </value>
+            <value>
+                <fullName>Aula</fullName>
+                <default>false</default>
+                <label>Aula</label>
+            </value>
+            <value>
+                <fullName>Noticias corporativas</fullName>
+                <default>false</default>
+                <label>Noticias corporativas</label>
+            </value>
+            <value>
+                <fullName>Alestas SMS(remuneración al accionista, JGA, etc.)</fullName>
+                <default>false</default>
+                <label>Alestas SMS(remuneración al accionista, JGA, etc.)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

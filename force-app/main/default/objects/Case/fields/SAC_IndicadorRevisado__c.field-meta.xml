@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_IndicadorRevisado__c</fullName>
+    <description>Campo indicador en la reclamación, donde los letrados podrán marcar si gestionan ellos la reclamación o la reasignan</description>
+    <label>Revisado</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Me quedo con la gestión</fullName>
+                <default>true</default>
+                <label>Me quedo con la gestión</label>
+            </value>
+            <value>
+                <fullName>Para derivar a otro despacho</fullName>
+                <default>false</default>
+                <label>Para derivar a otro despacho</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

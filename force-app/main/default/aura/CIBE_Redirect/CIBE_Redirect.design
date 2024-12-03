@@ -1,0 +1,3 @@
+<design:component>
+	 <design:attribute name="identificador" label="Record Id" description="Id del registro al que redirecciona el componente." />
+</design:component>

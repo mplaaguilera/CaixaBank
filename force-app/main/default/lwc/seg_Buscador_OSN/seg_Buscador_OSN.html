@@ -1,0 +1,148 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner" align="left">
+            <lightning-button label="Buscar OSN" icon-name="utility:search" onclick={modalBuscarOSNAbrir} disabled={isNotOwner}></lightning-button>
+            <lightning-button label="Limpiar OSN" icon-name="utility:delete" onclick={limpiarDatosOSN} style="margin-left: 2px" disabled={isNotOwner}></lightning-button>
+        </div>
+    </article>
+
+    <section id='section' role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small modalBuscarOSN" onkeydown={modalboxEnviarCorreoTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalBuscarOSNCerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Buscar OSN</h2>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_x-large">
+
+                <div if:true={mostarSpinner}>
+                    <div class="spinner mostrarSpinner">
+                        <lightning-spinner alternative-text="Cargando resultados"></lightning-spinner>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_6-of-8">
+                        <lightning-input 
+                        data-id="numperso" 
+                        icon-name="utility:search" 
+                        label="Nombre o NIF acreditada" 
+                        value=""
+                        placeholder="Indicar nombre o nif acreditada..."
+                        onkeyup={habilitarCampo}>
+                        </lightning-input>
+
+                        <!--No se encuentran resultados-->
+                        <div class="slds-hide mostrarErrorBuscar">
+                            <p class="buscar" style="color:red; text-align:left; margin-right:70px">No hay resultados para esta búsqueda.</p>
+                        </div>
+
+                        <!--Resultados-->
+                        <div class="resultadosBuscador" role="listbox" onmousedown={eventStopPropagation}>
+                            <!--Opciones de resultados-->
+                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                <template for:each={resultadoAcotado} for:item="resultado">
+                                    <div key={resultado.Id}>
+                                        <li role="presentation" class="slds-listbox__item datatableContainerResultados" data-id={resultado.Id} data-nombre={resultado.Name} data-numperso={resultado.AV_NumPerso__c} onclick={seleccionarResultado}>
+                                            <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                                <span class="slds-media__figure slds-listbox__option-icon">
+                                                    <lightning-icon icon-name= "standard:account" size="small"></lightning-icon>
+                                                </span>
+                                                <span class="slds-media__body">
+                                                    <span class="slds-listbox__option-text_entity" style="font-weight: bold;">{resultado.Name}</span>
+                                                    <span class="slds-listbox__option-meta slds-truncate">
+                                                            <lightning-icon icon-name="utility:record" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px;"></lightning-icon>
+                                                            {resultado.CC_Numero_Documento__c}
+                                                    </span>
+                                                    <span class="slds-listbox__option-meta slds-truncate">
+                                                        <lightning-icon icon-name="utility:company" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px; margin-left: 10px;"></lightning-icon>
+                                                        {resultado.SEG_NotaCentroPlantillasCAT__c}
+                                                </span>
+                                                <span class="slds-listbox__option-meta slds-truncate">
+                                                    <lightning-icon icon-name="utility:company" size="xx-small" class="slds-is-relative slds-var-m-right_x-small" style="top: -2px; margin-left: 10px;"></lightning-icon>
+                                                    {resultado.SEG_NotaCentroPlantillasEN__c}
+                                                </span>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </div>
+                                </template>                    
+                            </ul>
+                            <template if:true={mostrarBotonesNavegacion}>
+                                <div align="center" style="padding-top: 5px; padding-bottom: 10px;">
+                                    <lightning-button icon-name="utility:back" label="Anterior" >&nbsp;</lightning-button>
+                                    <lightning-button icon-name="utility:forward" label="Siguiente" ></lightning-button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+
+                    <div class="slds-col slds-size_2-of-8">
+                        </br>
+                        <lightning-button data-id="buscadorAcreditada" variant="brand" label="Buscar acreditada"  icon-name="utility:search" onclick={iniciarBusqueda} disabled={deshabilitarCampo} class="slds-m-left_x-small botonBuscarAcred"></lightning-button>
+                    </div>
+
+
+
+
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input data-id="numOSN" label="Número OSN" maxlength = 5></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-input data-id="numSOE" label="Número SOE" maxlength = 5></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-combobox
+                            name="estadosOSN"
+                            label="Estado"
+                            data-id="estadosOSN"
+                            value="estadoVacio"
+                            placeholder="Seleccionar estado OSN"
+                            options={optionsOSN}
+                            onchange={handleChange} >
+                        </lightning-combobox>
+                    </div>
+                </div>
+
+                <!--Contenido del buscador-->
+                <div class="slds-hide slds-var-m-top_xx-large mostrarResultadosOSN datatableContainer">
+                    <lightning-datatable
+                        key-field="Id"
+                        columns={datatableColumnas}
+                        data={datatableData}
+                        max-row-selection="1"
+                        column-widths-mode="auto"
+                        onrowselection={habilitarSel}>
+                    </lightning-datatable>
+                </div>
+
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer slds-grid slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
+                    <div class="slds-hide mostrarErrorCampos">
+                        <p style="color:red; text-align:left; margin-right:70px">Debe informarse, al menos, uno de los siguientes campos: "Nombre o NIF acreditada", "Número OSN" o "Número SOE".</p>
+                    </div>
+                    <div class="slds-hide mostrarErrorResultados">
+                        <p style="color:red; text-align:left; margin-right:70px">No se han encontrado resultados.</p>
+                    </div>
+                    <div class="slds-hide mostrarErrorLetras">
+                        <p style="color:red; text-align:left; margin-right:70px">No es posible indicar valores en OSN y SOE que no sean números.</p>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-size_1-of-1 slds-large-size_6-of-12">
+                    <lightning-button variant="brand" label="Buscar" title="Buscador OSN" icon-name="utility:search" class="slds-m-left_x-small botonBuscadorOSN" onclick={modalBuscarResultadosOSN}></lightning-button>
+                    <lightning-button variant="brand" label="Seleccionar" onclick={modalResultadosOSN} disabled={botonEnviarCorreoGenerarBorradorDisabled} class="slds-var-m-left_x-small botonSeleccionOSN"></lightning-button>
+                    <lightning-button class="slds-var-m-left_x-small slds-float_right" label="Cancelar" onclick={modalBuscarOSNCerrar}></lightning-button>
+                </div>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop"></div>
+</template>

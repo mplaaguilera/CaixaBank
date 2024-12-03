@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Llamadas_Contestadas_menos30s__c</fullName>
+    <description>To make reports</description>
+    <externalId>false</externalId>
+    <formula>IF(AND(ISPICKVAL(CC_Tipo_Cierre__c, &apos;Consulta cancelada&apos;), CC_Fecha_Fin__c - CC_Fecha_Inicio__c &lt;= 0.0003472222), 1, 0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>OS Llamadas Contestadas menos30s</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

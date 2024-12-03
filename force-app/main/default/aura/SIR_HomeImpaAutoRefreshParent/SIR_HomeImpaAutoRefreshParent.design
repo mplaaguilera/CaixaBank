@@ -1,0 +1,17 @@
+<design:component >
+    <design:attribute name="hasHeader" label="Header"
+        description="Check if you want the component to have header"
+        required="false"/>
+    <design:attribute name="headerIcon" label="Header Icon"
+        description="Header icon if needed. Example: standard:dashboard"
+        required="false"/>
+    <design:attribute name="headerTitle" label="Header Title"
+        description="Header title if needed"
+        required="false"/>
+    <design:attribute name="headerSubtitle" label="Header Subtitle"
+        description="Header subtitle if needed"
+        required="false"/>
+    <design:attribute name="listDatasets" label="List of datasets"
+        description="DeveloperName of the metadata (AV_ConfiguracionGrafico__mdt) split by comma (','). For example: AV_ChartWeekLess1,AV_ChartWeekLess2"
+        required="true"/>
+</design:component>

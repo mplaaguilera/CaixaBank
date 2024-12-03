@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_AciertoDatosExp__c</fullName>
+    <externalId>false</externalId>
+    <formula>(IF(SAC_Idioma_OK__c, 1, 0) + IF(SAC_Importe_Reclamado_OK__c, 1, 0) + IF(SAC_Importe_Tipo_OK__c , 1, 0) + IF(SAC_Naturaleza_OK__c , 1, 0) + IF(SAC_Representante_Legal_OK__c, 1, 0))/5</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>% Acierto Datos Expediente</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

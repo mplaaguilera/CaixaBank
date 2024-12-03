@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón Contact Center Confirming</label>
+    <protected>false</protected>
+    <values>
+        <field>OS_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Buzón Contact Center Confirming</value>
+    </values>
+    <values>
+        <field>OS_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">OS_CNF_CONTACT</value>
+    </values>
+    <values>
+        <field>OS_Correo__c</field>
+        <value xsi:type="xsd:string">contact.center.confirming@cnf.caixabank.com</value>
+    </values>
+    <values>
+        <field>OS_Email__c</field>
+        <value xsi:type="xsd:string">contact_center_confirming@9-xw8jewhgy72rhq2iwoo4ajzwotn2m9y2ygnaom9yrgeu05umo.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>OS_Recordtype_Caso_Defecto__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

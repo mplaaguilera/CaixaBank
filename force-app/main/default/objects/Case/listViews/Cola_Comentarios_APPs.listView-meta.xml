@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cola_Comentarios_APPs</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>Flag__c</columns>
+    <columns>CC_Rating__c</columns>
+    <columns>CC_Social_Persona__c</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>App__c</columns>
+    <columns>Versi_n_App__c</columns>
+    <columns>CC_Ultima_Interaccion__c</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.ORIGIN</field>
+        <operation>equals</operation>
+        <value>Comentarios Stores</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
+    <filters>
+        <field>App__c</field>
+        <operation>notContain</operation>
+        <value>Imagin</value>
+    </filters>
+    <label>Cola Comentarios APPs</label>
+    <queue>CC_Stores</queue>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

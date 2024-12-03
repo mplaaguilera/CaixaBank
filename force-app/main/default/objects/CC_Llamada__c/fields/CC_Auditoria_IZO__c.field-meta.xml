@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Auditoria_IZO__c</fullName>
+    <description>Indica la fecha en la que se ha marcado esta llamada para la auditoria IZO. Si no está informado, entonces no se audita.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Auditoría IZO (interno)</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

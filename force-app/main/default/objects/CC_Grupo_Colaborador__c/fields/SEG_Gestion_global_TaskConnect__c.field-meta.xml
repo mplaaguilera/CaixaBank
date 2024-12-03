@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Gestion_global_TaskConnect__c</fullName>
+    <defaultValue>false</defaultValue>
+    <label>Gestión global TaskConnect</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

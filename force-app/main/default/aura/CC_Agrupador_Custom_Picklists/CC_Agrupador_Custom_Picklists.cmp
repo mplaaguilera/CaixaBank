@@ -1,0 +1,213 @@
+<aura:component controller="CC_Agrupador_Custom_Picklists_Controller"
+    implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+
+    <aura:attribute name="rtGrupo" type="String" />
+    <aura:attribute name="Message" type="String" access="public" />
+    <aura:attribute name="clasificacionesMaximo" type="List" />
+    <aura:attribute name="clasificacionMaximoSelectValue" type="String" />
+    <aura:attribute name="clasificacionMaximoSelectName" type="String" />
+    <aura:attribute name="valorClasificacionBuscador" type="String" />
+    <aura:attribute name="valorGrupoBuscador" type="String" />
+    <aura:attribute name="listaBuscadorClasificacion" type="String" /> <!-- a cambiar -->
+    <aura:attribute name="clasificacionSeleccionadaValue" type="String" />
+    <aura:attribute name="listaBuscadorGrupo" type="String"/> <!-- a cambiar -->
+
+    <aura:attribute name="gruposMaximo" type="List" />
+    <aura:attribute name="grupoMaximoSelectValue" type="String" />
+    <aura:attribute name="grupoMaximoSelectName" type="String" />
+
+    <aura:attribute name="opcionesCallCenter" type="List" />
+    <aura:attribute name="opcionCallCenterSelectValue" type="String" />
+    <aura:attribute name="opcionCallCenterSelectName" type="String" />
+
+    <aura:attribute name="existeClasificacion" type="Boolean" default="false" />
+    <aura:attribute name="activarBuscador" type="Boolean" default="false" />
+
+    <aura:attribute name="botonGuardar" type="Boolean" default="false" />    
+
+    <!--Search-->
+    <aura:attribute name="objectName" type="String" default="CC_Clasificacion_Maximo__c" />
+    <aura:attribute name="fieldName" type="String" default="Name" />
+    <aura:attribute name="propietario" type="String" default="CC_Propietario__c" />
+    <aura:attribute name="selectRecordId" type="String" />
+    <aura:attribute name="selectRecordName" type="String" />
+    <aura:attribute name="Label" type="String" />
+    <aura:attribute name="searchRecords" type="List" />
+    <aura:attribute name="required" type="Boolean" default="false" />
+    <aura:attribute name="iconName" type="String" default="custom:custom67" />
+    <aura:attribute name="LoadingText" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <!--Spinner-->
+    <aura:if isTrue="{!v.botonGuardar}">
+        <div>
+            <lightning:spinner size="medium" alternativeText="Cargando caso..." />
+        </div>
+    </aura:if>
+
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="Grupo Maximo y Opción call center">
+                        <lightning:icon iconName="standard:picklist_type" size="small" />
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate"
+                            title="Grupo Maximo y Opción call center">
+                            <span>Gestión Maximo</span>
+                        </a>
+                    </h2>
+                    
+                </div>
+            </header>
+        </div>
+
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-3" style="margin-bottom: 1rem;">
+                    <!--Toggle para cambiar de picklist a buscador la clasificacion maximo y el grupo maximo onchange="{!c.allGrupos}"-->
+                    <lightning:input aura:id="checkbox" name="checkbox" type="toggle"
+                        label="Mostrar todas las Clasificaciones Máximo" checked="{!v.activarBuscador}"
+                        messageToggleActive="" messageToggleInactive="" />
+                </div>
+            </div>
+            
+
+            <!--Desplegable Clasificación Maximo-->
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1">
+                    <aura:if isTrue="{!!v.activarBuscador}">
+                        <lightning:combobox aura:id="clasificacionmaximo" name="clasificacion_maximo"
+                            label="Clasificación Maximo MCC:" placeholder="--Seleccione una opción--" value=""
+                            dropdownAlignment="right" options="{!v.clasificacionesMaximo}"
+                            onchange="{!c.seleccionaClasificacionMaximo}" />
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.activarBuscador}">
+                        <div class="slds-combobox_container">
+                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                    role="none">
+
+                                    <lightning:input aura:id="clasificacionmaximo" name="clasificacion_maximo"
+                                        label="Clasificación Maximo MCC:"
+                                        placeholder="--Buscar una Clasificación Maximo--"
+                                        value="{!v.valorClasificacionBuscador}" dropdownAlignment="right"
+                                        options="{!v.clasificacionesMaximo}" onchange="{!c.modificacionTexoBuscador}" />
+
+
+                                    <!-- <lightning:input type="search" value="{!v.SearchKeyWordPlantilla}" label="Plantilla"
+                                        onchange="{!c.teclaPulsadaLookupPlantilla2}" placeholder="Buscar plantilla..."
+                                        required="true" /> -->
+                                </div>
+                                <aura:if isTrue="{!v.listaBuscadorClasificacion.length}">
+                                    <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-7"
+                                        role="listbox">
+                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                            <aura:iteration items="{!v.listaBuscadorClasificacion}"
+                                                var="clasificadorSeleccionado">
+                                                <li role="presentation" class="slds-listbox__item"
+                                                    style="list-style-type: none;">
+                                                    <div class="slds-media slds-media_center slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                                        role="option" onclick="{!c.guardarVariable}"
+                                                        title="{!clasificadorSeleccionado.Name}"
+                                                        id="{!clasificadorSeleccionado.Id}">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning:icon iconName="standard:template"
+                                                                size="x-small" />
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity"
+                                                                title="{!clasificadorSeleccionado.Name}">{!clasificadorSeleccionado.Name}</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </div>
+
+
+
+
+                    </aura:if>
+                </div>
+
+                <!--Desplegable Grupo Maximo-->
+                <div class="slds-col slds-size_1-of-2">
+                    <aura:if isTrue="{!!v.activarBuscador}">
+                        <lightning:combobox aura:id="grupomaximo" name="grupo_maximo" label="Grupo Maximo"
+                            placeholder="--Seleccione un grupo--" value="" dropdownAlignment="right"
+                            options="{!v.gruposMaximo}" onchange="{!c.seleccionaGrupoMaximo}" />
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.activarBuscador}">
+                        <div class="slds-combobox_container">
+                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                    role="none">
+
+                                    <lightning:input aura:id="grupomaximo" name="grupo_maximo" label="Grupo Maximo"
+                                        placeholder="--Buscar un grupo Maximo--" value="{!v.valorGrupoBuscador}"
+                                        dropdownAlignment="right" options="{!v.gruposMaximo}"
+                                        onchange="{!c.modificacionTexoBuscador}" />
+                                </div>
+                                <aura:if isTrue="{!v.listaBuscadorGrupo.length}">
+                                    <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-7"
+                                        role="listbox">
+                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                            <aura:iteration items="{!v.listaBuscadorGrupo}"
+                                                var="grupoSeleccionado">
+                                                <li role="presentation" class="slds-listbox__item"
+                                                    style="list-style-type: none;">
+                                                    <div class="slds-media slds-media_center slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                                        role="option" onclick="{!c.guardarVariable}"
+                                                        title="{!grupoSeleccionado.RecordType.DeveloperName}"
+                                                        id="{!grupoSeleccionado.Id}">
+                                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                                            <lightning:icon iconName="standard:template"
+                                                                size="x-small" />
+                                                        </span>
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text_entity"
+                                                                title="{!grupoSeleccionado.Name}">{!grupoSeleccionado.Name}</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </div>
+
+                    </aura:if>
+                </div>
+
+                <!--Desplegable Opción Call Center-->
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning:combobox aura:id="opcioncallcenter" name="opcion_callcenter" label="Opción Call Center:"
+                        placeholder="--Seleccione una opción--" value="" dropdownAlignment="right"
+                        options="{!v.opcionesCallCenter}" onchange="{!c.seleccionaOpcionCallCenter}" />
+                </div>
+
+                <div class="slds-col slds-size_1-of-1" style="padding-top: 12px; text-align: right;">
+                    <lightning:button variant="brand" label="Guardar" title="Guardar" onclick="{!c.guardar}" />
+                </div>
+            </div>
+        </div>
+
+        <div style="height:4px;" />
+    </article>
+</aura:component>

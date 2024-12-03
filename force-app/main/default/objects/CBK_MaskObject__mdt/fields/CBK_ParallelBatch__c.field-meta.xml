@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_ParallelBatch__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador que determina que en caso de dividirse el batch, los subsiguientes batchs se lanzarán en paralelo. Si el valor es falso, se lanzarán encadenados de forma secuencial</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Paralelismo Ejecución Batchs</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ImporteMaximoCOPS</fullName>
+    <active>false</active>
+    <description>Si el importe supera un valor máximo, da un error</description>
+    <errorConditionFormula>AND(RecordType.DeveloperName == &apos;SAC_Escalado&apos;,
+ SAC_ImporteAutorizado__c &gt; 999999
+)</errorConditionFormula>
+    <errorMessage>No puedes autorizar un escalado con importe superior a 999999€</errorMessage>
+</ValidationRule>

@@ -1,0 +1,45 @@
+lightning-button.mybutton {
+    --sds-c-button-text-color: #000000;
+    --sds-c-button-text-color-hover: #000000;
+    --sds-c-button-brand-color-background-hover: #87cefa;
+}
+
+.headerClass .slds-form-element .slds-form-element__control .slds-form-element__static {   
+    color: white;
+    margin-bottom: 13px;
+}
+
+.contenidoClass .slds-form-element .slds-form-element__label{     
+    color: #ddd;
+}
+.contenidoClass .slds-form-element .slds-form-element__control .slds-form-element__static {   
+    color: white;
+    text-decoration:none;
+}
+.contenidoClass .slds-form-element .slds-form-element__control .slds-form-element__static a{   
+    color: white;
+    text-decoration:none;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.tooltip-container:hover .tooltip {
+    display: block;
+}
+
+.custom-bold {
+    font-weight: bold;
+}

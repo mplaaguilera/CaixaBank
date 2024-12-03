@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Franja_Horaria__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(MINUTE(TIMEVALUE(CreatedDate)) &lt; 30, LPAD(TEXT( CC_Franja_Horaria_Aux__c ), 2, &apos;0&apos;) &amp; &apos;:00 - &apos; &amp; LPAD(TEXT( CC_Franja_Horaria_Aux__c ), 2, &apos;0&apos;) &amp; &apos;:30&apos;,
+LPAD(TEXT( CC_Franja_Horaria_Aux__c ), 2, &apos;0&apos;) &amp; &apos;:30&apos; &amp; &apos; - &apos; &amp; LPAD(TEXT( CC_Franja_Horaria_Aux__c +1), 2, &apos;0&apos;)&amp;&apos;:00&apos; )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Franja Horaria</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

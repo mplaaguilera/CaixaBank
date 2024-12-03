@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CRMMisEventos</fullName>
+    <columns>START_DATE_TIME</columns>
+    <columns>END_DATE_TIME</columns>
+    <columns>RECORDTYPE</columns>
+    <columns>SUBJECT</columns>
+    <columns>WHAT_NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>AV_VisibleByLoggedUser__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>CRM - Mis Eventos</label>
+</ListView>

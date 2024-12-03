@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLEncuestaGuestLang__c</fullName>
+    <description>Parametro GestUserLang de la encuesta</description>
+    <externalId>false</externalId>
+    <formula>&quot;guestUserLang=&quot;+
+IF(ISBLANK(EV_LeadId__c),
+IF(ISBLANK(EV_ContactId__c),IF(ISBLANK(EV_AccountId__c),&apos;es&apos;,CASE(EV_AccountId__r.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)), CASE(EV_ContactId__r.Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
+CASE(EV_LeadId__r.EV_Idiomas__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>URL Encuesta GuestLang</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

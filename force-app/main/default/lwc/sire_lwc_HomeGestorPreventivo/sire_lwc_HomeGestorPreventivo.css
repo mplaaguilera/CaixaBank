@@ -1,0 +1,106 @@
+.styleCard{
+    position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgb(221, 219, 218) !important;
+    border-radius: 0.25rem !important;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10) !important;
+}
+
+.num-records-container{
+    text-align: center;
+    /*font-size: 5rem;*/
+    font-size: 4rem;
+    width: auto;
+    height: auto;
+    color: #d40000;
+}
+.card-title{
+    font-family: "SalesforceSans-Regular",Arial,sans-serif;
+    /*font-size: 1rem;*/
+    font-size: 0.9rem;
+    color: #16325c;
+    line-height: 1.25rem;
+    top: inherit;
+    /*padding-top: 1.75rem;*/
+    padding-top: 1.5rem;
+}
+.cursor-link{
+    cursor: pointer;
+}
+.cursor-default{
+    cursor: default;
+}
+.no-select{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.min-size{
+    min-height: 10rem;
+}
+.min-size-title{
+    min-height: 3.5rem;
+}
+.card-temp{
+    position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgb(221, 219, 218) !important;
+    border-radius: 0.25rem !important;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10) !important;
+}
+
+.titulo{
+    font-size: 0.9rem;
+    padding-bottom: 5px;
+    line-height: 1.25rem;
+    top: inherit;
+    width: calc(100% - 20px);
+    font-weight: bold;
+}
+
+.tablaAltura{
+    height: 250px;
+}
+
+.tablaAlturaSmall{
+    height: 140px;
+}
+
+.textoVerInforme {
+    padding-left: 10px;
+}
+
+.textoVerInformeProcesosEstrtegias {
+    float: right;
+    margin-top: -30px;
+}
+
+.paddingCajita {
+    padding-left: 35%;
+}
+
+.dimensionesCajitas { 
+    width: 190px;
+    height: 200px;
+}
+
+@media only screen and (max-width: 1600px) {
+    .dimensionesCajitas { width: 160px;height: 200px;}
+}
+
+@media only screen and (max-width: 1400px) {
+    .dimensionesCajitas { width: 140px;height: 200px;}
+}
+
+.colorTextoAzul {
+    color: #359cd5;
+}
+
+.colorTextoRojo {
+    color: #d40000;;
+}

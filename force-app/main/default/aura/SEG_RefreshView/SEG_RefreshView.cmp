@@ -1,0 +1,21 @@
+<aura:component implements="lightning:utilityItem" controller="SEG_MostrarExcepciones">
+
+  <lightning:empApi aura:id="empApi"/>
+  <aura:handler name="init" value="{!this}" action="{!c.onInit}"/>
+    
+<!-- Refresh automatico rompe la operativa
+  <aura:attribute name="refreshInterval" type="Integer" 
+                  default="60" />
+
+  <aura:attribute name="intervalId" type="String" 
+                  access="private" />
+   -->
+  <!-- Needed to refresh the list -->
+<!--
+  <lightning:navigationItemAPI aura:id="navigationItemAPI"/>
+  
+  
+	<aura:handler name="init" value="{!this}" action="{!c.toggleAutoRefresh}"/>
+-->
+
+</aura:component>

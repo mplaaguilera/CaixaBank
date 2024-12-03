@@ -1,0 +1,12 @@
+<template>
+    <template if:true={mostrarError}>
+        <div style="background-color: #a71930; color: white; padding: 10px; border-radius: 4px; display: flex; align-items: center;">
+            <div style="margin-right: 10px;">
+                <lightning-icon icon-name="utility:error" size="small" alternative-text="Error"></lightning-icon>
+            </div>
+            <div class="error-text slds-text-align_left">
+                {titulo}&nbsp;{mensaje}
+            </div>
+        </div>
+    </template>
+</template>

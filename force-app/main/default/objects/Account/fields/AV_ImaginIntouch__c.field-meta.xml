@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ImaginIntouch__c</fullName>
+    <description>Marca del cliente</description>
+    <externalId>false</externalId>
+    <formula>IF(
+AND(
+NOT(ISBLANK(AV_IndicadoresClientes__c)),
+OR(
+INCLUDES(AV_IndicadoresClientes__c,&quot;8&quot;),
+INCLUDES(AV_IndicadoresClientes__c,&quot;18&quot;),
+INCLUDES(AV_IndicadoresClientes__c,&quot;11&quot;))),
+IF(INCLUDES(AV_IndicadoresClientes__c,&quot;8&quot;), IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconIntouch__c,$Setup.AV_IconsFSC__c.AV_LabelIntouch__c,17,50),
+IF(INCLUDES(AV_IndicadoresClientes__c,&quot;18&quot;), IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconIntouchPremier__c,$Setup.AV_IconsFSC__c.AV_LabelIntouchPremier__c,24,178),
+IF(INCLUDES(AV_IndicadoresClientes__c,&quot;11&quot;), IMAGE($Setup.AV_IconsFSC__c.AV_Environment__c &amp; $Setup.AV_IconsFSC__c.AV_IconImagin__c,$Setup.AV_IconsFSC__c.AV_LabelImagin__c,32.5,110),NULL))),
+NULL)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>ㅤㅤ</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

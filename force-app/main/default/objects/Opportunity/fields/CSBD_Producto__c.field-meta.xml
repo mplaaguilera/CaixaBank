@@ -1,0 +1,1939 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Producto__c</fullName>
+    <label>Producto</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CSBD_Familia_Producto__c</controllingField>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Accidentes</fullName>
+                <default>false</default>
+                <label>Accidentes</label>
+            </value>
+            <value>
+                <fullName>Adeslas pymes</fullName>
+                <default>false</default>
+                <label>Adeslas pymes</label>
+            </value>
+            <value>
+                <fullName>Alarma</fullName>
+                <default>false</default>
+                <label>Alarma</label>
+            </value>
+            <value>
+                <fullName>Alta Cliente</fullName>
+                <default>false</default>
+                <label>Alta Cliente</label>
+            </value>
+            <value>
+                <fullName>Alta Cliente Digital</fullName>
+                <default>false</default>
+                <label>Alta Cliente Digital</label>
+            </value>
+            <value>
+                <fullName>Alta Cliente Residentes</fullName>
+                <default>false</default>
+                <label>Alta Cliente Residentes</label>
+            </value>
+            <value>
+                <fullName>Alta Cuenta</fullName>
+                <default>false</default>
+                <label>Alta Cuenta</label>
+            </value>
+            <value>
+                <fullName>Alta Cuenta Multititulares</fullName>
+                <default>false</default>
+                <label>Alta Cuenta Multititulares</label>
+            </value>
+            <value>
+                <fullName>Asistencia en viaje</fullName>
+                <default>false</default>
+                <label>Asistencia en viaje</label>
+            </value>
+            <value>
+                <fullName>Auto</fullName>
+                <default>false</default>
+                <label>Auto</label>
+            </value>
+            <value>
+                <fullName>Autónomos</fullName>
+                <default>false</default>
+                <label>Autónomos</label>
+            </value>
+            <value>
+                <fullName>Básico</fullName>
+                <default>false</default>
+                <label>Básico</label>
+            </value>
+            <value>
+                <fullName>C&amp;G</fullName>
+                <default>false</default>
+                <label>C&amp;G</label>
+            </value>
+            <value>
+                <fullName>C&amp;G LEADS PORTAL</fullName>
+                <default>false</default>
+                <label>C&amp;G LEADS PORTAL</label>
+            </value>
+            <value>
+                <fullName>C&amp;G LONO PORTAL</fullName>
+                <default>false</default>
+                <label>C&amp;G LONO PORTAL</label>
+            </value>
+            <value>
+                <fullName>Caixa Futuro</fullName>
+                <default>false</default>
+                <label>Caixa Futuro</label>
+            </value>
+            <value>
+                <fullName>CaixaWallet</fullName>
+                <default>false</default>
+                <label>CaixaWallet</label>
+            </value>
+            <value>
+                <fullName>Casa Fácil Fijo Empleados</fullName>
+                <default>false</default>
+                <label>Casa Fácil Fijo Empleados</label>
+            </value>
+            <value>
+                <fullName>Cita Previa</fullName>
+                <default>false</default>
+                <label>Cita Previa</label>
+            </value>
+            <value>
+                <fullName>Click&amp;Go</fullName>
+                <default>false</default>
+                <label>Click&amp;Go</label>
+            </value>
+            <value>
+                <fullName>Colectivo ONCE</fullName>
+                <default>false</default>
+                <label>Colectivo ONCE</label>
+            </value>
+            <value>
+                <fullName>Colectivo TELEFONICA</fullName>
+                <default>false</default>
+                <label>Colectivo TELEFONICA</label>
+            </value>
+            <value>
+                <fullName>CrediEstudios Curso a Curso</fullName>
+                <default>false</default>
+                <label>CrediEstudios Curso a Curso</label>
+            </value>
+            <value>
+                <fullName>Credit</fullName>
+                <default>false</default>
+                <label>Credit</label>
+            </value>
+            <value>
+                <fullName>Crédito Fácil a 10 meses con garantía personal</fullName>
+                <default>false</default>
+                <label>Crédito Fácil a 10 meses con garantía personal</label>
+            </value>
+            <value>
+                <fullName>Crédito Imagin</fullName>
+                <default>false</default>
+                <label>Crédito Imagin</label>
+            </value>
+            <value>
+                <fullName>Cuenta Caixafuturo - PIAS</fullName>
+                <default>false</default>
+                <label>Cuenta Caixafuturo - PIAS</label>
+            </value>
+            <value>
+                <fullName>Cuenta Caixafuturo - SIALP</fullName>
+                <default>false</default>
+                <label>Cuenta Caixafuturo - SIALP</label>
+            </value>
+            <value>
+                <fullName>Cuenta negocio</fullName>
+                <default>false</default>
+                <label>Cuenta negocio</label>
+            </value>
+            <value>
+                <fullName>Cuentas</fullName>
+                <default>false</default>
+                <label>Cuentas</label>
+            </value>
+            <value>
+                <fullName>Cuentas Multi Titular</fullName>
+                <default>false</default>
+                <label>Cuentas Multi Titular</label>
+            </value>
+            <value>
+                <fullName>Debit</fullName>
+                <default>false</default>
+                <label>Debit</label>
+            </value>
+            <value>
+                <fullName>Decesos</fullName>
+                <default>false</default>
+                <label>Decesos</label>
+            </value>
+            <value>
+                <fullName>Dental</fullName>
+                <default>false</default>
+                <label>Dental</label>
+            </value>
+            <value>
+                <fullName>Deposito bonificado</fullName>
+                <default>false</default>
+                <label>Deposito bonificado</label>
+            </value>
+            <value>
+                <fullName>Depósitos</fullName>
+                <default>false</default>
+                <label>Depósitos</label>
+            </value>
+            <value>
+                <fullName>Depósitos a Plazo</fullName>
+                <default>false</default>
+                <label>Depósitos a Plazo</label>
+            </value>
+            <value>
+                <fullName>Depositos bonificado</fullName>
+                <default>false</default>
+                <label>Depositos bonificado</label>
+            </value>
+            <value>
+                <fullName>Depósitos Combinados</fullName>
+                <default>false</default>
+                <label>Depósitos Combinados</label>
+            </value>
+            <value>
+                <fullName>Domiciliaciones</fullName>
+                <default>false</default>
+                <label>Domiciliaciones</label>
+            </value>
+            <value>
+                <fullName>ecoPréstamos Estrella</fullName>
+                <default>false</default>
+                <label>ecoPréstamos Estrella</label>
+            </value>
+            <value>
+                <fullName>Elegir producto</fullName>
+                <default>false</default>
+                <label>Elegir producto</label>
+            </value>
+            <value>
+                <fullName>Escoger Producto</fullName>
+                <default>false</default>
+                <label>Escoger Producto</label>
+            </value>
+            <value>
+                <fullName>Fes-te Client</fullName>
+                <default>false</default>
+                <label>Fes-te Client</label>
+            </value>
+            <value>
+                <fullName>Fondos</fullName>
+                <default>false</default>
+                <label>Fondos</label>
+            </value>
+            <value>
+                <fullName>Genérico</fullName>
+                <default>false</default>
+                <label>Genérico</label>
+            </value>
+            <value>
+                <fullName>Hipoteca</fullName>
+                <default>false</default>
+                <label>Hipoteca</label>
+            </value>
+            <value>
+                <fullName>Hipoteca 01</fullName>
+                <default>false</default>
+                <label>Hipoteca 01</label>
+            </value>
+            <value>
+                <fullName>Hipoteca CaixaBank</fullName>
+                <default>false</default>
+                <label>Hipoteca CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Casa Fácil</fullName>
+                <default>false</default>
+                <label>Hipoteca Casa Fácil</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Casa Fàcil</fullName>
+                <default>false</default>
+                <label>Hipoteca Casa Fàcil</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Click My Home</fullName>
+                <default>false</default>
+                <label>Hipoteca Click My Home</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Click My Home NO TOP</fullName>
+                <default>false</default>
+                <label>Hipoteca Click My Home NO TOP</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Click My Home TOP</fullName>
+                <default>false</default>
+                <label>Hipoteca Click My Home TOP</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Empleado Vivienda A</fullName>
+                <default>false</default>
+                <label>Hipoteca Empleado Vivienda A</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Empleado Vivienda B</fullName>
+                <default>false</default>
+                <label>Hipoteca Empleado Vivienda B</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Imagin</fullName>
+                <default>false</default>
+                <label>Hipoteca Imagin</label>
+            </value>
+            <value>
+                <fullName>Hipotecas</fullName>
+                <default>false</default>
+                <label>Hipotecas</label>
+            </value>
+            <value>
+                <fullName>Hipoteca Subrogación</fullName>
+                <default>false</default>
+                <label>Hipoteca Subrogación</label>
+            </value>
+            <value>
+                <fullName>Hogar</fullName>
+                <default>false</default>
+                <label>Hogar</label>
+            </value>
+            <value>
+                <fullName>HolaBank Onboarding</fullName>
+                <default>false</default>
+                <label>HolaBank Onboarding</label>
+            </value>
+            <value>
+                <fullName>Imagin&amp;Go</fullName>
+                <default>false</default>
+                <label>Imagin&amp;Go</label>
+            </value>
+            <value>
+                <fullName>ImaginBank</fullName>
+                <default>false</default>
+                <label>ImaginBank</label>
+            </value>
+            <value>
+                <fullName>KYC</fullName>
+                <default>false</default>
+                <label>KYC</label>
+            </value>
+            <value>
+                <fullName>Limite Tranferencias</fullName>
+                <default>false</default>
+                <label>Limite Tranferencias</label>
+            </value>
+            <value>
+                <fullName>liniaoberta</fullName>
+                <default>false</default>
+                <label>liniaoberta</label>
+            </value>
+            <value>
+                <fullName>Mascotas</fullName>
+                <default>false</default>
+                <label>Mascotas</label>
+            </value>
+            <value>
+                <fullName>Mejora vivienda</fullName>
+                <default>false</default>
+                <label>Mejora vivienda</label>
+            </value>
+            <value>
+                <fullName>Mi hucha</fullName>
+                <default>false</default>
+                <label>Mi hucha</label>
+            </value>
+            <value>
+                <fullName>Moto</fullName>
+                <default>false</default>
+                <label>Moto</label>
+            </value>
+            <value>
+                <fullName>MyBox Alarmas</fullName>
+                <default>false</default>
+                <label>MyBox Alarmas</label>
+            </value>
+            <value>
+                <fullName>MyBox Auto</fullName>
+                <default>false</default>
+                <label>MyBox Auto</label>
+            </value>
+            <value>
+                <fullName>MyBox Auto TR</fullName>
+                <default>false</default>
+                <label>MyBox Auto TR</label>
+            </value>
+            <value>
+                <fullName>MyBox Genéric</fullName>
+                <default>false</default>
+                <label>MyBox Genéric</label>
+            </value>
+            <value>
+                <fullName>MyBox Genérico</fullName>
+                <default>false</default>
+                <label>MyBox Genérico</label>
+            </value>
+            <value>
+                <fullName>MyBox Hogar</fullName>
+                <default>false</default>
+                <label>MyBox Hogar</label>
+            </value>
+            <value>
+                <fullName>MyBox Hogar KEOPS</fullName>
+                <default>false</default>
+                <label>MyBox Hogar KEOPS</label>
+            </value>
+            <value>
+                <fullName>MyBox Home</fullName>
+                <default>false</default>
+                <label>MyBox Home</label>
+            </value>
+            <value>
+                <fullName>MyBox Jubilación</fullName>
+                <default>false</default>
+                <label>MyBox Jubilación</label>
+            </value>
+            <value>
+                <fullName>MyBox Salud</fullName>
+                <default>false</default>
+                <label>MyBox Salud</label>
+            </value>
+            <value>
+                <fullName>MyBox Salud Senior</fullName>
+                <default>false</default>
+                <label>MyBox Salud Senior</label>
+            </value>
+            <value>
+                <fullName>MyBox Vida</fullName>
+                <default>false</default>
+                <label>MyBox Vida</label>
+            </value>
+            <value>
+                <fullName>MyCard Imagin</fullName>
+                <default>false</default>
+                <label>MyCard Imagin</label>
+            </value>
+            <value>
+                <fullName>My Card Oro Empleado</fullName>
+                <default>false</default>
+                <label>My Card Oro Empleado</label>
+            </value>
+            <value>
+                <fullName>Nomina</fullName>
+                <default>false</default>
+                <label>Nomina</label>
+            </value>
+            <value>
+                <fullName>Nómina</fullName>
+                <default>false</default>
+                <label>Nómina</label>
+            </value>
+            <value>
+                <fullName>Novación / Reconversión</fullName>
+                <default>false</default>
+                <label>Novación / Reconversión</label>
+            </value>
+            <value>
+                <fullName>One Clic Auto</fullName>
+                <default>false</default>
+                <label>One Clic Auto</label>
+            </value>
+            <value>
+                <fullName>Pack Digital Agrobank, Pack Digital Retail + TPV Tablet</fullName>
+                <default>false</default>
+                <label>Pack Digital Agrobank, Pack Digital Retail + TPV Tablet</label>
+            </value>
+            <value>
+                <fullName>Pack Digital E-Commerce + TPV Tablet</fullName>
+                <default>false</default>
+                <label>Pack Digital E-Commerce + TPV Tablet</label>
+            </value>
+            <value>
+                <fullName>Pack Digital Food&amp;Drink + TPV Tablet</fullName>
+                <default>false</default>
+                <label>Pack Digital Food&amp;Drink + TPV Tablet</label>
+            </value>
+            <value>
+                <fullName>Pack Digital Redes Sociales</fullName>
+                <default>false</default>
+                <label>Pack Digital Redes Sociales</label>
+            </value>
+            <value>
+                <fullName>Pack Digital Web + TPV Tablet</fullName>
+                <default>false</default>
+                <label>Pack Digital Web + TPV Tablet</label>
+            </value>
+            <value>
+                <fullName>Pago plazos</fullName>
+                <default>false</default>
+                <label>Pago plazos</label>
+            </value>
+            <value>
+                <fullName>PAI</fullName>
+                <default>false</default>
+                <label>PAI</label>
+            </value>
+            <value>
+                <fullName>Paneles Solares</fullName>
+                <default>false</default>
+                <label>Paneles Solares</label>
+            </value>
+            <value>
+                <fullName>Pension</fullName>
+                <default>false</default>
+                <label>Pension</label>
+            </value>
+            <value>
+                <fullName>Pensión</fullName>
+                <default>false</default>
+                <label>Pensión</label>
+            </value>
+            <value>
+                <fullName>Planes</fullName>
+                <default>false</default>
+                <label>Planes</label>
+            </value>
+            <value>
+                <fullName>Planes de Pensiones</fullName>
+                <default>false</default>
+                <label>Planes de Pensiones</label>
+            </value>
+            <value>
+                <fullName>Plena</fullName>
+                <default>false</default>
+                <label>Plena</label>
+            </value>
+            <value>
+                <fullName>Plena Plus</fullName>
+                <default>false</default>
+                <label>Plena Plus</label>
+            </value>
+            <value>
+                <fullName>Portatiles Samsung</fullName>
+                <default>false</default>
+                <label>Portatiles Samsung</label>
+            </value>
+            <value>
+                <fullName>Prepagament</fullName>
+                <default>false</default>
+                <label>Prepagament</label>
+            </value>
+            <value>
+                <fullName>Préstamo Amazon Estudios</fullName>
+                <default>false</default>
+                <label>Préstamo Amazon Estudios</label>
+            </value>
+            <value>
+                <fullName>Préstamo Amazon Hogar</fullName>
+                <default>false</default>
+                <label>Préstamo Amazon Hogar</label>
+            </value>
+            <value>
+                <fullName>Préstamo Amazon Viajes</fullName>
+                <default>false</default>
+                <label>Préstamo Amazon Viajes</label>
+            </value>
+            <value>
+                <fullName>Préstamo a particulares a interés fijo y garantía personal</fullName>
+                <default>false</default>
+                <label>Préstamo a particulares a interés fijo y garantía personal</label>
+            </value>
+            <value>
+                <fullName>Préstamo atenciones diversas</fullName>
+                <default>false</default>
+                <label>Préstamo atenciones diversas</label>
+            </value>
+            <value>
+                <fullName>Préstamo a tipo fijo ECO Empleados</fullName>
+                <default>false</default>
+                <label>Préstamo a tipo fijo ECO Empleados</label>
+            </value>
+            <value>
+                <fullName>Préstamo Auto Imagin</fullName>
+                <default>false</default>
+                <label>Préstamo Auto Imagin</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella Auto</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella Auto</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella Cuota Mínima</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella Cuota Mínima</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella Exprés</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella Exprés</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella Joven</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella Joven</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estrella Nómina</fullName>
+                <default>false</default>
+                <label>Préstamo Estrella Nómina</label>
+            </value>
+            <value>
+                <fullName>Préstamo Estudia Grado/Máster</fullName>
+                <default>false</default>
+                <label>Préstamo Estudia Grado/Máster</label>
+            </value>
+            <value>
+                <fullName>Préstamo Exprés Imagin</fullName>
+                <default>false</default>
+                <label>Préstamo Exprés Imagin</label>
+            </value>
+            <value>
+                <fullName>Préstamo Generico Imagin</fullName>
+                <default>false</default>
+                <label>Préstamo Generico Imagin</label>
+            </value>
+            <value>
+                <fullName>Préstamo ImaginGo</fullName>
+                <default>false</default>
+                <label>Préstamo ImaginGo</label>
+            </value>
+            <value>
+                <fullName>Préstamo LCI</fullName>
+                <default>false</default>
+                <label>Préstamo LCI</label>
+            </value>
+            <value>
+                <fullName>Préstamo Online Imagin</fullName>
+                <default>false</default>
+                <label>Préstamo Online Imagin</label>
+            </value>
+            <value>
+                <fullName>Préstamo Personal</fullName>
+                <default>false</default>
+                <label>Préstamo Personal</label>
+            </value>
+            <value>
+                <fullName>Préstamo personal a tipo fijo Empleados</fullName>
+                <default>false</default>
+                <label>Préstamo personal a tipo fijo Empleados</label>
+            </value>
+            <value>
+                <fullName>Préstamo personal desde imaginBank</fullName>
+                <default>false</default>
+                <label>Préstamo personal desde imaginBank</label>
+            </value>
+            <value>
+                <fullName>Préstamos</fullName>
+                <default>false</default>
+                <label>Préstamos</label>
+            </value>
+            <value>
+                <fullName>prestamos_personalización_imagin</fullName>
+                <default>false</default>
+                <label>prestamos_personalización_imagin</label>
+            </value>
+            <value>
+                <fullName>Prestamos Amazon Electrónica</fullName>
+                <default>false</default>
+                <label>Prestamos Amazon Electrónica</label>
+            </value>
+            <value>
+                <fullName>Prestamos Electrónica</fullName>
+                <default>false</default>
+                <label>Prestamos Electrónica</label>
+            </value>
+            <value>
+                <fullName>Préstamos Emprendedores</fullName>
+                <default>false</default>
+                <label>Préstamos Emprendedores</label>
+            </value>
+            <value>
+                <fullName>Préstamos Hipotecarios</fullName>
+                <default>false</default>
+                <label>Préstamos Hipotecarios</label>
+            </value>
+            <value>
+                <fullName>Prestamos leads</fullName>
+                <default>false</default>
+                <label>Prestamos leads</label>
+            </value>
+            <value>
+                <fullName>Prestamos LEADS PORTAL</fullName>
+                <default>false</default>
+                <label>Prestamos LEADS PORTAL</label>
+            </value>
+            <value>
+                <fullName>Préstamos LONO</fullName>
+                <default>false</default>
+                <label>Préstamos LONO</label>
+            </value>
+            <value>
+                <fullName>Prestamos LONO PORTAL</fullName>
+                <default>false</default>
+                <label>Prestamos LONO PORTAL</label>
+            </value>
+            <value>
+                <fullName>Préstamos Personales</fullName>
+                <default>false</default>
+                <label>Préstamos Personales</label>
+            </value>
+            <value>
+                <fullName>Préstamo Viajes</fullName>
+                <default>false</default>
+                <label>Préstamo Viajes</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella</fullName>
+                <default>false</default>
+                <label>Préstec Estrella</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella Auto</fullName>
+                <default>false</default>
+                <label>Préstec Estrella Auto</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella Exprés</fullName>
+                <default>false</default>
+                <label>Préstec Estrella Exprés</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella Jove</fullName>
+                <default>false</default>
+                <label>Préstec Estrella Jove</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella Nòmina</fullName>
+                <default>false</default>
+                <label>Préstec Estrella Nòmina</label>
+            </value>
+            <value>
+                <fullName>Préstec Estrella Quota Mínima</fullName>
+                <default>false</default>
+                <label>Préstec Estrella Quota Mínima</label>
+            </value>
+            <value>
+                <fullName>Préstec Estudia Grau/Màster</fullName>
+                <default>false</default>
+                <label>Préstec Estudia Grau/Màster</label>
+            </value>
+            <value>
+                <fullName>Previsión Profesional</fullName>
+                <default>false</default>
+                <label>Previsión Profesional</label>
+            </value>
+            <value>
+                <fullName>Protección Jurídica</fullName>
+                <default>false</default>
+                <label>Protección Jurídica</label>
+            </value>
+            <value>
+                <fullName>Renting_CaixaBank</fullName>
+                <default>false</default>
+                <label>Renting_CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Renting Auto</fullName>
+                <default>false</default>
+                <label>Renting Auto</label>
+            </value>
+            <value>
+                <fullName>Salud</fullName>
+                <default>false</default>
+                <label>Salud</label>
+            </value>
+            <value>
+                <fullName>Salud Básico</fullName>
+                <default>false</default>
+                <label>Salud Básico</label>
+            </value>
+            <value>
+                <fullName>Salut Pimes Dental</fullName>
+                <default>false</default>
+                <label>Salut Pimes Dental</label>
+            </value>
+            <value>
+                <fullName>Seguridad Social</fullName>
+                <default>false</default>
+                <label>Seguridad Social</label>
+            </value>
+            <value>
+                <fullName>Seguros Distribuidora</fullName>
+                <default>false</default>
+                <label>Seguros Distribuidora</label>
+            </value>
+            <value>
+                <fullName>Seleccionar producto</fullName>
+                <default>false</default>
+                <label>Seleccionar producto</label>
+            </value>
+            <value>
+                <fullName>Seleccionar tipus targeta</fullName>
+                <default>false</default>
+                <label>Seleccionar tipus targeta</label>
+            </value>
+            <value>
+                <fullName>Servicash</fullName>
+                <default>false</default>
+                <label>Servicash</label>
+            </value>
+            <value>
+                <fullName>Servicuentas</fullName>
+                <default>false</default>
+                <label>Servicuentas</label>
+            </value>
+            <value>
+                <fullName>Seviam</fullName>
+                <default>false</default>
+                <label>Seviam</label>
+            </value>
+            <value>
+                <fullName>Seviam Empresas</fullName>
+                <default>false</default>
+                <label>Seviam Empresas</label>
+            </value>
+            <value>
+                <fullName>Shop</fullName>
+                <default>false</default>
+                <label>Shop</label>
+            </value>
+            <value>
+                <fullName>Skills&amp;Education</fullName>
+                <default>false</default>
+                <label>Skills&amp;Education</label>
+            </value>
+            <value>
+                <fullName>Smart Money</fullName>
+                <default>false</default>
+                <label>Smart Money</label>
+            </value>
+            <value>
+                <fullName>Subrogación</fullName>
+                <default>false</default>
+                <label>Subrogación</label>
+            </value>
+            <value>
+                <fullName>Subrogación Hipoteca</fullName>
+                <default>false</default>
+                <label>Subrogación Hipoteca</label>
+            </value>
+            <value>
+                <fullName>Teléfono Samsung S22</fullName>
+                <default>false</default>
+                <label>Teléfono Samsung S22</label>
+            </value>
+            <value>
+                <fullName>Telefon Samsung S22</fullName>
+                <default>false</default>
+                <label>Telefon Samsung S22</label>
+            </value>
+            <value>
+                <fullName>Telefon Samsung S23</fullName>
+                <default>false</default>
+                <label>Telefon Samsung S23</label>
+            </value>
+            <value>
+                <fullName>Televisores</fullName>
+                <default>false</default>
+                <label>Televisores</label>
+            </value>
+            <value>
+                <fullName>TPV Tablet</fullName>
+                <default>false</default>
+                <label>TPV Tablet</label>
+            </value>
+            <value>
+                <fullName>Valora CaixaBank</fullName>
+                <default>false</default>
+                <label>Valora CaixaBank</label>
+            </value>
+            <value>
+                <fullName>Valor Futuro 10</fullName>
+                <default>false</default>
+                <label>Valor Futuro 10</label>
+            </value>
+            <value>
+                <fullName>VCX Negocios</fullName>
+                <default>false</default>
+                <label>VCX Negocios</label>
+            </value>
+            <value>
+                <fullName>Viajes</fullName>
+                <default>false</default>
+                <label>Viajes</label>
+            </value>
+            <value>
+                <fullName>Vida</fullName>
+                <default>false</default>
+                <label>Vida</label>
+            </value>
+            <value>
+                <fullName>Vida Familiar</fullName>
+                <default>false</default>
+                <label>Vida Familiar</label>
+            </value>
+            <value>
+                <fullName>VisaGo</fullName>
+                <default>false</default>
+                <label>VisaGo</label>
+            </value>
+            <value>
+                <fullName>VISA Negocios</fullName>
+                <default>false</default>
+                <label>VISA Negocios</label>
+            </value>
+            <value>
+                <fullName>Wivai</fullName>
+                <default>false</default>
+                <label>Wivai</label>
+            </value>
+            <value>
+                <fullName>Wivai Contratación</fullName>
+                <default>false</default>
+                <label>Wivai Contratación</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Colectivo ONCE</controllingFieldValue>
+            <valueName>Colectivo ONCE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hazte Cliente</controllingFieldValue>
+            <controllingFieldValue>Alta Cliente</controllingFieldValue>
+            <controllingFieldValue>Back Office</controllingFieldValue>
+            <valueName>Alta Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Alta Cliente Digital</controllingFieldValue>
+            <valueName>Alta Cliente Digital</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <valueName>Alta Cliente Residentes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <valueName>Alta Cuenta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <valueName>Alta Cuenta Multititulares</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Cuenta negocio</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Cuentas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <valueName>Cuentas Multi Titular</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Mi hucha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cuentas</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Servicuentas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Accidentes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Adeslas pymes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Alarma</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Asistencia en viaje</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Básico</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Decesos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Dental</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Hogar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Mascotas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Moto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Alarmas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Auto TR</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>MyBox Genéric</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>MyBox Genérico</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Hogar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>MyBox Hogar KEOPS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Home</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>MyBox Jubilación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Salud</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Salud Senior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Vida</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>One Clic Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Plena</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Plena Plus</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Previsión Profesional</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Protección Jurídica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Salud</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Salud Básico</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Salut Pimes Dental</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Seguros Distribuidora</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Seviam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Seviam Empresas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>VCX Negocios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Viajes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Vida</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros</controllingFieldValue>
+            <valueName>Vida Familiar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Depósitos</controllingFieldValue>
+            <valueName>Deposito bonificado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Depósitos</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Depósitos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Depósitos</controllingFieldValue>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Depósitos a Plazo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Depósitos</controllingFieldValue>
+            <valueName>Depositos bonificado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Depósitos</controllingFieldValue>
+            <valueName>Depósitos Combinados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Fes-te Client</controllingFieldValue>
+            <valueName>Fes-te Client</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Autónomos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>CaixaWallet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>CrediEstudios Curso a Curso</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Credit</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Crédito Fácil a 10 meses con garantía personal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Seguros de ahorro</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Cuenta Caixafuturo - PIAS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Seguros de ahorro</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Cuenta Caixafuturo - SIALP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Debit</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Domiciliaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>ecoPréstamos Estrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Fondos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Fondos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Genérico</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Hipoteca 01</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Hipoteca Click My Home</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Hipotecas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <valueName>liniaoberta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>MyBox Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Nomina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Nómina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>PAI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Pension</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Pensión</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Planes</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Planes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Prepagament</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo a particulares a interés fijo y garantía personal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Auto Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella Cuota Mínima</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella Exprés</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella Joven</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estrella Nómina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Estudia Grado/Máster</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Exprés Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo LCI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo Online Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamo personal desde imaginBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Prestamos leads</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamos LONO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella Exprés</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella Jove</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella Nòmina</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estrella Quota Mínima</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstec Estudia Grau/Màster</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Renting</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Renting_CaixaBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Domiciliaciones</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Seguridad Social</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Seleccionar tipus targeta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Servicash</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Fondos</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Smart Money</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>VISA Negocios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>LO Shop</controllingFieldValue>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Wivai</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Back Office</controllingFieldValue>
+            <valueName>Cita Previa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Back Office</controllingFieldValue>
+            <valueName>KYC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Back Office</controllingFieldValue>
+            <valueName>Limite Tranferencias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>HolaBank</controllingFieldValue>
+            <valueName>HolaBank Onboarding</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Shop</controllingFieldValue>
+            <valueName>Shop</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>C&amp;G</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>C&amp;G LEADS PORTAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>C&amp;G LONO PORTAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Click&amp;Go</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo Amazon Estudios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo Amazon Hogar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo Amazon Viajes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo atenciones diversas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo a tipo fijo ECO Empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo Generico Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo ImaginGo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo Personal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamo personal a tipo fijo Empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>prestamos_personalización_imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Prestamos Amazon Electrónica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamos Hipotecarios</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Prestamos LEADS PORTAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Prestamos LONO PORTAL</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Préstamos Personales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Préstamos</controllingFieldValue>
+            <valueName>Skills&amp;Education</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Casa Fácil Fijo Empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca CaixaBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Casa Fácil</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Casa Fàcil</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Empleado Vivienda A</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Empleado Vivienda B</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Hipoteca Subrogación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Mejora vivienda</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Novación / Reconversión</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Subrogación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Hipotecas</controllingFieldValue>
+            <valueName>Subrogación Hipoteca</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Renting</controllingFieldValue>
+            <valueName>Renting Auto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Renting</controllingFieldValue>
+            <valueName>Valora CaixaBank</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Pack Digital Agrobank, Pack Digital Retail + TPV Tablet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Pack Digital E-Commerce + TPV Tablet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Pack Digital Food&amp;Drink + TPV Tablet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Pack Digital Redes Sociales</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Pack Digital Web + TPV Tablet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Paneles Solares</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Portatiles Samsung</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Teléfono Samsung S22</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Telefon Samsung S22</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Telefon Samsung S23</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Televisores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>TPV Tablet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Wivai</controllingFieldValue>
+            <valueName>Wivai Contratación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros de ahorro</controllingFieldValue>
+            <valueName>Caixa Futuro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Seguros de ahorro</controllingFieldValue>
+            <valueName>Valor Futuro 10</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>Crédito Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>Imagin&amp;Go</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>MyCard Imagin</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>My Card Oro Empleado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>Pago plazos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tarjetas</controllingFieldValue>
+            <valueName>VisaGo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Microbank</controllingFieldValue>
+            <valueName>Préstamos Emprendedores</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Colectivo TELEFONICA</controllingFieldValue>
+            <valueName>Colectivo TELEFONICA</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

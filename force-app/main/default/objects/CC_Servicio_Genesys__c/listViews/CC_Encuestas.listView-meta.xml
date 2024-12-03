@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Encuestas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Codigo__c</columns>
+    <columns>CC_VDN__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Servicio_Genesys__c.CC_Encuesta</value>
+    </filters>
+    <label>Encuestas</label>
+</ListView>

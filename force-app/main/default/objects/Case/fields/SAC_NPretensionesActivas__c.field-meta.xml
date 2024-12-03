@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_NPretensionesActivas__c</fullName>
+    <description>Guarda el número de pretensiones activas que tiene la reclamación excluyendo las que estan en baja.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Número de pretensiones activas.</inlineHelpText>
+    <label>N pretensiones</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

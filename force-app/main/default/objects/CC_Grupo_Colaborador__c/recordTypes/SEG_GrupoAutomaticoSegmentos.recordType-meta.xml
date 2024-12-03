@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoAutomaticoSegmentos</fullName>
+    <active>true</active>
+    <label>Grupo Automático Segmentos</label>
+    <picklistValues>
+        <picklist>CC_Agrupacion__c</picklist>
+        <values>
+            <fullName>AiO BCN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AiO MAD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AiO VAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>All In One</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comercia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Facilities</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Now In Teléfono Único</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Payments</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PromoCaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VidaCaixa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Canal_de_procedencia__c</picklist>
+        <values>
+            <fullName>Accionista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apple App Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asociación Consumidores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Atención al Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banca Digital CNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bloqueos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Comercio Exterior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Contact Center International</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Export Online</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón International Support</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón KYC Renewal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Service Desk</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CCO CSI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBankNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cartera de Efectos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clases Pasivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dirección</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emisiones PromoCaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Extranjero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Formulario Web AC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Formulario web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Play Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HDT CSI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incidencias Técnicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Junta Andalucia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M2P Asistencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Preventiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pago Móvil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pasivo y Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Postventa CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRHH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recaudación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Redsys-Sermepa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguros CSI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Centrales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Generales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SmartPhones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Clientes CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Empleados CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PSU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas y Comercios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono COPS atención clientes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono COPS atención empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valija digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Virtualización de Proveedores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Empresa__c</picklist>
+        <values>
+            <fullName>COMDATA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DXC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MARKTEL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MST</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OESIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SIN PROVEEDOR</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo_cliente__c</picklist>
+        <values>
+            <fullName>Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Horas_SLA__c</picklist>
+        <values>
+            <fullName>12</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>24</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>48</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>72</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Negocio__c</picklist>
+        <values>
+            <fullName>CC</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>COPS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGMENTOS</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_NivelGrupo__c</picklist>
+        <values>
+            <fullName>SAC_Nivel2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Nivel3</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_EstadoSincronizacion__c</picklist>
+        <values>
+            <fullName>No sincronizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sincronizado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Organizacion__c</picklist>
+        <values>
+            <fullName>Banca Corporativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banca Internacional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro Soporte Especialistas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Financiación Estructurada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PYMES</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_TipoColaboradorWS__c</picklist>
+        <values>
+            <fullName>N</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>VALIJA</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Tipo_de_tarea_CSO__c</picklist>
+        <values>
+            <fullName>ACTIVO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AUDITORIAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AVALES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>AVALES INTERNACIONALES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>BASTANTEOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CERTIFICADOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COMEX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COMISIONES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CONSULTAS %28CSE%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CONTRATOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DOCUMENTACIÓN A CLIENTES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EFECTIVO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FACTURAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FFEE ADMINISTRACIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FFEE OPERACIONES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FFEE SEGUIMIENTO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FFEE SOPORTE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FICHEROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FIRMAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GESTIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INCIDENCIAS KODAK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INCIDENCIAS OFICINA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MCC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OID SEPA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PAGOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PAQUETERIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RENOVADOS LAE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>REVISIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>REVISIÓN MACROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RUI</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TAREAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TAREAS DXC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TAREAS HISPALIS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TAREAS INDRA</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Tipologia__c</picklist>
+        <values>
+            <fullName>BO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Firmas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MCC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Zona__c</picklist>
+        <values>
+            <fullName>CSE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Corporativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Créditos Sindicados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Andalucía</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Baleares</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Barcelona</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Canarias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Castilla La Mancha</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Castilla y León</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Cataluña</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Ebro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Madrid</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Murcia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Norte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresas Valencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Export Finance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Canarias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Cataluña</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Centro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Este</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Norte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones Sur</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficinas Representación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Operaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seguimiento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Pymes 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Pymes 2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Pymes 3</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Pymes 4</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sucursales Internacionales</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agrupacion__c</fullName>
+    <label>Agrupación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>All In One</fullName>
+                <default>false</default>
+                <label>All In One</label>
+            </value>
+            <value>
+                <fullName>ImaginBank</fullName>
+                <default>false</default>
+                <label>ImaginBank</label>
+            </value>
+            <value>
+                <fullName>Payments</fullName>
+                <default>false</default>
+                <label>Payments</label>
+            </value>
+            <value>
+                <fullName>Cajeros</fullName>
+                <default>false</default>
+                <label>Cajeros</label>
+            </value>
+            <value>
+                <fullName>Comercia</fullName>
+                <default>false</default>
+                <label>Comercia</label>
+            </value>
+            <value>
+                <fullName>Digital</fullName>
+                <default>false</default>
+                <label>Digital</label>
+            </value>
+            <value>
+                <fullName>Facilities</fullName>
+                <default>false</default>
+                <label>Facilities</label>
+            </value>
+            <value>
+                <fullName>PromoCaixa</fullName>
+                <default>false</default>
+                <label>Wivai</label>
+            </value>
+            <value>
+                <fullName>VidaCaixa</fullName>
+                <default>false</default>
+                <label>VidaCaixa</label>
+            </value>
+            <value>
+                <fullName>AiO BCN</fullName>
+                <default>false</default>
+                <label>AiO BCN</label>
+            </value>
+            <value>
+                <fullName>AiO MAD</fullName>
+                <default>false</default>
+                <label>AiO MAD</label>
+            </value>
+            <value>
+                <fullName>AiO VAL</fullName>
+                <default>false</default>
+                <label>AiO VAL</label>
+            </value>
+            <value>
+                <fullName>Now In Teléfono Único</fullName>
+                <default>false</default>
+                <label>Now In Teléfono Único</label>
+            </value>
+            <value>
+                <fullName>AiO IBI</fullName>
+                <default>false</default>
+                <label>AiO IBI</label>
+            </value>
+            <value>
+                <fullName>AiO BRG</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>AiO BRG</label>
+            </value>
+            <value>
+                <fullName>Grupo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Grupo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

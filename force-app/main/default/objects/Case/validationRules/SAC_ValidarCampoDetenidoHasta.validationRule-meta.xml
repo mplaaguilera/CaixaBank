@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarCampoDetenidoHasta</fullName>
+    <active>true</active>
+    <description>Validar que el campo detenido hasta se rellena únicamente en estado de subsanación y que contiene una fecha válida</description>
+    <errorConditionFormula>AND(NOT($Permission.SAC_ByPass),
+				RecordType.DeveloperName == &apos;SAC_Reclamacion&apos;,
+				ISCHANGED(SAC_DetenidoHasta__c),
+				NOT(AND(
+								ISPICKVAL(Status, &apos;SAC_006&apos;),
+        SAC_DetenidoHasta__c &lt;= NOW(),
+        SAC_DetenidoHasta__c &gt;= SAC_DetenidoDesde__c,
+				    NOT(ISBLANK(SAC_DetenidoDesde__c))
+							)
+				)
+)</errorConditionFormula>
+    <errorDisplayField>SAC_DetenidoHasta__c</errorDisplayField>
+    <errorMessage>El campo Detenido hasta solo puede ser completado en estado de subsanación y debe contener una fecha válida</errorMessage>
+</ValidationRule>

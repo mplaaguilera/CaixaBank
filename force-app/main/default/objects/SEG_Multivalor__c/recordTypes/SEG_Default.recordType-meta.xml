@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Default</fullName>
+    <active>true</active>
+    <label>Default</label>
+    <picklistValues>
+        <picklist>CBK_Negocio__c</picklist>
+        <values>
+            <fullName>Cops</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Segmentos</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_TipodeValor__c</picklist>
+        <values>
+            <fullName>Asunto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asunto a excluir</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuerpo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cuerpo a excluir</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Destinatario</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Destinatario CC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Destinatario CC a excluir</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Destinatario CCO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Destinatario a excluir</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitente a excluir</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,120 @@
+.THIS div.spinnerALF {
+    will-change: opacity;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    transition: opacity 120ms ease-out;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 100ms;
+    animation-timing-function: ease-out;
+}
+
+.THIS div.spinnerALF::after {
+    will-change: opacity;
+    position: absolute;
+    content: 'Esperando la respuesta de Alfabético...';
+    width: 100%;
+    text-align: center;
+    top: calc(50% + 18px);
+    z-index: 9999;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 100ms;
+    animation-timing-function: ease-out;
+}
+
+.THIS div.spinnerSFDC {
+    will-change: opacity;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    transition: opacity 140ms ease-out;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 100ms;
+    animation-timing-function: ease-out;
+}
+
+.THIS div.spinnerSFDC::after {
+    will-change: opacity;
+    position: absolute;
+    content: 'Actualizando información...';
+    width: 100%;
+    text-align: center;
+    top: calc(50% + 18px);
+    z-index: 9999;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 100ms;
+    animation-timing-function: ease-out;
+}
+
+@keyframes cc_fade_in {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.THIS div.slds-spinner {
+    top: calc(50% - 8px);
+}
+
+.THIS lightning-spinner.slds-spinner_container {
+    background-color: rgb(255, 255, 255, 0.86);
+    border-radius: 4px;
+}
+
+.THIS div.spinnerALF.oculto, .THIS div.spinnerSFDC.oculto {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.THIS .cc_blink {
+    opacity: 0.1;
+    animation-name: cc_blinker;
+    animation-iteration-count: 3;
+    animation-duration: 160ms;
+    animation-timing-function: ease-in;
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+}
+
+@keyframes cc_blinker {
+    to { opacity: 1; }
+}
+
+.THIS .cc_azul_cuenta {
+    background-color: #5867e8 !important;
+}
+
+.THIS span.resultado {
+    font-weight: 600;
+    transition: border-bottom 92ms ease-in;
+}
+
+.THIS button.slds-button.slds-button_neutral,
+.THIS input.slds-input,
+.THIS button.slds-combobox__input,
+.THIS div.slds-dropdown {
+	border-color: rgb(201, 201, 201);
+}
+
+.THIS lightning-icon.iconoWarning svg {
+    fill: rgb(255, 151, 23);
+}

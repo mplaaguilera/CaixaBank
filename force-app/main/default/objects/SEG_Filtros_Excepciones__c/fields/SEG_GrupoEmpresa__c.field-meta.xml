@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoEmpresa__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Asignación al grupo de empresas</description>
+    <label>Grupo Empresa</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Filtros de Excepciones (Grupo Empresa)</relationshipLabel>
+    <relationshipName>Excepciones_Grupo_Empresas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

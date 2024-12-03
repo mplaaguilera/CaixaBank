@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tareas_Pte_Asignar_misGrupos</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_Descripcion__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <columns>SAC_Criticidad__c</columns>
+    <columns>SAC_EquipoResponsable__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_FechaVencimientoInicial__c</columns>
+    <columns>SAC_FechaVencimientoProrroga__c</columns>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>SAC_Gestor__c</columns>
+    <columns>SAC_GrupoProveedor__c</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>SAC_Estado__c</field>
+        <operation>equals</operation>
+        <value>SAC_PendienteAsignar</value>
+    </filters>
+    <filters>
+        <field>SAC_EsMiGrupo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>SAC-Tareas Pte. Asignar de mis grupos</label>
+    <queue>SAC_PendienteAsignar</queue>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

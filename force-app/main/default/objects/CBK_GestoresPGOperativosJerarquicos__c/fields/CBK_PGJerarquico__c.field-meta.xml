@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PGJerarquico__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo indicador si el registro corresponde a un grupo jerárquico (el usuario podrá gestionar las asignaciones de los usuarios de este grupo) o un grupo público operativo (el usuario podrá asignar usuarios a este grupo público)</description>
+    <label>Indicador Grupo Jerárquico</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

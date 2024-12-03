@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cola_correos_entrantes_CSI_Bankia_Case</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Queue</filterScope>
+    <label>Cola correos entrantes CSI Bankia</label>
+    <queue>CC_Cola_correos_entrantes_CSI_Bankia</queue>
+    <sharedTo>
+        <group>CC_Correos_entrantes_CSI_Bankia</group>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MotivoRechazo__c</fullName>
+    <label>Motivo descarte</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_AltaErronea</fullName>
+                <default>false</default>
+                <label>Alta errónea</label>
+            </value>
+            <value>
+                <fullName>Rechazada por vinculacion</fullName>
+                <default>false</default>
+                <label>Rechazada por vinculación</label>
+            </value>
+            <value>
+                <fullName>Spam</fullName>
+                <default>false</default>
+                <label>Spam</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Rechazada por conversión</fullName>
+                <default>false</default>
+                <label>Rechazada por conversión</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

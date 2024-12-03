@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_LimiteRegistrosVirtuales__c</fullName>
+    <defaultValue>5</defaultValue>
+    <description>Campo que recoge el límite por el que un usuario va a poder acceder a un evento virtual.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Número de intentos de acceso al evento por persona. Por defecto, 5</inlineHelpText>
+    <label>Límite de registros virtuales</label>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

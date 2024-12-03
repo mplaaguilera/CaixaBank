@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ForbiddenWords__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Controla si se ejecutan las validaciones de las palabras prohibidas en los triggers.</description>
+    <label>Forbidden Words Validation</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

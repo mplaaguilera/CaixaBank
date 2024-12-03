@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Chat_Catalan_LiveChatTranscript</fullName>
+    <filterScope>Queue</filterScope>
+    <label>CC Chat Catalan</label>
+    <queue>CC_Chat_Catalan</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

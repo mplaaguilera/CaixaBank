@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GruposOperativos</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_Tipologia__c</columns>
+    <columns>SEG_Inactivo__c</columns>
+    <columns>SEG_No_visible__c</columns>
+    <columns>SEG_Padre__c</columns>
+    <columns>SEG_Organizacion__c</columns>
+    <columns>SEG_Zona__c</columns>
+    <columns>SEG_Grupo_padre__c</columns>
+    <columns>SEG_GrupoPadre2nivel__c</columns>
+    <columns>SEG_GrupoPadre3nivel__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.SEG_GrupoOperativoSegmentos</value>
+    </filters>
+    <filters>
+        <field>SEG_GrupoSegmentos__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Grupos Operativos SEG</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

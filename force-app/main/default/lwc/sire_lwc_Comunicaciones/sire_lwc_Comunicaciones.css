@@ -1,0 +1,43 @@
+.negrita {
+    font-weight: bold;
+}
+
+.caja {
+    border-radius: 5px; 
+    background-color: #eaf5fb; 
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.subtitulo {
+    font-weight: bold;
+    font-size: medium;
+}
+
+.margenDerecho {
+    margin-right: 15px;
+}
+
+.paddingNotificaciones {
+    padding-bottom: 5px;
+}
+
+.margenInferior {
+    margin-bottom: 5px;
+}
+
+.seminegrita {
+    font-weight: 500;
+}
+
+.letraPeque{
+    font-size: smaller;
+}
+
+.alturaMaxima{
+    max-height: 200px;
+}
+
+.textoVerInforme {
+    padding-left: 10px;
+}

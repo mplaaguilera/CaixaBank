@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_cambioStatus</fullName>
+    <active>true</active>
+    <description>Regla de validación que permite realizar el cambio de estado en el objeto Case para el proyecto SAC.</description>
+    <errorConditionFormula>AND(
+									NOT(ISNEW()),
+					    (RecordType.DeveloperName == &apos;SAC_Reclamacion&apos; || 
+         RecordType.DeveloperName == &apos;SAC_Pretension&apos; || 
+         RecordType.DeveloperName == &apos;SAC_Consulta&apos; ) &amp;&amp; 
+         TEXT(Status) &lt;&gt; SAC_StatusAuxiliar__c,
+				     $User.SAC_PerteneceCOPSAJ__c == false
+					)</errorConditionFormula>
+    <errorDisplayField>Status</errorDisplayField>
+    <errorMessage>No se puede actualizar el estado del registro actual desde esta ubicación, realice la acción desde la botonera superior.</errorMessage>
+</ValidationRule>

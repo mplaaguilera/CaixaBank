@@ -1,0 +1,1251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Solucion</fullName>
+    <active>true</active>
+    <label>Solución</label>
+    <picklistValues>
+        <picklist>AM_Buzon_origen_CAM__c</picklist>
+        <values>
+            <fullName>Buzón Carteras</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Fondos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Valores</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CBK_Traslado_Remitido__c</picklist>
+        <values>
+            <fullName>Remitido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Traslado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Agrupacion_Motivo__c</picklist>
+        <values>
+            <fullName>CALIDAD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COMISIONES Y GASTOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CONFIGURACIÓN PERSONAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DESACUERDOS%2C DEMORAS%2C DENEGACIONES%2C BLOQUEOS%2C ATRACO Y FRAUDE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ESTADOS LOGÍSTICOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GESTIÓN DE CONTRATOS%3A ALTAS%2C BAJAS Y OTRAS GESTIONES%2F CLÁUSULAS CONTRACTUALES%2F TITULARIDADES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IDENTIFICACIÓN%2C FIRMA DE OPERATIVA%2C OTP%2C SOLICITUD DE BLOQUEO%2C LÍMITES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INFORMACIÓN GENERAL</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INTERESES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A ABONO%2F AMPLIACIÓN DE CAPITAL%2F APORTACIÓN%2F CANJE%2F VENTA%2F TRASPASO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A ACCIONISTAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A DESCARGA%2F ACCESO%2F ACTIVACIÓN%2F ENVÍO%2F DOMICILIACIÓN%2F GESTIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A EXTRACTO%2F APUNTES%2F MOVIMIENTOS%2F LIQUIDACIONES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A INVERSIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A PAGO%2F REINTEGRO%2F AMORTIZACIÓN%2F COMPRA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A RIESGO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPERATIVA%3A SEGUROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PETICIÓN DE DOCUMENTACIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRSS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TEMAS TÉCNICOS - INSTALACIONES</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Agrupacion_Solucion__c</picklist>
+        <values>
+            <fullName>Derivar a fraude</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Derivar a oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Derivar a oficina%3A Limitación protocolo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No se realiza operativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Resto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se deriva a otros servicios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se facilita información</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Se realiza operativa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Agrupacion_Tematica__c</picklist>
+        <values>
+            <fullName>A- OPERACIONES DE ACTIVO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>B- OPERACIONES DE PASIVO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>C- INVERSIÓN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D- SERVICIOS DE COBROS Y PAGOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E- CANALES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>F- SEGUROS Y PLANES DE PENSIONES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>G- PROGRAMAS%2C CONVENIOS Y COLECTIVOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>H- OTROS SERVICIOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>N- HERRAMIENTAS PARA LA OFICINA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>O- CAMPAÑAS DE PRODUCTOS</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_AmbitoTareas__c</picklist>
+        <values>
+            <fullName>Fraude</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Area_Responsable__c</picklist>
+        <values>
+            <fullName>1500 - CONTACT CENTER CLIENTS</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Canal_Operativo__c</picklist>
+        <values>
+            <fullName>App BrokerNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App CBKNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App CaixaBankPay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App CaixaBankSign</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App imaginKids</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App imaginTeens</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajero ATM NOW</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otras App</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Plataforma virtual</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Portal CBK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRSS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Centrales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sin canal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SmartPhone</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web CBKNow</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Canal_Procedencia_Equivalente__c</picklist>
+        <values>
+            <fullName>Accionista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apple App Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Asociación Consumidores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Atención al Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banca Digital CNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bloqueos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBankNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cartera de Efectos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clases Pasivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dirección</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emisiones PromoCaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Extranjero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Formulario web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Play Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incidencias Técnicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Junta Andalucia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M2P Asistencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Preventiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pago Móvil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pasivo y Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Postventa CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRHH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recaudación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Redsys-Sermepa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Centrales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Generales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SmartPhones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Clientes CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Empleados CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PSU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas y Comercios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Virtualización de Proveedores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Canal_Resolucion__c</picklist>
+        <values>
+            <fullName>Accionista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apple Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Atención al Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banca Digital CNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bloqueos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBankNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clases Pasivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emisiones PromoCaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Extranjero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Formulario web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Play</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incidencias Técnicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Junta Andalucia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M2P Asistencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Now in Sales-MAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Preventiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pago Móvil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pasivo y Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Postventa CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRHH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recaudación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Redsys-Sermepa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Centrales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Generales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SmartPhones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Clientes CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Empleados CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PSU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas y Comercios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valija digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Virtualización de Proveedores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Clasificacion_Rapida__c</picklist>
+        <values>
+            <fullName>AHORRO</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>AUXILIAR ONLINE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CAIXABANK PAY</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>COMPRAS POR INTERNET</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ENVÍO DE FICHEROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FONDOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IDENTIFICACIÓN - Acceso con DNIe</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IDENTIFICACIÓN - Acceso con app</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PLANES</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RECEPCIÓN DE FICHEROS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGURIDAD - Accesos no reconocidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGURIDAD - Movimientos no reconocidos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGURIDAD - PHISHING%2FTROYANO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TRANSFERENCIAS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VALORES</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Motivo_NOK__c</picklist>
+        <values>
+            <fullName>Aumento superior al preconcedido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente anula la solicitud</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente desiste</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente en el extranjero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente no localizado por FEDEX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En periodo crítico</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Error KYC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Liquidación cerrada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Necesaria firma de consentimiento de consulta para scoring</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nivel de riesgo insuficiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No es el titular de la tarjeta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No es el titular del contrato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No preconcedido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No puede ir a un cajero%2F no tiene cajero cerca</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No supera el protocolo de seguridad</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nuevo límite superior al del contrato</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Operaciones fraccionadas o pendientes de confirmar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Operación no realizada o pendiente de confirmar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Perfil de la tarjeta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Política NOK %2F No titular</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Realizado últimos 30 días</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recibe por error la tarjeta de otro cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remitido a oficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Restr%2E Efect%2E Crédito %2F Señal impago</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Saldo insuficiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Saldo insuficiente%2F Comisión</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de débito</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta de empresa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjeta no lo permite por el perfil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono modificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono no coincide</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Teléfono no informado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo_Cliente__c</picklist>
+        <values>
+            <fullName>CSI Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28CAM%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28CAM%29%2FEmpleado %28CAM%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28COPS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28COPS%29%2FEmpleado %28COPS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28FRA%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente %28SACH%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cliente%2FEmpleado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado %28CAM%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado %28COPS%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HDT Empleado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prejubilado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Proveedor %2F Empleado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo_Ficha_TF__c</picklist>
+        <values>
+            <fullName>Ficha Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ficha de Cuentas a la vista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ficha de línea abierta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ficha de tarjetas</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_WebTipoContacto__c</picklist>
+        <values>
+            <fullName>Consulta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desacuerdo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falta respuesta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Felicitación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incidencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Llamada sencilla</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Petición de servicio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Petición documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pre-Queja</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Queja</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Buzon_Salida__c</picklist>
+        <values>
+            <fullName>Buzón Comercio Exterior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Contact Center International</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Export Online</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón International Support</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón KYC Renewal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Buzón Service Desk</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Departamento__c</picklist>
+        <values>
+            <fullName>BOS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EFECTIVO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>EXPFIN</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FINCOMEX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GOC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HOLABANK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OPCOMEX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UAFE</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Horas_SLA__c</picklist>
+        <values>
+            <fullName>24</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>48</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>72</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>92</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>96</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mismo dia</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_EntidadAfectada__c</picklist>
+        <values>
+            <fullName>SAC_002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_003</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_004</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_005</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_006</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_007</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_008</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_009</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_010</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_011</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_012</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_013</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_015</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_EntidadProductora__c</picklist>
+        <values>
+            <fullName>Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank Asset Management</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank Consumer Finance%2C S%2EA%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank Money to Pay</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank Payments %26 Consumer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank Payments E%2EF%2EC%2E E%2EP%2CS%2EA%2EU%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caixabank%2C S%2EA%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caser Bankia Mediación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Comercia Global Payments entidad de pago%2C S%2EL%2E</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Corporación Hipoteca Mutual</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mapfre Bankia Mediación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Otras empresas ajenas al grupo CXB</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Resto Bankia Mediación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Segurcaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Telefonica Consumer Finance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Vidacaixa%2C S%2EA%2E de Seguros y Reaseguros</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Links_Relacionados__c</picklist>
+        <values>
+            <fullName>Alta Formulario Pasarelas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Consulta Formulario Pasarelas</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_Organizacion__c</picklist>
+        <values>
+            <fullName>Banca Corporativa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro Empresas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro Soporte Especialistas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Financiación Estructurada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Instituciones</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SEG_SLACliente__c</picklist>
+        <values>
+            <fullName>Día siguiente recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mismo día recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 1 mes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 1 semana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 2 días hábiles desde la recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 2h después recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 3 días hábiles desde la recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 4 días hábiles desde la recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 4h después recepción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Máximo 5 días hábiles desde la recepción</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

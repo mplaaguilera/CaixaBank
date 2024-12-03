@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Regla</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				!(ISBLANK(TEXT(Tipo__c))),
+				TEXT( Tipo__c)!=&apos;APEX&apos;, 
+ ISBLANK(TEXT(Entidad__c)))</errorConditionFormula>
+    <errorMessage>Debe informarse el objeto sobre el realizar va la fusión</errorMessage>
+</ValidationRule>

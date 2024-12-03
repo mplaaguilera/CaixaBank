@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AccountId</fullName>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 AND 2) OR (3 AND 4) OR (5 AND 6) OR (5 AND 6)</booleanFilter>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente (COPS), Cliente, Cliente (CAM), Cliente (SACH), Cliente (FRA)</value>
+        </filterItems>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>notEqual</operation>
+            <value>Centro CaixaBank, Buzón COPS</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado, Empleado (HDT)</value>
+        </filterItems>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Centro CaixaBank</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Empleado (COPS), Empleado (CAM)</value>
+        </filterItems>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Buzón COPS, Centro CaixaBank</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

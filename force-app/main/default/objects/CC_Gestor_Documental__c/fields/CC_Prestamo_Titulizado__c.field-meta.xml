@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Prestamo_Titulizado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si el préstamo no está titulizado</inlineHelpText>
+    <label>Préstamo titulizado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

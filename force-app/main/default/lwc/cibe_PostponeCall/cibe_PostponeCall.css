@@ -1,0 +1,19 @@
+.PostponeCall-form{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.buttonStyle{
+    background-color: #009fe3;
+    width: 30%;
+    color: white;
+}
+.buttonAlign{
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: -20px;
+}
+.buttonStyleDisabled{
+    background-color: #797979;
+    width: 30%;
+    color: white;
+}

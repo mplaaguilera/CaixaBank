@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>warning</fullName>
+                <default>false</default>
+                <label>Aviso</label>
+            </value>
+            <value>
+                <fullName>info</fullName>
+                <default>false</default>
+                <label>Información</label>
+            </value>
+            <value>
+                <fullName>error</fullName>
+                <default>false</default>
+                <label>Error</label>
+            </value>
+            <value>
+                <fullName>success</fullName>
+                <default>false</default>
+                <label>Solución</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

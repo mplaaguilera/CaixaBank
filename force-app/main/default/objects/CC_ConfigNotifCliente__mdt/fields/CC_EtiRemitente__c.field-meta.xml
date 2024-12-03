@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_EtiRemitente__c</fullName>
+    <description>Etiqueta para incorporar en el remitente del e-mail</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Etiqueta para incorporar en el remitente del e-mail</inlineHelpText>
+    <label>Etiqueta remitente</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

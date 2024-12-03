@@ -1,0 +1,105 @@
+<template>
+  <!-- FORMULARIO -->
+  <template if:true={formularioVisible}>
+      <div class="formulario"> 
+          <!-- Tarea tipo SEL unica respuesta -->
+          <div if:true={isSELS}>
+            <h1 class="titulo" slot="title">{req_questionSEL}</h1>
+            <lightning-radio-group 
+                            class="responseSEL"
+                            label={seleccionS}
+                            options={options}
+                            value={valueSELS}
+                            type="radio"
+                            disabled={disableRadio}
+                            onchange={getSelection}
+                            required></lightning-radio-group>
+          </div>
+          <!-- Tarea tipo SEL respuesta multiple -->
+          <div if:true={isSELM}>
+            <h1 class="titulo" slot="title">{req_questionSEL}</h1>
+            <lightning-checkbox-group 
+                                class="responseSEL"
+                                label={seleccionM}
+                                options={options}
+                                value={valueSELM}
+                                disabled={disableCheck}
+                                onchange={getSelection}
+                                required></lightning-checkbox-group>
+          </div>
+    
+          <!-- Tarea tipo DAT -->
+          <div if:true={isDATF}>
+            <h1 class="titulo" slot="title">{req_questionDAT}</h1>
+            <lightning-input class="fieldsDAT" type="date" label={labelDATF} value={valueDATF} disabled={disableDATF} onchange={getSelection} required></lightning-input>
+            </br>
+            <!--lightning-record-edit-form object-api-name="SIREC__SIREC_obj_tarea__c" id="tareaNew1">
+              <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentario} onchange={changeComentarios}> </lightning-input-field>
+            </lightning-record-edit-form-->
+          </div>
+          <div if:true={isDATN}>
+            <h1 class="titulo" slot="title">{req_questionDAT}</h1>
+            <lightning-input class="fieldsDAT" type="number" label={labelDATN} value={valueDATN} step="0.01" disabled={disableDATN} onchange={getSelection} required></lightning-input>
+            </br>
+            <!--lightning-record-edit-form object-api-name="SIREC__SIREC_obj_tarea__c" id="tareaNew2">
+              <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentario} onchange={changeComentarios}> </lightning-input-field>
+            </lightning-record-edit-form-->  
+          </div>
+          <div if:true={isDATA}>
+            <h1 class="titulo" slot="title">{req_questionDAT}</h1>
+            <lightning-textarea maxlength="255" label={labelDATA} value={valueDATA} disabled={disableDATA} onchange={getSelection} required></lightning-textarea>
+            </br>
+            <!--lightning-record-edit-form object-api-name="SIREC__SIREC_obj_tarea__c" id="tareaNew3">
+              <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentario} onchange={changeComentarios}> </lightning-input-field>
+            </lightning-record-edit-form-->
+          </div>
+      </div>
+    </template>
+
+    <!-- ERRORES -->
+    <!-- Error Propietario -->
+    <template if:true={errorPropietario}>
+      <div class="slds-modal__content slds-p-around_medium error" >
+          <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+              <div class="slds-notify_container slds-is-relative">
+                  <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                      <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                          <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                          <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                          </svg>
+                      </span>
+                      <div class="slds-notify__content">
+                          <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                      </div>
+                  </div>
+              </div>                           
+          </div>             
+      </div>
+    </template>
+    <!-- Errores  -->
+    <template if:true={mensajeKO}>
+      <div class="slds-modal__content slds-p-around_medium error" >
+        <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+          <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+              <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                </svg>
+              </span>
+              <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                {codigoError}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- BOTONES -->
+    <footer class="slds-modal__footer">
+        <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={closeQuickAction} disabled={disabledCerrar} class="slds-m-left_x-small"></lightning-button>
+        <lightning-button variant="brand" label={nombreBoton} title={nombreBoton} onclick={handleSaveAndSendClick} disabled={disabledGuardar} class="slds-m-left_x-small"></lightning-button>
+    </footer>
+</template>

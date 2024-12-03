@@ -1,0 +1,23 @@
+{
+    "solicitudes": [
+        {
+            "referencia_usuario": "PST20190724235415409",
+            "tipoSolicitud": "desistimiento PAI",
+            "Fecha": "26-9-2019",
+            "NombreOficina": "CENTRO INTOUCH CAST.LA MANCHA-",
+            "NumOficina": "7625",
+            "CodMotivo": "5",
+            "Estado": "Pendiente enviar documentación",
+            "EmailGestorLO": "prueba@prueba.com",
+            "CSBD": "N",
+            "Numsolicitud": "4223010549222",
+            "EmailOficinaLO": "prueba@prueba.com",
+            "Canal": "LO",
+            "NUMPERSO": "CC83E9D",
+            "Idioma": "cas",
+            "NombreProducto": "Prestamo Online",
+            "DescripMotivo": "Otras",
+            "oficina": "98989"
+        }
+    ]
+}

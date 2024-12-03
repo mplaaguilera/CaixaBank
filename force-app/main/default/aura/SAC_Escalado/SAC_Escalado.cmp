@@ -1,0 +1,170 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" controller="SAC_LCMP_InsertarEscalado">
+    
+
+    <aura:attribute name="recordId"  type="String"/>    
+    <aura:attribute name="idEscalado" type="String" />
+
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="mensaje" type="String" default=""/>
+    <aura:attribute name="user" type="String" />
+    
+    <aura:attribute name="spinnerLoading" type="Boolean" default="false" />
+    <aura:attribute name="propuesta" type="String" />
+    <aura:attribute name="titulo" type="String" />
+    <aura:attribute name="observaciones" type="String" />
+    <aura:attribute name="motivo" type="String" />
+    <aura:attribute name="isModalOpen" type="Boolean" default="false" />
+    <aura:attribute name="isModalAdjuntos" type="Boolean" default="false" />
+    <aura:attribute name="isModalWarningOpen" type="Boolean" default="false" />
+    <aura:attribute name="esPropietario" type="Boolean" default="false" />
+    <aura:attribute name="hayEscaladoAbierto" type="Boolean" />
+    <aura:attribute name="necesitaEscalado" type="Boolean" default="false" />
+    <aura:attribute name="valueEquipo" type="String"/>
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="optionsEquipo" type="String[]" />
+    <aura:attribute name="grupoDestino" type="String" />
+
+    <aura:attribute name="ficherosAdjuntos" type="Object[]"/>
+    <aura:attribute name="permitirEdicion"  type="Boolean" default="true"/>
+    <aura:attribute name="verActual"  type="Boolean" default="true"/>
+    <aura:attribute name="escalado"  type="Boolean" default="true"/>
+    <aura:attribute name="mostrarOculto"  type="Boolean" default="true"/>
+
+
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+    <!-- button -->
+    <aura:if isTrue="{!or(v.caso.Status=='SAC_003',v.caso.Status=='SAC_007')}">
+        <div class="slds-clearfix">
+                <div class="slds-float_right">
+                    <aura:if isTrue="{!not(v.necesitaEscalado)}">
+                        <!-- Botón cuando necesitaEscalado es falso -->
+                        <lightning:button variant="brand" label="Nuevo escalado" onclick="{!c.comprobarPropietario}"/>
+                    </aura:if>                
+                </div>
+            <aura:if isTrue="{!v.necesitaEscalado}">
+                <div class="slds-box" style="padding: 10px;background-color: #16325c;" >
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_8-of-12">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-avatar">
+                                        <lightning:icon iconName="utility:warning" alternativeText="Approved" title="Approved" size="medium" variant="warning"/>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p style="padding-top: 10px; padding-left:10px; color: white;">{!v.mensaje}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_4-of-12">
+                            <div class="slds-float_right">
+                                <lightning:button variant="inverse" label="Nuevo escalado" onclick="{!c.comprobarPropietario}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aura:if>
+        </div>
+    </aura:if>
+
+    <!-- Modal introducir escalado -->
+    <aura:if isTrue="{!v.isModalOpen}">
+        <!-- Modal/Popup Box Aura starts here -->
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Aura header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModal}">
+                        <lightning:icon iconName="utility:close" alternativeText="close" variant="inverse" size="small" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Crear Escalado</h2>
+                </header>
+                <!-- Modal/Popup Box Aura body starts here -->
+                <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-1">
+                    <lightning:input type="text" name="input" label="Título" aura:id="titulo" placeholder="Título" required="true"/><br/>
+                    <lightning:textarea name="input" label="Propuesta Letrado" aura:id="propuestaLetrado" placeholder="Introduce la propuesta..." required="true"/>
+                    <!-- <lightning:select name="motivo" label="Motivo" required="true" value="{!v.value}">
+                        <option value="">Seleccionar</option>
+                    </lightning:select> -->
+                    <lightning:combobox label="Motivo" required="true" options='{!v.options}'
+                    onchange='{!c.valorMotivo}' value='{!v.motivo}'>
+                    </lightning:combobox>
+                    <lightning:combobox label="Equipo" required="true" options='{!v.optionsEquipo}'
+                    onchange='{!c.valorEquipo}' value='{!v.valueEquipo}'>
+                    </lightning:combobox>
+                    <lightning:textarea name="inputObservaciones" label="Observaciones"  aura:id="observaciones"/>
+                </div>
+                <!-- Modal/Popup Box Aura footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}" title="Cancelar">Cancelar</button>
+                    <lightning:button variant="Brand" class="slds-button" label="Siguiente" aura:id="buttonSiguiente" onclick="{!c.insertEscalado}"/>        
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- Modal adjuntar archivos -->
+    <aura:if isTrue="{!v.isModalAdjuntos}">
+        <!-- Modal/Popup Box Aura starts here -->
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Aura header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModalAdjuntos}">
+                        <lightning:icon iconName="utility:close" alternativeText="close" variant="inverse" size="small" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">Crear Escalado: Adjuntar archivos</h2>
+                </header>
+                <!-- Modal/Popup Box Aura body starts here -->
+                <div class="slds-modal__content slds-var-p-around_xx-large" id="modal-content-id-3">
+                    <br/>
+                    <c:SAC_AdjuntosGestionGlobal ficherosAdjuntos="{!v.ficherosAdjuntos}" permitirEdicion="{!v.permitirEdicion}" verActual="{!v.verActual}" ficherosAdjuntosVisibles="{!v.ficherosAdjuntos}" 
+                        recordName="Escalado" recordId="{!v.idEscalado}"  fieldApiName="SAC_CasoEscalado__c" objectApiName="SAC_Interaccion__c"
+                        mostrarOculto="{!v.mostrarOculto}"/>  
+                </div>
+                <!-- Modal/Popup Box Aura footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeModalAdjuntos}" title="Cancelar">Finalizar</button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- Modal warning -->
+    <aura:if isTrue="{!v.isModalWarningOpen}">
+        <!-- Modal/Popup Box Aura starts here -->
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Aura header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModalWarning}">
+                        <lightning:icon iconName="utility:close" alternativeText="close" variant="inverse" size="small" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Denegado</h2>
+                </header>
+                <!-- Modal/Popup Box Aura body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <p>¡No puedes crear un escalado si no eres el propietario de la reclamación o alguna de sus pretensiones!</p>
+                </div>
+                <!-- Modal/Popup Box Aura footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick="{!c.closeModalWarning}" title="OK">OK</button>
+                </footer>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!-- spinner -->
+    <aura:if isTrue="{!v.spinnerLoading}">
+        <div class="slds-is-relative">
+            <lightning:spinner alternativeText="Loading" size="large" variant="brand"/>
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_MaskObject__c</fullName>
+    <description>Lookup al metadato CBK_MaskObject. Corresponde al objeto sobre el que aplica el enmascaramiento del campo</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Mask Object</label>
+    <referenceTo>CBK_MaskObject__mdt</referenceTo>
+    <relationshipLabel>Mask Fields</relationshipLabel>
+    <relationshipName>Mask_Fields</relationshipName>
+    <required>true</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

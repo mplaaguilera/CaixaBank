@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Required_Canal_Operativo</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( RecordType.DeveloperName = &apos;CC_Tematica&apos;,
+     ISPICKVAL(CC_Tipo_Cliente__c, &apos;Cliente&apos;),
+   ISBLANK(CC_Canal_Operativo__c)
+				)</errorConditionFormula>
+    <errorMessage>El canal operativo es obligatorio para las temáticas de clientes</errorMessage>
+</ValidationRule>

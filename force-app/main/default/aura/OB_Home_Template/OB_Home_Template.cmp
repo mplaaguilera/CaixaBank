@@ -1,0 +1,29 @@
+<aura:component implements="lightning:homeTemplate">
+
+    <aura:attribute name="header" type="Aura.Component[]" />
+    <aura:attribute name="left" type="Aura.Component[]" />
+    <aura:attribute name="right" type="Aura.Component[]" />
+    <aura:attribute name="footer" type="Aura.Component[]" />
+
+
+    <div>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem class="slds-var-p-around_small" size="12">
+                {!v.header}
+            </lightning:layoutItem>
+            <lightning:layoutItem class="slds-var-p-around_small" size="12">
+                <lightning:layout>
+                    <lightning:layoutItem class="slds-var-p-around_medium" size="6">
+                        {!v.left}
+                    </lightning:layoutItem>
+                    <lightning:layoutItem class="slds-var-p-around_medium" size="6">
+                        {!v.right}
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="slds-var-p-around_medium" size="12">
+                {!v.footer}
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

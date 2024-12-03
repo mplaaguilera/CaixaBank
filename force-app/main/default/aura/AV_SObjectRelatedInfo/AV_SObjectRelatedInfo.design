@@ -1,0 +1,51 @@
+<design:component >
+	<design:attribute name="objectApiName" label="Object API Name"
+					  description="Object API Name"
+					  required="true"/>
+	<design:attribute name="filterType" label="Filter Object API Name"
+					  description="Filter Object API Name"
+					  required="true"/>
+	<design:attribute name="filterField" label="Filter Field Name"
+					  description="filterField"
+					  required="true"/>
+	<design:attribute name="fieldSetName" label="FieldSet Name"
+					  description="Fieldset Name"
+					  required="true"/>
+	<design:attribute name="displayLabel" label="Display labels"
+					  description="Display labels"
+					  dataSource="standard, label-hidden" default="standard"/>
+	<design:attribute name="columnNum" label="Column Number"
+					  description="Column Number"
+					  datasource="1,2,3" default="2"/>
+	<design:attribute name="readOnly" label="Read Only"
+					  description="Read Only" default="true"/>
+	<design:attribute name="allowEditMode" label="Allow edit mode"
+					  description="Allow edit mode" default="false"/>
+	<design:attribute name="density" label="Density"
+					  description="Density"
+					  datasource="auto,compact,comfy" default="auto"/>
+	<design:attribute name="textStyle" label="Field name style"
+					  description="Field name style"
+					  datasource="slds-label-normal, slds-label-normal-xxlarge, slds-label-normal-xlarge, slds-label-normal-large, slds-label-normal-medium, slds-label-normal-small, slds-label-normal-xsmall, slds-label-normal-xxsmall,
+					  			  slds-label-bold, slds-label-bold-xxlarge, slds-label-bold-xlarge, slds-label-bold-large, slds-label-bold-medium, slds-label-bold-small, slds-label-bold-xsmall, slds-label-bold-xxsmall"/>
+	<design:attribute name="contentStyle" label="Content field style"
+					  description="Content field style"
+					  datasource="slds-field-normal, slds-field-normal-xxlarge, slds-field-normal-xlarge, slds-field-normal-large, slds-field-normal-medium, slds-field-normal-small, slds-field-normal-xsmall, slds-field-normal-xxsmall,
+					  			  slds-field-bold, slds-field-bold-xxlarge, slds-field-bold-xlarge, slds-field-bold-large, slds-field-bold-medium, slds-field-bold-small, slds-field-bold-xsmall, slds-field-bold-xxsmall"/>
+	<design:attribute name="titleAccordion" label="Accordion title"
+					  description="Accordion title"
+					  required="false"/>
+	<design:attribute name="expandAccordion" label="Expand accordion section"
+					  description="Expand accordion section"
+					  default="true"/>
+	<design:attribute name="titleCard" label="Title Card"
+					  description="Title component"
+					  required="false"/>
+	<design:attribute name="iconCard" label="Image card"
+					  description="Image of the component related with the title"
+					  required="false"/>
+	<design:supportedFormFactors>
+		<design:supportedFormFactor type="Large"/>
+		<design:supportedFormFactor type="Small"/>
+	</design:supportedFormFactors>
+</design:component>

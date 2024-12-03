@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PorcentajeConsumoUmbral__c</fullName>
+    <description>Porcentaje del umbral definido en la configuración que se ha consumido</description>
+    <label>Porcentaje Umbral Consumido</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

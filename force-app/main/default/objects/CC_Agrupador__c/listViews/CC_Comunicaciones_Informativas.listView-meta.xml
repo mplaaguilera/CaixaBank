@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Comunicaciones_Informativas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Titulo__c</columns>
+    <columns>CC_Numero_Casos__c</columns>
+    <columns>CC_Numero_Casos_Telefono__c</columns>
+    <columns>CC_Estado__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CC_Fecha_Deteccion__c</columns>
+    <columns>CC_Fecha_Cierre__c</columns>
+    <columns>CC_CI_Name_GrupoColaborador_Interno_c__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Agrupador__c.CC_Comunicacion_Informativa</value>
+    </filters>
+    <label>Comunicaciones informativas</label>
+</ListView>

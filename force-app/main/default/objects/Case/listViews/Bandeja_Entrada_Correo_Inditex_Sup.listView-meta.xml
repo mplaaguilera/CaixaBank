@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bandeja_Entrada_Correo_Inditex_Sup</fullName>
+    <booleanFilter>(1 OR 2 OR 3) AND 4 AND 5</booleanFilter>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>OS_Fecha_Fin_Entitlement__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>OS_GrupoTrabajo__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>OWNER_NAME</columns>
+    <columns>CASES.RECORDTYPE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OWNER_NAME</field>
+        <operation>equals</operation>
+        <value>CNF CONTACT</value>
+    </filters>
+    <filters>
+        <field>OWNER_NAME</field>
+        <operation>equals</operation>
+        <value>2N CNF INDRA</value>
+    </filters>
+    <filters>
+        <field>OWNER_NAME</field>
+        <operation>equals</operation>
+        <value>CNF - Tercer Nivel de Confirming</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <filters>
+        <field>CC_Canal_Procedencia__c</field>
+        <operation>equals</operation>
+        <value>Buzón Inditex Suppliers</value>
+    </filters>
+    <label>Bandeja Entrada Correo - Inditex Sup</label>
+    <sharedTo>
+        <group>OS_2N_CNF_INDRA</group>
+        <group>OS_CNF_CONTACT</group>
+    </sharedTo>
+</ListView>

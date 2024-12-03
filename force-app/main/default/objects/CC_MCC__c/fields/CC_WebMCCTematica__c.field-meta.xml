@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_WebMCCTematica__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Temática a incorporar en la tipificación del caso</description>
+    <inlineHelpText>Temática a incorporar en la tipificación del caso</inlineHelpText>
+    <label>Temática MCC equivalente</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>A - Temática</value>
+        </filterItems>
+        <infoMessage>Temáticas de MCC</infoMessage>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>MCCs (Web MCC Temática)</relationshipLabel>
+    <relationshipName>MCCs_Tematica</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

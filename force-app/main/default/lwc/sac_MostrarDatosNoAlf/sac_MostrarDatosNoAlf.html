@@ -1,0 +1,46 @@
+<template>
+    <div if:true={mostrarCmpDAtosNoAlf} class="slds-card slds-card_boundary">
+        <lightning-card title={tituloTabla} icon-name="standard:custom">
+            <div slot="actions">
+                <div class="slds-float_right">
+                  <lightning-button
+                      variant="border-filled"
+                      title="Refrescar"
+                      onclick={handleRefreshClick}
+                      icon-name="utility:refresh"
+                      class="slds-p-around_xxx-small">
+                  </lightning-button>
+                </div>
+              </div>
+            <div class="slds-box slds-box_small">
+                <template for:each={reclamantes} for:item="reclamante">
+                    <template if:true={reclamante.SAC_TieneDatosNoAlf__c}>
+                        <div class="slds-media" key={reclamante.Id}>
+                            <div class="slds-media__figure" >
+                                <lightning-icon icon-name="standard:employee_organization" alternative-text="Contact Icon" size="medium"></lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading_small">
+                                    <a class="slds-text-link" style="font-size: 13px;" data-id={reclamante.SAC_Account__c} onclick={mostrarCuenta}>{reclamante.SAC_Account__r.Name}</a>
+                                </h2>
+                                <div style="display: flex;">
+                                    <span style="min-width: 110px;">Email:</span>
+                                    <span style="flex-grow: 1;">{reclamante.SAC_EmailNoAlf__c}</span>
+                                </div>
+                                <div style="display: flex;">
+                                    <span style="min-width: 110px;">Teléfono:</span>
+                                    <span style="flex-grow: 1;">{reclamante.SAC_TelefonoNoAlf__c}</span>
+                                </div>
+                                <div style="display: flex;">
+                                    <span style="min-width: 110px;">Dirección postal:</span>
+                                    <span style="flex-grow: 1;">{reclamante.SAC_DireccionNoAlf__c}</span>
+                                </div>
+                            </div>
+                        </div>
+                    <br key={reclamante.Id}>
+                    </template>
+                </template>
+            </div>
+        </lightning-card>
+      </div>
+</template>

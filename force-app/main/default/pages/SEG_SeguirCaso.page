@@ -1,0 +1,26 @@
+<apex:page standardController="Case" recordSetVar="casos" extensions="SEG_SeguirCaso_Controller" 
+           standardStylesheets="false" docType="html-5.0" showHeader="false" lightningStylesheets="true" applyBodyTag="false" >
+   <apex:includeScript value="/lightning/lightning.out.js" />
+    
+    <apex:includeLightning />
+    <div class="slds" > 
+        <div id="lightning" />
+    </div>
+    <apex:includeScript value="/canvas/sdk/js/publisher.js" />
+   
+ <apex:form >
+      <apex:actionFunction action="{!main}" name="hold" rerender="none"/>
+  </apex:form>
+    <script> 
+       hold();
+        $Lightning.use("c:SEG_ListadoCasos", function() {
+          $Lightning.createComponent("c:SEG_ListadoCasosUpdate",
+                { },
+                  "lightning",
+                  function(cmp) {
+               });
+        });
+    </script>
+
+       
+</apex:page>

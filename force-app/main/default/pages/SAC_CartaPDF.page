@@ -1,0 +1,41 @@
+<apex:page renderAs="pdf" applyBodyTag="false" standardController="SAC_DocumentoEnvio__c">
+        <head>
+                <style type="text/css" media="print">
+                       @page {
+                                 @top-center {
+                                       content: element(header);
+                               }
+                               @bottom-left {
+                                     content: element(footer);
+                               }
+                            }
+                                     div.header {
+                                      padding: 10px;
+                                      position: running(header);
+                           }
+                       div.footer {
+                                display: block;
+                             padding: 5px;
+                               position: running(footer);
+                      }
+                                     .pagenumber:before {
+                                        content: counter(page);
+                       }
+                                   .pagecount:before {
+                             content: counter(pages);
+                        }
+                    </style>
+              </head>
+           <div class="header">
+                
+           </div>
+           <div style="float: right;">               
+            
+           </div>
+           <div class="footer">
+
+          </div>
+          <div class="content">
+            <apex:outputText value="{!SAC_DocumentoEnvio__c.SAC_Cuerpo__c}" escape="false" ></apex:outputText>
+          </div>
+</apex:page>

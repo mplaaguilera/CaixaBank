@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_BotonPulsado__c</fullName>
+    <description>Campo picklist que almacenará el boton pulsado para crear la comunicación</description>
+    <label>BotonPulsado</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Responder</fullName>
+                <default>false</default>
+                <label>Responder</label>
+            </value>
+            <value>
+                <fullName>ResponderTodos</fullName>
+                <default>false</default>
+                <label>ResponderTodos</label>
+            </value>
+            <value>
+                <fullName>Reenviar</fullName>
+                <default>false</default>
+                <label>Reenviar</label>
+            </value>
+            <value>
+                <fullName>Nuevo</fullName>
+                <default>false</default>
+                <label>Nuevo</label>
+            </value>
+            <value>
+                <fullName>Acuse</fullName>
+                <default>false</default>
+                <label>Acuse</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

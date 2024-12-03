@@ -1,0 +1,85 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal" 
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="senRes" type="String" />
+    <aura:attribute name="motInad" type="String" />
+    <aura:attribute name="argRes" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="optionsMotivo" type="String[]" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+    <aura:attribute name="esInadmision" type="Boolean" default="false" />
+
+
+
+    <aura:registerEvent name="appEvent" type="c:SAC_PertimiteEmailRedaccion"/>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Cargando" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.usarComponente}">
+    <div class="slds-box slds-col " style="padding-top: 12px">
+        <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Sentido resolución:</b></h1>
+        <div class="slds-align-center" style="padding-top: 14px; padding-bottom: 8px">
+            
+
+                <lightning:combobox label="Sentido de Resolución" required="true" options='{!v.options}'
+                    onchange='{!c.sentidoRes}' value='{!v.senRes}'
+                    placeholder="Seleccione una de las opciones.">
+                </lightning:combobox>
+                <br />
+                <aura:if isTrue="{!v.esInadmision}">
+                <lightning:combobox label="Motivo inadmisión" required="true" options='{!v.optionsMotivo}'
+                onchange='{!c.motivoInad}' value='{!v.motInad}'
+                placeholder="Seleccione un motivo.">
+                </lightning:combobox>
+                <br />
+                </aura:if>         
+                <lightning:textarea name="argumentoResolucion" value='{!v.argRes}'
+                    label="Argumento de Resolución" maxlength="5000"
+                    message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.argumentoRes}'>
+                </lightning:textarea>
+
+        </div>
+        <div class="slds-col slds-size_12-of-12" style="padding: 8px">
+            <lightning:button label="Guardar Sentido Resolución" variant="brand"
+                onclick='{!c.guardarResolucion}'>
+            </lightning:button>
+        </div>
+    </div>
+    <br />
+    <aura:set attribute="else">
+        <div class="slds-box slds-col " style="padding-top: 12px">
+            <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Sentido resolución:</b></h1>
+            <div class="slds-grid slds-align-center" style="padding-top: 14px; padding-bottom: 8px">
+                <div class="slds-col slds-size_6-of-12" style="padding: 8px">
+    
+                    <lightning:combobox label="Sentido de Resolución" required="true" options='{!v.options}'
+                        onchange='{!c.sentidoRes}' value='{!v.senRes}' disabled="true"
+                        placeholder="Seleccione una de las opciones.">
+                    </lightning:combobox>
+    
+                </div>
+                <div class="slds-col slds-size_6-of-12" style="padding: 8px">
+    
+                    <lightning:textarea name="argumentoResolucion" value='{!v.argRes}'
+                        label="Argumento de Resolución" maxlength="240" disabled="true"
+                        message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.argumentoRes}'>
+                    </lightning:textarea>
+                </div>
+    
+            </div>
+            <div class="slds-col slds-size_12-of-12" style="padding: 8px">
+                <lightning:button label="Guardar Sentido Resolución" variant="brand"
+                    onclick='{!c.guardarResolucion}' disabled="true">
+                </lightning:button>
+            </div>
+        </div>
+        <br />
+    </aura:set>
+    </aura:if>
+</aura:component>

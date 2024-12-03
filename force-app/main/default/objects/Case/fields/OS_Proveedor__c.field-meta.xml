@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Proveedor__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;AOS&quot;), &quot;AOS&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;CAIXABANK&quot;), &quot;CAIXABANK&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;COMDATA&quot;), &quot;COMDATA&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;COPS&quot;), &quot;COPS&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;DIGITAL&quot;), &quot;DIGITAL&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;DXC&quot;), &quot;DXC&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;EVERIS&quot;), &quot;EVERIS&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;INDRA&quot;), &quot;INDRA&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;MST&quot;), &quot;MST&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;PAYMENTS&quot;), &quot;PAYMENTS&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;PROMOCAIXA&quot;), &quot;PROMOCAIXA&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;SILK&quot;), &quot;SILK&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;ASSET MANAGEMENT&quot;), &quot;ASSET MANAGEMENT&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;ITNOW&quot;), &quot;ITNOW&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;BIP&quot;), &quot;BIP&quot;,
+IF(ISPICKVAL(Owner:User.CC_Proveedor__c, &quot;WELAB&quot;), &quot;WELAB&quot;,
+&quot;&quot;))))))))))))))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Proveedor</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CR</fullName>
+    <fields>Name</fields>
+    <fields>SEG_Tematica__c</fields>
+    <fields>SEG_Producto__c</fields>
+    <fields>SEG_Motivo__c</fields>
+    <fields>SEG_Detalle__c</fields>
+    <label>SEG_CR</label>
+</CompactLayout>

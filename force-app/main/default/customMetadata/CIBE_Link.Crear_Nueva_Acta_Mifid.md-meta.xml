@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AV_CrearNuevaActaMifid</label>
+    <protected>false</protected>
+    <values>
+        <field>CIBE_Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CIBE_Order__c</field>
+        <value xsi:type="xsd:double">8.0</value>
+    </values>
+    <values>
+        <field>CIBE_Parameters__c</field>
+        <value xsi:type="xsd:string">{
+    &quot;sObj&quot;: &quot;Account, User&quot;,
+    &quot;recordTypes&quot;: [{
+    &quot;recordType&quot;: &quot;&quot;,
+    &quot;params&quot;: {
+        &quot;titularPrincipal&quot;: &quot;AV_NumPerso__c&quot;
+    },
+    &quot;staticParams&quot;: {
+        &quot;medio&quot;:&quot;002&quot;,
+        &quot;empContacto&quot;:&quot; &quot;
+    }
+    }
+    ]
+   }</value>
+    </values>
+    <values>
+        <field>CIBE_Title__c</field>
+        <value xsi:type="xsd:string">Crear Nueva Acta Mifid</value>
+    </values>
+    <values>
+        <field>CIBE_URL_Long__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CIBE_URL__c</field>
+        <value xsi:type="xsd:string">https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/peaRedirect.tf7?pea=CA.OFI.CoordinaGobiernoActas.actaMifid&amp;origen=salesforce&amp;_vmcNewTab=true&amp;params=titularPrincipal%3D{titularPrincipal}%26empContacto%3D{empContacto}%26medio%3D{medio}</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permission Set que permitirá solamente a los usuarios de negocio acceder a datos sensibles de la cuentra</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>CIBE Gestor Interno</label>
+</PermissionSet>

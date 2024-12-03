@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Plantilla_Tipo_Idioma</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Plantilla_Tipo_Idioma&apos;,
+   OR (
+      ISPICKVAL(OB_Tipo__c, &apos;&apos;),
+      ISPICKVAL(OB_Idioma__c, &apos;&apos;),
+      ISBLANK(OB_Plantilla__c),
+      ISBLANK(OB_Parametrizacion_Padre__c)
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

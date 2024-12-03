@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Secuencia__c</fullName>
+    <description>Secuencia del usuario para los grupos de Máximo</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Secuencia del usuario para los grupos de Máximo</inlineHelpText>
+    <label>Secuencia</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

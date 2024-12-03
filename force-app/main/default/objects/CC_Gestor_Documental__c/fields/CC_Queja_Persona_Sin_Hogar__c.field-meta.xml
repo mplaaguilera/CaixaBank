@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Queja_Persona_Sin_Hogar__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si el cliente se queja de la presencia de personas sin hogar</inlineHelpText>
+    <label>Queja personas sin hogar</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

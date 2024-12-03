@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Caso_sincronizado_en_BPO__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica que el caso se ha creado en BPO y cualquier cambio en campos claves deberá enviarse a BPO para su sincronización</description>
+    <inlineHelpText>Indica que el caso se ha creado en BPO y cualquier cambio en campos claves deberá enviarse a BPO para su sincronización</inlineHelpText>
+    <label>Caso sincronizado en BPO</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

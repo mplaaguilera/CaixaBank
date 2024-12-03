@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Nombre_Plantilla_3_Rec_Colab_Cat__c</fullName>
+    <description>Guarda el nombre de la plantilla de la 2ª Reclamación para Traslado a Colaborador (Català)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <label>Plantilla 3ª Reclamación Colab. Català</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

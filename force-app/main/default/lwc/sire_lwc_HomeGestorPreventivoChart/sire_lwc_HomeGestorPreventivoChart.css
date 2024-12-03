@@ -1,0 +1,17 @@
+.titulo{
+    font-size: 0.9rem;
+    /*color: #16325c;*/
+    /*padding-bottom: 15px;*/
+    line-height: 1.25rem;
+    top: inherit;
+    width: calc(100% - 20px);
+    font-weight: bold;
+}
+
+.textoVerInformeProcesosEstrategias {
+    padding-left: 10px;
+}
+
+.graficoAltura{
+    max-height: 320px;
+}

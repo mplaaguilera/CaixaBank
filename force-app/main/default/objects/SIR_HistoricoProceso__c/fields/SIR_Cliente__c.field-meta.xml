@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIR_Cliente__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Cliente</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Histórico Procesos</relationshipLabel>
+    <relationshipName>Historico_Procesos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

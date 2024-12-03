@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Aplicacion__c</fullName>
+    <description>Aplicación desde que se invoca la funcionalidad auditada</description>
+    <label>Aplicación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CaixaBank_OPS</fullName>
+                <default>false</default>
+                <label>CaixaBank OPS</label>
+            </value>
+            <value>
+                <fullName>Sales</fullName>
+                <default>false</default>
+                <label>Sales</label>
+            </value>
+            <value>
+                <fullName>EV_Gestor_de_eventos</fullName>
+                <default>false</default>
+                <label>Gestor de eventos</label>
+            </value>
+            <value>
+                <fullName>CSBD_App</fullName>
+                <default>false</default>
+                <label>Centro 4223</label>
+            </value>
+            <value>
+                <fullName>AV_CRM_Intouch</fullName>
+                <default>false</default>
+                <label>CRM</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

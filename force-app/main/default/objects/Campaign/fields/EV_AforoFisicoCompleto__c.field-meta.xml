@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_AforoFisicoCompleto__c</fullName>
+    <formula>EV_Aforo_espacio_fisico__c &lt;= EV_inscritosFisicos__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Aforo Fisico Completo</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

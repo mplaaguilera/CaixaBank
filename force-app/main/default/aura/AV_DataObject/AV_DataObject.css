@@ -1,0 +1,107 @@
+/*******************************************************************************************************/
+/* BOLD WEIGHT */
+/*******************************************************************************************************/
+.THIS .slds-field-bold>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold>.slds-form-element__label {
+    font-weight: bold;
+}
+
+.THIS .slds-field-bold-xxlarge>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-xxlarge>.slds-form-element__label {
+    font-weight: bold;
+    font-size: xx-large;
+}
+
+.THIS .slds-field-bold-xlarge>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-xlarge>.slds-form-element__label  {
+    font-weight: bold;
+    font-size: x-large;
+}
+
+.THIS .slds-field-bold-large>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-large>.slds-form-element__label {
+    font-weight: bold;
+    font-size: large;
+}
+
+.THIS .slds-field-bold-medium>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-medium>.slds-form-element__label {
+    font-weight: bold;
+    font-size: medium;
+}
+
+.THIS .slds-field-bold-small>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-small>.slds-form-element__label {
+    font-weight: bold;
+    font-size: small;
+}
+
+.THIS .slds-field-bold-xsmall>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-xsmall>.slds-form-element__label {
+    font-weight: bold;
+    font-size: x-small;
+}
+
+.THIS .slds-field-bold-xxsmall>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-bold-xxsmall>.slds-form-element__label {
+    font-weight: bold;
+    font-size: xx-small;
+}
+
+/*******************************************************************************************************/
+/* NORMAL WEIGHT */
+/*******************************************************************************************************/
+.THIS .slds-field-normal>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal>.slds-form-element__label {
+    font-weight: normal;
+}
+
+.THIS .slds-field-normal-xxlarge>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-xxlarge>.slds-form-element__label {
+    font-weight: normal;
+    font-size: xx-large;
+}
+
+.THIS .slds-field-normal-xlarge>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-xlarge>.slds-form-element__label  {
+    font-weight: normal;
+    font-size: x-large;
+}
+
+.THIS .slds-field-normal-large>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-large>.slds-form-element__label {
+    font-weight: normal;
+    font-size: large;
+}
+
+.THIS .slds-field-normal-medium>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-medium>.slds-form-element__label {
+    font-weight: normal;
+    font-size: medium;
+}
+
+.THIS .slds-field-normal-small>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-small>.slds-form-element__label {
+    font-weight: normal;
+    font-size: small;
+}
+
+.THIS .slds-field-normal-xsmall>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-xsmall>.slds-form-element__label {
+    font-weight: normal;
+    font-size: x-small;
+}
+
+.THIS .slds-field-normal-xxsmall>.slds-form-element__control>.slds-form-element__static,
+.THIS .slds-label-normal-xxsmall>.slds-form-element__label {
+    font-weight: normal;
+    font-size: xx-small;
+}
+
+/*******************************************************************************************************/
+/* NORMAL WEIGHT */
+/*******************************************************************************************************/
+
+.THIS .slds-float_right{
+    margin-top: -3rem;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Da visibilidad a la tab que contiene el lwc de creacion (CBK Notification)</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Crear Notificaciones</label>
+    <license>Salesforce</license>
+    <tabSettings>
+        <tab>SIR_CrearNotificaciones</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>

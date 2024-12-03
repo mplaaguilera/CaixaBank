@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>56.0</apiVersion>
+	<isExposed>true</isExposed>
+	<masterLabel>Lookup Flow CIBE</masterLabel>
+	<targets>
+		<target>lightning__FlowScreen</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__FlowScreen">
+			<property name="condition" type="String" label="condition" description="Condition Query, Ejemp Status='open'" role="inputOnly"/>
+			<property name="title" type="String" label="title" description="Titulo, Ejemp Name" role="inputOnly"/>
+			<property name="subtitle" type="String" label="subtitle" description="subtitle." role="inputOnly"/>
+			<property name="objectName" type="String" label="objectName" description="objectName." role="inputOnly"/>            
+			<property name="icon" type="String" label="icon" description="icon." role="inputOnly"/>
+			<property name="fieldlabel" type="String" label="fieldlabel" description="fieldlabel." role="inputOnly"/>
+			<property name="placeholder" type="String" label="placeholder" description="placeholder." role="inputOnly"/>
+			<property name="required" type="Boolean" label="required" description="required." role="inputOnly"/>
+
+			<property name="idResult" type="String" label="idResult" description="Id, resultado." role="outputOnly"/>
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CRM</fullName>
+    <columns>NAME</columns>
+    <columns>Class_Name__c</columns>
+    <columns>Status__c</columns>
+    <columns>NextExec__c</columns>
+    <columns>LastExec_Status__c</columns>
+    <columns>runningJobId__c</columns>
+    <columns>Tipo__c</columns>
+    <columns>Tipo_de_periodicidad__c</columns>
+    <columns>Periodicidad__c</columns>
+    <columns>BatchSize__c</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Proyecto__c</field>
+        <operation>contains</operation>
+        <value>Mis Clientes</value>
+    </filters>
+    <filters>
+        <field>NAME</field>
+        <operation>notContain</operation>
+        <value>Owners</value>
+    </filters>
+    <label>CRM - MC</label>
+</ListView>

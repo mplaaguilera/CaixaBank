@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo_Tipificacion</fullName>
+    <active>true</active>
+    <description>Bloqueo en la tipicición de Casos</description>
+    <errorConditionFormula>AND(TEXT(Origin) =&apos;Email - Revisar&apos;,
+				 ISCHANGED(CC_MCC_Tematica__c))</errorConditionFormula>
+    <errorMessage>No se permite tipificar este caso para este canal</errorMessage>
+</ValidationRule>

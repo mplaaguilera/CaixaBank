@@ -1,0 +1,46 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" controller="SAC_LCMP_InsertarReescalado">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="conclusion" type="String" />
+    <aura:attribute name="valorRespuesta" type="String"/>
+    <aura:attribute name="importe" type="Double"/>
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg', '.PDF']" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.cerrarAction}">            
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Responder</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <lightning:combobox label="Conclusión" required="true" options='{!v.options}'
+                onchange='{!c.valorConclusion}' value='{!v.conclusion}'>
+                </lightning:combobox>  
+                <br/>                             
+                <!-- <lightning:input name="importe" value='{!v.importe}' onchange='{!c.valorImporte}' aura:id="importe" type="number" label="Importe autorizado" required="true" formatter="currency" placeholder="0.00€"/> 
+                <br/> -->
+                <p>Respuesta</p>
+                <br/>
+                <lightning:inputRichText label="Respuesta" aura:id="textoRespuesta" value="{!v.valorRespuesta}" />
+                <br/>
+                <lightning:fileUpload label="Adjuntar archivos"
+                    name="fileUploader"
+                    multiple="true"
+                    accept="{!v.filetype}"
+                    recordId="{!v.recordId}"
+                    onuploadfinished="{!c.handleUploadFinished}" />
+            </div>
+            <footer class="slds-modal__footer">
+                <lightning:button variant="Neutral" class="slds-button" label="Cancelar" onclick="{!c.cerrarAction}"/>
+                <lightning:button variant="Brand" class="slds-button" label="Guardar" aura:id="buttonResponderId" onclick="{!c.guardarEscalado}"/>
+                <lightning:button variant="Brand" class="slds-button" label="Enviar" aura:id="buttonResponderId" onclick="{!c.responder}"/>
+            </footer>
+        </div>
+    </section>
+
+</aura:component>

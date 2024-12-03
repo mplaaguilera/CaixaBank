@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configuración de notificaciones a cliente para el seguimiento del caso</description>
+    <label>Configuración notificación cliente</label>
+    <pluralLabel>Configuración notificaciones a clientes</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

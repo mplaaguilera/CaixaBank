@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Response_03_EN</label>
+    <protected>false</protected>
+    <values>
+        <field>Idioma__c</field>
+        <value xsi:type="xsd:string">en</value>
+    </values>
+    <values>
+        <field>Respuesta__c</field>
+        <value xsi:type="xsd:string">Hello we thank you for scoring our app. We are working every day to improve the app and to add new functions.</value>
+    </values>
+</CustomMetadata>

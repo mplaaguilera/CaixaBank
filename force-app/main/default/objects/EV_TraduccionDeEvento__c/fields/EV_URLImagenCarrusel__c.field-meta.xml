@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenCarrusel__c</fullName>
+    <description>Carrusel Próximos eventos del Portal. Tamaño imagen (454x196)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Carrusel &quot;Próximos eventos&quot; del Portal (454x196px)</inlineHelpText>
+    <label>URL Imagen Próximos Eventos</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

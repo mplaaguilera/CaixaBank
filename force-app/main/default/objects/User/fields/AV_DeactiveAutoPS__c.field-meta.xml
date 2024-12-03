@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_DeactiveAutoPS__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Evita que el usuario se le actualice el Permission Set Group dependiendo de la función asignada, lo cual pasaría a ser manual en el caso de tener este check a true.</description>
+    <label>Desactivar Automatización PS</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

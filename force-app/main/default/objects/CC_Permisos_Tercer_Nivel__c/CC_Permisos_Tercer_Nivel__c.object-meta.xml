@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Custom permission para poder restringir los permisos al tercer nivel.</description>
+    <enableFeeds>false</enableFeeds>
+    <label>Permisos Tercer Nivel</label>
+    <visibility>Public</visibility>
+</CustomObject>

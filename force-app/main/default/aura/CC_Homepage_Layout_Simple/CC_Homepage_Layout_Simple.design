@@ -1,0 +1,6 @@
+<design:component label="1 columna">
+    <flexipage:template >
+        <flexipage:region name="main" defaultWidth="Xlarge">
+        </flexipage:region>
+    </flexipage:template>
+</design:component>

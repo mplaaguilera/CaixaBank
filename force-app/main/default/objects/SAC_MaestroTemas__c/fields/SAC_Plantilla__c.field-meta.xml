@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Plantilla__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para almacenar la plantilla que debe tener la marca</description>
+    <label>Plantilla</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 AND 2) OR (3 AND 4)</booleanFilter>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Fast track</value>
+        </filterItems>
+        <filterItems>
+            <field>SAC_PlantillaRedaccion__c.SAC_TipoPlantilla__c</field>
+            <operation>equals</operation>
+            <value>Fast track</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Envío automático carta</value>
+        </filterItems>
+        <filterItems>
+            <field>SAC_PlantillaRedaccion__c.SAC_TipoPlantilla__c</field>
+            <operation>equals</operation>
+            <value>Carta automática</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>SAC_PlantillaRedaccion__c</referenceTo>
+    <relationshipLabel>Maestro Temas</relationshipLabel>
+    <relationshipName>Maestro_Temas</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_mis_oportunidades_potenciales</fullName>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>AV_Origen__c</columns>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>AV_PF__c</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>OPPORTUNITY.CLOSE_DATE</columns>
+    <columns>AV_FechaProximoRecordatorio__c</columns>
+    <columns>AV_Potencial__c</columns>
+    <columns>AV_Tenencia__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.AV_AlertaComercial,Opportunity.AV_Iniciativa,Opportunity.AV_Propuesta,Opportunity.AV_Sugerencia</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.STAGE_NAME</field>
+        <operation>equals</operation>
+        <value>Potencial</value>
+    </filters>
+    <filters>
+        <field>OPPORTUNITY.CLOSE_DATE</field>
+        <operation>greaterThan</operation>
+        <value>TODAY</value>
+    </filters>
+    <label>3. Mis Oportunidades Potenciales (AVE)</label>
+    <sharedTo>
+        <role>AV_SistematicaComercial</role>
+    </sharedTo>
+</ListView>

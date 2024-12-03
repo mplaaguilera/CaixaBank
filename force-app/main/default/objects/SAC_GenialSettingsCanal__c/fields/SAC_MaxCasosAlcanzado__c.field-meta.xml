@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MaxCasosAlcanzado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si está a true la cantidad de casos tratados por la IA ha llegado al límite definido en Cantidad Casos Max</description>
+    <label>Max Casos Alcanzado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

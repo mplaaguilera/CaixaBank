@@ -1,0 +1,433 @@
+<aura:component controller="SEG_Case_EmailBuscador_Controller" implements="force:hasRecordId,force:hasSObjectName">
+
+    <!-- Atributos del componente -->
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="sBusqueda" type="String" default="" />
+    <aura:attribute name="bError" type="Boolean" default="false" />
+    <aura:attribute name="sMensErr" type="String" />
+    <aura:attribute name="bInfo" type="Boolean" default="false" />
+    <aura:attribute name="sMensInfo" type="String" />
+    <aura:attribute name="oContactos" type="List" />
+    <aura:attribute name="oColaboradores" type="List" />
+    <aura:attribute name="oColaborador" type="CC_Grupo_Colaborador_Contact__c" />
+    <aura:attribute name="oContacto" type="Contact" />
+    <aura:attribute name="oGrupos" type="List" />
+    <aura:attribute name="oGrupo" type="CC_Grupo_Colaborador__c" />
+    <aura:attribute name="oGestores" type="List" />
+    <aura:attribute name="oGestor" type="Contact" />
+    <aura:attribute name="oOtrosGestores" type="List" />
+    <aura:attribute name="oOtroGestor" type="Contact" />
+    <aura:attribute name="oCargo" type="String" default="" />
+    <aura:attribute name="contactNuevoData" type="Contact" />
+    <aura:attribute name="valueSearch" type="String" default="" />
+    <aura:attribute name="cuentaSel" type="String" default="" />
+    <aura:attribute name="searchResult" type="Map" />
+    <aura:attribute name="mostrarResultados" type="Boolean" default="false" />
+    <aura:attribute name="origenBusqueda" type="String" />
+    <aura:attribute name="deNuevo" type="boolean" />
+    <aura:attribute name="botonPulsado" type="String"/>
+    <aura:attribute name="contactPara" type="List" />
+    <aura:attribute name="contactCopia" type="List" />
+    <aura:attribute name="contactCCO" type="List" />
+    <aura:attribute name="dataPara" type="List" />
+    <aura:attribute name="boolRedactar" type="Boolean" />
+    <aura:attribute name="nuevoDestinatario" type="boolean" />
+    <aura:attribute name="boolPlantillas" type="boolean" />
+    <aura:attribute name="cerrarDestinatarios" type="boolean" />
+    <aura:attribute name="tipoDestinatarioPrincipal" type="String" default=""/>
+    <aura:attribute name="nombreGrupoColaboradorPrincipal" type="String" />
+    <aura:attribute name="numeroResultados" type="Integer" default="0"/>
+    <aura:attribute name="organizacionCaso" type="String"/>
+    <aura:attribute name="esSOE" type="Boolean" default="false"/>
+    <aura:attribute name="esOSN" type="Boolean" default="false"/>
+    <aura:attribute name="pulsadoRelacionados" type="Boolean" default="false"/>
+    <aura:attribute name="pulsadoSOE" type="Boolean" default="false"/>
+    <aura:attribute name="pulsadoOSN" type="Boolean" default="false"/>
+    <aura:attribute name="nombreContactoSOEOSN" type="String"/>
+    <aura:attribute name="emailContactoSOEOSN" type="String"/>
+
+    <!-- EVENTO PARA PASAR ID CONTACTO -->
+    <aura:registerEvent name="cargarEvento" type="c:SEG_senCntct_event"/>
+    <!-- EVENTO PARA PASAR LISTA NUEVO CONTACTO EN BUSCADOR -->
+    <aura:registerEvent name="cargarListaPara" type="c:SEG_Event_LstPara"/>
+    
+    
+    <!-- EVENTO PARA REGITRAR EL CONTACTO -->
+    <!--<aura:registerEvent name="controlarPlantillas" type="c:SEG_enviarDatosContacto"/>-->
+    <!--<aura:handler name="init" value="{!this}" action="{!c.buscarContactosBoton}" />-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <!--UI-->
+    <!--Card-->
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid" style="padding-bottom: 9px;">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                        <h2>
+                            <span class="slds-truncate slds-text-title_caps">Seleccionar destinatario principal</span>
+                        </h2>
+                    </aura:if>
+                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                        <h2>
+                            <span class="slds-truncate slds-text-title_caps">Añadir otros destinatarios</span>
+                        </h2>
+                    </aura:if>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner" style="position: relative; margin-bottom: 1px;">
+            <div class="slds-grid slds-gutters_xx-small slds-grid_vertical-align-end">
+                <div class="slds-col">
+                    <span onkeypress="{!c.lanzarBusqueda}">
+                        <lightning:input aura:id="valorBusqueda" type="search" name="valorBusqueda"
+                            value="{!v.sBusqueda}" onchange="{!c.cambioValorBusqueda}" spellcheck="false"
+                            placeholder="Buscar..." variant="label-hidden"/>
+                    </span>
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <lightning:buttonIcon iconName="utility:search" onclick="{!c.iniciarBusqueda}" disabled="{!v.sBusqueda == ''}"/>
+                </div>
+                <div class="slds-col slds-grow-none" align="right">
+                    <lightning:button aura:id="contactosB" label="Relacionados" iconName="utility:people" variant="{!v.pulsadoRelacionados ? 'brand' : 'neutral'}" onclick="{!c.buscarContactosBoton}"/>
+                </div>
+            </div>
+            <aura:if isTrue="{!v.organizacionCaso == 'Financiación Estructurada'}">
+                <!--style="display: flex;justify-content: flex-end;margin-top: 3px;"-->
+                <aura:if isTrue="{!v.esSOE}">
+                    <div class="slds-grid" style="display: flex;justify-content: flex-end;margin-top: 3px;position: relative;">
+                        <lightning:button aura:id="contactosSOE" class="botonFFEE" label="Contactos SOE" iconName="utility:people" variant="{!v.pulsadoSOE ? 'brand' : 'neutral'}" onclick="{!c.buscarContactosBoton}"/>
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.esOSN}">
+                    <div class="slds-grid" style="display: flex;justify-content: flex-end;margin-top: 3px;position: relative;">
+                        <lightning:button aura:id="contactosOSN" class="botonFFEE" label="Contactos OSN" iconName="utility:people" variant="{!v.pulsadoOSN ? 'brand' : 'neutral'}" onclick="{!c.buscarContactosBoton}"/>
+                    </div>
+                </aura:if>
+            </aura:if>
+            <aura:if isTrue="{!v.mostrarResultados}">
+                <div class="slds-text-color_weak" style="text-align: center; margin-top: 16px; font-size: 12px;"><b>{!v.numeroResultados}</b> resultados encontrados.</div>
+            </aura:if>
+        </div>
+
+        <!--Separador-->
+        <div style="height:0.1rem;" />
+
+        <!--Pie de la card (resultados)-->
+        <footer class="slds-card__footer" style="text-align: left;">
+            <aura:if isTrue="{!v.bInfo}">
+                <!--Sección de información-->
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                    <lightning:icon iconName="utility:info" size="x-small"/>
+                    &nbsp;&nbsp;{!v.sMensInfo}
+                </div>
+            </aura:if>
+
+            <aura:if isTrue="{!v.bError}">
+                <!--Sección de error-->
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                    <lightning:icon iconName="utility:warning" size="x-small" variant="warning" />
+                    &nbsp;&nbsp;{!v.sMensErr}
+                </div>
+            </aura:if>
+
+            <!-- Resultados -->
+            <aura:renderIf isTrue="{!v.mostrarResultados}">
+                <div class="slds-card__body slds-card__body_inner divScrollVertical slds-border_bottom">
+                    
+                    <!--Contactos de la SR-->
+                    <aura:if isTrue="{!and(v.oContactos != null,v.oContactos.length > 0)}">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-form-element">
+                                <div class="slds-text-title_caps slds-text-align_center" style="padding-bottom: 14px;">Empresas</div>
+                                <aura:iteration items="{!v.oContactos}" var="oContacto">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid" style="padding-bottom: 5px;">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container" title="Contacto">
+                                                        <lightning:icon iconName="action:add_contact" alternativeText="Contacto" size="x-small" />
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div>
+                                                        <aura:if isTrue="{!or(v.pulsadoSOE,v.pulsadoOSN)}">
+                                                            <h2 class="slds-card__header-link slds-truncate">{!!empty(oContacto.nombre) ? oContacto.nombre + ' ' + oContacto.apellido : oContacto.apellido}</h2>
+                                                        <aura:set attribute="else">
+                                                            <h2>
+                                                                <a href="javascript:void(0)"
+                                                                    class="slds-card__header-link slds-truncate"
+                                                                    name="{!oContacto.idContacto}"
+                                                                    aura:id="{!oContacto.idContacto}" title="Visualizar detalle"
+                                                                    onclick="{!c.navegarOrigen}">{!!empty(oContacto.nombre) ? oContacto.nombre + ' ' + oContacto.apellido : oContacto.apellido}</a>
+                                                            </h2>
+                                                        </aura:set>
+                                                        </aura:if>
+                                                    </div>
+                                                    <div>
+                                                        <p class="slds-form-element__label ">{!oContacto.email}</p>
+                                                        <br></br>
+                                                        <aura:if isTrue="{!oContacto.empresa != null}">
+                                                            <p class= "slds-form-element__label slds-truncate" title="{!oContacto.empresa}"><i>{!oContacto.empresa}</i></p>
+                                                            <br></br>
+                                                        </aura:if>
+                                                        <p class= "slds-form-element__label slds-truncate" title="{!oContacto.cargos}"><i>{!oContacto.cargos}</i></p>
+                                                        <aura:if isTrue="{!oContacto.entityType != null}">
+                                                            <p class= "slds-form-element__label slds-truncate" title="{!oContacto.entityType}"><i>{!oContacto.entityType}</i></p>
+                                                            <br></br>
+                                                        </aura:if>
+                                                        <aura:if isTrue="{!oContacto.entityName != null}">
+                                                            <p class= "slds-form-element__label slds-truncate" title="{!oContacto.entityName}"><i>{!oContacto.entityName}</i></p>
+                                                            <br></br>
+                                                        </aura:if>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                                                        <div style="padding-bottom: 7px;">
+                                                            <lightning:button aura:id="BotonPara" class="boton_estrecho" name="{!oContacto.email}" label="Para" onclick="{!c.seleccionarPara}" disabled="{!oContacto.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCc" class="boton_estrecho" name="{!oContacto.email}" label="CC" onclick="{!c.seleccionarCC}" disabled="{!oContacto.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCco" class="boton_estrecho" name="{!oContacto.email}" label="CCO" onclick="{!c.seleccionarCCO}" disabled="{!oContacto.email == 'Sin correo'}"/>
+                                                            <div style="height: 0.1rem;"/>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                                <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                                                    <aura:if isTrue="{!or(v.pulsadoSOE,v.pulsadoOSN)}">
+                                                        <div class="slds-no-flex" style="font-size: 12px; margin-right: 8px;" name="{!oContacto.email}" data-tipodestinatarioprincipal="Contacto" data-nombre="{!oContacto.nombre}" data-apellido="{!oContacto.apellido}" onclick="{!c.seleccionarPrincipalSOE_OSN}">
+                                                            <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                        </div>
+                                                        <aura:set attribute="else">
+                                                            <div class="slds-no-flex" style="font-size: 12px; margin-right: 8px;" name="{!oContacto.idContacto}" data-tipodestinatarioprincipal="Contacto" onclick="{!c.seleccionarPrincipal}">
+                                                                <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:if>
+                                            </header>
+                                        </div>
+                                    </article>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Colaboradores-->
+                    <aura:if isTrue="{!and(v.oColaboradores != null,v.oColaboradores.length > 0)}">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-form-element">
+                                <div class="slds-text-title_caps slds-text-align_center slds-border_top" style="padding-top: 14px; padding-bottom: 13px;">Colaboradores</div>
+                                <aura:iteration items="{!v.oColaboradores}" var="oColaborador">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container" title="Colaborador">
+                                                        <lightning:icon iconName="action:user" size="x-small" class="rojo" style="background-color: #f77e75;"/>
+                                                        <span class="slds-assistive-text">Colaboradores</span>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div>
+                                                        <h2>
+                                                            <a href="javascript:void(0)"
+                                                                class="slds-card__header-link slds-truncate"
+                                                                name="{!oColaborador.idContacto}"
+                                                                aura:id="{!oColaborador.idContacto}"
+                                                                title="Visualizar detalle"
+                                                                onclick="{!c.navegarOrigen}">{!!empty(oColaborador.nombre) ? oColaborador.nombre + ' ' + oColaborador.apellido : oColaborador.apellido}</a>
+                                                        </h2>
+                                                    </div>
+                                                    <div>
+                                                        <p class="slds-form-element__label">{!oColaborador.email}</p>
+                                                        <br/>
+                                                        <p class= "slds-form-element__label slds-truncate" title="{!oColaborador.grupo}"><i>{!oColaborador.grupo}</i></p>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                                                        <div style="padding-bottom: 7px;">
+                                                            <lightning:button aura:id="BotonPara" name="{!oColaborador.email}" label="Para" class="boton_estrecho" onclick="{!c.seleccionarPara}"/>
+                                                            <lightning:button aura:id="BotonCc" name="{!oColaborador.email}" label="CC" class="boton_estrecho" onclick="{!c.seleccionarCC}" disabled="{!oColaborador.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCco" name="{!oColaborador.email}" label="CCO" class="boton_estrecho" onclick="{!c.seleccionarCCO}" disabled="{!oColaborador.email == 'Sin correo'}"/>
+                                                            <div style="height: 0.1rem;"/>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                                <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                                                    <div class="slds-no-flex" style="font-size:12px; margin-right: 8px;" name="{!oColaborador.idContacto}" data-tipodestinatarioprincipal="Colaborador" onclick="{!c.seleccionarPrincipal}">
+                                                        <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                    </div>
+                                                </aura:if>
+                                            </header>
+                                        </div>
+                                    </article>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Grupo colaborador-->
+                    <aura:if isTrue="{!and(v.oGrupos != null, v.oGrupos.length > 0)}">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-form-element">
+                                <div class="slds-text-title_caps slds-text-align_center slds-border_top" style="padding-top: 14px; padding-bottom: 13px;">Grupos colaboradores</div>
+                                <aura:iteration items="{!v.oGrupos}" var="oGrupo">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container" title="Grupo colaborador">
+                                                        <lightning:icon iconName="action:new_group" size="x-small" class="rojo" style="background-color: #f77e75;"/> <span class="slds-assistive-text">Grupos colaboradores</span>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div>
+                                                        <h2>
+                                                            <a href="javascript:void(0)"
+                                                                class="slds-card__header-link slds-truncate"
+                                                                name="{!oGrupo.idGrupo}" aura:id="{!oGrupo.idGrupo}"
+                                                                title="Visualizar detalle"
+                                                                onclick="{!c.navegarOrigen}">{!oGrupo.nombre}</a>
+                                                        </h2>
+                                                    </div>
+                                                    <div>
+                                                        <p class="slds-form-element__label">{!oGrupo.tipo}</p>
+                                                        <div style="height: 9px;"/>
+                                                    </div>
+                                                    
+                                                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                                                        <div style="padding-bottom: 7px;">
+                                                            <lightning:button name="{!oGrupo.idGrupo}" label="Añadir colaboradores" class="boton_estrecho" onclick="{!c.seleccionarGrupo}" />
+                                                            <div style="height: 0.1rem;"/>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                                <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                                                    <div class="slds-no-flex" style="font-size: 12px; margin-right: 8px;" name="{!oGrupo.idGrupo}" data-tipodestinatarioprincipal="Grupo colaborador" data-nombregrupocolabprincipal="{!oGrupo.nombre}" onclick="{!c.seleccionarPrincipal}">
+                                                        <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                    </div>
+                                                </aura:if>
+                                            </header>
+                                        </div>
+                                    </article>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Gestores de la SR-->
+                    <aura:if isTrue="{!and(v.oGestores != null,v.oGestores.length > 0)}">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-form-element">
+                                <div class="slds-text-title_caps slds-text-align_center slds-border_top" style="padding-top: 14px; padding-bottom: 13px;">Gestores de la empresa</div>
+                                <aura:iteration items="{!v.oGestores}" var="oGestor">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container"
+                                                        title="Contacto">
+                                                        <lightning:icon iconName="action:add_contact" alternativeText="Contacto" size="x-small" />
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div>
+                                                        <h2>
+                                                            <a href="javascript:void(0)"
+                                                                class="slds-card__header-link slds-truncate"
+                                                                name="{!oGestor.idContacto}" aura:id="{!oGestor.idContacto}"
+                                                                title="Visualizar detalle"
+                                                                onclick="{!c.navegarOrigen}">{!!empty(oGestor.nombre) ? oGestor.nombre + ' ' + oGestor.apellido : oGestor.apellido}</a>
+                                                        </h2>
+                                                    </div>
+                                                    <div>
+                                                        <p class="slds-form-element__label">{!oGestor.email}</p>
+                                                        <br></br>
+                                                        <p class= "slds-form-element__label slds-truncate "><i>{!oGestor.tipoGestor}</i></p>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                                                        <div style="padding-bottom: 7px;">
+                                                            <lightning:button aura:id="BotonPara" name="{!oGestor.email}" label="Para" onclick="{!c.seleccionarPara}"  class="boton_estrecho" disabled="{!oGestor.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCc" name="{!oGestor.email}" label="CC" onclick="{!c.seleccionarCC}"  class="boton_estrecho" disabled="{!oGestor.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCco" name="{!oGestor.email}" label="CCO" onclick="{!c.seleccionarCCO}"  class="boton_estrecho" disabled="{!oGestor.email == 'Sin correo'}"/>
+                                                            <div style="height: 0.1rem;"/>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                                <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                                                    <div class="slds-no-flex" style="font-size: 12px; margin-right: 8px;" name="{!oGestor.idContacto}" data-tipodestinatarioprincipal="Contacto" onclick="{!c.seleccionarPrincipal}">
+                                                        <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                    </div>
+                                                </aura:if>
+                                            </header>
+                                        </div>
+                                    </article>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Otros Gestores de la SR-->
+                    <aura:if isTrue="{!and(v.oOtrosGestores != null,v.oOtrosGestores.length > 0)}">
+                        <div class="slds-card__body slds-card__body_inner">
+                            <div class="slds-form-element">
+                                <div class="slds-text-title_caps slds-text-align_center slds-border_top" style="padding-top: 14px; padding-bottom: 13px;">Otros gestores</div>
+                                <aura:iteration items="{!v.oOtrosGestores}" var="oOtroGestor">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container" title="Contacto">
+                                                        <lightning:icon iconName="action:add_contact" alternativeText="Contacto" size="x-small" />
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <div>
+                                                        <h2>
+                                                            <a href="javascript:void(0)"
+                                                                class="slds-card__header-link slds-truncate"
+                                                                name="{!oOtroGestor.idContacto}"
+                                                                aura:id="{!oOtroGestor.idContacto}"
+                                                                title="Visualizar detalle"
+                                                                onclick="{!c.navegarOrigen}">{!!empty(oOtroGestor.nombre) ? oOtroGestor.nombre + ' ' + oOtroGestor.apellido : oOtroGestor.apellido}</a>
+                                                        </h2>
+                                                    </div>
+                                                    <div>
+                                                        <p class="slds-form-element__label">
+                                                            {!oOtroGestor.email} - <i>{!oOtroGestor.centro}</i></p>
+                                                    </div>
+                                                    <aura:if isTrue="{!v.origenBusqueda == 'destinatarios'}">
+                                                        <div style="padding-bottom: 7px;">
+                                                            <lightning:button aura:id="BotonPara" name="{!oOtroGestor.email}" label="Para" class="boton_estrecho" onclick="{!c.seleccionarPara}" disabled="{!oOtroGestor.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCc" name="{!oOtroGestor.email}" label="CC" class="boton_estrecho" onclick="{!c.seleccionarCC}" disabled="{!oOtroGestor.email == 'Sin correo'}"/>
+                                                            <lightning:button aura:id="BotonCco" name="{!oOtroGestor.email}" label="CCO" class="boton_estrecho" onclick="{!c.seleccionarCCO}" disabled="{!oOtroGestor.email == 'Sin correo'}"/>
+                                                            <div style="height: 0.1rem;"/>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                                <aura:if isTrue="{!v.origenBusqueda == 'principal'}">
+                                                    <div class="slds-no-flex" style="font-size: 12px; margin-right: 8px;" name="{!oOtroGestor.idContacto}" data-tipodestinatarioprincipal="Contacto" onclick="{!c.seleccionarPrincipal}">
+                                                        <lightning:buttonIcon iconName="utility:adduser" variant="border-filled"/>
+                                                    </div>
+                                                </aura:if>
+                                            </header>
+                                        </div>
+                                    </article>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+                </div>
+
+                <!-- <div>
+                    <div align="right" style="padding-top: 6px; padding-right: 5px; padding-bottom: 10px;">
+                        <lightning:buttonIcon iconName="utility:back" onclick="{!c.beforePage}" disabled="{!v.pagina == 1}" />
+                        <span class="slds-text-color_weak" style="padding-left: 12px; padding-right: 12px;">{!v.pagina + '/' + v.totalPaginas}</span>
+                        <lightning:buttonIcon iconName="utility:forward" onclick="{!c.nextPage}" disabled="{!v.pagina == v.totalPaginas}" />
+                    </div>
+                </div> -->
+            </aura:renderIf>
+        </footer>
+    </article>
+</aura:component>

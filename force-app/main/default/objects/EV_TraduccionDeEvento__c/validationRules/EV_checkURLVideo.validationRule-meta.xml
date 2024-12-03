@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_checkURLVideo</fullName>
+    <active>false</active>
+    <description>Comprove if it have url and image video</description>
+    <errorConditionFormula>AND(
+NOT(ISBLANK(EV_Evento__r.EV_URLImagenVideo__c)),
+EV_URLVideoTeaser__c = null,
+$Profile.Name = &quot;EV_Eventos&quot;
+)</errorConditionFormula>
+    <errorMessage>No es posible informar este campo no tiene una URL</errorMessage>
+</ValidationRule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Aplicaciones</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Origen__c</columns>
+    <columns>CC_Version__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_FAQ__c.CC_Aplicaciones</value>
+    </filters>
+    <label>Aplicaciones</label>
+</ListView>

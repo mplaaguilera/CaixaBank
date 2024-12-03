@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NotEditCM</fullName>
+    <active>true</active>
+    <description>No pueden editar un CM si tienen el custom permission set EV_NotEditCM</description>
+    <errorConditionFormula>AND($Permission.EV_NotEditCM, OR(ISCHANGED(EV_Origen__c), ISCHANGED(EV_Empresa__c),
+ISCHANGED(EV_Canal__c), ISCHANGED(EV_Numperso__c), ISCHANGED(EV_QRLog__c), ISCHANGED(EV_URLPDFQR__c),
+ISCHANGED(EV_FormatoDeAsistencias__c), ISCHANGED(EV_Nickname__c), ISCHANGED(EV_EmailDeCampana__c),
+ISCHANGED(EV_TelefonoDeCampana__c), ISCHANGED(EV_Status__c), ISCHANGED(EV_InvitacionEncuesta__c), ISCHANGED(EV_CanalOrigen__c),
+ISCHANGED(EV_MiembroPrueba__c), ISCHANGED(EV_URLQRPKPASS__c)))</errorConditionFormula>
+    <errorMessage>Error. No puede editar un miembro de campaña.</errorMessage>
+</ValidationRule>

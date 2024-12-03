@@ -1,0 +1,173 @@
+<!-- sldsValidatorIgnore -->
+<template>
+	<div class="formulario slds-hide">
+        <!--Card Clasificar-->
+        <article class="slds-card" style="padding-left: 4px; padding-right: 2px;">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid" style="padding-top: 10px; margin-bottom: 0.85rem;">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate slds-var-m-left_small" style="position: relative; left: 1px;">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container">
+                            <lightning-icon icon-name="custom:custom62" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 13px; font-weight: 600; letter-spacing: 0.4px;">Clasificación</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div role="listitem">
+                <div class="slds-form-element slds-is-editing slds-var-m-left_small slds-var-m-right_medium">
+                    <div class="slds-grid slds-gutters_direct-small">
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-combobox data-id="tematica" label="Temática" placeholder="--Selecciona una temática--" options={optionsTematica} onfocus={tematicaFocus} onchange={tematicaSeleccionada}></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-combobox data-id="producto" label="Producto/Servicio" placeholder="--Seleccione un producto--" options={optionsProducto} onfocus={productoFocus} onchange={productoSeleccionado}></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-combobox data-id="motivo" label="Motivo" placeholder="--Seleccione un motivo--" options={optionsMotivo} onfocus={motivoFocus} onchange={motivoSeleccionado}></lightning-combobox>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-small">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox data-id="causa" label="Causa" placeholder="--Seleccione una causa--" options={optionsCausa} onfocus={causaFocus} onchange={causaSeleccionada}></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox data-id="solucion" label="Solución" placeholder="--Seleccione una solución--" options={optionsSolucion} onfocus={solucionFocus}></lightning-combobox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+        <!--Card Datos de Gestión-->
+        <article class="slds-card" style="padding-left: 4px; padding-right: 2px;">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid" style="margin-top: 1.2rem; margin-bottom: 0.75rem;">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate slds-var-m-left_small" style="position: relative; left: 1px;">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container">
+                            <lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 13px; font-weight: 600; letter-spacing: 0.4px;">Datos de gesión</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div role="listitem" style="padding-top: 5px;">
+                <div class="slds-form-element slds-is-editing slds-var-m-left_small slds-var-m-right_medium">
+                    <lightning-record-edit-form data-id="recordEditForm" record-id={recordId} object-api-name="Case" onload={recordEditFormOnLoad} onsuccess={recordEditFormOnSuccess} onerror={recordEditFormOnError}>
+                        <div class="slds-grid slds-wrap slds-gutters_direct-small">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field field-name="Origin" required disabled></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="CC_Canal_Procedencia__c" field-name="CC_Canal_Procedencia__c" required disabled></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="SACH_Interviniente__c" field-name="SACH_Interviniente__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="CC_Tipo_Contacto__c" field-name="CC_Tipo_Contacto__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field field-name="SACH_Situacion_Procesal__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field field-name="OS_Telefono__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2" style="padding-top: 22px;">
+                                <lightning-input-field data-id="detallesConsulta" field-name="CC_Detalles_Consulta__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2" style="padding-top: 22px;">
+                                <lightning-input-field field-name="CC_Detalles_Solucion__c" disabled={deshabilitar}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2" style="padding-top: 15px;">
+                                <div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+                                    <label class="slds-form-element__label" for="cambiarPendienteColaborador" style="max-width: none;">
+                                        Cambiar estado a &quot;Pendiente colaborador&quot;
+                                    </label>
+                                    <lightning-helptext content="Al guardar el caso con esta casilla marcada, se cambiará su estado a &quot;Pendiente colaborador&quot; y se reabrirá la última actividad de tipo &quot;Traslado a colaborador&quot; cerrada." style="display: contents; padding-top: none; float:none;"></lightning-helptext>
+                                    <lightning-input class="slds-form-element__control" style="padding-top: 2px; padding-left: 17.5rem;" type="checkbox" data-id="inputCambiarPendienteColab" value={cambiarEstadoPendienteColabChecked} onchange={cambiarEstadoPendienteColabOnChange} disabled={deshabilitar}></lightning-input>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2" align="right" style="padding-top: 11px;">
+                                <!--Botones-->
+                                <div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+                                    <template if:true={casoAbierto}>
+                                        <lightning-button data-id="guardar" label="Guardar" disabled={deshabilitar} onclick={recordEditFormSubmit}></lightning-button>
+                                        <lightning-button-group class="slds-var-m-left_medium">
+                                            <lightning-button data-id="guardarCerrar" variant="brand" label="Guardar y cerrar" onclick={recordEditFormSubmit} disabled={deshabilitarCerrar}></lightning-button>
+                                            <lightning-button-menu class="slds-button_last" menu-alignment="right" onselect={modalRechazarAbrir}>
+                                                <lightning-menu-item label="Guardar y rechazar" value="rechazar" disabled={deshabilitarRechazar}></lightning-menu-item>
+                                            </lightning-button-menu>
+                                        </lightning-button-group>
+                                    </template>
+                                    <template if:false={casoAbierto}>
+                                        <lightning-button label="Reactivar" variant="brand" onclick={modalReactivarAbrir} disabled={guardando}></lightning-button>
+                                    </template>
+                                </div>
+                            </div>
+                            <!--Campos ocultos-->
+                            <lightning-input-field data-id="inputEstado" field-name="Status" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputTematica" field-name="CC_MCC_Tematica__c" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputProducto" field-name="CC_MCC_ProdServ__c" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputMotivo" field-name="CC_MCC_Motivo__c" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputCausa" field-name="CC_MCC_Causa__c" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputSolucion" field-name="CC_MCC_Solucion__c" class="slds-hide"></lightning-input-field>
+                            <lightning-input-field data-id="inputOwnerId" field-name="OwnerId" class="slds-hide"></lightning-input-field>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </article>
+
+        <!--Modales-->
+
+        <!--Modal para Rechazar-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalRechazar" onkeydown={modalTeclaPulsada}>
+            <div class="slds-modal__container">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={closeModals} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-hyphenate">Rechazar caso</h1>
+                    <p class="slds-var-m-top_x-small">Para continuar la gestión de un caso rechazado deberá reactivarlo previamente.</p>
+                </div>
+                <div class="slds-modal__content slds-var-p-vertical_medium slds-var-p-horizontal_xx-large">
+                    <lightning-textarea label="Motivo del rechazo" data-id="inputEnviarMotivoRechazar" placeholder="Indique el motivo" required maxlength="400"></lightning-textarea>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-button data-id="guardarRechazar" label="Rechazar" variant="brand" onclick={recordEditFormSubmit} disabled={guardando}></lightning-button>
+                    <lightning-button class="modalRechazarCancelar slds-float_right slds-var-m-left_medium" label="Cancelar" onclick={closeModals} disabled={guardando}></lightning-button>
+                </div>
+            </div>
+        </section>
+
+        <!--Modal para Reactivar-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalReactivar" onkeydown={modalTeclaPulsada}>
+            <div class="slds-modal__container">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={closeModals} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-hyphenate">Reactivar caso</h1>
+                    <p class="slds-var-m-top_x-small">El caso pasará a estado "Activo" para que sea posible continuar su gestión.</p>
+                </div>
+                <div class="slds-modal__content slds-var-p-vertical_medium slds-var-p-horizontal_xx-large">
+                    <lightning-textarea label="Motivo de la reactivación" data-id="inputEnviarMotivoReactivar" placeholder="Indique el motivo" required maxlength="400"></lightning-textarea>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning-button label="Reactivar" variant="brand" onclick={reactivar} disabled={guardando}></lightning-button>
+                    <lightning-button class="modalReactivarCancelar slds-float_right slds-var-m-left_medium" label="Cancelar" onclick={closeModals} disabled={guardando}></lightning-button>
+                </div>
+            </div>
+        </section>
+
+        <!--Backdrop para los modales-->
+        <div class="backdropModales slds-backdrop"></div>
+    </div>
+</template>

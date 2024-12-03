@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Ultimos_5_dias_mes__c</fullName>
+    <formula>IF( AND(OR(AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26,MONTH(DATEVALUE(CreatedDate)) = 1),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 24,MONTH(DATEVALUE(CreatedDate)) = 2, YEAR(DATEVALUE(CreatedDate))/4 = 0),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 23,MONTH(DATEVALUE(CreatedDate)) = 2, YEAR(DATEVALUE(CreatedDate))/4 &lt;&gt; 0),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26,MONTH(DATEVALUE(CreatedDate)) = 3),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 25,MONTH(DATEVALUE(CreatedDate)) = 4),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26,MONTH(DATEVALUE(CreatedDate)) = 5),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 25,MONTH(DATEVALUE(CreatedDate)) = 6),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26,MONTH(DATEVALUE(CreatedDate)) = 7),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26,MONTH(DATEVALUE(CreatedDate)) = 8),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 25, MONTH(DATEVALUE(CreatedDate)) = 9),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26, MONTH(DATEVALUE(CreatedDate)) = 10),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 25, MONTH(DATEVALUE(CreatedDate)) = 11),
+AND(DAY(DATEVALUE(CreatedDate)) &gt;= 26, MONTH(DATEVALUE(CreatedDate)) = 12))
+), true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Ultimos 5 dias mes</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Categoria__c</fullName>
+    <inlineHelpText>En el portal de CaixaBank Talks, estas categorias se mostraran en el orden en que se seleccionen</inlineHelpText>
+    <label>Categoría por temática</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Cultura y sociedad</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Desarrolla tu potencial</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <label>Emprendimiento</label>
+            </value>
+            <value>
+                <fullName>015</fullName>
+                <default>false</default>
+                <label>Encuentros corporativos</label>
+            </value>
+            <value>
+                <fullName>014</fullName>
+                <default>false</default>
+                <label>Eventos culturales</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Gestión de las finanzas</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <label>Gestión de las inversiones</label>
+            </value>
+            <value>
+                <fullName>Gestión empresarial</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestión empresarial</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>Impacto social</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <label>Innovación</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <label>Mundo empresarial</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <label>Protección y seguridad</label>
+            </value>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <label>Salud y bienestar</label>
+            </value>
+            <value>
+                <fullName>012</fullName>
+                <default>false</default>
+                <label>Sostenibilidad</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <label>Tecnología y mundo digital</label>
+            </value>
+            <value>
+                <fullName>013</fullName>
+                <default>false</default>
+                <label>Webinar Aula</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

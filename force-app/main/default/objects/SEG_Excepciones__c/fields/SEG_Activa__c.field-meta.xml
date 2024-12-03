@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Activa__c</fullName>
+    <formula>IF( 
+				( NOT(ISBLANK(SEG_FechaDesactivacion__c)) &amp;&amp; NOW() &gt;= SEG_FechaActivacion__c &amp;&amp; NOW() &lt; SEG_FechaDesactivacion__c ) || 
+				( ISBLANK(SEG_FechaDesactivacion__c) &amp;&amp; NOW() &gt;= SEG_FechaActivacion__c ), 
+				true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Activa</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

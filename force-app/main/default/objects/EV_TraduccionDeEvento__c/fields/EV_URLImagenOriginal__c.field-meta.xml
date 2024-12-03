@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenOriginal__c</fullName>
+    <description>Slider evento principal del Portal. Tamaño imagen (1920x578)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Slider evento principal del Portal (1117x336px)</inlineHelpText>
+    <label>URL Imagen Destacado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

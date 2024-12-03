@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>SEG_Situacion_Contrato__c</columns>
+    <columns>NAME</columns>
+    <columns>SEG_Estado__c</columns>
+    <columns>SEG_Descripcion__c</columns>
+    <columns>SEG_CIF__c</columns>
+    <columns>SEG_NombreCuenta__c</columns>
+    <columns>SEG_NombreCliente__c</columns>
+    <columns>SEG_Numerodecentro__c</columns>
+    <columns>SEG_Fecha_Recepcion_Original__c</columns>
+    <columns>SEG_SROriginal__c</columns>
+    <columns>SEG_SR_Seguimiento__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <label>All</label>
+</ListView>

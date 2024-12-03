@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Productos_Now</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activa__c</columns>
+    <columns>CC_Valor__c</columns>
+    <columns>CC_Valor2__c</columns>
+    <columns>CSBD_Valor4__c</columns>
+    <columns>CC_Valor_SFDC__c</columns>
+    <columns>CREATEDBY_USER.ALIAS</columns>
+    <columns>UPDATEDBY_USER.ALIAS</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>CC_Lista__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Lista__c</field>
+        <operation>contains</operation>
+        <value>CSBD</value>
+    </filters>
+    <filters>
+        <field>CC_Lista__c</field>
+        <operation>contains</operation>
+        <value>Empresa</value>
+    </filters>
+    <filters>
+        <field>CC_Lista__c</field>
+        <operation>contains</operation>
+        <value>Familia</value>
+    </filters>
+    <filters>
+        <field>CC_Lista__c</field>
+        <operation>contains</operation>
+        <value>Producto</value>
+    </filters>
+    <label>CSBD - Productos Now</label>
+    <sharedTo>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

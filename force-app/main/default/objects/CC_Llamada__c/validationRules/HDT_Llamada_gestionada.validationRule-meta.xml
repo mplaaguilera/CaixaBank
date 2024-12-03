@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Llamada_gestionada</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				AND(
+								!$Permission.CBK_BypassValidationRules,
+				    !$Permission.HDT_BypassValidationRules),
+     ISCHANGED(HDT_Desborde_Gestionado__c),		
+     OR(
+       RecordType.DeveloperName &lt;&gt; &apos;HDT_Empleado&apos;,
+       HDT_Desborde__c &lt;&gt; true
+     )
+)</errorConditionFormula>
+    <errorMessage>Esta acción sólo se puede realizar en llamadas de desborde no gestionadas</errorMessage>
+</ValidationRule>

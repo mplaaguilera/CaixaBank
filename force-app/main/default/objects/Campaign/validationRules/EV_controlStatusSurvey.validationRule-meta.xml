@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_controlStatusSurvey</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISCHANGED(Status),
+OR($Profile.Name = &quot;EV_Eventos&quot;,
+ $Profile.Name = &quot;EV_EventosAccionistas&quot;),
+ISPICKVAL(Status, &quot;009&quot;),
+ISBLANK(EV_Encuesta__c)
+)</errorConditionFormula>
+    <errorMessage>No es posible el cambio de estado sin una encuesta asociada.</errorMessage>
+</ValidationRule>

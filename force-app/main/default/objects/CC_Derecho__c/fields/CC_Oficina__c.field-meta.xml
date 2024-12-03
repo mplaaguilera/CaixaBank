@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Oficina__c</fullName>
+    <description>Oficina desde la que se solicita el derecho.</description>
+    <label>Oficina</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ATENCIÓN AL CLIENTE</fullName>
+                <default>true</default>
+                <label>ATENCIÓN AL CLIENTE</label>
+            </value>
+            <value>
+                <fullName>CENTRO DE SOPORTE A BANCA DIGITAL</fullName>
+                <default>false</default>
+                <label>CENTRO DE SOPORTE A BANCA DIGITAL</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK DIGITAL BUSINESS</fullName>
+                <default>false</default>
+                <label>CAIXABANK DIGITAL BUSINESS</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK BUSINESS INTELLIGENCE</fullName>
+                <default>false</default>
+                <label>CAIXABANK BUSINESS INTELLIGENCE</label>
+            </value>
+            <value>
+                <fullName>SERVICIO DE ATENCIÓN AL CLIENTE HIPOTECARIO</fullName>
+                <default>false</default>
+                <label>SERVICIO DE ATENCIÓN AL CLIENTE HIPOTECARIO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

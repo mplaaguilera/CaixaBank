@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Accionistas</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>Flag__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>CC_Ultima_Interaccion__c</columns>
+    <columns>CASES.STATUS</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
+    <label>Cola Formulario Accionistas</label>
+    <queue>CC_Inbound_Email_Accionistas</queue>
+    <sharedTo>
+        <group>PublicGroup_Inbound_Email_Accionistas</group>
+    </sharedTo>
+</ListView>

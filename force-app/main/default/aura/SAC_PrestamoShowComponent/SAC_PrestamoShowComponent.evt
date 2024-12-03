@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Event template">
+    <aura:attribute name="showComponent" type="Boolean"/>
+    <aura:attribute name="showButton" type="Boolean"/>
+</aura:event>

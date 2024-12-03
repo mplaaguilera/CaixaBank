@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_NumPerso__c</fullName>
+    <description>Campo que se rellenará cuando se detecte en SAC_GenialQueueable que es confidencial, para rellenarlo en caso de que se tenga que crear el dommy confidencial</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <label>NumPerso</label>
+    <length>15</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

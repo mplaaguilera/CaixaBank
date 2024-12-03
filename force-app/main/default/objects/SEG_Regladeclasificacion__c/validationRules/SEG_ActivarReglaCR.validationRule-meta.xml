@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ActivarReglaCR</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( SEG_CRInactiva__c = true, SEG_Inactiva__c = false)</errorConditionFormula>
+    <errorDisplayField>SEG_Inactiva__c</errorDisplayField>
+    <errorMessage>No se puede activar una regla que tiene una CR inactiva asociada.</errorMessage>
+</ValidationRule>

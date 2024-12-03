@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_CheckMaskRecord__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador que determina si se valida el campo indicador de enmascaramiento o se enmascaran todos los registros.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Validar Enmascaramiento Registros</label>
+    <type>Checkbox</type>
+</CustomField>

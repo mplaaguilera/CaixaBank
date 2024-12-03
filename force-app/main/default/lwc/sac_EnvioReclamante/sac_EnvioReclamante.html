@@ -1,0 +1,87 @@
+<!--
+    INI - INS: 02/06/2021 -> Carlos Solis Caño -> :US204755
+  Envio Reclamante:
+
+  DESC: Lightning web component que contiene la funcionalidad de efectuar el envío al reclamante
+  
+  OBJ:	Comprueba si existen acciones antes de abrir un pop up y efectuar el envio. cambia el estado de la reclamacion y las pretensiones
+  -->
+<template>
+
+    <div class="slds-clearfix">
+        <div class="slds-float_right">
+            <lightning-button style="padding-left:8px" variant="brand" label="Envío reclamante" onclick={comprobarAccionesReclamacion}>
+            </lightning-button>
+        </div>
+    </div>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+
+    <!--Pop Up para cuando la reclamación NO tiene ninguna acción-->
+    <template if:true={isModalNoAccionesOpen}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalNoAcciones}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Envío reclamante</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Está a punto de finalizar la reclamación y se va a proceder al envío de la resolución al reclamante.</p>
+                    <p><b>Hemos detectado que no existe ninguna tarea de ejecución asociada, ¿Desea continuar?</b></p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalNoAcciones} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetailsModalNoAcciones} title="OK">OK</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Pop Up para cuando la reclamación SI tiene ninguna acción  (Se eliminará en un futuro)-->
+    <template if:true={isModalSiAccionesOpen}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalSiAcciones}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Envío reclamante</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <p>Está a punto de pasar a estado ejecución la reclamación y cerrar sus pretensiones.</p>
+                    <p>Se va a proceder al envío de la resolución al reclamante, ¿Desea continuar?</p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalSiAcciones} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetailsModalSiAcciones} title="OK">OK</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+</template>

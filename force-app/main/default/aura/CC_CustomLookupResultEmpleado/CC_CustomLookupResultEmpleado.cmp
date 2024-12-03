@@ -1,0 +1,18 @@
+<aura:component >
+
+	<aura:attribute name="empleado" type="Contact" />
+	<aura:attribute name="para" type="String" />
+    <aura:registerEvent name="oSelectedEmpleadoEvent" type="c:CC_SelectedEmpleadoEvent"/>
+
+    <li role="presentation">
+        <span class="slds-lookup__item-action slds-media slds-media_center" id="lookup-option-350" role="option">
+			<div class="slds-media__body">
+				<div class="slds-input-has-icon slds-input-has-icon_right">
+					<div class="slds-lookup__result-text">
+						<a onclick="{!c.seleccionarResultado}">{!v.empleado.Name}</a>
+					</div>
+				</div>
+			</div>
+        </span>
+    </li>
+</aura:component>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Tipo_de_puesto__c</fullName>
+    <label>Tipo de puesto</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Atril Bienvenida</fullName>
+                <default>false</default>
+                <label>Atril Bienvenida</label>
+            </value>
+            <value>
+                <fullName>Puesto de Caja</fullName>
+                <default>false</default>
+                <label>Puesto de Caja</label>
+            </value>
+            <value>
+                <fullName>Puesto Atención Personalizada</fullName>
+                <default>false</default>
+                <label>Puesto Atención Personalizada</label>
+            </value>
+            <value>
+                <fullName>Puesto Atención Especializada</fullName>
+                <default>false</default>
+                <label>Puesto Atención Especializada</label>
+            </value>
+            <value>
+                <fullName>Team Room</fullName>
+                <default>false</default>
+                <label>Team Room</label>
+            </value>
+            <value>
+                <fullName>Despacho Dirección</fullName>
+                <default>false</default>
+                <label>Despacho Dirección</label>
+            </value>
+            <value>
+                <fullName>Mueble Accesorios</fullName>
+                <default>false</default>
+                <label>Mueble Accesorios</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,157 @@
+<aura:component controller="CC_MCC_Plantilla_Asignar" implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+    
+    <!-- TIPO DE PLANTILLA -->
+    <aura:attribute name="optionsItemPlantilla" type="List" />
+    <aura:attribute name="tipoplantilla" type="String" default="SALESFORCE"/>
+    <aura:handler name="init" value="{!this}" action="{!c.loadItemPlantillaOptions}" />
+    
+    <!-- FORMATO DE LA PLANTILLA -->
+    <aura:attribute name="sdocs" type="String"/>
+    <aura:attribute name="optionsItemPlantillaFormato" type="List" />
+    <aura:attribute name="tipoplantillaFormato" type="String" default="PDF"/>
+    <aura:handler name="init" value="{!this}" action="{!c.loadItemPlantillaOptionsFormato}" />
+    
+    <!-- LENGUAJE DE LA PLANTILLA -->
+    <aura:attribute name="optionsItemPlantillaLenguaje" type="List" />
+    <aura:attribute name="tipoplantillaLenguaje" type="String" default="Castellano"/>
+    <aura:handler name="init" value="{!this}" action="{!c.loadItemPlantillaOptionsLenguaje}" />
+
+    <!-- Buscar nombre plantilla -->
+    <aura:attribute name="opcionesNombrePlantilla" type="List" />
+    <aura:attribute name="nombrePlantilla" type="String"/>
+    <aura:attribute name="nombrePlantillaElegido" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{! this }" action="{! c.buscarPlantillaSDOC }"/>
+
+    <!---->
+
+    <aura:attribute name="recordId" type="Id" />    
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
+    <aura:attribute name="mccPlantilla" type="CC_MCC_Plantilla__c" default="{'sobjectType':'CC_MCC_Plantilla__c'}"/>
+    <aura:attribute name="plantillaSeleccionada" type="Boolean" default="false"/>
+
+    <aura:attribute name="opcionesOperativaFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaOperativaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaOperativa" type="String"/>
+
+    <aura:attribute name="opcionesIdiomaFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaIdiomaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaIdioma" type="String"/>
+
+    <aura:attribute name="opcionesTratamientoFolder" type="List" default="[]"/>
+    
+    <aura:attribute name="procesoFinalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaFinal" type="String"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.iniciar }"/>
+
+    
+
+    <lightning:card>
+        <aura:set attribute="title">
+            <lightning:icon iconName="action:description" size="normal"/>
+            &nbsp;&nbsp;
+            Asignar una plantilla
+        </aura:set>
+        <br/>
+
+        <!-- Elegir tipo de plantilla -->
+        <lightning:select name="selectItemPlantilla" label="Selecciona el tipo de plantilla" value="{!v.tipoplantilla}">
+                <aura:iteration items="{!v.optionsItemPlantilla}" var="item">
+                    <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
+                </aura:iteration>
+        </lightning:select>
+        <br/>
+
+        <!-- //Elegir formato de la plantilla de S-Docs -->
+        <aura:if isTrue="{!v.tipoplantilla == 'SDOCS'}">
+            <lightning:select name="selectItemPlantillaFormato" label="Selecciona el formato de plantilla" value="{!v.tipoplantillaFormato}" onchange="{!c.buscarPlantillaSDOC}">
+                <aura:iteration items="{!v.optionsItemPlantillaFormato}" var="item">
+                    <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
+                </aura:iteration>
+            </lightning:select>
+            <br/>
+            
+        <!-- Elegir idioma plantilla S-Docs -->
+            <lightning:select name="selectItemPlantillaLenguaje" label="Selecciona el idioma de la plantilla" value="{!v.tipoplantillaLenguaje}" onchange="{!c.buscarPlantillaSDOC}">
+                <aura:iteration items="{!v.optionsItemPlantillaLenguaje}" var="item">
+                    <option text="{!item.label}" value="{!item.value}" selected="{!item.selected}"/>
+                </aura:iteration>
+            </lightning:select>
+            <br/>
+
+        <!-- Elegir plantilla S-Docs -->
+            <lightning:combobox aura:id="selectItem" name="plantillaPDF" label="Plantilla S-Docs"
+                                        placeholder="Selecciona la plantilla"
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        value="{!v.nombrePlantilla}"
+                                        onchange="{!c.handleValidarPlantillaElegida}"
+                                        options="{!v.opcionesNombrePlantilla}"/>
+            <br/>
+            
+            <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.handleClickCancelar}"/>
+            <aura:if isTrue="{!v.nombrePlantillaElegido}">
+                <lightning:button class="slds-float_right slds-button slds-button_brand" label="Asignar" onclick="{!c.handleClickAceptar}" />
+            </aura:if>
+
+        </aura:if>        
+        <!-- Fin buscar plantillas de S-Docs -->
+
+        <aura:if isTrue="{!v.tipoplantilla == 'SALESFORCE'}">
+            <lightning:combobox aura:id="selectItem" name="operativa" label="Operativa"
+                                        placeholder="-Selecciona una operativa-"
+                                        value=""
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handleCarpetaOperativaSeleccionada}"
+                                        options="{!v.opcionesOperativaFolder}"/>
+        
+        <aura:if isTrue="{!v.carpetaOperativaSeleccionada}">
+            <br/>   
+            <lightning:combobox aura:id="selectItem" name="idioma" label="Idioma"
+                                        placeholder="-Selecciona un idioma-"
+                                        value=""
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handleCarpetaIdiomaSeleccionada}"
+                                        options="{!v.opcionesIdiomaFolder}"/>
+
+        </aura:if>
+
+        <aura:if isTrue="{!v.carpetaIdiomaSeleccionada}">
+            <br/>
+            <lightning:combobox aura:id="selectItem" name="tratamiento" label="Tratamiento"
+                                        placeholder="-Selecciona un tratamiento-"
+                                        value=""
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handleCarpetaTratamientoSeleccionada}"
+                                        options="{!v.opcionesTratamientoFolder}"/>
+
+        </aura:if>
+
+        <aura:if isTrue="{!v.procesoFinalSeleccion}">
+            <br/>
+            <lightning:combobox aura:id="selectItem" name="plantilla" label="Plantilla"
+                                        placeholder="-Selecciona una plantilla-"
+                                        value=""
+                                        required="false"
+                                        dropdownAlignment="right"
+                                        variant="standard"
+                                        onchange="{!c.handlePlantillaSeleccionada}"
+                                        options="{!v.opcionesPlantilla}"/>
+        </aura:if>
+        <br/>
+        
+        <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.handleClickCancelar}"/>
+        <aura:if isTrue="{!and(not(v.sdocs), v.plantillaSeleccionada)}">
+            <lightning:button class="slds-float_right slds-button slds-button_brand" label="Asignar" onclick="{!c.handleClickAceptar}" />
+        </aura:if>
+
+    </aura:if>
+    </lightning:card>
+</aura:component>

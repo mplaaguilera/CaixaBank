@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Soluciones_COPS</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Causa__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Solucion</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente (COPS),Empleado (COPS),Cliente (COPS)/Empleado (COPS)</value>
+    </filters>
+    <filters>
+        <field>CC_Activo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Soluciones COPS</label>
+    <sharedTo>
+        <role>COPS</role>
+    </sharedTo>
+</ListView>

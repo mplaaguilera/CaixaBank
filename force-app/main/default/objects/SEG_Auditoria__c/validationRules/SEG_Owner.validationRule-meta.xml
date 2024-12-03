@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Owner</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(RecordType.DeveloperName = &apos;SEG_Auditorias&apos;, $User.Id  &lt;&gt;  SEG_NumeroSR__r.Owner:User.Id &amp;&amp; NOT($Permission.SEG_CrearAuditoriaSinOwnerCaso))</errorConditionFormula>
+    <errorMessage>Solo el owner del caso puede crear fichas de auditoría.</errorMessage>
+</ValidationRule>

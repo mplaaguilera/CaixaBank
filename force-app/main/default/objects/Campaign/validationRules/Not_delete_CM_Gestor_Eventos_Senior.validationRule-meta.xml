@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Not_delete_CM_Gestor_Eventos_Senior</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(OR($Permission.EV_Gestor_Eventos_Senior, $Permission.EV_NoDeleteCM),
+				PRIORVALUE(EV_Total_Miembros__c )&gt; EV_Total_Miembros__c)</errorConditionFormula>
+    <errorMessage>Error, no esta autorizado a eliminar miembros de campaña</errorMessage>
+</ValidationRule>

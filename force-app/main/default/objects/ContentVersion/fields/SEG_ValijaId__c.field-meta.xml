@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ValijaId__c</fullName>
+    <description>Identificador de Valija para los ficheros que se han recibido de paquetería o proceso de justificantes</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>Identificador de Valija para los ficheros que se han recibido de paquetería o proceso de justificantes</inlineHelpText>
+    <label>Valija Id (entrada)</label>
+    <length>20</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

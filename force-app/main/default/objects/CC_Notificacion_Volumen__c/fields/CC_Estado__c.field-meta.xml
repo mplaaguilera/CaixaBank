@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado__c</fullName>
+    <label>Estado</label>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Envío pendiente</fullName>
+                <default>true</default>
+                <label>Envío pendiente</label>
+            </value>
+            <value>
+                <fullName>Enviada</fullName>
+                <default>false</default>
+                <label>Enviada</label>
+            </value>
+            <value>
+                <fullName>Rechazada</fullName>
+                <default>false</default>
+                <label>Rechazada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

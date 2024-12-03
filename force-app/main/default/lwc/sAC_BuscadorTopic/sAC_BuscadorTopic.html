@@ -1,0 +1,68 @@
+<template>      
+    <lightning-card icon-name="standard:topic2" title="Marcas" variant="narrow" class="slds-border_bottom">
+        <template if:true={mensaje}>
+            <p style="color: red;">Tema desactivado</p>
+        </template>
+          <lightning-input
+              name="busqueda"
+              type="search"
+              placeholder="Escriba un nombre de tema y presione Enter"
+              value={enteredValue} 
+              onchange={buscarTopic}
+              onkeypress={teclaPulsada}
+              disabled={desabilitado}>
+          </lightning-input>
+      </lightning-card>       
+    <template if:true={objects}>
+        <template for:each={objects} for:item="object">
+            <p class="slds-badge" style="cursor: pointer;" key={object.value} onclick={handleclick} id={object.cadena}>{object.value}</p> 
+        </template>                       
+    </template>     
+    <div>
+        <template if:true={desabilitado}>
+            <lightning-pill-container items={listadoTopics}  
+            onclick={setExpanded}            
+            is-collapsible
+            is-expanded={isExpanded}>
+        </lightning-pill-container>          
+        </template>
+        <template if:false={desabilitado}>
+            <lightning-pill-container items={listadoTopics}  
+            onitemremove={handleItemRemove} 
+            onclick={setExpanded}            
+            is-collapsible
+            is-expanded={isExpanded}>
+        </lightning-pill-container>          
+        </template>
+    </div>
+    <template if:true={mostrarModificarTopic}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Botón cerrar superior y cabecera -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalModificar}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Cerrar</span>
+                    </button>
+                    <h2 if:true={nuevoTopic} id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">Añadir marca</h2>
+                    <h2 if:true={borrarTopic} id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Eliminar marca</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_large">
+                    <div class="slds-form-element__control">
+                        <div if:true={nuevoTopic} class="slds-p-around_small slds-align_absolute-center">
+                            Has añadido una nueva marca puede ser que provoque un cambio de asignación a letrado, revise y asigne si corresponde
+                        </div>  
+                        <div if:true={borrarTopic} class="slds-p-around_small slds-align_absolute-center">
+                            Has eliminado una marca puede ser que provoque un cambio de asignación a letrado, revise y asigne si corresponde
+                        </div>
+                    </div>
+                </div>
+                <!-- Botonera -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="brand" label="Continuar" onclick={confirmarModificarTopic} class="slds-m-left_x-small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>   
+</template>

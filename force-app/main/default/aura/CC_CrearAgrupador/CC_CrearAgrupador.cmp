@@ -1,0 +1,293 @@
+<aura:component controller="CC_Agrupador_Controller" implements="force:hasRecordId,force:lightningQuickAction" access="global">
+    
+    <!-- Atributos visualización -->
+    <aura:attribute name="bNotif" type="Boolean" default="true"/>
+    <aura:attribute name="bNewInc" type="Boolean" default="false"/>
+	<aura:attribute name="bAsocInc" type="Boolean" default="false"/>
+    <aura:attribute name="bCasoInc" type="Boolean" default="false"/>
+    <aura:attribute name="bVerAgrupActivos" type="Boolean" default="false"/>
+    <aura:attribute name="bPermiteAsociar" type="Boolean" default="false"/>
+    <aura:attribute name="bCanalNotif" type="Boolean" default="false"/>
+    
+    <!-- Permisos -->
+    <aura:attribute name="bCrear" type="Boolean" default="false"/>
+    <aura:attribute name="bEstado" type="Boolean" default="false"/>
+    <aura:attribute name="bAsociar" type="Boolean" default="false"/>
+    
+    <!-- Atributos -->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="agrupadorId" type="Id"/>
+    <aura:attribute name="oCaso" type="Case"/> <!-- default="{'Id':'','Subject':'','Description':'', 'CC_MCC_Tematica__c':'', 'CC_MCC_ProdServ__c':'', 'CC_MCC_Motivo__c':'', 'CC_Agrupador_Id__c':''}"/>-->
+    <aura:attribute name="oAgrupador" type="CC_Agrupador__c"/>
+    <aura:attribute name="oAgrActivos" type="List"/>
+    <aura:attribute name="oColumnas" type="List"/>
+    <aura:attribute name="agrupadorSel" type="CC_Agrupador__c"/>
+    <aura:attribute name="oRTAgrup" type="List"/>
+    <aura:attribute name="oRTSel" type="Id"/>
+    <aura:attribute name="grupoDflt" type="Id"/>
+    <aura:attribute name="sContactName" type="String"/>
+    <aura:attribute name="sClasifMaximo" type="Id"/>
+    <!--<aura:attribute name="sCanalNotif" type="String"/>-->
+    
+    <!-- Gestión de estilos de la QuickAction. Quitar marco gris. -->
+    <aura:attribute name="cssStyle" type="String"/>
+    <aura:unescapedHtml value="{!v.cssStyle}"/>
+
+    <!-- Método para inicializar. -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+<!--<lightning:listView aura:id="listViewAccounts"
+    objectApiName="CC_FAQ__c"
+    listName="All"
+    rows="5"
+    showSearchBar="true"
+    showActionBar="false"
+    enableInlineEdit="false"
+    showRowLevelActions="false"
+/>-->
+    
+        
+    <!--UI-->
+    
+    <!--Card Notificación cliente-->
+    <aura:renderIf isTrue="{!v.bNotif}">
+        <article class="slds-card">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Notificación del cierre">
+                            <lightning:icon iconName="action:announcement" size="xx-small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            Notificación de cierre
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            
+            <!-- Parte para actualizar el caso, notificación al cliente. -->
+            <aura:renderIf isTrue="{!v.bCanalNotif}">
+                
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <lightning:recordEditForm aura:id="editNotif" recordId="{!v.recordId}" objectApiName="Case" onsuccess="{!c.confirmarNotif}" onsubmit="{!c.validarDatosNotif}" onerror="{!c.errorDatosNotif}">
+                            <lightning:messages />
+                            
+                            <!-- Parte para actualizar el caso, notificación al cliente. -->
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element_horizontal slds-form-element">
+                                    <lightning:select aura:id="bNotificar" name="bNotificarCb" label="Notificar incidencia" required="true"> <!--onchange="{!c.cambioNotif}">-->
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </lightning:select>
+                                </div>
+                            </div>
+                            
+                            <lightning:inputField class="slds-hide" fieldName="CC_NotIncidencia__c"/>
+                            <lightning:inputField fieldName="CC_CanalNotifCli__c" />
+                            <lightning:inputField fieldName="CC_MailTelfNotif__c" />
+                            
+                            <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                                <lightning:button variant="brand" label="Guardar canal" title="Guardar" type="submit"/>
+                            </lightning:layout>
+                        </lightning:recordEditForm>
+                    </div>
+                </div>
+            </aura:renderIf>
+            
+            <aura:renderIf isTrue="{!not(v.bCanalNotif)}">
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <lightning:recordViewForm aura:id="viewNotif" recordId="{!v.recordId}" objectApiName="Case">
+                            
+                            <lightning:outputField fieldName="CC_NotIncidencia__c" />
+                            <lightning:outputField fieldName="CC_CanalNotifCli__c" />
+                            <lightning:outputField fieldName="CC_MailTelfNotif__c" />
+                            
+                        </lightning:recordViewForm>
+                    </div>
+                </div>
+            </aura:renderIf>
+        </article>
+    </aura:renderIf>
+    
+    <!--Card Visualización Incidencia-->
+    <aura:renderIf isTrue="{!v.bCasoInc}">
+        <article class="slds-card">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Datos incidencia asociada">
+                            <lightning:icon iconName="action:new_child_case" size="xx-small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            Datos incidencia asociada
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            
+            <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <lightning:recordViewForm aura:id="viewAgrup" objectApiName="Case" recordId="{!v.recordId}">
+                        
+                        <lightning:outputField fieldName="CC_Agrupador_Id__c" />
+
+                    </lightning:recordViewForm>
+                </div>
+            </div>
+        </article>
+    </aura:renderIf>
+    
+    <!--Card Asociar a una incidencia existente-->
+    <aura:renderIf isTrue="{!v.bAsocInc}">
+        <article class="slds-card">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Asociar a incidencia existente">
+                            <lightning:icon iconName="action:new_child_case" size="xx-small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            Asociar/Desasociar incidencia existente
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            
+            <!-- Parte para actualizar el caso, notificación al cliente. -->
+            <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <lightning:recordEditForm aura:id="asocAgrup" recordId="{!v.recordId}" objectApiName="Case" onsuccess="{!c.confirmarAsoc}" onsubmit="{!c.validarDatosCaso}" onerror="{!c.errorAsoc}" >
+                        <lightning:messages />
+                        
+                        <lightning:inputField aura:id="CC_AgruapdorAsocId" fieldName="CC_Agrupador_Id__c" />
+                        
+                        <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+							<!--<lightning:button variant="neutral" label="Ver incidencia del caso" title="Consultar el detalle de la incidencia del caso" type="button" onclick="{!c.verAgrupadorAsoc}"/>-->
+                            <aura:renderIf isTrue="{!v.bPermiteAsociar}">
+                            	<lightning:button variant="neutral" label="Ver incidencias públicas activas" title="Consultar todas las incidencias activas" type="button" onclick="{!c.verAgrupActivos}"/>
+                            </aura:renderIf>
+                            <aura:renderIf isTrue="{!not(v.bPermiteAsociar)}">
+                            	<lightning:button variant="neutral" label="Ver incidencia" title="Consultar la incidencia seleccionada" type="button" onclick="{!c.verAgrupSel}"/>
+                            </aura:renderIf>
+                            <lightning:button variant="brand" label="Actualizar caso" title="Guardar el caso para asociar / desasociar un agrupador" type="submit"/>
+                        </lightning:layout>
+                    </lightning:recordEditForm>
+                </div>
+            </div>
+            <aura:renderIf isTrue="{!v.bVerAgrupActivos}">
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <div style="height: 300px">
+                            <lightning:datatable
+                                                 columns="{! v.oColumnas }"
+                                                 data="{! v.oAgrActivos }"
+                                                 keyField="id"
+                                                 maxRowSelection="1"
+                                                 onrowselection="{! c.selAgrupadorActivo }"
+                                                 />
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <lightning:listView aura:id="listViewAgrupadores"
+                                            objectApiName="CC_Agrupador__c"
+                                            listName="CC_ActivasAsociar"
+                                            rows="10"
+                                            showSearchBar="true"
+                                            showActionBar="false"
+                                            enableInlineEdit="false"
+                                            showRowLevelActions="false"
+                                            />
+                    </div>
+                </div>-->
+                <div class="slds-form__item" role="listitem">
+                    <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                        <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                            <lightning:button variant="brand" label="Asociar al caso" title="Asociar la incidencia al caso" type="button" onclick="{!c.asocAgrupadorActivo}"/>
+                            <lightning:button variant="neutral" label="Ver" title="Ver detalle de la incidencia" type="button" onclick="{!c.verAgrupadorActivo}"/>
+                            <lightning:button variant="neutral" label="Cerrar" title="Cerrar listado de incidencias activas" type="button" onclick="{!c.cerrarAgrupActivos}"/>
+                        </lightning:layout>
+                    </div>
+                </div>
+            </aura:renderIf>
+        </article>
+    </aura:renderIf>
+    
+    <!--Card Creación Incidencia-->
+    <aura:renderIf isTrue="{!v.bNewInc}">
+        <article class="slds-card">
+            <!--Cabecera de la card-->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Creación incidencia">
+                            <lightning:icon iconName="action:new_child_case" size="xx-small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            Creación incidencia
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            
+            <!-- Parte para actualizar el caso, notificación al cliente. -->
+            <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <lightning:select aura:id="tipoAgrId" name="tipoAgrId" label="Tipo de agrupador" required="true" onchange="{! c.cambioTipo }">
+                        <aura:iteration items="{!v.oRTAgrup}" var="oData" indexVar="key">
+                            <option value="{!oData.value}">{!oData.key}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+            </div>
+            
+            <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    
+                    <!--TODO. TRATAMIENTO ERROR -->
+                    
+                    <lightning:recordEditForm aura:id="creaAgrup" objectApiName="CC_Agrupador__c" onsuccess="{!c.confirmarCrea}" onsubmit="{!c.validarDatosCreacion}">
+                        <lightning:messages />
+                        
+                        <lightning:inputField fieldName="CC_Titulo__c" value="{!v.oCaso.Subject}"/>
+                        <lightning:inputField fieldName="CC_Descripcion__c" value="{!v.oCaso.CC_Detalles_Consulta__c}"/>
+                        
+                        <lightning:inputField class="slds-hide" fieldName="RecordTypeId" value="{!v.oRTSel}" />
+                        <lightning:inputField class="slds-hide" fieldName="CC_Motivo__c" value="{!v.oCaso.CC_MCC_Motivo__c}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Producto_Servicio__c" value="{!v.oCaso.CC_MCC_ProdServ__c}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Tematica_Id__c" value="{!v.oCaso.CC_MCC_Tematica__c}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_GrupoMaximo__c" value="{!v.grupoDflt}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Persona_Afectada__c" value="{!v.sContactName}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Opcion_Call_Center__c" value=""/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Clasificacion_Maximo__c" value="{!v.sClasifMaximo}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_CanalEntrada__c" value="{!v.oCaso.Origin}"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_CanalProcedencia__c" value="{!v.oCaso.CC_Canal_Procedencia__c}"/>
+                        
+                        <lightning:inputField class="slds-hide" fieldName="CC_Tipo__c" value="!! PENDENT !!"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Prioridad__c" value="!! PENDENT !!"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Procedencia__c" value="!! PENDENT !!"/>
+                        <lightning:inputField class="slds-hide" fieldName="CC_Canal_Interaccion__c" value="!! PENDENT !!"/>
+                        
+                        <lightning:layout horizontalAlign="end" class="slds-m-top_large">
+                            <lightning:button variant="brand" label="Crear agrupador" title="Crear" type="submit" />
+                        </lightning:layout>
+                    </lightning:recordEditForm>
+                </div>
+            </div>
+        </article>
+    </aura:renderIf>
+</aura:component>

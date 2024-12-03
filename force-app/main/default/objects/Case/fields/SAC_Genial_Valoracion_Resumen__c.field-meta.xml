@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Genial_Valoracion_Resumen__c</fullName>
+    <description>Se usa este campo para guardar el Feedback del gestor sobre el Resumen propuesto por la IA</description>
+    <label>Valoración Resumen</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Neutral</fullName>
+                <default>true</default>
+                <label>Neutral</label>
+            </value>
+            <value>
+                <fullName>Acuerdo</fullName>
+                <default>false</default>
+                <label>Acuerdo</label>
+            </value>
+            <value>
+                <fullName>Desacuerdo</fullName>
+                <default>false</default>
+                <label>Desacuerdo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

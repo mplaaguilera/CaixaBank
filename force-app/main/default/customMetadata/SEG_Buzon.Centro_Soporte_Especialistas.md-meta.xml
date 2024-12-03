@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Centro Soporte Especialistas</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">info.cso@empresas.caixabank.com</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">seg_emailservice@mknsgg4dr3gyix3147x04otr6gz2yl0xchrsjeczh7d3arm0c.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">CSO-MCC-CSE</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Centro Soporte Especialistas</value>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:type="xsd:string">CSE</value>
+    </values>
+</CustomMetadata>

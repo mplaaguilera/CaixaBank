@@ -1,0 +1,84 @@
+<template> <!--<template lwc:render-mode='light'>-->
+
+	<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-top_large slds-var-m-bottom_x-large">
+		<div class="slds-col">
+			<h2 class="slds-card__header-title" style="align-items: center; font-size: 16px;">
+				<lightning-icon icon-name="standard:contract" size="small" class="iconoHeader slds-var-m-right_small"></lightning-icon>
+				Datos de la oferta comercial
+			</h2>
+		</div>
+		<div class="slds-col">
+			<lightning-button class="botonAbrirModal" label="Generar documento" icon-name="utility:pdf_ext" onclick={abrirModal} disabled={botonAbrirModalDisabled}></lightning-button>
+		</div>
+	</div>
+
+	<section role="dialog" aria-modal="true" class="modalGenerarDocumento slds-modal slds-modal_large" tabindex="-1" onkeydown={modalGenerarDocumentoOnkeydown}>
+		<div class="slds-modal__container">
+			<!-- sldsValidatorIgnoreNextLine -->
+			<button class="slds-button slds-button_icon slds-modal__close" onclick={cerrarModal}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-hyphenate">Generar documento</h1>
+				<p class="slds-var-m-top_x-small">Vincular a la oportunidad un documento PDF generado a partir de una plantilla.</p>
+			</div>
+			<div class="slds-modal__content slds-is-relative slds-var-p-around_x-large">
+				<div lwc:if={spinnerExportarPdf} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
+
+				<div class="slds-grid slds-gutters_direct-xx-small" style="height: 100%;">
+					<div class="divEdicion slds-col slds-size_3-of-5">
+						<!-- TinyMCE -->
+						<iframe lwc:if={rutasVisualforce.editor} class="iframeEditor slds-hide" src={rutasVisualforce.editor}></iframe>
+
+						<span class="spanCargandoEditor slds-align_absolute-center slds-text-color_weak">
+							<lightning-dynamic-icon type="ellie" alternative-text="Cargando editor.." class="slds-var-m-right_small slds-is-relative" style="top: 1px;"></lightning-dynamic-icon>
+							Cargando editor...
+						</span>
+					</div>
+
+					<div class="slds-col slds-size_2-of-5 slds-is-relative">
+						<div lwc:if={spinnerGenerarVistaPrevia} align="center">
+							<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+						</div>
+						<div class="divVistaPrevia slds-align_absolute-center">
+							<template lwc:if={rutasVisualforce.vistaPrevia}>
+								<iframe src={rutasVisualforce.vistaPrevia}></iframe>
+								<span class="spanPrevisualizacionDesactualizada slds-is-absolute slds-var-p-vertical_small slds-var-p-horizontal_large">
+									<lightning-icon icon-name="utility:info_alt" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+									<span>Vista previa desactualizada</span>
+								</span>
+							</template>
+							<c-seg_-Illustration lwc:else tipo="Desert" mensaje="Edita el documento y genera una vista previa."></c-seg_-Illustration>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-modal__footer">
+				<div class="slds-grid slds-grid_align-spread">
+					<div class="slds-col">
+						<lightning-button class="botonCerrarModal" label="Cancelar" icon-name="utility:close" onclick={cerrarModal}></lightning-button>
+					</div>
+					<div class="slds-col">
+						<c-csbd_-generar-documento-plantilla
+															 lwc:ref="csbdGenerarDocumentoPlantilla"
+															 carpeta-raiz-developer-name="CSBD_Plantillas_Generar_Documento"
+															 record-id={recordId}
+															 onmodalabierto={modalPlantillasAbierto}
+															 onmodalcerrado={modalPlantillasCerrado}
+															 oneventoaplicar={modalPlantillasSeleccionada}
+															 style="display: inline-block;">
+						</c-csbd_-generar-documento-plantilla>
+						<lightning-button class="botonVistaPrevia slds-var-m-left_small" label="Vista previa" icon-name="utility:preview" onclick={botonVistaPreviaOnclick} disabled></lightning-button>
+						<lightning-button class="botonGenerarPdf slds-var-m-left_small" label="Exportar PDF" variant="brand" icon-name="utility:pdf_ext" onclick={exportarPdf} disabled></lightning-button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="backdrop slds-backdrop" role="presentation"></div>
+
+</template>

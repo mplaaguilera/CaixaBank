@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>BrokerNow</label>
+    <protected>false</protected>
+    <values>
+        <field>Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>App_Name__c</field>
+        <value xsi:type="xsd:string">BrokerNow</value>
+    </values>
+    <values>
+        <field>Canal_operativo__c</field>
+        <value xsi:type="xsd:string">App BrokerNow</value>
+    </values>
+    <values>
+        <field>Identificador__c</field>
+        <value xsi:type="xsd:string">438886197</value>
+    </values>
+    <values>
+        <field>Imagen__c</field>
+        <value xsi:type="xsd:string">https://is1-ssl.mzstatic.com/image/thumb/Purple123/v4/d9/5b/e3/d95be313-7204-9511-fcce-c8c0fbd26639/AppIcon_FULL-0-1x_U007emarketing-0-0-85-220-0-5.png/60x0w.jpg</value>
+    </values>
+    <values>
+        <field>Tipo__c</field>
+        <value xsi:type="xsd:string">Apple Store</value>
+    </values>
+    <values>
+        <field>countryCode__c</field>
+        <value xsi:type="xsd:string">es</value>
+    </values>
+</CustomMetadata>

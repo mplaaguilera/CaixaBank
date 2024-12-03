@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Reabrir_Caso</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				ISCHANGED(CC_Reactivado_Operativa__c),
+				ISPICKVAL(Status, &quot;Activo&quot;),
+				NOT(ISPICKVAL(PRIORVALUE(Status), &quot;Cerrado&quot;)),
+				NOT(ISPICKVAL(PRIORVALUE(Status), &quot;Rechazado&quot;)),
+				NOT(ISPICKVAL(PRIORVALUE(Status), &quot;Pendiente Revisión&quot;))
+)</errorConditionFormula>
+    <errorMessage>El estado actual del caso no permite su reactivación.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_RecordTypeDeveloperName__c</fullName>
+    <description>Indica el Developer Name del Caso que se va a querer asociar al Caso creado.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Indica el Developer Name del Caso que se va a querer asociar al Caso creado.</inlineHelpText>
+    <label>Developer Name del Record Type</label>
+    <length>255</length>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

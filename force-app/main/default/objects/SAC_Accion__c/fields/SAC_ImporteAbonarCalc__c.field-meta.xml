@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ImporteAbonarCalc__c</fullName>
+    <formula>IF((SAC_Importe_Revisado__c == null || SAC_Importe_Revisado__c == 0), SAC_ImporteResuelto__c, SAC_Importe_Revisado__c) + SAC_ImpResueltoInteresesLegales__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Importe a abonar</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Currency</type>
+</CustomField>

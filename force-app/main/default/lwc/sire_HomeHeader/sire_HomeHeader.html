@@ -1,0 +1,26 @@
+<template>
+    <div if:true={hasHeader} class="slds-box slds-theme_shade home-padding slds-card" style="position: relative;
+    padding: 0.5rem;
+    border: 1px solid rgb(221, 219, 218);
+    border-radius: 0.25rem;
+    background-clip: padding-box;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);background-color: rgb(243, 242, 242);">
+        <h3 slot="title">
+            <lightning-icon icon-name={headerIcon} size="medium"></lightning-icon>
+            <span class="home-title">{title}</span>
+        </h3>
+        <div class="slds-page-header__info">
+            <div class="slds-col slds-align-bottom home-detail-span">
+                <span>{subtitle}</span>
+            </div>
+            <span class="span-detail">
+                <span class="first-span-detail">{label.dataAsLabel} <lightning-formatted-date-time value={now} year="numeric" month="short" day="2-digit" hour="2-digit"
+                    minute="2-digit"></lightning-formatted-date-time></span>
+            </span>
+        </div>
+    </div>
+    <span if:false={hasHeader} class="span-detail">
+        <span class="first-span-detail">{label.dataAsLabel} <lightning-formatted-date-time value={now} year="numeric" month="short" day="2-digit" hour="2-digit"
+            minute="2-digit"></lightning-formatted-date-time></span>
+    </span>
+</template>

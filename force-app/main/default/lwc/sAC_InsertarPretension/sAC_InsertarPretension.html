@@ -1,0 +1,36 @@
+<!--
+    INI - INS: 29/04/2021 -> Luis Mesa Garcia -> :US204743
+  Asociar Reclamaciones:
+
+  DESC: 	Lightning web component que contiene la funcionalidad de crear una nueva pretensión
+            desde la pantalla de una reclamación.
+  
+  OBJ:	Las pretensiones deberán crearse formando parte de la reclamación actual.
+  -->
+<template>
+
+    <template if:false={clicked}>
+        <div class="slds-clearfix">
+            <div class="slds-float_right">
+                <template if:true={tienePermisosEditar}>
+                    <lightning-button style="padding-left:8px" variant="brand" label="Nueva pretensión" onclick={insertRecord} >
+                    </lightning-button>
+                </template>
+                <template if:false={tienePermisosEditar}>
+                    <lightning-button style="padding-left:8px" variant="brand" label="Nueva pretensión" disabled="true" >
+                    </lightning-button>
+                </template>
+            </div>
+        </div>
+    </template>
+
+
+    
+    <!-- spinner -->
+    <template if:true={isLoading}>
+        <div class="slds-p-around_x-large">
+          <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+    
+</template>

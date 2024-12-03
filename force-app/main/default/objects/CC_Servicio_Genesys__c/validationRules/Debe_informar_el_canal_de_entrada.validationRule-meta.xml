@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Debe_informar_el_canal_de_entrada</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISPICKVAL(CC_Tipo_Cliente__c, &apos;Cliente&apos;),ISPICKVAL(CC_Canal_de_Entrada__c,&apos;&apos;))</errorConditionFormula>
+    <errorMessage>Debe informar el canal de entrada</errorMessage>
+</ValidationRule>

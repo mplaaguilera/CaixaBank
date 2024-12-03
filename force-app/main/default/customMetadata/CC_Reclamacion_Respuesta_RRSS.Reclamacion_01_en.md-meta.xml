@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Reclamación 01 en</label>
+    <protected>false</protected>
+    <values>
+        <field>Idioma__c</field>
+        <value xsi:type="xsd:string">en</value>
+    </values>
+    <values>
+        <field>Respuesta__c</field>
+        <value xsi:type="xsd:string">We remind you that we are waiting to receive your information to manage your case.</value>
+    </values>
+</CustomMetadata>

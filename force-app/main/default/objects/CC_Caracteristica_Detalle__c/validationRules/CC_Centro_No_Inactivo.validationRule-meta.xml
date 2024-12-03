@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Centro_No_Inactivo</fullName>
+    <active>true</active>
+    <errorConditionFormula>PRIORVALUE( CC_Centro_CaixaBank__c ) !=  CC_Centro_CaixaBank__c &amp;&amp;
+ CC_Centro_CaixaBank__r.CC_Inactivo__c</errorConditionFormula>
+    <errorDisplayField>CC_Centro_CaixaBank__c</errorDisplayField>
+    <errorMessage>El centro CaixaBank seleccionado no debe estar marcado como inactivo.</errorMessage>
+</ValidationRule>

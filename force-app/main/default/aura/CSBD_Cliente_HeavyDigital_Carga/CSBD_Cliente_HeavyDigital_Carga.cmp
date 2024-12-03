@@ -1,0 +1,24 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
+	<aura:attribute name="recordId" type="Id" />
+	<lightning:card title="Carga NUMPERSOs de clientes Heavy Digital" iconName="action:share_file">
+		<br/>
+		<div>
+            <p>
+                Seleccione un fichero <b>.txt</b> que contenga los NUMPERSOs a cargar.<br/>
+                Cada NUMPERSO debe estar separado por un salto de línea.
+                <br/>
+                <br/>
+                <div>
+                    <div style="display:inline-block; vertical-align: top;">Ejemplo:</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 8px; padding-bottom: 8px; margin-left: 20px; border:1px solid lightgray; display:inline-block;">
+                        <code>18608107</code><br/>
+                        <code>26735405</code><br/>
+                        <code>37870174</code><br/>
+                    </div>
+                </div>
+            </p>
+        </div>
+        <br/>
+		<c:cc_Caracteristica_Carga name="cc_Caracteristica_Carga" recordId="{!v.recordId}" onclickcancelar="{!c.handleClickCancelar}" onclickaceptar="{!c.handleClickAceptar}" onshowlogtoast="{!c.handleShowLogToast}"/>
+	</lightning:card>
+</aura:component>

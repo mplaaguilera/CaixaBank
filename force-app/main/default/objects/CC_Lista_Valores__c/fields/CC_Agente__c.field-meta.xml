@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check que indica si los casos se deben pasa a agente (que entren en la cola de Comentarios Apps y estado Activo), en caso contrario que queden cerrados y sin contar SLA.</description>
+    <label>¿Entra a agente?</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

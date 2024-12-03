@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Evento_Estado__c</fullName>
+    <description>Estado del evento de CSBD.</description>
+    <label>Estado</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pendiente</fullName>
+                <default>false</default>
+                <label>Pendiente</label>
+            </value>
+            <value>
+                <fullName>Completado</fullName>
+                <default>false</default>
+                <label>Completado</label>
+            </value>
+            <value>
+                <fullName>Cancelado</fullName>
+                <default>false</default>
+                <label>Cancelado</label>
+            </value>
+            <value>
+                <fullName>Gestionada Positiva</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Pendiente revisar</fullName>
+                <default>false</default>
+                <label>Pendiente revisar</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Cierre Caducada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cierre Caducada</label>
+            </value>
+            <value>
+                <fullName>Cierre Desactivada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cierre Desactivada</label>
+            </value>
+            <value>
+                <fullName>Desactivada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Desactivada</label>
+            </value>
+            <value>
+                <fullName>Gestionada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestionada</label>
+            </value>
+            <value>
+                <fullName>Gestionada negativa</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestionada negativa</label>
+            </value>
+            <value>
+                <fullName>Gestionado no localizado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestionado no localizado</label>
+            </value>
+            <value>
+                <fullName>No gestionada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>No gestionada</label>
+            </value>
+            <value>
+                <fullName>Pendiente no localizado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente no localizado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

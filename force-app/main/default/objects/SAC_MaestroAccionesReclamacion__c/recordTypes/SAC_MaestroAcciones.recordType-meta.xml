@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MaestroAcciones</fullName>
+    <active>true</active>
+    <description>Maestro de acciones para el proyecto de SAC Reclamaciones.</description>
+    <label>Maestro Acciones</label>
+    <picklistValues>
+        <picklist>SAC_tipo_formulario__c</picklist>
+        <values>
+            <fullName>Básico</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Importe</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Importes hipotecarios</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

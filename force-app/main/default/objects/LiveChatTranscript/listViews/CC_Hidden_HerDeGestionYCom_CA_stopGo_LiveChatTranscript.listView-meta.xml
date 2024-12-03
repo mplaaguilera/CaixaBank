@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Hidden_HerDeGestionYCom_CA_stopGo_LiveChatTranscript</fullName>
+    <filterScope>Queue</filterScope>
+    <label>CC_Hidden_HerDeGestionYCom_ca</label>
+    <queue>CC_Hidden_HerDeGestionYCom_CA_stopGo</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

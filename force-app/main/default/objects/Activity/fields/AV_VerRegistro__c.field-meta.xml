@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_VerRegistro__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(!ISBLANK(AV_Valor1__c),HYPERLINK(&quot;/lightning/r/Task/&quot;+ Id +&quot;/view&quot;, AV_Valor1__c, &quot;_self&quot;),
+IF(!ISBLANK(Subject),HYPERLINK(&quot;/lightning/r/Task/&quot;+ Id +&quot;/view&quot;, Subject, &quot;_self&quot;), 
+HYPERLINK(&quot;/lightning/r/Task/&quot;+ Id +&quot;/view&quot;, &quot;-&quot;, &quot;_self&quot;)
+))</formula>
+    <label>VerRegistro</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

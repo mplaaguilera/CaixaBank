@@ -1,0 +1,38 @@
+.margin-table{
+    margin-right: 2rem;
+    margin-left: 2rem;
+}
+
+.scrollbar
+{
+    overflow-x: scroll;
+}
+
+.force-overflow
+{
+    /*min-height: 450px;*/
+}
+
+.style-3::-webkit-scrollbar-track
+{
+    height: 6px;
+    background-color: #F5F5F5;
+    margin-left: 2px;
+    
+}
+
+.style-3::-webkit-scrollbar
+{
+
+    height: 6px;
+    background-color: #F5F5F5;
+    margin-left: 2px;
+}
+
+.style-3::-webkit-scrollbar-thumb
+{
+    height: 6px;
+    background-color: #8b8b8b;
+    border-radius: 2px;
+    margin-left: 2px;
+}

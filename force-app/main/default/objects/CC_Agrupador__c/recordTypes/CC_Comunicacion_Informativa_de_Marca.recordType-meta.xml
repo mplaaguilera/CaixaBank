@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Comunicacion_Informativa_de_Marca</fullName>
+    <active>true</active>
+    <label>Comunicación Informativa de Marca</label>
+    <picklistValues>
+        <picklist>CC_Canal_Interaccion__c</picklist>
+        <values>
+            <fullName>%21%21 PENDENT %21%21</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Estado_Maximo__c</picklist>
+        <values>
+            <fullName>ACCEPTED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CLOSED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INPROG</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PENDING_USER</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RESOLVED</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RESOLV_CHANGE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RESOLV_DOC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RESOLV_REV_CLOSE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RESOLV_REV_SOL</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Estado__c</picklist>
+        <values>
+            <fullName>Activo</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Cerrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente Revision</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Prioridad__c</picklist>
+        <values>
+            <fullName>%21%21 PENDENT %21%21</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Procedencia__c</picklist>
+        <values>
+            <fullName>%21%21 PENDENT %21%21</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo__c</picklist>
+        <values>
+            <fullName>%21%21 PENDENT %21%21</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

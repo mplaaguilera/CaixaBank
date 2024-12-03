@@ -1,0 +1,174 @@
+<aura:component controller="SAC_LCMP_GestionEmails"
+implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="busqueda" type="String" default=""/>
+    <aura:attribute name="selectedItem" type="String" />
+    <aura:attribute name="ficherosAdjuntos" type="Object[]" />
+    <aura:attribute name="ficherosAdjuntosVisibles" type="Object[]" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" default="ini"/>
+    <aura:attribute name="ContentDocumentId" type="Id" />
+    <aura:attribute name="verSF" type="Boolean" default="true"/>
+    <aura:attribute name="verLocal" type="Boolean" default="false"/>
+    <aura:attribute name="pills" type="List" />
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="seleccionarReclamacion" type="Boolean" default="false"/>
+    <aura:attribute name="popupValidate" type="Boolean" default="false"/>
+
+    <aura:attribute name="nonValidatedItems" type="List" />
+    <aura:attribute name="validateItems" type="Object[]" />
+
+
+    <!-- US670077 atributos para el desarrollo de adjuntar los archivos de la reclamacion a la derivacion automaticamente -->
+    <aura:attribute name="adjuntosDerivar" type="Boolean" default="false"/>
+    <aura:attribute name="pillsDervacionAdj" type="List" />
+    <aura:attribute name="adjCargados" type="Boolean" default="false"/>
+    <aura:attribute name="derivarAQuien" type="String" />
+
+    <!--Atributo para saber cual es la procedencia del componente y saber si debemos cambiar el bloque de los ficheros-->
+    <aura:attribute name="procedencia" type="String" />
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.Inicial}" />
+    <aura:handler name="change" value="{!v.caseId}" action="{!c.Inicial}" />
+
+    <aura:handler name="change" value="{!v.pills}" action="{!c.actualizaFicheros}" />
+
+    <aura:method name="refresh" action="{!c.Inicial}" access="PUBLIC">
+    </aura:method>
+
+
+    <div>
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="form-element-01">Adjuntos</label>
+            <div class="slds-form-element__control">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_9-of-12">
+                        <div class="ficherosincluidos" style="z-index: 9;">
+                            <lightning:pillContainer items="{!v.pills}" onitemremove="{!c.handleItemRemove}" onclick="{!c.myFunction}" ondblclick="{!c.myFunction}"/>
+                        </div>
+                    </div>
+                    <!--<div class="slds-col slds-size_3-of-12">
+                        <lightning:button variant="brand" label="Adjuntar archivos" title="Adjuntar archivos" onclick="{!c.myFunction}" class="slds-float_right"/>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="{!v.isOpen == true ? 'blockSF' : ''}"/>
+        <div class="{!v.isOpen == true ? 'aparece' : 'deaparece'}">
+            
+        <div  class="row dark-background slds-box slds-box_xx-small" onclick="{!c.myFunction}">
+            <div class="slds-text-heading_medium">
+                <lightning:icon iconName="utility:pop_in" alternativeText="Connected" variant="inverse" size="small"/>
+                Adjuntar archivos
+            </div>
+        </div>
+        <lightning:layout verticalAlign="stretch">
+            <lightning:layoutItem class="fondo" size="2" >
+                <lightning:verticalNavigation selectedItem="SF" class="navigation1 .slds-nowrap"
+                onselect="{! c.handleSelect }">
+                    <lightning:verticalNavigationSection label="Ubicación">
+                        <lightning:verticalNavigationItemIcon label="Salesforce" name="SF" iconName="utility:salesforce1"/>
+                        <aura:if isTrue="{!v.procedencia != 'SAC_003'}">
+                        <lightning:verticalNavigationItemIcon label="Mi equipo" name="EQUIPO" iconName="utility:open_folder" />
+                        </aura:if>
+                    </lightning:verticalNavigationSection>
+                </lightning:verticalNavigation>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="10" >
+            <lightning:layout verticalAlign="stretch" multipleRows="true" class="x-large">
+                <lightning:layoutItem size="12" flexibility="auto" padding="around-small">
+
+                        <lightning:input name="Busqueda" value='{!v.busqueda}' onchange='{!c.actualizaFicheros}' label="This is a search input"
+                        type="search"
+                        variant="label-hidden"/>
+                        <br/>
+                </lightning:layoutItem>
+                        <div class="slds-grid contenedorPrincipal">
+                        
+                            <div class="slds-col archivos">
+                                <div>
+                                    <ui:scrollerWrapper class="scrollerSize">
+
+                                    <aura:renderIf isTrue="{!v.verSF}">
+                                        <aura:iteration items="{!v.ficherosAdjuntosVisibles}" var="file">
+                                            <!-- Inicio item archivo-->
+                                            <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.ContentDocumentId}">
+                                                <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                    <div class="slds-col slds-size_11-of-12">
+                                                        <div class="slds-text-align_left">{!file.Title}</div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-12">
+                                                        <aura:renderIf isTrue="{!file.seleccionado}">
+                                                            <lightning:buttonIcon iconName="utility:remove_link" variant="bare" alternativeText="No incluir" title="No incluir"  onclick="{!c.desvincular}" name="{!file.Title}" value="{!file.ContentDocumentId}" class="slds-float_right"/>
+
+                                                            <aura:set attribute="else">
+                                                                <lightning:buttonIcon iconName="utility:new" variant="bare" alternativeText="Incluir" title="Incluir"  onclick="{!c.adjuntar}" name="{!file.Title}" value="{!file.ContentDocumentId}" class="slds-float_right"/>
+                                                            </aura:set>
+                                                        </aura:renderIf>  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Fin item archivo-->
+                                        </aura:iteration>
+                                    </aura:renderIf>
+                                    <aura:if isTrue="{!v.procedencia != 'SAC_003'}">
+                                    <aura:renderIf isTrue="{!v.verLocal}">
+                                        <aura:iteration items="{!v.pills}" var="file">
+                                            <aura:renderIf isTrue="{!file.origen == 'PC'}">
+                                                <!-- Inicio item archivo-->
+                                                <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.id}">
+                                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                        <div class="slds-col slds-size_11-of-12">
+                                                            <div class="slds-text-align_left">{!file.label}</div>
+                                                            
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-12">
+                                                            <lightning:buttonIcon iconName="utility:delete" variant="bare" alternativeText="No incluir" title="No incluir"  onclick="{!c.eliminaTemporal}" name="{!file.Title}" value="{!file.id}" class="slds-float_right"/>  
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Fin item archivo-->
+                                            </aura:renderIf>
+                                        </aura:iteration>
+                                        <div class="slds-form-element" style="padding-left: 10px; padding-right: 10px;">
+                                            <lightning:fileUpload name="fileUploader" multiple="true"
+                                                recordId="{!v.caseId}"
+                                                onuploadfinished="{!c.handleUploadFinished}" />
+                                            </div>
+                                    </aura:renderIf>
+                                    </aura:if>
+                                    </ui:scrollerWrapper>
+                                </div>
+                            </div>
+                            <div class="slds-col infoFile">    
+                                <lightning:fileCard fileId="{!v.ContentDocumentId}" description="Miniatura" />
+                                <lightning:recordViewForm recordId="{!v.ContentDocumentId}" objectApiName="ContentVersion">
+                                    <lightning:outputField fieldName="Title"/>
+                                    <lightning:outputField fieldName="CreatedDate"/>
+                                  <!--  <lightning:outputField fieldName="FileExtension"/>
+                                    <lightning:outputField fieldName="FileType"/> -->
+                                </lightning:recordViewForm>
+                            </div>    
+                        </div>
+                    </lightning:layout>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </div>
+
+    <aura:if isTrue="{!v.popupValidate}">
+        <lightning:card title="Elementos no validados">
+            <aura:iteration items="{!v.nonValidatedItems}" var="item">
+                <lightning:layout horizontalAlign="spread" multipleRows="true">
+                    <lightning:layoutItem size="8" padding="around-small">
+                        <p>{!item.Title}</p>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="4" padding="small">
+                        <lightning:button label="Validar" onclick="{!c.validateItem}" value="{!item.ContentDocumentId}" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:iteration>
+        </lightning:card>
+    </aura:if>
+</aura:component>

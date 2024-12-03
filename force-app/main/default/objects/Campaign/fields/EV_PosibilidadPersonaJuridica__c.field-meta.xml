@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_PosibilidadPersonaJuridica__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para determinar si en el evento se permiten personas jurídicas. También da paso al formulario de inscipción de persona jurídica.</description>
+    <inlineHelpText>Marcar este campo si al evento asistirán personas jurídicas.</inlineHelpText>
+    <label>Posibilidad Persona Jurídica</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

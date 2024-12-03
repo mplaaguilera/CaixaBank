@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>50.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>CIBE New opportunity CIB</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="pfId" type="String" label="Id PF Experiencia" description="Id del PF Experiencia." role="inputOnly"/>
+            <property name="producto" type="String" label="Producto" description="Producto." />
+            <property name="valueSubProducto" type="String" label="Sub Producto" description="Sub Producto." />
+            <property name="propietario" type="String" label="Propietario" description="Propietario." />
+            <property name="oportunidad" type="String" label="Nombre de la oportunidad" description="Nombre de la oportunidad." />
+            <property name="valueOperacion" type="String" label="Tipo Operación" description="Tipo de Operación." />
+            <property name="stageName" type="String" label="oppName" description="oppName" />
+            <property name="confidencial" type="Boolean" label="Confidencial" description="Confidencial." />
+            <property name="esg" type="Boolean" label="ESG" description="ESG." />
+            <property name="ecas" type="Boolean" label="ECA/Aseguradora" description="ECA/Aseguradora." />
+            <property name="sindicaciones" type="Boolean" label="Sindicado/Club Deal" description="Sindicado/Club Deal." />
+            <property name="cliente" type="String" label="Cliente" description="AccountId" />
+            <property name="linea" type="Boolean" label="Línea" description="Línea." />
+            <property name="anadirParticipantes" type="Boolean" label="Añadir participantes a la oportunidad" description="Añadir participantes a la oportunidad" />
+
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

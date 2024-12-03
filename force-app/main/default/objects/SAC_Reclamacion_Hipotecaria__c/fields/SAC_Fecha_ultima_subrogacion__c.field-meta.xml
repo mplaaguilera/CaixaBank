@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Fecha_ultima_subrogacion__c</fullName>
+    <description>Fecha de la última subrogación</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha última subrogación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

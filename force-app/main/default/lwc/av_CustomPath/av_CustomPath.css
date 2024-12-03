@@ -1,0 +1,16 @@
+.main-div{
+    margin-top: 1rem; 
+    margin-bottom: 1rem;
+}
+.lower-text{
+    font-size: 11px;
+}
+.cursor-edit{
+    cursor: pointer;
+}
+.cursor-readonly{
+    cursor: default;
+}
+.color-label{
+    color: #006DCC;
+}

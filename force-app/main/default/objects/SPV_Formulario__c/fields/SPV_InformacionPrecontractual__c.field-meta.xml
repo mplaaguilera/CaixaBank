@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_InformacionPrecontractual__c</fullName>
+    <description>Campo texto que indica la información precontractual del formulario de la reclamación</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Información precontractual</label>
+    <length>32768</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>7</visibleLines>
+</CustomField>

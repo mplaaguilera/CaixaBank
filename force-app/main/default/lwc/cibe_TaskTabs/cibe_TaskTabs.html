@@ -1,0 +1,52 @@
+<template>
+	<lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+		<div class="margin">
+			<header slot="title" class="slds-page-header slds-page-header_record-home" onclick={toggleShow}>
+				<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+				<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+				<label class="nameAccordation">{labels.gestionarTarea}</label>
+			</header>
+			<div if:true={isNoGestionable}>
+				<h2 class="slds-text-heading_small slds-m-left_medium slds-m-top_medium slds-text-strong">{labels.tareaInfNoGest}</h2>
+			</div>
+			<div if:false={isNoGestionable}>
+				<div if:true={preventClick} class="prevent-click"></div>
+				<lightning-tabset active-tab-value="" if:true={showDetail}>
+					<div if:false={isEvent}>
+						<lightning-tab label={labels.gestionarTask} value="ManagementHistory">
+							<c-cibe_-management-history record-id={recordId}></c-cibe_-management-history>
+						</lightning-tab>
+						<template if:true={isExperiencia}>	
+							<lightning-tab label={labels.noLocalizado} value="NoLocalizado2">
+								<c-cibe_-tab-not-located record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-tab-not-located>
+							</lightning-tab>
+							<lightning-tab label={labels.posponer} value="Posponer2">
+								<c-cibe_-postpone-call record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-postpone-call>
+							</lightning-tab>
+							<lightning-tab label={labels.cerrarTarea} value="CerrarTarea">
+								<c-cibe_-tab-closed record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-tab-closed>
+							</lightning-tab>
+						</template>
+						<template if:true={isEMP}>
+							<lightning-tab if:false={disableBtn} label={labels.noLocalizado} value="NoLocalizado">
+								<c-cibe_-tab-not-located record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-tab-not-located>
+							</lightning-tab>
+							<lightning-tab if:false={disableBtn} label={labels.posponer} value="Posponer">
+							<c-cibe_-postpone-call record-id={recordId} onprogressvaluechange={hanldeProgressValueChange}></c-cibe_-postpone-call>
+							</lightning-tab>
+						</template>
+						<template if:false={isExperiencia}>	
+							<lightning-tab if:false={disableBtn}  label={labels.cerrarTarea} value="CerrarInformar" onactive={navigateToTab}></lightning-tab>
+						</template>
+						
+					</div>
+				</lightning-tabset>
+				
+			</div>
+		</div>
+	</lightning-card>
+	<div if:true={showAssignPurse}>
+		<c-av_assign-purse record-id={recordId}></c-av_assign-purse>
+	</div>
+</template>

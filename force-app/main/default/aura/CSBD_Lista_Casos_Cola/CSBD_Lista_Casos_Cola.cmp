@@ -1,0 +1,36 @@
+<aura:component controller="CSBD_Lista_Casos_Cola_Controller" implements="lightning:utilityItem,force:hasRecordId">
+
+    <aura:attribute name="casos" type="List" default="[]"/>
+    <aura:attribute name="fechaActualizacion" type="String" default="N/A"/>
+    <aura:attribute name="idListviewCasos3n" type="String"/>
+    <aura:attribute name="esMiembroCola3n" type="Boolean" default="false"/>
+    <!-- <aura:attribute name="esAdmin" type="Boolean" default="false"/> -->
+    <aura:attribute name="resaltar" type="Boolean" default="true"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <lightning:utilityBarAPI aura:id="utilityBarApi"/>
+
+    <div class="slds-var-m-top_medium slds-var-p-vertical_large slds-var-p-horizontal_large">
+        <aura:if isTrue="{!v.esMiembroCola3n}">
+            <div class="slds-text-color_weak slds-align_absolute-center">
+                <lightning:icon iconName="standard:case" size="x-small" class="slds-var-m-right_small slds-is-relative" style="top: 1px;"/>
+                <span style="font-weight: 600;">{!v.casos.length} casos</span>
+                <span class="slds-var-m-horizontal_x-small slds-is-relative slds-text-color_weak" style="top: 1px; font-size: 16px; font-weight: 700;">·</span>
+                <span>Actualizado a las {!v.fechaActualizacion}</span>
+                <lightning:buttonIcon aura:id="botonRefrescar" tabindex="0" iconName="utility:refresh" class="botonRefrescar slds-var-m-left_medium" title="Actualizar" variant="bare" alternativeText="Actualizar" onclick="{!c.getCasosSinCache}"/>
+            </div>
+            <div class="slds-align_absolute-center slds-var-m-top_x-large">
+                <lightning:button label="Ver lista de casos" iconName="utility:list" onclick="{!c.navegarListview}" class="slds-var-m-left_large"/>
+                <span class="slds-var-m-left_xx-large slds-form-element__label slds-var-p-right_small">Resaltar</span>
+                <lightning:input type="toggle" checked="{!v.resaltar}" onchange="{!c.getCasosSinCache}" variant="label-hidden" messageToggleActive="" messageToggleInactive="" style="transform-origin: left; transform: scale(0.8);"/>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-align_absolute-center slds-var-m-top_xx-large" style="color: darkslategray; font-style: italic;">
+                    No eres miembro del equipo de 3N de CSBD.
+                </div>
+            </aura:set>
+        </aura:if>
+    </div>
+
+</aura:component>

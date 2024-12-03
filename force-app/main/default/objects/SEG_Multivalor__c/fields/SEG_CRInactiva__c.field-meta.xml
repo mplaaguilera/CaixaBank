@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CRInactiva__c</fullName>
+    <formula>SEG_Reglas_Clasificacion__r.SEG_CRInactiva__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>SEG_CRInactiva</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

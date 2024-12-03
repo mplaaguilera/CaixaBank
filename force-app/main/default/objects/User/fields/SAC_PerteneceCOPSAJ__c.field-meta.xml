@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PerteneceCOPSAJ__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para guardar si el usuario pertenece a un grupo de COPS o AJ.</description>
+    <label>Pertenece a COPS/AJ</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

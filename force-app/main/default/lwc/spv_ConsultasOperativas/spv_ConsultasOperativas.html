@@ -1,0 +1,22 @@
+<template>
+    <div class="slds-align_absolute-center">
+        <template if:true={visibilidadTomarPropiedadyDevolver}>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="tomarPropiedadId" label="Tomar en propiedad" icon-name="utility:change_owner" onclick={tomarPropiedad} disabled={disableBotonTomarPropiedad}></lightning-button>
+            </div>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="devolverConsultaId" label="Devolver consulta" icon-name="utility:skip" onclick={devolverConsulta} disabled={disableBotonDevolver}></lightning-button>
+            </div>
+        </template>
+        <template if:true={visibilidadPteRespuesta}>
+            <div class="slds-var-p-left_x-small">
+                <lightning-button data-id="marcarPteRespuestaDefinitiva" label="Marcar pendiente respuesta definitiva" icon-name="utility:answer" onclick={marcarPteRespuestaDef}></lightning-button>
+            </div>
+        </template>
+    </div>
+
+    <!--Spinner-->
+    <template if:true={mostrarSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+</template>

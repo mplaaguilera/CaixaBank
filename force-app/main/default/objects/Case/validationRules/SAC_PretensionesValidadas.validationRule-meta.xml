@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PretensionesValidadas</fullName>
+    <active>true</active>
+    <description>Regla que permite el paso de análisis a &quot;negociación&quot; o a &quot;resolución&quot; si todas sus pretensiones tienen el check de validación de MCC en true</description>
+    <errorConditionFormula>IF(
+AND(
+NOT($Permission.SAC_ByPass),
+$UserRole.DeveloperName = &apos;SAC_General&apos;,				
+OR(
+RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
+RecordType.DeveloperName = &apos;SAC_Pretension&apos;
+),
+ISPICKVAL(PRIORVALUE(Status), &apos;SAC_002&apos;),
+ISCHANGED(Status),
+OR(
+ISPICKVAL(Status, &apos;SAC_003&apos;),
+ISPICKVAL(Status, &apos;SAC_007&apos;)),
+SAC_ValidacionMCC__c = false
+),
+true,
+false
+)</errorConditionFormula>
+    <errorMessage>Tienen que estar todas sus pretensiones con el check de Validación MCC marcado</errorMessage>
+</ValidationRule>

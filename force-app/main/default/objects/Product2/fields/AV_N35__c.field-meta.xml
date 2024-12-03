@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_N35__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Producto de N35 asociado</description>
+    <label>Producto N35</label>
+    <referenceTo>Product2</referenceTo>
+    <relationshipLabel>Products (Producto N35)</relationshipLabel>
+    <relationshipName>Products_N35</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

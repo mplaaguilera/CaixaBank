@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Inicio_Vigencia__c</fullName>
+    <defaultValue>TODAY()</defaultValue>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Inicio Vigencia</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

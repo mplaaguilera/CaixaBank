@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cognitivo__c</fullName>
+    <formula>NOT(ISBLANK(CC_ConnId_Cognitivo__c))</formula>
+    <label>Cognitivo</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

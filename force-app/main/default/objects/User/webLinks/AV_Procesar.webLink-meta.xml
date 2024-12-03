@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Procesar</fullName>
+    <availability>online</availability>
+    <displayType>link</displayType>
+    <linkType>javascript</linkType>
+    <masterLabel>Ejecutar proceso de owners</masterLabel>
+    <openType>onClickJavaScript</openType>
+    <protected>false</protected>
+    <url>{!REQUIRESCRIPT(&quot;/soap/ajax/30.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/30.0/apex.js&quot;)}
+
+var apexClassArray= sforce.connection.query(&quot;SELECT Id FROM ApexClass WHERE Name =&apos;AV_ProccessAccountsOwnersBatch&apos;&quot;); 
+
+recordsclassid= apexClassArray.getArray(&quot;records&quot;); 
+
+var checkBatchRunningRecords= sforce.connection.query(&quot;SELECT ApexClassId, status FROM AsyncApexJob WHERE ApexClassId =&apos;&quot;+recordsclassid[0].Id+&quot;&apos; AND Status NOT IN (&apos;Completed&apos;,&apos;Aborted&apos;,&apos;Failed&apos;)&quot;); 
+
+records= checkBatchRunningRecords.getArray(&quot;records&quot;); 
+
+if(records.length&gt;0){ 
+window.alert(&quot;The batch job is currently executing. Please wait for it to complete.&quot;); 
+} 
+else{ 
+window.alert(&apos;The Integration batch job has started.&apos;); 
+sforce.apex.execute(&quot;AV_ProccessOwners&quot;,&quot;proccess&quot;,{param:&quot;{!User.Id}&quot;});
+}</url>
+</WebLink>

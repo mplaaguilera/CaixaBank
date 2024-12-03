@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TextoMostrar__c</fullName>
+    <description>Texto para mostrar a agente del Intent</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Texto para mostrar a agente del Intent</inlineHelpText>
+    <label>Texto a mostrar</label>
+    <length>5000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

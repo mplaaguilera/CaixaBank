@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Situacion_Chat__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(Abandoned &lt; 14 &amp;&amp; Abandoned &gt; 0,  CC_Motivo_Abandono__c &amp; &apos; &lt; 14s&apos;, 
+			IF(Abandoned &gt;0 &amp;&amp; Abandoned &lt; 30, CC_Motivo_Abandono__c &amp; &apos; &lt; 30s&apos;, 
+			IF(Abandoned &gt;= 14 &amp;&amp; Abandoned &lt;= 65, CC_Motivo_Abandono__c &amp; &apos; 14s - 65s&apos;, 
+						IF(Abandoned &gt; 65, CC_Motivo_Abandono__c &amp; &apos;  &gt; 65s&apos;, 
+									IF(WaitTime &gt; 0 &amp;&amp; WaitTime &lt; 30, &apos;Aceptada &lt;30s&apos;, &apos;Aceptada &gt;30s&apos;)))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Situación Chat</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Activo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Indicador de si el proceso de notificación de monitorización de la cola flexqueue se ha de continuar realizando para la aplicación del registro.</description>
+    <label>Activo</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

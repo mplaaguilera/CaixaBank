@@ -1,0 +1,364 @@
+<template>
+
+    <div if:true={isreport}>
+        <div if:true={opptask.AV_IsMain__c} class="slds-section__title slds-theme_shade section-div">
+            <lightning-layout data-id={opptask.Id}>
+                <lightning-layout-item class="center-buttons chever-buttons">
+                    <lightning-button-icon if:true={showDetailMain} icon-name="utility:chevrondown" size="small"
+                        class="chev-icon" variant="container" onclick={toggleShowOppTaskMain}></lightning-button-icon>
+                    <lightning-button-icon if:false={showDetailMain} icon-name="utility:chevronright" size="small"
+                        class="chev-icon" variant="container" onclick={toggleShowOppTaskMain}></lightning-button-icon>
+                </lightning-layout-item>
+                <lightning-layout-item>
+                    <label class="opptask-name opptask-title">{opptask.Name}</label>
+                    <small if:true={opptask.AV_Product__c}>{opptask.AV_Product__r.Name} | </small><small
+                        class="opptask-stage">{opptask.AV_Stage__c}</small>
+                </lightning-layout-item>
+                <lightning-layout-item alignment-bump="left" class="center-buttons">
+                    <div class="button-group">
+                        <lightning-icon icon-name="utility:favorite" size="small" variant="warning" class="main-icon"
+                            title="Oportunidad principal"></lightning-icon>
+                        <span class="slds-text-color_weak main-label span-button">Principal</span>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item if:true={isone} class="center-buttons">
+                    <div class="button-group" onclick={handleUnlink}>
+                        <lightning-button-icon icon-name="utility:link"
+                            alternative-text="Desvincular la oportunidad de la tarea" class="slds-m-left_xx-small"
+                            title="Desvincular la oportunidad de la tarea" variant="brand" label="Desvincular"
+                            size="medium"></lightning-button-icon>
+                        <span class="button-label span-button">Desvincular</span>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </div>
+    <div if:true={isreport}>
+        <div if:false={opptask.AV_IsMain__c} class="slds-section__title slds-theme_shade section-div">
+            <lightning-layout data-id={opptask.Id}>
+                <lightning-layout-item class="center-buttons chever-buttons">
+                    <lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small"
+                        class="chev-icon" variant="container" onclick={toggleShowOppTask}></lightning-button-icon>
+                    <lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small"
+                        class="chev-icon" variant="container" onclick={toggleShowOppTask}></lightning-button-icon>
+                </lightning-layout-item>
+                <lightning-layout-item>
+                    <label class="opptask-name opptask-title">{opptask.Name}</label>
+                    <small if:true={opptask.AV_Product__c}>{opptask.AV_Product__r.Name} | </small><small
+                        class="opptask-stage">{opptask.AV_Stage__c}</small>
+                </lightning-layout-item>
+                <lightning-layout-item alignment-bump="left" class="center-buttons slds-grid">
+                    <div class="slds-col button-group">
+                        <lightning-button-icon icon-name="utility:favorite"
+                            alternative-text="Convertir en oportunidad principal"
+                            class="slds-m-left_xx-small linked-opptask-button last-opptask-button"
+                            title="Convertir en oportunidad principal" variant="border-filled" onclick={handleMain}>
+                        </lightning-button-icon>
+                    </div>
+                    <div class="slds-col button-group" onclick={handleUnlink}>
+                        <lightning-button-icon icon-name="utility:link"
+                            alternative-text="Desvincular la oportunidad de la tarea" class="slds-m-left_xx-small"
+                            title="Desvincular la oportunidad de la tarea" variant="brand" label="Desvincular"
+                            size="medium"></lightning-button-icon>
+                        <span class="button-label span-button">Desvincular</span>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </div>
+    <div if:true={showDetailMain} class="opptask-form">
+        <lightning-record-edit-form object-api-name="Opportunity" class="recordEditForm">
+            <!-- spinner -->
+            <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+            <!--Sub producto-->
+            <lightning-layout class="layout-padding fix-margin margin-right-display">
+                <lightning-layout-item size="4" >
+                    <div data-id="lookup2" if:true={hasProduct}>
+                        <c-av_-lookup data-id="clookup2"
+                            selection={initialSelectionByProduct} errors={errors} onsearch={handleSearchByProduct}
+                            onclick={handleSearchClick} onselectionchange={handleSelectionChangeByProduct} fieldlabel="Sub producto" 
+                            placeholder="Buscar sub producto..." is-multi-entry={isMultiEntry2} onfocus={prueba}>
+                        </c-av_-lookup>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            
+
+            <!-- Path de estados ...(por defecto en gestión/insistir)-->
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label class="slds-form-element__label">Estado de la Oportunidad</label>
+                    <c-av_-custom-path all-stages={allStages} edit-mode="true" current-stage={path}
+                        onchangenew={handlePath}></c-av_-custom-path>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows class="slds-grid slds-gutters layout-padding">
+                <div if:true={expeVenta} class="slds-col slds-size_1-of-3">
+                    <lightning-layout-item>
+                            <lightning-combobox  class="padding-priority" style= "width:100%"
+                                label="Expectativa de venta " value={potencial} options={optionsPotencial}
+                                placeholder="--Seleccionar--" onchange={handleChangePotencial}>
+                            </lightning-combobox>
+                    </lightning-layout-item>
+                </div>
+                <div if:true={isclosed} class="slds-col slds-size_1-of-3">
+                    <lightning-layout-item>
+                            <lightning-combobox class="padding-priority" label="Resolución"
+                                options={optionsResolucion} placeholder="Selecciona una resolución"
+                                onchange={handleChangeResolucion}>
+                            </lightning-combobox>
+                    </lightning-layout-item>
+                </div>
+                <lightning-layout-item class="slds-col slds-size_1-of-3">
+                    <lightning-input 
+                        class="textBoxLeft user-input" type="text" name="amount" label="Importe" value={amount} 
+                        onblur={handleAmount} placeholder="€">
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-col slds-size_1-of-3">
+                    <lightning-input 
+                        class="textBoxLeft user-input" type="text" name="margin" label="Margen Previsto" value={margin} 
+                        onblur={handleMargin} placeholder="€">
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows class="layout-padding fecha-priorizados margin-right-display">
+                <lightning-layout-item if:true={showDateAndCli} size="12" small-device-size="12" medium-device-size="6" large-device-size="4">
+                    <abbr if:true={asterisk} class="slds-required asterisk">*</abbr>
+                    <label class="slds-form-element__label label-fecha-gestion">Fecha de la próxima gestión</label>
+                    <lightning-input type="date" class="user-input-fecha" name="fechagestion" variant="label-hidden"
+                        value={fechagestion} onchange={handleFechaGestion}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item if:false={checkNotAllowed} size="12" small-device-size="12" medium-device-size="6" large-device-size="8">
+                    <div class="slds-grid toggle-div">
+                        <lightning-input type="toggle" name="incluir" class="toggle-input user-input"
+                            onchange={handleIncluir} variant="label-hidden" message-toggle-active=""
+                            message-toggle-inactive="" checked={incluir}></lightning-input>
+                        <label class="slds-form-element__label label-priorizador">Incluir la oportunidad en "Clientes
+                            Priorizados" la semana de "próxima gestión"</label>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout if:true={showDateAndCli} class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label if:true={reqFechaGestion} class="slds-form-element__label req-label">Para la etapa
+                        seleccionada es obligatorio informar fecha de próxima gestión</label>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <!--comentario-->
+                    <label ><p if:true={requiredComment} class ='slds-required asterisk'>*</p>Comentario</label>
+                    <lightning-textarea class="user-input fix-margin" max-length="4000" name="comentario" 
+                        value={comentario} onblur={handleComentario}></lightning-textarea>
+                    <lightning-layout>
+                        <lightning-layout-item size="12">
+                            <label if:true={otros} class="slds-form-element__label req-label">Porfavor, indica el motivo
+                                de la resolución</label>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <!--Toggle-->
+                    <div class="slds-grid layout-padding">
+                        <lightning-input type="toggle" class="user-input" name="toggle" variant="label-hidden"
+                            message-toggle-active="" message-toggle-inactive="" onchange={handleOtraEntidad}
+                            checked={hasOtherEntity}></lightning-input>
+                        <label class="slds-form-element__label">El cliente tiene el producto en otra Entidad /
+                            Compañía</label>
+                    </div>
+
+                    <div if:true={show}>
+                        <div class="slds-grid slds-gutters entidad-color layout-padding">
+                            <div class="slds-col slds-size_2-of-3">
+                                <lightning-input class="user-input" type="text" name="entidad" label="Entidad/Compañía"
+                                    value={entidad} onblur={handleEntidad}></lightning-input>
+                            </div>
+                        </div>
+                        <div if:true={listEntFields} class="slds-grid slds-gutters entidad-color entidad-color-padd">
+                            <template for:each={listEntFields} for:item="fieldEnt">
+                                <div class={fieldEnt.divClass} key={fieldEnt.label}>
+                                    <lightning-input if:true={fieldEnt.fecha} type="Date" name={fieldEnt.label}
+                                        label={fieldEnt.label} value={fieldEnt.value} onchange={handleEntityFields}>
+                                    </lightning-input>
+                                    <!--<lightning-input if:true={fieldEnt.moneda} type="number" step=".01" formatter="currency" name={fieldEnt.label} label={fieldEnt.label} value={fieldEnt.value} onchange={handleEntityFields}></lightning-input>-->
+                                    <lightning-input if:true={fieldEnt.moneda} type="text" step=".01"
+                                        name={fieldEnt.label} data-id="importe" label={fieldEnt.label}
+                                        value={fieldEnt.value} onchange={handleEntityFields}></lightning-input>
+                                    <lightning-input if:true={fieldEnt.text} type="text" step=".01"
+                                        name={fieldEnt.label} label={fieldEnt.label} value={fieldEnt.value}
+                                        onblur={handleEntityFields}></lightning-input>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-record-edit-form>
+    </div>
+    <div if:true={showDetail} class="opptask-form">
+        <lightning-record-edit-form object-api-name="Opportunity" class="recordEditForm">
+            <!--porque es de una cuenta?-->
+
+            <lightning-input-field class="textBoxLeft" field-name="AV_ProductExperience__c"></lightning-input-field>
+
+            <lightning-layout if:false={isreport} class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label class="slds-text-title_bold">Alta nueva oportunidad</label>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows class="slds-grid slds-wrap layout-padding">
+                <lightning-layout-item if:false={isreport} class="slds-col slds-size_6-of-12">
+                    <div data-id="lookup1" class="margin-right-search">
+                        <c-av_-lookup data-id="clookup1"
+                            selection={initialSelection} errors={errors} onsearch={handleSearchProduct}
+                            onselectionchange={handleSelectionChange} required=true fieldlabel="Producto"
+                            placeholder="Buscar producto..." is-multi-entry={isMultiEntry2} onfocus={prueba}>
+                        </c-av_-lookup>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-col slds-size_6-of-12">
+                    <div data-id="lookup2" if:true={hasProduct} class="margin-left-search">
+                        <c-av_-lookup data-id="clookup2"
+                            selection={initialSelectionByProduct} errors={errors} onsearch={handleSearchByProduct}
+                            onclick={handleSearchClick} onselectionchange={handleSelectionChangeByProduct} fieldlabel="Sub producto" 
+                            placeholder="Buscar sub producto..." is-multi-entry={isMultiEntry2} onfocus={prueba}>
+                        </c-av_-lookup>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows if:false={isreport} class="slds-grid slds-gutters layout-padding">
+                <lightning-layout-item class="slds-col">
+                    <lightning-input class="textBoxLeft user-input" type="text" required="true" name="oportunidad"
+                        label="Nombre de la oportunidad" value={oportunidad} onchange={handleOportunidad}>
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-col">
+                    <c-av_-lookup data-id="clookup5" selection={initialSelectionEmployee} errors={errors}
+                        onsearch={handleSearchEmployee} onselectionchange={handleSelectionEmployee}
+                        fieldlabel="Empleado/a asignado" is-multi-entry={isMultiEntry2} required>
+                    </c-av_-lookup>
+                </lightning-layout-item>
+            </lightning-layout>
+            <!-- spinner -->
+            <lightning-spinner if:true={loading} size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+            <!-- Path de estados ...(por defecto en gestión/insistir)-->
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label class="slds-form-element__label">Estado de la Oportunidad</label>
+                    <c-av_-custom-path all-stages={allStages} edit-mode="true" current-stage={path}
+                        onchangenew={handlePath}></c-av_-custom-path>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows class="slds-grid slds-gutters layout-padding">
+                <div if:true={expeVenta} class="slds-col slds-size_1-of-3">
+                    <lightning-layout-item>
+                            <lightning-combobox  class="padding-priority" style= "width:100%"
+                                label="Expectativa de venta " value={potencial} options={optionsPotencial}
+                                placeholder="--Seleccionar--" onchange={handleChangePotencial}>
+                            </lightning-combobox>
+                    </lightning-layout-item>
+                </div>
+                <div if:true={isclosed} class="slds-col slds-size_1-of-3">
+                    <lightning-layout-item>
+                            <lightning-combobox class="padding-priority" label="Resolución"
+                                options={optionsResolucion} placeholder="Selecciona una resolución"
+                                onchange={handleChangeResolucion}>
+                            </lightning-combobox>
+                    </lightning-layout-item>
+                </div>
+                <lightning-layout-item class="slds-col slds-size_1-of-3">
+                    <lightning-input 
+                        class="textBoxLeft user-input" type="text" name="amount" label="Importe" value={amount} 
+                        onblur={handleAmount} placeholder="€">
+                    </lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-col slds-size_1-of-3">
+                    <lightning-input 
+                        class="textBoxLeft user-input" type="text" name="margin" label="Margen Previsto" value={margin} 
+                        onblur={handleMargin} placeholder="€">
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout multiple-rows class="layout-padding fecha-priorizados margin-right-display">
+                <lightning-layout-item if:true={showDateAndCli} size="12" small-device-size="12" medium-device-size="6" large-device-size="4">
+                    <abbr if:true={asterisk} class="slds-required asterisk">*</abbr>
+                    <label class="slds-form-element__label label-fecha-gestion">Fecha de la próxima gestión</label>
+                    <lightning-input type="date" class="user-input-fecha" name="fechagestion" variant="label-hidden"
+                        value={fechagestion} onchange={handleFechaGestion}></lightning-input>
+                </lightning-layout-item>
+                <lightning-layout-item if:false={checkNotAllowed} size="12" small-device-size="12" medium-device-size="6" large-device-size="8">
+                    <div class="slds-grid toggle-div">
+                        <lightning-input type="toggle" name="incluir" class="toggle-input user-input"
+                            onchange={handleIncluir} variant="label-hidden" message-toggle-active=""
+                            message-toggle-inactive="" checked={incluir}></lightning-input>
+                        <label class="slds-form-element__label label-priorizador">Incluir la oportunidad en "Clientes
+                            Priorizados" la semana de "próxima gestión"</label>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label if:true={reqFechaGestion} class="slds-form-element__label req-label">Para la etapa
+                        seleccionada es obligatorio informar fecha de próxima gestión</label>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <label ><p if:true={requiredComment} class ='slds-required asterisk'>*</p>Comentario</label>
+                    <lightning-textarea class="user-input fix-margin" max-length="4000" name="comentario"
+                        value={comentario} onblur={handleComentario}></lightning-textarea>
+                    <lightning-layout>
+                        <lightning-layout-item size="12">
+                            <label if:true={otros} class="slds-form-element__label req-label">Porfavor, indica el motivo
+                                de la resolución</label>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <lightning-layout class="layout-padding">
+                <lightning-layout-item size="12">
+                    <!--Toggle-->
+                    <div class="slds-grid layout-padding" style="margin-bottom:45px ">
+                        <lightning-input type="toggle" class="user-input" name="toggle" variant="label-hidden"
+                            message-toggle-active="" message-toggle-inactive="" onchange={handleOtraEntidad}
+                            checked={hasOtherEntity}></lightning-input>
+                        <label class="slds-form-element__label">El cliente tiene el producto en otra Entidad /
+                            Compañía</label>
+                    </div>
+
+                    <div if:true={show}>
+                        <div class="slds-grid slds-gutters entidad-color layout-padding" style="margin-top:-45px">
+                            <div class="slds-col slds-size_2-of-3">
+                                <lightning-input class="user-input" type="text" name="entidad" label="Entidad/Compañía"
+                                    value={entidad} onblur={handleEntidad}></lightning-input>
+                            </div>
+                        </div>
+                        <div if:true={listEntFields} class="slds-grid slds-gutters entidad-color entidad-color-padd">
+                            <template for:each={listEntFields} for:item="fieldEnt">
+                                <div class={fieldEnt.divClass} key={fieldEnt.label}>
+                                    <lightning-input if:true={fieldEnt.fecha} type="Date" name={fieldEnt.label}
+                                        label={fieldEnt.label} value={fieldEnt.value} onchange={handleEntityFields}>
+                                    </lightning-input>
+                                    <lightning-input if:true={fieldEnt.moneda} type="text" step=".01"
+                                        name={fieldEnt.label} label={fieldEnt.label} value={fieldEnt.value}
+                                        onchange={handleEntityFields}></lightning-input>
+                                    <lightning-input if:true={fieldEnt.text} type="text" step=".01"
+                                        name={fieldEnt.label} label={fieldEnt.label} value={fieldEnt.value}
+                                        onblur={handleEntityFields}></lightning-input>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-record-edit-form>
+    </div>
+</template>

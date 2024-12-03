@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_EventosAccionistas</fullName>
+    <fields>EV_CampaignId__c</fields>
+    <fields>EV_FirstName__c</fields>
+    <fields>EV_LastName__c</fields>
+    <fields>EV_Status__c</fields>
+    <fields>EV_CompanyOrAccount__c</fields>
+    <label>Eventos Accionistas</label>
+</CompactLayout>

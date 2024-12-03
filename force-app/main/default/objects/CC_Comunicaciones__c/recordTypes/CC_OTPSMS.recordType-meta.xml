@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_OTPSMS</fullName>
+    <active>true</active>
+    <description>RecordType para crear un nuevo OTPSMS</description>
+    <label>OTPSMS</label>
+    <picklistValues>
+        <picklist>CC_Estado__c</picklist>
+        <values>
+            <fullName>Aprobado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancelada por agente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cerrado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Denegado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>En progreso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Error</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Expirado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No autorizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OTP No recibida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pdte%2E Envío</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pdte%2E Validar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendiente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Rechazado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Nivel__c</picklist>
+        <values>
+            <fullName>Cliente Digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emergencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nivel 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nivel 2</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Resultado_Validacion__c</picklist>
+        <values>
+            <fullName>Identificación NOK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Identificación emergencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Identificación manual</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OTP errónea</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OTP no recibida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OTP validada correctamente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,139 @@
+<apex:page standardController="SAC_Accion__c" extensions="SAC_FinalizarTareaVF" recordSetVar="records" lightningStylesheets="true" applyHtmlTag="false" showHeader="false">
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <apex:slds />
+        <style>
+            .modal {
+                display: none;
+            }
+            .errorMsg1 {
+                display: none;
+            }
+            .errorMsgInc {
+                display: none;
+            }
+        </style>
+        <apex:form id="form">
+
+            <apex:actionFunction action="{!save}" name="guardar" reRender="main" oncomplete="closeModal();" >               
+                <apex:param name="observaciones" value="" /> 
+                <apex:param name="observacionesInc" value="" /> 
+            </apex:actionFunction>
+                
+            <apex:pageBlock >
+            <apex:pageMessages />
+                <apex:pageBlockButtons location="bottom" rendered="{!If( mostrar,true,false)}">  
+                   <apex:commandButton value="Aceptar" status="status" 
+                   reRender="main, modal" oncomplete="$('#modalDeFinalizar').modal({backdrop:'static'}).show(); return false;" />   		               
+                <apex:commandButton action="{!cancel}" value="Cancelar" />
+                </apex:pageBlockButtons>
+            </apex:pageBlock>
+
+
+            <!--Popup número 1 -->
+        
+            <div id="modalDeFinalizar" class="modal slds-scope">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">¿Cómo quiere finalizar las tareas?</h2>
+                        </header>
+                        <footer class="slds-modal__footer slds-modal__footer_directional">
+                            <commandbutton class="slds-button slds-button_neutral" onclick="closeModal1(); return false">Cancelar</commandbutton>
+                            <commandbutton class="slds-button slds-button_neutral" onclick="mostrarModal3(); return false;">Finalizada incompleta</commandbutton>
+                            <commandbutton class="slds-button slds-button_neutral" onclick="mostrarModal2(); return false">Finalizada</commandbutton>
+                            
+                        </footer>
+                    </div>
+                </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+
+            <!--Popup número 2 -->
+
+             <div id="modalDeFinalizar2" class="modal slds-scope">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">¿Cómo quiere finalizar las tareas?</h2>
+                        </header>
+                        <footer class="slds-modal__footer slds-modal__footer_directional">
+                            <commandbutton class="slds-button slds-button_neutral" onclick="closeModal2(); return false">Cancelar</commandbutton>
+                            <commandbutton class="slds-button slds-button_neutral" onclick="mostrarModal3(); return false;">Añadir comentarios</commandbutton>
+                            <commandbutton class="slds-button slds-button_neutral" onclick="guardarJS(); return false">Sin añadir comentarios</commandbutton>						
+                        </footer>
+                    </div>
+                </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+
+            <!--Popup número 3 -->
+
+            <div id="modalDeFinalizar3" class="modal slds-scope">
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Por favor, deje aquí sus comentarios </h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="Observaciones">
+                                <abbr class="slds-required" title="required">* </abbr>Comentarios</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="observaciones" placeholder="Escribe aquí el texto…"  class="slds-input" />
+                            </div>
+                            <div class="slds-form-element__control errorMsg1" id="errorMsg">
+                                <br />
+                                <span style="color: red"> Por favor, introduce una observación. </span>
+                            </div>
+                            </div>                   
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <commandbutton class="slds-button slds-button_neutral" onclick="closeModal3(); return false;">Cancelar</commandbutton>
+                            <commandbutton class="slds-button slds-button_brand" onclick="guardarIncJS(); return false">Guardar</commandbutton>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+
+
+        <script>
+            function closeModal1() {                
+                $('#modalDeFinalizar').modal('hide');
+            }
+            function closeModal2() {                
+                $('#modalDeFinalizar2').modal('hide');
+            } 
+            function closeModal3() {                
+                $('#modalDeFinalizar3').modal('hide');
+            }             
+            function mostrarModal2(){
+                $('#modalDeFinalizar').modal('hide');
+                $('#modalDeFinalizar2').modal({backdrop:'static'}).show(); return false;
+            }
+            function mostrarModal3(){
+                $('#modalDeFinalizar').modal('hide');
+                $('#modalDeFinalizar3').modal({backdrop:'static'}).show(); return false;
+            }             
+            function guardarJS(){
+                guardar('sincomentarios');
+                $('#modalDeFinalizar2').modal('hide');                
+            }   
+            function guardarIncJS(){ 
+                var str = document.getElementById('observaciones').value;
+                /*if(str != ''){
+                    guardar(str);
+                }
+                else{
+                    $('#errorMsg').removeClass('errorMsg1');
+                }*/
+                
+                str!='' ? guardar(str) :  $('#errorMsg').removeClass('errorMsg1');
+            }            
+            
+	   
+        </script>
+    </apex:form>    
+</apex:page>

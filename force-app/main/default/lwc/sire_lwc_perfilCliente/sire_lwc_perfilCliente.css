@@ -1,0 +1,18 @@
+.alignDerecha{
+    text-align: right !important;
+}
+
+.alignIzquierda{
+    text-align: left !important;
+}
+
+.slds-col {
+    margin-bottom: 5px;
+    align-self: center;
+}
+
+.linea {
+    color: #e5e5e5;
+    margin-bottom: 15px;
+    margin-top: 0px;
+}

@@ -1,0 +1,217 @@
+<aura:component controller="CC_ST_ReviewsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute name="recordId" type="String" />
+    <aura:attribute name="cssStyle" type="String"/>
+    <aura:attribute name="userInfo" type="user"/> 
+    <aura:attribute name="Respuesta" type="Boolean" default="false"/> 
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:unescapedHtml value="{!v.cssStyle}"/>
+    
+    <aura:attribute name="AuthorName" type="String" />
+    <aura:attribute name="Title" type="String" />
+    <aura:attribute name="Rating" type="String" />
+    <aura:attribute name="Content" type="String" />
+    <aura:attribute name="AppName" type="String" />
+    <aura:attribute name="ImgURL" type="String" />
+    <aura:attribute name="ReviewId" type="String" />
+    <aura:attribute name="Fecha" type="String" />
+    <aura:attribute name="caseExist" type="String" />
+    <aura:attribute name="CaseId" type="String" />
+    <aura:attribute name="CaseNumber" type="String" />
+    <aura:attribute name="CaseStatus" type="String" />
+    <aura:attribute name="CaseIdioma" type="String" />
+    <aura:attribute name="Mensaje" type="String" />
+    <aura:attribute name="Version" type="String" />
+    <aura:attribute name="Source" type="String" />
+    <aura:attribute name="Origin" type="String" />
+    <aura:attribute name="LastMsg" type="String" default="" />
+    <aura:attribute name="oTabuladas" type="List" />
+    <aura:attribute name="AppReviewsID" type="String" />
+    <aura:attribute name="App_ID" type="String" />
+        
+    <aura:if isTrue="{!v.Origin == 'Comentarios Stores'}">
+        <lightning:card variant="Narrow">
+            <div class="body_component">
+                    <article class="slds-card slds-m-around_x-large">
+                        <div class="slds-card__header slds-grid">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                        <img style="height: 60px; width: 60px;" src="{!v.ImgURL}"/>
+                                        <span class="slds-assistive-text">Logo</span>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h2 class="slds-card__header-title">
+                                            <h2 class="slds-text-heading_small">{!v.AppName}</h2>
+                                    </h2>
+                                    <h2 class="slds-card__header-title">
+                                            <h2 class="slds-text-heading_small">{!v.Title}</h2>
+                                    </h2>
+                                    <h2 class="slds-card__header-title">
+                                        <h2 class="slds-text-body_small">De {!v.AuthorName}</h2>
+                                    </h2>
+                                    <h2 class="slds-card__header-title">
+                                        <h2 class="slds-text-body_small">Versión: {!v.Version}</h2>
+                                    </h2>
+                                </div>    
+                                <aura:if isTrue="{!v.Source == 'Apple App Store'}">
+                                    <div class="slds-media__figure">
+                                        <span  title="IOS">
+                                            <img style="border-radius: 11px;" src="{!$Resource.CC_Iconos + '/ios.png'}"/>
+                                            <span class="slds-assistive-text">IOS</span>
+                                        </span>
+                                    </div>
+                                </aura:if>
+                                
+                                <aura:if isTrue="{!v.Source == 'Google Play Store'}">
+                                    <div class="slds-media__figure">
+                                        <span  title="Android">
+                                            <img style="border-radius: 11px;" src="{!$Resource.CC_Iconos + '/android.png'}"/>
+                                            <span class="slds-assistive-text">Android</span>
+                                        </span>
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!v.Source == 'Huawei App Store'}">
+                                    <div class="slds-media__figure">
+                                        <span  title="Huawei">
+                                            <img style="border-radius: 11px;" src="{!$Resource.CC_Iconos + '/huawei.jpg'}"/>
+                                            <span class="slds-assistive-text">Huawei</span>
+                                        </span>
+                                    </div>
+                                </aura:if>
+                            </header>
+                            <div class="slds-no-flex">
+                                <h2 class="slds-card__header-title">
+                                    <aura:if isTrue="{!(v.Rating == '1')}">
+                                        <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!(v.Rating == '2')}">
+                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!(v.Rating == '3')}">
+                                                        <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                        <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                        <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!(v.Rating == '4')}">
+                                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                    <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                    <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                    <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                    <lightning:icon iconName="utility:favorite" size="x-small"/>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner">{!v.Content}</div>
+                </article>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <lightning:card variant="Narrow">
+                    <aura:if isTrue="{!v.CaseStatus != 'Cerrado'}">
+                        <!--<div class="row" aura:id = "BotonRespuesta">
+                            <lightning:button variant="brand"
+                                              iconName="utility:reply"
+                                              onclick="{!c.Habilitar_respuesta}"
+                                              label="Responder a la Store"
+                                              aura:id="btn0"/>
+                        </div> slds-hide-->
+                        <div class="row" aura:id = "Respuesta">  
+                            <lightning:textarea name="input" aura:id="inputF" value="{!v.Mensaje}" placeholder="Respuesta a Store" maxlength="350" messageWhenTooLong="No se permiten más de 350 caracteres." />
+                            <p align="right">
+                                <aura:if isTrue="{!v.Source == 'Apple App Store'}">
+                                    <lightning:button variant="brand"
+                                                    iconName="utility:copy_to_clipboard"
+                                                    onclick="{!c.RespuestaStore}"
+                                                    label="Copiar texto al portapapeles"
+                                                    aura:id="btn1"/>
+                                </aura:if>
+                                <aura:if isTrue="{!v.Source == 'Google Play Store'}">
+                                    <lightning:button variant="brand"
+                                                        iconName="utility:reply"
+                                                        onclick="{!c.RespuestaStore}"
+                                                        label="Enviar a Google Play"
+                                                        aura:id="btn2"/>
+                                </aura:if>
+                                <aura:if isTrue="{!v.Source == 'Huawei App Store'}">
+                                    <lightning:button variant="brand"
+                                                        iconName="utility:reply"
+                                                        onclick="{!c.RespuestaStore}"
+                                                        label="Enviar a Huawei App"
+                                                        aura:id="btn3"/>
+                                </aura:if>
+                                <lightning:button variant="brand"
+                                                    iconName="utility:open_folder" 
+                                                    onclick="{!c.buscarTabuladaStore}"
+                                                    label="Seleccionar tabulada"
+                                                    aura:id="btn2"/>
+                            </p>
+                        </div>
+                    </aura:if>
+                    <!-- Respuesta si depende del boton para que aparezca el texto y tabuladas -->
+                </lightning:card>
+            </div>
+        </lightning:card>
+	</aura:if>
+    <!--Modal Respuesta Tabuladas-->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="Modalbox">
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <button class="slds-button slds-button_icon slds-modal__close" title="Cerrar" onclick="{!c.cerrarModal}">
+                        <span class="slds-icon_container" title="Cerrar">
+                            <lightning:icon iconName="utility:close" size="small"/>
+                        </span>
+                        <span class="slds-assistive-text">Cerrar</span>
+                </button>
+                <!--Título-->
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Respuestas Comentarios Stores</h2>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-p-around--medium">
+                <div class="slds-card__body slds-card__body_inner">
+                    <div class="slds-form-element">
+                        <b><label class="slds-form-element__label" for="combobox-unique-id">Seleccione una respuesta</label></b>
+                        <aura:iteration items="{!v.oTabuladas}" var="oCon">                        
+                            <article class="slds-card">
+                                <div class="slds-card__header slds-grid">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__body">
+                                            <p><b>{!oCon.Name}:</b></p>
+                                            <p>{!oCon.Message}</p>
+                                        </div>
+                                        <div class="slds-no-flex">
+                                            <lightning:button class="slds-button" iconName="utility:quick_text" label="Seleccionar" name="{!oCon.Message}" onclick="{!c.selTabulada}"  />
+                                        </div>
+                                    </header>
+                                </div>
+                            </article>
+                        </aura:iteration>
+                    </div>
+                </div>
+            </div>
+    		<!--Pie del modal-->
+            <footer class="slds-modal__footer">
+                <!-- <lightning:button class="slds-button slds-button_brand" label="Remitir" onclick="{!c.remitirColaborador}"/> -->
+                <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModal}"/>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+</aura:component>

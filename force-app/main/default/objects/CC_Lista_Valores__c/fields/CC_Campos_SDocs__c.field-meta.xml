@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Campos_SDocs__c</fullName>
+    <description>Lista multiple que contiene los campos posibles a seleccionar para las plantillas de SDocs.</description>
+    <label>Campos SDocs</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>CC_All_In_One__c</fullName>
+                <default>false</default>
+                <label>All In One</label>
+            </value>
+            <value>
+                <fullName>CC_Bloqueo_Retencion_Saldo__c</fullName>
+                <default>false</default>
+                <label>Bloqueo Retención Saldos</label>
+            </value>
+            <value>
+                <fullName>CC_Cambio_Oficina__c</fullName>
+                <default>false</default>
+                <label>Cambio de oficina</label>
+            </value>
+            <value>
+                <fullName>CC_Cierre_Recinto_Cajero__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Cierre_Recinto_Cajero__c</label>
+            </value>
+            <value>
+                <fullName>CC_Indicar_Gastos__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Indicar_Gastos__c</label>
+            </value>
+            <value>
+                <fullName>CC_Informacion_Condiciones_Financiacion__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Informacion_Condiciones_Financiacion__c</label>
+            </value>
+            <value>
+                <fullName>CC_Ofrecio_Soluciones_Refinanciacion__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Ofrecio_Soluciones_Refinanciacion__c</label>
+            </value>
+            <value>
+                <fullName>CC_Queja_Cobro_Tarifa_Telefonica__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Queja_Cobro_Tarifa_Telefonica__c</label>
+            </value>
+            <value>
+                <fullName>CC_Queja_Limpieza__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Queja_Limpieza__c</label>
+            </value>
+            <value>
+                <fullName>CC_Queja_Persona_Sin_Hogar__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Queja_Persona_Sin_Hogar__c</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Cancelacion_Contratos__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Solicitud_Cancelacion_Contratos__c</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Info_Prestamo__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Solicitud_Info_Prestamo__c</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Informacion_Aportar__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Solicitud_Informacion_Aportar__c</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Informacion_Requisitos__c</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CC_Solicitud_Informacion_Requisitos__c</label>
+            </value>
+            <value>
+                <fullName>CC_Codigo_Prestamo__c</fullName>
+                <default>false</default>
+                <label>Código Préstamo</label>
+            </value>
+            <value>
+                <fullName>CC_Contacto_Cliente__c</fullName>
+                <default>false</default>
+                <label>Contacto con el cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Contestar_Respuesta_Cliente__c</fullName>
+                <default>false</default>
+                <label>Contestar la respuesta del cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Contrato_Tarjeta_Cliente__c</fullName>
+                <default>false</default>
+                <label>Contrato tarjeta cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Copia_Parcial_Escritura__c</fullName>
+                <default>false</default>
+                <label>Copia parcial escritura</label>
+            </value>
+            <value>
+                <fullName>CC_Cuadro_Amortizacion__c</fullName>
+                <default>false</default>
+                <label>Cuadro amortización</label>
+            </value>
+            <value>
+                <fullName>CC_Detalle_Informacion_Enviar__c</fullName>
+                <default>false</default>
+                <label>Detalle información a enviar</label>
+            </value>
+            <value>
+                <fullName>CC_Documentacion_Adicional__c</fullName>
+                <default>false</default>
+                <label>Documentación adicional</label>
+            </value>
+            <value>
+                <fullName>CC_Documentacion_No_Localizada_Cliente__c</fullName>
+                <default>false</default>
+                <label>Documentación no localizada (cliente)</label>
+            </value>
+            <value>
+                <fullName>CC_Documentacion_No_Localizada__c</fullName>
+                <default>false</default>
+                <label>Documentación no localizada (promotor)</label>
+            </value>
+            <value>
+                <fullName>CC_Extractos_Liquidacion__c</fullName>
+                <default>false</default>
+                <label>Extractos y/o liquidación</label>
+            </value>
+            <value>
+                <fullName>CC_Falta_Entrega__c</fullName>
+                <default>false</default>
+                <label>Falta Entrega</label>
+            </value>
+            <value>
+                <fullName>CC_Fecha_Final_Calculo__c</fullName>
+                <default>false</default>
+                <label>Fecha final del cálculo</label>
+            </value>
+            <value>
+                <fullName>CC_Fraude__c</fullName>
+                <default>false</default>
+                <label>Fraude</label>
+            </value>
+            <value>
+                <fullName>CC_Hello_Letter__c</fullName>
+                <default>false</default>
+                <label>HELLO LETTER</label>
+            </value>
+            <value>
+                <fullName>CC_Informacion_Documentacion_Adicional__c</fullName>
+                <default>false</default>
+                <label>Información documentación adicional</label>
+            </value>
+            <value>
+                <fullName>CC_Movimiento_En_Cuenta__c</fullName>
+                <default>false</default>
+                <label>Información sobre movimiento en cuenta</label>
+            </value>
+            <value>
+                <fullName>CC_Intervencion_Fuerzas_Seguridad__c</fullName>
+                <default>false</default>
+                <label>Intervención fuerzas de seguridad</label>
+            </value>
+            <value>
+                <fullName>CC_No_Localiza_Contrato_Cuenta__c</fullName>
+                <default>false</default>
+                <label>No se localiza en contrato de la cuenta</label>
+            </value>
+            <value>
+                <fullName>CC_Parte_Documentacion__c</fullName>
+                <default>false</default>
+                <label>Parte de documentación</label>
+            </value>
+            <value>
+                <fullName>CC_Prestamo_Titulizado__c</fullName>
+                <default>false</default>
+                <label>Préstamo titulizado</label>
+            </value>
+            <value>
+                <fullName>CC_Prestamo_Vendido_Tercero__c</fullName>
+                <default>false</default>
+                <label>Préstamo vendido a un tercero</label>
+            </value>
+            <value>
+                <fullName>CC_Respuesta_Cliente__c</fullName>
+                <default>false</default>
+                <label>Resumen de la respuesta del cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Sexo__c</fullName>
+                <default>false</default>
+                <label>Sexo</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud__c</fullName>
+                <default>false</default>
+                <label>Solicitud</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Cancelacion_Seguro__c</fullName>
+                <default>false</default>
+                <label>Solicitud Cancelacion Seguros</label>
+            </value>
+            <value>
+                <fullName>CC_Cuenta_A_Mi_Nombre__c</fullName>
+                <default>false</default>
+                <label>Solicitud cuentas a mi nombre</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Documentacion__c</fullName>
+                <default>false</default>
+                <label>Solicitud Documentación</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Facturas_Gastos__c</fullName>
+                <default>false</default>
+                <label>Solicitud facturas de gastos</label>
+            </value>
+            <value>
+                <fullName>CC_Solicitud_Testamentaria__c</fullName>
+                <default>false</default>
+                <label>Solicitud Testamentaria</label>
+            </value>
+            <value>
+                <fullName>CC_Tasacion_Inmueble_Hipotecado__c</fullName>
+                <default>false</default>
+                <label>Tasación del inmueble hipotecado</label>
+            </value>
+            <value>
+                <fullName>CC_Tiempo_Espera__c</fullName>
+                <default>false</default>
+                <label>Tiempo de espera</label>
+            </value>
+            <value>
+                <fullName>CC_Tono_Irrespetuoso__c</fullName>
+                <default>false</default>
+                <label>Tono Irrespetuoso</label>
+            </value>
+            <value>
+                <fullName>CC_Usuario_Now__c</fullName>
+                <default>false</default>
+                <label>Usuario de Now</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

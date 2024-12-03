@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Mis Oportunidades</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_BackgroundColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_BorderColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Data__c</field>
+        <value xsi:type="xsd:string">SELECT COUNT() FROM Opportunity WHERE StageName IN (&apos;Potencial&apos;,&apos;En gestión/insistir&apos;,&apos;En espera&apos;) AND AccountId != null AND AV_PF__c != null AND Name != null AND AV_FechaProximoRecordatorio__c &gt; TODAY AND RecordType.DeveloperName IN (&apos;AV_Iniciativa&apos;,&apos;AV_AlertaComercial&apos;,&apos;AV_Propuesta&apos;,&apos;AV_Sugerencia&apos;) AND Account.AV_Negocio__c != null AND OwnerId = &apos;#userId&apos;</value>
+    </values>
+    <values>
+        <field>AV_FilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Orden__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Redirect__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>AV_ReportName__c</field>
+        <value xsi:type="xsd:string">AV_MyOpportunities</value>
+    </values>
+    <values>
+        <field>AV_TipoGrafico__c</field>
+        <value xsi:type="xsd:string">bar</value>
+    </values>
+    <values>
+        <field>AV_UserBackgroundColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,0.5)</value>
+    </values>
+    <values>
+        <field>AV_UserBorderColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,1)</value>
+    </values>
+    <values>
+        <field>AV_UserFilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

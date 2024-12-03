@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MotivoInadmision__c</fullName>
+    <description>Campo para guardar el motivo de la inadmisión de una Reclamación/Pretensión en el proyecto de SAC.</description>
+    <label>Motivo inadmisión</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SAC_SentidoResolucion__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Antigüedad reclamación</fullName>
+                <default>false</default>
+                <label>Antigüedad reclamación</label>
+            </value>
+            <value>
+                <fullName>Empleados</fullName>
+                <default>false</default>
+                <label>Empleados</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>Inadmitida - Falta Concreción</label>
+            </value>
+            <value>
+                <fullName>SAC_010</fullName>
+                <default>false</default>
+                <label>Inadmitida - Falta de representación</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>Inadmitida - Ident. Incompleta</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Inadmitida - Incompetente</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Inadmitida - Otras instancias</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Inadmitida - Prescripción</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Inadmitida - Reiteración</label>
+            </value>
+            <value>
+                <fullName>No consumidor</fullName>
+                <default>false</default>
+                <label>No consumidor</label>
+            </value>
+            <value>
+                <fullName>Prescripción</fullName>
+                <default>false</default>
+                <label>Prescripción</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>Antigüedad reclamación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>Empleados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_004</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_010</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_005</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_006</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_007</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_008</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>SAC_009</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>No consumidor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_004</controllingFieldValue>
+            <valueName>Prescripción</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

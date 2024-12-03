@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Motivos_CSI_Bankia</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Tematica_Formula__c</columns>
+    <columns>CC_Producto_Servicio__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Motivo</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>CSI Bankia</value>
+    </filters>
+    <filters>
+        <field>CC_Fecha_Vigencia_Inicio__c</field>
+        <operation>greaterOrEqual</operation>
+        <value>2/12/2020 12:00 AM</value>
+    </filters>
+    <label>Motivos CSI Bankia</label>
+    <sharedTo>
+        <group>CC_Correos_entrantes_CSI_Bankia</group>
+        <group>CC_N2_CSI_CCO_Empl_Bankia</group>
+        <group>CC_N3_CSI_Empl_Bankia</group>
+        <group>CC_Respuesta_CSI_Bankia</group>
+    </sharedTo>
+</ListView>

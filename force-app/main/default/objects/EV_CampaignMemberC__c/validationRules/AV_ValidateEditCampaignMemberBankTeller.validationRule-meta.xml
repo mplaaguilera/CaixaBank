@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidateEditCampaignMemberBankTeller</fullName>
+    <active>true</active>
+    <description>Validación de que no pueda modificar CampaignMember si el usuario tiene el permiso de bank teller.</description>
+    <errorConditionFormula>$Permission.AV_BankTeller_Custom</errorConditionFormula>
+    <errorMessage>Su usuario no tiene suficientes permisos para modificar este registro.</errorMessage>
+</ValidationRule>

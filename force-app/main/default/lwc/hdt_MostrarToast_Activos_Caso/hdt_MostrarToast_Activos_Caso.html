@@ -1,0 +1,11 @@
+<template>
+    <lightning-card title="Advertencia" icon-name="utility:warning">
+        <div class="slds-m-around_medium">
+            <p>El activo asociado a este caso está marcado como inactivo. ¿Deseas continuar con la operación?</p>
+        </div>
+        <div class="slds-m-around_medium">
+            <lightning-button label="Continuar" variant="brand" onclick={handleContinue}></lightning-button>
+            <lightning-button label="Cancelar" variant="neutral" onclick={handleCancel}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

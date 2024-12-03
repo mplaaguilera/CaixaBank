@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Grupos_Tercer_Nivel</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Queue_Traslado__c</columns>
+    <columns>CC_Tipo_cliente__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.CC_Grupo_Tercer_Nivel</value>
+    </filters>
+    <label>Grupos Tercer Nivel</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_TipoClasificacion__c</fullName>
+    <description>Tipo de clasificación para el caso en Segmentos.</description>
+    <label>Tipo de clasificación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Regla de clasificación</fullName>
+                <default>false</default>
+                <label>Regla de clasificación</label>
+            </value>
+            <value>
+                <fullName>Cognitive sin adjuntos</fullName>
+                <default>false</default>
+                <label>Cognitive sin adjuntos</label>
+            </value>
+            <value>
+                <fullName>Cognitive con adjuntos</fullName>
+                <default>false</default>
+                <label>Cognitive con adjuntos</label>
+            </value>
+            <value>
+                <fullName>Robot no clasificado</fullName>
+                <default>false</default>
+                <label>Robot no clasificado</label>
+            </value>
+            <value>
+                <fullName>No se ha podido clasificar</fullName>
+                <default>false</default>
+                <label>No se ha podido clasificar</label>
+            </value>
+            <value>
+                <fullName>Clasificado Manualmente</fullName>
+                <default>false</default>
+                <label>Clasificado Manualmente</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

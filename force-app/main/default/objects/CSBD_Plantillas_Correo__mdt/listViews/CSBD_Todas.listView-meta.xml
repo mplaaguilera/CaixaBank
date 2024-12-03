@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Todas</fullName>
+    <columns>MasterLabel</columns>
+    <columns>CSBD_Idioma__c</columns>
+    <columns>CSBD_Nombre_Plantilla__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>CSBD_Todas</label>
+    <language>en_US</language>
+</ListView>

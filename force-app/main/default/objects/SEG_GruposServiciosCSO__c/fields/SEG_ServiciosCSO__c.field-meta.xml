@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ServiciosCSO__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Servicios CSO</label>
+    <referenceTo>SEG_ServiciosCSO__c</referenceTo>
+    <relationshipLabel>Grupos Servicios CSO</relationshipLabel>
+    <relationshipName>Grupos_Servicios_CSO</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

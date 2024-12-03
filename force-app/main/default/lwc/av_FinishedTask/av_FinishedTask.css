@@ -1,0 +1,16 @@
+.closed-form{
+    margin-left: 3rem;
+    margin-right: 1rem;
+}
+.card-title{
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.inputs{width:100%}
+
+.formattedDate {
+    padding-top: var(--lwc-spacingXxSmall,0.25rem);
+}
+
+.mmm  label{ display:none}

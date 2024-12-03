@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Busqueda_email</fullName>
+    <columns>FULL_NAME</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <columns>EMPLOYEE_NUMBER</columns>
+    <columns>CORE.USERS.USERNAME</columns>
+    <columns>CORE.USERS.EMAIL</columns>
+    <columns>CORE.USER_ROLE.NAME</columns>
+    <columns>CORE.PROFILE.NAME</columns>
+    <columns>CORE.USERS.DEPARTMENT</columns>
+    <columns>CORE.USERS.ACTIVE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CORE.USERS.EMAIL</field>
+        <operation>equals</operation>
+        <value>sohalloran@salesforce.com</value>
+    </filters>
+    <label>Búsqueda email</label>
+    <language>en_US</language>
+</ListView>

@@ -1,0 +1,59 @@
+<template>
+    <lightning-card class="customCard slds-border_bottom" variant="Narrow" title="Cesión de permisos"
+        icon-name="standard:portal">
+        <label class="inputPadding"><b>Puedes conceder un máximo de 3 permisos </b> </label>
+        <span> <lightning-badge style="margin-left:1rem;margin-top:1rem" label={permisosDispoLabel}></lightning-badge></span>
+        <div class="slds-border_bottom" style="margin:1rem 0"></div>
+        <div class="inputPadding">
+            <div data-id="lookup1"  style="width:100%">
+                <c-av_-lookup data-id="clookup1" onsearch={handleSearchOffice}
+                    onselectionchange={handleSelectionOffice} fieldlabel="  Ceder a: " placeholder="Buscar empleado/a"
+                    my-office="false" is-multy-entry = "false">
+                </c-av_-lookup>
+            </div>
+        </div>
+        <div class="slds-form_vertical inputPadding ">
+            <b if:true={showLabel}>Empleados seleccionados: </b>
+            <template for:each={selectedEmployees} for:item="emp">
+                <div key={emp.bucleId} data-id="emp" class="emp-select " style="margin:8px 0">
+                    <lightning-pill label={emp.label} name={emp.id} onremove={unSelectEmployee} >
+                        <lightning-icon icon-name="standard:user" alternative-text="user" style="border-radius:15px"></lightning-icon>
+                    </lightning-pill>
+                </div>
+            </template>
+            <div if:true={showLabel} class="slds-border_bottom"></div>
+            <div>
+                <div class="slds-grid" style="padding-right:.5 rem" >
+                    <div class="slds-col">
+                        <div class="stickyLabel" >
+                            <abbr class="slds-required asterisk">*</abbr>
+                            <label class="slds-form-element__label label-fecha-gestion">Inicio cesión</label>
+                        </div>
+                        <lightning-input data-id='startDate' class="slds-size_12-of-12" type="date"
+                            name="startDateInterval" onchange={handleDates} disabled={employeesDiv}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12"></div>
+                    <div class="slds-col" style="align-items: right;">
+                        <div style="text-align:left">
+                            <div class="stickyLabel">
+                                <abbr class="slds-required ">*</abbr>
+                                <label class="slds-form-element__label label-fecha-gestion">Final cesión</label>
+                            </div>
+                            <lightning-input data-id='endDate' class="slds-size_12-of-12" type="date"
+                                name="endDateInterval" onchange={handleDates} disabled={employeesDiv}>
+                            </lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttonDiv">
+                    <button type="button" class="slds-button slds-button_neutral" onclick={cancelModal}>Cancelar
+                    </button>
+                    <button type="button" class="slds-button slds-button_brand" onclick={cederPermisos}
+                        disabled={formedPer}>Aceptar </button>
+                </div>
+            </div>
+        </div>
+        <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls">
+        </lightning-spinner>
+    </lightning-card>
+</template>

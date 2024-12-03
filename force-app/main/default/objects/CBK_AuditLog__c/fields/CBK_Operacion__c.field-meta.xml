@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Operacion__c</fullName>
+    <description>Identificador del tipo de operación auditada (C,R,U,D)</description>
+    <label>Operación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>Creación</label>
+            </value>
+            <value>
+                <fullName>R</fullName>
+                <default>false</default>
+                <label>Lectura</label>
+            </value>
+            <value>
+                <fullName>U</fullName>
+                <default>false</default>
+                <label>Actualización</label>
+            </value>
+            <value>
+                <fullName>D</fullName>
+                <default>false</default>
+                <label>Borrado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

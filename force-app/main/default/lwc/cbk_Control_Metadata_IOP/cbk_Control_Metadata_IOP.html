@@ -1,0 +1,72 @@
+<template>
+		<lightning-card variant="Narrow" title="Control de colisión de Metadata" icon-name="custom:custom43">
+				<div class="row">
+						<div class="column">
+								<div class="slds-p-horizontal_small">
+										<c-cbk_-mv_-picklist 
+												if:true={picklistValues} 
+												options={picklistValues}
+												onvaluechange={handleValueChange} 
+												label="IOPs">
+										</c-cbk_-mv_-picklist>
+								</div>
+						</div>
+						<div class="column">
+								<div class="slds-p-horizontal_small">
+										<lightning-combobox label="Entornos" 
+																				name="Entornos" 
+																				onchange={handleValueChangeEnt} 
+																				options={picklistValuesEnt} 
+																				placeholder={Entorno} 
+																				value={Entorno}>
+										</lightning-combobox>
+										<div if:true={error} style="margin-left:3%">
+												<b style="color: red;">{error}</b>
+										</div>
+								</div>		
+						</div>
+				</div>
+
+				
+				<fieldset class="slds-form-element">
+						<div class="slds-form-element__control">
+								<div class="slds-radio_button-group">
+										<span class="slds-button slds-radio_button">
+												<input type="radio" name="example-unique-name-92" id="example-unique-id-94" value="US" onclick={handleValueChangeTipo}/>
+												<label class="slds-radio_button__label" for="example-unique-id-94">
+														<span class="slds-radio_faux">Colisión por User Story</span>
+												</label>
+										</span>
+										<span class="slds-button slds-radio_button">
+												<input type="radio" name="example-unique-name-92" id="example-unique-id-95" value="Proyecto" onclick={handleValueChangeTipo} />
+												<label class="slds-radio_button__label" for="example-unique-id-95">
+														<span class="slds-radio_faux">Colisión por Proyecto</span>
+												</label>
+										</span>
+										<span class="slds-button slds-radio_button">
+												<input type="radio" name="example-unique-name-92" id="example-unique-id-96" value="IOP" onclick={handleValueChangeTipo} />
+												<label class="slds-radio_button__label" for="example-unique-id-96">
+														<span class="slds-radio_faux">Colisión por IOPs</span>
+												</label>
+										</span>
+								</div>
+						</div>
+				</fieldset>	
+				
+				<div if:true={isLoaded}>		
+						<lightning-tree-grid columns = {gridColumns}
+																		data = {gridData}
+																		key-field = "Objeto"
+																		hide-checkbox-column = true
+																		onheaderaction = {handleHeaderAction}>
+						</lightning-tree-grid>
+						
+				</div>
+				<div if:false={isLoaded} class="slds-is-relative">
+            <lightning-spinner
+                alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+		
+		</lightning-card>
+</template>

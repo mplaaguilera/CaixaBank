@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_IncludeInPrioritizingCustomers__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Al marcar esta opción, se incluirá la oportunidad en “clientes priorizados” la semana correspondiente a la fecha de próxima gestión</inlineHelpText>
+    <label>Incluir en “clientes priorizados”</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

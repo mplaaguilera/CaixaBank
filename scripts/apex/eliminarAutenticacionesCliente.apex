@@ -1,0 +1,1 @@
+Database.delete([SELECT Id FROM CC_Comunicaciones__c WHERE CC_Cliente__c = '0015r00000w5weBAAQ'], false);

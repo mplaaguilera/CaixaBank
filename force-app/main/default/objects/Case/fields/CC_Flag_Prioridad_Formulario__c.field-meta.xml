@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Flag_Prioridad_Formulario__c</fullName>
+    <description>Flag Prioridad para formulario web, calculando los SLA&apos;s para poner los colores de prioridad</description>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Canal_Procedencia__c,&apos;Formulario Consultas Operativas&apos;),IF(NOT(ISBLANK(CC_EstadoSLA__c)),IF(CONTAINS(CC_EstadoSLA__c, &apos;Verde&apos;),IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),IF(CONTAINS(CC_EstadoSLA__c, &apos;Naranja&apos;),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15))),IF(NOT(ISNULL(CC_FechasSLA__c)),IF(NOT(ISNULL(ClosedDate)),IF(ClosedDate &lt; DATETIMEVALUE(LEFT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),IF(ClosedDate &gt; DATETIMEVALUE(LEFT(CC_FechasSLA__c,19)) &amp;&amp; ClosedDate &lt; DATETIMEVALUE(RIGHT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),IF(ClosedDate &gt; DATETIMEVALUE(RIGHT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)))),IF(NOW() &lt; DATETIMEVALUE(LEFT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),IF(NOW() &gt; DATETIMEVALUE(LEFT(CC_FechasSLA__c,19)) &amp;&amp; NOW() &lt; DATETIMEVALUE(RIGHT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),IF(NOW() &gt; DATETIMEVALUE(RIGHT(CC_FechasSLA__c,19)),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15))))),IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15))),
+IF(ISPICKVAL(CC_Canal_Procedencia__c,&apos;Caixabank Talks&apos;),
+    IF(NOT(ISNULL(CC_Fecha_Traslado_Colaborador__c)),IF(((CC_Fecha_Traslado_Colaborador__c - CreatedDate)*24) &lt; 5,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15)),
+    IF(((NOW() - CreatedDate)*24) &lt; 5,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15))),
+    IF(AND(ISNULL(CC_Fecha_Activo_Formulario__c),NOT(ISNULL(ClosedDate))),
+	IF(((ClosedDate - CreatedDate)*24)&lt;=2,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+		IF(AND(((ClosedDate - CreatedDate)*24)&gt;2,((ClosedDate - CreatedDate)*24)&lt;=48),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15), 
+			IF(((ClosedDate - CreatedDate)*24)&gt;48,IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),
+				IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+			)
+		)
+	),
+	IF(AND(NOT(ISNULL(CC_Fecha_Activo_Formulario__c)),NOT(ISNULL(ClosedDate))), 
+		IF(((ClosedDate - CC_Fecha_Activo_Formulario__c)*24)&lt;=48, IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+			IF(AND(((ClosedDate - CC_Fecha_Activo_Formulario__c)*24)&gt;48,((ClosedDate - CC_Fecha_Activo_Formulario__c)*24)&lt;=72),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+				IF(((ClosedDate - CC_Fecha_Activo_Formulario__c)*24)&gt;72,IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),
+					IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+				)
+			)
+		),
+		IF(AND(NOT(ISNULL(CC_Fecha_Activo_Formulario__c)),ISNULL(ClosedDate)), 
+			IF(((NOW() - CC_Fecha_Activo_Formulario__c)*24)&lt;=2,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+				IF(AND(((NOW() - CC_Fecha_Activo_Formulario__c)*24)&gt;2,((NOW() - CC_Fecha_Activo_Formulario__c)*24)&lt;=48),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+					IF(((NOW() - CC_Fecha_Activo_Formulario__c)*24)&gt;48,IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),
+						IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+					)
+				)
+			),
+			IF(((NOW() - CreatedDate)*24)&lt;=2,IMAGE(&quot;/resource/CC_Green&quot;,&apos;Verde&apos;,15,15),
+				IF(AND(((NOW() - CreatedDate)*24)&gt;2,((NOW() - CreatedDate)*24)&lt;=48),IMAGE(&quot;/resource/CC_Orange&quot;,&apos;Naranja&apos;,15,15),
+					IF(((NOW() - CreatedDate)*24)&gt;48,IMAGE(&quot;/resource/CC_Red&quot;,&apos;Rojo&apos;,15,15),
+						IMAGE(&quot;/resource/CC_Gray&quot;,&apos;Gris&apos;,15,15)
+					)
+				)
+			)
+		)
+	)
+)
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Prioridad Formulario</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

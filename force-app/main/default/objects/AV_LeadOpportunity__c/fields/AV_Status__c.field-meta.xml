@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Status__c</fullName>
+    <label>Estado lead oportunidad</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>01</fullName>
+                <default>false</default>
+                <label>Aceptado</label>
+            </value>
+            <value>
+                <fullName>02</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Nuevo</fullName>
+                <default>false</default>
+                <label>Nuevo</label>
+            </value>
+            <value>
+                <fullName>Enviada oferta comercial</fullName>
+                <default>false</default>
+                <label>Enviada oferta comercial</label>
+            </value>
+            <value>
+                <fullName>Activo</fullName>
+                <default>false</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

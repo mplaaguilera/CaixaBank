@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="busqueda plantillas">
+    <aura:attribute name="plantillaByEvent" type="EmailTemplate"/>
+</aura:event>

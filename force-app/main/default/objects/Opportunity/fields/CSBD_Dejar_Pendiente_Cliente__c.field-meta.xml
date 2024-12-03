@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Dejar_Pendiente_Cliente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Este campo se marca al generar un borrador de correo a través de la operativa &quot;Enviar correo&quot; según el valor indicado por el usuario en el modal de dicha operativa. Posteriormente al enviar el correo, si el campo está marcado, la oportunidad quedará en estado &quot;Pendiente Cliente&quot;</description>
+    <label>Dejar &quot;Pendiente Cliente&quot;</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

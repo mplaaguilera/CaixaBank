@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Reclamacion_FCO__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checkbox para saber si un caso de FCO ha sido reclamado o no</description>
+    <label>Reclamación FCO</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

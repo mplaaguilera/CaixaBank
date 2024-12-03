@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Resultados_Cierre</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Resultado_Cierre&apos;,
+   OR (
+      ISPICKVAL(OB_Tipo_Contratacion__c, &apos;&apos;),
+      ISPICKVAL(OB_Tipo_Cierre__c, &apos;&apos;)
+   )
+)</errorConditionFormula>
+    <errorMessage>Los campos &quot;Tipo de contratación&quot; y &quot;Tipo de cierre&quot; son obligatorios</errorMessage>
+</ValidationRule>

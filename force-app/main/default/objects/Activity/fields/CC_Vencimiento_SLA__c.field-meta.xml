@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Vencimiento_SLA__c</fullName>
+    <formula>IF(OR(ISNULL(CC_Fecha_Fin__c), ISNULL(CC_Fecha_Vencimiento__c)), FALSE, CC_Fecha_Vencimiento__c &lt; CC_Fecha_Fin__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Vencimiento SLA</label>
+    <type>Checkbox</type>
+</CustomField>

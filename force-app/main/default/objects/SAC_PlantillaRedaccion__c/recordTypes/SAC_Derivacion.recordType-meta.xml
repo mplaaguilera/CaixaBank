@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Derivacion</fullName>
+    <active>true</active>
+    <description>RecordType para almacenar las plantillas de derivación</description>
+    <label>Derivación</label>
+    <picklistValues>
+        <picklist>SAC_CanalRespuesta__c</picklist>
+        <values>
+            <fullName>Email</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_CartaPostal</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_MotivoSubsanacion__c</picklist>
+        <values>
+            <fullName>En plazo legal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falta de identificación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falta documentación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Faltan datos o concreción</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Faltan poderes abogado%2F familiar%2F representante empresa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mail no registrado Seguros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No aporta factura</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reclamante no se identifica</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Varios</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_Motivo_Inadmision__c</picklist>
+        <values>
+            <fullName>Antigüedad reclamación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No consumidor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prescripción</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_Origen__c</picklist>
+        <values>
+            <fullName>Email</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_CartaPostal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Formulario</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_FormularioOficina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Manual</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_TipoPlantilla__c</picklist>
+        <values>
+            <fullName>SAC_Derivacion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Inadmision</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Redaccion</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Subsanacion</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

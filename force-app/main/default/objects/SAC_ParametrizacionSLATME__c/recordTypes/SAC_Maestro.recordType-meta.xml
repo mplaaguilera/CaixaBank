@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Maestro</fullName>
+    <active>true</active>
+    <description>Record type para la insercción de las parametrizaciones SLA/TMO en los MCC Detalle</description>
+    <label>Maestro</label>
+    <picklistValues>
+        <picklist>SAC_CanalProcedencia__c</picklist>
+        <values>
+            <fullName>Castilla la Mancha</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Junta Andalucia</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_Estados__c</picklist>
+        <values>
+            <fullName>SAC_001</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_002</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_003</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_004</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_006</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_007</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SAC_Tipo__c</picklist>
+        <values>
+            <fullName>SAC_CasoSensible</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC_Presidencia</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CanalDeContactoPreferente__c</fullName>
+    <description>Canal de contacto preferente del cliente</description>
+    <label>Canal de contacto preferente</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>T</fullName>
+                <default>false</default>
+                <label>Teléfono</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Muro</label>
+            </value>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>Correo</label>
+            </value>
+            <value>
+                <fullName>V</fullName>
+                <default>false</default>
+                <label>Videollamada</label>
+            </value>
+            <value>
+                <fullName>MuroDeprecated</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>MuroDeprecated</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

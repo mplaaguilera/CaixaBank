@@ -1,0 +1,130 @@
+<aura:component controller="SAC_InteraccionOperativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:attribute name="user" type="String" />
+    <aura:attribute name="interaccion" type="SAC_Interaccion__c" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="mostrarBoton" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarBotonPropiedadConsultas" type="Boolean" default="false"/>
+    <aura:attribute name="esPropietario" type="Boolean" default="false"/>
+    <aura:attribute name="esConsulta" type="Boolean" default="false"/>
+    <aura:attribute name="isModalOpen" type="Boolean" default="false" />
+    <aura:attribute name="propuestaLetrado" type="String" />
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    <!--Refresh-->
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+
+    <div style="padding-top: 5px" align="center">
+        <!--Botones de la operativa de consultas -->
+        <aura:if isTrue="{!v.esConsulta}">
+            <aura:if isTrue="{!and(v.mostrarBoton == true &amp;&amp; v.esPropietario == false &amp;&amp; v.mostrarBotonPropiedadConsultas == true)}">
+                    <lightning:button aura:id="botonTomarPropiedad" 
+                                    label="Tomar en propiedad" 
+                                    iconName="utility:change_owner" 
+                                    onclick="{!c.tomarPropiedad}" 
+                                    disabled="false" />
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.mostrarBotonPropiedadConsultas == true}">
+                        <lightning:button aura:id="botonTomarPropiedad" 
+                                        label="Tomar en propiedad" 
+                                        iconName="utility:change_owner" 
+                                        onclick="" 
+                                        disabled="true" />
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!and(v.esPropietario == true &amp;&amp; v.mostrarBotonPropiedadConsultas)}">
+                <lightning:button aura:id="botonDevolverConsulta" 
+                                    label="Devolver consulta" 
+                                    iconName="utility:skip" 
+                                    onclick="{!c.devolver}" 
+                                    disabled="false" />
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.mostrarBotonPropiedadConsultas == true}">
+                        <lightning:button aura:id="botonDevolverConsulta" 
+                            label="Devolver consulta " 
+                            iconName="utility:skip"  
+                            disabled="true" />  
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!v.interaccion.SAC_Estado__c == 'SAC_Resuelta'}">
+                <lightning:button aura:id="botonRespuestaDefinitiva" 
+                                    label="Marcar pendiente respuesta definitiva"
+                                    iconName="utility:priority" 
+                                    onclick="{!c.marcaPendienteRespuestaDefinitiva}" 
+                                    disabled="false" />
+            </aura:if>
+            <!--Botones de la operativa de escalados -->
+            <aura:set attribute="else">
+                <aura:if isTrue="{!and(v.mostrarBoton, v.esPropietario == false)}">
+                    <lightning:button aura:id="botonTomarPropiedad" 
+                                    label="Tomar en propiedad" 
+                                    iconName="utility:change_owner" 
+                                    onclick="{!c.tomarPropiedad}" 
+                                    disabled="false" />
+                <aura:set attribute="else">
+                    <lightning:button aura:id="botonTomarPropiedad" 
+                                        label="Tomar en propiedad" 
+                                        iconName="utility:change_owner" 
+                                        onclick="" 
+                                        disabled="true" />
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!v.esPropietario}">
+                    <lightning:button aura:id="botonDevolverEscalado" 
+                                        label="Devolver escalado a mi grupo"
+                                        iconName="utility:skip" 
+                                        onclick="{!c.devolver}" 
+                                        disabled="false" />
+                    <lightning:button aura:id="botonCancelarEscalado" 
+                                        label="Cancelar Escalado"
+                                        iconName="utility:close" 
+                                        onclick="{!c.cancelaEscalado}" 
+                                        disabled="false" />
+                    <aura:set attribute="else">
+                        <lightning:button aura:id="botonDevolverEscalado" 
+                                            label="Devolver escalado a mi grupo"
+                                            iconName="utility:skip"  
+                                            disabled="true" /> 
+                        <lightning:button aura:id="botonCancelarEscalado" 
+                                            label="Cancelar Escalado"
+                                            iconName="utility:close" 
+                                            disabled="true" />
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!and(v.esPropietario == true, v.interaccion.SAC_Estado__c == 'SAC_Devuelto')}">
+                    <lightning:button aura:id="botonVolverEscalar" 
+                                        label="Volver a escalar"
+                                        iconName="utility:arrowup" 
+                                        onclick="{!c.openModal}" 
+                                        disabled="false" />
+                </aura:if>
+            </aura:set>
+        </aura:if>   
+    </div>
+
+    
+    
+    <aura:if isTrue="{!v.isModalOpen}">
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Encabezado del modal -->
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium">Volver a escalar</h2>
+                </header>
+                <!-- Contenido del modal -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:textarea label="Propuesta letrado" value="{!v.propuestaLetrado}" />
+                </div>
+                <!-- Pie del modal -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.volverEscalar}">Aceptar</button>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+</aura:component>

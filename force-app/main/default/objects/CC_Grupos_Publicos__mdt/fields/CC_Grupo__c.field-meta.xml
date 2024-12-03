@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Grupo__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Grupo</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Administradores</fullName>
+                <default>true</default>
+                <label>Administradores</label>
+            </value>
+            <value>
+                <fullName>Configuradores de eventos</fullName>
+                <default>false</default>
+                <label>Configuradores de eventos</label>
+            </value>
+            <value>
+                <fullName>Coordinadores</fullName>
+                <default>false</default>
+                <label>Coordinadores</label>
+            </value>
+            <value>
+                <fullName>Ejecutores de eventos</fullName>
+                <default>false</default>
+                <label>Ejecutores de eventos</label>
+            </value>
+            <value>
+                <fullName>Gestores</fullName>
+                <default>false</default>
+                <label>Gestores</label>
+            </value>
+            <value>
+                <fullName>Observadores</fullName>
+                <default>false</default>
+                <label>Observadores</label>
+            </value>
+            <value>
+                <fullName>CC_Operadores</fullName>
+                <default>false</default>
+                <label>Operadores</label>
+            </value>
+            <value>
+                <fullName>CC_Tercer_Nivel</fullName>
+                <default>false</default>
+                <label>Tercer Nivel</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

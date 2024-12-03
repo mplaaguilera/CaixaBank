@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="urn:metadata.tooling.soap.sforce.com" fqn="av_MetricChartsWrapper">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Metric Chart</masterLabel>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage">
+            <property name="hasHeader" type="Boolean" default="false" label="Header" description="Check if you want the component to have header"/>
+            <property name="headerIcon" type="String" default="standard:dashboard" label="Header icon" description="Header icon if needed. Example: standard:dashboard"/>
+            <property name="headerTitle" type="String" default="" label="Header title" description="Header title if needed"/>
+            <property name="headerSubtitle" type="String" default="" label="Header subtitle" description="Header subtitle if needed"/>
+            <property name="listDatasets" type="String" default="" label="List of dataset" required="true" description="DeveloperName of the metadata (AV_ConfiguracionGrafico__mdt) split by comma (','). For example: AV_ChartWeekLess1,AV_ChartWeekLess2"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

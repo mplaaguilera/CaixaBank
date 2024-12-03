@@ -1,0 +1,1629 @@
+<aura:component controller="CC_EmailSendController" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="cargando" type="Boolean" default="false" />
+    <aura:attribute name="renderModales" type="Boolean" default="false" />
+    <aura:attribute name="cargandoGestor" type="Boolean" default="false" />
+    <aura:attribute name="spinnerActivado" type="Boolean" default="false" />
+    <aura:attribute name="timeoutTeclaPulsada" type="String" />
+    <aura:attribute name="permisos" type="Object" default="{}"/>
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="recordDataError" type="String" />
+    <aura:attribute name="tituloMensajePoseidon" type="String" />
+    <aura:attribute name="cuerpoMensajePoseidon" type="String" />
+    <aura:attribute name="selectedRecordGroup" type="CC_Grupo_Colaborador__c" default="{}"/>
+    <aura:attribute name="selectedRecordQueue" type="QueueSobject"/>
+    <aura:attribute name="listOfSearchRecordsGroup" type="Group[]"/>
+    <aura:attribute name="listOfSearchRecordsQueue" type="QueueSobject[]"/>
+    <aura:attribute name="SearchKeyWordGroup" type="string" />
+    <aura:attribute name="SearchKeyWordQueue" type="string" />
+    <aura:attribute name="casoEnTercerNivel" type="boolean"/>
+    <aura:attribute name="casoEnSegundoNivel" type="boolean"/>
+    <aura:attribute name="comentario" type="String" />
+    <aura:attribute name="tipoTarea" type="String" />
+    <aura:attribute name="selectedRecord" type="CC_Grupo_Colaborador__c" default="{}" />
+    <aura:attribute name="selectedRecordSegundaOficina" type="Account" />
+    <aura:attribute name="selectedRecordPlantilla" type="EmailTemplate" default="{}"/>
+    <aura:attribute name="listOfSearchRecords" type="CC_Grupo_Colaborador__c[]" />
+    <aura:attribute name="listOfSearchRecordsOfi" type="Account[]" />
+    <aura:attribute name="listOfSearchRecords2aOfi" type="Account[]" default="[]" />
+    <aura:attribute name="listOfSearchRecordsEmpl" type="Contact[]" />
+    <aura:attribute name="listOfSearchRecordsPlantilla" type="EmailTemplate[]"/>
+    <aura:attribute name="SearchKeyWord" type="string" />
+    <aura:attribute name="SearchKeyWordEmp" type="string" />
+    <aura:attribute name="SearchKeyWordOfi" type="string" />
+    <aura:attribute name="SearchKeyWordSegundaOfi" type="string" default="" />
+    <aura:attribute name="Message" type="String" default="buscar..." />
+    <aura:attribute name="myMap" type="Map" />
+    <aura:attribute name="remitir" type="boolean" />
+    <aura:attribute name="tipoOperativa" type="String" />
+    <aura:attribute name="noIdentificado" type="boolean" />
+    <aura:attribute name="ultimoGrupo2N" type="String" />
+    <aura:attribute name="ultimoGrupo2NId" type="String" />
+    <aura:attribute name="ultimoGrupo3N" type="String" />
+    <aura:attribute name="ultimoGrupo3NId" type="String" />
+    <aura:attribute name="tipoCliente" type="String" />
+    <aura:attribute name="today" type="date" />
+    <aura:attribute name="labelResponder" type="String" default="Responder a cliente" />
+    <aura:attribute name="labelClienteEmpleado" type="String" default="cliente" />
+    <aura:attribute name="ampliarInfoDevolverSAC" type="boolean" default="false" />
+    <aura:attribute name="canalOperativo" type="String" />
+    <aura:attribute name="causa" type="String" />
+    <aura:attribute name="solucion" type="String" />
+    <aura:attribute name="AccountId" type="String" />
+    <aura:attribute name="representanteId" type="String" />
+    <aura:attribute name="accountRecordtypeDeveloperName" type="String" />
+    <aura:attribute name="ContactId" type="String" />
+    <aura:attribute name="tipoCita" type="String" />
+    <aura:attribute name="ampliarInformacionDevolucion1N" type="boolean" default="false" />
+    <aura:attribute name="tipoRegistro" type="String" />
+    <aura:attribute name="modalAutenticacionVisible" type="Boolean" default="false" />
+    <aura:attribute name="modalDevolverSACVisible" type="Boolean" default="false" />
+    <aura:attribute name="picklistFirstOptionsPlantilla" type="Object[]" />
+    <aura:attribute name="picklistFirstOptionsGrupo" type="Object[]" />
+    <aura:attribute name="picklistFirstOptionsOficina" type="Object[]" />
+    <aura:attribute name="picklistFirstOptionsEmpleado" type="Object[]" />
+    <aura:attribute name="plantillaSeleccionadaValue" type="String" />
+    <aura:attribute name="plantillaSeleccionadaName" type="String" />
+    <aura:attribute name="plantillaEstaSeleccionada" type="Boolean" default="false" />
+    <aura:attribute name="grupoSeleccionado" type="Boolean" default="false" />
+    <aura:attribute name="grupoSeleccionadoValue" type="String" />
+    <aura:attribute name="grupoSeleccionadoName" type="String" />
+    <aura:attribute name="grupoSeleccionadoId" type="String" />
+    <aura:attribute name="oficinaSeleccionada" type="Boolean" default="false" />
+    <aura:attribute name="oficinaGestoraSeleccionada" type="Boolean" default="false" />
+    <aura:attribute name="empleadoGestorSeleccionado" type="Boolean" default="false" />
+    <aura:attribute name="oficinaSeleccionadaValue" type="String" />
+    <aura:attribute name="v.oficinaGestor" type="String" />
+    <aura:attribute name="oficinaSeleccionadaName" type="String" />
+    <aura:attribute name="oficinaGestoraSeleccionadaId" type="String" />
+    <aura:attribute name="oficinaGestoraSeleccionadaEmail" type="String" />
+    <aura:attribute name="oficinaGestoraSeleccionadaName" type="String" />
+    <aura:attribute name="oficinaGestoraSeleccionadaRecordtypeId" type="String" />
+    <aura:attribute name="empleadoGestorId" type="String" />
+    <aura:attribute name="empleadoGestorName" type="String" />
+    <aura:attribute name="accountRecordtypeId" type="String" />
+    <aura:attribute name="oficinaId" type="String" />
+    <aura:attribute name="oficinaName" type="String" />
+    <aura:attribute name="empleadoSeleccionado" type="Boolean" default="false" />
+    <aura:attribute name="empleadoSeleccionadoValue" type="String" />
+    <aura:attribute name="empleadoSeleccionadoName" type="String" />
+    <aura:attribute name="actualFirstOptionPlantilla" type="String" />
+    <aura:attribute name="actualFirstOptionGrupo" type="String" />
+    <aura:attribute name="actualFirstOptionCola" type="String" />
+    <aura:attribute name="actualFirstOptionOficina" type="String" />
+    <aura:attribute name="actualFirstOptionEmpleado" type="String" />
+    <aura:attribute name="actualFirstOptionPlantillaSolicitud" type="String" />
+    <aura:attribute name="optionsPlantilla" type="List" />
+    <aura:attribute name="optionsPlantillaSolicitud" type="List" />
+    <aura:attribute name="optionsPlantillaResponder" type="List" />
+    <aura:attribute name="optionsGrupo" type="List" />
+    <aura:attribute name="optionsCola" type="List" />
+    <aura:attribute name="habilitarOperativas" type="boolean" />
+    <aura:attribute name="verTodosLosGrupos" type="boolean" default="false" />
+    <aura:attribute name="verTodasLasOficinas" type="boolean" default="false" />
+    <aura:attribute name="noVerOficinas" type="boolean" default="false" />
+    <aura:attribute name="verTodosLosEmpleados" type="boolean" default="false" />
+    <aura:attribute name="noVerEmpleados" type="boolean" default="false" />
+    <aura:attribute name="uncheckedPlantilla" type="boolean" default="false" />
+    <aura:attribute name="verGrupos" type="boolean" default="true" />
+    <aura:attribute name="verOficinas" type="boolean" default="false" />
+    <aura:attribute name="verEmpleados" type="boolean" default="false" />
+    <aura:attribute name="verTodosLosGrupos2N" type="boolean" default="false" />
+    <aura:attribute name="verTodosLosGrupos3N" type="boolean" default="false" />
+    <aura:attribute name="optionsGrupo2N" type="List" />
+    <aura:attribute name="optionsGrupo3N" type="List" />
+    <aura:attribute name="optionsQueue" type="List" />
+    <aura:attribute name="idioma" type="String" />
+    <aura:attribute name="idiomaPlantilla" type="String" />
+    <aura:attribute name="tratamiento" type="String" />
+    <aura:attribute name="canalRespuesta" type="String" />
+    <aura:attribute name="SearchKeyWordPlantilla" type="string" />
+    <aura:attribute name="idPropietario" type="String" />
+    <aura:attribute name="mostrarIniLync" type="Boolean" default="false" />
+    <aura:attribute name="mostrarFinLync" type="Boolean" default="false" />
+    <aura:attribute name="habilitarLync" type="Boolean" default="false" />
+    <aura:attribute name="emailWebCollab" type="String" />
+    <aura:attribute name="opcionesIdiomaFolder" type="List" default="[]" />
+    <aura:attribute name="carpetaIdiomaSeleccionada" type="Boolean" default="false" />
+    <aura:attribute name="carpetaIdioma" type="String" />
+    <aura:attribute name="opcionesTratamientoFolder" type="List" default="[]" />
+    <aura:attribute name="procesoFinalSeleccion" type="Boolean" default="false" />
+    <aura:attribute name="carpetaFinal" type="String" />
+    <aura:attribute name="oCaso" type="Case" />
+    <aura:attribute name="estadoCaso" type="String" />
+    <aura:attribute name="canalEntrada" type="String" />
+    <aura:attribute name="fechaTraslado2N" type="String" />
+    <aura:attribute name="botonOperativa" type="String" />
+    <aura:attribute name="canalProcedencia" type="String" />
+    <aura:attribute name="gdpr" type="Boolean" default="false" />
+    <aura:attribute name="enviarNotificacionIdioma" type="String" default="" />
+    <aura:attribute name="enviarNotificacionIdiomas" type="List" default="[{'label': 'Castellano', 'value': 'Castellano'},
+                                                                        {'label': 'Catalán', 'value': 'Català'},
+                                                                        {'label': 'Inglés', 'value': 'Inglés'}]" />
+    <aura:attribute name="enviarNotificacionPlantillas" type="List" default="[]" />
+    <aura:attribute name="enviarNotificacionPlantilla" type="String" default="" />
+    <aura:attribute name="DeeplinkApp" type="String" default="" />
+    <aura:attribute name="DeeplinkAsuntoCas" type="String" default="" />
+    <aura:attribute name="DeeplinkAsuntoCat" type="String" default="" />
+    <aura:attribute name="DeeplinkAsuntoIng" type="String" default="" />
+    <aura:attribute name="valorDeeplink" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPrivCas" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPrivCat" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPrivIng" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPubCas" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPubCat" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtPubIng" type="String" default="" />
+    <aura:attribute name="DeeplinkSobreTituloCas" type="String" default="" />
+    <aura:attribute name="DeeplinkSobreTituloCat" type="String" default="" />
+    <aura:attribute name="DeeplinkSobreTituloIng" type="String" default="" />
+    <aura:attribute name="DeeplinkTituloCas" type="String" default="" />
+    <aura:attribute name="DeeplinkTituloCat" type="String" default="" />
+    <aura:attribute name="DeeplinkTituloIng" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtBotonCas" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtBotonCat" type="String" default="" />
+    <aura:attribute name="DeeplinkTxtBotonIng" type="String" default="" />
+    <aura:attribute name="numPerso" type="String" />
+    <aura:attribute name="boolParametrosPoseidon" type="Boolean" default="false"/>
+    <aura:attribute name="labelParametroPoseidon" type="String" default="" />
+    <aura:attribute name="placeholderInputPoseidon" type="String" default="" />
+    <aura:attribute name="valueInputPoseidon" type="String" default="" />
+    <aura:attribute name="lengthInputPoseidon" type="Integer" default="" />
+    <aura:attribute name="plantillasDeeplinking" type="List" default="[]" />
+    <aura:attribute name="plantillaDeeplink" type="String" default="" />
+    <aura:attribute name="motivo" type="String" default="" />
+    <aura:attribute name="enviarNotificacionCaracteresRestantes" type="Integer" default="160" />
+    <aura:attribute name="options3N" type="List" default="[
+            {'label': 'Gestion', 'value': 'Gestión'},
+            {'label': 'Revisar Respuesta al cliente', 'value': 'Revisar respuesta'}
+        ]" />
+    <aura:attribute name="tipoGestion2N" type="String" />
+    <aura:attribute name="tipoGestion3N" type="String" />
+    <aura:attribute name="deshabilitarEscalar" type="Boolean" default="false" />
+    <aura:attribute name="deshabilitarTransfer" type="Boolean" default="false" />
+    <aura:attribute name="deshabilitarQAPropuestasMejora" type="Boolean" default="false" />
+    <aura:attribute name="deshabilitarDerivarAlSac" type="Boolean" default="false" />
+    <aura:attribute name="deshabilitarDevolverAlSac" type="Boolean" default="false" />
+    <aura:attribute name="esClienteDigital" type="Boolean" default="false" />
+    <aura:attribute name="tieneGestor" type="Boolean" default="false" />
+    <aura:attribute name="numeroGestor" type="String" />
+    <aura:attribute name="nombreGestor" type="String" />
+    <aura:attribute name="nombreGestorAsignado" type="String" />
+    <aura:attribute name="oficinaGestor" type="String" />
+    <aura:attribute name="asuntoEvento" type="String" />
+    <aura:attribute name="asuntoTarea" type="String" />
+    <aura:attribute name="fechaActividad" type="date" />
+    <aura:attribute name="comentariosTarea" type="String" />
+    <aura:attribute name="archivoTarea" type="List" default="[]" />
+    <aura:attribute name="fechasDisponibilidad" type="List" default="[]" />
+    <aura:attribute name="horasDisponibilidad" type="List" default="[]" />
+    <aura:attribute name="disponibilidadConsultada" type="Boolean" default="false" />
+    <aura:attribute name="gestorAsignadoCoincide" type="Boolean" default="true" />
+    <aura:attribute name="mensajeErrorInt" type="String" />
+    <aura:attribute name="gestorBackupActivo" type="Boolean" default="false" />
+    <aura:attribute name="gestorBackupActivoDos" type="Boolean" default="false" />
+    <aura:attribute name="existeBackup" type="Boolean" default="true" />
+    <aura:attribute name="gestoresBackup" type="List" default="[]" />
+    <aura:attribute name="gestorElegido" type="String" />
+    <aura:attribute name="nombreGestorElegido" type="String" />
+    <aura:attribute name="motivoDevolucionSAC" type="String" />
+    <aura:attribute name="mostrarBotonesPendienteCliente" type="Boolean" />
+    <aura:attribute name="mostrarBotonesPendienteInterno" type="Boolean" />
+    <aura:attribute name="mostrarBotonesPendienteColaborador" type="Boolean" />
+    <aura:attribute name="plantillaSeleccionada" type="EmailTemplate" />
+    <aura:attribute name="emailParaAux" type="String" />
+    <aura:attribute name="emailParaEmplAux" type="String" />
+    <aura:attribute name="emailCopiaAux" type="String[]" />
+    <aura:attribute name="emailAccountCase" type="String" />
+    <aura:attribute name="nombreAccountCase" type="String" />
+    <aura:attribute name="comboboxEmpleadosOptions" type="List" />
+    <aura:attribute name="comboboxEmpleadoSeleccionado" type="String" />
+    <aura:attribute name="idBoton" type="String" />
+    <aura:attribute name="accountTareaGestor" type="Account" />
+    <aura:attribute name="oficinaAccount" type="Boolean" description="Cierto si la oficina permite realizar la operativa, falso en caso contrario"/>
+    <aura:attribute name="verSegundaOficina" type="Boolean" default="false" description="Cierto si debe permitirse seleccionar una 2a oficina al trasladar"/>
+    <aura:attribute name="mostrarModalOficina" type="Boolean" default="false" description="Cierto si hace click en la operativa Oficina"/>
+    <aura:attribute name="mostrarCitaGestor" type="Boolean" default="true" description="Cierto si se muestra boton Cita Gestor"/>
+    <aura:attribute name="mostrarTareaGestor" type="Boolean" default="true" description="Cierto si se muestra boton Tarea Gestor"/>
+    <aura:attribute name="mostrarBotonOficinaEmpleadoCaixaBank" type="Boolean" default="true" description="True enseña los botones de Oficina CaixaBank y Empleado CaixaBank"/>
+	<aura:attribute name="mostrarModalGenerarDocumento" type="Boolean" default="false" description="True enseña el lwc de Generar Documento"/>
+	<aura:attribute name="psSdocs" type="Boolean" default="false" description="True si el agente tiene el PS asignado"/>
+    <aura:attribute name="mostrarOnboarding" type="Boolean" default="false" description="Cierto si se muestra boton Onboarding"/>
+    <aura:attribute name="botonValidarOnboarding" type="Boolean" default="true"/>
+    <aura:attribute name="valueInputDNI" type="String" default="" />
+
+
+    <!--Handlers-->
+    <aura:handler name="init" value="this" action="{!c.doInit}" />
+    <aura:handler name="oSelectedAccountEvent" event="c:CC_SelectedAccountEvent" action="{!c.handleComponentEvent}" />
+    <aura:handler name="oSelectedOfficeEvent" event="c:CC_SelectedOfficeEvent" action="{!c.handleComponentEventOffice}" />
+    <aura:handler name="oSelectedEmpleadoEvent" event="c:CC_SelectedEmpleadoEvent" action="{!c.handleComponentEventEmpleado}" />
+    <aura:handler name="oSelectedGroupEvent" event="c:CC_SelectedGroupEvent" action="{!c.handleComponentEventNivel3}" />
+    <aura:handler name="oSelectedGroup2NEvent" event="c:CC_SelectedGroup2NEvent" action="{!c.handleComponentEventNivel2}" />
+    <aura:handler name="oSelectedPlantillaEvent" event="c:CC_SelectedPlantillaEvent" action="{!c.handleComponentEventPlantilla}" />
+    <aura:handler name="oSelectedQueueTransfer" event="c:CC_SelectedQueueEvent" action="{!c.handleComponentEventTransfer}" />
+    <aura:handler name="change" value="{!v.selectedRecord.Name}" action="{!c.obtenerPlantillasGrupo}" />
+    <aura:handler name="changeOfi" value="{!v.selectedRecord.Name}" action="{!c.obtenerPlantillasOficina}" />
+    <aura:handler name="changeEmp" value="{!v.selectedRecord.Name}" action="{!c.obtenerPlantillasEmpleado}" />
+
+    <lightning:navigation aura:id="navService" />
+    <lightning:quickActionAPI aura:id="quickActionAPI" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="recordDataCase" recordId="{!v.recordId}" layoutType="COMPACT" targetFields="{!v.caso}"
+        fields="OwnerId, CC_MCC_Motivo__c,CaseNumber, CC_MCC_Plantilla__c, CC_Derivar__c,
+                CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, CC_MCC_Motivo__r.CC_AmbitoTareas__c, CC_MCC_Solucion__r.CC_AmbitoTareas__c"
+        recordUpdated="{!c.recordDataUpdated}" targetError="{!v.recordDataError}"/>
+
+    <div class="slds-backdrop" aura:id="backdrop" />
+
+    <!--Spinner-->
+    <aura:if isTrue="{!v.spinnerActivado}">
+        <div><lightning:spinner size="medium" /></div>
+    </aura:if>
+
+    <!--Botonera-->
+    <aura:if isTrue="{!!v.cargando}">
+        <div class="slds-var-m-vertical_x-small">
+            <div class="filaBotones">
+                <aura:if isTrue="{!v.permisos.CC_Trasladar_Colaborador}">
+                    <lightning:button aura:id="Trasladar Colaborador" label="Trasladar a colaborador" iconName="action:email" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Remitir_Colaborador, !v.deshabilitarQAPropuestasMejora)}">
+                    <lightning:button aura:id="Remitir Colaborador" label="Remitir a colaborador" iconName="action:email" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Trasladar_3N, !v.deshabilitarQAPropuestasMejora)}">
+                    <lightning:button aura:id="Trasladar 3N" label="Trasladar a 3N" iconName="utility:change_owner" onclick="{!c.validacionesOperativa}" />
+                    <aura:if isTrue="{!v.tipoRegistro == 'CC_Empleado'}">
+                        <lightning:button aura:id="Trasladar 2N" label="Trasladar a 2N" iconName="utility:change_owner" onclick="{!c.validacionesOperativa}" />
+                     </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!or(v.casoEnSegundoNivel, v.casoEnTercerNivel)}">
+                    <aura:if isTrue="{!and(!v.deshabilitarQAPropuestasMejora)}">
+                        <aura:if isTrue="{!and(v.permisos.CC_Devolver_1N, v.permisos.CC_Devolver_1N_LOV)}">
+                            <lightning:button aura:id="Devolver Nivel 1" label="Devolver a 1N" iconName="utility:change_owner" onclick="{!c.validacionesOperativa}" />
+                        </aura:if>
+                        <aura:if isTrue="{!v.permisos.CC_Rechazar_1N}">
+                            <lightning:button aura:id="Rechazar Nivel 1" label="Rechazar traslado" iconName="utility:change_owner" onclick="{!c.validacionesOperativa}" />
+                        </aura:if>
+                    </aura:if>
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.canalProcedencia == 'Formulario Consultas Operativas', v.permisos.CC_Realizar_Transfer)}">
+                    <lightning:button aura:id="transfer" label="Transferir a cola" iconName="utility:send" onclick="{!c.modalTransferAbrir}" />
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Autoasignarme_Caso, v.idPropietario != $SObjectType.CurrentUser.Id)}">
+                    <lightning:button aura:id="Autoasignarme" label="Autoasignarme" iconName="utility:change_owner" onclick="{!c.onClickAutoasignarme}" />
+                </aura:if>
+
+                <aura:if isTrue="{!v.permisos.permisoDevolverAlSac}">
+                    <lightning:button aura:id="devolverAlSAC" label="Devolver al SAC" iconName="utility:change_request" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+                <aura:if isTrue="{!v.permisos.permisoDerivarAlSac}">
+                    <lightning:button aura:id="derivarAlSAC" label="Derivar al SAC" iconName="utility:trending" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <!-- Ini: Botón añadido por Moises Cano US969672 -->
+                <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente'}">
+                    <lightning:button aura:id="linksTF" label="Lanzar Links TF" iconName="utility:trending" onclick="{!c.validacionesLinksTF}" />
+                </aura:if> -->
+                <!--Fin: Botón añadido por Moises Cano US969672 -->
+
+                <!--Ini: Botón añadido por JorgeH para US504352-->
+                <aura:if isTrue="{!v.permisos.CC_Confidencial &amp;&amp; v.tipoRegistro == 'CC_Cliente'}">
+                    <lightning:button aura:id="verClienteConfidencial" label="Ver cliente confidencial" iconName="utility:user" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+                <!--Fin: Botón añadido por JorgeH para US504352-->
+
+                <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora &amp;&amp; v.mostrarCitaGestor}">
+                    <lightning:button aura:id="citaGestor" label="Cita gestor" iconName="utility:event" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+            </div>
+
+            <div class="filaBotones">
+                <aura:if isTrue="{!v.permisos.CC_Asociar_Incidencia &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="Trasladar Incidencia" label="Trasladar a incidencia" iconName="utility:custom_apps" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Solicitar_Informacion, !v.deshabilitarQAPropuestasMejora)}">
+                    <aura:if isTrue="{!v.canalRespuesta !='SMS' &amp;&amp; v.canalRespuesta !='Twitter' &amp;&amp; v.canalRespuesta !='Comentarios Apps'}">
+                        <lightning:button aura:id="Solicitud Info Email" label="Solicitar información" iconName="action:email" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!and(v.canalRespuesta=='SMS', v.tipoRegistro != 'CC_CSI_Bankia')}">
+                        <lightning:button aura:id="Solicitud Info SMS" label="Solicitar información" iconName="utility:sms" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!and(v.canalRespuesta=='Twitter', v.tipoRegistro != 'CC_CSI_Bankia')}">
+                        <lightning:button aura:id="Solicitud Info Twitter" label="Solicitar información" iconName="action:share_post" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Responder_Cliente, !v.deshabilitarQAPropuestasMejora)}">
+                    <aura:if isTrue="{!v.canalRespuesta !='SMS' &amp;&amp; v.canalRespuesta !='Twitter' &amp;&amp; v.canalRespuesta !='Comentarios Apps'}">
+                        <lightning:button aura:id="Responder Cliente Email" label="{!v.labelResponder}" iconName="action:email" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.canalRespuesta=='SMS' &amp;&amp; v.tipoRegistro != 'CC_CSI_Bankia'}">
+                        <lightning:button aura:id="Responder Cliente SMS" label="{!v.labelResponder}" iconName="utility:sms" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.canalRespuesta=='Twitter' &amp;&amp; v.tipoRegistro != 'CC_CSI_Bankia'}">
+                        <lightning:button aura:id="Responder Cliente Twitter" label="{!v.labelResponder}" iconName="action:share_post" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.canalRespuesta=='Comentarios Apps' &amp;&amp; v.tipoRegistro != 'CC_CSI_Bankia'}">
+                        <lightning:button aura:id="Responder Cliente Apps" label="{!v.labelResponder}" iconName="utility:advertising" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                </aura:if>
+
+                <aura:if isTrue="{!v.permisos.CC_Envio_Notificacion_Push &amp;&amp; v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="botonNotificacionPush" label="Notificación" iconName="utility:notification" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!v.permisos.CC_DeepLinking &amp;&amp; v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="botonDeepLinking" label="Poseidón" iconName="utility:push" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!v.permisos.CC_GDPR &amp;&amp; v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="GDPR" label="GDPR" iconName="utility:locker_service_console" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!v.permisos.CC_OTP &amp;&amp; v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="OTP" label="Autenticación" iconName="utility:password" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!and(v.permisos.CC_Lync, v.habilitarLync)}">
+                    <aura:if isTrue="{!and(v.mostrarIniLync, v.tipoRegistro == 'CC_Cliente')}">
+                        <lightning:button aura:id="IniLync" label="Iniciar Lync" iconName="utility:screen" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                    <aura:if isTrue="{!and(v.mostrarFinLync, v.tipoRegistro == 'CC_Cliente')}">
+                        <lightning:button aura:id="FinLync" label="Finalizar Lync" iconName="utility:screen" onclick="{!c.validacionesOperativa}" />
+                    </aura:if>
+                </aura:if>
+
+                <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; v.accountRecordtypeDeveloperName == 'CC_ClientePA' &amp;&amp; !v.deshabilitarQAPropuestasMejora &amp;&amp; v.mostrarTareaGestor}">
+                    <lightning:button aura:id="tareaGestor" label="Tarea gestor" iconName="utility:task" onclick="{!c.validacionesOperativa}" />
+                </aura:if>
+
+                <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="operativaOficina" label="Derivar" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
+                    <aura:if isTrue="{!v.mostrarModalOficina}">
+                        <c:cc_Operativa_Oficina aura:id="lwcOperativa" recordId="{!v.recordId}" onmodalcerrado="{!c.handleModalOficinaCerrado}" onrealizartrasladocolaborador="{!c.realizarTrasladoDesdeDerivar}" onrealizarremitido="{!c.abrirModalTrasladarColaborador}" onrefrescartab="{!c.refreshTab}" ondesactivarspinner="{!c.desactivarSpinnerDerivar}"/>
+                    </aura:if>
+                </aura:if>
+
+                <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora &amp;&amp; v.mostrarOnboarding}">
+                    <lightning:button aura:id="operativaOnboarding" label="Onboarding" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
+                </aura:if> -->
+
+                <!-- <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente' &amp;&amp; !v.deshabilitarQAPropuestasMejora}">
+                    <lightning:button aura:id="cancelarCita" label="Cancelar cita" iconName="utility:company" onclick="{!c.validacionesOperativa}"/>
+                    <aura:if isTrue="{!v.mostrarModalCancelarCita}">
+                        <c:cc_Cancelar_Cita recordId="{!v.recordId}"/>
+                    </aura:if>
+                </aura:if> -->
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.renderModales}">
+        <!--Modal para trasladar/remitir a colaborador-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalboxColab" onkeydown="{!c.modalTrasladarColaboradorTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalTrasladarColaborador }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!!v.remitir ? 'Trasladar a grupo colaborador' :
+                        'Remitir a grupo colaborador'}</h2>
+                    <p class="slds-var-m-top_x-small">{!!v.remitir ? 'Seleccione el grupo colaborador al que trasladar la
+                        gestión del caso.' : 'Seleccione el grupo colaborador al que remitir el caso.'}</p>
+                </header>
+
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium modalColaboradorContent">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <!--Toggle para cambiar entre ver los colaboradores para el MCC o todos los colaboradores-->
+                        <div class="slds-align_absolute-left">
+                            <lightning:buttonGroup>
+                                <div class="slds-grid slds-gutters_direct-x-small">
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="checkbox" type="toggle" label="Grupo colaborador" checked="{!v.verGrupos}" onchange="{!c.seeGrupos}" messageToggleActive="" messageToggleInactive="" />
+                                    </div>
+                                    <aura:if isTrue="{!v.mostrarBotonOficinaEmpleadoCaixaBank}">
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Oficina CaixaBank" checked="{!v.verOficinas}" onchange="{!c.seeOficinas}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Empleado CaixaBank" checked="{!v.verEmpleados}" onchange="{!c.seeEmpleados}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </lightning:buttonGroup>
+                        </div>
+
+                        <aura:if isTrue="{!v.verGrupos}">
+                            <lightning:buttonGroup class="slds-var-m-top_x-large slds-var-m-left_xx-large">
+                                <lightning:input aura:id="checkbox" name="checkbox" type="toggle" label="Mostrar todos los grupos" checked="{!v.verTodosLosGrupos}" onchange="{!c.allGrupos}" messageToggleActive="" messageToggleInactive="" />
+                            </lightning:buttonGroup>
+                            <div style="height: 1rem;" /> <!--Separador-->
+
+                            <!--Desplegable de grupos relacionados con la clasificación-->
+                            <aura:if isTrue="{!!v.verTodosLosGrupos}">
+                                <lightning:combobox name="selectGroups" label="Grupos relacionados con la clasificación" placeholder="Seleccione un valor" options="{!v.optionsGrupo}" onchange="{!c.obtenerPlantillasGrupo}" aura:id="selectGroups" required="true" />
+                            </aura:if>
+
+                            <!--Buscador de todos los grupos-->
+                            <aura:if isTrue="{!v.verTodosLosGrupos}">
+                                <div aura:id="searchRes" class="slds-form-element slds-lookup" data-select="single">
+                                    <label class="slds-form-element__label" for="lookup-348">Grupo colaborador</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-input-has-icon slds-input-has-icon_right">
+                                            <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                                                <span class="slds-pill">
+                                                    <span class="slds-pill__label" id="GrupoSeleccionado">{!v.selectedRecord.Name}</span>
+                                                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarGrupoColaborador}" alternativeText="Cerrar" />
+                                                </span>
+                                            </div>
+                                            <div aura:id="lookupField" class="slds-show">
+                                                <lightning:input type="search" onkeyup="{!c.teclaPulsadaLookupGrupoColaborador}" value="{!v.SearchKeyWord}" placeholder="Nombre del grupo colaborador" required="true" variant="label-hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Resultados del buscador de todos los grupos-->
+                                    <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                        <aura:if isTrue="{!v.listOfSearchRecords.length == 0}">
+                                            <span>
+                                                <center>
+                                                    No existen grupos con este nombre.
+                                                </center>
+                                            </span>
+                                        </aura:if>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                                <c:CC_CustomLookupResult grupo="{!singleRec}" />
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <!--Desplegable de plantillas-->
+                            <aura:if isTrue="{!and(not(v.uncheckedPlantilla),v.grupoSeleccionado)}">
+                                <div style="height:1rem;" /> <!--Separador-->
+                                <lightning:combobox aura:id="plantillaSeleccionada" name="general" label="Plantilla" placeholder="Seleccione un valor" options="{!v.optionsPlantilla}" onchange="{!c.seleccionarPlantilla}" required="true" />
+                            </aura:if>
+                            <aura:if isTrue="{!v.grupoSeleccionado}">
+                                <div aura:id="searchResPlantilla" class="slds-form-element slds-lookup" data-select="single">
+                                    <aura:if isTrue="{!v.uncheckedPlantilla}">
+                                        <label class="slds-form-element__label" for="lookup-348">Plantilla</label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-input-has-icon slds-input-has-icon_right">
+                                                <div aura:id="lookup-pill-plantilla" class="slds-pill-container slds-hide">
+                                                    <span class="slds-pill">
+                                                        <span class="slds-pill__label">{!v.selectedRecordPlantilla.Name}
+                                                        </span>
+                                                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarPlantilla}" alternativeText="Cerrar" />
+                                                    </span>
+                                                </div>
+                                                <div aura:id="lookupFieldPlantilla" class="slds-show">
+                                                    <ui:inputText updateOn="keyup" keyup="{!c.teclaPulsadaLookupPlantilla}" class="slds-lookup__search-input slds-input " value="{!v.SearchKeyWordPlantilla}" placeholder="buscar..." />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                            <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                    <c:CC_CustomLookupResultPlantilla oPlantilla="{!singleRecPlantilla}" />
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.grupoSeleccionado}">
+                                <lightning:input aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" messageToggleActive="" messageToggleInactive="" />
+                            </aura:if>
+                        </aura:if>
+                        <aura:if isTrue="{!v.verOficinas}">
+                            <lightning:buttonGroup class="slds-var-m-top_x-large slds-var-m-left_xx-large">
+                                <div class="slds-grid slds-gutters_direct-x-small">
+                                    <aura:if isTrue="{!v.tipoRegistro == 'CC_Empleado'}">
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Oficina empleado" checked="{!v.noVerOficinas}" onchange="{!c.getOfiCliente}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente'}">
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Oficina gestora del cliente" checked="{!v.noVerOficinas}" onchange="{!c.getOfiCliente}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                    </aura:if>
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="checkbox" type="toggle" label="Otra oficina" checked="{!v.verTodasLasOficinas}" onchange="{!c.allOficinas}" messageToggleActive="" messageToggleInactive="" />
+                                    </div>
+                                </div>
+                            </lightning:buttonGroup>
+                            <div style="height: 1rem;" /> <!--Separador-->
+
+                            <!--Buscador de todas las oficinas-->
+                            <aura:if isTrue="{!v.verTodasLasOficinas}">
+                                <div aura:id="searchRes2" class="slds-form-element slds-lookup" data-select="single">
+                                    <label class="slds-form-element__label" for="lookup-348"><abbr class="slds-required">*</abbr>Oficina</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-input-has-icon slds-input-has-icon_right">
+                                            <div aura:id="lookup-pill-2" class="slds-pill-container slds-hide">
+                                                <span class="slds-pill">
+                                                    <span class="slds-pill__label" id="oficinaSeleccionada">{!v.selectedRecord.Name}</span>
+                                                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarOficina}" alternativeText="Cerrar" />
+                                                </span>
+                                            </div>
+                                            <div aura:id="lookupField2" class="slds-show">
+                                                <lightning:input type="search" onkeyup="{!c.teclaPulsadaLookupOficina}" value="{!v.SearchKeyWordOfi}" placeholder="Buscar por número o nombre" required="true" variant="label-hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Resultados del buscador de todas las oficinas-->
+                                    <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                        <aura:if isTrue="{!v.listOfSearchRecordsOfi.length == 0}">
+                                            <span>
+                                                <center>
+                                                    No existen oficinas con este nombre.
+                                                </center>
+                                            </span>
+                                        </aura:if>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.listOfSearchRecordsOfi}" var="singleRec">
+                                                <c:CC_CustomLookupResultOffice oficina="{!singleRec}" para="{!v.emailParaAux}" copia="{!v.emailCopiaAux}" segundaOficina="{!false}" />
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </aura:if>
+
+                            <div style="height: 1rem;" /> <!--Separador-->
+
+                            <!-- BUSCADOR 2ª OFICINA -->
+                            <aura:if isTrue="{!and(v.caso.CC_MCC_Motivo__r.CC_Permitir_traslado_2_oficina__c, or(v.verTodasLasOficinas, v.noVerOficinas))}">
+                                <aura:if isTrue="{!v.oficinaSeleccionada}">
+                                    <div class="slds-form-element slds-var-p-bottom_medium">
+                                        <div class="slds-form-element__control">
+                                            <aura:if isTrue="{!v.selectedRecordSegundaOficina}">
+                                                <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Segunda oficina</label>
+                                                <div class="slds-combobox_container slds-has-selection">
+                                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                                            <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                                                <lightning:icon iconName="standard:account" size="x-small" />
+                                                            </span>
+                                                            <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                                <span class="slds-truncate">{!v.selectedRecordSegundaOficina.Name}</span>
+                                                            </div>
+                                                            <span class="slds-input__icon slds-input__icon_right" style="pointer-events: initial; top: calc(50% - 1px);">
+                                                                <lightning:buttonIcon iconName="utility:close" size="small" variant="bare" tooltip="Deseleccionar" onclick="{!c.lookupDeseleccionar}" />
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <aura:set attribute="else">
+                                                    <div class="slds-combobox_container">
+                                                        <div aura:id="lookup2aOficina" class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                                <lightning:input aura:id="lookup2aOficinaInput" type="search" label="Segunda oficina" autoComplete="off" placeholder="Buscar por número o nombre" value="{!v.SearchKeyWordSegundaOfi}" onchange="{!c.lookupOnchange}" onfocus="{!c.lookupAbrir}" onblur="{!c.lookupCerrar}" />
+                                                            </div>
+                                                            <aura:if isTrue="{!v.listOfSearchRecords2aOfi.length}">
+                                                                <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                        <aura:iteration items="{!v.listOfSearchRecords2aOfi}" var="resultadoLookup2aOficina">
+                                                                            <li role="presentation" class="slds-listbox__item" onclick="{!c.lookupSeleccionar}" data-id="{!resultadoLookup2aOficina.Id}">
+                                                                                <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                                    <span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -2px;">
+                                                                                        <lightning:icon iconName="standard:account" size="small" />
+                                                                                    </span>
+                                                                                    <span class="slds-media__body">
+                                                                                        <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!resultadoLookup2aOficina.Name}</span>
+                                                                                        <span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="font-weight: 300; padding-top: 1px;">{!resultadoLookup2aOficina.CC_Email__c}</span>
+                                                                                    </span>
+                                                                                </div>
+                                                                            </li>
+                                                                        </aura:iteration>
+                                                                    </ul>
+                                                                </div>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!v.SearchKeyWordSegundaOfi}">
+                                                                        <div class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                                <li role="presentation" class="slds-listbox__item">
+                                                                                    <div aria-selected="true" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option" style="cursor: default;">
+                                                                                        <span class="slds-media__body">
+                                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity slds-text-color_weak">No hay resultados.</span>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </aura:if>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </div>
+                                                    </div>
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                </aura:if>
+                            </aura:if>
+                            <!-- FIN BUSCADOR 2ª OFICINA -->
+
+
+
+                            <!--Desplegable de plantillas-->
+                            <aura:if isTrue="{!and(not(v.uncheckedPlantilla),v.oficinaSeleccionada)}">
+
+                                <div style="height:1rem;" /> <!--Separador-->
+                                <lightning:combobox aura:id="plantillaSeleccionada" name="general" label="Plantilla" placeholder="Seleccione un valor" options="{!v.optionsPlantilla}" onchange="{!c.seleccionarPlantilla}" required="true" />
+                            </aura:if>
+                            <aura:if isTrue="{!v.oficinaSeleccionada}">
+                                <div aura:id="searchResPlantilla" class="slds-form-element slds-lookup" data-select="single">
+                                    <aura:if isTrue="{!v.uncheckedPlantilla}">
+                                        <label class="slds-form-element__label">Plantilla</label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-input-has-icon slds-input-has-icon_right">
+                                                <div aura:id="lookup-pill-plantilla" class="slds-pill-container slds-hide">
+                                                    <span class="slds-pill">
+                                                        <span class="slds-pill__label">{!v.selectedRecordPlantilla.Name}
+                                                        </span>
+                                                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarPlantilla}" alternativeText="Cerrar" />
+                                                    </span>
+                                                </div>
+                                                <div aura:id="lookupFieldPlantilla" class="slds-show">
+                                                    <ui:inputText updateOn="keyup" keyup="{!c.teclaPulsadaLookupPlantilla}" class="slds-lookup__search-input slds-input " value="{!v.SearchKeyWordPlantilla}" placeholder="buscar..." />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                            <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                    <c:CC_CustomLookupResultPlantilla oPlantilla="{!singleRecPlantilla}" />
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.oficinaSeleccionada}">
+                                <br />
+                                <lightning:input aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" onclick="{!c.toggleVerTodasLasPlantillasOnclick}" messageToggleActive="" messageToggleInactive="" />
+                            </aura:if>
+                        </aura:if>
+                        <aura:if isTrue="{!v.verEmpleados}">
+                            <lightning:buttonGroup class="slds-var-m-top_x-large slds-var-m-left_xx-large">
+                                <div class="slds-grid slds-gutters_direct-x-small">
+                                    <aura:if isTrue="{!v.tipoRegistro == 'CC_Empleado'}">
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Empleado" checked="{!v.noVerEmpleados}" onchange="{!c.getEmpleCliente}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.tipoRegistro == 'CC_Cliente'}">
+                                        <div class="slds-col">
+                                            <lightning:input aura:id="checkbox" type="toggle" label="Empleado gestor del cliente" checked="{!v.noVerEmpleados}" onchange="{!c.getEmpleCliente}" messageToggleActive="" messageToggleInactive="" />
+                                        </div>
+                                    </aura:if>
+                                    <div class="slds-col">
+                                        <lightning:input aura:id="checkbox" type="toggle" label="Otro empleado" checked="{!v.verTodosLosEmpleados}" onchange="{!c.allEmpleados}" messageToggleActive="" messageToggleInactive="" />
+                                    </div>
+                                </div>
+                            </lightning:buttonGroup>
+                            <div style="height: 1rem;" /> <!--Separador-->
+
+                            <!--Buscador de todos los empleados-->
+                            <aura:if isTrue="{!v.verTodosLosEmpleados}">
+                                <div aura:id="searchRes3" class="slds-form-element slds-lookup" data-select="single">
+                                    <label class="slds-form-element__label">Empleado</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-input-has-icon slds-input-has-icon_right">
+                                            <div aura:id="lookup-pill-3" class="slds-pill-container slds-hide">
+                                                <span class="slds-pill">
+                                                    <span class="slds-pill__label" id="empleadoSeleccionado">{!v.selectedRecord.Name}</span>
+                                                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarEmpleado}" alternativeText="Cerrar" />
+                                                </span>
+                                            </div>
+                                            <div aura:id="lookupField3" class="slds-show">
+                                                <lightning:input type="search" onkeyup="{!c.teclaPulsadaLookupEmpleado}" value="{!v.SearchKeyWordEmp}" placeholder="Nombre del Empleado" required="true" variant="label-hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Resultados del buscador de todos los grupos-->
+                                    <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                        <aura:if isTrue="{!v.listOfSearchRecordsEmpl.length == 0}">
+                                            <span>
+                                                <center>
+                                                    No existen empleados con este nombre.
+                                                </center>
+                                            </span>
+                                        </aura:if>
+                                        <ul class="slds-lookup__list" role="listbox">
+                                            <aura:iteration items="{!v.listOfSearchRecordsEmpl}" var="singleRec">
+                                                <c:CC_CustomLookupResultEmpleado empleado="{!singleRec}" />
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <!--Desplegable de plantillas-->
+
+                            <aura:if isTrue="{!and(not(v.uncheckedPlantilla),v.empleadoSeleccionado)}">
+                                <div style="height:1rem;" /> <!--Separador-->
+                                <lightning:combobox aura:id="plantillaSeleccionada" name="general" label="Plantilla" placeholder="Seleccione un valor" options="{!v.optionsPlantilla}" onchange="{!c.seleccionarPlantilla}" required="true" />
+                            </aura:if>
+                            <aura:if isTrue="{!v.empleadoSeleccionado}">
+
+                                <div aura:id="searchResPlantilla" class="slds-form-element slds-lookup" data-select="single">
+                                    <aura:if isTrue="{!v.uncheckedPlantilla}">
+                                        <label class="slds-form-element__label">Plantilla</label>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-input-has-icon slds-input-has-icon_right">
+                                                <div aura:id="lookup-pill-plantilla" class="slds-pill-container slds-hide">
+                                                    <span class="slds-pill">
+                                                        <span class="slds-pill__label">{!v.selectedRecordPlantilla.Name}
+                                                        </span>
+                                                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarPlantilla}" alternativeText="Cerrar" />
+                                                    </span>
+                                                </div>
+                                                <div aura:id="lookupFieldPlantilla" class="slds-show">
+                                                    <ui:inputText updateOn="keyup" keyup="{!c.teclaPulsadaLookupPlantilla}" class="slds-lookup__search-input slds-input " value="{!v.SearchKeyWordPlantilla}" placeholder="buscar..." />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="slds-lookup__menu slds slds-float_left" id="lookup-348">
+                                            <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                                            <ul class="slds-lookup__list" role="listbox">
+                                                <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                    <c:CC_CustomLookupResultPlantilla oPlantilla="{!singleRecPlantilla}" />
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </aura:if>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!or(v.grupoSeleccionado, v.empleadoSeleccionado, v.oficinaSeleccionada)}">
+                                <br />
+                                <lightning:input aura:id="checkboxPlantilla" name="checkbox" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" messageToggleActive="" messageToggleInactive="" />
+                            </aura:if>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </div>
+
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <aura:if isTrue="{!!v.remitir}">
+                        <lightning:button class="slds-button slds-button_brand" label="Trasladar" aura:id="tab1" onclick="{!c.trasladarColaborador}" disabled="{!and(!v.selectedRecordPlantilla.Id, !v.plantillaEstaSeleccionada)}" />
+                        <aura:set attribute="else">
+                            <lightning:button class="slds-button slds-button_brand" label="Remitir" aura:id="tab2" onclick="{!c.remitirColaborador}" disabled="{!and(not(v.selectedRecordPlantilla.Name),v.plantillaEstaSeleccionada == false )}" />
+                        </aura:set>
+                    </aura:if>
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalTrasladarColaborador}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal 3Nivel-->
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="Modalbox3Nivel" onkeydown="{!c.modalTrasladar3NTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalTrasladar3N }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Escalar a tercer nivel</h2>
+                    <p class="slds-var-m-top_x-small">Seleccione el grupo de tercer nivel al que escalar el caso.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:input aura:id="checkbox" name="checkbox" type="toggle" label="Mostrar todos los grupos" checked="{!v.verTodosLosGrupos3N}" onchange="{!c.allGrupos3N}" messageToggleActive="" messageToggleInactive="" />
+                    <div style="height:1rem;" /> <!--Separador-->
+
+                    <!--Desplegable de grupos asociados al MCC-->
+                    <aura:if isTrue="{!!v.verTodosLosGrupos3N}">
+                        <lightning:combobox name="selectGroups3N" label="Grupos asociados al MCC" placeholder="Seleccione un valor" options="{!v.optionsGrupo3N}" onchange="{!c.seleccionarGrupo3N}" aura:id="selectGroups3N" required="true" />
+                    </aura:if>
+                    <!--Lookup de grupos de tercer nivel-->
+
+                    <div aura:id="searchResGroup" class="slds-form-element slds-lookup" data-select="single">
+                        <aura:if isTrue="{!v.verTodosLosGrupos3N}">
+                            <label class="slds-form-element__label">Grupo de tercer nivel</label>
+                            <!--This part is for display search bar for lookup-->
+                            <div class="slds-form-element__control">
+                                <div class="slds-input-has-icon slds-input-has-icon_right">
+                                    <!-- This markup is for when an record is selected -->
+                                    <div aura:id="lookup-pill-group" class="slds-pill-container slds-hide">
+                                        <span class="slds-pill">
+                                            <span class="slds-pill__label">{!v.selectedRecordGroup.Name} </span>
+                                            <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarGrupo3N}" alternativeText="Cerrar" />
+                                        </span>
+                                    </div>
+                                    <div aura:id="lookupFieldGroup" class="slds-show">
+                                        <ui:inputText aura:id="inputText3N" value="{!v.SearchKeyWordGroup}" updateOn="keyup" keyup="{!c.teclaPulsadaLookupGrupo3N}" class="slds-lookup__search-input slds-input " placeholder="buscar..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <!-- chema -->
+                        <div class="tipoGestion">
+                            <lightning:radioGroup name="TipoGestion" label="Tipo de gestión" options="{!v.options3N}" value="{!v.tipoGestion3N}" type="radio" />
+                        </div>
+                        <!--This part is for Display typehead lookup result List-->
+                        <div class="slds-lookup__menu slds" id="lookup-348">
+                            <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                            <ul class="slds-lookup__list" role="listbox">
+                                <aura:iteration items="{!v.listOfSearchRecordsGroup}" var="singleRecGroup">
+                                    <c:CC_CustomLookupResultNivel3 oGroup="{!singleRecGroup}" />
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="height:7rem;" />
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" variant="Brand" label="Escalar" onclick="{!c.trasladar3N}" disabled="{!v.deshabilitarEscalar}" />
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalTrasladar3N}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal 2Nivel-->
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="Modalbox2Nivel" onkeydown="{!c.modalTrasladar2NTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalTrasladar2N }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Escalar a segundo nivel</h2>
+                    <p class="slds-var-m-top_x-small">Seleccione el grupo de segundo nivel al que escalar el caso.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:input aura:id="checkbox" name="checkbox" type="toggle" label="Mostrar todos los grupos" checked="{!v.verTodosLosGrupos2N}" onchange="{!c.allGrupos2N}" messageToggleActive="" messageToggleInactive="" />
+                    <div style="height:1rem;" /> <!--Separador-->
+
+                    <!--Desplegable de grupos asociados al MCC-->
+                    <aura:if isTrue="{!!v.verTodosLosGrupos2N}">
+                        <lightning:combobox name="selectGroups2N" label="Grupos asociados al MCC" placeholder="Seleccione un valor" options="{!v.optionsGrupo2N}" onchange="{!c.seleccionarGrupo2N}" aura:id="selectGroups2N" required="true" />
+                    </aura:if>
+
+                    <!--Lookup de grupos de segundo nivel-->
+                    <div aura:id="searchResGroup2N" class="slds-form-element slds-lookup" data-select="single">
+                        <aura:if isTrue="{!v.verTodosLosGrupos2N}">
+                            <label class="slds-form-element__label" for="lookup-348">Grupo de segundo nivel</label>
+                            <!--This part is for display search bar for lookup-->
+                            <div class="slds-form-element__control">
+                                <div class="slds-input-has-icon slds-input-has-icon_right">
+                                    <!-- This markup is for when a record is selected -->
+                                    <div aura:id="lookup-pill-group2N" class="slds-pill-container slds-hide">
+                                        <span class="slds-pill">
+                                            <span class="slds-pill__label">{!v.selectedRecordGroup.Name} </span>
+                                            <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarGrupo2N}" alternativeText="Cerrar" />
+                                        </span>
+                                    </div>
+                                    <div aura:id="lookupFieldGroup2N" class="slds-show">
+                                        <ui:inputText aura:id="inputText2N" value="{!v.SearchKeyWordGroup}" updateOn="keyup" keyup="{!c.teclaPulsadaLookupGrupo2N}" class="slds-lookup__search-input slds-input " placeholder="buscar..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <!-- chema -->
+                        <div class="tipoGestion">
+                            <lightning:radioGroup name="TipoGestion" label="Tipo de gestión" options="{!v.options3N}" value="{!v.tipoGestion3N}" type="radio" />
+                        </div>
+                        <!--This part is for Display typehead lookup result List-->
+                        <div class="slds-lookup__menu slds" id="lookup-348">
+                            <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                            <ul class="slds-lookup__list" role="listbox">
+                                <aura:iteration items="{!v.listOfSearchRecordsGroup}" var="singleRecGroup">
+                                    <c:CC_CustomLookupResultNivel2 oGroup="{!singleRecGroup}" />
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="height:7rem;" />
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" variant="Brand" label="Escalar" onclick="{!c.trasladar2N}" disabled="{!v.deshabilitarEscalar}" />
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalTrasladar2N}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal para solicitud de información-->
+        <section role="dialog" tabindex="-1" aura:id="ModalboxSolicitarInfo" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" onkeydown="{!c.modalSolicitarInfoTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalSolicitarInfo }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Solicitar información</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Seleccione la plantilla de correo a usar para la solicitud de información al cliente.<br />
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:combobox aura:id="selectItemIdiomaSol" name="idioma" label="Idioma" placeholder="-Selecciona un idioma-" value="" required="true" dropdownAlignment="right" variant="standard" messageWhenValueMissing="Debe seleccionar un idioma" onchange="{!c.handleCarpetaIdiomaSeleccionada}" options="{!v.opcionesIdiomaFolder}" />
+                        <br />
+                        <aura:if isTrue="{!v.carpetaIdiomaSeleccionada}">
+                            <lightning:combobox aura:id="selectItemTratamientoSol" name="tratamiento" label="Tratamiento" placeholder="-Selecciona un tratamiento-" value="" required="true" dropdownAlignment="right" variant="standard" messageWhenValueMissing="Debe seleccionar un tratamiento" onchange="{!c.handleCarpetaTratamientoSeleccionada}" options="{!v.opcionesTratamientoFolder}" />
+                            <br />
+                        </aura:if>
+                        <aura:if isTrue="{!v.procesoFinalSeleccion}">
+                            <lightning:combobox aura:id="selectItemPlantillaSol" name="plantilla" label="Plantilla" placeholder="-Selecciona una plantilla-" value="" required="true" dropdownAlignment="right" variant="standard" messageWhenValueMissing=" " onchange="{!c.seleccionarPlantilla}" options="{!v.optionsPlantillaResponder}" />
+                            <br />
+                        </aura:if>
+                        <!--<lightning:combobox aura:id="plantillaSeleccionadaSolicitud" name="general" label="Plantillas" placeholder="Seleccione un valor" options="{!v.optionsPlantillaSolicitud}" onchange="{!c.seleccionarPlantilla}" required = "true" />-->
+                    </lightning:layoutItem>
+                    <div style="height:4rem;" />
+                </div>
+
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" variant="Brand" label="Solicitar información" onclick="{!c.solicitarInfo}" disabled="{!v.plantillaSeleccionadaValue==null}" />
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalSolicitarInfo}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal para devolver a 1N/Rechazar traslado-->
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxDevolver1N" onkeydown="{!c.modalDevolver1NTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalDevolver1N }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!v.tipoTarea == 'devolver' ? 'Devolver a 1N' :
+                        'Rechazar traslado'}</h2>
+                    <p class="slds-var-m-top_x-small">
+                        {!v.tipoTarea == 'devolver' ? 'Indique el motivo de la devolución a primer nivel.' : 'Indique el
+                        motivo del rechazo para el traslado a tercer nivel.'}
+                        <br />
+                        {!v.casoEnSegundoNivel ? 'El motivo quedará registrado en la actividad de traslado a segundo nivel
+                        del caso.' :
+                        'El motivo quedará registrado en la actividad de traslado a tercer nivel del caso.'
+                        }
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <aura:if isTrue="{!v.tipoTarea =='devolver'}">
+                        <div class="slds-form-element__control">
+                            <lightning:input name="inputMotivoDevolucion" aura:id="inputMotivoDevolucion" label="Motivo de la devolución" value="{!v.comentario}" required="true" messageWhenValueMissing="Debe informar un motivo" />
+                            <lightning:input type="checkbox" label="Ampliar información" name="checkboxAmpliarInformacion" checked="{!v.ampliarInformacionDevolucion1N}" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.tipoTarea =='rechazar'}">
+                        <div class="slds-form-element__control">
+                            <lightning:input name="input1" label="Motivo del rechazo" value="{!v.comentario}" required="true" messageWhenValueMissing="Debe informar un motivo" />
+                        </div>
+                    </aura:if>
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" variant="Brand" label="{!v.tipoTarea == 'devolver' ? 'Devolver' : 'Rechazar'}" onclick="{!c.devolver1N}" />
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalDevolver1N}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal para responder a cliente-->
+        <section role="dialog" tabindex="-1" aura:id="ModalboxPrevioResponderCliente" aria-modal="true" class="slds-modal" onkeydown="{!c.modalResponderClienteTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalPrevioResponderCliente }" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!v.labelResponder}</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Seleccione que tipo de repuesta quiere realizar.<br />
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content cc_modalContent_overflow_initial slds-var-p-around_x-large" align="center">
+                    <lightning:button aura:id="Correo electronico" label="Correo electrónico" iconName="action:email" onclick="{!c.responderEmail}" />
+                    <lightning:button aura:id="Correo postal"  label="Correo postal" iconName="action:new_note"  onclick="{!c.responderCPostal}" />
+                    <br />
+                </div>
+
+
+
+                <!--Pie-->
+                <footer class="slds-modal__footer" align="right">
+                    <lightning:button label="Cancelar" onclick="{!c.cerrarModalPrevioResponderCliente}" />
+                </footer>
+            </div>
+        </section>
+        <aura:if isTrue="{!v.mostrarModalGenerarDocumento}">
+            <c:cc_GenerarDocumento aura:id="modalGenerarDocumento" recordId="{!v.recordId}" onmodalcerrado="{!c.cerrarModalPrevioResponderCliente}"/>
+        </aura:if>
+
+
+
+        <!--Modal para responder a cliente-->
+        <section role="dialog" tabindex="-1" aura:id="ModalboxResponderCliente" aria-modal="true" class="slds-modal" onkeydown="{!c.modalResponderClienteTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalResponderCliente }" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!v.labelResponder}</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Seleccione la plantilla de correo a usar para responder al {!v.labelClienteEmpleado}.<br />
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content cc_modalContent_overflow_initial slds-var-p-around_x-large">
+                    <lightning:combobox aura:id="selectItemIdioma" name="idioma" label="Idioma" placeholder="-Selecciona un idioma-" required="true" messageWhenValueMissing="Debe seleccionar un idioma" onchange="{!c.handleCarpetaIdiomaSeleccionada}" options="{!v.opcionesIdiomaFolder}" />
+                    <br />
+                    <aura:if isTrue="{!v.carpetaIdiomaSeleccionada}">
+                        <lightning:combobox aura:id="selectItemTratamiento" name="tratamiento" label="Tratamiento" placeholder="-Selecciona un tratamiento-" required="true" messageWhenValueMissing="Debe seleccionar un tratamiento" onchange="{!c.handleCarpetaTratamientoSeleccionada}" options="{!v.opcionesTratamientoFolder}" />
+                        <br />
+                    </aura:if>
+
+                    <aura:if isTrue="{!and(not(v.uncheckedPlantilla), v.procesoFinalSeleccion)}">
+                        <lightning:combobox aura:id="selectItemPlantilla" name="plantilla" label="Plantilla" placeholder="-Selecciona una plantilla-" required="true" onchange="{!c.seleccionarPlantilla}" options="{!v.optionsPlantillaResponder}" />
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.procesoFinalSeleccion}">
+                        <aura:if isTrue="{!v.uncheckedPlantilla}">
+                            <aura:if isTrue="{!v.plantillaSeleccionada}">
+                                <div class="slds-combobox_container slds-has-selection">
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon" title="Account">
+                                                <lightning:icon iconName="standard:template" size="x-small" />
+                                            </span>
+                                            <button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                <span class="slds-truncate">{!v.plantillaSeleccionada.Name}</span>
+                                            </button>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Borrar selección" onclick="{!c.deseleccionarPlantilla2}">
+                                                <lightning:icon iconName="utility:close" size="x-small" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="slds-combobox_container">
+                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                <lightning:input type="search" value="{!v.SearchKeyWordPlantilla}" label="Plantilla" onchange="{!c.teclaPulsadaLookupPlantilla2}" placeholder="Buscar plantilla..." required="true" />
+                                            </div>
+                                            <aura:if isTrue="{!v.listOfSearchRecordsPlantilla.length}">
+                                                <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-7" role="listbox">
+                                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                        <aura:iteration items="{!v.listOfSearchRecordsPlantilla}" var="singleRecPlantilla">
+                                                            <li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+                                                                <div class="slds-media slds-media_center slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" onclick="{!c.handleComponentEventPlantilla2}" title="{!singleRecPlantilla.Name}" id="{!singleRecPlantilla.Id}">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <lightning:icon iconName="standard:template" size="x-small" />
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-listbox__option-text_entity" title="{!singleRecPlantilla.Name}">{!singleRecPlantilla.Name}</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </aura:iteration>
+                                                    </ul>
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </aura:if>
+                    </aura:if>
+                    <aura:if isTrue="{!v.procesoFinalSeleccion}">
+                        <br />
+                        <lightning:input aura:id="checkboxPlantilla" type="toggle" label="Ver todas las plantillas" checked="{!v.uncheckedPlantilla}" messageToggleActive="" messageToggleInactive="" style="width: fit-content;" onchange="{!c.checkboxPlantillaChange}" />
+                    </aura:if>
+                </div>
+
+                <!--Pie-->
+                <footer class="slds-modal__footer" align="right">
+                    <lightning:button variant="brand" label="{!v.labelResponder}" onclick="{!c.responderCliente}" disabled="{!!v.plantillaSeleccionadaValue}" />
+                    <lightning:button label="Cancelar" onclick="{!c.cerrarModalResponderCliente}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal para enviar notificación-->
+        <section role="dialog" tabindex="-1" aura:id="modalboxEnviarNotificacion" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" onkeydown="{!c.modalEnviarNotificacionTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalEnviarNotificacion }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Enviar notificación</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Indique los datos de la notificación a enviar. Si el cliente no dispone de la app o no es posible
+                        entregar la notificación, se le enviará un mensaje de texto SMS.<br />
+                    </p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:input name="inputEnviarNotificacionDestinatario" aura:id="inputEnviarNotificacionDestinatario" type="tel" label="Enviar a" placeholder="Indique el número de teléfono" required="true" />
+                        <br />
+                        <lightning:combobox aura:id="inputEnviarNotificacionIdioma" name="inputEnviarNotificacionIdioma" label="Idioma de la plantilla" placeholder="--Seleccione un idioma--" messageWhenValueMissing="Debe seleccionar un idioma." options="{!v.enviarNotificacionIdiomas}" value="{!v.enviarNotificacionIdioma}" onchange="{!c.seleccionaEnviarNotificacionIdioma}" />
+                        <br />
+                        <lightning:combobox aura:id="inputEnviarNotificacionPlantilla" name="inputEnviarNotificacionPlantilla" label="Plantilla" placeholder="--Seleccione una plantilla--" messageWhenValueMissing="Debe seleccionar una plantilla." options="{!v.enviarNotificacionPlantillas}" value="{!v.enviarNotificacionPlantilla}" onchange="{!c.seleccionaEnviarNotificacionPlantilla}" />
+                        <br />
+                        <lightning:textarea label="Contenido" aura:id="inputEnviarNotificacionContenido" name="inputEnviarNotificacionContenido" placeholder="Indique el texto a enviar" onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}" required="true" maxlength="160" />
+
+                        <!--Indicador de caracteres restantes-->
+                        <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
+                            <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}" /> caracteres restantes.
+                        </div>
+                    </lightning:layoutItem>
+                    <div style="height:2rem;" />
+                </div>
+
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="enviarNotificacionBotonEnviar" class="slds-button slds-button_brand" variant="Brand" label="Enviar notificación" onclick="{!c.enviarNotificacion}" />
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalEnviarNotificacion}" />
+                </footer>
+            </div>
+        </section>
+
+
+        <!--Modal para deeplinking-->
+        <section role="dialog" tabindex="-1" aura:id="modalboxDeepLink" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal" onkeydown="{!c.modalDeepLinkingTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalDeepLinking }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Enviar notificación</h2>
+                    <p class="slds-var-m-top_x-small">
+                        Indique los datos de la notificación a enviar. Si el cliente no dispone de la app o no es posible
+                        entregar la notificación, se le enviará un mensaje de texto SMS.<br />
+                    </p>
+                    <div style="height: 1rem;"/>
+                    <p style="color: rgb(42, 153, 243); font-style: italic; padding-left: 5px;" align="left">{!v.tituloMensajePoseidon}</p>
+                    <p style="font-style: italic; font-weight: bold; padding-left: 5px;" align="left">{!v.cuerpoMensajePoseidon}</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:layoutItem size="12" padding="around-small">
+
+                        <lightning:combobox aura:id="inputSeleccionDeepLink" name="inputSeleccionDeepLink" label="Selecciona plantilla" placeholder="--Seleccione una plantilla--" messageWhenValueMissing="Debe seleccionar una plantilla." options="{!v.plantillasDeeplinking}" value="{!v.plantillaDeeplink}" onchange="{!c.seleccionplantillasDeeplinking}" />
+                        <br />
+                        <aura:if isTrue="{!v.boolParametrosPoseidon}">
+                            <div class="slds-modal__content">
+                                <label class="slds-form-element__label" id="labelParametroPoseidon"></label>
+                                <ui:inputText class="slds-lookup__search-input slds-input" value="{!v.valueInputPoseidon}" maxlength="{!v.lengthInputPoseidon}" placeholder="{!v.placeholderInputPoseidon}" />
+                            </div>
+                        </aura:if>
+
+                        <!--     <lightning:combobox aura:id="inputEnviarNotificacionPlantilla" name="inputEnviarNotificacionPlantilla" label="Plantilla"
+                            placeholder="- -Seleccione una plantilla- -"
+                            messageWhenValueMissing="Debe seleccionar una plantilla."
+                            options="{!v.enviarNotificacionPlantillas}"
+                            value="{!v.enviarNotificacionPlantilla}"
+                            onchange="{!c.seleccionaEnviarNotificacionPlantilla}"/>
+                        <br/>
+                        <lightning:textarea label="Contenido" aura:id="inputEnviarNotificacionContenido" name="inputEnviarNotificacionContenido" placeholder="Indique el texto a enviar" onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}" required="true" maxlength="160"/>
+
+                        <!- -Indicador de caracteres restantes- ->
+                        <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
+                            <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}"/> caracteres restantes.
+                        </div> -->
+                    </lightning:layoutItem>
+                    <div style="height:2rem;" />
+                </div>
+
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="enviarDeeplinkBotonEnviar" class="slds-button slds-button_brand" variant="Brand" label="Enviar notificación" onclick="{!c.enviarNotificacionDeepLinking}" />
+                    <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalDeepLinking}" />
+                </footer>
+            </div>
+        </section>
+
+
+        <!--Modal para Autenticación-->
+        <aura:if isTrue="{!v.modalAutenticacionVisible}">
+            <section role="dialog" tabindex="-1" aura:id="modalboxAutenticacion" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_medium" onkeydown="{!c.modaAutenticacionTeclaPulsada}">
+                <div class="slds-modal__container" style="padding-top: 0px; padding-bottom: 0px;">
+                    <!--Cabecera del modal-->
+                    <header class="slds-modal__header">
+                        <!--Icono de cierre-->
+                        <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalAutenticacion }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                        <!--Título-->
+                        <div class="slds-grid slds-align_absolute-center">
+                            <div>
+                                <lightning:icon iconName="utility:password" size="small" />
+                            </div>
+                            <div style="padding-left: 5px;">
+                                <h2 class="slds-text-heading_medium slds-hyphenate">Autenticación segura</h2>
+                            </div>
+                        </div>
+                        <p class="slds-var-m-top_x-small">
+                            Seleccione el nivel de la autenticación segura que desea iniciar.<br />
+                        </p>
+                    </header>
+                    <!--Contenido del modal-->
+                    <div class="slds-modal__content slds-var-p-around_medium">
+                        <c:CC_OTP />
+                    </div>
+
+                    <!--Pie-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalAutenticacion}" />
+                    </footer>
+                </div>
+            </section>
+        </aura:if>
+
+        <!--Modal cita gestor-->
+        <section role="dialog" aura:id="modalCitaGestor" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalCitaGestorTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCitaGestorCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Agendar cita con gestor</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-top_large slds-var-p-right_xx-large slds-var-p-bottom_large slds-var-p-left_xx-large slds-is-relative cc_modalCitaGestor_modalContent">
+                    <aura:if isTrue="{!v.cargandoGestor}">
+                        <div style="height: 55px;" align="center">
+                            <lightning:spinner size="small" variant="brand" style="position: absolute;" alternativeText="Cargando..." />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!!v.cargandoGestor}">
+                        <aura:if isTrue="{!v.numeroGestor == 'KO'}">
+                            <div style="margin: 10px">
+                                <span style="margin-right: 10px" class="slds-icon_container">
+                                    <lightning:icon iconName="utility:warning" variant="warning" size="x-small" />
+                                </span>
+                                <b>No es posible agendar un evento</b>
+                                <p style="margin-top: 10px">{!v.mensajeErrorInt}</p>
+                            </div>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.tieneGestor}">
+                                    <div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
+                                    <div class="slds-var-m-top_medium">
+                                        <aura:if isTrue="{!v.esClienteDigital}">
+                                            <lightning:select aura:id="tipoCita" name="tipoCita" label="Tipo de cita" required="true">
+                                                <option value="43">Llamada telefónica</option>
+                                            </lightning:select>
+                                            <aura:set attribute="else">
+                                                <lightning:select aura:id="tipoCita" name="tipoCita" label="Tipo de cita" required="true" onchange="{!c.resetDisponibilidadConsultada}">
+                                                    <aura:if isTrue="{!v.oficinaGestor != '03223'}">
+                                                        <option value="42">Entrevista</option>
+                                                    </aura:if>
+                                                    <option value="43">Llamada telefónica</option>
+                                                </lightning:select>
+                                            </aura:set>
+                                        </aura:if>
+                                        <lightning:input aura:id="asuntoEvento" name="asuntoEvento" required="true" label="Asunto" maxlength="200" class="slds-var-m-top_medium"/>
+
+                                        <aura:if isTrue="{!!v.gestorBackupActivo}">
+                                            <div class="slds-var-m-top_xx-large" style="font-size:14px; font-weight:700;">Asignado a</div>
+                                            <div style="margin-top:10px;">
+                                                <span style="padding-right:10px;" class="slds-icon">
+                                                    <lightning:icon iconName="standard:user" size="x-small" />
+                                                </span>
+                                                {!v.nombreGestor}
+                                            </div>
+                                            <div style="margin-top:15px;">
+                                                <aura:if isTrue="{!!v.gestorAsignadoCoincide}">
+                                                    <span style="margin-right: 5px" class="slds-icon_container">
+                                                        <lightning:icon iconName="utility:info_alt" size="x-small" />
+                                                    </span>
+                                                    El gestor disponible no coincide con el asignado al
+                                                    cliente: {!v.nombreGestorAsignado}.
+                                                </aura:if>
+                                            </div>
+                                            <div>
+                                                <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                                                    Fecha y hora</div>
+                                                <aura:if isTrue="{!!v.disponibilidadConsultada}">
+                                                    <lightning:button label="Consultar disponibilidad" iconName="utility:search" title="Consultar disponibilidad" onclick="{!c.consultarFechasDisponibilidadGestor}" />
+                                                    <aura:set attribute="else">
+                                                        <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <lightning:combobox aura:id="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options="{!v.fechasDisponibilidad}" onchange="{!c.consultarHorasDisponibilidadGestor}" />
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <lightning:combobox aura:id="horasDisponibilidad" label="Hora" placeholder="--Seleccione una hora--" options="{!v.horasDisponibilidad}" />
+                                                            </div>
+                                                        </div>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                        </aura:if>
+                                        <div>
+                                            <div class="slds-var-m-top_xx-large" style="font-size:14px;font-weight:700; margin-bottom:10px;">
+                                                Otros gestores
+                                            </div>
+                                            <lightning:input aura:id="gestorBackupActivo" name="checkbox" type="toggle" checked="{!v.gestorBackupActivo}" onchange="{!c.mostrarGestorBackup}" messageToggleActive="Gestor backup" messageToggleInactive="Gestor asignado" disabled="true" />
+                                        </div>
+                                        <aura:if isTrue="{!v.gestorBackupActivoDos}">
+                                            <aura:if isTrue="{!v.existeBackup}">
+                                                <div class="slds-col slds-size_1-of-1" style="margin-top:15px; margin-bottom:10px;">
+                                                    <lightning:combobox aura:id="gestoresBackup" label="Gestor backup" placeholder="--Seleccione un gestor--" options="{!v.gestoresBackup}" onchange="{!c.resetDisponibilidadConsultada}" />
+                                                    <div>
+                                                        <div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">
+                                                            Fecha y hora
+                                                        </div>
+                                                        <aura:if isTrue="{!!v.disponibilidadConsultada}">
+                                                            <lightning:button label="Consultar disponibilidad" iconName="utility:search" title="Consultar disponibilidad" onclick="{!c.consultarFechasDisponibilidadBackup}" />
+                                                            <aura:set attribute="else">
+                                                                <div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+                                                                    <div class="slds-col slds-size_1-of-2">
+                                                                        <lightning:combobox aura:id="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options="{!v.fechasDisponibilidad}" onchange="{!c.consultarHorasDisponibilidadBackup}" />
+                                                                    </div>
+                                                                    <div class="slds-col slds-size_1-of-2">
+                                                                        <lightning:combobox aura:id="horasDisponibilidad" label="Hora" placeholder="--Seleccione una hora--" options="{!v.horasDisponibilidad}" />
+                                                                    </div>
+                                                                </div>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </div>
+                                                </div>
+                                                <aura:set attribute="else">
+                                                    <div style="margin-top:15px;">
+                                                        <span style="margin-right: 5px; margin-left: 5px;" class="slds-icon_container">
+                                                            <lightning:icon iconName="utility:info_alt" size="x-small" />
+                                                        </span>
+                                                        No existen backups asignados al gestor de este cliente.
+                                                    </div>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:if>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div style="margin: 10px">
+                                            <span style="margin-right: 10px" class="slds-icon_container">
+                                                <lightning:icon iconName="utility:warning" variant="warning" size="x-small" />
+                                            </span>
+                                            <b>No es posible agendar un evento</b>
+                                            <p style="margin-top: 10px">El cliente relacionado con este caso no tiene un
+                                                gestor asignado. </p>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button aura:id="modalCitaGestorCancelar" label="Cancelar" onclick="{!c.modalCitaGestorCerrar}" />
+                    <lightning:button label="Agendar cita gestor" variant="brand" iconName="utility:event" disabled="{!!v.disponibilidadConsultada}" onclick="{!c.confirmarCitaGestor}" />
+                </div>
+            </div>
+        </section>
+
+        <!--Modal tarea gestor-->
+        <section role="dialog" aura:id="modalTareaGestor" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTareaGestorTeclaPulsada}">
+            <!--Cabecera del modal-->
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalTareaGestorCerrar}" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Crear tarea para el gestor</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-top_large slds-var-p-right_xx-large slds-var-p-bottom_large slds-var-p-left_xx-large slds-is-relative">
+                    <aura:if isTrue="{!v.cargandoGestor}">
+                        <div style="height: 55px;" align="center">
+                            <lightning:spinner size="small" variant="brand" style="position: absolute;" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!!v.cargandoGestor}">
+                        <aura:if isTrue="{!v.numeroGestor == 'KO'}">
+                            <div style="margin: 10px">
+                                <span style="margin-right: 10px" class="slds-icon_container">
+                                    <lightning:icon iconName="utility:warning" variant="warning" size="small" />
+                                </span>
+                                <b>No es posible crear una tarea</b>
+                                <p style="margin-top: 10px">{!v.mensajeErrorInt}</p>
+                            </div>
+                            <aura:set attribute="else">
+                                <!--<aura:if isTrue="{!v.tieneGestor}">-->
+                                <div style="font-size: 14px; font-weight: 700;">Nueva tarea</div>
+                                <div class="slds-grid slds-gutters slds-var-m-top_medium">
+                                    <div class="slds-col slds-size_2-of-3">
+                                        <lightning:input aura:id="asuntoTarea" required="true" label="Asunto" maxlength="255" value="Solicitud contacto gestor (Contact Center)" disabled="true" />
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-3">
+                                        <lightning:input aura:id="fechaActividad" type="date" value="{!v.today}" label="Fecha actividad" required="true" />
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
+                                        <lightning:textarea aura:id="comentariosTarea" required="true" label="Comentarios" value="{!v.comentariosTarea}" />
+                                    </div>
+                                </div>
+                                <div class="slds-var-m-top_xx-large slds-var-m-bottom_large" style="font-size: 14px; font-weight: 700;">Subir archivo</div>
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-1 slds-var-m-top_medium">
+                                        <lightning:fileUpload aura:id="archivoTarea" required="false" multiple="false" label="Subir archivo" value="{!v.archivoTarea}" />
+                                    </div>
+                                </div>
+                                <div class="slds-var-m-top_xx-large slds-var-m-bottom_large" style="font-size: 14px; font-weight: 700;">Asignada </div>
+                                <lightning:icon class="slds-var-m-right_small" iconName="standard:user" size="x-small" />{!v.nombreGestor}
+                                <!-- DESAROLLO PARADO (POSIBLEMENTE ENERO 2024)
+                                <aura:if isTrue="{!v.nombreGestor != 'Sin Gestor/EAP'}">
+                                    <lightning:combobox aura:id="comboboxEmpleados" label="Empleado" placeholder="Seleccione un empleado" options="{!v.comboboxEmpleadosOptions}" class="slds-var-m-top_medium" onchange="{!c.tareaGestorEmpleadoSeleccionadoOnChange}"/>
+                                </aura:if>
+                                -->
+                                <div style="margin-top:15px;">
+                                    <aura:if isTrue="{!and(!!v.gestorAsignadoCoincide, !v.nombreGestor == 'Sin Gestor/EAP')}">
+                                        <span style="margin-right: 5px" class="slds-icon_container">
+                                            <lightning:icon iconName="utility:info_alt" size="small" />
+                                        </span>
+                                        El gestor disponible para su atención no coincide con el asignado al cliente: {!v.nombreGestorAsignado}.
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.nombreGestor == 'Sin Gestor/EAP'}">Se asignará a un gestor genérico.</aura:if>
+                                </div>
+                                <!--<aura:set attribute="else">
+                                        <div style="margin: 10px">
+                                            <span style="margin-right: 10px" class="slds-icon_container">
+                                                <lightning:icon iconName="utility:warning" variant="warning" size="small" />
+                                            </span>
+                                            <b>No es posible crear una tarea</b>
+                                            <p style="margin-top: 10px">El cliente relacionado con este caso no tiene un
+                                                gestor asignado. </p>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>-->
+                            </aura:set>
+                        </aura:if>
+                    </aura:if>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button aura:id="modalTareaGestorCancelar" label="Cancelar" onclick="{!c.modalTareaGestorCerrar}" />
+                    <lightning:button label="Crear tarea gestor" variant="brand" iconName="utility:task" onclick="{!c.crearTarea}" />
+                </div>
+            </div>
+        </section>
+
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalboxReturnSAC" onkeydown="{!c.modalDevolverSACTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cerrarModalDevolverSAC }" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Devolver a SAC</h2>
+                    <p class="slds-var-m-top_x-small">Indique el motivo de la devolución a SAC</p>
+                    <p class="slds-var-m-top_x-small">El motivo quedará registrado en la actividad de Devolver a SAC</p>
+                </header>
+
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning:layoutItem size="12" padding="around-small">
+                        <lightning:input value="{!v.motivoDevolucionSAC}" aura:id="motDevolucionSAC" label="Introduce el motivo de la devolución a SAC" required="true" class="slds-show" />
+                        <lightning:textarea value="{!v.motivoDevolucionSAC}" aura:id="ampliarMotivoDevolucionSAC" label="Introduce el motivo de la devolución a SAC" required="true" class="slds-hide" />
+                        <lightning:input aura:id="checkbox" style="padding-right: 7%;margin-top: 4px;" name="checkbox" type="checkbox" label="Ampliar información" checked="false" onchange="{!c.ampliarMotivoDevolverSAC }" messageToggleActive="" messageToggleInactive="" />
+                    </lightning:layoutItem>
+                    <div style="height:3rem;" /> <!--Separador-->
+                </div>
+
+                <!--Pie del modal-->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" label="Devolver" aura:id="returnSAC" onclick="{!c.devolverSAC}" disabled="{false}" />
+                    <lightning:button class="slds-float_right" variant="Neutral" label="Cancelar" onclick="{!c.cerrarModalDevolverSAC}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal Transfer-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalBoxTransfer" onkeydown="{!c.modalTransferTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalTransferCerrar}" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Transferir a cola</h2>
+                    <p class="slds-var-m-top_x-small">Selecciona la cola a la que quieres transferir la propiedad del caso.</p>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large modalBoxTransfer_modalContent">
+                    <!--Lookup de colas-->
+                    <div aura:id="searchResQueue" class="slds-form-element slds-lookup" data-select="single">
+                        <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
+                            <div class="slds-col slds-grow-none">
+                                <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Cola destino</label>
+                            </div>
+                            <div class="slds-col">
+                                <!--This part is for display search bar for lookup-->
+                                <div class="slds-form-element__control">
+                                    <div class="slds-input-has-icon slds-input-has-icon_right">
+                                        <!-- This markup is for when an record is selected -->
+                                        <div aura:id="lookup-pill-queue" class="slds-pill-container slds-hide">
+                                            <span class="slds-pill">
+                                                <span class="slds-pill__label">{!v.selectedRecordQueue.Name} </span>
+                                                <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{!c.deseleccionarQueue}"/>
+                                            </span>
+                                        </div>
+                                        <div aura:id="lookupFieldQueue" class="slds-show">
+                                            <lightning:input type="search" aura:id="inputTextQueue" value="{!v.SearchKeyWordQueue}" onchange="{!c.inputTextQueueOnchange}" placeholder="Buscar cola por nombre" variant="label-hidden" required="true"/>
+                                            <!--This part is for Display typehead lookup result List-->
+                                            <div class="slds-lookup__menu slds">
+                                                <div class="slds-lookup__item_label slds-text-body_small">{!v.Message}</div>
+                                                <ul class="slds-lookup__list" role="listbox">
+                                                    <aura:iteration items="{!v.listOfSearchRecordsQueue}" var="singleRecQueue">
+                                                        <c:CC_CustomLookupResultQueue oQueue="{!singleRecQueue}" />
+                                                    </aura:iteration>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div style="height:7rem;" />
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Transferir a cola" iconName="utility:send" onclick="{!c.cambiarPropietarioTransfer}" disabled="{!v.deshabilitarTransfer || !v.SearchKeyWordQueue}" />
+                    <lightning:button aura:id="modalTransferCancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalTransferCerrar}" />
+                </footer>
+            </div>
+        </section>
+
+        <!--Modal Onboarding-->
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="ModalBoxOnboarding" onkeydown="{!c.modalOnboardingTeclaPulsada}">
+            <div class="slds-modal__container">
+                <!--Cabecera del modal-->
+                <header class="slds-modal__header">
+                    <!--Icono de cierre-->
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalOnboardingCerrar}" variant="border-filled" class="slds-button_icon slds-modal__close" />
+                    <!--Título-->
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Onboarding</h2>
+                </header>
+                <!--Contenido del modal-->
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <!--Lookup de colas-->
+                    <div aura:id="searchResQueue" class="slds-form-element slds-lookup" data-select="single">
+                        <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
+                            <div class="slds-col slds-grow-none">
+                                <!-- <label class="slds-form-element__label"><abbr class="slds-required">*</abbr>DNI</label> -->
+                                <lightning:input aura:id="inputDNIOnboarding" label="Numero de documento" placeholder="DNI/NIE/Pasaporte..." onchange="{!c.validarDNIOnboarding}" />
+                            </div>
+                        </div>
+
+                    </div>
+                    <div style="height:7rem;" />
+                </div>
+                <!--Pie-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Validar DNI" disabled="{!v.botonValidarOnboarding}" onclick="{!c.validarDNIOnboarding}"/>
+                    <lightning:button aura:id="modalOnboardingCancelar" class="slds-float_right" label="Cancelar" onclick="{!c.modalOnboardingCerrar}" />
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+</aura:component>

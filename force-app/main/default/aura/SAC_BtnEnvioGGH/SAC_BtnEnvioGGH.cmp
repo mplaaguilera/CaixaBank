@@ -1,0 +1,46 @@
+<aura:component controller="SAC_TareasOperativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="tarea" type="SAC_Accion__c" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="envioRealizado" type="Boolean" default="false" />
+    <aura:attribute name="campos" type="String[]" default = "['Id', 'SAC_Estado__c']"/>
+
+    <aura:attribute name="ldsError" type="String"/>
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="tareaData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="{!v.campos}" targetFields="{!v.tarea}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}"/>
+
+    <div style="padding-top: 4px" align="center">
+        <aura:if isTrue="{!and(v.envioRealizado == false, v.tarea.SAC_Estado__c == 'SAC_PendienteEnviar' || v.tarea.SAC_Estado__c == 'SAC_PteReenvio')}">
+            <lightning:button aura:id="botonEnvioGGH" label="Enviar GGH" iconName="utility:announcement" onclick="{!c.enviarGGHJS}" disabled="false"/>       
+            <lightning:button aura:id="botonFinalizarTarea" label="Finalizar Tarea" iconName="utility:change_owner" onclick="{!c.finalizarTarea}" disabled="false" />
+            <aura:set attribute="else">
+                <lightning:button aura:id="botonEnvioGGH" label="Enviar GGH" iconName="utility:announcement"  disabled="true"/>       
+                <lightning:button aura:id="botonFinalizarTarea" label="Finalizar Tarea" iconName="utility:change_owner"  disabled="true" />
+            </aura:set>
+        </aura:if>
+        <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."  variant="brand" size="large" class="slds-hide"/>
+    </div>    
+
+    <aura:if isTrue="{!v.isLoading}">
+            <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                        <div class="slds-form-element__control">
+                            <div align="center">
+                                <span class="slds-text-heading_small slds-truncate">
+                                    <br/>
+                                    Actualizando los datos... por favor espere.
+                                </span>
+                                <div class="caseHolder">
+                                    <lightning:spinner alternativeText="Loading" size="medium" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+</aura:component>

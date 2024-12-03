@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Cuenta_actual_activa__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si la cuenta actual está activa o no</description>
+    <label>Cuenta actual activa</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

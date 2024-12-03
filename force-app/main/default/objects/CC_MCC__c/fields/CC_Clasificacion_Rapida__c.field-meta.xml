@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Clasificacion_Rapida__c</fullName>
+    <label>Clasificación rápida</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>AHORRO</fullName>
+                <default>false</default>
+                <label>AHORRO</label>
+            </value>
+            <value>
+                <fullName>AUXILIAR ONLINE</fullName>
+                <default>false</default>
+                <label>AUXILIAR ONLINE</label>
+            </value>
+            <value>
+                <fullName>BIZUM - BENEFICIARIO NO RECIBE IMPORTE</fullName>
+                <default>false</default>
+                <label>BIZUM - BENEFICIARIO NO RECIBE IMPORTE</label>
+            </value>
+            <value>
+                <fullName>BIZUM - INCIDENCIA</fullName>
+                <default>false</default>
+                <label>BIZUM - INCIDENCIA</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK PAY</fullName>
+                <default>false</default>
+                <label>CAIXABANK PAY</label>
+            </value>
+            <value>
+                <fullName>COMPRAS POR INTERNET</fullName>
+                <default>false</default>
+                <label>COMPRAS POR INTERNET</label>
+            </value>
+            <value>
+                <fullName>ENVÍO DE FICHEROS</fullName>
+                <default>false</default>
+                <label>ENVÍO DE FICHEROS</label>
+            </value>
+            <value>
+                <fullName>FONDOS</fullName>
+                <default>false</default>
+                <label>FONDOS</label>
+            </value>
+            <value>
+                <fullName>IDENTIFICACIÓN - Acceso web</fullName>
+                <default>false</default>
+                <label>IDENTIFICACIÓN - Acceso web</label>
+            </value>
+            <value>
+                <fullName>IDENTIFICACIÓN - Acceso con app</fullName>
+                <default>false</default>
+                <label>IDENTIFICACIÓN - Acceso con app</label>
+            </value>
+            <value>
+                <fullName>IDENTIFICACIÓN - Acceso con DNIe</fullName>
+                <default>false</default>
+                <label>IDENTIFICACIÓN - Acceso con DNIe</label>
+            </value>
+            <value>
+                <fullName>PLANES</fullName>
+                <default>false</default>
+                <label>PLANES</label>
+            </value>
+            <value>
+                <fullName>RECEPCIÓN DE FICHEROS</fullName>
+                <default>false</default>
+                <label>RECEPCIÓN DE FICHEROS</label>
+            </value>
+            <value>
+                <fullName>SEGURIDAD - Accesos no reconocidos</fullName>
+                <default>false</default>
+                <label>SEGURIDAD - Accesos no reconocidos</label>
+            </value>
+            <value>
+                <fullName>SEGURIDAD - Movimientos no reconocidos</fullName>
+                <default>false</default>
+                <label>SEGURIDAD - Movimientos no reconocidos</label>
+            </value>
+            <value>
+                <fullName>SEGURIDAD - PHISHING/TROYANO</fullName>
+                <default>false</default>
+                <label>SEGURIDAD - PHISHING/TROYANO</label>
+            </value>
+            <value>
+                <fullName>TRANSFERENCIAS</fullName>
+                <default>false</default>
+                <label>TRANSFERENCIAS</label>
+            </value>
+            <value>
+                <fullName>VALORES</fullName>
+                <default>false</default>
+                <label>VALORES</label>
+            </value>
+            <value>
+                <fullName>BIZUM</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>BIZUM</label>
+            </value>
+            <value>
+                <fullName>IDENTIFICACIÓN</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>IDENTIFICACIÓN</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

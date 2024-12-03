@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Contiene permisos para datos de carácter sensible</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.AV_Colectivos__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SEG_DatosSensibles</label>
+    <license>Salesforce</license>
+</PermissionSet>

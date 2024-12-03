@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Presidencia__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Chechbox para indicar si el grupo debe resolver casos que tengan la opción presidencia activada.</description>
+    <label>Presidencia</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

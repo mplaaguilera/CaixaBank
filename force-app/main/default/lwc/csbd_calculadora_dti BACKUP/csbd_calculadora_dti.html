@@ -1,0 +1,669 @@
+<template>
+
+	<article class="cardCalculadoraDti slds-card slds-var-m-top_x-large cargando">
+		<div class="slds-card__body slds-card__body_inner slds-var-p-bottom_large">
+
+			<div class="camposCabecera slds-text-color_weak slds-var-m-top_large">
+				<div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
+					<div class="slds-col slds-grow-none slds-truncate" title={camposCabecera.tipoOperacionUsoVivienda}>
+						<lightning-icon icon-name="utility:key" size="x-small" class="tipoOperacionUsoVivienda slds-var-m-right_small"></lightning-icon>
+						<span>{camposCabecera.tipoOperacion} de {camposCabecera.usoVivienda}</span>
+					</div>
+					<div class="slds-col slds-grow-none slds-truncate" title={camposCabecera.tipoConstruccion}>
+						<lightning-icon icon-name="utility:custom_apps" size="x-small" class="tipoConstruccion slds-var-m-right_small"></lightning-icon>
+						<span>{camposCabecera.tipoConstruccion}</span>
+					</div>
+					<template lwc:if={camposCabecera.direccion}>
+						<div class="slds-col slds-grow-none slds-truncate" title={camposCabecera.direccion}>
+							<lightning-icon icon-name="utility:checkin" size="x-small" class="direccion slds-var-m-right_small"></lightning-icon>
+							<span>{camposCabecera.direccion}</span>
+						</div>
+						<!-- "Ver en el mapa"
+					<div class="slds-col slds-grow-none" style="padding-left: 0;">
+						<lightning-button-icon class="botonModalMapaAbrir slds-is-relative" icon-name="utility:location" size="small" tooltip="Ver en el mapa" onclick={modalMapaAbrir} style="top: -2px;"></lightning-button-icon>
+					</div>
+					-->
+					</template>
+				</div>
+
+				<!--
+				<template lwc:if={modalMapaAbierto}>
+					<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_medium modalMapa" onkeydown={modalOnkeydown}>
+						<div class="slds-modal__container">
+							<header class="slds-modal__header">
+								<lightning-button-icon icon-name="utility:close" size="large" onclick={modalCerrar} variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+								<h2 class="slds-text-heading_medium slds-hyphenate">Situación de la vivienda</h2>
+							</header>
+							<div class="slds-modal__content slds-var-p-vertical_large slds-var-p-horizontal_x-large">
+								<div style="border: 1px solid rgb(201, 201, 201); border-radius: 5px;">
+									<lightning-map map-markers={camposCabecera.mapMarkers} options={camposCabecera.mapOptions} zoom-level=15 selected-marker-value="inmueble"></lightning-map>
+								</div>
+							</div>
+							<footer class="slds-modal__footer">
+								<lightning-button class="botonModalMapaCerrar" label="Cerrar" onclick={modalCerrar}></lightning-button>
+							</footer>
+						</div>
+					</section>
+					<div class="slds-backdrop"></div>
+				</template>
+				-->
+			</div>
+
+			<!-- <div class="slds-card__body slds-card__body_inner slds-var-p-bottom_large"> -->
+			<div class="slds-grid slds-grid_vertical">
+				<!--Sección de indicadores de viabilidad -->
+				<div class="slds-col slds-var-m-bottom_large">
+					<div class="divCalculos">
+						<div class="slds-grid slds-grid_vertical-align-center slds-is-relative slds-gutters_direct-x-small" style="top: -2px;">
+							<!--
+							<div class="slds-col slds-align_absolute-center divCalculoViabilidad">
+								<span lwc:if={datatableData.calculos}>
+									<template lwc:if={data.hipotecaViable}>
+										<lightning-icon icon-name="utility:success" size="x-small" class="iconoSuccess"></lightning-icon>
+										<span class="slds-var-m-left_small viabilidadLabel" style="color: forestgreen;">Viable</span>
+									</template>
+									<template lwc:else>
+										<lightning-icon icon-name="utility:ban" size="x-small" class="iconoError"></lightning-icon>
+										<span class="slds-var-m-left_small viabilidadLabel" style="color: firebrick;">No viable</span>
+									</template>
+								</span>
+							</div>
+							-->
+							<div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="ltv">
+								<div class="slds-grid slds-grid_vertical" style="text-align: center; padding-left: 8px; padding-right: 8px;">
+									<div class="slds-col">
+										<span class="slds-var-m-right_small calculoLabel">LTV</span>
+									</div>
+									<div class="slds-col" style="margin-top: 4px;">
+										<span lwc:if={datatableData.calculos} class="calculoValue">
+											<template lwc:if={datatableData.calculos.ltv.valor}>
+												{datatableData.calculos.ltv.valor}
+												<span class="calculoValuePercent">%</span>
+											</template>
+											<span lwc:else class="calculoValueDesconocido">?</span>
+											<!-- <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small slds-hide" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext> -->
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiNomina">
+								<div class="slds-grid slds-grid_vertical" style="text-align: center;">
+									<div class="slds-col">
+										<span class="slds-var-m-right_small calculoLabel">DTI Nómina</span>
+									</div>
+									<div class="slds-col" style="margin-top: 4px;">
+										<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+											<div class="slds-col">
+												<div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+													<div class="slds-col">
+														<span class="calculoLabel subtitulo">Sin bonificar</span>
+													</div>
+													<div class="slds-col">
+														<span lwc:if={datatableData.calculos} class="calculoValue sinBonificar">
+															<template lwc:if={datatableData.calculos.dtiNomina.valor}>
+																{datatableData.calculos.dtiNomina.valor}
+																<span class="calculoValuePercent">%</span>
+															</template>
+															<span lwc:else class="calculoValueDesconocido">?</span>
+														</span>
+													</div>
+												</div>
+											</div>
+											<div class="slds-col">
+												<div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+													<div class="slds-col">
+														<span class="calculoLabel subtitulo">Bonificado</span>
+													</div>
+													<div class="slds-col">
+														<span lwc:if={datatableData.calculos} class="calculoValue">
+															<template lwc:if={datatableData.calculos.dtiNominaBonificado.valor}>
+																{datatableData.calculos.dtiNominaBonificado.valor}
+																<span class="calculoValuePercent">%</span>
+															</template>
+															<span lwc:else class="calculoValueDesconocido">?</span>
+														</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext> -->
+								</div>
+							</div>
+							<div class="slds-col slds-align_absolute-center divCalculoItem" data-calculo="dtiIrpf">
+								<div class="slds-grid slds-grid_vertical" style="text-align: center;">
+									<div class="slds-col">
+										<span class="slds-var-m-right_small calculoLabel">DTI IRPF</span>
+									</div>
+									<div class="slds-col" style="margin-top: 4px;">
+										<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+											<div class="slds-col">
+												<div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+													<div class="slds-col">
+														<span class="calculoLabel subtitulo">Sin bonificar</span>
+													</div>
+													<div class="slds-col">
+														<span lwc:if={datatableData.calculos} class="calculoValue sinBonificar">
+															<template lwc:if={datatableData.calculos.dtiIrpf.valor}>
+																{datatableData.calculos.dtiIrpf.valor}
+																<span class="calculoValuePercent">%</span>
+															</template>
+															<span lwc:else class="calculoValueDesconocido">?</span>
+														</span>
+													</div>
+												</div>
+											</div>
+											<div class="slds-col">
+												<div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+													<div class="slds-col">
+														<span class="calculoLabel subtitulo">Bonificado</span>
+													</div>
+													<div class="slds-col">
+														<span lwc:if={datatableData.calculos} class="calculoValue">
+															<template lwc:if={datatableData.calculos.dtiIrpfBonificado.valor}>
+																{datatableData.calculos.dtiIrpfBonificado.valor}
+																<span class="calculoValuePercent">%</span>
+															</template>
+															<span lwc:else class="calculoValueDesconocido">?</span>
+														</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- <lightning-helptext lwc:if={data.ltvViableHasta} icon-name="utility:ban" class="calculoIcon iconoError slds-var-m-left_x-small" content={data.ltvViableHasta.mensajeNoViable}></lightning-helptext> -->
+									</div>
+								</div>
+							</div>
+							<div class="slds-col slds-grow-none">
+								<div class="divTooltipCalculos slds-var-m-left_small slds-align_absolute-center" style="position: relative;" onmouseenter={divTooltipCalculosOnmouseenter} onmouseleave={divTooltipCalculosOnmouseleave}>
+									<lightning-icon class="iconoTooltipCalculos" icon-name="utility:info_alt" size="x-small"></lightning-icon>
+									<div class="tooltipCalculos slds-popover slds-popover_tooltip slds-nubbin_bottom slds-is-absolute" role="tooltip"> <!--slds-slide-from-bottom-to-top-->
+										<div class="slds-popover__body">
+											<ul>
+												<li>El LTV (<span style="font-style: italic;">Loan To Value</span>) mide la relación entre el importe de la hipoteca y el valor de la tasación de la vivienda.</li>
+												<li class="slds-var-m-top_xx-large">
+													El DTI (<span style="font-style: italic;">Debt To Income</span>) mide la relación entre la deuda total y los ingresos del cliente.
+													<div class="slds-var-m-top_x-small" style="color: gold;">Debido a la política de riesgo, para su cálculo solo se tiene en cuenta el 50% de los ingresos por alquileres de los titulares.</div>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="slds-col">
+				<!--Info-->
+				<div class="slds-is-relative">
+					<div class="divInfo slds-text-color_weak">
+						<div class="slds-grid slds-gutters_x-small slds-grid_vertical-align-center">
+							<div class="slds-col slds-text-color_weak" style="text-align: end;">
+								<ul>
+									<template for:each={mensajesInfo} for:item="mensaje">
+										<li key={mensaje.tipo} lwc:if={mensaje.mostrar} class="infoItem" title={mensaje.title}>
+											<span class="slds-is-relative slds-var-m-right_small" style="top: -2px;">
+												<lightning-icon icon-name={mensaje.iconName} class={mensaje.iconoClass} size="xx-small"></lightning-icon>
+											</span>
+											<span class="slds-truncate" style={mensaje.textoStyle}>{mensaje.texto}</span>
+										</li>
+									</template>
+								</ul>
+							</div>
+							<div class="slds-col slds-shrink-none slds-grow-none">
+								<lightning-button label="Descartar" icon-name="utility:undo" class="botonesFooter" onclick={botonDescartarOnclick}></lightning-button>
+								<lightning-button label="Guardar" variant="brand" class="botonGuardar botonesFooter slds-var-m-left_medium" onclick={botonGuardarOnclick}></lightning-button>
+							</div>
+						</div>
+					</div>
+					<hr />
+				</div>
+			</div>
+
+			<!--Tablas-->
+			<div class="slds-col slds-var-m-top_x-large">
+				<div class="slds-grid slds-wrap slds-gutters_direct-medium slds-grid_vertical-stretch">
+					<div class="gridColDatatable slds-col slds-size_1-of-2">
+						<div class="tituloTabla slds-var-m-bottom_small">
+							<lightning-icon icon-name="utility:database" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+							Importe
+						</div>
+						<div class="datatableContainer datatableContainerImporte">
+							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableImporte sinNumerosFilas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.importe}
+												 data={datatableData.importe}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="importe">
+							</lightning-datatable>
+						</div>
+					</div>
+					<div class="gridColDatatable slds-col slds-size_1-of-2">
+						<div class="tituloTabla slds-var-m-bottom_small">
+							<lightning-icon icon-name="utility:paste" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+							General
+						</div>
+						<div class="datatableContainer datatableContainerGeneral">
+							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableGeneral1 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.general1}
+												 data={datatableData.general1}
+												 hide-checkbox-column
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="general1">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableGeneral2 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.general2}
+												 data={datatableData.general2}
+												 hide-checkbox-column
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="general2">
+							</lightning-datatable>
+						</div>
+					</div>
+					<div class="gridColDatatable slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+						<div class="tituloTabla slds-var-m-bottom_small">
+							<lightning-icon icon-name="utility:chart" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -2px;"></lightning-icon>
+							Cuota mensual
+						</div>
+						<div class="datatableContainer datatableContainerCuotaMensual">
+							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual1 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual1}
+												 data={datatableData.cuotaMensual1}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 data-datatable="cuotaMensual1">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual2 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual2}
+												 data={datatableData.cuotaMensual2}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="cuotaMensual2">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual3 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual3}
+												 data={datatableData.cuotaMensual3}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="cuotaMensual3">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual4 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual4}
+												 data={datatableData.cuotaMensual4}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 data-datatable="cuotaMensual4">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual5 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual5}
+												 data={datatableData.cuotaMensual5}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 data-datatable="cuotaMensual5">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableCuotaMensual6 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.cuotaMensual6}
+												 data={datatableData.cuotaMensual6}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 data-datatable="cuotaMensual6">
+							</lightning-datatable>
+						</div>
+					</div>
+					<div class="gridColDatatable slds-col slds-size_1-of-2 slds-var-m-top_xx-large">
+						<div>
+							<div class="tituloTabla slds-var-m-bottom_small" style="display: inline-block;">
+								<lightning-icon icon-name="utility:case" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -1px;"></lightning-icon>
+								Fondos propios (mensual)
+							</div>
+							<span class="popoverTiposBonificadosContainer slds-is-relative" onmouseenter={popoverTiposBonificadosContainerOnmouseenter} onmouseleave={popoverTiposBonificadosContainerOnmouseleave}>
+								<lightning-icon class="iconoTiposBonificados slds-var-m-left_small" icon-name="utility:metrics" size="x-small" style="overflow: hidden;"></lightning-icon>
+								<section class="popoverTiposBonificados slds-popover slds-nubbin_left" role="dialog">
+									<div class="slds-popover__body">
+										<template lwc:if={datatableTiposBonificados.data.length} for:each={datatableTiposBonificados.data} for:item="tipo">
+											<div key={tipo.nombre}>
+												<div class="tituloDatatableTiposBonificados slds-text-title_caps slds-var-m-top_small slds-var-p-bottom_small">
+													<lightning-icon icon-name={tipo.iconName} size="x-small"></lightning-icon>
+													{tipo.nombre}
+												</div>
+												<div class="datatableContainerTiposBonificados">
+													<lightning-datatable
+														class="datatableTiposBonificados"
+														key-field="tipo"
+														columns={tipo.columns}
+														data={tipo.data}
+														hide-checkbox-column
+														hide-table-header>
+													</lightning-datatable>
+												</div>
+											</div>
+										</template>
+										<div lwc:if={datatableTiposBonificados.data.mostrarFooter} class="popoverTiposBonificadosTextoFooter slds-var-m-top_x-small slds-var-m-bottom_xxx-small">
+											+1% adicional por gastos.
+										</div>
+									</div>
+								</section>
+							</span>
+						</div>
+						<div class="datatableContainer datatableContainerFondosPropios">
+							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableFondosPropios1 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.fondosPropios1}
+												 data={datatableData.fondosPropios1}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="fondosPropios1">
+							</lightning-datatable>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableFondosPropios2 sinNumerosFilas listaTablas transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.fondosPropios2}
+												 data={datatableData.fondosPropios2}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 hide-table-header
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="fondosPropios2">
+							</lightning-datatable>
+						</div>
+					</div>
+					<div class="gridColDatatable primerTitular slds-col slds-size_1-of-2 csbd-var-m-top_xxx-large">
+						<div class="slds-grid slds-grid_vertical" style="height: 100%">
+							<div class="slds-col slds-grow-none" style="margin-bottom: 8px;">
+								<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center" style="min-height: 26px;">
+									<div class="slds-col slds-shrink-none">
+										<div class="tituloTabla" style="top: 1px;">
+											<lightning-icon icon-name="utility:user" size="xx-small" class="tituloTablaIcono slds-var-m-right_small"></lightning-icon>
+											Primer titular
+										</div>
+									</div>
+									<div lwc:if={oportunidad} class="slds-col" style="overflow: hidden;">
+										<span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__c.value} class="pillCliente slds-truncate" title={oportunidad.fields.CSBD_ContactoTitular1__r.displayValue} onclick={navegarDetalleRegistro} data-record-id={oportunidad.fields.CSBD_ContactoTitular1__c.value}>
+											<lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+											<span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular1__r.displayValue}</span>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div lwc:if={oportunidad} class="datosTitular slds-var-m-bottom_large slds-text-color_weak">
+								<template lwc:if={oportunidad.fields.CSBD_ContactoTitular1__c.value}>
+									<span title="Escala maestra">EM&nbsp;</span>
+									<template lwc:if={oportunidad.fields.CSBD_Contact__c.value}>
+										<span lwc:if={oportunidad.fields.CSBD_Contact__r.value.fields.CSBD_Escala_Maestra__c.value} class="valor">{oportunidad.fields.CSBD_Contact__r.value.fields.CSBD_Escala_Maestra__c.value}</span>
+										<span lwc:else>?</span>
+									</template>
+									<span lwc:else>?</span>
+									<span class="separadorTexto"></span>
+									<span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Edad__c.value} class="valor">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Edad__c.value}</span>
+									<span lwc:else>?</span>
+									<span>&nbsp;años</span>
+									<span class="separadorTexto"></span>
+									<span lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Estado_Civil__c.value} style="font-weight: 400;">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Estado_Civil__c.value}</span>
+									<span lwc:else>Estado civil desconocido</span>
+									<span class="separadorTexto"></span>
+									<template lwc:if={oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Numero_Hijos__c.value}>
+										<span class="valor">{oportunidad.fields.CSBD_ContactoTitular1__r.value.fields.CSBD_Numero_Hijos__c.value}</span>
+										<span>&nbsp;hijos</span>
+									</template>
+									<span lwc:else>Sin hijos</span>
+								</template>
+								<span lwc:else>Sin primer titular</span>
+							</div>
+							<div class="slds-col">
+								<div class="datatableContainer datatableContainerPrimerTitular" style="height: 100%;">
+									<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+									<!-- sldsValidatorIgnoreNextLine -->
+									<lightning-datatable
+														 class="datatablePrimerTitular transparente slds-hide"
+														 key-field="id"
+														 columns={datatableColumns.titular}
+														 data={datatableData.primerTitular}
+														 hide-checkbox-column
+														 column-widths-mode="auto"
+														 suppress-bottom-bar
+														 wrap-text-max-lines="2"
+														 oncellchange={datatableOncellchange}
+														 data-datatable="primerTitular"
+														 resize-column-disabled>
+									</lightning-datatable>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="gridColDatatable segundoTitular slds-col slds-size_1-of-2 csbd-var-m-top_xxx-large">
+						<div class="slds-grid slds-grid_vertical" style="height: 100%">
+							<div class="slds-col slds-grow-none" style="margin-bottom: 8px;">
+								<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center" style="min-height: 26px;">
+									<div class="slds-col slds-shrink-none">
+										<div class="tituloTabla" style="top: 1px;">
+											<lightning-icon icon-name="utility:people" size="xx-small" class="tituloTablaIcono slds-var-m-right_small"></lightning-icon>
+											Segundo titular
+										</div>
+									</div>
+									<div lwc:if={oportunidad} class="slds-col" style="overflow: hidden;">
+										<span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__c.value} class="pillCliente slds-truncate" title={oportunidad.fields.CSBD_ContactoTitular2__r.displayValue} onclick={navegarDetalleRegistro} data-record-id={oportunidad.fields.CSBD_ContactoTitular2__c.value}>
+											<lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+											<span class="pillClienteLabel">{oportunidad.fields.CSBD_ContactoTitular2__r.displayValue}</span>
+										</span>
+									</div>
+								</div>
+							</div>
+							<div lwc:if={oportunidad} class="datosTitular slds-var-m-bottom_large slds-text-color_weak" style="text-align: end;">
+								<template lwc:if={oportunidad.fields.CSBD_ContactoTitular2__c.value}>
+									<span title="Escala maestra">EM&nbsp;</span>
+									<template lwc:if={oportunidad.fields.CSBD_Contact_2__c.value}>
+										<span lwc:if={oportunidad.fields.CSBD_Contact_2__r.value.fields.CSBD_Escala_Maestra__c.value} class="valor">{oportunidad.fields.CSBD_Contact_2__r.value.fields.CSBD_Escala_Maestra__c.value}</span>
+										<span lwc:else>?</span>
+									</template>
+									<span lwc:else>?</span>
+									<span class="separadorTexto"></span>
+									<span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Edad__c.value} class="valor">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Edad__c.value}</span>
+									<span lwc:else>?</span>
+									<span>&nbsp;años</span>
+									<span class="separadorTexto"></span>
+									<span lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Estado_Civil__c.value} style="font-weight: 400;">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Estado_Civil__c.value}</span>
+									<span lwc:else>Estado civil desconocido</span>
+									<span class="separadorTexto"></span>
+									<template lwc:if={oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Numero_Hijos__c.value}>
+										<span class="valor">{oportunidad.fields.CSBD_ContactoTitular2__r.value.fields.CSBD_Numero_Hijos__c.value}</span>
+										<span>&nbsp;hijos</span>
+									</template>
+									<span lwc:else>Sin hijos</span>
+								</template>
+								<span lwc:else>Sin segundo titular</span>
+							</div>
+							<div class="slds-col">
+								<div class="datatableContainer datatableContainerSegundoTitular" style="height: 100%;">
+									<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+									<!-- sldsValidatorIgnoreNextLine -->
+									<lightning-datatable
+														 class="datatableSegundoTitular transparente slds-hide"
+														 key-field="id"
+														 columns={datatableColumns.titular}
+														 data={datatableData.segundoTitular}
+														 hide-checkbox-column
+														 column-widths-mode="auto"
+														 suppress-bottom-bar
+														 wrap-text-max-lines="2"
+														 oncellchange={datatableOncellchange}
+														 data-datatable="segundoTitular"
+														 resize-column-disabled>
+									</lightning-datatable>
+								</div>
+							</div>
+						</div>
+					</div>
+					<template lwc:if={data}>
+						<div lwc:if={data.dosTitulares} class="gridColDatatable slds-col slds-size_1-of-1">
+							<div class="divSumaIngresosTitulares">
+								<lightning-icon icon-name="utility:new" size="xx-small" class="slds-var-m-right_small slds-is-relative" style="top: -1px;"></lightning-icon>
+								Suma de ingresos anuales por nómina de los titulares:
+								<lightning-formatted-number value={data.totalIngresosNominaTitulares} format-style="currency" currency-code="EUR" class="slds-var-m-left_small" style="font-weight: 500;"></lightning-formatted-number>
+								<span class="slds-var-m-left_medium">
+									<!-- &#40;<lightning-formatted-number value={data.primerTitular.totalIngresos} format-style="currency" currency-code="EUR"></lightning-formatted-number>&nbsp;+&nbsp; -->
+									&#40;<lightning-formatted-number value={data.primerTitular.nominasNetas.neto} format-style="currency" currency-code="EUR"></lightning-formatted-number>&nbsp;+&nbsp;
+									<!-- <lightning-formatted-number value={data.segundoTitular.totalIngresos} format-style="currency" currency-code="EUR"></lightning-formatted-number>&#41; -->
+									<lightning-formatted-number value={data.segundoTitular.nominasNetas.neto} format-style="currency" currency-code="EUR"></lightning-formatted-number>&#41;
+								</span>
+							</div>
+						</div>
+					</template>
+
+					<div class="gridColDatatable slds-col slds-size_1-of-1 slds-var-m-top_xx-large">
+						<div class="tituloTabla slds-var-m-bottom_small">
+							<lightning-icon icon-name="utility:offline_briefcase" size="xx-small" class="tituloTablaIcono slds-var-m-right_small" style="top: -2px;"></lightning-icon>
+							Deuda
+						</div>
+						<div class="datatableContainer datatableContainerDeuda">
+							<c-lwc-labs-loading-stencil type="table"></c-lwc-labs-loading-stencil>
+							<!-- sldsValidatorIgnoreNextLine -->
+							<lightning-datatable
+												 class="datatableDeuda transparente slds-hide"
+												 key-field="id"
+												 columns={datatableColumns.deuda}
+												 data={datatableData.deuda}
+												 hide-checkbox-column
+												 column-widths-mode="auto"
+												 suppress-bottom-bar
+												 oncellchange={datatableOncellchange}
+												 data-datatable="deuda"
+												 resize-column-disabled>
+							</lightning-datatable>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Pie-->
+		<footer class="slds-card__footer slds-var-p-top_large slds-var-p-bottom_x-small">
+			<div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center">
+				<div class="slds-col slds-shrink-none slds-grow-none">
+					<lightning-button-icon icon-name="utility:arrow_top" onclick={scrollToTop} variant="bare" tooltip="Subir al inicio" class="slds-var-m-right_medium slds-is-relative" style="top: 1px;"></lightning-button-icon>
+
+					<lightning-button-menu class="botonesFooter" icon-name="utility:settings" variant="container" menu-alignment="bottom-left" tooltip="Opciones" onselect={menuSettingsOnselect}>
+						<lightning-menu-subheader label="Datos guardados"></lightning-menu-subheader>
+						<lightning-menu-item label="Borrar datos guardados" prefix-icon-name="utility:delete" value="borrarDatosGuardados"></lightning-menu-item>
+						<lightning-menu-divider></lightning-menu-divider>
+						<lightning-menu-subheader label="Desarrollo"></lightning-menu-subheader>
+						<lightning-menu-item label="Iniciar depuración en consola" prefix-icon-name="utility:apex" value="debugger"></lightning-menu-item>
+						<lightning-menu-item label="console.log()" prefix-icon-name="utility:bug" value="log"></lightning-menu-item>
+					</lightning-button-menu>
+				</div>
+				<div class="slds-col" style="text-align: end;">
+					<!--Info-->
+					<div class="slds-is-relative">
+						<div class="divInfo slds-text-color_weak">
+							<ul>
+								<template for:each={mensajesInfo} for:item="mensaje">
+									<li key={mensaje.tipo} lwc:if={mensaje.mostrar} class="infoItem" title={mensaje.title}>
+										<span class="slds-is-relative slds-var-m-right_small" style="top: -1px;">
+											<lightning-icon icon-name={mensaje.iconName} class={mensaje.iconoClass} size="xx-small"></lightning-icon>
+										</span>
+										<span class="slds-truncate" style={mensaje.textoStyle}>{mensaje.texto}</span>
+									</li>
+								</template>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="slds-col slds-shrink-none slds-grow-none">
+					<lightning-button label="Descartar" icon-name="utility:undo" class="botonesFooter" onclick={botonDescartarOnclick}></lightning-button>
+					<lightning-button label="Guardar" variant="brand" class="botonGuardar botonesFooter slds-var-m-left_medium" onclick={botonGuardarOnclick}></lightning-button>
+				</div>
+			</div>
+		</footer>
+	</article>
+
+	<section role="dialog" tabindex="-1" aria-modal="true" class="modalBorrarDatosGuardados slds-modal" onkeydown={modalOnkeydown}>
+		<div class="slds-modal__container">
+			<!-- <lightning-button-icon icon-name="utility:close" size="large" onclick={modalCerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon> -->
+			<button class="slds-button slds-button_icon slds-modal__close" onclick={modalCerrar}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">Borrar datos guardados</h2>
+			</header>
+			<div class="slds-modal__content slds-var-p-top_x-large slds-var-p-bottom_xx-large slds-var-p-horizontal_xx-large" style="text-align: center;">
+				<div style="font-size: 14px; font-weight: 500;">¿Quieres borrar los datos guardados?</div>
+				<div class="slds-var-m-top_x-large" style="font-weight: 500;">Se perderán todas las modificaciones realizadas desde la recepción de la oportunidad.</div>
+				<div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center slds-var-m-top_xx-large slds-var-m-horizontal_xx-large slds-is-relative" style="text-align: start; left: 12px;">
+					<div class="slds-col slds-grow-none">
+						<lightning-icon icon-name="utility:warning" variant="warning" size="small" class="slds-is-relative" style="top: 1px;"></lightning-icon>
+					</div>
+					<div class="slds-col slds-text-color_weak">
+						Las modificaciones realizadas en campos también modificables fuera de la pestaña "Entrevista", no se pueden deshacer y conservarán su valor actual.
+					</div>
+				</div>
+			</div>
+			<div class="slds-modal__footer">
+				<lightning-button label="Borrar datos guardados" icon-name="utility:delete" variant="destructive" onclick={modalBorrarDatosGuardadosAceptar}></lightning-button>
+				<lightning-button class="modalBorrarDatosGuardadosCancelar slds-var-m-left_small" label="Cancelar" onclick={modalCerrar}></lightning-button>
+			</div>
+		</div>
+	</section>
+
+	<div class="slds-backdrop"></div>
+
+</template>

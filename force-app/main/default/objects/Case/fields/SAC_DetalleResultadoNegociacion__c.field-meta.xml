@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_DetalleResultadoNegociacion__c</fullName>
+    <label>Detalle resultado negociación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Factoría</fullName>
+                <default>false</default>
+                <label>Factoría</label>
+            </value>
+            <value>
+                <fullName>Falta de respuesta</fullName>
+                <default>false</default>
+                <label>Falta de respuesta</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Préstamo usura – Acepta – TIN 10%</fullName>
+                <default>false</default>
+                <label>Préstamo usura – Acepta – TIN 10%</label>
+            </value>
+            <value>
+                <fullName>Préstamo usura – Acepta – TIN 13%</fullName>
+                <default>false</default>
+                <label>Préstamo usura – Acepta – TIN 13%</label>
+            </value>
+            <value>
+                <fullName>Préstamo usura – Acepta – TIN 6,5%</fullName>
+                <default>false</default>
+                <label>Préstamo usura – Acepta – TIN 6,5%</label>
+            </value>
+            <value>
+                <fullName>Préstamo usura – Demanda – NO Pago Directo</fullName>
+                <default>false</default>
+                <label>Préstamo usura – Demanda – NO Pago Directo</label>
+            </value>
+            <value>
+                <fullName>Rechazo expreso</fullName>
+                <default>false</default>
+                <label>Rechazo expreso</label>
+            </value>
+            <value>
+                <fullName>Revolving - Acepta - TAE 10,99%</fullName>
+                <default>false</default>
+                <label>Revolving - Acepta - TAE 10,99%</label>
+            </value>
+            <value>
+                <fullName>Revolving - Acepta - TAE 14,99%</fullName>
+                <default>false</default>
+                <label>Revolving - Acepta - TAE 14,99%</label>
+            </value>
+            <value>
+                <fullName>Revolving - Acepta - TAE 7,5%</fullName>
+                <default>false</default>
+                <label>Revolving - Acepta - TAE 7,5%</label>
+            </value>
+            <value>
+                <fullName>Revolving – Demanda – NO Pago Directo</fullName>
+                <default>false</default>
+                <label>Revolving – Demanda – NO Pago Directo</label>
+            </value>
+            <value>
+                <fullName>Revolving - Rechaza  - Cierre SR</fullName>
+                <default>false</default>
+                <label>Revolving - Rechaza  - Cierre SR</label>
+            </value>
+            <value>
+                <fullName>Revolving - Rechaza - Pago Directo</fullName>
+                <default>false</default>
+                <label>Revolving - Rechaza - Pago Directo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

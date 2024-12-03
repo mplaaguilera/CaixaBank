@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GenialEstado__c</fullName>
+    <label>SAC_GenialEstado</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_001</fullName>
+                <default>false</default>
+                <label>Enviado</label>
+            </value>
+            <value>
+                <fullName>SAC_002</fullName>
+                <default>false</default>
+                <label>Respondido(Shadow)</label>
+            </value>
+            <value>
+                <fullName>SAC_003</fullName>
+                <default>false</default>
+                <label>Respondido</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>Error Envío</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>Pendiente Envio</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Error Respuesta</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

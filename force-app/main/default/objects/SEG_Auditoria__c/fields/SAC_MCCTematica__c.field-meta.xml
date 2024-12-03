@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MCCTematica__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para informar el MCC Temática al generar una auditoria</description>
+    <label>Temática</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>A - Temática</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Auditorias (Temática)</relationshipLabel>
+    <relationshipName>Auditorias</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

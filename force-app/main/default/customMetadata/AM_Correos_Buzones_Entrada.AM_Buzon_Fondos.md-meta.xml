@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón Fondos</label>
+    <protected>false</protected>
+    <values>
+        <field>AM_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Buzón Fondos</value>
+    </values>
+    <values>
+        <field>AM_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">AM_Buzon_Fondos</value>
+    </values>
+    <values>
+        <field>AM_Email_Destino__c</field>
+        <value xsi:type="xsd:string">comercializacion.fondos@caixabank.com</value>
+    </values>
+    <values>
+        <field>AM_Email_Redireccion_Buzon__c</field>
+        <value xsi:type="xsd:string">am_emailservice@nbq3mfbaeq6av2d9gzykv0mttw0p7j4omu5i6wunajezr76cs.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>AM_Record_type_DeveloperName_por_defecto__c</field>
+        <value xsi:type="xsd:string">AM_Empleado</value>
+    </values>
+</CustomMetadata>

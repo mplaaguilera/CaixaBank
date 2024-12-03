@@ -1,0 +1,104 @@
+<template>
+    <div class="basicContainer">
+        <lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 93;position:fixed"></lightning-spinner>
+
+        <lightning-card >
+            <div class="cardStyle">
+                <div style="display:flex;margin-bottom:1rem">
+                    <lightning-icon  icon-name='utility:event' size="medium"></lightning-icon><h1 ><strong style="font-size:1.5rem">&nbsp;Planificar cita</strong></h1>
+                </div>
+
+                <c-av_-new-event-report-detail 
+                data-id="detailCmp" 
+                clientinfo={clientinfo} 
+                debug={debugvar}
+                oneventinfo={setEventObject}></c-av_-new-event-report-detail>
+
+            </div>
+        </lightning-card>
+
+        <!-- PARTE DE LAS OPORTUNIDADES  -->
+        <div if:true={showOpposList} style="margin-top:2.5rem" >
+            <span> 
+                <lightning-icon size="small" icon-name="standard:opportunity"></lightning-icon><strong>&nbsp;&nbsp; Oportunidades (Vinculadas {opposCount})</strong>
+            </span>
+
+            <div class="newOppoContainer">
+                <div class="slds-grid">
+                    <c-av_-lookup data-id="newproductlookup"
+                    onsearch={handleSearchProduct}
+                    onselectionchange={handleSelectionProduct} 
+                    fieldlabel="Añadir oportunidad"
+                    placeholder="Buscar producto..." >
+                    </c-av_-lookup>
+                    <lightning-button class="buttonAnadir" label="Añadir" disabled={productToAdd} onclick={handleAddOppo}></lightning-button>
+                </div>
+            </div>
+
+            <template for:each={oppoList} for:item="opp">
+                <div key={opp.Id} class="cardMargin"> 
+                    <c-av_-detail-oppo-new-event 
+                    oppo={opp} 
+                    onvinculateaction={handleVinculation}
+                    onmainclick={handleMainOpp}
+                    onsenddatafromoppo={buildOppoObj}
+                    data-id={opp.Id}
+                    potentiallist={potentialList}
+                    ></c-av_-detail-oppo-new-event>
+                </div>
+            </template>
+            
+            <template for:each={oppoNewList} for:item="opp">
+                <div key={opp.Id} class="cardMargin"> 
+                    <c-av_-detail-oppo-new-event 
+                    oppo={opp} 
+                    onvinculateaction={handleVinculation}
+                    onmainclick={handleMainOpp}
+                    onsenddatafromoppo={buildOppoObj}
+                    data-id={opp.Id}
+                    potentiallist={potentialList}
+                    ></c-av_-detail-oppo-new-event>
+                </div>
+            </template>
+        </div>
+    </div>
+    <div if:true={showCalendar}>
+        <div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open">
+        <lightning-spinner  if:true={showSpinner} alternative-text="Loading" size="large"  style="z-index: 999;position:fixed"></lightning-spinner>
+
+            <div class="slds-modal__container customModal">
+                <header class="slds-modal__header">
+                {altaDeActividadLabel}
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" style="height:70vh">
+                    <div>
+                        <strong>
+                            <h1>{altaDeActividadLabel}</h1>
+                        </strong>
+                    </div>
+                    <div class="calendarStyle">
+                        <c-av_-custom-calendar 
+                        data-id = 'customcalendar'
+                        timerange={durationToCalendar} 
+                        currentdate={activityDateToCalendar}
+                        userid={employeeToCalendar}
+                        evsubject={subjectToCalendar}
+                        gestoroverwrite={overlapToCalendar}>
+                        </c-av_-custom-calendar>
+                    </div>
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancelar" onclick={closeModal} style="margin-right:1rem"></lightning-button>
+                    <lightning-button label="Guardar evento" onclick={handleCreateEvent}></lightning-button>
+                </footer>
+                    
+            </div>
+                
+        </div> 
+    </div>
+    <div class="customFooter">
+		<button type="submit" class="slds-button slds-button_stretch buttonStyleCancel" disabled={disableButtonCancel} data-id="cancelButton" onclick={handleCancel}>Cancelar</button>
+		<button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={disableButtonSave} data-id="saveButton" name="save" onclick={handleSave}>Siguiente</button>
+	</div>
+</template>

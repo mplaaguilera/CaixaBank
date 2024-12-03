@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Compact_Layout</fullName>
+    <fields>SEG_N_case_y_subject__c</fields>
+    <fields>SEG_NIF_peticionario__c</fields>
+    <fields>AccountId</fields>
+    <fields>SEG_Numero_centro__c</fields>
+    <fields>ContactId</fields>
+    <fields>SEG_Case_Owner__c</fields>
+    <fields>SEG_Gestor_comercial__c</fields>
+    <label>SEG Compact Layout</label>
+</CompactLayout>

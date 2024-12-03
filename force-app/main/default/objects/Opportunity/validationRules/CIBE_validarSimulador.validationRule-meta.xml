@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_validarSimulador</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+NOT(ISNEW()),
+OR(
+RecordType.DeveloperName = &quot;CIBE_AccionComercialCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_AccionComercialEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_AlertaComercialCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_AlertaComercialEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleado&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_IniciativaEmpleadoEMP&quot;,
+RecordType.DeveloperName = &quot;CIBE_OportunidadCentralizada&quot;,
+RecordType.DeveloperName = &quot;CIBE_SugerenciaCIB&quot;,
+RecordType.DeveloperName = &quot;CIBE_SugerenciaEMP&quot;
+),
+OR(
+AND(
+ISBLANK(CIBE_Numero_de_Simulador__c),
+NOT(ISBLANK(TEXT(CIBE_Tipo_de_simulacion__c)))
+),
+AND(
+ISBLANK(TEXT(CIBE_Tipo_de_simulacion__c)),
+NOT(ISBLANK(CIBE_Numero_de_Simulador__c))
+)
+)
+)</errorConditionFormula>
+    <errorMessage>Debe rellenar todos los campos de la sección &quot;calculadora de precios&quot;</errorMessage>
+</ValidationRule>

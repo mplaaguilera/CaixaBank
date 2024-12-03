@@ -1,0 +1,19 @@
+<template>
+    <div>
+        <span> 
+            <lightning-icon size="small" icon-name="standard:task"></lightning-icon><strong>&nbsp;&nbsp;Tareas</strong>
+        </span>
+    </div>
+    <div class = "cardMargin">
+        <lightning-spinner if:true={showSpinner}  alternative-text="Loading" class = "customSpinner" size="large"  style="z-index: 3;"></lightning-spinner>
+        <template for:each={listTasks} for:item="tsk">
+            <div key={tsk.Id} class="cardMargin"> 
+                <c-av_-detail-task-appointment 
+                task={tsk}
+                onsenddatafromtask={buildTaskObj} 
+                data-id={tsk.Id}
+                ></c-av_-detail-task-appointment>
+            </div>
+        </template>
+    </div>
+</template>

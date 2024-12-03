@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>X02_Pr_stamos_CxB_Sin_l_mites_ahora</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>CSBD_Contact_Escala_Maestra__c</columns>
+    <columns>CSBD_Now_Importe__c</columns>
+    <columns>CSBD_Dif_Importe_Preconcedido_Imagen__c</columns>
+    <columns>CSBD_Importe_Disponible_Contacto__c</columns>
+    <columns>CSBD_Turno_Contacto__c</columns>
+    <columns>CSBD_Horario_Contacto__c</columns>
+    <columns>CSBD_Estado_Tracking__c</columns>
+    <columns>CSBD_Prioridad_Tracking__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_Prestamo</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Nueva</value>
+    </filters>
+    <filters>
+        <field>CSBD_Empresa_Proveedora__c</field>
+        <operation>equals</operation>
+        <value>CaixaBank</value>
+    </filters>
+    <filters>
+        <field>CSBD_Importe_Disponible_Contacto__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CSBD_Limite_Prestamos_Oficinas__c</field>
+        <operation>greaterThan</operation>
+        <value>0</value>
+    </filters>
+    <label>02. Préstamos CxB (Sin límites ahora)</label>
+    <sharedTo>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

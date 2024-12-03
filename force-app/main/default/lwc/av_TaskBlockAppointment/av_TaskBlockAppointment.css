@@ -1,0 +1,20 @@
+.cardMargin{
+    margin:1rem 0;
+    position: relative;
+}
+
+.customSpinner{
+    z-index:3;
+    width:101%;
+    height:103%;
+    border-radius: 10px;
+    position: absolute;
+    transition: opacity .2s ease,visibility 0s;
+    transition-delay: 0s,.3s;
+    --slds-g-color-neutral-100-opacity-75:rgb(229,229,229);
+    top:auto !important;
+    bottom:auto !important;
+    left: auto !important;
+    right:auto !important;
+
+}

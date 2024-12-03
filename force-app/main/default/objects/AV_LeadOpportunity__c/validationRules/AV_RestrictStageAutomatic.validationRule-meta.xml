@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_RestrictStageAutomatic</fullName>
+    <active>true</active>
+    <description>Cualquier empleado/a podrá cambiar a cualquier etapa menos a Vencida, Con venta y Potencial.</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.AV_AvoidBulkApi),
+				$Profile.Name = &apos;AV_Usuario_CaixaBank&apos;,
+				ISCHANGED(AV_StatusLeadOpp__c),
+				OR(
+     ISPICKVAL(AV_StatusLeadOpp__c, &apos;Potencial&apos;),
+					ISPICKVAL(AV_StatusLeadOpp__c, &apos;Vencida&apos;),
+					ISPICKVAL(AV_StatusLeadOpp__c, &apos;Con venta&apos;)
+					)
+				)</errorConditionFormula>
+    <errorMessage>No es posible realizar el cambio de estado. Los estados Potencial, Vencida y Con venta son estados automáticos.</errorMessage>
+</ValidationRule>

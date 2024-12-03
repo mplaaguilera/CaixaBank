@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Marca_Caso_Compact_Layout</fullName>
+    <fields>CC_Marca__c</fields>
+    <label>Marca de un caso Compact Layout</label>
+</CompactLayout>

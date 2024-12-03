@@ -1,0 +1,46 @@
+<apex:page >
+    <apex:includeScript value="{!URLFOR($Resource.TinyMCE, 'tinymce/js/tinymce/tinymce.min.js')}"/>
+	<apex:includeScript value="{!$Resource.html2pdf}"/>            
+    <script>
+                tinymce.init({
+                    selector : "textarea",
+                     font_formats: 'Arial=arial,helvetica,sans-serif;chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;',
+                     toolbar: "insertfile undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | bullist numlist outdent indent | removeformat | preview | help",
+                     content_css: [
+                      '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                      '//www.tiny.cloud/css/codepen.min.css'
+                    ],
+                    image_advtab: true,
+                    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                    skin: 'oxide',
+                    menubar: 'file edit view insert format tools table help',
+                     plugins: [
+                                  "accordion","advlist","anchor","autolink","charmap ","lists","link","image","preview","anchor",
+                                   "searchreplace","wordcount","visualblocks","visualchars","code","fullscreen","codesample",
+                                    "media","save","table","directionality","help","importcss","insertdatetime","nonbreaking","pagebreak",
+                                    "emoticons","template","quickbars"
+                              ],
+                  });
+
+
+                function ConvertPDF() {    
+                    var element =  '<page backcolor="#AAAAAA" backimg="https://absolute-url/logo-130x90.png"  backimgw="100%" > ' + tinymce.get("myTextArea").getContent() + '</page>'; 
+                    var opt = {
+                      margin:       1,
+                      filename:     'myfile.pdf',
+                      image:        { type: 'jpeg', quality: 0.98 },
+                      html2canvas:  { scale: 2 },
+                      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    };
+                    
+                    //var worker = html2pdf().set(opt).from(element).save();
+                    var worker = html2pdf().set(opt).from(element).output('dataurlnewwindow')
+                    
+                }
+    </script>
+
+    <apex:form id="myTextArea">
+        <textarea id="myTextArea" name="myTextArea">Initial content here...</textarea>
+        <button type="button" onclick="ConvertPDF();">Generate PDF</button>        
+    </apex:form>
+</apex:page>

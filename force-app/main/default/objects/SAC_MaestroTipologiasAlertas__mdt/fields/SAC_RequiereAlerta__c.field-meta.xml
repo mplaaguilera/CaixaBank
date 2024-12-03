@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_RequiereAlerta__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si requiere alerta (visualización registro)</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Requiere alerta</label>
+    <type>Checkbox</type>
+</CustomField>

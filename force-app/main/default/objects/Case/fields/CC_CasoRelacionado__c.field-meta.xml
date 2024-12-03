@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_CasoRelacionado__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Caso relacionado</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Value does not exist or does not match filter criteria.</errorMessage>
+        <filterItems>
+            <field>Case.ContactId</field>
+            <operation>equals</operation>
+            <valueField>Case.ContactId</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Cases</relationshipLabel>
+    <relationshipName>Cases</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

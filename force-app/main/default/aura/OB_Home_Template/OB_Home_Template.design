@@ -1,0 +1,8 @@
+<design:component label="Cabecera, 2 columnas y pie">
+    <flexipage:template>
+        <flexipage:region name="header" label="Header" defaultWidth="LARGE"/>
+        <flexipage:region name="left" label="Left region" defaultWidth="MEDIUM" />
+        <flexipage:region name="right" label="Right region" defaultWidth="MEDIUM" />
+        <flexipage:region name="footer" label="Footer" defaultWidth="LARGE" />
+    </flexipage:template>
+</design:component>

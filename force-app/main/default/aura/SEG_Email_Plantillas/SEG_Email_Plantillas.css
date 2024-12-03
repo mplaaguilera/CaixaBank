@@ -1,0 +1,8 @@
+.THIS .slds-listbox__option-text {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.THIS .rojo svg {
+    background-color: #f77e75 !important;
+}

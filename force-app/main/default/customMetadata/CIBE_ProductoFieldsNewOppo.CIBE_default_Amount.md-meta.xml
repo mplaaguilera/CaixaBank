@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>default  Amount</label>
+    <protected>false</protected>
+    <values>
+        <field>CIBE_FieldName__c</field>
+        <value xsi:type="xsd:string">Amount</value>
+    </values>
+    <values>
+        <field>CIBE_FlowVariableName__c</field>
+        <value xsi:type="xsd:string">importeSaldo</value>
+    </values>
+    <values>
+        <field>CIBE_Label__c</field>
+        <value xsi:type="xsd:string">CIBE_Importe</value>
+    </values>
+    <values>
+        <field>CIBE_Order__c</field>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>CIBE_ProductName__c</field>
+        <value xsi:type="xsd:string">default</value>
+    </values>
+    <values>
+        <field>CIBE_Required__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CIBE_Type__c</field>
+        <value xsi:type="xsd:string">number</value>
+    </values>
+</CustomMetadata>

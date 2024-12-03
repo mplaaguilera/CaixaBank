@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Crear_Ficha_Producto</fullName>
+    <active>true</active>
+    <description>No permitir la creación de un articulo con record type CC_Ficha_Producto a que no tenga  en el campo Validation Status el valor Validado</description>
+    <errorConditionFormula>ISNEW() &amp;&amp; 
+RecordType.DeveloperName == &apos;CC_Ficha_Producto&apos; &amp;&amp;
+NOT( ISPICKVAL(ValidationStatus, &apos;Validated&apos;)  )</errorConditionFormula>
+    <errorMessage>No se permite publicar ningun articulo donde el campo &apos;Validation Status&apos; no sea &apos;Validado&apos;.</errorMessage>
+</ValidationRule>

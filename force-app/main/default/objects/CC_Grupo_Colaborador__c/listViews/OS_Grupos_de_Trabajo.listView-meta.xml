@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Grupos_de_Trabajo</fullName>
+    <columns>NAME</columns>
+    <columns>OS_GrupoTrabajo__c</columns>
+    <columns>CC_Canal_de_procedencia__c</columns>
+    <columns>OS_Tematica__c</columns>
+    <columns>OS_Negocio__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.OS_GrupoTrabajo</value>
+    </filters>
+    <label>Grupos de Trabajo</label>
+    <sharedTo>
+        <role>COPS</role>
+    </sharedTo>
+</ListView>

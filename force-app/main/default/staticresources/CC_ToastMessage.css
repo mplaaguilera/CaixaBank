@@ -1,0 +1,15 @@
+.toastMessage.forceActionsText{
+     white-space : pre-line !important;
+}
+button.inline-edit-trigger[title="Modificar Estado"] {
+    display: none !important;
+}
+button.inline-edit-trigger[title="Edit State"] {
+    display: none !important;
+}
+.flexipageRecordHomePinnedLeftSidebarTwoColTemplateDesktop.has-pinned-regions .left-col.pinnedLeftSidebarTwoCol {
+	width: 35% !important;
+}
+.runtime_service_omnichannelAbstractPushedRequest {
+    background-color: lightblue !important;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PurgeProcess_AdminChangeActive</fullName>
+    <active>true</active>
+    <description>Solamente los usuarios autorizados pueden cambiar el valor del campo Activo.</description>
+    <errorConditionFormula>AND(
+				OR (ISCHANGED(CBK_Activo__c),CBK_Activo__c==true), 
+				NOT($Permission.CBK_PurgeAuth)
+)</errorConditionFormula>
+    <errorMessage>Solamente los usuarios autorizados pueden cambiar el valor del campo Activo o activar un proceso de purgado.</errorMessage>
+</ValidationRule>

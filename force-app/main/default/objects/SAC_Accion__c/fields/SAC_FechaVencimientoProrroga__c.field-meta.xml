@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaVencimientoProrroga__c</fullName>
+    <description>Guardará la fecha de vencimiento después de sumar los días de prórroga.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha vto prórroga</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

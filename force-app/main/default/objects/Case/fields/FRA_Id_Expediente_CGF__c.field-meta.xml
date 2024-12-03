@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_Id_Expediente_CGF__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Campo external ID para guardar el identificador del expediente CGF en el caso de Salesforce, proyecto HUB Fraude</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <label>Id Expediente CGF</label>
+    <length>30</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

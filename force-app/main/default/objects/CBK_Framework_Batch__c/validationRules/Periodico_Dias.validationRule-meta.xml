@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Periodico_Dias</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				TEXT(Tipo__c) =&apos;Periodico&apos;,
+				Activo__c,    
+				NOT(OR(
+								 Lunes__c,
+								 Martes__c, 
+								 Miercoles__c, 
+								 Jueves__c, 
+								 Viernes__c, 
+								 Sabado__c,
+								 Domingo__c
+								)
+						)
+				)</errorConditionFormula>
+    <errorDisplayField>Lunes__c</errorDisplayField>
+    <errorMessage>Deben seleccionarse los días de ejecución</errorMessage>
+</ValidationRule>

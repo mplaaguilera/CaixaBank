@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Cliente__c</fullName>
+    <description>Cliente de la venta</description>
+    <label>Cliente</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Ventas</relationshipLabel>
+    <relationshipName>Ventas1</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>true</writeRequiresMasterRead>
+</CustomField>

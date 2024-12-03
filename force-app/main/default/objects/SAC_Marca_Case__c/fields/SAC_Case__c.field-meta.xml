@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Case__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description>Caso con el que están relacionado las marcas</description>
+    <label>Case</label>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Marcas Casos</relationshipLabel>
+    <relationshipName>Marcas_Casos</relationshipName>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

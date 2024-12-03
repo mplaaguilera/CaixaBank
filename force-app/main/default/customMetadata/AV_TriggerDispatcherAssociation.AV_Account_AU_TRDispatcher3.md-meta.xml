@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AV_Account_AU_TRDispatcher3</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_Dispatcher__c</field>
+        <value xsi:type="xsd:string">AV_Account_AU_TRDispatcher</value>
+    </values>
+    <values>
+        <field>AV_FieldValues__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_FilterField__c</field>
+        <value xsi:type="xsd:string">AV_Negocio__c</value>
+    </values>
+    <values>
+        <field>AV_TriggerHandler__c</field>
+        <value xsi:type="xsd:string">AV_Account_AU_TRHan</value>
+    </values>
+</CustomMetadata>

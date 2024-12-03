@@ -1,0 +1,63 @@
+div.slds-card__header {
+    border-bottom: 1px solid #e3e3e3;
+    border-radius: 4px 4px 0px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
+    cursor: default;
+}
+
+div.slds-card__header-title.fontSizeLarge {
+    font-size: 16px !important;
+}
+
+div.slds-card__header lightning-icon.iconoHeader {
+    --slds-c-icon-color-background: #4ea8d8;
+}
+
+ul.listaCaracteristicas {
+    list-style: none;
+}
+
+ul.listaCaracteristicas > li:last-child {
+    margin-bottom: 0px;
+}
+
+ul.listaCaracteristicas > li > span:hover {
+    cursor: pointer;
+}
+
+ul.listaCaracteristicas > li > span:hover > span.titulo {
+    border-bottom: 1px solid;
+}
+
+ul.listaCaracteristicas > li > span > lightning-icon.iconoCaracteristica {
+    --slds-c-icon-color-background: transparent;
+    --slds-c-icon-color-foreground: #4ea8d8;
+}
+
+ul.listaCaracteristicas > li > span > span.titulo {
+    position: relative;
+    top: 1px;
+}
+
+ul.listaCaracteristicas > li > span > lightning-icon.warning {
+    --slds-c-icon-color-foreground-default: #de9400;
+    will-change: opacity, transform, --slds-c-icon-color-foreground-default;
+    animation-name: blinkKeyframes;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 310ms;
+}
+
+@keyframes blinkKeyframes {
+    from {
+        opacity: 0.3;
+        transform: scale(1);
+        --slds-c-icon-color-foreground-default: orange;
+    } to {
+        opacity: 1;
+        transform: scale(1.12);
+        --slds-c-icon-color-foreground-default: rgb(235, 160, 84);
+    }
+}

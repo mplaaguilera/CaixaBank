@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Motivo</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Codigo_Externo__c</columns>
+    <columns>CC_Producto_Servicio__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Motivo</value>
+    </filters>
+    <label>Motivo</label>
+    <sharedTo>
+        <role>SPV_General</role>
+        <roleAndSubordinates>SAC_General</roleAndSubordinates>
+    </sharedTo>
+</ListView>

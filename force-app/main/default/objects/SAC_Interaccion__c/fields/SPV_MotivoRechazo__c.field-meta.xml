@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_MotivoRechazo__c</fullName>
+    <description>Campo para indicar el motivo de rechazo de un escalado</description>
+    <label>Motivo de rechazo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SPV_Allanamiento</fullName>
+                <default>false</default>
+                <label>Allanamiento</label>
+            </value>
+            <value>
+                <fullName>SPV_Negociacion</fullName>
+                <default>false</default>
+                <label>Negociación</label>
+            </value>
+            <value>
+                <fullName>SPV_Desistimiento</fullName>
+                <default>false</default>
+                <label>Desistimiento</label>
+            </value>
+            <value>
+                <fullName>SPV_ResolucionErronea</fullName>
+                <default>false</default>
+                <label>Resolución errónea</label>
+            </value>
+            <value>
+                <fullName>SPV_FaltaDocumentacion</fullName>
+                <default>false</default>
+                <label>Falta documentación</label>
+            </value>
+            <value>
+                <fullName>SPV_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

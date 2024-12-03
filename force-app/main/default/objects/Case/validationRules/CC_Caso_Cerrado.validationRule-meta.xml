@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Caso_Cerrado</fullName>
+    <active>false</active>
+    <description>Validación de que no se pueda modificar ningún campo si el estado del caso es Cerrado.</description>
+    <errorConditionFormula>AND (ISPICKVAL(Status, &quot;Cerrado&quot;),
+					OR(ISCHANGED(CC_Idioma__c),
+					   ISCHANGED(OwnerId),
+					   ISCHANGED(CC_Canal_Operativo__c),
+								ISCHANGED(Description),
+  						ISCHANGED(CC_Tipo_Contacto__c)
+							))</errorConditionFormula>
+    <errorMessage>No puedes modificar el caso porque está cerrado.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,186 @@
+.THIS .fondo {
+    background-color: #f4f6f9;
+    border-right: 1px solid #e7e7e7;
+}
+
+.THIS .navigation1 {
+background-color: #f4f6f9;
+}
+
+.THIS .navigation2 {
+border-right: 1px solid #e7e7e7;
+}
+
+.THIS .archivos{
+    border-right: 1px solid #e7e7e7;
+    width: 100%;
+}
+
+.THIS .slds-file-selector{
+    display: flex;
+}
+
+.THIS .slds-file-selector__dropzone{
+    height: 110px;
+    width: -webkit-fill-available;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{ /*the right label*/
+    font-size: 100%;
+}
+
+.THIS .ficherosincluidos{
+    padding: var(--lwc-spacingXxxSmall,0.125rem);
+    border: var(--lwc-borderWidthThin,1px) dashed var(--lwc-colorBorder,rgb(221, 219, 218));
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+    margin-bottom: 5px;
+    z-index: 9;
+    position: relative;
+    background-color: white;
+    min-height: 33px;
+}
+
+.THIS .deaparece{
+    transition: all .3s ease-in-out !important;
+    transform: translateY(100%) scaleY(0);
+    transition: all .2s ease-in-out !important;
+    position: fixed;
+    z-index: 10;
+    background-color: white;
+    overflow: hidden;
+    bottom: 0;
+    max-height: 50vh;
+    width: 100vw;
+    left: calc(-50vw + 50%);
+ }
+ 
+.THIS .aparece {    
+    transition: all .5s ease-in-out!important;
+    transform: translateY(0px); 
+    position: fixed;
+    z-index: 10;
+    background-color: white;
+    overflow: hidden;
+    right: 0;
+    bottom: 0;
+    max-height: 50vh;
+    width: 100vw;
+    left: calc(-50vw + 50%);
+}
+
+.THIS .scrollerSize {
+    height: 300px;
+    margin-bottom: 10px;
+}
+
+.THIS .blockSF{
+    background-color: #333333;
+    z-index: 8;
+    position: fixed;
+    opacity: 0.3;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+.THIS .dark-background{
+    background-color: #16325c;
+    color: #fff;
+}
+
+.THIS .contenedorPrincipal{
+    width: 100%;
+    margin-right: 12px;
+    border-width: var(--slds-c-card-sizing-border, var(--sds-c-card-sizing-border, var(--lwc-borderWidthThin,1px)));
+    border-style: solid;
+    border-color: var(--slds-c-card-color-border, var(--sds-c-card-color-border, var(--lwc-cardColorBorder,rgb(201, 201, 201))));
+    border-radius: var(--slds-c-card-radius-border, var(--sds-c-card-radius-border, var(--lwc-borderRadiusMedium,0.25rem)));
+    box-shadow: var(--slds-c-card-shadow, var(--sds-c-card-shadow, var(--lwc-cardShadow,0 2px 2px 0 rgba(0, 0, 0, 0.10))));
+}
+
+.THIS .contenedorPrincipalPopUp{
+    width: 100%;
+    margin-right: 12px;
+}
+
+.THIS .infoFile{
+    width:auto;
+    margin-left: 12PX;
+}
+
+.THIS .file-selector-image .slds-file-selector {
+    display: block;
+}
+
+.THIS .file-selector-image .slds-file-selector__dropzone {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    margin: auto;
+    padding: 1rem;
+}
+
+.THIS .file-selector-image .slds-file-selector__dropzone slot {
+    width: 100%;
+}
+
+.THIS .file-selector-image .slds-file-selector_files .slds-file-selector__body {
+    display: block;
+    text-align: center;
+}
+
+.THIS .file-selector-image .slds-file-selector_files .slds-file-selector__text {
+    margin-top: 0.75rem;
+}
+
+.THIS .slds-dropdown {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.THIS .disabledItem {
+    color: #bbb;
+    cursor: no-drop; 
+}
+
+/* scroll interno de la lista */
+.THIS .recordListBox {
+    margin-top:0px !important;
+    overflow-y: scroll;
+}
+
+.THIS .inputBox input {
+    padding-left: 10px;
+}
+
+.THIS .eachItem:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+.THIS .inputIcon {
+    z-index: 99;
+    padding: 2px 0;
+}
+ 
+/* For Scrolling */
+.THIS ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.THIS ::-webkit-scrollbar-track {
+    display: none !important;
+}
+
+.THIS ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0,0,0,0.4);
+}

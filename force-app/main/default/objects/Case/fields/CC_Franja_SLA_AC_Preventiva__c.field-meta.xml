@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Franja_SLA_AC_Preventiva__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(OR(ISPICKVAL(CC_Canal_Resolucion__c,&apos;Atención al Cliente&apos;),ISPICKVAL(CC_Canal_Resolucion__c,&apos;Oficina Preventiva&apos;),ISPICKVAL(CC_Canal_Resolucion__c,&apos;Junta Andalucia&apos;)
+						,ISPICKVAL(CC_Canal_Resolucion__c,&apos;Omic&apos;),ISPICKVAL(CC_Canal_Resolucion__c,&apos;Asociación Consumidores&apos;),ISPICKVAL(CC_Canal_Resolucion__c,&apos;Dirección&apos;)),
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion_Verde__c+1, &quot;0-3 días&quot;,
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion_Naranja__c+1, &quot;4-5 días&quot;,
+IF(IF(IsClosed, ClosedDate, NOW()) &lt;= CC_Fecha_Limite_Resolucion__c+1, &quot;6-7 días&quot;,
+&quot;+7 días&quot;))),&apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Franja SLA AC Preventiva</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

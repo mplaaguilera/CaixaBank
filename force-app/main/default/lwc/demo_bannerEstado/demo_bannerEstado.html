@@ -1,0 +1,19 @@
+<template>
+    <article lwc:if={caso} class="banner tipoBonificado slds-card slds-theme_alert-texture">
+        <div class="slds-card__body" style="margin: unset;">
+            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning-icon icon-name="utility:database" size="x-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>
+						Se ha ofrecido previamente al cliente un tipo bonificado del&nbsp;
+						<span style="font-weight: 500;">{datos.tipoBonificado}%</span>.
+					</p>
+                </div>
+            </div>
+        </div>
+    </article>
+</template>

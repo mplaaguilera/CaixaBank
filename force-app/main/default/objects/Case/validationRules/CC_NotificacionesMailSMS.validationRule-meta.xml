@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NotificacionesMailSMS</fullName>
+    <active>true</active>
+    <description>Validación del canal de notificación Mail/SMS</description>
+    <errorConditionFormula>AND(
+    $Permission.CC_Validation_Int = FALSE,
+    TEXT(CC_CanalNotifCli__c) &lt;&gt; &apos;Twitter&apos;,
+    ISBLANK(CC_MailTelfNotif__c),
+    OR(
+        TEXT(CC_AcuseRecibo__c) = &apos;1&apos;,
+        TEXT(CC_SegOperativa__c) = &apos;1&apos;,
+        TEXT(CC_NotIncidencia__c) = &apos;1&apos;
+    ),
+    NOT(ISBLANK(AccountId)),
+    ISBLANK(Account.PersonEmail)
+)</errorConditionFormula>
+    <errorMessage>Se ha de especificar un e-mail / teléfono para enviar una notificación.</errorMessage>
+</ValidationRule>

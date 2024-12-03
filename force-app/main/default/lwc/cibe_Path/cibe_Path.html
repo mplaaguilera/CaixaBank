@@ -1,0 +1,97 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-p-horizontal_large">
+                <div class="slds-path">
+                    <div class="slds-grid slds-path__track">
+                        <div class="slds-grid slds-path__scroller-container">
+                            <div class="slds-path__scroller">
+                                <div class="slds-path__scroller_inner">
+                                    <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Potencial">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-1" role="option" tabindex="0" data-stage="Potencial">
+                                                <span class="slds-path__title" data-stage="Potencial">{labels.potencial}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="En curso">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-2" role="option" tabindex="-1" data-stage="En curso">
+                                                <span class="slds-path__title" data-stage="En curso">{labels.enCurso}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="CIBE_Pendiente_Firma">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-3" role="option" tabindex="-1" data-stage="CIBE_Pendiente_Firma">
+                                                <span class="slds-path__title" data-stage="CIBE_Pendiente_Firma">{labels.pendienteFirma}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="CIBE_Cerrado positivo">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-4" role="option" tabindex="-1" data-stage="CIBE_Cerrado positivo">
+                                                <span class="slds-path__title" data-stage="CIBE_Cerrado positivo">{labels.cerradaPositiva}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="Cerrado negativo">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-5" role="option" tabindex="-1" data-stage="Cerrado negativo">
+                                                <span class="slds-path__title" data-stage="Cerrado negativo">{labels.cerradaNegativa}</span>
+                                            </a>
+                                        </li>
+                                        <li class="slds-path__item slds-is-incomplete" role="presentation" onclick={click} data-stage="CIBE_Vencido">
+                                            <a aria-selected="false" class="slds-path__link" href="#" id="path-6" role="option" tabindex="-1" data-stage="CIBE_Vencido">
+                                                <span class="slds-path__title" data-stage="CIBE_Vencido">{labels.vencida}</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="slds-m-around_medium">          
+            <lightning-record-edit-form record-id={recordId} record-type-id={recordTypeId} 
+                                        object-api-name={objectApiName} onsubmit={handleSubmit} 
+                                        onsuccess={handleSuccess} onerror={handleError} mode="view" density="compact">
+                
+                
+
+                <template if:true={isCerradoPositivo}>
+                    <template if:true={isImpComisiones}>
+                        <lightning-input-field field-name="CIBE_ImpactoDivisaComisionesCierreAnio__c" required></lightning-input-field>
+                    </template>
+                    <template if:true={isImpBalance}>
+                        <lightning-input-field field-name="CIBE_ImpactoDIvisaBalanceCierreAnio__c" required></lightning-input-field>
+                    </template>
+                </template>
+                <template if:true={isCerradoNegativo}>
+                    <lightning-input-field field-name="CIBE_CerradoNegativo__c" required></lightning-input-field>
+                </template>
+
+                <template if:true={noIsVencida}>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                            <lightning-input-field class="user-input-fecha" field-name="AV_FechaProximoRecordatorio__c"></lightning-input-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-p-around_x-small">
+                            <div class="slds-grid slds-wrap">
+                                <label class="slds-col slds-size_2-of-3 slds-p-around_x-small slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none">{labels.incluirClienteLabel}</label>
+                                <lightning-input-field class="slds-col slds-size_1-of-3 slds-p-around_x-small" type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input-field>                        
+                            </div>
+                        </div>
+                    </div>
+                        <!--<lightning-input type="date" label={labels.fechaProxGestionLabel} format="DD-MM-YY"  required="true" field-name="AV_FechaProximoRecordatorio__c"
+                    class="user-input-fecha" ></lightning-input>
+                    
+                    <label class="slds-form-element__label slds-p-horizontal_none slds-m-horizontal_none" for="toggle">{labels.incluirClienteLabel}</label>
+                    <lightning-input type="toggle" name="toggle" variant="label-hidden" message-toggle-active="" message-toggle-inactive="" 
+                    field-name="AV_IncludeInPrioritizingCustomers__c"></lightning-input> -->
+                </template>
+                <lightning-input-field class="slds-hide" field-name="StageName" value={stage} required></lightning-input-field>
+                <div class="slds-m-top_x-small slds-align_absolute-center">
+                    <lightning-button id="submit1" type="submit" label={labels.guardar} variant="brand"></lightning-button>
+                </div>
+            </lightning-record-edit-form>
+        </footer>
+        <template if:true={loading}>
+            <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+        </template>
+    </article>
+</template>

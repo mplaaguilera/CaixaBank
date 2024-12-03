@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_AccionesARealizar__c</fullName>
+    <description>Acciones a realizar después del cierre de una experiencia de cliente</description>
+    <label>Acciones a realizar</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OECP</fullName>
+                <default>false</default>
+                <label>Ofrecer y explicar cita previa</label>
+            </value>
+            <value>
+                <fullName>AUCN</fullName>
+                <default>false</default>
+                <label>Acompañar uso y conocimiento NOW</label>
+            </value>
+            <value>
+                <fullName>EPCA</fullName>
+                <default>false</default>
+                <label>Explicar precio/comisiones aplicadas</label>
+            </value>
+            <value>
+                <fullName>EVMS</fullName>
+                <default>false</default>
+                <label>Explicar ventajas Modelo Store</label>
+            </value>
+            <value>
+                <fullName>RPNR</fullName>
+                <default>false</default>
+                <label>Revisar problema no resuelto</label>
+            </value>
+            <value>
+                <fullName>DCSAMC</fullName>
+                <default>false</default>
+                <label>Disculparse por la calidad de servicio y aplicar mejoras en el centro</label>
+            </value>
+            <value>
+                <fullName>DEDS</fullName>
+                <default>false</default>
+                <label>Detectar el error y dar solución</label>
+            </value>
+            <value>
+                <fullName>ADRE</fullName>
+                <default>false</default>
+                <label>Aplicar descuento, reembolso, etc.</label>
+            </value>
+            <value>
+                <fullName>OPANC</fullName>
+                <default>false</default>
+                <label>Ofrecer producto acorde con necesidad cliente</label>
+            </value>
+            <value>
+                <fullName>FNDCG</fullName>
+                <default>false</default>
+                <label>Facilitar nombre y datos contacto gestor</label>
+            </value>
+            <value>
+                <fullName>RMSSCC</fullName>
+                <default>false</default>
+                <label>Reportar mejora a SSCC</label>
+            </value>
+            <value>
+                <fullName>Otras</fullName>
+                <default>false</default>
+                <label>Otras</label>
+            </value>
+            <value>
+                <fullName>DCSAM</fullName>
+                <default>false</default>
+                <label>Disculparse por la calidad de servicio y aplicar mejoras</label>
+            </value>
+            <value>
+                <fullName>ODEPS</fullName>
+                <default>false</default>
+                <label>Ofrecer detalle explicación de producto / servicio</label>
+            </value>
+            <value>
+                <fullName>EMEPV</fullName>
+                <default>false</default>
+                <label>Explicar el modelo especializado y su propuesta de valor</label>
+            </value>
+            <value>
+                <fullName>FNDC</fullName>
+                <default>false</default>
+                <label>Facilitar nombre y datos contacto</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>10</visibleLines>
+</CustomField>

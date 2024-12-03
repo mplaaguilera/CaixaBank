@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Motivo_relacionado__c</fullName>
+    <description>Campo descriptivo con el motivo del MCC el cual se relaciona con el Motivo NOK de la operativa de tarjetas</description>
+    <label>Motivo relacionado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Bloquear producto / servicio</fullName>
+                <default>false</default>
+                <label>Bloquear producto / servicio</label>
+            </value>
+            <value>
+                <fullName>Aumento de Crédito</fullName>
+                <default>false</default>
+                <label>Aumento de Crédito</label>
+            </value>
+            <value>
+                <fullName>Fraccionamiento</fullName>
+                <default>false</default>
+                <label>Fraccionamiento</label>
+            </value>
+            <value>
+                <fullName>Disposición de crédito en cuenta (ServiCash)</fullName>
+                <default>false</default>
+                <label>Disposición de crédito en cuenta (ServiCash)</label>
+            </value>
+            <value>
+                <fullName>Amortización / Avance de Pago</fullName>
+                <default>false</default>
+                <label>Amortización / Avance de Pago</label>
+            </value>
+            <value>
+                <fullName>Cambiar PIN</fullName>
+                <default>false</default>
+                <label>Cambiar PIN</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

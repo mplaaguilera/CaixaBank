@@ -1,0 +1,30 @@
+{
+    "solicitudes": [
+        {
+            "referencia_usuario": "PST20190724235415407",
+            "tipoSolicitud": "cmn",
+            "nombre": "prova",
+            "telefono": "0034600000000",
+            "idProducto": "HazteCliente",
+            "idioma": "2",
+            "tipollamada": "1",
+            "horaIni": "0",
+            "minIni": "0",
+            "horaFin": "0",
+            "minFin": "0",
+            "origen": "",
+            "nombre2": "",
+            "apellidos": "",
+            "nif": "",
+            "canal": "",
+            "colectivo": "0",
+            "numperso": "CC83E9D",
+            "subproducto_1": "Sin especificar",
+            "regalo_1": "",
+            "apellidos_2": "",
+            "timestamp": "20190725000209",
+            "proceso": "",
+			"descripcion":"test"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GRR_Todos_los_Clientes</fullName>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CC_Numero_Documento__c</columns>
+    <columns>ACCOUNT.PHONE1</columns>
+    <columns>PC_PHONE3</columns>
+    <columns>PC_EMAIL</columns>
+    <columns>FinServ__BillingAddress__pc</columns>
+    <columns>ACCOUNT.RECORDTYPE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>ACCOUNT.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Account.CC_Cliente,PersonAccount.CC_ClientePA,PersonAccount.GRR_NoCliente_PA</value>
+    </filters>
+    <label>Todos los Clientes GRR</label>
+    <sharedTo>
+        <role>GRR</role>
+        <role>GRR_Agente</role>
+    </sharedTo>
+</ListView>

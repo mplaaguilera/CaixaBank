@@ -1,0 +1,32 @@
+div.campos div.slds-grid > div.slds-col {
+    height: 50px;
+}
+
+div.slds-section button.slds-section__title-action > lightning-icon {
+    transition: transform 130ms ease;
+    transform-origin: center;
+    transform: rotate(-90deg);
+}
+
+div.slds-section.slds-is-open button.slds-section__title-action > lightning-icon {
+    transform: rotate(0deg);
+}
+
+div.slds-section__content {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+div.slds-section__content.sectionContentDesglosePagos {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+div.slds-section__content lightning-input {
+    display: inline-block;
+    width: 100%;
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}

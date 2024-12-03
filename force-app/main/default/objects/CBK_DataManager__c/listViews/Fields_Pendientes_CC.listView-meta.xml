@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fields_Pendientes_CC</fullName>
+    <booleanFilter>1 AND 2 AND (3 OR 4) AND 5</booleanFilter>
+    <columns>NAME</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>Status__c</columns>
+    <columns>Field_Name__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>Object_Name__c</columns>
+    <columns>Object__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Draft,Pending</value>
+    </filters>
+    <filters>
+        <field>API_Name__c</field>
+        <operation>startsWith</operation>
+        <value>CC_</value>
+    </filters>
+    <filters>
+        <field>CREATEDBY_USER</field>
+        <operation>equals</operation>
+        <value>Bluewolf</value>
+    </filters>
+    <filters>
+        <field>CREATEDBY_USER</field>
+        <operation>equals</operation>
+        <value>Dana Kusiak</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_DataManager__c.Field,CBK_DataManager__c.Object,CBK_DataManager__c.RecordType</value>
+    </filters>
+    <label>Fields Pendientes CC</label>
+</ListView>

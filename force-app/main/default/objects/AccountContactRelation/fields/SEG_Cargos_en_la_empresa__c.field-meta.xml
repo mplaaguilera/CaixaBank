@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Cargos_en_la_empresa__c</fullName>
+    <description>Cargos asociados a Contactos (Cargos en la empresa)</description>
+    <label>Cargos Contactos (Cargos en la empresa)</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>(cruz roja CASTRO URDIALES)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>(cruz roja CASTRO URDIALES)</label>
+            </value>
+            <value>
+                <fullName>ABOGADO/A SOCIEDAD</fullName>
+                <default>false</default>
+                <label>ABOGADO/A SOCIEDAD</label>
+            </value>
+            <value>
+                <fullName>ACCOUNTANT</fullName>
+                <default>false</default>
+                <label>ACCOUNTANT</label>
+            </value>
+            <value>
+                <fullName>ADJUNT FINANCES</fullName>
+                <default>false</default>
+                <label>ADJUNT FINANCES</label>
+            </value>
+            <value>
+                <fullName>ADMINISTRACION</fullName>
+                <default>false</default>
+                <label>ADMINISTRACION</label>
+            </value>
+            <value>
+                <fullName>Administración</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Administración</label>
+            </value>
+            <value>
+                <fullName>ADMINISTRADOR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>ADMINISTRADOR</label>
+            </value>
+            <value>
+                <fullName>ADMINISTRADOR CONCURSAL</fullName>
+                <default>false</default>
+                <label>ADMINISTRADOR CONCURSAL</label>
+            </value>
+            <value>
+                <fullName>ADMINISTRADOR UNICO</fullName>
+                <default>false</default>
+                <label>ADMINISTRADOR UNICO</label>
+            </value>
+            <value>
+                <fullName>Administrador único</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Administrador único</label>
+            </value>
+            <value>
+                <fullName>ADMINISTRATIVO/A</fullName>
+                <default>false</default>
+                <label>ADMINISTRATIVO/A</label>
+            </value>
+            <value>
+                <fullName>ANALISTA DE PAGO</fullName>
+                <default>false</default>
+                <label>ANALISTA DE PAGO</label>
+            </value>
+            <value>
+                <fullName>ANALISTA ECONOMICO</fullName>
+                <default>false</default>
+                <label>ANALISTA ECONOMICO</label>
+            </value>
+            <value>
+                <fullName>Analista económico</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Analista económico</label>
+            </value>
+            <value>
+                <fullName>APODERADO</fullName>
+                <default>false</default>
+                <label>APODERADO</label>
+            </value>
+            <value>
+                <fullName>AUT TRANSFERENCIAS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>AUT TRANSFERENCIAS</label>
+            </value>
+            <value>
+                <fullName>BAJA EMPRESA</fullName>
+                <default>false</default>
+                <label>BAJA EMPRESA</label>
+            </value>
+            <value>
+                <fullName>BAJA TEMPORAL</fullName>
+                <default>false</default>
+                <label>BAJA TEMPORAL</label>
+            </value>
+            <value>
+                <fullName>CONSEJERO/A DELEGADO/A</fullName>
+                <default>false</default>
+                <label>CONSEJERO/A DELEGADO/A</label>
+            </value>
+            <value>
+                <fullName>CONTABILIDAD</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CONTABILIDAD</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO ADMINISTRACION</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO ADMINISTRACION</label>
+            </value>
+            <value>
+                <fullName>Departamento administración</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Departamento administración</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO AUDITOR</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO AUDITOR</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO COMERCIAL</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO COMERCIAL</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO CONTABILIDAD</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO CONTABILIDAD</label>
+            </value>
+            <value>
+                <fullName>Departamento de finanzas</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Departamento de finanzas</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO DE RRHH</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO DE RRHH</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO EXPANSION</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO EXPANSION</label>
+            </value>
+            <value>
+                <fullName>Departamento expansión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Departamento expansión</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO FINANCIERO</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO FINANCIERO</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO FISCAL</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO FISCAL</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO GESTION</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO GESTION</label>
+            </value>
+            <value>
+                <fullName>Departamento gestión</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Departamento gestión</label>
+            </value>
+            <value>
+                <fullName>DEPARTAMENTO TESORERIA</fullName>
+                <default>false</default>
+                <label>DEPARTAMENTO TESORERIA</label>
+            </value>
+            <value>
+                <fullName>Departamento tesorería</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Departamento tesorería</label>
+            </value>
+            <value>
+                <fullName>DEPARTMENTO DE FINANZAS</fullName>
+                <default>false</default>
+                <label>DEPARTMENTO DE FINANZAS</label>
+            </value>
+            <value>
+                <fullName>DIRECTOR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>DIRECTOR</label>
+            </value>
+            <value>
+                <fullName>DIRECTOR/A FINANCIERO/A</fullName>
+                <default>false</default>
+                <label>DIRECTOR/A FINANCIERO/A</label>
+            </value>
+            <value>
+                <fullName>DIRECTOR/A GENERAL</fullName>
+                <default>false</default>
+                <label>DIRECTOR/A GENERAL</label>
+            </value>
+            <value>
+                <fullName>DIRECTORA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>DIRECTORA</label>
+            </value>
+            <value>
+                <fullName>DPTO CONTABILIDAD</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>DPTO CONTABILIDAD</label>
+            </value>
+            <value>
+                <fullName>Extractos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Extractos</label>
+            </value>
+            <value>
+                <fullName>FRONT OFFICE</fullName>
+                <default>false</default>
+                <label>FRONT OFFICE</label>
+            </value>
+            <value>
+                <fullName>GERENTE</fullName>
+                <default>false</default>
+                <label>GERENTE</label>
+            </value>
+            <value>
+                <fullName>GESTORA</fullName>
+                <default>false</default>
+                <label>GESTORA</label>
+            </value>
+            <value>
+                <fullName>GESTORIA</fullName>
+                <default>false</default>
+                <label>GESTORIA</label>
+            </value>
+            <value>
+                <fullName>Gestoría</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestoría</label>
+            </value>
+            <value>
+                <fullName>IDAPA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>IDAPA</label>
+            </value>
+            <value>
+                <fullName>INEXISTENTE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>INEXISTENTE</label>
+            </value>
+            <value>
+                <fullName>INFORMATICO/A</fullName>
+                <default>false</default>
+                <label>INFORMATICO/A</label>
+            </value>
+            <value>
+                <fullName>Informático/a</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Informático/a</label>
+            </value>
+            <value>
+                <fullName>INTERLOCUTOR</fullName>
+                <default>false</default>
+                <label>INTERLOCUTOR</label>
+            </value>
+            <value>
+                <fullName>INTERLOCUTOR INTERNACIONAL</fullName>
+                <default>false</default>
+                <label>INTERLOCUTOR INTERNACIONAL</label>
+            </value>
+            <value>
+                <fullName>JEFE DE SECCION DE GESTION ECO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>JEFE DE SECCION DE GESTION ECO</label>
+            </value>
+            <value>
+                <fullName>JEFE DE TESOREIA</fullName>
+                <default>false</default>
+                <label>JEFE DE TESOREIA</label>
+            </value>
+            <value>
+                <fullName>Jefe de tesorería</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Jefe de tesorería</label>
+            </value>
+            <value>
+                <fullName>Jubilado/a</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Jubilado/a</label>
+            </value>
+            <value>
+                <fullName>JUBILADO/A (lista gris)</fullName>
+                <default>false</default>
+                <label>JUBILADO/A (lista gris)</label>
+            </value>
+            <value>
+                <fullName>LOE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>LOE</label>
+            </value>
+            <value>
+                <fullName>Navarra</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Navarra</label>
+            </value>
+            <value>
+                <fullName>PROMOTOR/A</fullName>
+                <default>false</default>
+                <label>PROMOTOR/A</label>
+            </value>
+            <value>
+                <fullName>Resp.Financiero</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Resp.Financiero</label>
+            </value>
+            <value>
+                <fullName>RESPONSABLE NOMINAS</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>RESPONSABLE NOMINAS</label>
+            </value>
+            <value>
+                <fullName>Rin sancions internacionals</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Rin sancions internacionals</label>
+            </value>
+            <value>
+                <fullName>SECCION ECONOMICA DE REGIMEN D</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SECCION ECONOMICA DE REGIMEN D</label>
+            </value>
+            <value>
+                <fullName>SECRETARIA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SECRETARIA</label>
+            </value>
+            <value>
+                <fullName>SECRETARIA GENERAL</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SECRETARIA GENERAL</label>
+            </value>
+            <value>
+                <fullName>SECRETARIO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SECRETARIO</label>
+            </value>
+            <value>
+                <fullName>SECRETARIO/A</fullName>
+                <default>false</default>
+                <label>SECRETARIO/A</label>
+            </value>
+            <value>
+                <fullName>Serv. Gestion Agricultura y Pe</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Serv. Gestion Agricultura y Pe</label>
+            </value>
+            <value>
+                <fullName>SERVICIO JURIDICA SOCIEDAD</fullName>
+                <default>false</default>
+                <label>SERVICIO JURIDICA SOCIEDAD</label>
+            </value>
+            <value>
+                <fullName>Servicio jurídica sociedad</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Servicio jurídica sociedad</label>
+            </value>
+            <value>
+                <fullName>SOCIO</fullName>
+                <default>false</default>
+                <label>SOCIO</label>
+            </value>
+            <value>
+                <fullName>SOLICITUD DEV FUERA DE PLAZO-</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SOLICITUD DEV FUERA DE PLAZO-</label>
+            </value>
+            <value>
+                <fullName>SUBDIRECTORA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SUBDIRECTORA</label>
+            </value>
+            <value>
+                <fullName>Tesorera</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tesorera</label>
+            </value>
+            <value>
+                <fullName>TESORERIA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TESORERIA</label>
+            </value>
+            <value>
+                <fullName>TESORERO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TESORERO</label>
+            </value>
+            <value>
+                <fullName>TESORERO/A</fullName>
+                <default>false</default>
+                <label>TESORERO/A</label>
+            </value>
+            <value>
+                <fullName>TF7-RESPONSABLE ADMTVA.</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TF7-RESPONSABLE ADMTVA.</label>
+            </value>
+            <value>
+                <fullName>TF7-VICETESORERO / APODERADO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TF7-VICETESORERO / APODERADO</label>
+            </value>
+            <value>
+                <fullName>TRANSF MANUALES / PAG AUT EXPL</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>TRANSF MANUALES / PAG AUT EXPL</label>
+            </value>
+            <value>
+                <fullName>VIDACAIXA</fullName>
+                <default>false</default>
+                <label>VIDACAIXA</label>
+            </value>
+            <value>
+                <fullName>Vizcaia TF7(NO) DIR ECON.FINAN</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Vizcaia TF7(NO) DIR ECON.FINAN</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>6</visibleLines>
+</CustomField>

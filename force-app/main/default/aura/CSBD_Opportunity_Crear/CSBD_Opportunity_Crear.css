@@ -1,0 +1,20 @@
+.THIS button.slds-button:not(.slds-button_icon-bare):not(.slds-button_icon-container):not(.slds-text-link),
+.THIS button.slds-button:disabled,
+.THIS input.slds-input,
+.THIS input.slds-input:disabled,
+.THIS textarea.slds-textarea,
+.THIS button.slds-combobox__input,
+.THIS div.slds-combobox__input,
+.THIS div.slds-dropdown,
+.THIS select.slds-select {
+	border-color: rgb(201, 201, 201);
+}
+
+.THIS div.slds-combobox.slds-is-open > div.slds-dropdown {
+	max-height: 506px;
+}
+
+.THIS lightning-input-field.slds-form-element_stacked {
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}

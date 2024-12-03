@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaConteoCasos__c</fullName>
+    <description>Fecha en la que se ha modificado la Cantidad Casos Actual.
+Si esta fecha es diferente al día actual, se actualiza con la nueva fecha y se pone la Cantidad Casos Actual. a 0.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Conteo Casos</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

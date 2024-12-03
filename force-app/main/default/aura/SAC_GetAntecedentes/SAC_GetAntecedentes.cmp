@@ -1,0 +1,50 @@
+<aura:component controller="SAC_LCMP_GetAntecedentes"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+<!--<aura:component controller="SAC_LCMP_GetAntecedentes" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global"> -->
+<!--Solicitar los antecedentes con un botón y guardarlos en el objeto custom de antecedentes. Guardar en un campo del caso la fecha en la que fue por última vez almacenado esto.
+Poder traer también los Antecedentes a demanda con un botón-->
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    <aura:attribute name="ultimaActualizacion" type="date" />
+    <aura:attribute name="antecedentesRevisados" type="Boolean" default="false" />
+    <aura:attribute name="permisosEditar" type="Boolean" default="false" />
+
+    <!--doInit-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Spinner-->
+    <aura:if isTrue="{!v.spinner}">
+        <div>
+            <lightning:spinner variant="brand" size="large" />
+        </div>
+    </aura:if>
+    <div class="slds-box slds-box_small">
+        <lightning:card title="Recuperación de antecedentes">
+            <p class="slds-p-horizontal_small">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-6">
+                        Fecha última solicitud
+                    </div>
+                    <div class="slds-col slds-size_1-of-6">
+                        <lightning:formattedDateTime year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" value='{!v.ultimaActualizacion}'></lightning:formattedDateTime>
+                    </div>
+                    <div class="slds-col slds-size_1-of-6">
+                        Antecedentes Revisados
+                    </div>
+                    <div class="slds-col slds-size_1-of-6">
+                        <aura:if isTrue="{!v.permisosEditar}">
+                            <lightning:input type="checkbox" value="{!v.antecedentesRevisados}" checked="{!v.antecedentesRevisados}" onchange="{!c.guardar}"/>
+                            <aura:set attribute="else">
+                                <lightning:input type="checkbox" value="{!v.antecedentesRevisados}" checked="{!v.antecedentesRevisados}" disabled="true" />
+                            </aura:set>
+                        </aura:if>
+                    </div> 
+                    <div class="slds-col slds-size_2-of-6">
+                        <lightning:button label="Actualizar antecedentes"  iconName="utility:sync" variant="brand" title="Buscar antecedentes" class="slds-float_right" 
+                        onclick="{!c.buscarAntecedentes}" />
+                    </div>
+                </div>
+            </p>
+        </lightning:card>
+    </div>
+</aura:component>

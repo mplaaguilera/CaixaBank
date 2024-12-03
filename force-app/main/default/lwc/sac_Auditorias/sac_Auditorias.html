@@ -1,0 +1,791 @@
+<template>
+  <div class="card-container">
+    <lightning-card>
+      <div class="container">
+        <lightning-icon icon-name="custom:custom18" size="medium" class="custom-icon"></lightning-icon>
+        <div class="custom-title"><strong>Creación Auditorías SAC</strong></div>
+        <div class="slds-col_bump-left">
+          <!-- <lightning-button label="Nueva" onclick={resetBuscador} class="boton-reset"></lightning-button> -->
+        </div>
+      </div>
+    </lightning-card>
+  </div>
+  <br/>
+  <template if:true={tienePermisos}>
+    <div>
+      <lightning-card  title="Alta auditoría">
+        <div class="slds-p-horizontal_small">
+          <div class="slds-form" role="list">
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>Nombre</label>
+                  <div class="slds-form-element__control">
+                    <input type="text" id="single-form-element-id-02" value={nombreAuditoria} onchange={cargarNombreAudit} placeholder="Introduzca el nombre deseado..." autocomplete="off" class="slds-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Fecha</label>
+                  <div class="slds-form-element__control">
+                    <lightning-input type="date" name="input6" readonly value={fechaActual} date-style="short"></lightning-input>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>Tipo auditoria</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Selector de tipo de auditoria -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} class="inputBox" placeholder="Seleccione el tipo/s de auditoria deseado/s..." onblur={blurTipoAuditoria} onclick={mostrarOpcTipoAudit} value={searchInputTipoAudit} variant="label-hidden" id="combobox-id-1" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones tipo de auditoria -->
+                        <template if:true={modalOpcionesTipoAudit}>
+                          <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template for:each={optionData} for:item="option">
+                                <li key={option.value} data-value={option.value} data-label={option.label} onmousedown={selectTipoAuditoria} class="slds-listbox__item eachItem">
+                                  <template if:true={option.selected}>
+                                    <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                  </template>
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.label}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                            
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>SLA Calidad</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Selector de SLA Calidad -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} class="inputBox" placeholder="Seleccione una opción..." onblur={blurSlaCalidad} onclick={mostrarOpcSlaCalidad} value={searchInputSlaCalidad} variant="label-hidden" id="combobox-id-97" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones SLA Calidad -->
+                        <template if:true={modalOpcionesSlaCalidad}>
+                          <div id="listbox-id-96" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template for:each={optionSlaCalidad} for:item="option">
+                                <li key={option.value} data-value={option.value} data-label={option.label} onmousedown={selectSlaCalidad} class="slds-listbox__item eachItem">
+                                  <template if:true={option.selected}>
+                                    <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                  </template>
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.label}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+          </div>
+        </div>
+      </lightning-card>
+      <br/>
+      <lightning-card  title="Criterios de auditoría">
+        <div class="slds-p-horizontal_small">
+          <div class="slds-form" role="list">
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Perímetro fecha cierre desde</label>
+                  <div class="slds-form-element__control">
+                    <lightning-input type="date" class="date-picker_fecha_inicio" placeholder="Introduzca la fecha desde deseada..." value={fechaDesde} onchange={cargarFechaDesde} autocomplete="off" date-style="short"></lightning-input>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">hasta</label>
+                  <div class="slds-form-element__control">
+                    <lightning-input type="date" class="date-picker_fecha_fin" placeholder="Introduzca la fecha hasta deseada..." value={fechaHasta} onchange={cargarFechaHasta} autocomplete="off" date-style="short"></lightning-input>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <!-- <div if:true={esCOPSAJ} class="slds-form__row"> -->
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div if:true={userSupervisorProv} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <div if:true={esCOPSAJ}>
+                    <label class="slds-form-element__label" for="single-form-element-id-02">Grupo proveedor</label>
+                  </div>
+                  <div if:false={esCOPSAJ}>
+                    <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>Grupo proveedor</label>
+                  </div>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de grupo proveedor -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <div if:true={esCOPSAJ}>
+                            <lightning-input disabled={disabled} name="buscadorGrupoProveedor" class="inputBox" placeholder=" -- todos --" onblur={blurGrupoProv} onclick={mostrarOpcGrupoProv} onkeyup={filtrarOpcGrupoProv} value={searchInputGrupoProveedor} autocomplete="off" variant="label-hidden" id="combobox-id-2" ></lightning-input>
+                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                          </div>
+                          <div if:false={esCOPSAJ}>
+                            <div if:true={variosProv}>
+                              <lightning-input disabled={disabled} name="buscadorVariosGruposProv" class="inputBox" placeholder="Seleccione uno de los grupos a los que pertenece..." onblur={blurGrupoProv} onclick={mostrarOpcGrupoProv} onkeyup={filtrarOpcGrupoProv} value={searchInputGrupoProveedor} autocomplete="off" variant="label-hidden" id="combobox-id-26" ></lightning-input>
+                              <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                            </div>
+                            <div if:false={variosProv}>
+                              <lightning-input disabled="true" name="buscadorGrupoProveedor" class="inputBox" value={searchInputGrupoProveedor} autocomplete="off" variant="label-hidden" id="combobox-id-9" ></lightning-input>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Mostrar opciones grupo proveedor -->
+                        <template if:true={modalOpcionesGrupoProveedor}>
+                          <div id="listbox-id-2" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid"> <!-- slds-dropdown_length-5 EN VEZ DE 4 HABIA 5 ANTES DE FIJAR  --> 
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsGrupoProv} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectGrupoProv} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div if:false={supervisorProvOrLet} class="separador-central"></div>
+              <div if:true={userSupervisorLet} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <div if:true={esCOPSAJ}>
+                    <label class="slds-form-element__label" for="single-form-element-id-03">Despachos</label>
+                  </div>
+                  <div if:false={esCOPSAJ}>
+                    <label class="slds-form-element__label" for="single-form-element-id-03"><strong class="campo-obligatorio">* </strong>Despachos</label>
+                  </div>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de despachos -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <div if:true={esCOPSAJ}>
+                            <lightning-input disabled={disabled} name="buscadorGrupoLetrado" class="inputBox" placeholder=" -- todos --" onblur={blurGrupoLetrado} onclick={mostrarOpcGrupoLetrado} onkeyup={filtrarOpcGrupoLetrado} value={searchInputGrupoLetrado} autocomplete="off" variant="label-hidden" id="combobox-id-3" ></lightning-input>
+                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                          </div>
+                          <div if:false={esCOPSAJ}>
+                            <div if:true={variosLet}>
+                              <lightning-input disabled={disabled} name="buscadorVariosGruposLet" class="inputBox" placeholder="Seleccione uno de los grupos a los que pertenece..." onblur={blurGrupoLetrado} onclick={mostrarOpcGrupoLetrado} onkeyup={filtrarOpcGrupoLetrado} value={searchInputGrupoLetrado} autocomplete="off" variant="label-hidden" id="combobox-id-34" ></lightning-input>
+                              <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                            </div>
+                            <div if:false={variosLet}>
+                              <lightning-input disabled="true" name="buscadorGrupoLetrado" class="inputBox" value={searchInputGrupoLetrado} autocomplete="off" variant="label-hidden" id="combobox-id-10" ></lightning-input>
+                            </div>
+                          </div>      
+                        </div>
+                        <!-- Mostrar opciones despachos -->
+                        <template if:true={modalOpcionesGrupoLetrado}>
+                          <div id="listbox-id-3" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsGrupoLet} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectGrupoLetrado} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div if:true={supervisorProvOrLet} class="separador-central"></div>
+              <div if:true={supervisorProvOrLet} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03"></label>
+                  <div class="slds-form-element__control">
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div if:true={userSupervisorProv} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Gestor</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de gestor -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning-input disabled={disabledGestor} name="buscadorGestor" class="inputBox" placeholder=" -- todos --" onblur={blurGestor} onclick={mostrarOpcGestor} onkeyup={filtrarOpcGestor} value={searchInputGestor} autocomplete="off" variant="label-hidden" id="combobox-id-15" ></lightning-input>
+                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones gestor -->
+                        <template if:true={modalOpcionesGestor}>
+                          <div id="listbox-id-15" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsGestor} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectGestor} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div if:false={supervisorProvOrLet} class="separador-central"></div>
+              <div if:true={userSupervisorLet} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Letrados</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de letrados -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning-input disabled={disabledLetrados} name="buscadorLetrados" class="inputBox" placeholder=" -- todos --" onblur={blurLetrados} onclick={mostrarOpcLetrados} onkeyup={filtrarOpcLetrados} value={searchInputLetrados} autocomplete="off" variant="label-hidden" id="combobox-id-32" ></lightning-input>
+                            <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones letrados -->
+                        <template if:true={modalOpcionesLetrados}>
+                          <div id="listbox-id-33" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsLetrados} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectLetrados} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div if:true={supervisorProvOrLet} class="separador-central"></div>
+              <div if:true={supervisorProvOrLet} class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03"></label>
+                  <div class="slds-form-element__control">
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Importe abonado desde</label>
+                  <div class="slds-form-element__control">
+                    <input type="text" id="single-form-element-id-06" placeholder="Introduzca el importes desde..." onchange={cargarImporteDesde} onclick={clicarImporte} autocomplete="off" class="slds-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Importe abonado hasta</label>
+                  <div class="slds-form-element__control">
+                    <input type="text" id="single-form-element-id-07" placeholder="Introduzca el importes hasta..." onchange={cargarImporteHasta} onclick={clicarImporte} autocomplete="off" class="slds-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row" style="margin-top: 5px;">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Sentido resolución</label>
+                  <div class="slds-form-element__control">
+    
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Selector de sentido resolución -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} class="inputBox" placeholder=" -- todos --" onblur={blurSentidoResolucion} onclick={mostrarOpcSentidoResolucion} value={searchInputSentidoResolucion} variant="label-hidden" id="combobox-id-54" title={searchInputSentidoResolucion} readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones sentido resolución -->
+                        <template if:true={modalOpcionesSentidoResolucion}>
+                          <div id="listbox-id-54" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template for:each={listaSentidosResolucion} for:item="option">
+                                <li key={option.value} data-value={option.value} data-label={option.label} onmousedown={selectSentidoResolucion} class="slds-listbox__item eachItem">
+                                  <template if:true={option.selected}>
+                                    <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                  </template>
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.label}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>        
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <!-- <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Importe abonado hasta</label>
+                  <div class="slds-form-element__control">
+                    <input type="text" id="single-form-element-id-07" placeholder="Introduzca el importes hasta..." onchange={cargarImporteHasta} onclick={clicarImporte} autocomplete="off" class="slds-input" />
+                  </div>
+                </div> -->
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <br/>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <strong>MCC</strong>
+            </div>
+            
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>Solo tomar la pretensión principal</label>
+                  <div class="slds-form-element__control">
+                    <!-- <lightning-combobox name="soloPretPpal" placeholder="Seleccione una opción..." options={optionsTrueFalse} onchange={cargarSoloPretPpal} class="slds-input"></lightning-combobox> -->
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Selector de solo pret ppal -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} class="inputBox" placeholder="Seleccione una opción..." onblur={blurSoloPretPpal} onclick={mostrarOpcSoloPretPpal} value={searchInputSoloPretPpal} variant="label-hidden" id="combobox-id-98" readonly></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones solo pret ppal -->
+                        <template if:true={modalOpcionesSoloPretPpal}>
+                          <div id="listbox-id-99" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template for:each={optionPretPpal} for:item="option">
+                                <li key={option.value} data-value={option.value} data-label={option.label} onmousedown={selectSoloPretPpal} class="slds-listbox__item eachItem">
+                                  <template if:true={option.selected}>
+                                    <lightning-icon icon-name="utility:check" size="x-small" alternative-text="icon" ></lightning-icon>
+                                  </template>
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.label}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03"></label>
+                  <div class="slds-form-element__control">
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Temática</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de temática -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} name="buscadorTematica" class="inputBox" placeholder=" -- todos --" onblur={blurTematica} onclick={mostrarOpcTematica} onkeyup={filtrarOpcTematica} value={searchInputTematica} autocomplete="off" variant="label-hidden" id="combobox-id-4" ></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones temática -->
+                        <template if:true={modalOpcionesTematica}>
+                          <div id="listbox-id-4" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsTematica} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectTematica} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Producto</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de producto -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledProducto} name="buscadorProducto" class="inputBox" placeholder=" -- todos --" onblur={blurProducto} onclick={mostrarOpcProducto} onkeyup={filtrarOpcProducto} value={searchInputProducto} autocomplete="off" variant="label-hidden" id="combobox-id-5" ></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones producto -->
+                        <template if:true={modalOpcionesProducto}>
+                          <div id="listbox-id-5" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsProducto} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectProducto} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Motivo</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de motivo -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledMotivo} name="buscadorMotivo" class="inputBox" placeholder=" -- todos --" onblur={blurMotivo} onclick={mostrarOpcMotivo} onkeyup={filtrarOpcMotivo} value={searchInputMotivo} autocomplete="off" variant="label-hidden" id="combobox-id-6" ></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones motivo -->
+                        <template if:true={modalOpcionesMotivo}>
+                          <div id="listbox-id-6" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsMotivo} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectMotivo} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03">Detalle</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de detalle -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabledDetalle} name="buscadorDetalle" class="inputBox" placeholder=" -- todos --" onblur={blurDetalle} onclick={mostrarOpcDetalle} onkeyup={filtrarOpcDetalle} value={searchInputDetalle} autocomplete="off" variant="label-hidden" id="combobox-id-7" ></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones detalle -->
+                        <template if:true={modalOpcionesDetalle}>
+                          <div id="listbox-id-7" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsDetalle} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectDetalle} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <div class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02"><strong class="campo-obligatorio">* </strong>Número reclamaciones a auditar</label>
+                  <div class="slds-form-element__control">
+                    <input type="text" id="single-form-element-id-019" placeholder="Número máximo de reclamaciones…" onchange={cargarNumRec} autocomplete="off" class="slds-input" />
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03"></label>
+                  <div class="slds-form-element__control">
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+            <br/>
+            <div if:true={esCOPSAJ} class="slds-form__row">
+              <div class="separador-lateral"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-02">Grupo responsable de la auditoría</label>
+                  <div class="slds-form-element__control">
+                    <div class="slds-combobox_container">
+                      <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                        <!-- Buscador/Selector de grupo responsable de resolver -->
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                          <lightning-input disabled={disabled} name="buscadorGrupoResolver" class="inputBox" placeholder="Seleccione el grupo deseado..." onblur={blurGrupoResolver} onclick={mostrarOpcGrupoResolver} onkeyup={filtrarOpcGrupoResolver} value={searchInputGrupoResolver} autocomplete="off" variant="label-hidden" id="combobox-id-40" ></lightning-input>
+                          <lightning-icon class="slds-input__icon" icon-name="utility:down" size="x-small" alternative-text="search"></lightning-icon>
+                        </div>
+                        <!-- Mostrar opciones grupo responsable de resolver -->
+                        <template if:true={modalOpcionesGrupoResolver}>
+                          <div id="listbox-id-41" class="slds-dropdown slds-dropdown_length-4 slds-dropdown_fluid">
+                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                              <template if:false={message} >
+                                <div  class="scroll-container">
+                                  <template for:each={filteredResultsGrupoResolver} for:item="option">
+                                    <li key={option.id} data-value={option.Id} data-name={option.Name} onmousedown={selectGrupoResolver} class="slds-listbox__item eachItem">
+                                      <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{option.Name}</span>
+                                    </li>
+                                  </template>
+                                  <div if:true={hayMasResultados} class="fixed-div">
+                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate"><em>&nbsp;&nbsp;&nbsp;{mensajeMuchosResultados}</em></span>
+                                  </div>
+                                </div>
+                              </template>
+                              <template if:true={message} >
+                                <li class="slds-listbox__item">
+                                  <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{message}</span>
+                                </li>
+                              </template>
+                            </ul>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="separador-central"></div>
+              <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+                  <label class="slds-form-element__label" for="single-form-element-id-03"></label>
+                  <div class="slds-form-element__control">
+                  </div>
+                </div>
+              </div>
+              <div class="separador-lateral"></div>
+            </div>
+          </div>
+        </div>
+      </lightning-card>  
+      <br/>
+      <lightning-button label="Generar auditoría" onclick={botonGenerarAuditoria} class="slds-float_right slds-m-left_x-small"></lightning-button>
+      <br/><br/><br/>
+      <div if:true={mostrarListaReclamaciones}>
+        <lightning-card  title="Lista de reclamaciones">
+          <div class="slds-form-element__control tabla-reclamaciones">
+            <div if:true={hayReclamaciones}>
+              <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                      <div class="slds-truncate">
+                        <lightning-input onchange={allSelected} type="checkbox" name="selectAll"></lightning-input>
+                      </div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" title="Nombre">CaseNumber</div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" title="Grupo">Subject</div>
+                    </th>
+                    <th class="" scope="col">
+                      <div class="slds-truncate" title="Estado">Estado</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={listaRecs} for:item="rec">
+                    <tr key={rec.id}>
+                      <th scope="col">
+                        <div>
+                          <lightning-input type="checkbox" value={rec.id} reclamacion-id={rec.id} onchange={selectUnaRec} name="individual"></lightning-input>
+                        </div>
+                      </th>
+                      <th scope="col">
+                        <lightning-button onclick={mostrarRec} data-value={rec.id} label={rec.caseNumber} variant="base"></lightning-button>
+                      </th>
+                      <th scope="col">
+                        <div>{rec.subject}</div>
+                      </th>
+                      <th scope="col">
+                        <div>{rec.status}</div>
+                      </th>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div if:false={hayReclamaciones}>
+              <p>No existe ninguna reclamación que cumpla los criterios establecidos.... </p>
+            </div>
+          </div>
+        </lightning-card>
+        <br/>
+        <lightning-button disabled={disabledConfirmarAudit} label="Confirmar" onclick={botonConfirmarAuditoria} class="slds-float_right slds-m-left_x-small"></lightning-button>
+        <br/><br/><br/>
+      </div>
+      <div>
+        <template if:true={spinnerLoading}>
+          <div class="spinner">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+          </div>
+        </template>
+      </div>
+    </div>
+  </template>
+  <template if:false={tienePermisos}>
+    <lightning-card>
+      <div class="container">
+        <div class="no-tiene-permisos">Este usuario no tiene los permisos necesarios para utilizar esta funcionalidad.</div>
+      </div>
+    </lightning-card>
+  </template>
+</template>

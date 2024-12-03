@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidationResolutionVentaDesestimada</fullName>
+    <active>true</active>
+    <description>El gestor no puede cambiar la resolución a Venta desestimada.</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.AV_AvoidBulkApi),
+				$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+    ISPICKVAL(AV_Resolution__c, &quot;Venta desestimada&quot;)
+)</errorConditionFormula>
+    <errorDisplayField>AV_Resolution__c</errorDisplayField>
+    <errorMessage>No es posible cambiar la resolución a Venta desestimada, es una resolución automática.</errorMessage>
+</ValidationRule>

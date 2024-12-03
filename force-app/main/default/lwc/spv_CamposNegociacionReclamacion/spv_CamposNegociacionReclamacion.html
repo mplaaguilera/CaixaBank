@@ -1,0 +1,49 @@
+<template>
+    <lightning-card>
+        <template for:each={pretensiones} for:item="pretension">
+            <lightning-record-edit-form object-api-name="Case" key={pretension.Id} record-id={pretension.Id}>
+                <div class="slds-grid slds-wrap">
+                        <div class="slds-size_1-of-1">
+                            <div class="titulo">
+                                <span class="marca"></span>
+                                <b>ID de la pretensión: </b>
+                                <lightning-button variant="base" class="botonAccount" label={pretension.SPV_IdPretension__c} name={pretension.Id} onclick={verPretensionClick} key={pretension.Id} data-target-id={pretension.Id} ></lightning-button>
+                            </div>
+                        </div>
+
+                        <div class="slds-size_1-of-3" >
+                            <div class="contenedor primeraCol">
+                                <span class="marca-triangulo"></span>
+                                <p>Negociación finalizada: </p> 
+                                <lightning-input type="checkbox" checked={pretension.SAC_NegociacionFinalizada__c} disabled></lightning-input>
+                                
+                               <!--<lightning-output-field field-name="SAC_NegociacionFinalizada__c"></lightning-output-field>-->
+                            </div>
+                        </div>
+                            
+                        
+                        <div class="slds-size_2-of-3">
+                            <div class="contenedor">
+                                <span class="marca-triangulo"></span>
+                                <p>Resultado de la negociación: </p>
+                                <p>{pretension.SAC_ResultadoNegociacion__c}</p>
+                                <!--<lightning-output-field field-name="SAC_ResultadoNegociacion__c"></lightning-output-field>-->
+                            </div>  
+                        </div>
+
+
+                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                </div>
+
+
+            </lightning-record-edit-form>
+                
+
+        </template>
+
+
+    </lightning-card>
+
+
+
+</template>

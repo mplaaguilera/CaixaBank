@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Campaign_Id__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Campaign Id</label>
+    <referenceTo>Campaign</referenceTo>
+    <relationshipLabel>Historiales miembros de campaña</relationshipLabel>
+    <relationshipName>Historiales_miembros_de_campa_a</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

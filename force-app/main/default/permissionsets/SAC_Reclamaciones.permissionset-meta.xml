@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>SAC_Reclamaciones</name>
+    </customPermissions>
+    <description>Permisos para crear manualmente una reclamación</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SAC_Reclamaciones</label>
+    <recordTypeVisibilities>
+        <recordType>Case.SAC_Reclamacion</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+</PermissionSet>

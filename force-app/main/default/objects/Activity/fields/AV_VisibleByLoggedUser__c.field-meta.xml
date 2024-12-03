@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_VisibleByLoggedUser__c</fullName>
+    <formula>IF(OwnerId=$User.Id, true,
+IF( ISBLANK( AV_CodigoGestorAsignado__c ), false, IF(  AV_CodigoGestorAsignado__c =  $User.AV_ExternalID__c ,true,false))
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>AV_VisibleByLoggedUser</label>
+    <type>Checkbox</type>
+</CustomField>

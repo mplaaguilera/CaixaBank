@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Created_1r_SocialPost__c</fullName>
+    <description>Recuperar la fecha de creación del 1r Social Post del caso para reporting</description>
+    <formula>IF(ISPICKVAL(Origin , &quot;Twitter&quot;), Source:SocialPost.HarvestDate, null)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Fecha 1r Twitter</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

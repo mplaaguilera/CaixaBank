@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_AnalisisAllanamientoEscalado</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SAC_MaestroTemas__c.SPV_AnalisisAllanamiento</value>
+    </filters>
+    <label>Análisis Allanamiento/Desistimiento</label>
+    <sharedTo>
+        <role>SPV_General</role>
+    </sharedTo>
+</ListView>

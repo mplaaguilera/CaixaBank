@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_IdAsistenteAdobe__c</fullName>
+    <description>Id Asistente Adobe</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <label>Id Asistente Adobe</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,64 @@
+<template>
+  {validate}
+  <!-- Aqui se va a poner el componente si se cumple la condición de que todos sean del mismo grupo -->
+  <template if:true={success}>
+    <div class="toast">
+      <c-custom-toast class="toast" tipo="Success" cuerpo={cuerpo}></c-custom-toast>
+    </div>
+  </template>
+  <div class="container" id="listaUsuariosCambios">
+    <div class="container-inside" id="container-inside">
+        <template if:false={isError}>
+            <div class="header">
+                <h1 class="header">
+                  Seleccione el usuario al que va a asignar los registros
+                </h1>
+              </div>
+              {userOptions}
+              <div class="selectedBox" id="SelectedBox">
+                  <select
+                    id="optionSelect"
+                    class="slds-select"
+                    name="optionSelect"
+                    onchange={changeHandler}
+                  >
+                  <option value="">Seleccione el usuario</option>
+                    <template for:each={valores} for:item="option">
+                      <option value={option.value} key={option.value}>
+                        {option.label}
+                      </option>
+                    </template>
+                  </select>
+              </div>
+        
+              <!-- Buttons center-->
+              <div class="buttons" id="buttons">
+                <lightning-button
+                  variant="brand"
+                  label="Guardar"
+                  onclick={handleGuardar}
+                  class="slds-m-left_x-small"
+                ></lightning-button>
+                <lightning-button
+                  variant="Neutral"
+                  label="Cancelar"
+                  onclick={handleCancelar}
+                  class="slds-m-left_x-small"
+                ></lightning-button>
+              </div>
+        </template>
+        <template if:true={isError}>
+            <div id="toast-container" class="toast-container">
+              <c-custom-toast tipo="error" cuerpo={cuerpo}></c-custom-toast>
+            </div>
+            <div class="cancel-button" id="errorButtonsContainer">
+                <lightning-button
+                  label="Volver"
+                  onclick={handleCancelar}
+                  class="slds-m-left_x-small"
+                ></lightning-button>
+              </div>
+        </template>
+    </div>
+  </div>
+</template>

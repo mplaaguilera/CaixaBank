@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Automatica__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si la actividad ha sido creado por el usuario &quot;System&quot; o por el usuario &quot;Auotmated Process&quot;</description>
+    <label>Creada por usuario de sistema</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,81 @@
+<aura:component controller="SAC_Asignacion_Plantillas"
+    implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId"
+    access="global">
+
+    <aura:attribute name="opcionesPlantillaES" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaCAT" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaING" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaEUSK" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaVAL" type="List" default="[]" />
+    <aura:attribute name="opcionesPlantillaGAL" type="List" default="[]" />
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <!--Spinner-->
+    <aura:if isTrue="{!v.spinner}">
+        <div>
+            <lightning:spinner variant="brand" size="large" />
+        </div>
+    </aura:if>
+
+    <article class="slds-card">
+
+        <div class="c-container">
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:tabset>
+                        <lightning:tab label="Vinculación de plantillas">
+                            <lightning:combobox aura:id="PlantillaCastellano" name="plantilla"
+                                label="Plantilla Castellano" placeholder="-Selecciona una plantilla-" value=""
+                                required="false" dropdownAlignment="right" variant="standard" onchange="{!c.updateES}"
+                                options="{!v.opcionesPlantillaES}" />
+                            <lightning:combobox aura:id="PlantillaCatalan" name="plantilla" label="Plantilla Catalan"
+                                placeholder="-Selecciona una plantilla-" value="" required="false"
+                                dropdownAlignment="right" variant="standard" onchange="{!c.updateCAT}"
+                                options="{!v.opcionesPlantillaCAT}" />
+                            <lightning:combobox aura:id="PlantillaIngles" name="plantilla" label="Plantilla Ingles"
+                                placeholder="-Selecciona una plantilla-" value="" required="false"
+                                dropdownAlignment="right" variant="standard" onchange="{!c.updateING}"
+                                options="{!v.opcionesPlantillaING}" />
+                            <lightning:combobox aura:id="PlantillaEuskera" name="plantilla" label="Plantilla Euskera"
+                                placeholder="-Selecciona una plantilla-" value="" required="false"
+                                dropdownAlignment="right" variant="standard" onchange="{!c.updateEUSK}"
+                                options="{!v.opcionesPlantillaEUSK}" />
+                            <lightning:combobox aura:id="PlantillaValenciano" name="plantilla" label="Plantilla Valenciano"
+                                placeholder="-Selecciona una plantilla-" value="" required="false"
+                                dropdownAlignment="right" variant="standard" onchange="{!c.updateVAL}"
+                                options="{!v.opcionesPlantillaVAL}" />
+                            <lightning:combobox aura:id="PlantillaGallego" name="plantilla" label="Plantilla Gallego"
+                                placeholder="-Selecciona una plantilla-" value="" required="false"
+                                dropdownAlignment="right" variant="standard" onchange="{!c.updateGAL}"
+                                options="{!v.opcionesPlantillaGAL}" />
+
+                            <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}"
+                                objectApiName="SAC_PlantillaRedaccion__c" onload="{!c.handleCreateLoad}" onsuccess="{!c.onSuccess}"
+                                onsubmit="{!c.onSubmit}">
+                                <div class="slds-hide">
+                                    <lightning:inputField fieldName="SAC_TipoPlantilla__c" aura:id="SAC_TipoPlantilla" />
+                                    <lightning:inputField fieldName="SAC_PlantillaCastellano__c" aura:id="SAC_PlantillaCastellano" />
+                                    <lightning:inputField fieldName="SAC_PlantillaCastellanoId__c" aura:id="SAC_PlantillaCastellanoId" />
+                                    <lightning:inputField fieldName="SAC_PlantillaCatalan__c" aura:id="SAC_PlantillaCatalan" />
+                                    <lightning:inputField fieldName="SAC_PlantillaCatalanId__c" aura:id="SAC_PlantillaCatalanId" />
+                                    <lightning:inputField fieldName="SAC_PlantillaIngles__c" aura:id="SAC_PlantillaIngles" />
+                                    <lightning:inputField fieldName="SAC_PlantillaInglesId__c" aura:id="SAC_PlantillaInglesId" />
+                                    <lightning:inputField fieldName="SAC_PlantillaEuskera__c" aura:id="SAC_PlantillaEuskera" />
+                                    <lightning:inputField fieldName="SAC_PlantillaEuskeraId__c" aura:id="SAC_PlantillaEuskeraId" />
+                                    <lightning:inputField fieldName="SAC_PlantillaValenciano__c" aura:id="SAC_PlantillaValenciano" />
+                                    <lightning:inputField fieldName="SAC_PlantillaValencianoId__c" aura:id="SAC_PlantillaValencianoId" />
+                                    <lightning:inputField fieldName="SAC_PlantillaGallego__c" aura:id="SAC_PlantillaGallego" />
+                                    <lightning:inputField fieldName="SAC_PlantillaGallegoId__c" aura:id="SAC_PlantillaGallegoId" />
+                                </div>
+                                <lightning:button class="slds-m-top_small slds-float_right" variant="brand" type="submit" name="update"
+                                    label="Guardar cambios" />
+                            </lightning:recordEditForm>
+                        </lightning:tab>
+                    </lightning:tabset>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+        </article>
+</aura:component>

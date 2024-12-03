@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_NumPerso__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>AV_Numperso de la cuenta</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>AV_Numperso de la cuenta</inlineHelpText>
+    <label>NumPerso AV</label>
+    <length>15</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

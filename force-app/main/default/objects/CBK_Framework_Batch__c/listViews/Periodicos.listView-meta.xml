@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Periodicos</fullName>
+    <columns>NAME</columns>
+    <columns>Status__c</columns>
+    <columns>Class_Name__c</columns>
+    <columns>Orden__c</columns>
+    <columns>Priority__c</columns>
+    <columns>NextExec__c</columns>
+    <columns>Tipo__c</columns>
+    <columns>runningJobId__c</columns>
+    <columns>Proyecto__c</columns>
+    <columns>Periodicidad__c</columns>
+    <columns>Tipo_de_periodicidad__c</columns>
+    <columns>Activo__c</columns>
+    <columns>LastExec_Ini__c</columns>
+    <columns>JobPath__c</columns>
+    <columns>Calc_NextExec__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Tipo__c</field>
+        <operation>equals</operation>
+        <value>Periodico</value>
+    </filters>
+    <label>Periódicos</label>
+</ListView>

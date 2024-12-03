@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ValidarLogoPie</fullName>
+    <active>true</active>
+    <description>Validamos si en el campo Logo pie figura &apos;Otros&apos; para tener que rellenar el campo de URL Logo Pie</description>
+    <errorConditionFormula>AND(EV_URLLogoPie__c= null, ISPICKVAL(EV_Evento__r.EV_LogoPie__c, &apos;009&apos;))</errorConditionFormula>
+    <errorDisplayField>EV_URLLogoPie__c</errorDisplayField>
+    <errorMessage>Debe rellenar el campo URL Logo Pie</errorMessage>
+</ValidationRule>

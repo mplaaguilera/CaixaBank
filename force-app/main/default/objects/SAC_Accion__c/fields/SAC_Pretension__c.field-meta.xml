@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Pretension__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup a Case, generando la relación Acción - Pretensión.</description>
+    <label>Pretensión</label>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Acciones de ejecución (Pretensión)</relationshipLabel>
+    <relationshipName>SAC_AccionesPretension</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

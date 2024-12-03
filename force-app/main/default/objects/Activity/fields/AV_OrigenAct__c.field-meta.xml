@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_OrigenAct__c</fullName>
+    <description>Campo que muestra el tipo de origen de la actividad.</description>
+    <label>Origen Act</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>AV_AccionComercial</fullName>
+                <default>false</default>
+                <label>Acción Comercial</label>
+            </value>
+            <value>
+                <fullName>AV_AlertaComercial</fullName>
+                <default>false</default>
+                <label>Alerta Comercial</label>
+            </value>
+            <value>
+                <fullName>AV_CitasNoCerradas</fullName>
+                <default>false</default>
+                <label>Citas no cerradas</label>
+            </value>
+            <value>
+                <fullName>AV_CitasPrevias</fullName>
+                <default>false</default>
+                <label>Citas Previas</label>
+            </value>
+            <value>
+                <fullName>AV_ContactosGCF</fullName>
+                <default>false</default>
+                <label>Tareas AVE</label>
+            </value>
+            <value>
+                <fullName>AV_CloseDeLoop</fullName>
+                <default>false</default>
+                <label>Experiencia Cliente</label>
+            </value>
+            <value>
+                <fullName>AV_IniciativaGestora</fullName>
+                <default>false</default>
+                <label>Iniciativa Gestor/a</label>
+            </value>
+            <value>
+                <fullName>AV_Llamadas</fullName>
+                <default>false</default>
+                <label>Llamadas</label>
+            </value>
+            <value>
+                <fullName>AV_Morosidad</fullName>
+                <default>false</default>
+                <label>Morosidad</label>
+            </value>
+            <value>
+                <fullName>AV_Muro</fullName>
+                <default>false</default>
+                <label>Muro</label>
+            </value>
+            <value>
+                <fullName>AV_Normativo</fullName>
+                <default>false</default>
+                <label>Normativo</label>
+            </value>
+            <value>
+                <fullName>AV_OnBoarding</fullName>
+                <default>false</default>
+                <label>OnBoarding</label>
+            </value>
+            <value>
+                <fullName>AV_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>AV_Priorizador</fullName>
+                <default>false</default>
+                <label>Priorizador</label>
+            </value>
+            <value>
+                <fullName>AV_R2B</fullName>
+                <default>false</default>
+                <label>R2B</label>
+            </value>
+            <value>
+                <fullName>AV_Avisos</fullName>
+                <default>false</default>
+                <label>Avisos</label>
+            </value>
+            <value>
+                <fullName>AV_ContactosGCF_Online</fullName>
+                <default>false</default>
+                <label>Contacto GCF Online</label>
+            </value>
+            <value>
+                <fullName>Contact Center</fullName>
+                <default>false</default>
+                <label>Contact Center</label>
+            </value>
+            <value>
+                <fullName>Now in Sales</fullName>
+                <default>false</default>
+                <label>Now in Sales</label>
+            </value>
+            <value>
+                <fullName>AV_AlertasComerciales</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Alertas comerciales</label>
+            </value>
+            <value>
+                <fullName>AV_IniciativaGestor</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Iniciativa Gestor (Oportunidades Gestor)</label>
+            </value>
+            <value>
+                <fullName>AV_OnboardingIntouch</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Onboarding Intouch</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,72 @@
+.showLink{
+    color: #005fb2; cursor: pointer;
+}
+.linkDiv{
+    margin: 0 auto;
+    width: fit-content
+}
+.spin-cls{
+  display: block;
+}
+.animate-flicker {
+    -webkit-animation: flickerAnimation 0.25s !important;
+    -moz-animation: flickerAnimation 0.25s !important;
+    -o-animation: flickerAnimation 0.25s !important;
+    animation: flickerAnimation 0.25s !important;
+}
+  
+  @keyframes flickerAnimation {
+    0% {
+      opacity: 1;
+    }
+  
+    50% {
+      opacity: 0;
+    }
+  
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @-o-keyframes flickerAnimation {
+    0% {
+      opacity: 1;
+    }
+  
+    50% {
+      opacity: 0;
+    }
+  
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @-moz-keyframes flickerAnimation {
+    0% {
+      opacity: 1;
+    }
+  
+    50% {
+      opacity: 0;
+    }
+  
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @-webkit-keyframes flickerAnimation {
+    0% {
+      opacity: 1;
+    }
+  
+    50% {
+      opacity: 0;
+    }
+  
+    100% {
+      opacity: 1;
+    }
+  }

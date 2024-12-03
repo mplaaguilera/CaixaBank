@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Cola_Backup__c</fullName>
+    <label>Cola Backup</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>2N CCI Holabank</fullName>
+                <default>false</default>
+                <label>2N CCI Holabank</label>
+            </value>
+            <value>
+                <fullName>2N CNF INDRA</fullName>
+                <default>false</default>
+                <label>2N CNF INDRA</label>
+            </value>
+            <value>
+                <fullName>2N CREDITO STOCK</fullName>
+                <default>false</default>
+                <label>2N CREDITO STOCK</label>
+            </value>
+            <value>
+                <fullName>2N GGCC FAG</fullName>
+                <default>false</default>
+                <label>2N GGCC FAG</label>
+            </value>
+            <value>
+                <fullName>2N GGCC FAG ACCENTURE</fullName>
+                <default>false</default>
+                <label>2N GGCC FAG ACCENTURE</label>
+            </value>
+            <value>
+                <fullName>2N SINDICADOS FAG</fullName>
+                <default>false</default>
+                <label>2N SINDICADOS FAG</label>
+            </value>
+            <value>
+                <fullName>2N SINDICADOS FAG ACCENTURE</fullName>
+                <default>false</default>
+                <label>2N SINDICADOS FAG ACCENTURE</label>
+            </value>
+            <value>
+                <fullName>2N SINDICADOS FAG INDRA</fullName>
+                <default>false</default>
+                <label>2N SINDICADOS FAG INDRA</label>
+            </value>
+            <value>
+                <fullName>2N SINDICADOS FAG PNA</fullName>
+                <default>false</default>
+                <label>2N SINDICADOS FAG PNA</label>
+            </value>
+            <value>
+                <fullName>2N UAFE CEF</fullName>
+                <default>false</default>
+                <label>2N UAFE CEF</label>
+            </value>
+            <value>
+                <fullName>2N UAFE CNF</fullName>
+                <default>false</default>
+                <label>2N UAFE CNF</label>
+            </value>
+            <value>
+                <fullName>2N UAFE CNF PNA</fullName>
+                <default>false</default>
+                <label>2N UAFE CNF PNA</label>
+            </value>
+            <value>
+                <fullName>2N UAFE FAG ACCENTURE</fullName>
+                <default>false</default>
+                <label>2N UAFE FAG ACCENTURE</label>
+            </value>
+            <value>
+                <fullName>2N UAFE FAG INDRA</fullName>
+                <default>false</default>
+                <label>2N UAFE FAG INDRA</label>
+            </value>
+            <value>
+                <fullName>2N UAFE FAG PNA</fullName>
+                <default>false</default>
+                <label>2N UAFE FAG PNA</label>
+            </value>
+            <value>
+                <fullName>3N CCI Holabank</fullName>
+                <default>false</default>
+                <label>3N CCI Holabank</label>
+            </value>
+            <value>
+                <fullName>3N CREDITO STOCK</fullName>
+                <default>false</default>
+                <label>3N CREDITO STOCK</label>
+            </value>
+            <value>
+                <fullName>3N UAFE CEF</fullName>
+                <default>false</default>
+                <label>3N UAFE CEF</label>
+            </value>
+            <value>
+                <fullName>3N UAFE FAG</fullName>
+                <default>false</default>
+                <label>3N UAFE FAG</label>
+            </value>
+            <value>
+                <fullName>Avales Internacionales Accenture</fullName>
+                <default>false</default>
+                <label>Avales Internacionales Accenture</label>
+            </value>
+            <value>
+                <fullName>Avales Internacionales COPS</fullName>
+                <default>false</default>
+                <label>Avales Internacionales COPS</label>
+            </value>
+            <value>
+                <fullName>Avales Internacionales Indra</fullName>
+                <default>false</default>
+                <label>Avales Internacionales Indra</label>
+            </value>
+            <value>
+                <fullName>BAJA_3N UAFE EXF</fullName>
+                <default>false</default>
+                <label>BAJA_3N UAFE EXF</label>
+            </value>
+            <value>
+                <fullName>Buzón Comercio Exterior</fullName>
+                <default>false</default>
+                <label>Buzón Comercio Exterior</label>
+            </value>
+            <value>
+                <fullName>Buzón Contact Center International</fullName>
+                <default>false</default>
+                <label>Buzón Contact Center International</label>
+            </value>
+            <value>
+                <fullName>Buzón Export Online</fullName>
+                <default>false</default>
+                <label>Buzón Export Online</label>
+            </value>
+            <value>
+                <fullName>Buzón International Support</fullName>
+                <default>false</default>
+                <label>Buzón International Support</label>
+            </value>
+            <value>
+                <fullName>Buzón KYC Renewal</fullName>
+                <default>false</default>
+                <label>Buzón KYC Renewal</label>
+            </value>
+            <value>
+                <fullName>Buzón Service Desk</fullName>
+                <default>false</default>
+                <label>Buzón Service Desk</label>
+            </value>
+            <value>
+                <fullName>Buzón Valija digital</fullName>
+                <default>false</default>
+                <label>Buzón Valija digital</label>
+            </value>
+            <value>
+                <fullName>Calidad Créditos Documentarios</fullName>
+                <default>false</default>
+                <label>Calidad Créditos Documentarios</label>
+            </value>
+            <value>
+                <fullName>CCI Holabank</fullName>
+                <default>false</default>
+                <label>CCI Holabank</label>
+            </value>
+            <value>
+                <fullName>CNF CONTACT</fullName>
+                <default>false</default>
+                <label>CNF CONTACT</label>
+            </value>
+            <value>
+                <fullName>CNF GGCC</fullName>
+                <default>false</default>
+                <label>CNF GGCC</label>
+            </value>
+            <value>
+                <fullName>CNF INDITEX</fullName>
+                <default>false</default>
+                <label>CNF INDITEX</label>
+            </value>
+            <value>
+                <fullName>CNF UAFE INDRA</fullName>
+                <default>false</default>
+                <label>CNF UAFE INDRA</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Clara</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Clara</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo COPS</fullName>
+                <default>false</default>
+                <label>Cola Efectivo COPS</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Francisco</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Francisco</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo INDRA</fullName>
+                <default>false</default>
+                <label>Cola Efectivo INDRA</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Inés</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Inés</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Leticia</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Leticia</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Marta</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Marta</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Mireia</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Mireia</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Oriol</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Oriol</label>
+            </value>
+            <value>
+                <fullName>Cola Efectivo Robert</fullName>
+                <default>false</default>
+                <label>Cola Efectivo Robert</label>
+            </value>
+            <value>
+                <fullName>Comercio Exterior</fullName>
+                <default>false</default>
+                <label>Comercio Exterior</label>
+            </value>
+            <value>
+                <fullName>Contact Center International</fullName>
+                <default>false</default>
+                <label>Contact Center International</label>
+            </value>
+            <value>
+                <fullName>COPS Bancos</fullName>
+                <default>false</default>
+                <label>COPS Bancos</label>
+            </value>
+            <value>
+                <fullName>COPS Sucursales</fullName>
+                <default>false</default>
+                <label>COPS Sucursales</label>
+            </value>
+            <value>
+                <fullName>Créditos documentarios EXPORT COPS</fullName>
+                <default>false</default>
+                <label>Créditos documentarios EXPORT COPS</label>
+            </value>
+            <value>
+                <fullName>Créditos documentarios IMPORT COPS</fullName>
+                <default>false</default>
+                <label>Créditos documentarios IMPORT COPS</label>
+            </value>
+            <value>
+                <fullName>DXC Bancos</fullName>
+                <default>false</default>
+                <label>DXC Bancos</label>
+            </value>
+            <value>
+                <fullName>DXC Sucursales</fullName>
+                <default>false</default>
+                <label>DXC Sucursales</label>
+            </value>
+            <value>
+                <fullName>Efectivo COPS</fullName>
+                <default>false</default>
+                <label>Efectivo COPS</label>
+            </value>
+            <value>
+                <fullName>Export Finance</fullName>
+                <default>false</default>
+                <label>Export Finance</label>
+            </value>
+            <value>
+                <fullName>Export Online</fullName>
+                <default>false</default>
+                <label>Export Online</label>
+            </value>
+            <value>
+                <fullName>Financiación COMEX COPS</fullName>
+                <default>false</default>
+                <label>Financiación COMEX COPS</label>
+            </value>
+            <value>
+                <fullName>Financiación COMEX COPS Sevilla</fullName>
+                <default>false</default>
+                <label>Financiación COMEX COPS Sevilla</label>
+            </value>
+            <value>
+                <fullName>Financiación COMEX Indra</fullName>
+                <default>false</default>
+                <label>Financiación COMEX Indra</label>
+            </value>
+            <value>
+                <fullName>Indra Sucursales</fullName>
+                <default>false</default>
+                <label>Indra Sucursales</label>
+            </value>
+            <value>
+                <fullName>International Operations Indra</fullName>
+                <default>false</default>
+                <label>International Operations Indra</label>
+            </value>
+            <value>
+                <fullName>International Support</fullName>
+                <default>false</default>
+                <label>International Support</label>
+            </value>
+            <value>
+                <fullName>KYC Renewal</fullName>
+                <default>false</default>
+                <label>KYC Renewal</label>
+            </value>
+            <value>
+                <fullName>NTT DATA Sucursales</fullName>
+                <default>false</default>
+                <label>NTT DATA Sucursales</label>
+            </value>
+            <value>
+                <fullName>Oficinas internacionales COPS</fullName>
+                <default>false</default>
+                <label>Oficinas internacionales COPS</label>
+            </value>
+            <value>
+                <fullName>Operativa Comex DXC</fullName>
+                <default>false</default>
+                <label>Operativa Comex DXC</label>
+            </value>
+            <value>
+                <fullName>REMESAS FIN COPS</fullName>
+                <default>false</default>
+                <label>REMESAS FIN COPS</label>
+            </value>
+            <value>
+                <fullName>Responsables COPS</fullName>
+                <default>false</default>
+                <label>Responsables COPS</label>
+            </value>
+            <value>
+                <fullName>Service Desk</fullName>
+                <default>false</default>
+                <label>Service Desk</label>
+            </value>
+            <value>
+                <fullName>Servicio Firma COPS</fullName>
+                <default>false</default>
+                <label>Servicio Firma COPS</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS atención clientes</fullName>
+                <default>false</default>
+                <label>Teléfono COPS atención clientes</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS atención empleados</fullName>
+                <default>false</default>
+                <label>Teléfono COPS atención empleados</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS Avales Int Oficinas</fullName>
+                <default>false</default>
+                <label>Teléfono COPS Avales Int Oficinas</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS Bancos</fullName>
+                <default>false</default>
+                <label>Teléfono COPS Bancos</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS Internacional</fullName>
+                <default>false</default>
+                <label>Teléfono COPS Internacional</label>
+            </value>
+            <value>
+                <fullName>Teléfono COPS Oficinas C2C</fullName>
+                <default>false</default>
+                <label>Teléfono COPS Oficinas C2C</label>
+            </value>
+            <value>
+                <fullName>UAFE Clasificador</fullName>
+                <default>false</default>
+                <label>UAFE Clasificador</label>
+            </value>
+            <value>
+                <fullName>Valija digital</fullName>
+                <default>false</default>
+                <label>Valija digital</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

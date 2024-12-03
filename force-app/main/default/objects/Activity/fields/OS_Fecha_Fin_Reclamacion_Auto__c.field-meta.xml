@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Fecha_Fin_Reclamacion_Auto__c</fullName>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Fin. Reclamación Auto</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

@@ -1,0 +1,95 @@
+<template>
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-opportunity">
+                                <lightning-icon icon-name="standard:report" alternative-text="Opportunity" title="Opportunity" size="medium"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">           
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>{labels.subtitulo}</span>
+                                        <span class="slds-page-header__title slds-truncate">{labels.titulo}</span>
+                                        <span>{labels.tareasPendientesEMP}</span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <article class="slds-card slds-m-top_x-small">
+            <div class="slds-card__header slds-grid">
+              <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                  <h2 class="slds-card__header-title">
+                      <span>{labels.filtrar}</span>
+                  </h2>
+                </div>
+                <div class="slds-no-flex">
+                  <lightning-button class="slds-m-horizontal_xx-small" variant="neutral" label={labels.reiniciar} onclick={resetFilters} disabled={buttonDisabled}></lightning-button>
+                  <lightning-button class="slds-m-horizontal_xx-small" variant="brand" label={labels.aplicar} onclick={handleSearchData} disabled={buttonDisabled}></lightning-button>
+    
+                </div>
+              </header>
+            </div>
+     
+              <div class="slds-grid slds-gutters slds-m-around_small slds-border_top">
+                <div class="slds-col slds-size_1-of-4">
+                    <lightning-input  type="text" name="subject"  onchange={handleChangeSubject} placeholder={labels.buscarAsunto}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-4 slds-m-top_medium ">
+                    <c-av_-lookup class="lookup-cmp"
+                    data-id="clookup4"
+                    errors={errors}
+                    onsearch={handleSearchGrupoComercial}
+                    onselectionchange={handleSelectionChange}
+                    placeholder={labels.buscarGC}
+                    selection={initialSelection}
+                    >
+                </c-av_-lookup>
+                </div>
+              </div>
+    
+           <div if:true={showPill}>
+                <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_small slds-border_top">
+                    <div class="slds-col slds-size_1-of-4">
+                        <h5 ><strong>{labels.grupoComercial}</strong></h5>
+                        <div class="slds-list_horizontal">
+                            <template for:each={selection} for:item="item" >
+                                <div key={item.bucleId}  class="slds-m-around_xxx-small">
+                                    <lightning-pill label={item.title} name={item.id} onremove={handleRemoveSelectedItem}>
+                                            <lightning-icon icon-name="standard:account"  alternative-text="account"></lightning-icon>
+                                    </lightning-pill>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+    
+          </article>
+    
+          <lightning-spinner if:true={showSpinner} alternative-text={labels.cargando} variant="brand" size="medium"
+            class="spin-cls"></lightning-spinner>
+    
+        <lightning-datatable
+            class="slds-m-top_medium"
+            key-field="id"
+            data={data}
+            columns={columns}
+            sorted-by={sortByFieldName}
+            sorted-direction={sortDirection}
+            onsort={handleSortData}
+            default-sort-direction={defaultSort}
+            hide-checkbox-column=yes
+            >
+        </lightning-datatable>
+</template>

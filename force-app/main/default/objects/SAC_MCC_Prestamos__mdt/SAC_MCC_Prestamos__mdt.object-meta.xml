@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Listado de MCCs que aplican en el flujo de Resolución Express</description>
+    <label>SAC MCC Préstamos</label>
+    <pluralLabel>SAC MCCs Préstamos</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

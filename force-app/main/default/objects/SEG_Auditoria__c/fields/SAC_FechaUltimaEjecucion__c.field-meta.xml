@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaUltimaEjecucion__c</fullName>
+    <description>Campo para almacenar la fecha de ultima ejecución de una auditoria programada</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha última ejecución</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

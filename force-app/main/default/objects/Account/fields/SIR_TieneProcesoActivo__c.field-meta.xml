@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIR_TieneProcesoActivo__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo que se habilita/deshabilita desde el trigger de SIREC__SIREC_obj_proceso__c. 
+Se habilita cuando el cliente tiene un Proceso de recordType Amistoso y que no sea de Refinanciación, y que el campo ‘Situacion del proceso’ sea != Finalizado/Ilocalizado/Recobrado</description>
+    <label>Tiene Proceso Activo</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

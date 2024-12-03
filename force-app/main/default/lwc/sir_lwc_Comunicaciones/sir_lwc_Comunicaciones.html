@@ -1,0 +1,52 @@
+<template >  
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-card icon-name="custom:custom53" title='Mis avisos de gestión'>  
+                <ul class="slds-m-around_x-small alturaMaxima slds-scrollable"> 
+                    
+                    <template for:each={comunicaciones} for:item="comunicacion">
+                        <li key={comunicacion.Id} class="caja">                                    
+                            <span class="negrita margenInferior">{comunicacion.Title__c}</span>&nbsp;<span class="letraPeque">({comunicacion.Account__r.Name})</span>
+                            <span class="seminegrita" style="float: right;">
+                                Desde:&nbsp;<lightning-formatted-date-time value={comunicacion.InitDate__c} year="numeric" month="long" day="2-digit" > </lightning-formatted-date-time> &nbsp;Hasta:&nbsp;<lightning-formatted-date-time value={comunicacion.FinishDate__c} year="numeric" month="long" day="2-digit" > </lightning-formatted-date-time></span></br>
+                            <span>{comunicacion.Message__c}</span>
+                        </li>
+                    </template>                           
+                </ul>
+            </lightning-card>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <!-- Inicio Modificacion HSC 04/10/2022 -- US424115 -->
+            <lightning-card icon-name="custom:custom25" title='Acciones planificadas para hoy'>
+                <div class="textoVerInforme" slot="actions">
+                    <lightning-formatted-url value={informeAccionesHoy} label="Ver Informe de acciones planificadas" tooltip="Ver Todas" ></lightning-formatted-url>
+                </div> 
+
+                <template if:false={showTable}>
+                    <span style="padding:15px; text-align:center">No tiene acciones planificadas para hoy</span>
+                </template>
+                <template if:true={showTable}>
+                    <div style="padding-top: 5px;padding-bottom: 10px">
+                        <ul class="slds-m-around_x-small alturaMaxima slds-scrollable"> 
+                            <article class="dashGridItem slds-card  flexTable" dir="ltr">
+                                  
+                            <lightning-datatable
+                                key-field="id"
+                                data={acciones}
+                                columns={columnsAcciones}
+                                default-sort-direction={defaultSortDirection}
+                                sorted-direction={sortDirection}
+                                sorted-by={sortedBy}
+                                onsort={onHandleSort}
+                                hide-checkbox-column >
+                            </lightning-datatable>
+                            </article>
+                        </ul>
+                    </div>
+                </template>
+                
+            </lightning-card>
+            <!-- Fin Modificacion HSC 04/10/2022 -- US424115 -->
+        </div>
+    </div>
+</template>

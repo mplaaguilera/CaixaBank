@@ -1,0 +1,59 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" controller="SAC_LCMP_InsertarReescalado">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="idReescalado" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="motivo" type="String" />
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg', '.PDF']" />
+
+
+    <aura:attribute name="adjuntos" type="Boolean" default="false" />
+    <aura:attribute name="ficherosAdjuntos" type="Object[]"/>
+    <aura:attribute name="ficherosAdjuntosCase" type="Object[]" />
+    <aura:attribute name="permitirEdicion"  type="Boolean" default="true"/>
+    <aura:attribute name="verActual"  type="Boolean" default="true"/>
+    <aura:attribute name="reescalado"  type="Boolean" default="true"/>
+    <aura:attribute name="mostrarOculto"  type="Boolean" default="true"/>
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.cerrarAction}">            
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Re escalar</h2>
+            </header>
+            <aura:if isTrue="{!v.adjuntos}">
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <p class="slds-m-top_x-small">Va a proceder al reescalado. Compruebe los archivos adjuntos que desee reescalar</p>  
+                    <br/>
+                    <c:SAC_AdjuntosGestionGlobal ficherosAdjuntos="{!v.ficherosAdjuntos}" permitirEdicion="{!v.permitirEdicion}" verActual="{!v.verActual}" ficherosAdjuntosVisibles="{!v.ficherosAdjuntos}" 
+                        recordName="Reescalado" recordId="{!v.idReescalado}" fieldApiName="SAC_CasoEscalado__c" objectApiName="SAC_Interaccion__c"
+                        mostrarOculto="{!v.mostrarOculto}"/>                            
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="Neutral" class="slds-button" label="Cancelar" onclick="{!c.cerrarAction}"/>
+                    <lightning:button variant="Brand" class="slds-button" label="Finalizar" aura:id="buttonFinalizar" onclick="{!c.cerrarAction}"/> 
+                </footer>
+                <aura:set attribute="else">
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p class="slds-m-top_x-small">Va a proceder al reescalado. Rellene los campos con la nueva propuesta y el motivo</p>                                
+                        <lightning:textarea name="input3" aura:id="propuestaCops" label="Propuesta COPS" required="true" placeholder="Propuesta COPS"/> 
+                        <lightning:combobox label="Motivo" required="true" options='{!v.options}'
+                            onchange='{!c.valorMotivo}' value='{!v.motivo}'>
+                        </lightning:combobox>
+                        <lightning:textarea name="inputObservaciones" aura:id="observaciones" label="Observaciones"></lightning:textarea>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="Neutral" class="slds-button" label="Cancelar" onclick="{!c.cerrarAction}"/>
+                        <lightning:button variant="Brand" class="slds-button" label="Siguiente" aura:id="buttonEscaladoId" onclick="{!c.reescalar}"/>        
+                    </footer>  
+                </aura:set>
+            </aura:if>
+        </div>
+    </section>
+
+
+</aura:component>

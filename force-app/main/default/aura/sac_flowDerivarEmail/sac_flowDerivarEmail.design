@@ -1,0 +1,20 @@
+<design:component >
+    <design:attribute name="para" label="Para"
+    description="A quien se va a mandar el email"
+    default=""/>
+    <design:attribute name="CC" label="CC"
+    description="Carbon copy"
+    default=""/>
+    <design:attribute name="asunto" label="Asunto"
+    description="Asunto del email"
+    default=""/>
+    <design:attribute name="cuerpo" label="Cuerpo"
+    description="Cuerpo del email"
+    default=""/>
+    <design:attribute name="procedencia" label="Procedencia"
+    description="Origen desde el que se llama al componente de email"
+    default=""/>
+    <design:attribute name="recordId" label="recordId"
+    description="Id del registro en el que se encuentra el flow"
+    default=""/>
+</design:component>

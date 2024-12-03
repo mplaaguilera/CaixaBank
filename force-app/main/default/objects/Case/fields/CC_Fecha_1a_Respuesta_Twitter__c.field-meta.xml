@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Fecha_1a_Respuesta_Twitter__c</fullName>
+    <description>Fecha de respuesta del Twitter</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Respuesta Twitter</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

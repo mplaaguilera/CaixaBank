@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Trigger_Activo__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador si el trigger sobre el objeto Account está activo.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Indicador si el trigger sobre el objeto Account está activo.</inlineHelpText>
+    <label>Trigger Activo</label>
+    <type>Checkbox</type>
+</CustomField>

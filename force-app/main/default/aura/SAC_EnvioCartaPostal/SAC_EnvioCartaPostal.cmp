@@ -1,0 +1,37 @@
+<aura:component controller="SAC_LCMP_EnvioCartaPostal" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="procedencia"  type="String"/>
+    <aura:attribute name="cuerpoCliente"  type="String"/>
+    <aura:attribute name="nombreTitular"  type="String"/>
+    <aura:attribute name="direccionEnvio"  type="String"/>
+    <aura:attribute name="poblacionEC"  type="String"/>
+    <aura:attribute name="provinciaEC"  type="String"/>
+    <aura:attribute name="paisEC"  type="String"/>
+    <aura:attribute name="codigoPostalEC"  type="String"/>
+    <aura:attribute name="hayContacto"  type="Boolean" default="false"/> 
+    <aura:attribute name="hayDireccion"  type="Boolean" default="false"/> 
+    
+
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.recuperacionDatosPostales}"/> -->
+
+     <!--Lightning Data Service-->
+     <force:recordData aura:id="tareaData" recordId="{!v.recordId}" layoutType="COMPACT"
+     recordUpdated="{!c.recuperacionDatosPostales}"/>
+
+    <aura:if isTrue="{!and(v.hayContacto, v.hayDireccion)}">
+
+        <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitular}" direccion="{!v.direccionEnvio}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoCliente}" procedencia="{!v.procedencia}"/>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!!v.hayContacto}">
+                <strong>No hay ninguna persona de contacto asociada.</strong>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!!v.hayDireccion}">
+                        <strong>No hay ninguna dirección postal de contacto indicada.</strong>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

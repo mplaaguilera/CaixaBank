@@ -1,0 +1,106 @@
+article.slds-card.contenedor {
+    /* min-width: 615px; */
+    max-width: 820px;
+}
+
+article.slds-card.contenedor div.labelCuota,
+article.slds-card.contenedor div.valorCuota {
+    visibility: hidden;
+}
+
+article.slds-card.contenedor.editandoOportunidad div.labelCuota,
+article.slds-card.contenedor.editandoOportunidad div.valorCuota {
+    visibility: visible;
+}
+
+article.formularioInfo span.valor {
+    font-size: 13px;
+    font-weight: 500;
+    text-wrap: nowrap;
+}
+
+span.iconoHeader {
+    padding: 2px 4px 5px 4px;
+    border-radius: 5px;
+}
+
+lightning-icon.iconoWarning {
+    --slds-c-icon-color-foreground-default: #d65c30;
+}
+
+span.iconoHeader.iconoHeaderFijo {
+    background-color: #eebd18;
+}
+
+span.iconoHeader.iconoHeaderVariable {
+    background-color: #f9a13c;
+}
+
+span.iconoHeader.iconoHeaderMixto {
+    background-color: #e29072;
+}
+
+span.iconoHeader > lightning-icon {
+    --slds-c-icon-color-foreground-default: white;
+}
+
+article.formularioFijo,
+article.formularioVariable,
+article.formularioMixto {
+    padding: 2px 16px 4px 6px;
+}
+
+article header {
+    margin-bottom: 10px;
+}
+
+h2.tituloTipo {
+    position: relative;
+    top: 1px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+div.slds-col.labelValor,
+div.slds-col.labelCuota {
+    padding-right: 0px;
+    position: relative;
+    top: -2px;
+}
+
+div.slds-col.labelCuota {
+    padding-right: 0px;
+    padding-left: 20px;
+    width: 210px;
+    max-width: 210px;
+}
+
+article.formularioFijo div.slds-col.labelValor,
+article.formularioVariable div.slds-col.labelValor {
+    width: 104px;
+    min-width: 104px;
+    max-width: 104px;
+}
+
+article.formularioMixto div.slds-col.labelValor {
+    width: 192px;
+    min-width: 192px;
+    max-width: 192px;
+}
+
+div.slds-grid.lineaFormulario + div.slds-grid.lineaFormulario {
+    margin-top: 13px;
+}
+
+lightning-input.inputInteres {
+    --slds-c-input-color-background: #fffdf7;
+}
+
+lightning-input.inputCuota {
+    --slds-g-color-neutral-base-95: #f4f9ff;
+    --slds-g-color-neutral-base-50: rgb(24, 24, 24);
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}

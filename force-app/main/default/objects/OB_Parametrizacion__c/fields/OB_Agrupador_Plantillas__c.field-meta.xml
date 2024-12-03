@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Agrupador_Plantillas__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Agrupador de plantillas</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>OB_Parametrizacion__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Agrupador de plantillas</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>OB_Parametrizacion__c</referenceTo>
+    <relationshipName>Relaciones_Campanya_Producto</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

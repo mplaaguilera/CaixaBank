@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>X07_Pr_stamos_CxB_Estudio_3</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>CSBD_Contact_Escala_Maestra__c</columns>
+    <columns>CSBD_Now_Importe__c</columns>
+    <columns>CSBD_Dif_Importe_Preconcedido_Imagen__c</columns>
+    <columns>CSBD_Importe_Disponible_Contacto__c</columns>
+    <columns>CSBD_Turno_Contacto__c</columns>
+    <columns>CSBD_Horario_Contacto__c</columns>
+    <columns>CSBD_Estado_Tracking__c</columns>
+    <columns>CSBD_Prioridad_Tracking__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_Prestamo</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Nueva</value>
+    </filters>
+    <filters>
+        <field>CSBD_Empresa_Proveedora__c</field>
+        <operation>equals</operation>
+        <value>CaixaBank</value>
+    </filters>
+    <filters>
+        <field>CSBD_Importe_Disponible_Contacto__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CSBD_Dif_Importe_Preconcedido_Label__c</field>
+        <operation>equals</operation>
+        <value>Sin Límite</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado_Tracking__c</field>
+        <operation>equals</operation>
+        <value>Estudio de la operación</value>
+    </filters>
+    <filters>
+        <field>CSBD_Prioridad_Tracking__c</field>
+        <operation>equals</operation>
+        <value>3</value>
+    </filters>
+    <filters>
+        <field>CSBD_Scoring_Riesgo__c</field>
+        <operation>notEqual</operation>
+        <value>Denegada SIA</value>
+    </filters>
+    <label>07. Préstamos CxB (Estudio 3)</label>
+    <sharedTo>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

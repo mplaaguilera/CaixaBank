@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>RRSS Twitter CABK_Respon</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_CasoCanalAcceso__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CasoEstado__c</field>
+        <value xsi:type="xsd:string">Activo</value>
+    </values>
+    <values>
+        <field>CC_CasoPrioridad__c</field>
+        <value xsi:type="xsd:string">Medium</value>
+    </values>
+    <values>
+        <field>CC_CasoTipoCliente__c</field>
+        <value xsi:type="xsd:string">Cliente</value>
+    </values>
+    <values>
+        <field>CC_Cuenta_RRSS__c</field>
+        <value xsi:type="xsd:string">CABK_Respon</value>
+    </values>
+    <values>
+        <field>CC_HorasReapertura__c</field>
+        <value xsi:type="xsd:double">2.0</value>
+    </values>
+    <values>
+        <field>CC_Imaginbank__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CC_Red_Social__c</field>
+        <value xsi:type="xsd:string">Twitter</value>
+    </values>
+    <values>
+        <field>CC_ReglaAssigCaso__c</field>
+        <value xsi:type="xsd:string">CC_Asig_Caso_Cola</value>
+    </values>
+</CustomMetadata>

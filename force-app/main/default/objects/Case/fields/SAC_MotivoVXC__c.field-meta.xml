@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MotivoVXC__c</fullName>
+    <label>Motivo VCX</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_001</fullName>
+                <default>false</default>
+                <label>Apertura póliza/contrato sin autorización</label>
+            </value>
+            <value>
+                <fullName>SAC_002</fullName>
+                <default>false</default>
+                <label>Información errónea o incompleta</label>
+            </value>
+            <value>
+                <fullName>SAC_003</fullName>
+                <default>false</default>
+                <label>Campañas comerciales</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>Solicitud de Información/ Petición de documentación</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>Solicitud de restitución de seguro/anulación del plan por rescate erróneo</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Solicitud de certificados fiscales</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Solicitud de información sobre la evolución de inversiones /rentabilidades (información, pérdida económica)</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Imposibilidad de realizar aportaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Incremento de prima</label>
+            </value>
+            <value>
+                <fullName>SAC_010</fullName>
+                <default>false</default>
+                <label>Solicitud de información sobre el valor de rescate</label>
+            </value>
+            <value>
+                <fullName>SAC_011</fullName>
+                <default>false</default>
+                <label>Desacuerdo con nuevas condiciones/garantías /capitales/coberturas</label>
+            </value>
+            <value>
+                <fullName>SAC_012</fullName>
+                <default>false</default>
+                <label>Denegación de incremento del importe de las aportaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_013</fullName>
+                <default>false</default>
+                <label>Traspaso de planes/ahorro (estado de situación del traspaso)</label>
+            </value>
+            <value>
+                <fullName>SAC_014</fullName>
+                <default>false</default>
+                <label>Incumplimiento de contrato</label>
+            </value>
+            <value>
+                <fullName>SAC_015</fullName>
+                <default>false</default>
+                <label>Domiciliación ajena</label>
+            </value>
+            <value>
+                <fullName>SAC_016</fullName>
+                <default>false</default>
+                <label>Embargo</label>
+            </value>
+            <value>
+                <fullName>SAC_017</fullName>
+                <default>false</default>
+                <label>Desacuerdo con la cancelación del contrato</label>
+            </value>
+            <value>
+                <fullName>SAC_018</fullName>
+                <default>false</default>
+                <label>Cancelación por obligatoriedad en la contratación</label>
+            </value>
+            <value>
+                <fullName>SAC_019</fullName>
+                <default>false</default>
+                <label>ACREDITADO - cliente notifica la cancelación a oficina y no se atiende</label>
+            </value>
+            <value>
+                <fullName>SAC_020</fullName>
+                <default>false</default>
+                <label>Devolución de recibos (Ley SEPA)</label>
+            </value>
+            <value>
+                <fullName>SAC_021</fullName>
+                <default>false</default>
+                <label>Desacuerdo con la respuesta</label>
+            </value>
+            <value>
+                <fullName>SAC_022</fullName>
+                <default>false</default>
+                <label>Contratación de producto sin percepción de cliente (TMK)</label>
+            </value>
+            <value>
+                <fullName>SAC_023</fullName>
+                <default>false</default>
+                <label>Desacuerdo con PU de SEVIAM (incremento excesivo préstamo)</label>
+            </value>
+            <value>
+                <fullName>SAC_024</fullName>
+                <default>false</default>
+                <label>Control de suscripción denegado</label>
+            </value>
+            <value>
+                <fullName>SAC_025</fullName>
+                <default>false</default>
+                <label>Prima no actualizada a capital de préstamo pendiente</label>
+            </value>
+            <value>
+                <fullName>SAC_026</fullName>
+                <default>false</default>
+                <label>Problemas contacto TLK</label>
+            </value>
+            <value>
+                <fullName>SAC_027</fullName>
+                <default>false</default>
+                <label>Solicitud de información sobre el valor de extorno</label>
+            </value>
+            <value>
+                <fullName>SAC_028</fullName>
+                <default>false</default>
+                <label>Modificación periodicidad de la prima</label>
+            </value>
+            <value>
+                <fullName>SAC_029</fullName>
+                <default>false</default>
+                <label>Demora en el proceso de resolución del siniestro</label>
+            </value>
+            <value>
+                <fullName>SAC_030</fullName>
+                <default>false</default>
+                <label>Quejas por documentación solicitada para la prestación</label>
+            </value>
+            <value>
+                <fullName>SAC_031</fullName>
+                <default>false</default>
+                <label>Desacuerdo con designación de beneficiarios</label>
+            </value>
+            <value>
+                <fullName>SAC_032</fullName>
+                <default>false</default>
+                <label>Reclamación por cuotas del préstamo (remanente)</label>
+            </value>
+            <value>
+                <fullName>SAC_033</fullName>
+                <default>false</default>
+                <label>Desacuerdo con resolución del siniestro (denegación)</label>
+            </value>
+            <value>
+                <fullName>SAC_034</fullName>
+                <default>false</default>
+                <label>Demora en el cobro</label>
+            </value>
+            <value>
+                <fullName>SAC_035</fullName>
+                <default>false</default>
+                <label>Desacuerdo con el importe</label>
+            </value>
+            <value>
+                <fullName>SAC_036</fullName>
+                <default>false</default>
+                <label>Falta de información siniestro/ prestación (no sé como está mi siniestro)</label>
+            </value>
+            <value>
+                <fullName>SAC_037</fullName>
+                <default>false</default>
+                <label>Cliente solicita prestación/ indemnización</label>
+            </value>
+            <value>
+                <fullName>SAC_038</fullName>
+                <default>false</default>
+                <label>Denegación de prestación</label>
+            </value>
+            <value>
+                <fullName>SAC_039</fullName>
+                <default>false</default>
+                <label>Cancelación por subrogación o amortización del activo</label>
+            </value>
+            <value>
+                <fullName>SAC_040</fullName>
+                <default>false</default>
+                <label>Cancelación a vencimiento</label>
+            </value>
+            <value>
+                <fullName>SAC_041</fullName>
+                <default>false</default>
+                <label>Desacuerdo con el importe del extorno</label>
+            </value>
+            <value>
+                <fullName>SAC_042</fullName>
+                <default>false</default>
+                <label>Desacuerdo con penalización (carta regalo)</label>
+            </value>
+            <value>
+                <fullName>SAC_043</fullName>
+                <default>false</default>
+                <label>Solicitud de información sobre la penalización (carta regalo)</label>
+            </value>
+            <value>
+                <fullName>SAC_044</fullName>
+                <default>false</default>
+                <label>Incremento del importe de las aportaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_045</fullName>
+                <default>false</default>
+                <label>Desacuerdo con el importe del rescate</label>
+            </value>
+            <value>
+                <fullName>SAC_046</fullName>
+                <default>false</default>
+                <label>Denegación de prestación (PP) (rescate…)</label>
+            </value>
+            <value>
+                <fullName>SAC_047</fullName>
+                <default>false</default>
+                <label>NO ACREDITADO - cliente notifica la cancelación a oficina y no se atiende</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

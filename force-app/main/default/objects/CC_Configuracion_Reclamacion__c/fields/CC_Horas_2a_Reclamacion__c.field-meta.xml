@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Horas_2a_Reclamacion__c</fullName>
+    <description>Número de horas que deben pasar para que se envíe la segunda reclamación</description>
+    <label>Horas 2ª Rec.</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>CC_Horas</valueSetName>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CabeceraOportunidad</fullName>
+    <fields>Name</fields>
+    <fields>RecordTypeId</fields>
+    <fields>StageName</fields>
+    <fields>AV_Product__c</fields>
+    <fields>AV_ImportDisponiblePrestamosOficinas__c</fields>
+    <fields>CSBD_Empresa_Proveedora__c</fields>
+    <label>Cabecera Oportunidad</label>
+</CompactLayout>

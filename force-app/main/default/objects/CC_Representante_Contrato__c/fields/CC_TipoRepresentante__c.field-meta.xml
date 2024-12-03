@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TipoRepresentante__c</fullName>
+    <description>Tipo de representante del cliente.</description>
+    <label>Tipo de representante</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Autorizado</fullName>
+                <default>false</default>
+                <label>Autorizado</label>
+            </value>
+            <value>
+                <fullName>Representante legal</fullName>
+                <default>false</default>
+                <label>Representante legal</label>
+            </value>
+            <value>
+                <fullName>Apoderado</fullName>
+                <default>false</default>
+                <label>Apoderado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

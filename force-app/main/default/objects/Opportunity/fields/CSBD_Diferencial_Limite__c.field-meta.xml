@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Diferencial_Limite__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(BLANKVALUE(CSBD_Limite_Prestamos_Oficinas__c, 0) = 0,
+   IMAGE(&apos;/resource/CSBD_Diferencial_Limite_Sin_Limite&apos;, &apos;Sin límite&apos;),
+   IF(CSBD_Limite_Prestamos_Oficinas__c - Amount &lt; 0,
+      IMAGE(&apos;/resource/CSBD_Diferencial_Limite_Negativo&apos;, &apos;Negativo&apos;),
+      IMAGE(&apos;/resource/CSBD_Diferencial_Limite_Positivo&apos;, &apos;Positivo&apos;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Diferencial inicial límite</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

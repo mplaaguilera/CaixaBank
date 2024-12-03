@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ShowCaseRecord__c</fullName>
+    <description>Hace que el campo numero de caso sea clickable y te de mas detalles del caso</description>
+    <externalId>false</externalId>
+    <formula>IF( !ISBLANK( CaseNumber ) ,  HYPERLINK(&quot;/lightning/r/Case/&quot;+ Id +&quot;/view&quot;, CaseNumber , &quot;_self&quot;) , HYPERLINK(&quot;/lightning/r/Case/&quot;+ Id +&quot;/view&quot;,&quot;-&quot;, &quot;_self&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Ver Registro Caso</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

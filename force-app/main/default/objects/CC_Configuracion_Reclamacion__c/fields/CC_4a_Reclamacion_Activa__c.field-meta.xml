@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_4a_Reclamacion_Activa__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Flag que activa la cuarta reclamación automática</description>
+    <label>4ª Rec. Activa</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

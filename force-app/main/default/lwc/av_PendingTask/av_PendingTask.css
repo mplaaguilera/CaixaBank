@@ -1,0 +1,12 @@
+.taskinfo {
+    padding-top: 22px;
+}
+.sizeinfo {
+    font-size: 0.9rem;
+}
+.borderTask {
+    padding-bottom: 10px;
+}
+.borderTaskComment {
+    border-bottom:#cecdcd 1px solid;
+}

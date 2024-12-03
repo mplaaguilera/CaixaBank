@@ -1,0 +1,48 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <div class="slds-card__header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span> {labels.ge} ({dataValues.length})</span>
+                    </h2>
+                </div>
+                <lightning-button-group>
+                    <lightning-button-icon icon-name="utility:refresh" size="medium" onclick={refresh}></lightning-button-icon>
+                </lightning-button-group>
+
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner ">
+            <div>
+                <lightning-datatable
+                        key-field="id"
+                        hide-checkbox-column=”true”
+                        data={pageData}
+                        columns={columns}
+                        sorted-by={sortByFieldName}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortData}
+                        default-sort-direction={defaultSort}>
+                </lightning-datatable>
+            </div>
+            <!--<div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
+                <lightning-button-group>
+                    <lightning-button-icon icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
+                </lightning-button-group>
+                <div class="slds-m-top_xxx-small">
+                    ({getPageNumber} / {getTotalPageNumber})
+                </div>
+            </div> -->
+            <template if:true={isShowSpinner}> 
+                <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+            </template>
+        </div>
+    </div>    
+</template>

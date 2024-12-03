@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Sistema_Operativo__c</fullName>
+    <label>Sistema Operativo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CC_Canal_Operativo__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Android</fullName>
+                <default>false</default>
+                <label>Android</label>
+            </value>
+            <value>
+                <fullName>IOS</fullName>
+                <default>false</default>
+                <label>IOS</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>App BrokerNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankPay</controllingFieldValue>
+            <controllingFieldValue>App CBKNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankSign</controllingFieldValue>
+            <controllingFieldValue>App Imagin</controllingFieldValue>
+            <valueName>Android</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>App BrokerNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankPay</controllingFieldValue>
+            <controllingFieldValue>App CBKNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankSign</controllingFieldValue>
+            <controllingFieldValue>App Imagin</controllingFieldValue>
+            <valueName>IOS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>App BrokerNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankPay</controllingFieldValue>
+            <controllingFieldValue>App CBKNow</controllingFieldValue>
+            <controllingFieldValue>App CaixaBankSign</controllingFieldValue>
+            <controllingFieldValue>App Imagin</controllingFieldValue>
+            <valueName>Otros</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

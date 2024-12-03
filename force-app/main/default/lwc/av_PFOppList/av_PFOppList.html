@@ -1,0 +1,45 @@
+<template>
+    <div>
+        <lightning-card icon-name={icon}>
+            <h1 slot="title" class="card-title">{label.currentOppsLabel}</h1>
+            <template if:true={listVigentes} for:each={listVigentes} for:item="opty">
+                <div key={opty.Id} data-id="vig">
+                    <c-av_-detail-opp opp={opty} listformat={listFormat} opendetail="true"></c-av_-detail-opp> 
+                </div>
+            </template>
+            <template if:false={listVigentes}>
+                <div class="slds-card__body slds-card__body_inner">
+                    <p>{label.noDataFoundLabel}</p>
+                </div>
+            </template> 
+            <template if:true={showSpinner}> 
+                <div>
+                    <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+                </div>
+            </template>
+        </lightning-card>
+    </div>
+    <div class="not-first-card">
+        <lightning-card >
+            <h1 slot="title" class="card-title">
+                <lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+                {label.historicalOppsLabel}
+            </h1>
+            <template if:true={listHistorico} for:each={listHistorico} for:item="opty">
+                <div key={opty.Id} data-id="his">
+                    <c-av_-detail-opp opp={opty} listformat={listFormat}></c-av_-detail-opp> 
+                </div>
+            </template>
+            <template if:false={listHistorico}>
+                <div class="slds-card__body slds-card__body_inner">
+                    <p>{label.noDataFoundLabel}</p>
+                </div>
+            </template> 
+            <template if:true={showSpinner}> 
+                <div>
+                    <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+                </div>
+            </template>
+        </lightning-card>
+    </div>
+</template>

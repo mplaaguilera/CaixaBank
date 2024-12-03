@@ -1,0 +1,18 @@
+.THIS .TextAreaFull{
+    transition: all .5s ease-in-out!important;
+     transform: translateY(5px); 
+    position: relative;
+    z-index: 99;
+    width: 90vw;
+    left: 5vw; /*calc(-50vw + 60%) !important;*/
+    /*height: 90vh;*/
+    top: calc(-50vh + 55%) !important;
+}
+
+
+
+.THIS .TextAreaFull:last-child .slds-rich-text-area__content{
+	height: 90vw;
+	max-height: 85vh;
+
+}

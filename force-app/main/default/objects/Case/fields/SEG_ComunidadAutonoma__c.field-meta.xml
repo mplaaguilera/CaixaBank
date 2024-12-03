@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ComunidadAutonoma__c</fullName>
+    <description>Comunidad Autónoma que puede ser necesario en las operaciones de Valija</description>
+    <inlineHelpText>Comunidad Autónoma que puede ser necesario en las operaciones de Valija</inlineHelpText>
+    <label>Comunidad Autónoma</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>61-Andalucía</fullName>
+                <default>false</default>
+                <label>61-Andalucía</label>
+            </value>
+            <value>
+                <fullName>62-Aragón</fullName>
+                <default>false</default>
+                <label>62-Aragón</label>
+            </value>
+            <value>
+                <fullName>65-Canarias</fullName>
+                <default>false</default>
+                <label>65-Canarias</label>
+            </value>
+            <value>
+                <fullName>66-Cantabria</fullName>
+                <default>false</default>
+                <label>66-Cantabria</label>
+            </value>
+            <value>
+                <fullName>67-Castilla la Mancha</fullName>
+                <default>false</default>
+                <label>67-Castilla la Mancha</label>
+            </value>
+            <value>
+                <fullName>68-Castilla y León</fullName>
+                <default>false</default>
+                <label>68-Castilla y León</label>
+            </value>
+            <value>
+                <fullName>69-Cataluña</fullName>
+                <default>false</default>
+                <label>69-Cataluña</label>
+            </value>
+            <value>
+                <fullName>70-Extremadura</fullName>
+                <default>false</default>
+                <label>70-Extremadura</label>
+            </value>
+            <value>
+                <fullName>71-Galicia</fullName>
+                <default>false</default>
+                <label>71-Galicia</label>
+            </value>
+            <value>
+                <fullName>72-Madrid</fullName>
+                <default>false</default>
+                <label>72-Madrid</label>
+            </value>
+            <value>
+                <fullName>73-Murcia</fullName>
+                <default>false</default>
+                <label>73-Murcia</label>
+            </value>
+            <value>
+                <fullName>74-Navarra</fullName>
+                <default>false</default>
+                <label>74-Navarra</label>
+            </value>
+            <value>
+                <fullName>76-La Rioja</fullName>
+                <default>false</default>
+                <label>76-La Rioja</label>
+            </value>
+            <value>
+                <fullName>77-Valencia</fullName>
+                <default>false</default>
+                <label>77-Valencia</label>
+            </value>
+            <value>
+                <fullName>91-Vizcaya</fullName>
+                <default>false</default>
+                <label>91-Vizcaya</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

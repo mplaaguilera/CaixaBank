@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TipoContingenciaPrestacion__c</fullName>
+    <label>Tipo contingencia/prestación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>No Prestación</fullName>
+                <default>false</default>
+                <label>No Prestación</label>
+            </value>
+            <value>
+                <fullName>Jubilación</fullName>
+                <default>false</default>
+                <label>Jubilación</label>
+            </value>
+            <value>
+                <fullName>Fallecimiento</fullName>
+                <default>false</default>
+                <label>Fallecimiento</label>
+            </value>
+            <value>
+                <fullName>Enfermedad Grave</fullName>
+                <default>false</default>
+                <label>Enfermedad Grave</label>
+            </value>
+            <value>
+                <fullName>Incapacidad Temporal</fullName>
+                <default>false</default>
+                <label>Incapacidad Temporal</label>
+            </value>
+            <value>
+                <fullName>Invalidez</fullName>
+                <default>false</default>
+                <label>Invalidez</label>
+            </value>
+            <value>
+                <fullName>Desempleo y Dependencia</fullName>
+                <default>false</default>
+                <label>Desempleo y Dependencia</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

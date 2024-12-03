@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Case_Compact_Layout</fullName>
+    <fields>Subject</fields>
+    <fields>Status</fields>
+    <fields>CC_Idioma__c</fields>
+    <fields>Origin</fields>
+    <fields>CC_Canal_Procedencia__c</fields>
+    <fields>CC_Tipo_Contacto__c</fields>
+    <fields>OS_GrupoTrabajo__c</fields>
+    <label>OS Case Compact Layout</label>
+</CompactLayout>

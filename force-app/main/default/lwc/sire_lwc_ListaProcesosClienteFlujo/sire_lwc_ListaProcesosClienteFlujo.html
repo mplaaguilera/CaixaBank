@@ -1,0 +1,13 @@
+<template >
+    <div class="slds-box slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none" style="padding: 10px;">
+        <lightning-card icon-name="standard:procedure_detail" title={tituloTabla}>           
+            <lightning-button label={boton} title={boton} onclick={goToCliente} slot="actions"></lightning-button>
+            <lightning-datatable
+                key-field="id"
+                data={procesos}
+                columns={columns}
+                hide-checkbox-column >
+            </lightning-datatable>       
+        </lightning-card>
+    </div>
+</template>

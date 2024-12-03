@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Modificar_Empleado</fullName>
+    <active>true</active>
+    <description>Bloquea la creación o modificación de un Empleado a los perfiles no supervisores/administradores.</description>
+    <errorConditionFormula>AND(
+AND(
+!$Permission.CBK_BypassValidationRules,
+!$Permission.CC_ByPassVR
+),
+RecordType.DeveloperName == &apos;CC_Empleado&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;API Only&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;System Administrator&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;AV_Usuario_CaixaBank&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;Administrador del sistema&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;CIBE_Gestor&apos; &amp;&amp;
+$Profile.Name &lt;&gt; &apos;CBK_Sailpoint&apos; &amp;&amp;
+((CC_Empleado_Cargado_Manualmente__c == true &amp;&amp; $Profile.Name &lt;&gt; &apos;CC_Supervisor&apos;) ||
+(CC_Empleado_Cargado_Manualmente__c == false &amp;&amp; NOT(ISCHANGED(CC_Empleado_Cargado_Manualmente__c)))
+&amp;&amp; (NOT(ISPICKVAL(CC_Cargo__c, &apos;AGENTE FINANCIERO&apos;) &amp;&amp; $Profile.Name = &apos;CC_Supervisor&apos;))) &amp;&amp;
+NOT(ISCHANGED(OS_Modificacion_Campos_Contact_COPS__c))
+)</errorConditionFormula>
+    <errorMessage>No se permite la creación o modificación de un Empleado.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,81 @@
+<template>
+    <div class="slds-align_absolute-center">
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="tomarPropiedad" label="Tomar propiedad" icon-name="utility:change_owner" onclick={handleTomarPropiedad} disabled={disableBotonTomarPropiedad}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="devolverEscalado" label="Devolver escalado al grupo" icon-name="utility:skip" onclick={handleDevolverEscalado} disabled={disableBotonDevolverEscalado}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="enviarEscalado" label="Enviar escalado" icon-name="utility:send" onclick={handleEnviarEscalado} disabled={disableBotonEnviar}></lightning-button>
+        </div>
+        <div class="slds-var-p-left_x-small">
+            <lightning-button data-id="responderEscalado" label="Responder escalado" icon-name="utility:answer" onclick={abrirModalResponder} disabled={disableBotonDevolverEscalado}></lightning-button>
+        </div>
+    </div>
+
+    <!--Spinner-->
+    <template if:true={mostrarSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+
+    <!--Modal responder-->
+    <template if:true={mostrarModalResponder}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={cerrarModalResponder}>
+                        <lightning-icon icon-name="utility:close" size="small" alternative-text="Cerrar"></lightning-icon>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Responder escalado</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!--Picklist tipo de respuesta-->
+                    <lightning-combobox
+                        label="Tipo de respuesta"
+                        value={selectedValueTipoRespuesta}
+                        placeholder="Selecciona un tipo de respuesta"
+                        options={picklistTipoRespuestaValues}
+                        onchange={handleTipoRespuestaChange}>
+                    </lightning-combobox>
+                    <!--Campo Comentarios-->
+                    <template if:true={mostrarComentarios}>
+                        <div class="slds-p-top_small">
+                            <div class="slds-form-element__label">Respuesta</div>
+                            <lightning-input-rich-text
+                                label="Respuesta"
+                                value={comentarios}
+                                onchange={handleComentariosChange}>
+                            </lightning-input-rich-text>
+                        </div>
+                    </template>
+                    <!--Picklist motivo de rechazo-->
+                    <template if:true={mostrarMotivoRechazo}>
+                        <div class="slds-p-top_small">
+                            <lightning-combobox
+                                label="Motivo de rechazo"
+                                value={selectedValueMotivoRechazo}
+                                placeholder="Selecciona un motivo de rechazo"
+                                options={picklistMotivoRechazoValues}
+                                onchange={handleMotivoRechazoChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-p-top_small">
+                            <div class="slds-form-element__label">Respuesta</div>
+                            <lightning-input-rich-text
+                                label="Respuesta"
+                                value={comentarios}
+                                onchange={handleComentariosChange}>
+                            </lightning-input-rich-text>
+                        </div>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="neutral" label="Cancelar" title="Cancelar" onclick={cerrarModalResponder} class="slds-var-p-right_small"></lightning-button>
+                    <lightning-button variant="brand" label="Responder" title="Responder" onclick={handleResponderEscalado}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

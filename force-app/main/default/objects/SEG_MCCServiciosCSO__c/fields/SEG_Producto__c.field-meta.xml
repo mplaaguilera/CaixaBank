@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Producto__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Producto</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>B - Producto/Servicio</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.SEG_Tematica__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Tematica__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Tipo_Cliente__c</field>
+            <operation>equals</operation>
+            <value>Segmentos</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>MCC Servicios CSO (Producto)</relationshipLabel>
+    <relationshipName>MCC_Servicios_CSO1</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

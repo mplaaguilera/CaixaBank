@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Reactivada_Respuesta_Recibida__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>La oportunidad se ha reactivado automáticamente debido a que se ha recibido la respuesta del cliente.</inlineHelpText>
+    <label>Reactivada por respuesta de cliente</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

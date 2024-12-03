@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TaskControlManualStatusNoLocalizado</fullName>
+    <active>true</active>
+    <description>Solo se permite manualmente cambiar de estado Pendiente no localizado a los siguientes estados: &quot;Gestionada positiva&quot; o &quot;Gestionada negativa&quot;</description>
+    <errorConditionFormula>AND( 
+ISCHANGED( Status ),
+NOT( ISNEW() ),
+ISPICKVAL(PRIORVALUE(Status) , &quot;Pendiente no localizado&quot;),
+NOT(ISPICKVAL(Status , &quot;Gestionada positiva&quot;)), 
+NOT(ISPICKVAL(Status, &quot;Gestionada negativa&quot;)),
+OR(
+        RecordType.DeveloperName = &apos;AV_Priorizador&apos;,
+        RecordType.DeveloperName = &apos;AV_AlertaComercial&apos;,
+        RecordType.DeveloperName = &apos;AV_MorosidadNormativa&apos;,
+        RecordType.DeveloperName = &apos;AV_ConversacionPendiente&apos;,
+        RecordType.DeveloperName = &apos;AV_Onboarding&apos;,
+        RecordType.DeveloperName = &apos;AV_ExperienciaCliente&apos;,
+        RecordType.DeveloperName = &apos;AV_ContactosGCF&apos;,
+        RecordType.DeveloperName = &apos;AV_Otros&apos;
+),
+AND(
+ !$Permission.AV_ByPassValidationRules,
+ !$Permission.CBK_BypassValidationRules 
+),
+OR(ISPICKVAL($User.AV_Funcion__c, &quot;Gestor&quot;), ISPICKVAL($User.AV_Funcion__c, &quot;Oficina&quot;),
+ISPICKVAL($User.AV_Funcion__c, &quot;DC&quot;),
+ISPICKVAL($User.AV_Funcion__c, &quot;DT&quot;),
+ISPICKVAL($User.AV_Funcion__c, &quot;DAN&quot;)),
+$Profile.Name =&quot;AV_Usuario_CaixaBank&quot;,
+NOT( $Permission.AV_AvoidBulkApi ),
+ActivityDate&lt;=TODAY()
+)</errorConditionFormula>
+    <errorMessage>No se permite cambiar al estado seleccionado.</errorMessage>
+</ValidationRule>

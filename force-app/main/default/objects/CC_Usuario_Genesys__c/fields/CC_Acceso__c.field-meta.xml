@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Acceso__c</fullName>
+    <description>Medios en los cuales el usuario puede atender a clientes.</description>
+    <label>Acceso</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Teléfono</fullName>
+                <default>false</default>
+                <label>Teléfono</label>
+            </value>
+            <value>
+                <fullName>Chat</fullName>
+                <default>false</default>
+                <label>Chat</label>
+            </value>
+            <value>
+                <fullName>Call me now</fullName>
+                <default>false</default>
+                <label>Call me now</label>
+            </value>
+            <value>
+                <fullName>Call me back</fullName>
+                <default>false</default>
+                <label>Call me back</label>
+            </value>
+            <value>
+                <fullName>Otros CSBD</fullName>
+                <default>false</default>
+                <label>Otros CSBD</label>
+            </value>
+            <value>
+                <fullName>Teléfono, Chat</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Teléfono, Chat</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_1a_Reclamacion_Activa__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Flag que activa la primera reclamación automática</description>
+    <label>1ª Rec. Activa</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

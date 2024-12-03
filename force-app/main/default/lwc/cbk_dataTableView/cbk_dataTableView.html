@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title={label}> 
+        <div class="body_component"> 
+            <ul class="slds-timeline">
+            <lightning-datatable
+                    key-field="Id"
+                    hide-checkbox-column
+                    data={data}
+                    columns={columns}
+                    selected-rows={selectedRecords}
+                    sorted-by={sortBy}
+                    sorted-direction={sortDirection}
+                    onsort={handleSortdata}
+                    onrowselection={handleSelect}>
+            </lightning-datatable>
+            </ul>
+        </div>
+     </lightning-card>
+</template>

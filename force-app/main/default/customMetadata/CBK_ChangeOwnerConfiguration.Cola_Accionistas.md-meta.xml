@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Cola Accionistas</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>DeveloperNameApp__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Object_Name__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>PernisionSetName__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Project__c</field>
+        <value xsi:type="xsd:string">CBK</value>
+    </values>
+    <values>
+        <field>QueueName__c</field>
+        <value xsi:type="xsd:string">CC_Inbound_Email_Accionistas</value>
+    </values>
+    <values>
+        <field>Type__c</field>
+        <value xsi:type="xsd:string">Queue</value>
+    </values>
+</CustomMetadata>

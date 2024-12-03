@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ReclamantesConDatosNoAlf__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo que informa si alguno de los reclamantes tiene datos no albafetizados.</description>
+    <label>Reclamantes con datos no alfabetizados</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

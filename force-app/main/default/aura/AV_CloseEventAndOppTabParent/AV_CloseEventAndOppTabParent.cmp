@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    <lightning:workspaceAPI aura:id="workspace" />
+    <aura:registerEvent name="appEvent" type="c:AV_ReportAppEvent"/>
+    <!-- <c:av_CloseEventAndOppTab onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:av_CloseEventAndOppTab> -->
+    <c:av_CloseEventAndOppTab onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}"></c:av_CloseEventAndOppTab>
+    <!-- Hay que mirar que tenga el permiso del  reporte -->
+    
+</aura:component>

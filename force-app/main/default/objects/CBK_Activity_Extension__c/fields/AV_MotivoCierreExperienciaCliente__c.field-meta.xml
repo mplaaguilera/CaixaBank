@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_MotivoCierreExperienciaCliente__c</fullName>
+    <description>Motivo de cierre de una experiencia de cliente</description>
+    <label>Motivo cierre experiencia cliente</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>MO</fullName>
+                <default>false</default>
+                <label>Modelo de oficina</label>
+            </value>
+            <value>
+                <fullName>FC</fullName>
+                <default>false</default>
+                <label>Facilidad de contacto</label>
+            </value>
+            <value>
+                <fullName>CO</fullName>
+                <default>false</default>
+                <label>Cierre oficina</label>
+            </value>
+            <value>
+                <fullName>CG</fullName>
+                <default>false</default>
+                <label>Cambio de gestor</label>
+            </value>
+            <value>
+                <fullName>AT</fullName>
+                <default>false</default>
+                <label>Atención y trato</label>
+            </value>
+            <value>
+                <fullName>COG</fullName>
+                <default>false</default>
+                <label>Competencia del Gestor</label>
+            </value>
+            <value>
+                <fullName>NOW</fullName>
+                <default>false</default>
+                <label>NOW (Web o App)</label>
+            </value>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>Cajeros</label>
+            </value>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>Producto</label>
+            </value>
+            <value>
+                <fullName>PC</fullName>
+                <default>false</default>
+                <label>Precio y/o comisiones</label>
+            </value>
+            <value>
+                <fullName>CTE</fullName>
+                <default>false</default>
+                <label>Colas y tiempos de espera</label>
+            </value>
+            <value>
+                <fullName>PNR</fullName>
+                <default>false</default>
+                <label>Problema no resuelto</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Morosidad</label>
+            </value>
+            <value>
+                <fullName>GP</fullName>
+                <default>false</default>
+                <label>Gestión Postventa</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>PA</fullName>
+                <default>false</default>
+                <label>Poca agilidad</label>
+            </value>
+            <value>
+                <fullName>CE</fullName>
+                <default>false</default>
+                <label>Claridad explicaciones</label>
+            </value>
+            <value>
+                <fullName>DC</fullName>
+                <default>false</default>
+                <label>Dificultad de contacto</label>
+            </value>
+            <value>
+                <fullName>NoG</fullName>
+                <default>false</default>
+                <label>No reconoce tener gestor</label>
+            </value>
+            <value>
+                <fullName>NoR</fullName>
+                <default>false</default>
+                <label>No concesión de riesgos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>10</visibleLines>
+</CustomField>

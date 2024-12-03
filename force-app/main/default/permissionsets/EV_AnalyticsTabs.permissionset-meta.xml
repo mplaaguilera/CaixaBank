@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>EV_AnalyticsTabs</label>
+    <license>Salesforce</license>
+    <tabSettings>
+        <tab>Seguimiento_de_eventos</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Info_Denegacion__c</fullName>
+    <description>En este campo se almacena la información a mostrar en el apartado Journey Cognitive del caso.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Información Denegación</label>
+    <length>32768</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

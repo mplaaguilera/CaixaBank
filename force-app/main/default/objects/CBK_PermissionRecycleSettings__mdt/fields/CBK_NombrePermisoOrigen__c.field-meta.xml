@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_NombrePermisoOrigen__c</fullName>
+    <description>Texto donde se registrará el nombre del permiso a revisar o que determinartá la exclusión de los usuarios en el proceso batch. En el caso del PermissionSet, el valor de Name. En el caso de PermissionSetGroup el DeveloperName y en el PermissionSetLicense el DeveloperName también. En el caso de los Custom Permission se indicará el DeveloperName.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Nombre Permiso a Reciclar</label>
+    <length>80</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

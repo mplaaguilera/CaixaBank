@@ -1,0 +1,224 @@
+<template>
+    <c-spv_-reclamantes id="lwcReclamantes" record-id={recordId} hidden></c-spv_-reclamantes>
+
+    <article class="slds-card">
+        <!-- Spinners -->
+        <template if:true={bEsperaALF}>
+            <div class="spinnerALF">
+                <lightning-spinner variant="brand" size="medium" alternative-text="Esperando la respuesta de Alfabético..."></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={isLoading}>
+            <div class="slds-p-around_x-large">
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={bEsperaSFDC}>
+            <div class="spinnerSFDC">
+                <lightning-spinner size="medium" alternative-text="Actualizando información..."></lightning-spinner>
+            </div>
+        </template>
+        <template if:true={bEsperaPopUp}>
+            <lightning-spinner size="medium" alternative-text="Actualizando información..."></lightning-spinner>
+        </template>
+        <template if:true={esperaInsertNoCliente}>
+            <lightning-spinner size="medium" alternative-text="Insertando registro..."></lightning-spinner>
+        </template>
+
+
+        <!--Cabecera de la card-->
+        <header class="slds-media slds-media_center slds-has-flexi-truncate" style="padding-left: 12px; padding-right:12px; padding-top: 4px;">
+            <div class="slds-media__figure">
+                <lightning-icon icon-name="custom:custom64" size="small" class="cc_azul_cuenta"></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Identificar
+                        Cliente</span>
+                </h2>
+            </div>
+            <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                <lightning-button label="No se identifica" onclick={handleActualizarIdentificacion}
+                    disabled={disableButton}></lightning-button>
+            </div>
+            <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                <lightning-button label="Crear No Cliente" onclick={crearNoCliente}></lightning-button>
+            </div>
+        </header>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+            <div class="slds-grid slds-gutters slds-grid_pull-padded-small slds-grid_vertical-align-end">
+                <!--Tipo de búsqueda-->
+                <div class="slds-col slds-size--6-of-12">
+                    <lightning-combobox name="tipoBusqueda" label="Tipo de búsqueda" value={sTipoBusqueda}
+                        options={sTipoBusquedaOptions} onchange={handleTipoBusquedaChange}>
+                    </lightning-combobox>
+                </div>
+                <!--Valor de búsqueda-->
+                <div class="slds-col slds-size--5-of-12 slds-gutters_x-small">
+                    <span onkeypress={valorBusquedaTeclaPulsada}>
+                        <lightning-input type="search" name="valorBusqueda" label="Valor" value={sBusqueda}
+                            onchange={handleValorBusquedaChange} spellcheck="false" placeholder="Valor a buscar">
+                        </lightning-input>
+                    </span>
+                </div>
+                <!--Botón para iniciar búsqueda-->
+                <div class="slds-col slds-grow-none">
+                    <lightning-button-icon icon-name="utility:search" variant="brand" title="Identificar"
+                        onclick={buscarAlfabetico} alternative-text="Buscar en Alfabético" disabled={isBusquedaEmpty}>
+                    </lightning-button-icon>
+                </div>
+            </div>
+        </div>
+        <div style="height:0.4rem;"></div>
+        <!--Separador-->
+       
+       
+        <!--Pie de la card (resultados)-->
+        <footer class="slds-card__footer" style="text-align: left;">
+            <template if:true={bRes}>
+                <!-- Cuentas -->
+                <div class="slds-card__body slds-card__body_inner">
+                    <div class="slds-form-element">
+                        <b><label class="slds-form-element__label" for="combobox-unique-id">Cuentas identificadas:</label></b>
+                        <template for:each={oCuentas} for:item="oCuenta">
+                            <article key={oCuenta.Id} class="slds-card">
+                                <div class="slds-card__header slds-grid">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__figure">
+                                            <span class="slds-icon_container slds-icon-standard-account" title="Cuenta">
+                                                <lightning-icon icon-name="standard:account" alternative-text="Cuenta" size="small" ></lightning-icon>
+                                                <span class="slds-assistive-text">Cuenta</span>
+                                            </span>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <a href="javascript:void(0)" class="slds-card__header-link slds-truncate"
+                                               name={oCuenta.Id} data-id={oCuenta.Id} title="Visualizar detalle"
+                                               onclick={navigateToAccount} onmouseover={handleMouseover} onmousemove={handleMouseover} onmouseleave={handleMouseLeave}>{oCuenta.Name}</a>
+                                        </div><!-- Hacer over -->
+                                        <template if:true={identificacionPrevia}>
+                                            <div class="slds-no-flex">
+                                                <lightning-button variant="Brand" icon-name="utility:check"
+                                                                 label="Reclamante secundario" name={oCuenta.Id}
+                                                                 onclick={asociarCliente} ></lightning-button> <!-- !c.asociarSoloAccSecundario -->
+                                            </div>
+                                        </template>
+                                        <template if:false={identificacionPrevia}>
+                                            <div class="slds-no-flex">
+                                                <lightning-button variant="Brand" icon-name="utility:check"
+                                                                 label="Asociar" name={oCuenta.Id}
+                                                                 onclick={asociarCliente} ></lightning-button> <!-- !c.comprobarMultiplesReclamacionesCuenta -->
+                                            </div>
+                                        </template>
+                                    </header>
+                                </div>
+                            </article>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            <template if:true={bError}>
+                <!--Sección de error-->
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                    <lightning-icon icon-name="utility:warning" size="x-small" variant="error" ></lightning-icon>
+                    &nbsp;&nbsp;{sMensErr}
+                </div>
+            </template>
+
+            <template if:true={bInfo}>
+                <!--Sección de error-->
+                <div align="center" class="slds-text-body_regular cc_blink" style="padding:3px 0px 3px 0px">
+                    <lightning-icon icon-name="utility:info" size="x-small" variant="error" ></lightning-icon>
+                    &nbsp;&nbsp;{sMensInfo}
+                </div>
+            </template>
+            
+            
+        </footer>
+    </article>
+
+    
+    <template if:true={modalCrearNoCliente}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" variant="border" onclick={ocultarModal} alternative-text="close"  class="slds-modal__close"></lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación
+                    </h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2" style="padding-right:15px; margin-bottom:15px;">
+                            <lightning-input name="valueFname" type="text" label="Nombre" value={valueFname} onchange={handleChange} required></lightning-input>
+                            <br/>
+                            <lightning-input name="valueLname" type="text" label="Apellidos" value={valueLname} onchange={handleChange} required></lightning-input>
+                            <br/>
+                            <lightning-input name="valuePhone" type="text" label="Teléfono" value={valuePhone} onchange={handleChange}></lightning-input>
+                            <br/>
+                            <lightning-input name="valueEmail" type="email" label="Email" value={valueEmail} onchange={handleChange}></lightning-input>
+                            <br/>
+                            <lightning-combobox name="valueCodigo" label="Tipo de código" value={valueCodigo} placeholder="--None--" options={options} onchange={handleChange} required></lightning-combobox>
+                            <br/>
+                            <lightning-input name="valueNumDoc" type="text" label="Número de documento" value={valueNumDoc} onchange={handleChange} required></lightning-input>
+                            <br/>
+                            <br/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2" style="padding-right:15px;margin-bottom:15px;">
+                            <b>Dirección</b>
+                            <br/>
+                            <lightning-input name="valueStreet" type="text" label="Calle" value={valueStreet} onchange={handleChange}></lightning-input>
+                            <lightning-input name="valuePostal" type="text" label="Código postal" value={valuePostal} onchange={handleChange}></lightning-input>
+                            <lightning-input name="valueCity" type="text" label="Ciudad" value={valueCity} onchange={handleChange}></lightning-input>
+                            <lightning-input name="valueState" type="text" label="Provincia" value={valueState} onchange={handleChange}></lightning-input>
+                            <lightning-input name="valueCountry" type="text" label="País" value={valueCountry} onchange={handleChange}></lightning-input>
+                        </div>
+                    </div>
+                    <lightning-button class="slds-m-top_small " variant="neutral" label="Cancelar" title="Cancelar" onclick={ocultarModal}></lightning-button>
+                    <lightning-button class="slds-m-top_small slds-m-horizontal_small" variant="brand" label="Crear"  title="Crear" onclick={insertNoCliente}></lightning-button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+     <!--Popover para las accounts-->
+     <template if:true={idPopUp} >
+        <section aria-describedby="dialog-body-id-110" aria-label="Dialog Title" class="slds-popover slds-popover_walkthrough slds-popover_feature slds-nubbin_right" style={posicionCursor} role="dialog">
+            <div class="slds-popover__body">
+                <div class="slds-media">
+                    <div class="slds-media__body">
+                        <div class="slds-media">
+                            <div class="slds-media__body">
+                                <lightning-record-view-form object-api-name="Account" record-id={idPopUp}>
+                                    <div class="headerClass">
+                                        <P><lightning-output-field field-name={nameField} variant="label-hidden" class="wololo"></lightning-output-field></P>
+                                    </div>
+                                    <div class="contenidoClass">
+                                        <div class="slds-grid">
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name={CC_Numero_Documento__cField}></lightning-output-field>
+                                                <lightning-output-field field-name={PhoneField}></lightning-output-field>
+                                                <lightning-output-field field-name={PersonMobilePhoneField}></lightning-output-field>
+                                                <lightning-output-field field-name={PersonEmailField}></lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name={AV_EAPGestor__cField}></lightning-output-field>
+                                                <lightning-output-field field-name={BillingAddressField}></lightning-output-field>
+                                                <lightning-output-field field-name={CC_OficinaGestoraId__cField}></lightning-output-field>
+                                                <div class="slds-p-left_xx-small"></div>                                             
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-record-view-form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+</template>

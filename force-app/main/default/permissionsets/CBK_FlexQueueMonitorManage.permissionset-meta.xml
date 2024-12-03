@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>CBK_FlexQueueMonitor_Schedule</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>CBK_FlexQueueMonitor_Schedule_Test</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>PermissionSet con los permisos necesarios para la gestión de registros de monitorización de la flexqueue. Debe asociarse al usuario que ejecute el proceso planificado.</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_Aplicacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_HoldingBatches__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_NotificacionNecesaria__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_NotificacionRealizada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_PorcentajeConsumoUmbral__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CBK_FlexQueueMonitor__c.CBK_PrefijoAplicacion__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>FlexQueue Monitor Manage</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>true</modifyAllRecords>
+        <object>CBK_FlexQueueMonitor__c</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+</PermissionSet>

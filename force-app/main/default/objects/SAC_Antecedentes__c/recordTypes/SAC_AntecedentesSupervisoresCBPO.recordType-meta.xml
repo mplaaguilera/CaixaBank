@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_AntecedentesSupervisoresCBPO</fullName>
+    <active>true</active>
+    <description>Record type para los antecedentes de SAC de reclamaciones de Supervisores (CBPO)</description>
+    <label>Antecedentes Supervisores (CBPO)</label>
+</RecordType>

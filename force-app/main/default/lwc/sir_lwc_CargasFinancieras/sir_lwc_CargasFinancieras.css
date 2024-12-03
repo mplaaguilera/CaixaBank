@@ -1,0 +1,54 @@
+.textCenter {
+    text-align: center;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.textoGrande {
+    font-size:0.75vw;
+}
+
+.negrita {
+    font-weight: bold;
+}
+
+.noBordes {
+    border: 0px solid !important;
+}
+
+.noLabel{
+    margin-top: -15px;
+}
+.semiNegrita {
+    font-weight: 600;
+}
+lightning-input{ 
+   max-width: 200px;
+}
+.oblique {
+    font-style: oblique;
+}
+details > summary {
+    padding: 4px;
+    background-color: #eeeeee;
+    outline: none;
+}
+
+.bordeTopAzul{
+    border-top: 2px solid #359CD5;
+}
+.fondoAzul {
+    background-color: #359CD5;
+    color: white;
+}
+.textoCentrado {
+    text-align: center;
+}
+.tdInputCentrado {
+    text-align: -webkit-center;
+}
+.sinBordeTop {
+    border-top: none;
+}

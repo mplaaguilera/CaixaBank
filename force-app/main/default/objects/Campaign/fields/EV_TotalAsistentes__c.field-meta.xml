@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_TotalAsistentes__c</fullName>
+    <description>Todos los miembros de campaña con status Asistencia Confirmada</description>
+    <inlineHelpText>Número de personas que han asistido al evento.</inlineHelpText>
+    <label>Total Asistentes</label>
+    <summaryFilterItems>
+        <field>CampaignMember.Status</field>
+        <operation>equals</operation>
+        <value>Asistió</value>
+    </summaryFilterItems>
+    <summaryFilterItems>
+        <field>CampaignMember.EV_Empresa__c</field>
+        <operation>equals</operation>
+        <value>False</value>
+    </summaryFilterItems>
+    <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

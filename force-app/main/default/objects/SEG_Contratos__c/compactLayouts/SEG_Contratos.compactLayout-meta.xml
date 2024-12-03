@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Contratos</fullName>
+    <fields>Name</fields>
+    <fields>SEG_Situacion_Contrato__c</fields>
+    <fields>SEG_NombreCuenta__c</fields>
+    <fields>SEG_Fecha_Contrato__c</fields>
+    <fields>SEG_Fecha_1_Reclamacion__c</fields>
+    <fields>SEG_Fecha_2_Reclamacion__c</fields>
+    <fields>SEG_Fecha_3_Reclamacion__c</fields>
+    <fields>SEG_Fecha_Llamada__c</fields>
+    <fields>SEG_Gestor_comercial__c</fields>
+    <label>Contratos</label>
+</CompactLayout>

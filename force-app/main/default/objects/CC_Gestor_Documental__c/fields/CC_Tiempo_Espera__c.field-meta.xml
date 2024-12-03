@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tiempo_Espera__c</fullName>
+    <label>Tiempo de espera</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sol·licita su turno y se queja por el tiempo de espera</fullName>
+                <default>false</default>
+                <label>Sol·licita su turno y se queja por el tiempo de espera</label>
+            </value>
+            <value>
+                <fullName>Solo solicita su turno</fullName>
+                <default>false</default>
+                <label>Solo solicita su turno</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

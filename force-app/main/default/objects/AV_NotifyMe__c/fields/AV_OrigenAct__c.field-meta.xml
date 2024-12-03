@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_OrigenAct__c</fullName>
+    <label>Origen</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>AV_AccionComercial</fullName>
+                <default>false</default>
+                <label>Acción Comercial</label>
+            </value>
+            <value>
+                <fullName>AV_AlertaComercial</fullName>
+                <default>false</default>
+                <label>Alerta Comercial</label>
+            </value>
+            <value>
+                <fullName>AV_AlertasComerciales</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Alertas comerciales</label>
+            </value>
+            <value>
+                <fullName>AV_CitasNoCerradas</fullName>
+                <default>false</default>
+                <label>Citas no cerradas</label>
+            </value>
+            <value>
+                <fullName>AV_CitasPrevias</fullName>
+                <default>false</default>
+                <label>Citas Previas</label>
+            </value>
+            <value>
+                <fullName>AV_ContactosGCF</fullName>
+                <default>false</default>
+                <label>Contactos de GCF</label>
+            </value>
+            <value>
+                <fullName>AV_CloseDeLoop</fullName>
+                <default>false</default>
+                <label>Experiencia Cliente</label>
+            </value>
+            <value>
+                <fullName>AV_IniciativaGestora</fullName>
+                <default>false</default>
+                <label>Iniciativa Gestor/a</label>
+            </value>
+            <value>
+                <fullName>AV_IniciativaGestor</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Iniciativa Gestor (Oportunidades Gestor)</label>
+            </value>
+            <value>
+                <fullName>AV_Llamadas</fullName>
+                <default>false</default>
+                <label>Llamadas</label>
+            </value>
+            <value>
+                <fullName>AV_Morosidad</fullName>
+                <default>false</default>
+                <label>Morosidad</label>
+            </value>
+            <value>
+                <fullName>AV_Muro</fullName>
+                <default>false</default>
+                <label>Muro</label>
+            </value>
+            <value>
+                <fullName>AV_Normativo</fullName>
+                <default>false</default>
+                <label>Normativo</label>
+            </value>
+            <value>
+                <fullName>AV_OnBoarding</fullName>
+                <default>false</default>
+                <label>OnBoarding</label>
+            </value>
+            <value>
+                <fullName>AV_OnboardingIntouch</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Onboarding Intouch</label>
+            </value>
+            <value>
+                <fullName>CIBE_OperacionesPendientesFirma</fullName>
+                <default>false</default>
+                <label>Operaciones pendientes de firma</label>
+            </value>
+            <value>
+                <fullName>AV_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>AV_Priorizador</fullName>
+                <default>false</default>
+                <label>Priorizador</label>
+            </value>
+            <value>
+                <fullName>AV_R2B</fullName>
+                <default>false</default>
+                <label>Stop&amp;GO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

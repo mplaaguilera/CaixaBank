@@ -1,0 +1,197 @@
+<template>
+    <lightning-card>
+        <lightning-record-edit-form object-api-name="Case" record-id={recordId} onsuccess={handleSuccess}
+            onsubmit={handleSubmit}>
+            <lightning-messages>
+            </lightning-messages>
+            <div class="slds-form__item" role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoNotaria__c">
+                                </lightning-input-field>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoNotaria__c" readonly="true"> 
+                                </lightning-input-field>
+                            </template>                            
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoNotaria__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoNotaria__c" readonly="true">
+                                </lightning-input-field>
+                            </template>                                
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-input-field field-name="SAC_ImpAbonadoNotaria__c" readonly="true" data-id="overview" d>
+                            </lightning-input-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoGestoria__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoGestoria__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoGestoria__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoGestoria__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-input-field field-name="SAC_ImpAbonadoGestoria__c" readonly="true">
+                            </lightning-input-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoRegistros__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoRegistros__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoRegistros__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoRegistros__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-input-field field-name="SAC_ImpAbonadoRegistros__c" readonly="true">
+                            </lightning-input-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoTasacion__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoTasacion__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoTasacion__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoTasacion__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-input-field field-name="SAC_ImpAbonadoTasacion__c" readonly="true">
+                            </lightning-input-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoInteresesLegales__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpReclamadoInteresesLegales__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <template if:false={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoInteresesLegales__c" >
+                                </lightning-input-field>                                
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-input-field field-name="SAC_ImpResueltoInteresesLegales__c" readonly="true">
+                                </lightning-input-field>
+                            </template>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-input-field field-name="SAC_ImpAbonadoInteresesLegales__c" readonly="true">
+                            </lightning-input-field>
+                        </div>
+                        <template if:true={showSacOtrosGastos}>
+                            <div class="slds-size_1-of-3">
+                                <lightning-input-field field-name="SAC_Otros_gastos__c" readonly="true">
+                                </lightning-input-field>
+                            </div>
+                            <div class="slds-size_1-of-3">
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="slds-size_1-of-3">
+                                <p>&nbsp;</p>
+                            </div>
+                            <div class="slds-size_2-of-3">
+                                <p class="slds-text-body_small slds-m-bottom_small slds-m-top_x-small">
+                                    <strong>Otros gastos reclamados en el Formulario, es necesario revisar a qué concepto de importe reclamado corresponden</strong>
+                                </p>
+                            </div>
+                        </template>
+                        <div class="slds-col slds-size_1-of-1 slds-border_top" style="margin-top: 12px; margin-bottom: 12px;"></div>
+                        
+                        <div class="slds-size_1-of-3">
+                            <lightning-output-field field-name="CC_Importe_Reclamado__c" >
+                            </lightning-output-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-output-field field-name="SAC_Importe_Resuelto__c" >
+                            </lightning-output-field>
+                        </div>
+                        <div class="slds-size_1-of-3">
+                            <lightning-output-field field-name="CC_Importe_Abonado__c" >
+                            </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <template if:false={readOnly}>
+                                <lightning-button class="slds-float_right" variant="brand" type="submit" name="update" data-id="button" 
+                                label="Actualizar importes"></lightning-button>
+                            </template>
+                            <template if:true={readOnly}>
+                                <lightning-button class="slds-float_right" variant="brand" type="submit" name="update" data-id="button" disabled="true"
+                                label="Actualizar importes" title="Ya hay una tarea de GGH en proceso"></lightning-button>                            
+                            </template>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning-record-edit-form>
+    </lightning-card>
+
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

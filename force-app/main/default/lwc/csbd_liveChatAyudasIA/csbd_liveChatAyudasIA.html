@@ -1,0 +1,26 @@
+<template>
+    <lightning-card>
+        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+            <span class="slds-assistive-text">warning</span>
+            <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small" title="Description of icon when needed">
+            <lightning-icon icon-name="utility:warning" alternative-text="Warning!" title="Warning"></lightning-icon>
+            </span>
+            <h2>{label.mensajeIAResponsable}</h2>
+        </div>
+        <lightning-button class="slds-align_absolute-center slds-m-top_medium" variant="brand" label="Vista Completa" icon-name="utility:expand" onclick={navigateToParentComponent}></lightning-button>
+        <lightning-tabset>
+            <lightning-tab label="Oportunidad" value="oportunidad"  onactive={handleTabClick}>
+                <c-csbd-_resumen-oportunidad record-id={idOportunidad} plan-opo={planOpo} plan-ampli={planAmpli}></c-csbd-_resumen-oportunidad>
+            </lightning-tab>
+            <lightning-tab label="Producto" value="producto"  onactive={handleTabClick}>
+                <c-csbd-_resumen-producto record-id={idOportunidad} plan-prod={planProd}></c-csbd-_resumen-producto>
+            </lightning-tab>
+            <lightning-tab label="Argumentario" value="argumentario"  onactive={handleTabClick}>
+                <c-csbd-_resumen-argumentario record-id={idOportunidad} plan-arg={planArg}></c-csbd-_resumen-argumentario>
+            </lightning-tab>
+        </lightning-tabset>
+    </lightning-card>
+    <lightning-card>
+        <c-csbd-_-chat-g-p-t record-id={idOportunidad}></c-csbd-_-chat-g-p-t>
+    </lightning-card>
+</template>

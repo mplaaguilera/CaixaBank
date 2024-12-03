@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Reportar_temas_nuevos__c</fullName>
+    <description>Cargos asociados a Contactos (Reportar temas nuevos)</description>
+    <label>Cargos Contactos (Reportar temas nuevos)</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>ACTIVO</fullName>
+                <default>false</default>
+                <label>ACTIVO</label>
+            </value>
+            <value>
+                <fullName>AVALES</fullName>
+                <default>false</default>
+                <label>AVALES</label>
+            </value>
+            <value>
+                <fullName>Avisar comunicaciones</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Avisar comunicaciones</label>
+            </value>
+            <value>
+                <fullName>AVISAR SIEMPRE</fullName>
+                <default>false</default>
+                <label>AVISAR SIEMPRE</label>
+            </value>
+            <value>
+                <fullName>Aviso agosto aviso vacaciones (otro contacto)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso agosto aviso vacaciones (otro contacto)</label>
+            </value>
+            <value>
+                <fullName>Aviso CDE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso CDE</label>
+            </value>
+            <value>
+                <fullName>Aviso CDI</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso CDI</label>
+            </value>
+            <value>
+                <fullName>Aviso COMEX</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso COMEX</label>
+            </value>
+            <value>
+                <fullName>Aviso financiación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso financiación</label>
+            </value>
+            <value>
+                <fullName>Aviso RMD</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso RMD</label>
+            </value>
+            <value>
+                <fullName>Aviso RME</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso RME</label>
+            </value>
+            <value>
+                <fullName>Aviso RMI</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso RMI</label>
+            </value>
+            <value>
+                <fullName>Aviso seguro de cambio</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso seguro de cambio</label>
+            </value>
+            <value>
+                <fullName>Aviso tarjeta</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso tarjeta</label>
+            </value>
+            <value>
+                <fullName>Aviso TDI recibida</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Aviso TDI recibida</label>
+            </value>
+            <value>
+                <fullName>AVISO VACACIONES</fullName>
+                <default>false</default>
+                <label>AVISO VACACIONES</label>
+            </value>
+            <value>
+                <fullName>B2B</fullName>
+                <default>false</default>
+                <label>B2B</label>
+            </value>
+            <value>
+                <fullName>BASTANTEO</fullName>
+                <default>false</default>
+                <label>BASTANTEO</label>
+            </value>
+            <value>
+                <fullName>BLANQUEO</fullName>
+                <default>false</default>
+                <label>BLANQUEO</label>
+            </value>
+            <value>
+                <fullName>CALL BACK</fullName>
+                <default>false</default>
+                <label>CALL BACK</label>
+            </value>
+            <value>
+                <fullName>Call back (confirmar ordenes de pago)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Call back (confirmar ordenes de pago)</label>
+            </value>
+            <value>
+                <fullName>CARGOS</fullName>
+                <default>false</default>
+                <label>CARGOS</label>
+            </value>
+            <value>
+                <fullName>CARNETS FC BARCELONA</fullName>
+                <default>false</default>
+                <label>CARNETS FC BARCELONA</label>
+            </value>
+            <value>
+                <fullName>CDE</fullName>
+                <default>false</default>
+                <label>CDE</label>
+            </value>
+            <value>
+                <fullName>CDI</fullName>
+                <default>false</default>
+                <label>CDI</label>
+            </value>
+            <value>
+                <fullName>COBROS</fullName>
+                <default>false</default>
+                <label>COBROS</label>
+            </value>
+            <value>
+                <fullName>COMEX</fullName>
+                <default>false</default>
+                <label>COMEX</label>
+            </value>
+            <value>
+                <fullName>COMUNICACIONES</fullName>
+                <default>false</default>
+                <label>COMUNICACIONES</label>
+            </value>
+            <value>
+                <fullName>CONTRATOS</fullName>
+                <default>false</default>
+                <label>CONTRATOS</label>
+            </value>
+            <value>
+                <fullName>DHL</fullName>
+                <default>false</default>
+                <label>DHL</label>
+            </value>
+            <value>
+                <fullName>DOCUMENTACION A FIRMAR</fullName>
+                <default>false</default>
+                <label>DOCUMENTACION A FIRMAR</label>
+            </value>
+            <value>
+                <fullName>Documentación a firmar</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Documentación a firmar</label>
+            </value>
+            <value>
+                <fullName>FALTA SALDO</fullName>
+                <default>false</default>
+                <label>FALTA SALDO</label>
+            </value>
+            <value>
+                <fullName>FINANCIACION</fullName>
+                <default>false</default>
+                <label>FINANCIACION</label>
+            </value>
+            <value>
+                <fullName>Incidencias B2B</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias B2B</label>
+            </value>
+            <value>
+                <fullName>Incidencias oficina</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias oficina</label>
+            </value>
+            <value>
+                <fullName>Incidencias recibos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias recibos</label>
+            </value>
+            <value>
+                <fullName>Incidencias sepa</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias sepa</label>
+            </value>
+            <value>
+                <fullName>Incidencias TCR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias TCR</label>
+            </value>
+            <value>
+                <fullName>Incidencias TIR</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Incidencias TIR</label>
+            </value>
+            <value>
+                <fullName>NO AVISAR</fullName>
+                <default>false</default>
+                <label>NO AVISAR</label>
+            </value>
+            <value>
+                <fullName>OFICINA</fullName>
+                <default>false</default>
+                <label>OFICINA</label>
+            </value>
+            <value>
+                <fullName>PAG</fullName>
+                <default>false</default>
+                <label>PAG</label>
+            </value>
+            <value>
+                <fullName>PAQUETERIA</fullName>
+                <default>false</default>
+                <label>PAQUETERIA</label>
+            </value>
+            <value>
+                <fullName>Paquetería</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Paquetería</label>
+            </value>
+            <value>
+                <fullName>PETICION BOLETAS</fullName>
+                <default>false</default>
+                <label>PETICION BOLETAS</label>
+            </value>
+            <value>
+                <fullName>Petición boletas</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Petición boletas</label>
+            </value>
+            <value>
+                <fullName>RECIBOS</fullName>
+                <default>false</default>
+                <label>RECIBOS</label>
+            </value>
+            <value>
+                <fullName>Reclamaciones de contratos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reclamaciones de contratos</label>
+            </value>
+            <value>
+                <fullName>Reportar avales</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar avales</label>
+            </value>
+            <value>
+                <fullName>Reportar bastanteos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar bastanteos</label>
+            </value>
+            <value>
+                <fullName>Reportar cargos en cuenta</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar cargos en cuenta</label>
+            </value>
+            <value>
+                <fullName>Reportar cobros</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar cobros</label>
+            </value>
+            <value>
+                <fullName>Reportar falta saldo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar falta saldo</label>
+            </value>
+            <value>
+                <fullName>Reportar PAG</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar PAG</label>
+            </value>
+            <value>
+                <fullName>Reportar TEV (alta planta)</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar TEV (alta planta)</label>
+            </value>
+            <value>
+                <fullName>Reportar todo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar todo</label>
+            </value>
+            <value>
+                <fullName>Reportar TRF</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reportar TRF</label>
+            </value>
+            <value>
+                <fullName>RMD</fullName>
+                <default>false</default>
+                <label>RMD</label>
+            </value>
+            <value>
+                <fullName>RME</fullName>
+                <default>false</default>
+                <label>RME</label>
+            </value>
+            <value>
+                <fullName>RMI</fullName>
+                <default>false</default>
+                <label>RMI</label>
+            </value>
+            <value>
+                <fullName>SEGURO DE CAMBIO</fullName>
+                <default>false</default>
+                <label>SEGURO DE CAMBIO</label>
+            </value>
+            <value>
+                <fullName>SEPA</fullName>
+                <default>false</default>
+                <label>SEPA</label>
+            </value>
+            <value>
+                <fullName>TARJETA</fullName>
+                <default>false</default>
+                <label>TARJETA</label>
+            </value>
+            <value>
+                <fullName>TCR</fullName>
+                <default>false</default>
+                <label>TCR</label>
+            </value>
+            <value>
+                <fullName>TDI</fullName>
+                <default>false</default>
+                <label>TDI</label>
+            </value>
+            <value>
+                <fullName>TEV (ALTA PLANTA)</fullName>
+                <default>false</default>
+                <label>TEV (ALTA PLANTA)</label>
+            </value>
+            <value>
+                <fullName>TIR</fullName>
+                <default>false</default>
+                <label>TIR</label>
+            </value>
+            <value>
+                <fullName>TODO</fullName>
+                <default>false</default>
+                <label>TODO</label>
+            </value>
+            <value>
+                <fullName>TRF</fullName>
+                <default>false</default>
+                <label>TRF</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>6</visibleLines>
+</CustomField>

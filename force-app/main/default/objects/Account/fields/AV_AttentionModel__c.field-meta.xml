@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_AttentionModel__c</fullName>
+    <description>Indica el modelo de atención.</description>
+    <label>Modelo de atención</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>Alto potencial</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>Potencial</label>
+            </value>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>Puntual</label>
+            </value>
+            <value>
+                <fullName>D</fullName>
+                <default>false</default>
+                <label>inTouch</label>
+            </value>
+            <value>
+                <fullName>E</fullName>
+                <default>false</default>
+                <label>Imagin</label>
+            </value>
+            <value>
+                <fullName>H</fullName>
+                <default>false</default>
+                <label>Premier</label>
+            </value>
+            <value>
+                <fullName>I</fullName>
+                <default>false</default>
+                <label>Premier Senior</label>
+            </value>
+            <value>
+                <fullName>J</fullName>
+                <default>false</default>
+                <label>InTouch Alto Potencial</label>
+            </value>
+            <value>
+                <fullName>K</fullName>
+                <default>false</default>
+                <label>InTouch Potencial</label>
+            </value>
+            <value>
+                <fullName>L</fullName>
+                <default>false</default>
+                <label>Privada Base</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Privada Estándar</label>
+            </value>
+            <value>
+                <fullName>N</fullName>
+                <default>false</default>
+                <label>Privada Plus</label>
+            </value>
+            <value>
+                <fullName>X</fullName>
+                <default>false</default>
+                <label>RGPD Pendiente</label>
+            </value>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>Cliente de alto valor</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>Cliente a potenciar</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>Cliente a mantener</label>
+            </value>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>Potencialㅤ</label>
+            </value>
+            <value>
+                <fullName>Q</fullName>
+                <default>false</default>
+                <label>Asociado</label>
+            </value>
+            <value>
+                <fullName>Z</fullName>
+                <default>false</default>
+                <label>RGPD NO</label>
+            </value>
+            <value>
+                <fullName>O</fullName>
+                <default>false</default>
+                <label>Alto Potencialㅤ</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

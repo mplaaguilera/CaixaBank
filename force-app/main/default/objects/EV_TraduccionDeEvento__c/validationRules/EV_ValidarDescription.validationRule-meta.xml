@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ValidarDescription</fullName>
+    <active>true</active>
+    <errorConditionFormula>LEN(EV_Descripcion__c ) &lt; 250 ||  LEN(EV_Descripcion__c ) &gt; 496</errorConditionFormula>
+    <errorDisplayField>EV_Descripcion__c</errorDisplayField>
+    <errorMessage>Caracteres 250 mínimos y 496 máximos</errorMessage>
+</ValidationRule>

@@ -1,0 +1,15 @@
+<aura:component implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller='AV_Header_Controller'>
+     
+<lightning:workspaceAPI aura:id="workspaceCmp" />
+    <aura:attribute name = "origenTab" type = 'String'></aura:attribute>
+    <!-- <aura:attribute name="origenTab" type="String" /> -->
+    <aura:attribute name="id" type="String" />
+    <aura:attribute name="recordToGo" type="String" />
+    <aura:attribute name="origenTabUrl" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.onPageReferenceChange}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+        <!-- <aura:registerEvent name="appEvent" type="c:AV_ReportAppEvent"/> -->
+    <c:av_newEvent onclosetabfinish="{!c.closeFocusedTabFinish}" onfocustab="{!c.focusedTab}" onclosetab="{!c.closeFocusedTab}" onrenametab="{!c.doInit}" accountid="{!v.c__recId}"
+    onfocusrecordtab = "{!c.focusRecordTab}"
+    onfocusrecordtabandclose = "{!c.closeFocusedTabAndClose}"></c:av_newEvent>
+</aura:component>

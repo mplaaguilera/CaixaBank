@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>Consulta de usuario</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>Reformulación</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>Resultados de Watson Assistant</label>
+            </value>
+            <value>
+                <fullName>4</fullName>
+                <default>false</default>
+                <label>Respuesta del Agente Cognitivo</label>
+            </value>
+            <value>
+                <fullName>5</fullName>
+                <default>false</default>
+                <label>Texto de usuario</label>
+            </value>
+            <value>
+                <fullName>6</fullName>
+                <default>false</default>
+                <label>Opción mostrada al usuario</label>
+            </value>
+            <value>
+                <fullName>7</fullName>
+                <default>false</default>
+                <label>Resultados de Retrieve and Rank (o Discovery)</label>
+            </value>
+            <value>
+                <fullName>8</fullName>
+                <default>false</default>
+                <label>Espacio detectado</label>
+            </value>
+            <value>
+                <fullName>9</fullName>
+                <default>false</default>
+                <label>Resultados del Buscador Semántico</label>
+            </value>
+            <value>
+                <fullName>10</fullName>
+                <default>false</default>
+                <label>Texto de FAQ Guias</label>
+            </value>
+            <value>
+                <fullName>11</fullName>
+                <default>false</default>
+                <label>Texto generado por el usuario</label>
+            </value>
+            <value>
+                <fullName>12</fullName>
+                <default>false</default>
+                <label>Teléfono seleccionado en Click 2 Call</label>
+            </value>
+            <value>
+                <fullName>13</fullName>
+                <default>false</default>
+                <label>Clasificación no univoca del Espacio de Trabajo (opciones mostradas al usuario)</label>
+            </value>
+            <value>
+                <fullName>14</fullName>
+                <default>false</default>
+                <label>Texto de Hidden Agent</label>
+            </value>
+            <value>
+                <fullName>15</fullName>
+                <default>false</default>
+                <label>Texto de Agente</label>
+            </value>
+            <value>
+                <fullName>16</fullName>
+                <default>false</default>
+                <label>Respuesta de Agente</label>
+            </value>
+            <value>
+                <fullName>17</fullName>
+                <default>false</default>
+                <label>Texto de usuario traducido</label>
+            </value>
+            <value>
+                <fullName>18</fullName>
+                <default>false</default>
+                <label>Registro de traceo de un error</label>
+            </value>
+            <value>
+                <fullName>19</fullName>
+                <default>false</default>
+                <label>Registro de una acción de usuario sobre un actionLink de una FAQ</label>
+            </value>
+            <value>
+                <fullName>20</fullName>
+                <default>false</default>
+                <label>Consulta de usuario clasificada como Chit Chat</label>
+            </value>
+            <value>
+                <fullName>21</fullName>
+                <default>false</default>
+                <label>Consulta de usuario con pocas palabras que no ha sido clasificada como Chit Chat</label>
+            </value>
+            <value>
+                <fullName>22</fullName>
+                <default>false</default>
+                <label>Consulta de usuario clasificada en algún espacio de negocio con un número de palabras permitido</label>
+            </value>
+            <value>
+                <fullName>23</fullName>
+                <default>false</default>
+                <label>Texto de usuario en una conversación con Chat Agent</label>
+            </value>
+            <value>
+                <fullName>24</fullName>
+                <default>false</default>
+                <label>Consulta de usuario que el clasificador no ha conseguido clasificar de forma clara en un espacio de trabajo</label>
+            </value>
+            <value>
+                <fullName>25</fullName>
+                <default>false</default>
+                <label>Consulta de usuario con demasiadas palabras</label>
+            </value>
+            <value>
+                <fullName>26</fullName>
+                <default>false</default>
+                <label>Consulta de usuario durante un diálogo</label>
+            </value>
+            <value>
+                <fullName>27</fullName>
+                <default>false</default>
+                <label>Reservada. Sin uso.</label>
+            </value>
+            <value>
+                <fullName>31</fullName>
+                <default>false</default>
+                <label>Registro de una petición de soporte a Hidden Agent</label>
+            </value>
+            <value>
+                <fullName>32</fullName>
+                <default>false</default>
+                <label>Registro de una conexión con cierto Hidden Agent</label>
+            </value>
+            <value>
+                <fullName>33</fullName>
+                <default>false</default>
+                <label>Registro de una respuesta proporcionada por un Hidden Agent</label>
+            </value>
+            <value>
+                <fullName>35</fullName>
+                <default>false</default>
+                <label>Registro del fin de la comunicación con Hidden Agent</label>
+            </value>
+            <value>
+                <fullName>36</fullName>
+                <default>false</default>
+                <label>Registro del fin de la atención de un Hidden Agent a una conversación</label>
+            </value>
+            <value>
+                <fullName>41</fullName>
+                <default>false</default>
+                <label>Registro de una petición de soporte a Chat Agent</label>
+            </value>
+            <value>
+                <fullName>42</fullName>
+                <default>false</default>
+                <label>Registro de una conexión con cierto Chat Agent</label>
+            </value>
+            <value>
+                <fullName>43</fullName>
+                <default>false</default>
+                <label>Registro de una respuesta proporcionada por un Chat Agent</label>
+            </value>
+            <value>
+                <fullName>44</fullName>
+                <default>false</default>
+                <label>Registro de un mensaje enviado por Chat Agent</label>
+            </value>
+            <value>
+                <fullName>45</fullName>
+                <default>false</default>
+                <label>Registro del fin de la comunicación con Chat Agent</label>
+            </value>
+            <value>
+                <fullName>46</fullName>
+                <default>false</default>
+                <label>Registro del fin de la atención de un Chat Agent a una conversación</label>
+            </value>
+            <value>
+                <fullName>47</fullName>
+                <default>false</default>
+                <label>Usuario ha reemprendido un chat</label>
+            </value>
+            <value>
+                <fullName>48</fullName>
+                <default>false</default>
+                <label>Usuario a rechazado un STOP &amp; GO</label>
+            </value>
+            <value>
+                <fullName>49</fullName>
+                <default>false</default>
+                <label>El timeout ha expirado</label>
+            </value>
+            <value>
+                <fullName>50</fullName>
+                <default>false</default>
+                <label>Se ha ofrecido la reconexión con agente</label>
+            </value>
+            <value>
+                <fullName>51</fullName>
+                <default>false</default>
+                <label>Registro de Click-To-Call indicado por un Agente Oculto</label>
+            </value>
+            <value>
+                <fullName>52</fullName>
+                <default>false</default>
+                <label>Registro de Escalado del sistema a Click-To-Call</label>
+            </value>
+            <value>
+                <fullName>53</fullName>
+                <default>false</default>
+                <label>Registro de Click-To-Call de Emergencia Mostrado</label>
+            </value>
+            <value>
+                <fullName>54</fullName>
+                <default>false</default>
+                <label>Registro de Click-To-Call indicado por un Agente Chat</label>
+            </value>
+            <value>
+                <fullName>55</fullName>
+                <default>false</default>
+                <label>Registro de Click to call indicado por Diálogo o FAQ Guiada</label>
+            </value>
+            <value>
+                <fullName>60</fullName>
+                <default>false</default>
+                <label>Registro que marca el comienzo de una nueva iteración</label>
+            </value>
+            <value>
+                <fullName>61</fullName>
+                <default>false</default>
+                <label>Registro de notificación de espacio de trabajo mostrada</label>
+            </value>
+            <value>
+                <fullName>62</fullName>
+                <default>false</default>
+                <label>Registro de notificación de centro mostrada</label>
+            </value>
+            <value>
+                <fullName>63</fullName>
+                <default>false</default>
+                <label>Resultados de Watson Assistant mostrados por pantalla</label>
+            </value>
+            <value>
+                <fullName>64</fullName>
+                <default>false</default>
+                <label>Registro de nodo mostrado</label>
+            </value>
+            <value>
+                <fullName>65</fullName>
+                <default>false</default>
+                <label>Registro de feedback mostrado</label>
+            </value>
+            <value>
+                <fullName>66</fullName>
+                <default>false</default>
+                <label>Opción seleccionada por el usuario</label>
+            </value>
+            <value>
+                <fullName>67</fullName>
+                <default>false</default>
+                <label>Resultados de Watson R&amp;R (o Discovery) mostrados por pantalla</label>
+            </value>
+            <value>
+                <fullName>68</fullName>
+                <default>false</default>
+                <label>Registro de una campaña mostrada al usuario</label>
+            </value>
+            <value>
+                <fullName>69</fullName>
+                <default>false</default>
+                <label>Resultados completos del Clasificador</label>
+            </value>
+            <value>
+                <fullName>70</fullName>
+                <default>false</default>
+                <label>Registro de un recibo de un evento de feedback por parte del controlador de la conversación</label>
+            </value>
+            <value>
+                <fullName>71</fullName>
+                <default>false</default>
+                <label>Registro de un audio de usuario</label>
+            </value>
+            <value>
+                <fullName>72</fullName>
+                <default>false</default>
+                <label>Registro de Insight a usuario impactado</label>
+            </value>
+            <value>
+                <fullName>73</fullName>
+                <default>false</default>
+                <label>Registro de notificación de USUARIO mostrada</label>
+            </value>
+            <value>
+                <fullName>74</fullName>
+                <default>false</default>
+                <label>Registro de notificación global mostrada</label>
+            </value>
+            <value>
+                <fullName>75</fullName>
+                <default>false</default>
+                <label>Resultado mostrado repetido</label>
+            </value>
+            <value>
+                <fullName>77</fullName>
+                <default>false</default>
+                <label>Fin FAQ</label>
+            </value>
+            <value>
+                <fullName>80</fullName>
+                <default>false</default>
+                <label>Registro de un recibo de un evento de selección de elemento en una lista, por parte del controlador de la conversación</label>
+            </value>
+            <value>
+                <fullName>81</fullName>
+                <default>false</default>
+                <label>Inicio de un diálogo de Watson Assistant</label>
+            </value>
+            <value>
+                <fullName>82</fullName>
+                <default>false</default>
+                <label>Petición de Ejecución de Acciones</label>
+            </value>
+            <value>
+                <fullName>83</fullName>
+                <default>false</default>
+                <label>Instrucción indicada por Watson</label>
+            </value>
+            <value>
+                <fullName>84</fullName>
+                <default>false</default>
+                <label>Respuesta de Watson recibida por el usuario</label>
+            </value>
+            <value>
+                <fullName>85</fullName>
+                <default>false</default>
+                <label>Fin de un diálogo de Watson Assistant</label>
+            </value>
+            <value>
+                <fullName>86</fullName>
+                <default>false</default>
+                <label>Resultado de un conjunto de acciones se envía a Watson</label>
+            </value>
+            <value>
+                <fullName>28</fullName>
+                <default>false</default>
+                <label>Reservada. Sin uso</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,75 @@
+<aura:component controller="SAC_LCMP_GestionEmails"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+    <aura:attribute name="ficherosAdjuntosOrigen" type="ContentVersion[]" />
+    <aura:attribute name="ficherosAdjuntosIncluidos" type="ContentVersion[]" />
+
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+    <aura:attribute name="documentosSubidosEstaEjecucion" type="String[]" />
+    <aura:attribute name="ficherosBorrados" type="String[]" />
+    <aura:attribute name="columns" type="List" default ="[
+    {label: 'nombre', fieldName: 'Title', type: 'text'},
+    {label: 'Id', fieldName: 'ContentDocumentId', type: 'Id'},
+    { type: 'action', typeAttributes: { rowActions: [{ label: 'Show details', name: 'show_details' } ]}} ]"/>
+    <aura:attribute name="ContentDocumentId" type="Id" />
+    <aura:attribute name="anchoTabla" type="Integer" default="12"/>
+    <aura:attribute name="anchodetalle" type="Integer" default="1"/>
+    <aura:attribute name="verDetalle" type="Boolean" default="false"/>
+    <aura:attribute name="busqueda" type="String" default=""/>
+    <aura:attribute name="preselectedRow" type="List" />
+    <aura:attribute name="pills" type="List" />
+
+
+
+
+    <aura:handler name="change" value="{!v.ficherosAdjuntosOrigen}" action="{!c.Inicial}"/>
+
+   <!-- <aura:handler name="init" value="{!this}" action="{!c.tmpInicial}" />-->
+   <lightning:pillContainer items="{!v.pills}" />
+
+    <div class="c-container">
+
+        <aura:iteration items="{!v.ficherosAdjuntosIncluidos}" var="file">
+           
+        <lightning:pill name="{!pill.ContentDocumentId}" label="{!file.Title}" >
+            <aura:set attribute="media">
+                <lightning:icon iconName="doctype:attachment"  alternativeText="attachment"/>
+            </aura:set>
+        </lightning:pill>
+        </aura:iteration>
+
+
+        <lightning:layout verticalAlign="stretch" multipleRows="true" class="x-large">
+            <lightning:layoutItem size="{!v.anchoTabla}" flexibility="auto" padding="around-small">
+                <lightning:input name="Busqueda" value='{!v.busqueda}' onchange='{!c.cambiaFiltro}' label="This is a search input"
+                type="search"
+                variant="label-hidden"/>
+                <br/>
+                <lightning:datatable
+                    keyField="Id"
+                    data="{! v.ficherosAdjuntos }"
+                    columns="{! v.columns }"
+                    onrowselection="{! c.updateSelected}"
+                    onrowaction="{! c.handleRowAction }"
+                    selectedRows="{!v.preselectedRow}"/>
+                
+            </lightning:layoutItem>
+            <aura:if isTrue="{!v.verDetalle}">
+            <lightning:layoutItem size="{!v.anchodetalle}" flexibility="auto" padding="around-small">
+                 <lightning:fileCard fileId="{!v.ContentDocumentId}" description="Miniatura" />
+                 <lightning:recordViewForm recordId="{!v.ContentDocumentId}" objectApiName="ContentVersion">
+                    <lightning:outputField fieldName="Title"/>
+                    <lightning:outputField fieldName="CreatedDate"/>
+                    <lightning:outputField fieldName="FileExtension"/>
+                    <lightning:outputField fieldName="FileType"/>
+                 </lightning:recordViewForm>
+            </lightning:layoutItem>
+            </aura:if>
+        </lightning:layout>
+        
+
+    </div>
+
+
+</aura:component>

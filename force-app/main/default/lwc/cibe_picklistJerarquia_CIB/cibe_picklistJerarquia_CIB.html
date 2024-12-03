@@ -1,0 +1,34 @@
+<template>
+    <lightning-card >
+        <div>
+            <button class="slds-button test-id__section-header-button slds-section__title-action" name ="Jerarquía Negocio NAME" title="Jerarquía Negocio Title" onclick={toggleShowAlerts}>
+                <lightning-icon if:true={showAlert} size="xx-small" icon-name="utility:chevrondown" class="slds-m-rigth_x-small"></lightning-icon>
+                <lightning-icon if:false={showAlert} size="xx-small" icon-name="utility:chevronright" class="slds-m-rigth_x-small"></lightning-icon>
+                <p class="slds-p-horizontal_small" style="font-size: medium;">{labels.jerarCIB}</p>
+            </button>
+        </div>
+        <div if:true={showAlert}>
+                <div class="slds-grid slds-gutters slds-m-around_xx-small slds-grid_align-center">
+                    <div class="slds-col slds-size_1-of-4  slds-m-left_medium">
+                        <lightning-combobox  data-field="negocio" label={labels.negocio} options={picklistValues} name="inputField"  value={inputField} onchange={handleValueChange} read-only=""  placeholder={negociosValue}> 
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4 slds-m-left_x-small flex-width">
+                        <lightning-combobox data-field="redes" label={labels.redeSeg} options={picklistValues2} name="inputField2" value={inputField2} onchange={handleValueChange2} placeholder={redesValue} read-only="" >
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4 slds-m-left_x-small">
+                        <lightning-combobox data-field="sectores" label={labels.sectorPai} options={picklistValues3} name="inputField3" value={inputField3} onchange={handleValueChange3} placeholder={sectorValue} read-only="" >
+                        </lightning-combobox>
+                    </div>
+                    <div class="section-content slds-size_1-of-4 slds-m-left_x-small slds-m-right_large">
+                        <lightning-combobox data-field="centro" label={labels.centCar} options={picklistValues4} name="inputField4" value={inputField4} onchange={handleValueChange4} placeholder={centrosValue} read-only="" >
+                        </lightning-combobox>
+                    </div>
+                </div>
+        </div>
+        <!--<div class="slds-col slds-size_1-of-5 slds-m-left_xx-large">
+            <lightning-button label={labels.guardar} variant="brand" onclick={updateCentro} disabled={disabled} ></lightning-button>
+        </div>-->
+    </lightning-card>
+</template>

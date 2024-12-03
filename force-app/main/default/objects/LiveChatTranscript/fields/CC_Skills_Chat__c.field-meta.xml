@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Skills_Chat__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF ( OR (ISNULL( CC_Categoria__c ), ISBLANK( CC_Categoria__c )), TEXT(CC_Tipo__c) + &quot;-&quot; + TEXT(CC_Idioma__c) + &quot;-&quot; + CC_Espacio__c, TEXT(CC_Tipo__c) + &quot;-&quot; + TEXT(CC_Idioma__c) + &quot;-&quot; + CC_Espacio__c + &quot;-&quot; + CC_Categoria__c)</formula>
+    <label>Skills Chat</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ValidationMotivo</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( SEG_Producto__c &lt;&gt; SEG_Motivo__r.CC_Producto_Servicio__c, ! ISBLANK( SEG_Motivo__c))</errorConditionFormula>
+    <errorDisplayField>SEG_Motivo__c</errorDisplayField>
+    <errorMessage>Se debe añadir un Motivo que pertenezca al Producto seleccionado.</errorMessage>
+</ValidationRule>

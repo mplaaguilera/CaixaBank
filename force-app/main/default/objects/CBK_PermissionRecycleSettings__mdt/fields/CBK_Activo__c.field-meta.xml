@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Activo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Check que indica si el registro ha de ser considerado para la revisión de permisos asignados</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Activo</label>
+    <type>Checkbox</type>
+</CustomField>

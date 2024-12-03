@@ -1,0 +1,104 @@
+<template>
+    <div if:true={showButton}>
+        <div class="slds-clearfix">
+            <button class="slds-button slds-button_brand slds-float_left" onclick={showForm}>Nuevo Proceso Refi</button>
+        </div>
+
+       <div if:true={showFormComponent}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">           
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{title}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">  
+                     <!-- P2253-569 - INICIO Modificacion HSC 25/10/2022 - Mostrar mensaje inicial antes de comenzar el proceso de Refi -->
+                    <template if:true={mostrarParteCero}>  
+                        <h3 class="slds-modal__title slds-hyphenate">{tituloMensaje} </h3></br>  
+                        <p>{mensajeInicial}</p>      
+                    </template>
+                     <!-- P2253-569 - FIN Modificacion HSC 25/10/2022 - Mostrar mensaje inicial antes de comenzar el proceso de Refi -->
+
+                    
+                    <template if:true={mostrarParteUno}>    
+                        <h3 class="slds-modal__title slds-hyphenate">Contratos con impago</h3></br>
+                        <!-- P2253-712 - Modificacion Helena Solana Cabañas 12/12/2022 - Lista de contratos al crear Proceso Refi - con todos -->
+                        <div style="height:fit-content">        
+                            <lightning-datatable
+                                key-field="id"
+                                data={contratosConDeuda}
+                                columns={columnsContratoDeuda}
+                                onrowselection={getSelectedIdConDeuda}>
+                            </lightning-datatable>
+                        </div> 
+                    </template>
+            
+                    <template if:true={noHayContratosDeuda}>
+                        <h3 class="slds-modal__title slds-hyphenate">Contratos con impago</h3></br>              
+                        Este cliente no tiene contratos con deuda.
+                    </template>   
+            
+                    </br>
+                    <template if:true={mostrarParteDos}> 
+                        <h3 class="slds-modal__title slds-hyphenate">Contratos sin impago</h3></br>  
+                        <!-- P2253-712 - Modificacion Helena Solana Cabañas 12/12/2022 - Lista de contratos al crear Proceso Refi - con todos -->
+                        <div style="height:fit-content">
+                            <lightning-datatable
+                                key-field="id"
+                                data={contratosSinDeuda}
+                                columns={columnsContratoSinDeuda}
+                                onrowselection={getSelectedIdSinDeuda}>
+                            </lightning-datatable>
+                        </div>         
+                    </template>
+            
+                    <template if:true={noHayContratosSin}>   
+                        <h3 class="slds-modal__title slds-hyphenate">Contratos sin impago</h3></br>          
+                        Este cliente no tiene contratos sin deuda.
+                    </template> 
+                    
+                    </br>
+                    <template if:true={mostrarError}> 
+                        <div class="slds-modal__content slds-p-around_medium error" >
+                            <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+                              <div class="slds-notify_container slds-is-relative">
+                                <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                                  <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                                    </svg>
+                                  </span>
+                                  <div class="slds-notify__content">
+                                    <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>          
+                    </template>
+                    </br>   
+                </div>
+                
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeAction} >Cancelar</button>
+                    <template if:true={mostrarContinuar}>
+                        <button class="slds-button slds-button_brand" onclick={continuar} >Continuar</button>
+                    </template>
+                    <!--P2253-712 - Modificacion HSC 02/12/2022 - Mostrar todo en una pantalla unificada
+                    <template if:true={mostrarSiguiente}>
+                        <button class="slds-button slds-button_brand" onclick={siguiente} >Siguiente</button>
+                    </template>-->
+                    <template if:true={mostrarCrear}>
+                        <button class="slds-button slds-button_brand" onclick={crear} disabled={disableSave}>Crear</button>
+                    </template>
+                </footer>
+
+            </div>
+                
+        </section> 
+        <div class="slds-backdrop slds-backdrop_open"></div>
+       </div>
+    </div>
+    
+    
+  
+</template>

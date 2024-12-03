@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mis_Casos_Pendientes_CAM2</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Fecha_Ultima_Interaccion__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>OWNER_NAME</columns>
+    <columns>CASES.RECORDTYPE</columns>
+    <columns>AM_Caso_Origen_SNAD__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Pendiente Colaborador,Pendiente Cliente,Pendiente Interno</value>
+    </filters>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.AM_Cliente,Case.AM_Empleado</value>
+    </filters>
+    <label>Mis Casos Pendientes CAM</label>
+    <sharedTo>
+        <group>AM_Buzon_Carteras</group>
+        <group>AM_Buzon_Fondos</group>
+        <group>AM_Buzon_Valores</group>
+    </sharedTo>
+</ListView>

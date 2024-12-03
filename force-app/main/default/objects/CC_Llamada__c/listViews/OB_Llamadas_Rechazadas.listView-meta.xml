@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Llamadas_Rechazadas</fullName>
+    <columns>NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OB_Estado__c</field>
+        <operation>equals</operation>
+        <value>OB_Rechazada</value>
+    </filters>
+    <label>Llamadas Rechazadas</label>
+</ListView>

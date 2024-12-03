@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_CanalDeComunicacion3__c</fullName>
+    <description>Canal terciario por el que se contactará al cliente en caso de ser posible</description>
+    <label>Canal de comunicación 3</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>EV_CanalesComunicacion</valueSetName>
+    </valueSet>
+</CustomField>

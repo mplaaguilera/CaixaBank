@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Creditos_sindicados__c</fullName>
+    <description>Cargos asociados a Créditos sindicados</description>
+    <label>Cargos (Créditos sindicados)</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>ASESOR CONTRATO</fullName>
+                <default>false</default>
+                <label>ASESOR CONTRATO</label>
+            </value>
+            <value>
+                <fullName>ASESOR FICHA</fullName>
+                <default>false</default>
+                <label>ASESOR FICHA</label>
+            </value>
+            <value>
+                <fullName>ASESOR JURIDICO</fullName>
+                <default>false</default>
+                <label>ASESOR JURIDICO</label>
+            </value>
+            <value>
+                <fullName>Asesor jurídico</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Asesor jurídico</label>
+            </value>
+            <value>
+                <fullName>ASESOR TECNICO</fullName>
+                <default>false</default>
+                <label>ASESOR TECNICO</label>
+            </value>
+            <value>
+                <fullName>Asesor técnico</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Asesor técnico</label>
+            </value>
+            <value>
+                <fullName>GARANTE</fullName>
+                <default>false</default>
+                <label>GARANTE</label>
+            </value>
+            <value>
+                <fullName>GESTOR WAIVER</fullName>
+                <default>false</default>
+                <label>GESTOR WAIVER</label>
+            </value>
+            <value>
+                <fullName>ORIGINADOR</fullName>
+                <default>false</default>
+                <label>ORIGINADOR</label>
+            </value>
+            <value>
+                <fullName>OSN</fullName>
+                <default>false</default>
+                <label>OSN</label>
+            </value>
+            <value>
+                <fullName>SOE</fullName>
+                <default>false</default>
+                <label>SOE</label>
+            </value>
+            <value>
+                <fullName>USO EN ADMINISTRACION</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>USO EN ADMINISTRACION</label>
+            </value>
+            <value>
+                <fullName>Uso en administración</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Uso en administración</label>
+            </value>
+            <value>
+                <fullName>USO EN SEGUIMIENTO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>USO EN SEGUIMIENTO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>6</visibleLines>
+</CustomField>

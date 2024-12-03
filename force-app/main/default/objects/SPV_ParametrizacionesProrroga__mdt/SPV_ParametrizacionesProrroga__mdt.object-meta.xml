@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Metadata para configurar los días de prórroga de la reclamación según su comunidad autónoma</description>
+    <label>SPV Parametrización Prórroga</label>
+    <pluralLabel>SPV Parametrizaciones Prórroga</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

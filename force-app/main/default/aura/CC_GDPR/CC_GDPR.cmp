@@ -1,0 +1,199 @@
+<aura:component controller="CC_GDPR" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" access="global">
+
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="lstOfRecordType" type="String[]" />
+    <aura:attribute name="mapOfRecordType" type="Map" />
+    <aura:attribute name="derechosCliente" type="Object"/>
+    <aura:attribute name="columnasDerechosCliente" type="List"/>
+    <aura:attribute name="derechosCaso" type="Object"/>
+    <aura:attribute name="columnasDerechosCaso" type="List"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+   	<aura:attribute name="caseRecord" type="Object"/>
+    <aura:attribute name="recordLoadError" type="String"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    <aura:attribute name="derechoId" type="String" />
+    <aura:attribute name="loaded" type="Boolean" default="false" />
+    <aura:attribute name="operativaDisponible" type="Boolean" default="false" />
+
+    <!-- Gestión de estilos de la QuickAction. Quitar marco gris -->
+    <aura:attribute name="cssStyle" type="String"/>    
+    <aura:unescapedHtml value="{!v.cssStyle}"/>
+
+    <!-- Método de inicialización --> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+ 
+    <!-- Histórico de derechos asociados al cliente -->
+    <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Histórico de derechos asociados al cliente">
+                            <lightning:icon iconName="custom:custom90" size="small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Histórico de derechos asociados al cliente</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-table slds-table_cell-buffer slds-table_bordered" style="height: 158px">
+                <aura:if isTrue="{! !v.loaded }">
+                    <lightning:spinner alternativeText="Cargando" />
+                </aura:if>
+                <lightning:datatable data="{! v.derechosCliente }" 
+                                     columns="{! v.columnasDerechosCliente }" 
+                                     keyField="idUrl"
+                                     hideCheckboxColumn="true"
+                                     minColumnWidth="150"/>
+            </div>
+        </article>
+    </div>
+    
+    <!-- Derechos asociados al caso -->
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="Derechos asociados al caso">
+                        <lightning:icon iconName="custom:custom90" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate">Derechos asociados al caso</span>
+                    </h2>
+                </div>
+                <div class="slds-no-flex">
+                    <lightning:button aura:id="refrescar" iconName="utility:refresh" title="Refrescar" onclick="{!c.refrescar}"/>
+                    <lightning:button aura:id="ejercerDerecho" label="Ejercer derecho" iconName="utility:add" title="Ejercer derecho" onclick="{!c.abrirModalEjercerDerecho}"/>
+                </div>
+            </header>
+        </div>
+        <div class="slds-table slds-table_cell-buffer slds-table_bordered" style="height: 158px">
+            <aura:if isTrue="{! !v.loaded }">
+                <lightning:spinner alternativeText="Cargando" />
+            </aura:if>
+            <lightning:datatable data="{! v.derechosCaso }"
+                                 columns="{! v.columnasDerechosCaso }"
+                                 keyField="idUrl"
+                                 hideCheckboxColumn="true"
+                                 minColumnWidth="150"/>
+            
+            
+        </div>
+    </article>
+    
+    <!--Modal para ejercer derecho-->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_small scroller" aura:id="ModalboxEjercerDerecho">
+        <force:recordData aura:id="recordLoader"
+                          recordId="{!v.recordId}"
+                          fields="AccountId, Contact.FirstName, Contact.LastName, Contact.CC_FechaNac__c, Account.CC_NumPerso__c, Account.CC_Numero_Documento__c, Account.Phone, Account.CC_Email__c, Account.BillingStreet, Account.BillingPostalCode, Account.BillingCity, Account.BillingState, Account.BillingCountry, Account.CC_OficinaGestoraId__r.Name, Account.CC_OficinaGestoraId__r.BillingStreet, Account.CC_OficinaGestoraId__r.BillingPostalCode, Account.CC_OficinaGestoraId__r.BillingCity, Account.CC_OficinaGestoraId__r.BillingState"
+                          targetFields="{!v.caseRecord}"
+                          targetError="{!v.recordLoadError}"/>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <button class="slds-button slds-button_icon slds-modal__close" title="Cerrar" onclick="{!c.cerrarModalEjercerDerecho}">
+                    <span class="slds-icon_container" title="Cerrar">
+                        <lightning:icon iconName="utility:close" size="small"/>
+                    </span>
+                    <span class="slds-assistive-text">Cerrar</span>
+                </button>
+                <!--Título-->
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Ejercer derecho</h2>
+            </header>
+            
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                
+                <div class="slds-box slds-box_small slds-m-bottom--x-small">
+                    <h3 class="slds-section-title--divider">Cliente</h3>
+                    <div class="slds-form--stacked slds-p-around--medium">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:input name="nif" readonly="true" value="{!v.caseRecord.Account.CC_Numero_Documento__c}" label="Número de documento" required="true" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:input name="nombre" readonly="true" value="{!v.caseRecord.Contact.FirstName}" label="Nombre" />
+                            </div>
+                            <div class="slds-col slds-size_2-of-4">
+                                <lightning:input name="apellido1" readonly="true" value="{!v.caseRecord.Contact.LastName}" label="Apellidos" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:input name="fechaNacimiento" readonly="true" value="{!v.caseRecord.Contact.CC_FechaNac__c}" label="Fecha nacimiento" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning:input name="telefono" readonly="true" value="{!v.caseRecord.Account.Phone}" label="Teléfono" />
+                            </div>
+                            <div class="slds-col slds-size_2-of-4">
+                                <lightning:input name="email" readonly="true" value="{!v.caseRecord.Account.CC_Email__c}" label="Email" />
+                            </div>
+                            <div class="slds-col slds-size_2-of-3">
+                                <lightning:input name="direccion" readonly="true" value="{!v.caseRecord.Account.BillingStreet}" label="Dirección" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:input name="cp" readonly="true" value="{!v.caseRecord.Account.BillingPostalCode}" label="Código postal" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:input name="provincia" readonly="true" value="{!v.caseRecord.Account.BillingState}" label="Provincia" />
+                            </div>
+                            <div class="slds-col slds-size_2-of-3">
+                                <lightning:input name="localidad" readonly="true" value="{!v.caseRecord.Account.BillingCity}" label="Localidad" />
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+                
+                <div class="slds-box slds-box_small slds-m-bottom--x-small">
+                    <h3 class="slds-section-title--divider">Oficina gestora</h3>
+                    <div class="slds-form--stacked slds-p-around--medium">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:input name="oficinaGestora_nombre" readonly="true" value="{!v.caseRecord.Account.CC_OficinaGestoraId__r.Name}" label="Nombre" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning:input name="oficinaGestora_direccion" readonly="true" value="{!v.caseRecord.Account.CC_OficinaGestoraId__r.BillingStreet}" label="Dirección" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:input name="oficinaGestora_codigoPostal" readonly="true" value="{!v.caseRecord.Account.CC_OficinaGestoraId__r.BillingPostalCode}" label="Código postal" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:input name="oficinaGestora_ciudad" readonly="true" value="{!v.caseRecord.Account.CC_OficinaGestoraId__r.BillingCity}" label="Ciudad" />
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning:input name="oficinaGestora_provincia" readonly="true" value="{!v.caseRecord.Account.CC_OficinaGestoraId__r.BillingState}" label="Provincia" />
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+                
+                <div class="slds-box slds-box_small slds-m-bottom--x-small">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning:select aura:id="recordTypePickList" name="derecho" label="Derecho" required="true">
+                                <option value="" text="--Ninguno--"/>
+                                <aura:iteration items="{!v.lstOfRecordType}" var="item">
+                                    <option value="{!item}" text="{!item}"/>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!--Pie del modal-->
+            <footer class="slds-modal__footer">
+                <lightning:button class="slds-button slds-button--neutral" label="Cancelar" onclick="{!c.cerrarModalEjercerDerecho}"/>
+                <lightning:button class="slds-button slds-button--brand" label="Siguiente" onclick="{!c.crearRegistroDerecho}"/>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop" aura:id="ModalBackdropEjercerDerecho"></div>
+
+</aura:component>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado_Reversion__c</fullName>
+    <description>Estado de la solicitud de reversión de ImaginBank.</description>
+    <label>Estado Reversión</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pendiente envío</fullName>
+                <default>false</default>
+                <label>Pendiente envío</label>
+            </value>
+            <value>
+                <fullName>Enviado</fullName>
+                <default>false</default>
+                <label>Enviado</label>
+            </value>
+            <value>
+                <fullName>Recibido</fullName>
+                <default>false</default>
+                <label>Recibido</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

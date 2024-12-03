@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_EmailTelefonoObligatorio</fullName>
+    <active>true</active>
+    <description>Un contacto comercial de CIB y EMP tiene que tener un email o un teléfono informado para poder ser creado</description>
+    <errorConditionFormula>$Profile.Name = &apos;CIBE_Gestor&apos; &amp;&amp;
+ RecordType.DeveloperName =&apos;CIBE_ContactoComercial&apos; &amp;&amp;
+	 ISNEW() &amp;&amp;
+		ISBLANK(Phone) &amp;&amp;
+		ISBLANK(Email)</errorConditionFormula>
+    <errorMessage>Se debe incluir un email o un teléfono para poder crear el contacto</errorMessage>
+</ValidationRule>

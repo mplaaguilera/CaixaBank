@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Export Finance</label>
+    <protected>false</protected>
+    <values>
+        <field>SEG_Correo_de_procedencia__c</field>
+        <value xsi:type="xsd:string">exportfinance.segmentos@gmail.com</value>
+    </values>
+    <values>
+        <field>SEG_Email_SF__c</field>
+        <value xsi:type="xsd:string">seg_emailservice@k853zl0ts2utfl45cbgz0gj25ktzh7w0iw10ut55tpbi4ye0p.kn-yy52aa.cs338.apex.sandbox.salesforce.com</value>
+    </values>
+    <values>
+        <field>SEG_Grupo_MCC__c</field>
+        <value xsi:type="xsd:string">EXPORT FINANCE FFEE</value>
+    </values>
+    <values>
+        <field>SEG_OZ_Preferente__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SEG_Organizacion__c</field>
+        <value xsi:type="xsd:string">Financiación Estructurada</value>
+    </values>
+    <values>
+        <field>SEG_Zona__c</field>
+        <value xsi:type="xsd:string">Export Finance</value>
+    </values>
+</CustomMetadata>

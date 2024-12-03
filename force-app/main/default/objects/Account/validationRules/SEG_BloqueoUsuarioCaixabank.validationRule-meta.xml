@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_BloqueoUsuarioCaixabank</fullName>
+    <active>true</active>
+    <description>Bloqueo para el perfil SEG_usuario_Caixabank</description>
+    <errorConditionFormula>RecordType.DeveloperName = &apos;CC_Colaborador&apos;
+&amp;&amp;  $Profile.Name = &apos;SEG_Usuario_CaixaBank&apos;</errorConditionFormula>
+    <errorMessage>No tienes permisos para cambiar datos de esta cuenta.</errorMessage>
+</ValidationRule>

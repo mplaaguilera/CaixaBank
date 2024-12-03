@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>PRO</label>
+    <protected>false</protected>
+    <values>
+        <field>CSBD_DatasetId__c</field>
+        <value xsi:type="xsd:string">659ed2aa5e65972c9fdb6f9b</value>
+    </values>
+    <values>
+        <field>CSBD_Envio_Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CSBD_FlowId__c</field>
+        <value xsi:type="xsd:string">3e868cd5-7015-4014-a8d9-ad8ad0b7aaa6</value>
+    </values>
+    <values>
+        <field>CSBD_SchemaId__c</field>
+        <value xsi:type="xsd:string">https://ns.adobe.com/caixa/schemas/9d44c838acb12141b81e0d3d994181914201e9db84a452d6</value>
+    </values>
+</CustomMetadata>

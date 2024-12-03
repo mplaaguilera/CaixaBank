@@ -1,0 +1,74 @@
+<template>
+    <template if:true={cargando}>
+        <div class="backgroundInverse">
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+    </template>
+    <article class="slds-card slds-card_boundary">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+              <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <lightning-icon icon-name="standard:event" class="slds-m-right_small" size="small"></lightning-icon>
+                    <span>{label.events} ({eventSize})</span>            
+                </h2>
+              </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner" style="text-align:right;">
+            <lightning-datatable
+                key-field="id"
+                data={pageDataEvent}
+                columns={columnsEvent}
+                hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+        <footer class="slds-card__footer">
+        <div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
+            <lightning-button-group>
+                <lightning-button-icon data-type="Event" icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
+                <lightning-button-icon data-type="Event" icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
+                <lightning-button-icon data-type="Event" icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
+                <lightning-button-icon data-type="Event" icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
+            </lightning-button-group>
+            <div class="slds-m-top_xxx-small">
+                ({getPageNumberEvent} / {getTotalPageNumberEvent})
+            </div>
+        </div>
+        </footer>
+    </article>
+    <article class="slds-card slds-card_boundary">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+              <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <lightning-icon icon-name="standard:task" class="slds-m-right_small" size="small"></lightning-icon>
+                    <span>{label.tasks} ({taskSize})</span>              
+                </h2>
+              </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning-datatable
+                key-field="id"
+                label={label.tasks}
+                data={pageDataTask}
+                columns={columnsTask}
+                hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+        <footer class="slds-card__footer">
+            <div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
+                <lightning-button-group>
+                    <lightning-button-icon data-type="Task" icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
+                    <lightning-button-icon data-type="Task" icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
+                    <lightning-button-icon data-type="Task" icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
+                    <lightning-button-icon data-type="Task" icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
+                </lightning-button-group>
+                <div class="slds-m-top_xxx-small">
+                    ({getPageNumberTask} / {getTotalPageNumberTask})
+                </div>
+            </div>
+        </footer>
+    </article>
+</template>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaVtoInferiorInicial</fullName>
+    <active>true</active>
+    <description>Validation rule para que no permita modificar la fecha de prorroga de la tarea a una fecha inferior a la Fecha vto inicial</description>
+    <errorConditionFormula>AND(
+					OR(RecordType.DeveloperName = &apos;SAC_MaestroDeTareas&apos;,RecordType.DeveloperName = &apos;SAC_OtrasTareas&apos;),
+					SAC_FechaVencimientoProrroga__c &lt;= SAC_FechaVencimientoInicial__c
+	    )</errorConditionFormula>
+    <errorMessage>La fecha de vencimiento de la prórroga no puede ser inferior o igual a la fecha de vencimiento inicial</errorMessage>
+</ValidationRule>

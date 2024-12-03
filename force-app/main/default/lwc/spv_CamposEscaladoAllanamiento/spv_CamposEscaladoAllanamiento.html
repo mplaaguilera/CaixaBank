@@ -1,0 +1,30 @@
+<template>
+        <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                        <lightning-combobox
+                                id="comboMotivo"
+                                name="Motivo Allanamiento"
+                                label="Motivo de allanamiento"
+                                value={selectedOptionMotivo}
+                                placeholder={escaladoMotivo}
+                                options={optionsMotivo}
+                                onchange={handleOptionChangeMotivo} 
+                                style='margin-left: 7px; margin-right: 7px;'
+                                variant="label-inline">
+                        </lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                        <lightning-combobox
+                                id="comboAnalisis"
+                                name="Analisis Allanamiento/Desistimientoo"
+                                label="Análisis Allanamiento/Desistimiento"
+                                value={selectedOptionAnalisis}
+                                placeholder={escaladoAnalisis}
+                                options={optionsAnalisis}
+                                onchange={handleOptionChangeAnalisis} 
+                                style='margin-right: 7px; margin-left: 7px;'
+                                variant="label-inline">
+                        </lightning-combobox>
+                </div>
+        </div>
+</template>

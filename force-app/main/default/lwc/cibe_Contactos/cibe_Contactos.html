@@ -1,0 +1,180 @@
+<template>
+    <div class="slds-card">
+        <div class="slds-card__header ">
+            <header class="slds-text-align_right">
+                <!-- <div class="slds-media__figure">
+                    <lightning-icon icon-name="standard:contact" size="small"></lightning-icon>
+                </div> -->
+                <!-- <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{labels.title} ({dataValues.length})</span>
+                    </h2>
+                </div> -->
+
+                <div class="slds-media slds-media_responsive">
+                    <div class="slds-media__figure slds-m-top_xx-small">
+                        <lightning-icon icon-name="utility:info" size="x-small"></lightning-icon>
+                    </div> 
+                    <div class="slds-media__body slds-m-top_xx-small">
+                        <div class="slds-text-align_left slds-m-top_xxx-small">
+                            <span>{labels.ayuda}</span>
+                        </div>
+                    </div>
+                    <div class="slds-media__figure slds-media__figure_reverse">
+                <div class="slds-text-align_right">
+                    <lightning-button-group>
+                        <template if:true={isShowAddMemberButton}>
+                                    <lightning-button class="slds-button_neutral" label={labels.nuevo} onclick={showAddContact}></lightning-button>
+                        </template>
+                    </lightning-button-group>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div>
+                <lightning-datatable
+                        key-field="id"
+                        hide-checkbox-column=”true”
+                        data={pageData}
+                        columns={columns}
+                        sorted-by={sortBy}
+                        sorted-direction={sortDirection}
+                        onsort={handleSortData}
+                        default-sort-direction={defaultSort}
+                        onrowaction={handleRowAction}
+                        resize-column-disabled>
+                </lightning-datatable>
+            </div>
+            <div class="slds-no-flex slds-text-align_right slds-m-top_xx-small">
+                <lightning-button-group>
+                    <lightning-button-icon icon-name="utility:arrow_left" size="medium" onclick={first}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:left" size="medium" onclick={previous}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:right" size="medium" onclick={next}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:arrow_right" size="medium" onclick={last}></lightning-button-icon>
+                </lightning-button-group>
+                <div class="slds-m-top_xxx-small">
+                    ({getPageNumber} / {getTotalPageNumber})
+                </div>
+            </div>
+            <template if:true={isShowSpinner}> 
+                <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+            </template>
+        </div>
+    <!--</div>-->
+
+    <!-- ADD MODAL -->
+    <template if:true={isShowAddContact}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideAddContact}></lightning-button-icon>
+                <div class="slds-is-relative">
+                    <template if:true={loadingAdd}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <div class="slds-modal__header">
+                        <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{labels.addContacto}</h1>
+                    </div>
+                    <lightning-record-edit-form object-api-name="Contact" record-type-id={recordTypeId} mode="edit" onsuccess={handleAddSuccess} onsubmit={handleAddSubmit} onerror={handleAddError}>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <h3 class="slds-section__title slds-theme--shade slds-p-left_medium">{labels.informacion}</h3>
+                            <div class="slds-grid slds-gutters slds-m-top_medium">
+                                <div class="slds-col">
+                                    <lightning-input-field field-name="Name" required></lightning-input-field>
+                                    <lightning-input-field field-name="AccountId" value={recordId} disabled required></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_Cargo__c"></lightning-input-field>                                   </div>
+                                <div class="slds-col margin">
+                                    <lightning-input-field field-name="Email"></lightning-input-field>
+                                    <lightning-input-field field-name="Phone"></lightning-input-field>
+                                    <lightning-input-field field-name="CC_Idioma__c"></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_Confidencial__c"></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_ContactoInfoComercial__c"></lightning-input-field>            
+                                </div>
+                            </div>
+                            <h3 class="slds-section__title slds-theme--shade slds-p-left_medium">{labels.observaciones}</h3>
+                            <div class="slds-m-top_medium">
+                                <lightning-input-field field-name="Description"></lightning-input-field>
+                            </div>    
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick={hideAddContact}>{labels.cancelar}</button>
+                            <lightning-button class="slds-button" type="submit" label={labels.add} variant="brand"></lightning-button>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+      <!-- EDIT MODAL -->
+    <template if:true={isShowEditContact}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideEditContact}></lightning-button-icon>
+                <div class="slds-is-relative">
+                    <template if:true={loadingEdit}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <div class="slds-modal__header">
+                        <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">{labels.editarContacto}</h1>
+                    </div>
+                    <lightning-record-edit-form record-id={editedRecord} object-api-name="Contact" mode="edit" onsuccess={handleEditSuccess} onsubmit={handleEditSubmit}>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                            <h3 class="slds-section__title slds-theme--shade slds-p-left_medium">{labels.informacion}</h3>
+                            <div class="slds-grid slds-gutters slds-m-top_medium">
+                                <div class="slds-col">
+                                    <lightning-input-field field-name="Name" required></lightning-input-field>
+                                    <lightning-input-field field-name="AccountId" disabled required></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_Cargo__c"></lightning-input-field>  
+                                </div>
+                                <div class="slds-col margin">
+                                    <lightning-input-field field-name="Email"></lightning-input-field>
+                                    <lightning-input-field field-name="Phone"></lightning-input-field>
+                                    <lightning-input-field field-name="CC_Idioma__c"></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_Confidencial__c"></lightning-input-field>
+                                    <lightning-input-field field-name="CIBE_ContactoInfoComercial__c"></lightning-input-field>
+                                </div>
+                            </div>
+                            <h3 class="slds-section__title slds-theme--shade slds-p-left_medium">{labels.observaciones}</h3>
+                            <div class="slds-m-top_medium">
+                                <lightning-input-field field-name="Description"></lightning-input-field>
+                            </div>    
+                        </div>
+                        <div class="slds-modal__footer">
+                            <button class="slds-button slds-button_neutral" onclick={hideEditContact}>{labels.cancelar}</button>
+                            <lightning-button class="slds-button" type="submit" label={labels.actualizar} variant="brand"></lightning-button>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <!-- DELETE MODAL -->
+    <template if:true={isShowDeleteContact}>
+        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideDeleteMember}></lightning-button-icon>
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{labels.eliminarContacto}</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                    <div class="slds-form slds-m-around_medium">
+                        <div class="slds-form-element slds-form-element_stacked slds-m-around_small slds-text-align_center">
+                            {labels.eliminarContactoConfirmacion}
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={hideDeleteContact}>{labels.cancelar}</button>
+                    <button class="slds-button slds-button_brand" onclick={handleDeleteContact}>{labels.eliminar}</button>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

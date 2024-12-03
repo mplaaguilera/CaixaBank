@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CustomerProHolder1__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(AV_Lead__r.AV_numperso__c),&quot;&quot;,HYPERLINK(&quot;/&quot; &amp; AV_Lead__r.AV_numperso__c,  AV_Lead__r.AV_numperso__r.FirstName  + &quot; &quot;+  AV_Lead__r.AV_numperso__r.LastName ,&quot;_self&quot; 
+))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Ficha cliente titular</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

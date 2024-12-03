@@ -1,0 +1,23 @@
+<template>
+    <lightning-card  variant="Narrow" 
+    icon-name="standard:service_contract">
+    <h1 slot="title">Contratos con Impago ({sumContractDeuda})</h1>
+        <lightning-datatable
+            key-field="id"
+            data={contratosConDeuda}
+            columns={columnsContratoDeuda}
+            hide-checkbox-column >
+        </lightning-datatable>
+    </lightning-card>
+    <br>
+    <lightning-card  variant="Narrow" 
+    icon-name="standard:contract">
+    <h1 slot="title">Contratos sin Impago ({sumContractSinDeuda})</h1>
+        <lightning-datatable
+            key-field="id"
+            data={contratosSinDeuda}
+            columns={columnsContratoSinDeuda}
+            hide-checkbox-column >
+        </lightning-datatable>
+    </lightning-card>    
+</template>

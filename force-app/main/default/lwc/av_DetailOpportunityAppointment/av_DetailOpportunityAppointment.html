@@ -1,0 +1,115 @@
+<template>
+	<div data-id="mainDiv" class="slds-grid basicContainer">
+		<!-- PRIMERA FILA  -->
+		<div class="slds-clearfix" style="width:100%;">
+			<div class="slds-float_left" if:true={vinculed} style="margin-right: 15px;">
+				<lightning-icon if:true={mainVinculed} size ="x-small" title ={label.mainOpp} class="main-icon slds-button slds-button_neutral" icon-name="utility:favorite" variant="warning" ></lightning-icon>
+				<div if:false={mainVinculed} class="vinculed">
+					<lightning-button-icon size ="medium" title={label.markMainOpp} icon-name="utility:favorite" variant="border-filled" onclick={handleMain} ></lightning-button-icon>
+				</div>
+			</div>
+			<div class="slds-float_left">
+				<div class="name-col">
+					<div style="width:fit-content">
+						<a if:true={isInserted} onclick={navigateToRecord} name={id}>{name}</a>
+						<span if:false={isInserted} >{name}</span>
+						<p>{label.statusOpp} <b>{statusNow}</b></p>
+					</div>
+				</div>
+			</div>
+			<div class="marginButtons itemSetting slds-float_left" style="margin-right:15px; margin-left: 15px; width:fit-content">
+				<lightning-button-icon icon-name="utility:arrow_right" data-id="arrow" onclick={handlePath}  name="arrow" class={arrowClass} variant="border" size="large" title="Insistir"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:event" data-id="agendado" onclick={handlePath}  name="agendado" class={agendadoClass} variant="border" size="large" title="Agendar"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:check" data-id="check" onclick={handlePath}  name="check" class={checkClass} variant="border" size="large" title="Cerrada Positiva"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:close" data-id="close" onclick={handlePath} name="close" class={closeClass}  variant="border" size="large" title="Cerrada Negativa"></lightning-button-icon>
+				<lightning-button-icon icon-name="utility:ban" data-id="ban" onclick={handlePath} name="ban" class={banClass}  variant="border" size="large" title="No apto"></lightning-button-icon>
+			</div>
+			<div class="slds-float_left" if:true={unfoldCmp}>
+				<div class="slds-clearfix marginInput">
+				
+					<abbr if:true={asteriskComentary} class="asteriskComentary">*</abbr>
+					<textarea style="margin-top: 17px; width: 380px" data-id="comentario" class="slds-float_left longWidth slds-textarea custom-textarea" placeholder="Comentario"  onchange={handleChangeComentario}>{comentarioToSend}</textarea>
+					<!-- <lightning-textarea data-id="comentario" class="slds-float_left longWidth prueba-textarea" type="text"  placeholder="Comentario"  onchange={handleChangeComentario} value={comentarioToSend}></lightning-textarea> -->
+					<div class="slds-float_left shortWidth" if:true={switchNextManagement}>
+						<abbr if:true={asterisk} class="asterisk">*</abbr>
+						<lightning-input  data-id="nextManagementeDate" class="nextDateClass" type="date" placeholder={especialInputLabel}  onchange={handleChangeFecha} min={todayString} value={oppoDate} message-when-range-underflow="La fecha ha de ser superior a hoy" date-style="short">
+						</lightning-input>
+					</div>
+					<lightning-combobox if:true={switchPotencial} class="slds-float_left shortWidth" placeholder="Expectativa de venta" options={potentiallist}  onchange={handleChangePotencial} value={expectativaToSend}></lightning-combobox>
+					<div if:true={switchResolution} class="slds-float_left shortWidth">
+						<lightning-combobox placeholder="Resolución" options={resolutionlist}  onchange={handleChangeResolucion}></lightning-combobox>
+					</div>
+				</div>
+			</div>
+			<lightning-button if:true={unfoldCmp} class="slds-float_right" label ={label.detail} onclick={openDetailWindow} style="margin-top:1.1rem"></lightning-button>
+			<!-- POPUP -->
+			<div class="modalContainer slds-modal slds-fade-in-open slds-backdrop slds-backdrop_open" if:true={isModalOpen}>
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<h2 class="slds-text-heading_medium"><strong>{label.detail}</strong></h2>
+					</header>
+					<div class="slds-modal__content slds-p-around_medium">
+						<div class="modalInputs">
+							<lightning-input if:true={switchImportSelf} class="shortWidth inputsDivfirst" type="text" placeholder="€" label={label.amount} value={importePropioToSend} onchange={handleChangeImportePropio}></lightning-input>
+							<lightning-input if:true={switchMargin} class="shortWidth inputsDivfirst" type="text" placeholder="€" label ="Margen estimado de la oportunidad" value={marginToSend} onchange={handleChangeMargin} style="width: 230px;"></lightning-input>
+							<div data-id="lookup2" class="marginSubProduct" if:true={switchSubProduct}>
+								<c-av_-lookup data-id="clookup2" 
+								selection={subProductInitial}
+								onsearch={handleSearchByProduct}
+								onclick={handleSearchClick} 
+								onselectionchange={handleSelectionChangeByProduct} 
+								fieldlabel="Sub producto" 
+								placeholder="Buscar sub producto..."></c-av_-lookup>
+							</div>
+						</div>
+						<div class="modalToggle" if:true={neededToggle}>
+							<lightning-input if:true={isToggleActive}
+							type="toggle" 
+							label="Producto en otra entidad" 
+							name="toggle" message-toggle-active="" 
+							message-toggle-inactive="" 
+							checked
+							onclick={handleToggleClick}></lightning-input>
+
+							<lightning-input if:false={isToggleActive}
+							type="toggle" 
+							label="Producto en otra entidad" 
+							name="toggle" message-toggle-active="" 
+							message-toggle-inactive="" 
+							onclick={handleToggleClick}></lightning-input>
+						</div>  
+						<template if:true={isToggleActive}>
+							<div class="modalInputs">
+								<lightning-input class="shortWidth inputsDivfirst" type="text" placeholder="Escribe el nombre" label="Entidad/Compañía" value={otraEntidadToSend} onchange={handleChangeOtraEntidad} style="width: 250px;"></lightning-input>
+								<lightning-input class="shortWidth inputsDivfirst" type="date" label="Vencimiento" style="width: 150px;" value={fechaOtraEntidadToSend} onchange={handleChangeFechaOtraEntidad} date-style="short"></lightning-input>    
+							</div>
+							<div class="modalInputs">
+								<lightning-input if:true={switchImportOtherEntity} class="shortWidth" type="text" placeholder="€" label ="Importe" value={importeOtraEntidadToSend} onchange={handleChangeImporteOtraEntidad} ></lightning-input>
+								<lightning-input class="shortWidth inputsDivfirst" type="text" placeholder="€" label ="Importe cuota" style="width: 130px;" value={cuotaToSend} onchange={handleChangeCuota}></lightning-input>
+							</div>
+						</template>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button label="Guardar" onclick={closeModal}></lightning-button>
+					</footer>
+				</div>
+			</div>
+		</div>
+		<!-- CUARTA FILA  -->
+		<!-- <div>
+			<div class="slds-grid inputsDiv">
+				<div if:true={showMoreInfo} class="slds-grid inputsDiv" >
+					<div data-id="lookup2" if:true={switchSubProduct}>
+						<c-av_-lookup data-id="clookup2" 
+						selection={subProductInitial}
+						onsearch={handleSearchByProduct} 
+						onselectionchange={handleSelectionChangeByProduct} fieldlabel="Sub producto" 
+						placeholder="Buscar sub producto..."></c-av_-lookup>
+					</div>
+					<lightning-input if:true={switchImportOtherEntity} class="shortWidth" type="text" placeholder="€" label ="ImporteOE" value={importeOtraEntidad} onchange={handleChangeImporteOtraEntidad} ></lightning-input>
+					<lightning-input if:true={switchMargin} class="shortWidth" type="text" placeholder="€" label ="Margen" value={margin}  onchange={handleChangeMargin}></lightning-input>
+				</div>
+			</div>
+		</div> -->
+	</div>
+</template>

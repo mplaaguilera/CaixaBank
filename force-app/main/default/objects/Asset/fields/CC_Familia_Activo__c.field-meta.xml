@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Familia_Activo__c</fullName>
+    <label>Familia de activo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>PACC</fullName>
+                <default>false</default>
+                <label>ACCESORIOS PC/PORT/TAPC</label>
+            </value>
+            <value>
+                <fullName>AP</fullName>
+                <default>false</default>
+                <label>ACCESS POINT</label>
+            </value>
+            <value>
+                <fullName>ACT</fullName>
+                <default>false</default>
+                <label>ACTUALIZADOR</label>
+            </value>
+            <value>
+                <fullName>ATRI</fullName>
+                <default>false</default>
+                <label>ADAP. TR PER IMPRES</label>
+            </value>
+            <value>
+                <fullName>ADAP</fullName>
+                <default>false</default>
+                <label>ADAPTADORS - NO PLAQ</label>
+            </value>
+            <value>
+                <fullName>ADPP</fullName>
+                <default>false</default>
+                <label>ADAPTADORS - PRALS</label>
+            </value>
+            <value>
+                <fullName>AGEL</fullName>
+                <default>false</default>
+                <label>AGENDA ELECTRÓNICA</label>
+            </value>
+            <value>
+                <fullName>SPKR</fullName>
+                <default>false</default>
+                <label>ALTAVOZ</label>
+            </value>
+            <value>
+                <fullName>AMPL</fullName>
+                <default>false</default>
+                <label>AMPL</label>
+            </value>
+            <value>
+                <fullName>MEM</fullName>
+                <default>false</default>
+                <label>AMPL./PLQ.MEM.</label>
+            </value>
+            <value>
+                <fullName>AURI</fullName>
+                <default>false</default>
+                <label>AURICULARES</label>
+            </value>
+            <value>
+                <fullName>BANN</fullName>
+                <default>false</default>
+                <label>BANNER</label>
+            </value>
+            <value>
+                <fullName>BAST</fullName>
+                <default>false</default>
+                <label>BASTIDOR</label>
+            </value>
+            <value>
+                <fullName>BASL</fullName>
+                <default>false</default>
+                <label>BASTIDOR LAN OFICINA</label>
+            </value>
+            <value>
+                <fullName>BIM</fullName>
+                <default>false</default>
+                <label>BIM</label>
+            </value>
+            <value>
+                <fullName>BLIN</fullName>
+                <default>false</default>
+                <label>BLINDATJE</label>
+            </value>
+            <value>
+                <fullName>BRID</fullName>
+                <default>false</default>
+                <label>BRIDGE</label>
+            </value>
+            <value>
+                <fullName>CAIX</fullName>
+                <default>false</default>
+                <label>CAIXER</label>
+            </value>
+            <value>
+                <fullName>CAJE</fullName>
+                <default>false</default>
+                <label>CAJERO</label>
+            </value>
+            <value>
+                <fullName>PHOT</fullName>
+                <default>false</default>
+                <label>CAMARAS DIGITALS</label>
+            </value>
+            <value>
+                <fullName>CDRR</fullName>
+                <default>false</default>
+                <label>CDROM REGRABABLE</label>
+            </value>
+            <value>
+                <fullName>CTRL</fullName>
+                <default>false</default>
+                <label>CENTRALETES</label>
+            </value>
+            <value>
+                <fullName>CONT</fullName>
+                <default>false</default>
+                <label>CONTADORES</label>
+            </value>
+            <value>
+                <fullName>CNTR</fullName>
+                <default>false</default>
+                <label>CONTESTADOR</label>
+            </value>
+            <value>
+                <fullName>CNTL</fullName>
+                <default>false</default>
+                <label>CONTROLADOR INTEGRADO</label>
+            </value>
+            <value>
+                <fullName>CORP</fullName>
+                <default>false</default>
+                <label>CORPORATIVA</label>
+            </value>
+            <value>
+                <fullName>DEST</fullName>
+                <default>false</default>
+                <label>DESTRUCTORA DE DOC.</label>
+            </value>
+            <value>
+                <fullName>DME</fullName>
+                <default>false</default>
+                <label>DIRECTORI MULTI EMPR</label>
+            </value>
+            <value>
+                <fullName>DISE</fullName>
+                <default>false</default>
+                <label>DISC EXTERN USB</label>
+            </value>
+            <value>
+                <fullName>DSMO</fullName>
+                <default>false</default>
+                <label>DISC MAGNETO-OPTIC</label>
+            </value>
+            <value>
+                <fullName>DISC</fullName>
+                <default>false</default>
+                <label>DISCO PC</label>
+            </value>
+            <value>
+                <fullName>DSC</fullName>
+                <default>false</default>
+                <label>DISCO-PC</label>
+            </value>
+            <value>
+                <fullName>DISP</fullName>
+                <default>false</default>
+                <label>DISPENSADOR-RECICALDOR DE BILLETES</label>
+            </value>
+            <value>
+                <fullName>DVCR</fullName>
+                <default>false</default>
+                <label>DVD + LECT/GRAB. CDR</label>
+            </value>
+            <value>
+                <fullName>DVDR</fullName>
+                <default>false</default>
+                <label>DVD + LECT/GRAB.DVD</label>
+            </value>
+            <value>
+                <fullName>PRES</fullName>
+                <default>false</default>
+                <label>ELEMENTOS PARA PRESENTACIONES</label>
+            </value>
+            <value>
+                <fullName>VARI</fullName>
+                <default>false</default>
+                <label>ELEMENTOS VARIOS</label>
+            </value>
+            <value>
+                <fullName>7340</fullName>
+                <default>false</default>
+                <label>ENCRIPTADORES</label>
+            </value>
+            <value>
+                <fullName>TELF</fullName>
+                <default>false</default>
+                <label>EQUIP TELEFONIC</label>
+            </value>
+            <value>
+                <fullName>ESPE</fullName>
+                <default>false</default>
+                <label>ESPECIALS I DIVERSOS</label>
+            </value>
+            <value>
+                <fullName>FAX</fullName>
+                <default>false</default>
+                <label>FAX</label>
+            </value>
+            <value>
+                <fullName>FIC</fullName>
+                <default>false</default>
+                <label>FICTICIO</label>
+            </value>
+            <value>
+                <fullName>FW</fullName>
+                <default>false</default>
+                <label>FIREWALL</label>
+            </value>
+            <value>
+                <fullName>FTCP</fullName>
+                <default>false</default>
+                <label>FOTOCOPIADORA</label>
+            </value>
+            <value>
+                <fullName>FTFX</fullName>
+                <default>false</default>
+                <label>FOTOCOPIADORA-FAX</label>
+            </value>
+            <value>
+                <fullName>FRLY</fullName>
+                <default>false</default>
+                <label>FRAME RELAY</label>
+            </value>
+            <value>
+                <fullName>GRAB</fullName>
+                <default>false</default>
+                <label>GRABADORA</label>
+            </value>
+            <value>
+                <fullName>HUB</fullName>
+                <default>false</default>
+                <label>HUB(FER SERVIR SWIT)</label>
+            </value>
+            <value>
+                <fullName>HUBS</fullName>
+                <default>false</default>
+                <label>HUB SWITCH</label>
+            </value>
+            <value>
+                <fullName>IBER</fullName>
+                <default>false</default>
+                <label>IBERCOM</label>
+            </value>
+            <value>
+                <fullName>IMPR</fullName>
+                <default>false</default>
+                <label>IMPRESSORA</label>
+            </value>
+            <value>
+                <fullName>MFIF</fullName>
+                <default>false</default>
+                <label>IMPR MULTIFUNCIONAL</label>
+            </value>
+            <value>
+                <fullName>KBLE</fullName>
+                <default>false</default>
+                <label>KBLE</label>
+            </value>
+            <value>
+                <fullName>KIO</fullName>
+                <default>false</default>
+                <label>KIOSCO</label>
+            </value>
+            <value>
+                <fullName>KIT</fullName>
+                <default>false</default>
+                <label>KITS</label>
+            </value>
+            <value>
+                <fullName>LECT</fullName>
+                <default>false</default>
+                <label>LECTOR</label>
+            </value>
+            <value>
+                <fullName>LTGR</fullName>
+                <default>false</default>
+                <label>LECTOR/GRAVADOR</label>
+            </value>
+            <value>
+                <fullName>REG</fullName>
+                <default>false</default>
+                <label>LINEA REGULAR</label>
+            </value>
+            <value>
+                <fullName>LINE</fullName>
+                <default>false</default>
+                <label>LINIES</label>
+            </value>
+            <value>
+                <fullName>SOFT</fullName>
+                <default>false</default>
+                <label>LLICENCIES SOFTWARE</label>
+            </value>
+            <value>
+                <fullName>MLAN</fullName>
+                <default>false</default>
+                <label>MACROLAN</label>
+            </value>
+            <value>
+                <fullName>MATR</fullName>
+                <default>false</default>
+                <label>MATRIZ COMMUTACION</label>
+            </value>
+            <value>
+                <fullName>MKD</fullName>
+                <default>false</default>
+                <label>MKD</label>
+            </value>
+            <value>
+                <fullName>MNTR</fullName>
+                <default>false</default>
+                <label>MONITOR</label>
+            </value>
+            <value>
+                <fullName>MSAU</fullName>
+                <default>false</default>
+                <label>MSAU</label>
+            </value>
+            <value>
+                <fullName>NODC</fullName>
+                <default>false</default>
+                <label>NODO CLIENTE</label>
+            </value>
+            <value>
+                <fullName>STRG</fullName>
+                <default>false</default>
+                <label>OF REPR DEL ESTRNGER</label>
+            </value>
+            <value>
+                <fullName>PANT</fullName>
+                <default>false</default>
+                <label>PANTALLA</label>
+            </value>
+            <value>
+                <fullName>PC</fullName>
+                <default>false</default>
+                <label>PC</label>
+            </value>
+            <value>
+                <fullName>PORT</fullName>
+                <default>false</default>
+                <label>PC - PORTATIL</label>
+            </value>
+            <value>
+                <fullName>PLQ</fullName>
+                <default>false</default>
+                <label>PLACA-ADAPTADOR</label>
+            </value>
+            <value>
+                <fullName>PLQP</fullName>
+                <default>false</default>
+                <label>PLAQUES PCMCIA</label>
+            </value>
+            <value>
+                <fullName>PLYR</fullName>
+                <default>false</default>
+                <label>PLAYER DE CARTELERIA</label>
+            </value>
+            <value>
+                <fullName>PLTR</fullName>
+                <default>false</default>
+                <label>PLOTTER - PRAL</label>
+            </value>
+            <value>
+                <fullName>GATE</fullName>
+                <default>false</default>
+                <label>PORTES DISPENSADOR</label>
+            </value>
+            <value>
+                <fullName>PVAR</fullName>
+                <default>false</default>
+                <label>PRINCIPAL - VARIS</label>
+            </value>
+            <value>
+                <fullName>PROJ</fullName>
+                <default>false</default>
+                <label>PROJECTOR</label>
+            </value>
+            <value>
+                <fullName>PP</fullName>
+                <default>false</default>
+                <label>PUNT A PUNT</label>
+            </value>
+            <value>
+                <fullName>REC</fullName>
+                <default>false</default>
+                <label>RECICLADOR</label>
+            </value>
+            <value>
+                <fullName>RECL</fullName>
+                <default>false</default>
+                <label>RECL</label>
+            </value>
+            <value>
+                <fullName>X250</fullName>
+                <default>false</default>
+                <label>RED - CERO - X25</label>
+            </value>
+            <value>
+                <fullName>RDSI</fullName>
+                <default>false</default>
+                <label>RED DGTL.SERV.INTG.</label>
+            </value>
+            <value>
+                <fullName>X251</fullName>
+                <default>false</default>
+                <label>RED-UNO</label>
+            </value>
+            <value>
+                <fullName>REPE</fullName>
+                <default>false</default>
+                <label>REPETIDOR F.O.</label>
+            </value>
+            <value>
+                <fullName>DOCK</fullName>
+                <default>false</default>
+                <label>REPLICADOR PUERTOS PORTATIL</label>
+            </value>
+            <value>
+                <fullName>ROUT</fullName>
+                <default>false</default>
+                <label>ROUT/BROG NO PCS</label>
+            </value>
+            <value>
+                <fullName>RSAN</fullName>
+                <default>false</default>
+                <label>RSAN</label>
+            </value>
+            <value>
+                <fullName>SCAN</fullName>
+                <default>false</default>
+                <label>SCANERS</label>
+            </value>
+            <value>
+                <fullName>MSCL</fullName>
+                <default>false</default>
+                <label>SERV.AMBIENT.MUSICAL</label>
+            </value>
+            <value>
+                <fullName>S90X</fullName>
+                <default>false</default>
+                <label>SERVEI - 90X</label>
+            </value>
+            <value>
+                <fullName>INCI</fullName>
+                <default>false</default>
+                <label>SERVEI DESCONEGUT</label>
+            </value>
+            <value>
+                <fullName>GAUD</fullName>
+                <default>false</default>
+                <label>SERVEI GAUDI</label>
+            </value>
+            <value>
+                <fullName>IP</fullName>
+                <default>false</default>
+                <label>SERVEIS IP</label>
+            </value>
+            <value>
+                <fullName>XDSL</fullName>
+                <default>false</default>
+                <label>SERVEI XDSL ASSOCIAT</label>
+            </value>
+            <value>
+                <fullName>CINC</fullName>
+                <default>false</default>
+                <label>SERVICIO CINCO</label>
+            </value>
+            <value>
+                <fullName>SECO</fullName>
+                <default>false</default>
+                <label>SERVIDOR DE COMUNICACIONES</label>
+            </value>
+            <value>
+                <fullName>SDEP</fullName>
+                <default>false</default>
+                <label>SISTEMA DE DEPOSITO</label>
+            </value>
+            <value>
+                <fullName>SMPH</fullName>
+                <default>false</default>
+                <label>SMARTPHONE</label>
+            </value>
+            <value>
+                <fullName>SOND</fullName>
+                <default>false</default>
+                <label>SONDA LAN</label>
+            </value>
+            <value>
+                <fullName>7710</fullName>
+                <default>false</default>
+                <label>SONDA MNTRZACÓ LAN</label>
+            </value>
+            <value>
+                <fullName>SOPO</fullName>
+                <default>false</default>
+                <label>SOPORTE</label>
+            </value>
+            <value>
+                <fullName>STRE</fullName>
+                <default>false</default>
+                <label>STREAMERS</label>
+            </value>
+            <value>
+                <fullName>SWIT</fullName>
+                <default>false</default>
+                <label>SWITCH</label>
+            </value>
+            <value>
+                <fullName>TABL</fullName>
+                <default>false</default>
+                <label>TABLET / TABLETA DIGITALIZADORA</label>
+            </value>
+            <value>
+                <fullName>TAPC</fullName>
+                <default>false</default>
+                <label>TABLET PC</label>
+            </value>
+            <value>
+                <fullName>TAI</fullName>
+                <default>false</default>
+                <label>TAI -TERM.AUTOSERVEI</label>
+            </value>
+            <value>
+                <fullName>SIM</fullName>
+                <default>false</default>
+                <label>TARJETA - SIM -</label>
+            </value>
+            <value>
+                <fullName>TEAC</fullName>
+                <default>false</default>
+                <label>TEAC</label>
+            </value>
+            <value>
+                <fullName>TECL</fullName>
+                <default>false</default>
+                <label>TECLAT</label>
+            </value>
+            <value>
+                <fullName>TCTF</fullName>
+                <default>false</default>
+                <label>TECLATS MULTIFUNCION</label>
+            </value>
+            <value>
+                <fullName>TMC</fullName>
+                <default>false</default>
+                <label>TELEF.MOBIL CORPORAT</label>
+            </value>
+            <value>
+                <fullName>TMD</fullName>
+                <default>false</default>
+                <label>TELEF.MOBIL DIGITAL</label>
+            </value>
+            <value>
+                <fullName>TELD</fullName>
+                <default>false</default>
+                <label>TELEFON DIGITAL</label>
+            </value>
+            <value>
+                <fullName>VOIP</fullName>
+                <default>false</default>
+                <label>TELEFONIA IP</label>
+            </value>
+            <value>
+                <fullName>TELX</fullName>
+                <default>false</default>
+                <label>TELEX</label>
+            </value>
+            <value>
+                <fullName>TIK</fullName>
+                <default>false</default>
+                <label>TIK</label>
+            </value>
+            <value>
+                <fullName>TMAC</fullName>
+                <default>false</default>
+                <label>TLF.MOBIL-ACCESORIS</label>
+            </value>
+            <value>
+                <fullName>TMTE</fullName>
+                <default>false</default>
+                <label>TLF.MOBIL-TERMINALS</label>
+            </value>
+            <value>
+                <fullName>TUR</fullName>
+                <default>false</default>
+                <label>TUR</label>
+            </value>
+            <value>
+                <fullName>VERI</fullName>
+                <default>false</default>
+                <label>VERIFICADORAS</label>
+            </value>
+            <value>
+                <fullName>VDCO</fullName>
+                <default>false</default>
+                <label>VIDEO CONFERENCIA</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

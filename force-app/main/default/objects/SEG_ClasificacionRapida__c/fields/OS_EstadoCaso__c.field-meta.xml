@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_EstadoCaso__c</fullName>
+    <label>Estado caso</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CBK_Negocio__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Cerrado</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>Activo</fullName>
+                <default>false</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>Rechazado</fullName>
+                <default>false</default>
+                <label>Rechazado</label>
+            </value>
+            <value>
+                <fullName>Pendiente Colaborador</fullName>
+                <default>false</default>
+                <label>Pendiente Colaborador</label>
+            </value>
+            <value>
+                <fullName>Pendiente Cliente</fullName>
+                <default>false</default>
+                <label>Pendiente Cliente</label>
+            </value>
+            <value>
+                <fullName>Pendiente Incidencia</fullName>
+                <default>false</default>
+                <label>Pendiente Incidencia</label>
+            </value>
+            <value>
+                <fullName>Pendiente Interno</fullName>
+                <default>false</default>
+                <label>Pendiente Interno</label>
+            </value>
+            <value>
+                <fullName>Pendiente Revisión</fullName>
+                <default>false</default>
+                <label>Pendiente Revisión</label>
+            </value>
+            <value>
+                <fullName>Pendiente Alerta</fullName>
+                <default>false</default>
+                <label>Pendiente Alerta</label>
+            </value>
+            <value>
+                <fullName>SAC_013</fullName>
+                <default>false</default>
+                <label>Descartada</label>
+            </value>
+            <value>
+                <fullName>New</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>New</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Cerrado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Activo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <valueName>Rechazado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Incidencia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Interno</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Revisión</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <valueName>Pendiente Alerta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <valueName>SAC_013</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

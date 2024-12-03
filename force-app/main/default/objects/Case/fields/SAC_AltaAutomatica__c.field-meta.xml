@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_AltaAutomatica__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para identificar las reclamaciones/pretensiones que han sido dadas de alta desde el botón &quot;Nueva reclamación vinculada&quot;</description>
+    <label>Alta automática</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

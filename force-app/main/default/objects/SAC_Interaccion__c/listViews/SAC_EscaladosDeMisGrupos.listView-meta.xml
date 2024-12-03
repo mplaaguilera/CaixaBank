@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EscaladosDeMisGrupos</fullName>
+    <columns>CREATED_DATE</columns>
+    <columns>NAME</columns>
+    <columns>SAC_Titulo__c</columns>
+    <columns>SAC_MotivoEscalado__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <columns>SAC_GrupoColaborador__c</columns>
+    <columns>OWNER.ALIAS</columns>
+    <columns>SAC_EscaladoNV2__c</columns>
+    <columns>SAC_EscaladoNV3__c</columns>
+    <columns>SAC_CasoEscalado__c</columns>
+    <columns>SAC_MCC_Producto__c</columns>
+    <columns>SAC_MCC_Motivo__c</columns>
+    <columns>SAC_VencimientoReclamacion__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SAC_Interaccion__c.SAC_Escalado,SAC_Interaccion__c.SAC_EscaladoNV3</value>
+    </filters>
+    <filters>
+        <field>SAC_EsMiGrupo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>SAC - Escalados a mis grupos</label>
+</ListView>

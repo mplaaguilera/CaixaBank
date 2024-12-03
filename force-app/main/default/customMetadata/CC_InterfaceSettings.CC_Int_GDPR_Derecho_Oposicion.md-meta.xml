@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CC_Int_GDPR_Derecho_Oposicion</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_Password__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Username__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ACTION__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_AFFECTEDEMAIL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_AFFECTEDPHONE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ALF_CliConf__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Activa__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Body__c</field>
+        <value xsi:type="xsd:string">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:gdp=&quot;http://gdprderechosv4.gdprderechos.mca.si.absis.lacaixa.es/&quot;&gt;&lt;soapenv:Header/&gt;&lt;soapenv:Body&gt;&lt;gdp:AltaSolicitud&gt;&lt;externalInputTO&gt;&lt;canal&gt;##canal##&lt;/canal&gt;&lt;canalComunicacion&gt;##canalComunicacion##&lt;/canalComunicacion&gt;&lt;datosAdicionalesAlta&gt;&lt;codigoPostal&gt;##codigoPostal##&lt;/codigoPostal&gt;&lt;localidad&gt;##localidad##&lt;/localidad&gt;&lt;nombre&gt;##nombre##&lt;/nombre&gt;&lt;nombreVia&gt;##nombreVia##&lt;/nombreVia&gt;&lt;pais&gt;##pais##&lt;/pais&gt;&lt;primerApell&gt;##primerApell##&lt;/primerApell&gt;&lt;provincia&gt;##provincia##&lt;/provincia&gt;&lt;resto&gt;##resto##&lt;/resto&gt;&lt;segundoApell&gt;##segundoApell##&lt;/segundoApell&gt;&lt;/datosAdicionalesAlta&gt;&lt;derechoAlta&gt;&lt;derecho&gt;##derecho##&lt;/derecho&gt;&lt;identPortabilidad&gt;##identPortabilidad##&lt;/identPortabilidad&gt;&lt;textoOposicion&gt;##textoOposicion##&lt;/textoOposicion&gt;&lt;textoRectificacion&gt;##textoRectificacion##&lt;/textoRectificacion&gt;&lt;textoRevocacion&gt;##textoRevocacion##&lt;/textoRevocacion&gt;&lt;tipoPortabilidad&gt;##tipoPortabilidad##&lt;/tipoPortabilidad&gt;&lt;tipoLimitacion&gt;##tipoLimitacion##&lt;/tipoLimitacion&gt;&lt;/derechoAlta&gt;&lt;empresa&gt;##empresa##&lt;/empresa&gt;&lt;estado&gt;##estado##&lt;/estado&gt;&lt;motivo&gt;##motivo##&lt;/motivo&gt;&lt;numeroGrabacion&gt;##numeroGrabacion##&lt;/numeroGrabacion&gt;&lt;oficina&gt;##oficina##&lt;/oficina&gt;&lt;representanteAlta/&gt;&lt;solicitanteAlta&gt;&lt;documento&gt;##documento##&lt;/documento&gt;&lt;numperso&gt;##numperso##&lt;/numperso&gt;&lt;paisExpedicion&gt;##paisExpedicion##&lt;/paisExpedicion&gt;&lt;tipoDocumento&gt;##tipoDocumento##&lt;/tipoDocumento&gt;&lt;/solicitanteAlta&gt;&lt;/externalInputTO&gt;&lt;/gdp:AltaSolicitud&gt;&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;</value>
+    </values>
+    <values>
+        <field>CC_CLASS__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Certificado__c</field>
+        <value xsi:type="xsd:string">Cert_PRE_2wSSL</value>
+    </values>
+    <values>
+        <field>CC_CharSet__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CliConfiErr__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CC_ContentType__c</field>
+        <value xsi:type="xsd:string">text/xml</value>
+    </values>
+    <values>
+        <field>CC_ConvAmbito__c</field>
+        <value xsi:type="xsd:string">https://api.pre.private.cer.caixabank.com/GDPRDerechos/GDPRDerechosV4/altaSolicitud/</value>
+    </values>
+    <values>
+        <field>CC_DiasRef__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_EXTERNALSYSTEM__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_EndPoint__c</field>
+        <value xsi:type="xsd:string">https://api.pre.private.cer.caixabank.com/tech/gdpr/GDPRDerechos/GDPRDerechosV4/AltaSolicitud</value>
+    </values>
+    <values>
+        <field>CC_HttpRequest__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_ITD_ITNINCIDENTINCI__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNESCENARIO__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNEVENTO__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNINCTYPE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNRELEVANTE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ITNROL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Aplicacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Canal__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OCP_Usuario__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ORGID__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_REPORTEDEMAIL__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_REPORTEDPHONE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_SITEID__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_SoapAction__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TimeOut__c</field>
+        <value xsi:type="xsd:double">60000.0</value>
+    </values>
+    <values>
+        <field>CC_TipoPeticion__c</field>
+        <value xsi:type="xsd:string">POST</value>
+    </values>
+    <values>
+        <field>CC_TrazaActiva__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_TrazaEntrada__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_TrazaSalida__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_WORKLOG_ACTION__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_WORKLOG_LOGTYPE__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

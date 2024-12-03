@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_PorcentajeBonificacion__c</fullName>
+    <defaultValue>IF ( $RecordType.DeveloperName = &apos;CSBD_Hipoteca&apos;, 0.0075, null)</defaultValue>
+    <description>% de descuento que aplicar sobre el interés (campo CSBD_TIN_Inicial__c)</description>
+    <label>% de bonificación</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>3</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

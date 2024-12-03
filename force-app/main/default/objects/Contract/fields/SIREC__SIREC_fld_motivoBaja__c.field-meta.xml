@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIREC__SIREC_fld_motivoBaja__c</fullName>
+    <deprecated>false</deprecated>
+    <label>Motivo de Baja</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CAN</fullName>
+                <default>false</default>
+                <label>CANCELADO DEFINITIVO</label>
+            </value>
+            <value>
+                <fullName>DEV</fullName>
+                <default>false</default>
+                <label>DEVUELTO</label>
+            </value>
+            <value>
+                <fullName>REG</fullName>
+                <default>false</default>
+                <label>REGULARIZADO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

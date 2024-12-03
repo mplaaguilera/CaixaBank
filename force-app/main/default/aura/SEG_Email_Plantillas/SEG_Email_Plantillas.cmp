@@ -1,0 +1,143 @@
+<aura:component controller="SEG_Case_EmailPlantillas_Controller" implements="force:hasRecordId">
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="user" type="String"/>
+    <aura:attribute name="esPropietario" type="Boolean" default="false" />
+    <aura:attribute name="plantillas" type="List" />
+    <aura:attribute name="idiomaOptions" type="List" default="[
+        {value: 'en', label: 'Inglés'},
+        {value: 'es', label: 'Castellano'},
+        {value: 'ca', label: 'Català'},
+        {value: 'eu', label: 'Euskera'},
+        {value: 'ga', label: 'Gallego'}
+    ]" />
+    <aura:attribute name="plantilla" type="SEG_Plantilla__c" />
+    <aura:attribute name="plantillasOrg" type="List" />
+    <aura:attribute name="mostrarPlantillas" type="boolean" default="false" />
+    <aura:attribute name="selectedIdioma" type="String" />
+    <aura:attribute name="cntId" type="String" />
+    <aura:attribute name="contactData" type="Contact" />
+    <aura:attribute name="contactPrincipal" type="Contact" />
+    <aura:attribute name="nombreGrupoColaboradorPrincipal" type="String" />
+    <aura:attribute name="contactPara" type="List" />
+    <aura:attribute name="contactParaEmail" type="List" />
+    <aura:attribute name="cerrarResponder" type="boolean" />
+    <aura:attribute name="datosEmail" type="EmailMessage" />
+    <aura:attribute name="datosContact" type="Contact" />
+    <aura:attribute name="caseId" type="String" />
+    <aura:attribute name="origenNuevo" type="boolean" />
+    <aura:attribute name="nuevoDestino" type="boolean" />
+    <aura:attribute name="infoContacto" type="Contact" />
+    <aura:attribute name="dataPara" type="List" />
+    <aura:attribute name="plantillaId" type="String" />
+    <aura:attribute name="plantillaIdOrg" type="String" />
+    <aura:attribute name="idiomaPlanId" type="String" />
+    <aura:attribute name="nombrePlantilla" type="String" />
+    <aura:attribute name="tipoDestinatarioPrincipal" type="String" default=""/>
+    <aura:attribute name="nombreContactoSOEOSN" type="String"/>
+    <aura:attribute name="emailContactoSOEOSN" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+
+    <!-- EVENTO PARA PASAR LISTA NUEVO CONTACTO EN BUSCADOR -->
+    <aura:registerEvent name="cargarLista" type="c:SEG_lstDestinatario_event" />
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-grid slds-grid_vertical slds-wrap" style="width: 100%;">
+            <div class="slds-col" style="padding-top: 8px;">
+                <span class="slds-truncate slds-text-title_caps">Destinatario principal</span>
+            </div>
+
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small" style="padding-left: 24px; padding-top: 11px; padding-bottom: 10px;" title="Destinatario principal">
+                <div class="slds-col slds-grow-none slds-gutters_x-small">
+                    <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Grupo colaborador'}">
+                        <lightning:icon iconName="action:new_group" size="x-small" class="rojo" style="background-color: #f77e75;" title="Grupo colaborador"/>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Colaborador'}">
+                                <lightning:icon iconName="action:user" size="x-small" class="rojo" style="background-color: #f77e75;" title="Colaborador"/>
+                                <aura:set attribute="else">
+                                    <lightning:icon iconName="action:add_contact" size="x-small" title="Contacto"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-col slds-grow-none"> 
+                    <aura:if isTrue="{!v.nuevoDestino}">
+                        <aura:if isTrue="{!v.emailContactoSOEOSN != ''}">
+                            <span class="slds-listbox__option-text_entity"><b>{!v.nombreContactoSOEOSN}</b></span>
+                            <span class="slds-listbox__option-meta ">{!v.emailContactoSOEOSN}</span>
+                            <aura:set attribute="else">
+                                <span class="slds-listbox__option-text_entity"><b>{!v.contactPrincipal.Name}</b></span>
+                                <span class="slds-listbox__option-meta ">{!!empty(v.contactPrincipal.Email) ? v.contactPrincipal.Email : 'Sin correo'}</span>
+                            </aura:set>   
+                        </aura:if>
+                        <aura:set attribute="else"> 
+                            <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Grupo colaborador'}">
+                                <span class="slds-listbox__option-text_entity"><b>{!v.nombreGrupoColaboradorPrincipal}</b></span>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!!empty(v.datosEmail)}">
+                                        <span class="slds-listbox__option-text_entity"><b>{!v.datosEmail.FromName}</b></span>
+                                        <span class="slds-listbox__option-meta ">{!v.datosEmail.FromAddress}</span>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if>
+                <!--    <aura:if isTrue="{!!empty(v.datosEmail)}">
+                        <span class="slds-listbox__option-text_entity"><b>{!v.datosEmail.FromName}</b></span>
+                        <span class="slds-listbox__option-meta ">{!v.datosEmail.FromAddress}</span>
+                        <aura:set attribute="else"> 
+                            <aura:if isTrue="{!v.tipoDestinatarioPrincipal == 'Grupo colaborador'}">
+                                <span class="slds-listbox__option-text_entity"><b>{!v.nombreGrupoColaboradorPrincipal}</b></span>
+                                <aura:set attribute="else">
+                                    <span class="slds-listbox__option-text_entity"><b>{!v.contactPrincipal.Name}</b></span>
+                                    <span class="slds-listbox__option-meta ">{!!empty(v.contactPrincipal.Email) ? v.contactPrincipal.Email : 'Sin correo'}</span>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                    </aura:if> -->
+                </div>
+            </div>
+
+            <div class="slds-col" style="padding-top: 16px; padding-bottom: 5px;">
+                <span class="slds-truncate slds-text-title_caps">Seleccionar plantilla</span>
+            </div>
+
+            <div class="slds-col slds-var-p-vertical_x-small">
+                <lightning:combobox aura:id="selectIdioma" autocomplete="off" name="Idioma" label="Idioma" value="{!v.selectedIdioma}" options="{!v.idiomaOptions}" onchange="{!c.mostrarPlantillasIdioma}" placeholder="Seleccionar idioma"/>
+            </div>
+            <div class="slds-col slds-var-p-vertical_x-small" style="width: 100%;">
+                <lightning:combobox aura:id="selectPlantilla" autocomplete="off" name="Plantillas" label="Plantilla" value="{!v.plantillaId}" options="{!v.plantillas}" onchange="{!c.plantillaLista}" placeholder="Seleccionar plantilla" disabled="{!v.selectedIdioma == null}"/>
+            </div>
+            <div class="slds-col slds-var-p-vertical_x-small" style="width: 100%;">
+                <div class="slds-combobox_container slds-combobox-addon_end">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                            <lightning:input type="search" value="{!v.nombrePlantilla}" label="Buscar plantilla" aura:id="buscarKeyPlantilla" onchange="{!c.buscarPlantilla}" placeholder="Plantilla de mi organización..." disabled="{!v.selectedIdioma == null}"/>
+                        </div>
+                        <aura:if isTrue="{!v.mostrarPlantillas}">
+                            <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="max-width: initial; width: 100%; max-height: 200px;">
+                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                    <aura:iteration items="{!v.plantillasOrg}" var="currentPlantilla">
+
+                                        <li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+                                            <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" id="{!currentPlantilla.value}" name="{!currentPlantilla.label}" onclick="{!c.seleccionarPlantilla}" title="{!currentPlantilla.label}">
+                                                <span class="slds-media__figure slds-listbox__option-icon">
+                                                    <lightning:icon iconName="standard:template" size="small"/>
+                                                </span>
+                                                <span class="slds-media__body">
+                                                    <span class="slds-listbox__option-text_entity">{!currentPlantilla.label}</span>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

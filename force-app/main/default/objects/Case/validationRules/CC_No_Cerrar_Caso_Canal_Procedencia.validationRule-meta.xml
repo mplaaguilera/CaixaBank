@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_No_Cerrar_Caso_Canal_Procedencia</fullName>
+    <active>true</active>
+    <description>No se cierra el caso si el canal de procedencia es Activaciones CaixaCard o Activaciones RACC.</description>
+    <errorConditionFormula>AND(
+ ISCHANGED(Status),
+ ISPICKVAL(Status,&quot;Cerrado&quot;),
+OR(
+ ISPICKVAL(CC_Canal_Procedencia__c,&quot;Activaciones CaixaCard&quot;),
+ ISPICKVAL(CC_Canal_Procedencia__c, &quot;Activaciones RACC&quot;) ),
+
+NOT(CC_Cancelar_SmartScript__c),
+
+OR(
+ ISBLANK(AccountId),
+ ISBLANK(TEXT(CC_Motivo_Llamada_Smart_Script__c)),
+ ISNULL(CC_Numero_Contrato__c),
+ NOT(CC_Politica_Seguridad_OK__c),
+ NOT(CC_Activacion_OK__c),
+ ISBLANK(CC_PAN__c) ))</errorConditionFormula>
+    <errorMessage>No se permite cerrar si no se ha completado o cancelado el guión de Activación/Renovación de Tarjetas.</errorMessage>
+</ValidationRule>

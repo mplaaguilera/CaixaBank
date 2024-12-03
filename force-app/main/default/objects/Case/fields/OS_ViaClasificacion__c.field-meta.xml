@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_ViaClasificacion__c</fullName>
+    <label>Vía Clasificación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Cognitivo</fullName>
+                <default>false</default>
+                <label>Cognitivo</label>
+            </value>
+            <value>
+                <fullName>Ninguno</fullName>
+                <default>false</default>
+                <label>Ninguno</label>
+            </value>
+            <value>
+                <fullName>Por defecto</fullName>
+                <default>false</default>
+                <label>Por defecto</label>
+            </value>
+            <value>
+                <fullName>Regla Clasificación</fullName>
+                <default>false</default>
+                <label>Regla Clasificación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

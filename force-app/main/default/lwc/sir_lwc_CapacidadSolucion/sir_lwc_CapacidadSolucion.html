@@ -1,0 +1,221 @@
+<template >
+    <details open >
+        <summary > <lightning-icon  size="x-small" icon-name="utility:chevronright"></lightning-icon> Determinación de la capacidad de pago actual</summary>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Ingresos disponibles mensuales" read-only="true" disabled="true" value={ingresosDisponibles}></lightning-input>
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Gastos necesarios mensuales" read-only="true" disabled="true" value={gastosNecesarios} ></lightning-input>
+                </div>
+                    <div class="slds-m-around_x-small">
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Importe cuotas Actuales CaixaBank" read-only="true" disabled="true" value={importeCuotaActual} ></lightning-input>
+                        <lightning-input variant="label-inline" type="number" label="Ratio de endeudamiento Actual CxB" formatter="percent-fixed" read-only="true" disabled="true" value={ratioEndeudamiento} ></lightning-input>
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small" style="height: 80px;">
+                    </div>
+                    <div class="slds-m-around_x-small">
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Importe total de cuotas de financiación" read-only="true" disabled="true" value={importeTotalFinanciacion} ></lightning-input>
+                        <lightning-input variant="label-inline" type="number" label="Ratio de endeudamiento total" formatter="percent-fixed" read-only="true" disabled="true" value={ratioTotal}></lightning-input>    
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small negrita">
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Capacidad de pago del cliente" read-only="true" disabled="true" value={capacidadPagoCliente} ></lightning-input>
+                        <lightning-input variant="label-inline" type="text" label="Viabilidad - Sostenibilidad para continuar con la búsqueda de solución" read-only="true" disabled="true" value={tipoSolucion} field-level-help="Si la alternativa es Solución Finalista ver las opciones planteadas al final de este check list. En caso contrario continuar con el resto de apartados." ></lightning-input>
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <template if:true={checkFinalista}>
+                            <lightning-radio-group name="Solución finalista"
+                                                label="Solución finalista"
+                                                options={options}
+                                                value={value}
+                                                type="radio"
+                                                onchange={handleOnChange}>
+                            </lightning-radio-group>
+                        </template>
+                    </div>
+                </div>
+            </div>
+    </details>
+    </br>
+    <details open>
+        <summary><lightning-icon  size="x-small" icon-name="utility:chevronright"></lightning-icon> Determinación del endeudamiento futuro</summary>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <div style="padding-top:12px"></div>
+                        <div class ="formulario">
+                            <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Ingresos disponibles futuros mensuales" value={IngresosFuturo} onchange={handleIngresosFuturo} field-level-help="Si no dispone del dato estimar según edad y cualificación."></lightning-input>
+                        </div>
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Importe cuotas Actuales Caixabank" read-only="true" disabled="true" value={importeCuotaActualFuturo} ></lightning-input>
+                        <lightning-input variant="label-inline" type="number" label="Ratio de endeudamiento Futuro CxB" formatter="percent-fixed" read-only="true" disabled="true" value={ratioFuturo} ></lightning-input>
+                        <br><br>
+                        <lightning-textarea name="input1"  value={textIngresoFuturos}   onchange={handleTextoIngresos}  label="Indicar en este apartado el desglose de los ingresos disponibles futuros" maxlength="255"></lightning-textarea>
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <p><b>TABLA PARA CALCULAR LA ESTIMACIÓN A FUTURO SEGÚN EDAD Y CUALIFICACIÓN</b></p>
+                        <table style="width:550px" class="paddingTable">
+                            <tr>
+                                <th colspan="4" class="noBorder classCenter">INGRESOS MEDIOS PREVIOS</th>
+                            </tr>
+                            <tr>
+                                <th class="noBorder" style="width:320px">Trabajador cuenta ajena o autónomo cualificado</th>
+                                <th>{mas}1.500 €</th>
+                                <th>{mas}3.000 €</th>
+                                <th>{menos}3.000 €</th>
+                            </tr>
+                            <tr>
+                                <td class="negrita">{mas}50 años</td>
+                                <td>{mas}1.500 €</td>
+                                <td>2.000 €</td>
+                                <td>2.500 €</td>
+                            </tr>
+                            <tr>
+                                <td class="negrita">{mas}Entre 51 y 60 años</td>
+                                <td>&nbsp;1.200 €</td>
+                                <td>1.750 €</td>
+                                <td>2.000 €</td>    
+                            </tr>                 
+                        </table>
+                        <br>
+                        <table style="width:550px" class="paddingTable">
+                            <tr>
+                                <th colspan="4" class="noBorder classCenter">INGRESOS MEDIOS PREVIOS</th>
+                            </tr>
+                            <tr>
+                                <th class="noBorder" style="width:320px"> Autónomo NO cualificado</th>
+                                <th>{mas}1.500 €</th>
+                                <th>{mas}3.000 €</th>
+                                <th>{menos}3.000 €</th>
+                            </tr>
+                            <tr>
+                                <td class="negrita">{mas}50 años</td>
+                                <td>{mas}1.500 €</td>
+                                <td>1.500 €</td>
+                                <td>1.500 €</td>
+                            </tr>
+                            <tr>
+                                <td class="negrita">{mas}Entre 51 y 60 años</td>
+                                <td>&nbsp;1.200 €</td>
+                                <td>1.200 €</td>
+                                <td>1.200 €</td>
+                            </tr>                 
+                        </table>
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                      
+                    </div>
+                </div> 
+            </div>
+        </details>
+    </br>
+    <details open>
+       <summary> <lightning-icon  size="x-small" icon-name="utility:chevronright"></lightning-icon> Determinación de la solución a aplicar</summary>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-4">
+                    <div class="slds-m-around_x-small">
+                        <p class="semiNegrita">Ratio Endeudamiento</p>
+                        <div class ="formulario">
+                            <lightning-input variant="label-inline" type="number" label="R.E. Admisión" step="0.01" formatter="percent-fixed"  onchange={handleRatioAdmision} value={ratioAdmision} field-level-help="Si disponemos del dato"></lightning-input>
+                        </div>
+                        <lightning-input variant="label-inline" type="number" label="R.E. Actual" formatter="percent-fixed" read-only="true" disabled="true" value={ratioActual} ></lightning-input>
+                        <lightning-input variant="label-inline" type="number" label="R.E. Futuro" formatter="percent-fixed" read-only="true" disabled="true" value={ratioFuturo} ></lightning-input>
+                    </div>
+                </div>       
+                <div class="slds-size_1-of-4">
+                    <div class="slds-m-around_x-small">
+                        <p class="semiNegrita">Tipo Dificultad</p>
+                        <div style="height: 40px;"><lightning-input type="text" label="" read-only="true" disabled="true" value={tipoDificultad} ></lightning-input></div>
+                    </div>
+                </div>  
+                <div class="slds-size_1-of-4">
+                    <div class="slds-m-around_x-small">
+                        <p class="semiNegrita">Solución a aplicar</p>
+                            <div style="height: 40px;"><lightning-input type="text" label="" read-only="true" disabled="true" value={solucionAplicar} ></lightning-input></div>
+                    </div>
+                </div>       
+            </div>
+        </br>
+            <div class="slds-grid slds-wrap">      
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <template if:true={checkCortoPlazo}>
+                            <lightning-radio-group name="Soluciones a corto plazo"
+                                                label="Soluciones a corto plazo"
+                                                options={optionsCortoPlazo}
+                                                value={valueCortoPlazo}
+                                                type="radio"
+                                                onchange={handleCorto}>
+                            </lightning-radio-group>
+                        </template>
+                    </div>
+                </div> 
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <template if:true={checkLargoPlazo}>
+                            <lightning-radio-group name="Soluciones a largo plazo"
+                                                label="Soluciones a largo plazo"
+                                                options={optionsLargoPlazo}
+                                                value={valueLargoPlazo}
+                                                type="radio"
+                                                onchange={handleLargo}>
+                            </lightning-radio-group>
+                        </template>
+                    </div>
+                </div> 
+            </div>
+    </details>
+    </br>
+    <details open>
+        <summary><lightning-icon  size="x-small" icon-name="utility:chevronright"></lightning-icon> Análisis viabilidad solución</summary></span>
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title"></span>
+                </h3>
+            </div>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Capacidad de devolución / pago" read-only="true" disabled="true" value={capacidadDevolucion}></lightning-input>
+                        <lightning-input variant="label-inline" type="number" formatter="currency" step=".01" label="Carga / cuota financiera Caixabank tras la refinanciación" read-only="true" disabled="true" value={cargaFinacieraCaixa} field-level-help="Carga Financiera CXB considerando la propuesta de refinanciación"></lightning-input>
+                    </div>
+                </div>
+                <div class="slds-size_1-of-2">
+                    <div class="slds-m-around_x-small">
+                        <lightning-input variant="label-inline" type="text" label="Deuda" read-only="true" disabled="true" value={solucionDeuda} field-level-help="En caso de que la solución adoptada no sea sostenible, replantear la solución. En última instancia seleccionar una solución finalista"></lightning-input>
+                    </div>
+                </div>        
+            </div>              
+            <div class="slds-size_1-of-2">
+                <div class="slds-m-around_x-small">
+                    <lightning-textarea name="input1" label="Solución a aplicar (A completar por el gestor según decisión adoptada)"  value={solucionDeudaAplicar} onchange={handleSolucionDeuda} maxlength="255"></lightning-textarea>
+                </div>
+            </div> 
+
+            <div class="slds-size_1-of-2">
+                <div class="slds-m-around_x-small">
+                    <lightning-textarea name="input1" label="Otros datos de interés (A completar por el gestor, aclaración sobre solución aplicada sobre todo si fuera distinta de los inicialmente recomendado)" value={datosInteresSolucion} onchange={handleTextoSolucion} maxlength="255"></lightning-textarea>
+                </div>
+            </div> 
+            
+    </details>
+
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-size_2-of-2">
+            <div style="float: left;" class="slds-m-around_x-small">
+                <button class="slds-button slds-button_brand" onclick={guardar} >Guardar</button>
+                <span style="color: lightgray; margin-left: 10px;">Recuerde enviar el Formulario a SIREC con el Botón correspondiente de la cabecera del Formulario.</span>
+            </div>
+        </div>       
+    </div>
+    
+</template>

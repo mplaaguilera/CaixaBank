@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Agrupadores_Pendientes_de_Revisi_n_soluc</fullName>
+    <columns>CREATED_DATE</columns>
+    <columns>NAME</columns>
+    <columns>CC_Estado__c</columns>
+    <columns>CC_Publica__c</columns>
+    <columns>CC_Id_Maximo__c</columns>
+    <columns>CC_Tematica_Id__c</columns>
+    <columns>CC_Titulo__c</columns>
+    <columns>CC_Numero_Casos__c</columns>
+    <columns>CC_Numero_Reclamaciones__c</columns>
+    <columns>OWNER.ALIAS</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Agrupador__c.CC_Incidencia</value>
+    </filters>
+    <filters>
+        <field>CC_Estado__c</field>
+        <operation>equals</operation>
+        <value>Pendiente Revision</value>
+    </filters>
+    <filters>
+        <field>CC_GrupoMaximo__c</field>
+        <operation>equals</operation>
+        <value>C-CXB-ES-CC-CSI-BANKIA</value>
+    </filters>
+    <label>Agrupadores Pendientes de Revisión soluc</label>
+    <sharedTo>
+        <group>CC_Respuesta_CSI_Bankia</group>
+    </sharedTo>
+</ListView>

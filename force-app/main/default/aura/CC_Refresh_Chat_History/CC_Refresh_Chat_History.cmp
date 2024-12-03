@@ -1,0 +1,6 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >  
+  <aura:handler event="c:CC_Refresh_ChatHistory" action="{!c.init}" />
+    <!--<aura:handler name="init" value="{!this}" action="{!c.init}" />-->
+   
+   <c:cc_Chat_History aura:id="cc_Chat_History"></c:cc_Chat_History>  
+</aura:component>

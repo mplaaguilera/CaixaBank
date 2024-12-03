@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_NotiPlantillaHTML__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>si este campo viene con el check a true, el código cogerá la plantilla configurada para el envío de email, quitará los tags y lo meterá como notificación.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Notificación Plantilla HTML</label>
+    <type>Checkbox</type>
+</CustomField>

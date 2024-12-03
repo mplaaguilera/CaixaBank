@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_inscritosFisicos__c</fullName>
+    <label>Inscritos Físicos</label>
+    <summaryFilterItems>
+        <field>CampaignMember.EV_FormatoDeAsistencias__c</field>
+        <operation>equals</operation>
+        <value>Física</value>
+    </summaryFilterItems>
+    <summaryFilterItems>
+        <field>CampaignMember.Status</field>
+        <operation>equals</operation>
+        <value>QR enviado, Registro confirmado, Asistió</value>
+    </summaryFilterItems>
+    <summaryForeignKey>CampaignMember.CampaignId</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

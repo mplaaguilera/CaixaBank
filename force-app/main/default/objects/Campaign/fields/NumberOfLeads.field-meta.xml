@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NumberOfLeads</fullName>
+    <inlineHelpText>Del total de inscritos, personas que no se han inscrito a través de invitación centralizada.</inlineHelpText>
+</CustomField>

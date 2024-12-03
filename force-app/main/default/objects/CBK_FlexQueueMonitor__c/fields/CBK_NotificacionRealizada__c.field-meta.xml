@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_NotificacionRealizada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador donde se registra si para la entrada de monitorización la notificación en caso de ser necesaria se ha realizado o no (por no superar el intervalo mínimo de notificación).</description>
+    <label>Notificación realizada</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

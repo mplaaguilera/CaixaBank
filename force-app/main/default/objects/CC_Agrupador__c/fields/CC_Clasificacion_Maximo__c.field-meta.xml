@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Clasificacion_Maximo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Clasificación Máximo de la incidencia</description>
+    <inlineHelpText>Clasificación Máximo de la incidencia</inlineHelpText>
+    <label>Clasificación Maximo</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Clasificacion_Maximo__c.CC_Activa__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Clasificacion_Maximo__c</referenceTo>
+    <relationshipLabel>Agrupadores (Clasificación Maximo)</relationshipLabel>
+    <relationshipName>AgrupadoresClasif</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

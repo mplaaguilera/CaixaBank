@@ -1,0 +1,245 @@
+<template>
+
+    <article class="contenedor slds-card slds-var-m-top_large">
+
+        <div class="campos slds-card__body slds-card__body_inner">
+            <div if:false={editandoTablaMaestra} class="slds-grid slds-gutters_direct-small slds-grid_vertical-align-center">
+                <div class="slds-col" style="padding-right: 0;">
+                    <article class="slds-card slds-card_boundary formularioInfo">
+                        <div class="slds-card__body slds-card__body_inner slds-var-m-top_medium" style="padding: 0 6px;">
+                            <div lwc:if={oportunidad} class="slds-grid slds-grid_align-spread slds-var-p-horizontal_small">
+                                <div class="slds-col">
+                                    <span class="slds-form-element__label">Producto</span>
+                                    <span lwc:if={oportunidad.fields} class="valor">{oportunidad.fields.CSBD_Producto__c.value}</span>
+                                </div>
+                                <div class="slds-col" title={oportunidad.categoriaTitularTitle}>
+                                    <span class="slds-form-element__label">Categoría del titular</span>
+                                    <span lwc:if={oportunidad.fields} class="valor">{oportunidad.categoriaTitular}</span>
+                                    <span style="font-size: 12px;">
+                                        &nbsp;(
+                                        <lightning-formatted-number value={oportunidad.ingresosAnualesTitular1} format-style="currency" currency-code="EUR"></lightning-formatted-number>
+                                        <span lwc:if={oportunidad.ingresosAnualesTitular2}>
+                                            &nbsp;+&nbsp;<lightning-formatted-number value={oportunidad.ingresosAnualesTitular2} format-style="currency" currency-code="EUR"></lightning-formatted-number>
+                                        </span>
+                                    </span>
+                                    )
+
+                                </div>
+                                <div class="slds-col">
+                                    <span class="slds-form-element__label">Plazo</span>
+                                    <span lwc:if={oportunidad.fields} class="valor">{oportunidad.plazo}</span>
+                                    <span style="font-size: 12px;">
+                                        &nbsp;(<span lwc:if={oportunidad.fields}>{oportunidad.plazoMeses}</span>)
+                                    </span>
+                                </div>
+                            </div>
+                            <div lwc:if={listaPreciosMaestraNoDefinida} class="slds-var-m-top_large slds-align_absolute-center">
+                                <lightning-icon class="iconoWarning slds-var-m-right_small" icon-name="utility:warning" size="xx-small"></lightning-icon>
+                                <span style="font-size: 13px; font-weight: 500; color: #d65526;">
+                                    No hay tabla de precios por defecto definida para esta combinación.
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <lightning-button class="botonGuardar botonDisabledGuardar" label="Guardar" variant="brand" onclick={botonGuardarOnclick}></lightning-button>
+                </div>
+            </div>
+            <div if:false={editandoTablaMaestra} style="height: 1.3rem;"></div>
+
+            <!--Fijo-->
+            <article class="slds-card slds-card_boundary formularioFijo">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="iconoHeader iconoHeaderFijo">
+                                <lightning-icon icon-name="utility:pin" size="xx-small"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title tituloTipo">Fijo</h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner slds-var-m-top_medium">
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">No bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="fijoNoBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.fijoNoBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota fija no bonificada</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="fijoNoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="fijoBonificado" label="Bonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.fijoBonificado} variant="label-hidden" onchange={campoOnchange}> </lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota fija bonificada</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="fijoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <div style="height: 1.2rem;"></div>
+
+            <!--Variable-->
+            <article class="slds-card slds-card_boundary formularioVariable">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="iconoHeader iconoHeaderVariable">
+                                <lightning-icon icon-name="utility:graph" size="xx-small"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title tituloTipo">Variable</h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner slds-var-m-top_medium ">
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">No bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="variableNoBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.variableNoBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota variable no bonificada</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="variableNoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="variableBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.variableBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota variable bonificada</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="variableBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <div style="height: 1rem;"></div>
+
+            <!--Mixto-->
+            <article class="slds-card slds-card_boundary formularioMixto">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="iconoHeader iconoHeaderMixto">
+                                <lightning-icon icon-name="utility:left_join" size="xx-small"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title tituloTipo">Mixto</h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner slds-var-m-top_medium">
+
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Años tramo fijo</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="mixtoAñosTramoFijo" type="number" min="0" step="1" value={precios.mixtoAñosTramoFijo} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota"></div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="slds-hidden" variant="label-hidden"></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Tramo fijo no bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="mixtoTramoFijoNoBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.mixtoTramoFijoNoBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota tramo fijo no bonificado</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="mixtoTramoFijoNoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Tramo fijo bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="mixtoTramoFijoBonificado" type="number" formatter="percent-fixed" step=".01" max="100" value={precios.mixtoTramoFijoBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota tramo fijo bonificado</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="mixtoTramoFijoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Tramo variable no bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="mixtoTramoVariableNoBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.mixtoTramoVariableNoBonificado} variant="label-hidden" onchange={campoOnchange}> </lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota tramo variable no bonificado</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="mixtoTramoVariableNoBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center lineaFormulario">
+                        <div class="slds-col labelValor">
+                            <span class="slds-form-element__label">Tramo variable bonificado</span>
+                        </div>
+                        <div class="slds-col valor">
+                            <lightning-input class="inputInteres" data-name="mixtoTramoVariableBonificado" type="number" formatter="percent-fixed" step="0.01" max="100" value={precios.mixtoTramoVariableBonificado} variant="label-hidden" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col labelCuota">
+                            <span class="slds-form-element__label">Cuota tramo variable bonificado</span>
+                        </div>
+                        <div class="slds-col valorCuota">
+                            <lightning-input class="inputCuota" data-name="mixtoTramoVariableBonificado" type="number" formatter="currency" step="0.01" variant="label-hidden" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <footer class="slds-card__footer" style="border: none; margin-top: 0px;">
+            <div class="slds-grid slds-grid_align-spread">
+                <div class="slds-col">
+                    <lightning-button if:false={editandoTablaMaestra} class="botonRestablecer botonDisabledGuardar slds-hide" label="Restablecer" icon-name="utility:undo" variant="destructive-text" onclick={restablecer}></lightning-button>
+                </div>
+                <div class="slds-col">
+                    <lightning-button class="botonGuardar botonDisabledGuardar" label="Guardar" variant="brand" onclick={botonGuardarOnclick}></lightning-button>
+                </div>
+            </div>
+        </footer>
+
+    </article>
+</template>

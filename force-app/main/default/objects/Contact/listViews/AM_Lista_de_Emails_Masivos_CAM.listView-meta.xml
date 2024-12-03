@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AM_Lista_de_Emails_Masivos_CAM</fullName>
+    <columns>FULL_NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CONTACT.PHONE1</columns>
+    <columns>CONTACT.EMAIL</columns>
+    <columns>CONTACT.TITLE</columns>
+    <columns>CORE.USERS.ALIAS</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CONTACT.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Contact.CC_Empleado</value>
+    </filters>
+    <filters>
+        <field>CONTACT.LAST_NAME</field>
+        <operation>equals</operation>
+        <value>EQUIPO DE SOPORTE</value>
+    </filters>
+    <filters>
+        <field>ACCOUNT.ADDRESS1_STATE</field>
+        <operation>equals</operation>
+        <value>Barcelona</value>
+    </filters>
+    <label>Lista de Emails Masivos CAM</label>
+    <sharedTo>
+        <group>AM_Buzon_Carteras</group>
+        <group>AM_Buzon_Fondos</group>
+    </sharedTo>
+</ListView>

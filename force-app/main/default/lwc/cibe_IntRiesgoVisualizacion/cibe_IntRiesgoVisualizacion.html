@@ -1,0 +1,79 @@
+<template>
+    <template if:true={cargando}>
+        <div class="backgroundInverse">
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+    </template>
+    <template if:false={bError}>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Activo</span>
+                    </h2>
+                </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner" style="text-align:right;">
+                <lightning-tree-grid
+                    style="text-align:right;"
+                    key-field="producto"
+                    data={dataActivo}
+                    columns={columnsActivo}
+                    expanded-rows={initialExpandedRows}
+                    hide-checkbox-column>
+                </lightning-tree-grid>
+            </div>
+            <footer class="slds-card__footer"></footer>
+        </article>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Pasivo</span>
+                    </h2>
+                </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <lightning-tree-grid
+                    key-field="producto"
+                    data={dataPasivo}
+                    columns={columnsPasivo}
+                    hide-checkbox-column>
+                </lightning-tree-grid>
+            </div>
+        </article>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Servicios</span>
+                    </h2>
+                </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <lightning-tree-grid
+                    key-field="producto"
+                    data={dataServicio}
+                    columns={columnsServicio}
+                    expanded-rows={initialExpandedRowsProductos}
+                    hide-checkbox-column>
+                </lightning-tree-grid>
+            </div>
+           
+        </article>
+    </template>
+    <template if:true={bError}>
+        <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+            <img src="/img/chatter/Desert.svg" class="slds-illustration__svg" alt=""/>
+            <div class="slds-text-color_weak">
+                <h3 class="slds-text-heading_medium">{error}</h3>
+            </div>
+        </div>
+    </template>
+</template>

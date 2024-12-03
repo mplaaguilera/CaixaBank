@@ -1,0 +1,204 @@
+<template>
+   <div class={toggleIcon}>
+    <h1 class="slds-section__title">
+      <button aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandable}>
+        <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+          <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+        </svg>
+        <span class="slds-truncate" title="Section Title">{labels.calcPrecios}</span>
+      </button>
+    </h1>
+   <div class="slds-section__content" id="expando-unique-id">
+    <template if:true={cargando}>
+        <div class="backgroundInverse">
+            <lightning-spinner class="slds-align_absolute-center" alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+    </template>
+      <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+        <div class="slds-col slds-size_8-of-12">
+        </div>
+        <div class="slds-col slds-size_2-of-12">
+            <template if:true={buttonActive}>
+                <a class="slds-button slds-button_stretch slds-button_neutral" href={url}> 
+                    <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" size="x-small"></lightning-icon>
+                    <span class='slds-m-left_small'>{labels.accSimulacion}</span>    
+                </a>
+            </template>
+        </div>
+        <div class="slds-col slds-size_2-of-12">
+            <div if:true={buttonActive}>
+                <a class="slds-button slds-button_stretch slds-button_neutral" href={urlprecios}> 
+                    <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" size="x-small"></lightning-icon>
+                    <span class='slds-m-left_small'>{labels.accesoInforme}</span>    
+                </a>
+            </div>
+        </div>
+    </div>
+        <lightning-record-form
+            object-api-name={objectApiName}
+            record-id={recordId}
+            fields={fields}
+            columns="2"
+            onsubmit={handleSubmit}
+        >
+        </lightning-record-form>
+        
+        <lightning-record-view-form
+            object-api-name={objectApiName}
+            record-id={recordId}
+        >   
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <template if:true={buttonActive}>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARNomOperacion__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARTipoOperacion__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARImporte__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <template if:true={bMeses}>
+                            <lightning-output-field field-name="CIBE_RARPlazoMeses__c"> </lightning-output-field>
+                        </template>
+                        <template if:false={bMeses}>
+                            <lightning-output-field field-name="CIBE_RARPlazoFecha__c"> </lightning-output-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARIndiceReferencia__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARInteresDiferencial__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARComisionApertura__c"> </lightning-output-field>
+                    </div> 
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_ComisionSaldoMedio__c"> </lightning-output-field>
+                    </div> 
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARGarantias__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <!--empty space-->
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_PDRating__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARSeveridad__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RAROperacionRar__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_VAOperacion__c"> </lightning-output-field>
+                    </div>
+                    
+                   
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARConjunto__c"> </lightning-output-field>
+                    </div>
+                   
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARPost__c"> </lightning-output-field>
+                    </div> 
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARComision12meses__c"> </lightning-output-field>
+                    </div>                 
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning-output-field field-name="CIBE_RARMargenDiario__c"> </lightning-output-field>
+                    </div>
+                    
+                    
+                </template>
+            </div>
+        </lightning-record-view-form>
+        
+    
+            <lightning-accordion allow-multiple-sections-open
+                onsectiontoggle={handleToggleSection}>
+                <template for:each={simulaciones} for:item="simulacion">
+                    <lightning-accordion-section name={simulacion.numero} label={simulacion.nombre} key={simulacion.numero} active-section-name={simulacion.numero}>
+                        <template if:true={bGrupo}>
+                            
+                                <template if:true={simulacion.operacionGuardada}>
+                                    <lightning-record-view-form
+                                    object-api-name={objectApiName}
+                                    record-id={recordId}
+                                    >
+                                        <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name="CIBE_PDRating__c"> </lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name="CIBE_RARSeveridad__c"> </lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name="CIBE_RARMargenDiario__c"> </lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-output-field field-name="CIBE_RARComision12meses__c"> </lightning-output-field>
+                                            </div>   
+                                        </div>
+                                    </lightning-record-view-form>
+                                </template>
+                                <template if:false={simulacion.operacionGuardada}>
+                                    <lightning-record-edit-form object-api-name="Opportunity">
+                                        <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                                            <div class="slds-col slds-size_2-of-4">
+                                                <lightning-input-field field-name="CIBE_RARPD__c" value={simulacion.pd} readonly="true"> </lightning-input-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="CIBE_RARSeveridad__c" value={simulacion.lgd} readonly="true"> </lightning-input-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="CIBE_RARMargenDiario__c" value={simulacion.netProfitability} readonly="true"> </lightning-input-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input-field field-name="CIBE_RARComision12meses__c" value={simulacion.commissions} readonly="true"> </lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </lightning-record-edit-form>
+                                </template>
+    
+                            
+                        </template>
+                        <article class="slds-card slds-card_boundary">
+                            <div class="slds-card__header slds-grid">
+                                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__body">
+                                    <h2 class="slds-card__header-title">
+                                        <span>{labels.operaciones}</span>
+                                    </h2>
+                                </div>
+                                </header>
+                            </div>
+                            <div class="slds-card__body slds-card__body_inner">
+                                <lightning-datatable
+                                    data-id={simulacion.numero}
+                                    key-field="operationNumber"
+                                    data={simulacion.operaciones}
+                                    columns={columns}
+                                    onrowselection={handleRowSelection}
+                                    min-column-width="200"
+                                    selected-rows={selectedRow}
+                                    onclick={handleTableClick}>
+                                </lightning-datatable>           
+                            </div>
+                        </article>
+                        
+                    </lightning-accordion-section>
+                </template>
+                <template if:true={buttonActive}>
+                    <lightning-button label={labels.saveOp} onclick={handleSelect}> </lightning-button>
+                </template>
+                
+                
+            </lightning-accordion>
+  </div>
+</div>
+
+</template>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TareasCerradasUltimos7</fullName>
+    <columns>NAME</columns>
+    <columns>SAC_Descripcion__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <columns>SAC_Criticidad__c</columns>
+    <columns>SAC_Propietario__c</columns>
+    <columns>SAC_EquipoResponsable__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_FechaVencimientoInicial__c</columns>
+    <columns>SAC_FechaVencimientoProrroga__c</columns>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>SAC_Gestor__c</columns>
+    <columns>SAC_GrupoProveedor__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>SAC_Estado__c</field>
+        <operation>equals</operation>
+        <value>SAC_Finalizada,SAC_FinalizadaIncompleta</value>
+    </filters>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>LAST_N_DAYS:7</value>
+    </filters>
+    <filters>
+        <field>SAC_EsDeMiReclamacion__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>SAC-Tareas cerradas en los últimos 7 día</label>
+</ListView>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Marca__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Marca</label>
+    <referenceTo>CC_Caracteristica__c</referenceTo>
+    <relationshipLabel>Agrupadores (Marca)</relationshipLabel>
+    <relationshipName>Agrupadores</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

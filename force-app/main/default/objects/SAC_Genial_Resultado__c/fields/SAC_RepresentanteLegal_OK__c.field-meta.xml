@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_RepresentanteLegal_OK__c</fullName>
+    <formula>OR(SAC_NumeroDelDocumento_OK__c,  SAC_EmailRepresentante_OK__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Representante Legal OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

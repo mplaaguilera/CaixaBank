@@ -1,0 +1,145 @@
+<template>
+	<div class="filter-card">
+		
+		<lightning-card variant="Narrow">
+			<!--<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon slds-float_right" variant="container" onclick={toggleShow}></lightning-button-icon>
+			<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon slds-float_right" variant="container" onclick={toggleShow}></lightning-button-icon>-->
+			<lightning-icon style="margin: 0 0 1rem 1rem" icon-name="custom:custom15" alternative-text="Cliente" title="Cliente"></lightning-icon>
+			<span class="slds-text-heading_small slds-truncate title">Clientes</span>
+			<div>
+				<div>
+					<div data-id="lookup2" class="filters_row_1 slds-form_vertical slds-grid slds-wrap slds-border_top divPadding-first">
+						<!-- Office -->
+						<c-av_-lookup class="lookup-cmp slds-size_1-of-4"
+							data-id="clookup5"
+							selection={initialSelectionOffice}
+							errors={errors}
+							onsearch={handleSearchOffice}
+							onselectionchange={handleSelectionChange}
+							fieldlabel="Oficina"
+							placeholder={officePlaceholder}
+							is-multi-entry={isMultiEntry2}
+							required>
+						</c-av_-lookup>
+						<!-- Negocio -->
+						<lightning-combobox data-id="negocio" class="slds-size_1-of-4" name="recordTypes" label="Negocio" 
+							options={optionsNegocio} placeholder="--Seleccionar--" onchange={handleChangeNegocio} value={negocioFilter} required>
+						</lightning-combobox>
+						<!-- Employee -->
+						<lightning-combobox class="slds-size_1-of-4" name="owner" label="Empleado"
+							options={optionsEmployee} value={employeeFilter} placeholder="--Seleccionar--" onchange={handleChangeEmployee} required>
+						</lightning-combobox>
+                        <!-- Empty space -->
+                        <div class="slds-size_1-of-4"></div>
+					</div>
+				</div>
+				<div class="moreFilters" ><a onclick={showMoreFilters}><strong>{seeFiltersLabel}</strong></a></div>
+                <!-- <div> -->
+                <div if:true={showMoreFiltersDiv}>
+					<div data-id="lookup2" class="filters_row_2 slds-form_vertical slds-grid slds-border_top divPadding">
+						<!-- Cesta/cartera -->
+						<lightning-combobox class="slds-size_1-of-4" name="carteras" label="Cesta/cartera" 
+                        	options={optionsBook}  onchange={handleChangeBook} placeholder={placeHolder} value={carteraFilter} disabled={emptyBook}>
+                        </lightning-combobox>
+						<!-- Modelo de atención -->
+                        <lightning-combobox class="slds-size_1-of-4" name="modelo" label="Modelo de atención" 
+                        	options={optionsModelo} placeholder="--Seleccionar--"  onchange={handleChangeModelo} value={modeloFilter} >
+                        </lightning-combobox>
+						<!-- Edad -->
+                        <lightning-input class="slds-size_1-of-8" type="number" value={edadMinFilter} label="Edad (desde)" onchange={handleChangeEdadMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" value={edadMaxFilter} label="(hasta)" onchange={handleChangeEdadMax}></lightning-input>
+						<!-- Ingresos -->
+                        <lightning-input class="slds-size_1-of-8" type="number" value={ingresosMinFilter} label="Ingresos (desde)" onchange={handleChangeIngresosMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" value={ingresosMaxFilter} label="(hasta)" onchange={handleChangeIngresosMax}></lightning-input>
+					</div>
+					<div data-id="lookup2" class="filters_row_3 slds-form_vertical slds-grid divPadding">
+						<!-- Ahorro/inversión -->
+                        <lightning-input class="slds-size_1-of-8" type="number" label="Ahorro/inversión (desde)" value={ahorroMinFilter} onchange={handleChangeAhorroMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" label="(hasta)" value={ahorroMaxFilter} onchange={handleChangeAhorroMax}></lightning-input>
+						<!-- Financiación -->
+                        <lightning-input class="slds-size_1-of-8" type="number" label="Financiación (desde)" value={financiacionMinFilter} onchange={handleChangeFinanciacionMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" label="(hasta)" value={financiacionMaxFilter} onchange={handleChangeFinanciacionMax}></lightning-input>
+						<!-- Rentabilidad -->
+						<lightning-input class="slds-size_1-of-8" type="number" label="Rentabilidad (desde)" value={rentabilidadMinFilter} onchange={handleChangeRentabilidadMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" label="(hasta)" value={rentabilidadMaxFilter} onchange={handleChangeRentabilidadMax}></lightning-input>
+                        <!-- Precon -->
+						<lightning-input class="slds-size_1-of-8" type="number" label="Preconcedido (desde)" value={preconMinFilter} onchange={handleChangePreconMin}></lightning-input>
+						<lightning-input class="slds-size_1-of-8" type="number" label="(hasta)" value={preconMaxFilter} onchange={handleChangePreconMax}></lightning-input>
+					</div>
+                    <div data-id="lookup2" class="filters_row_4 slds-form_vertical slds-grid divPadding">
+						<!-- MyBox -->
+                        <lightning-combobox class="slds-size_1-of-4" name="mybox" label="My box" 
+                        	options={optionsYesOrNo} placeholder="--Seleccionar--" onchange={handleChangeMyBox} value={myBoxFilter}>
+                        </lightning-combobox>
+						<!-- Experiencia de cliente -->
+                        <lightning-combobox class="slds-size_1-of-4" name="experiencia" label="Experiencia de Cliente (Perfil Cliente)" 
+                        	options={optionsExperiencia} placeholder="--Seleccionar--" onchange={handleChangeExperiencia} value={experienciaFilter}>
+                        </lightning-combobox>
+                        <!-- Target Auto -->
+                        <lightning-combobox class="slds-size_1-of-4" name="targetAuto" label="Target Auto" 
+                            options={optionsYesOrNo} placeholder="--Seleccionar--" onchange={handleChangeTargetAuto} value={targetAutoFilter}>
+                        </lightning-combobox>
+                        <!-- Empty space -->
+                        <div class="slds-size_1-of-4"></div>
+					</div>
+				</div>
+				<div class="buttonAlign slds-border_top">
+					<p><lightning-formatted-text value="Para búsquedas de clientes potenciales por producto utiliza el buscador de oportunidades potenciales donde podrás encontrar los clientes con mayor probabilidad de contratar ese producto concreto en base a su perfil y comportamiento"></lightning-formatted-text></p>
+					<lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
+					<lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={handleSearchData} disabled={buttonDisabled}></lightning-button>
+				</div>
+			</div>
+		</lightning-card>
+	</div>
+	<div>
+		
+		<lightning-card if:true={firstSearch} variant="Narrow"  title="Resultados de la búsqueda" icon-name={iconName}>
+
+			<div class="total-data-text" >
+				<lightning-formatted-text class="slds-text-title--caps totalText" value={totalRecountCount}></lightning-formatted-text>
+				<!--<div class="help-text">
+					<lightning-helptext if:true={helpMessage} content={recordLimit}></lightning-helptext>
+				</div>-->
+				<div class="help-text">
+					<p if:true={helpMessage}><lightning-formatted-text value={recordLimit}></lightning-formatted-text></p>
+				</div>
+			</div>
+			<div if:true={data} class="table-container table-container-paginacion">
+				<!--<c-av_-paginator records={opps} 
+					total-records={opps.length} 
+					onpaginatorchange={handlePaginatorChange}>
+				</c-av_-paginator>-->
+				<lightning-datatable data-id="divblock" key-field="Id" 
+					data={items} 
+					columns={columns}
+					row-number-offset={rowNumberOffset}
+					onrowselection={getSelectedName}
+					default-sort-direction={defaultSortDirection}
+            		sorted-direction={sortDirection}
+					sorted-by={sortedBy}
+            		onsort={onHandleSort}
+					load-more-offset>
+				</lightning-datatable>
+				<br/>
+				<div if:true={isMultipagina}>
+					<lightning-layout horizontal-align="space">
+						<lightning-layout-item flexibility="auto">
+							<lightning-button label="Anterior" icon-name="utility:chevronleft" onclick={previousHandler}>
+							</lightning-button>
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							Página {page} de {totalPage}
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							<lightning-button label="Posterior" icon-name="utility:chevronright" icon-position="right"
+								onclick={nextHandler}></lightning-button>
+						</lightning-layout-item>
+					</lightning-layout>
+				</div>
+			</div>
+
+			<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>
+			
+		</lightning-card>
+	</div>
+</template>

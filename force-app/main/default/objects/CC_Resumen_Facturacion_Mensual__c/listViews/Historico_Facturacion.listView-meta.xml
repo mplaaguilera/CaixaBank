@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Historico_Facturacion</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Empresa__c</columns>
+    <columns>CC_Canal_de_Entrada__c</columns>
+    <columns>CC_Area_de_Negocio__c</columns>
+    <columns>CC_Numero_Casos__c</columns>
+    <columns>CC_Precio__c</columns>
+    <columns>CC_Suma_a_facturar__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Fecha_Ejecucion__c</field>
+        <operation>greaterThan</operation>
+        <value>5/1/2022 12:00 AM</value>
+    </filters>
+    <label>Histórico Facturación</label>
+</ListView>

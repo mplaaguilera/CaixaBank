@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PurgeProcess_AdminChangeStatus</fullName>
+    <active>true</active>
+    <description>VR para que solamente los usuarios que tienen el custom permission pueda activar/desactivar así como pasar el estado del proceso de purgado al estado autorizado</description>
+    <errorConditionFormula>AND(
+				 OR(ISNEW(),ISCHANGED(CBK_Estado__c)), 
+				ISPICKVAL(CBK_Estado__c, &apos;Autorizado&apos;), 
+				NOT($Permission.CBK_PurgeAuth)
+)</errorConditionFormula>
+    <errorMessage>Solamente los usuarios autorizados pueden pasar el estado del proceso de purgado al estado Autorizado.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,22 @@
+<apex:page standardController="SAC_Accion__c" extensions="SAC_AsignarVF" recordSetVar="records" lightningStylesheets="true">      
+     <apex:form id="form"> 
+        <apex:pageBlock >
+        <apex:pageMessages />
+        <br />
+        <apex:panelGrid columns="1" style="display: table; width: 100%">
+        <apex:outputPanel style="text-align: center; display: block;">
+            <apex:selectList id="selectedUser" value="{!selectedUser}" size="5" rendered="{!If( mostrar,true,false)}">
+                    <apex:selectOptions value="{!contactlist}"></apex:selectOptions>
+            </apex:selectList>
+        </apex:outputPanel>
+        </apex:panelGrid>
+        <br />
+        <br />
+            <apex:pageBlockButtons location="bottom" rendered="{!If( mostrar,true,false)}">       
+            <apex:commandButton value="Aceptar" action="{!save}" reRender="form">			         
+            </apex:commandButton>                  
+            <apex:commandButton action="{!cancel}" value="Cancel" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>         
+    </apex:form>
+</apex:page>

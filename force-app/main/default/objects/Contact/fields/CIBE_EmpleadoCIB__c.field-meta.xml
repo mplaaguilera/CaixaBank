@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_EmpleadoCIB__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Se marcara cuando el usuario asociado al contact su perfil sea CIB</description>
+    <inlineHelpText>Se marcara cuando el usuario asociado al contact su perfil sea CIB</inlineHelpText>
+    <label>Empleado CIB</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

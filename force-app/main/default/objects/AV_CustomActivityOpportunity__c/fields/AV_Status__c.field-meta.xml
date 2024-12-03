@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Status__c</fullName>
+    <description>Estados de la tarea</description>
+    <label>Status</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Open</fullName>
+                <default>false</default>
+                <label>Pendiente</label>
+            </value>
+            <value>
+                <fullName>Pendiente no localizado</fullName>
+                <default>false</default>
+                <label>Pendiente no localizado</label>
+            </value>
+            <value>
+                <fullName>Gestionada positiva</fullName>
+                <default>false</default>
+                <label>Gestionada positiva</label>
+            </value>
+            <value>
+                <fullName>Gestionada negativa</fullName>
+                <default>false</default>
+                <label>Gestionada negativa</label>
+            </value>
+            <value>
+                <fullName>Gestionado no localizado</fullName>
+                <default>false</default>
+                <label>Gestionado no localizado</label>
+            </value>
+            <value>
+                <fullName>No gestionada</fullName>
+                <default>false</default>
+                <label>No gestionada</label>
+            </value>
+            <value>
+                <fullName>Desactivada</fullName>
+                <default>false</default>
+                <label>Desactivada</label>
+            </value>
+            <value>
+                <fullName>Completed</fullName>
+                <default>false</default>
+                <label>Completado</label>
+            </value>
+            <value>
+                <fullName>Rechazada</fullName>
+                <default>false</default>
+                <label>Rechazada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

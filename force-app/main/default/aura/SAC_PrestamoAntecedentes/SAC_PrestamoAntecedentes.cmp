@@ -1,0 +1,945 @@
+<aura:component controller="SAC_LCMP_PrestamoGlobal" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    
+    <aura:attribute name="reclAntExist" type="Boolean" default="false"/>
+    <aura:attribute name="reclAntReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="reclAntCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="reclAntReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="reclAntCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="antHistExist" type="Boolean" default="false"/>
+    <aura:attribute name="antHistReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="antHistCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="antHistReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="antHistCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="antCBPOExist" type="Boolean" default="false"/>
+    <aura:attribute name="antCBPOReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="antCBPOCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="antCBPOReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="antCBPOCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="demEntExist" type="Boolean" default="false"/>
+    <aura:attribute name="demEntReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="demEntCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="demEntReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="demEntCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="demMorExist" type="Boolean" default="false"/>
+    <aura:attribute name="demMorReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="demMorCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="demMorReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="demMorCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="concursosExist" type="Boolean" default="false"/>
+    <aura:attribute name="concursosReclamanteExist" type="Boolean" default="false"/>
+    <aura:attribute name="concursosCotitularExist" type="Boolean" default="false"/>
+    <aura:attribute name="concursosReclamanteList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    <aura:attribute name="concursosCotitularList" type="SAC_LCMP_PrestamoGlobal.antecedenteWrapper[]"/>
+    
+    <aura:attribute name="showEmptyMessage" type="Boolean" default="false"/>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <aura:attribute name="tituloRelatedList" type="string"/>
+    <lightning:navigation aura:id="navService"/>
+    
+    <div class="slds-box slds-col " style="padding-top: 12px">
+        <h1 style="padding-top: 12px; font-size: 15px"><b>Antecedentes Reclamantes y Co-titulares:</b></h1>
+        <div class="slds-align-center" style="padding-top: 14px; padding-bottom: 8px">
+            <lightning:button class="slds-button slds-button_brand" label="Consultar Antecedentes" onclick="{!c.consultarCotitulares}" />
+            
+            <!--Spinner-->
+            <aura:if isTrue="{!v.spinner}">
+                <div>
+                    <lightning:spinner variant="brand" size="large" />
+                </div>
+            </aura:if>
+            <!-- Tables -->
+            <!-- Reclamaciones Anteriores -->
+            <aura:if isTrue="{!v.reclAntExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Reclamaciones Anteriores - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.reclAntReclamanteExist}">
+                            <lightning:card title="Reclamantes"> 
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">Case Number</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Subject</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Temática</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Producto/Servicio</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Motivo</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Detalle</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">Fecha Recepción</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.reclAntReclamanteList}" var="rec">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!rec.caseNumber}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!rec.subject}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!rec.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!rec.tematica}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!rec.productoServicio}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!rec.motivo}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!rec.detalle}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!rec.fechaAlta}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.reclAntCotitularExist}">
+                            <lightning:card title="Cotitulares">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">Case Number</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Subject</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Temática</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Producto/Servicio</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Motivo</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Detalle</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">Fecha Recepción</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.reclAntCotitularList}" var="rec">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!rec.caseNumber}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!rec.subject}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!rec.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!rec.tematica}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!rec.productoServicio}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!rec.motivo}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!rec.detalle}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!rec.fechaAlta}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- Reclamaciones Históricas SAC -->
+            <aura:if isTrue="{!v.antHistExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Reclamaciones Históricas SAC - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.antHistReclamanteExist}">
+                            <lightning:card title="Reclamantes"> 
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title01">Contrato</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title02">Oficina afectada</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title03">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title04">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title05">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title06">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title07">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title08">I. Resuelto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title09">Producto/Servicio</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.antHistReclamanteList}" var="ant">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title10">{!ant.contrato}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title11">{!ant.oficinaAfectada}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title12">{!ant.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title13">{!ant.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title14">{!ant.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title15">{!ant.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title16">{!ant.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title17">{!ant.importeResuelto}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title18">{!ant.productoServicio}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.antHistCotitularExist}">
+                            <lightning:card title="Cotitulares"> 
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title01">Contrato</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title02">Oficina afectada</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title03">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title04">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title05">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title06">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title07">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title08">I. Resuelto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title09">Producto/Servicio</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.antHistCotitularList}" var="ant">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title10">{!ant.contrato}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title11">{!ant.oficinaAfectada}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title12">{!ant.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title13">{!ant.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title14">{!ant.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title15">{!ant.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title16">{!ant.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title17">{!ant.importeResuelto}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title18">{!ant.productoServicio}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- Antecedentes CBPO -->
+            <aura:if isTrue="{!v.antCBPOExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Antecedentes CBPO - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.antCBPOReclamanteExist}">
+                            <lightning:card title="Reclamantes">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title19">ID Reclamacion</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title20">Oficina afectada</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title21">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title22">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title23">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title24">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title25">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title26">I. Resuelto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title27">Producto/Servicio</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.antCBPOReclamanteList}" var="ant">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title28">{!ant.idReclamacion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title29">{!ant.oficinaAfectada}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title30">{!ant.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title31">{!ant.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title32">{!ant.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title33">{!ant.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title34">{!ant.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title35">{!ant.importeResuelto}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title36">{!ant.productoServicio}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.antCBPOCotitularExist}">
+                            <lightning:card title="Cotitulares">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title19">ID Reclamacion</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title20">Oficina afectada</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title21">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title22">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title23">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title24">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title25">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title26">I. Resuelto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title27">Producto/Servicio</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.antCBPOCotitularList}" var="ant">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title28">{!ant.idReclamacion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title29">{!ant.oficinaAfectada}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title30">{!ant.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title31">{!ant.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title32">{!ant.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title33">{!ant.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title34">{!ant.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title35">{!ant.importeResuelto}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title36">{!ant.productoServicio}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- Demandas Entidad -->
+            <aura:if isTrue="{!v.demEntExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Demandas Judiciales Entidad - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.demEntReclamanteExist}">
+                            <lightning:card title="Reclamantes">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title37">Nº Procedimiento</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title38">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title39">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title40">Oficina Gestora</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title41">NIF</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title42">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title42">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title44">Materia</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title45">Estado</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.demEntReclamanteList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title46">{!dem.numProcedimiento}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title47">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title48">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title49">{!dem.oficinaGestora}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title50">{!dem.nif}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title51">{!dem.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title52">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title53">{!dem.materia}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title542">{!dem.estado}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.demEntCotitularExist}">
+                            <lightning:card title="Cotitulares">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title37">Nº Procedimiento</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title38">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title39">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title40">Oficina Gestora</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title41">NIF</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title42">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title42">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title44">Materia</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title45">Estado</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.demEntCotitularList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title46">{!dem.numProcedimiento}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title47">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title48">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title49">{!dem.oficinaGestora}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title50">{!dem.nif}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title51">{!dem.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title52">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title53">{!dem.materia}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title542">{!dem.estado}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- Demandas Judiciales -->
+            <aura:if isTrue="{!v.demMorExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Demandas Judiciales Morosidad - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.demMorExist}">
+                            <lightning:card title="Reclamantes">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Oficina Gestora</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">NIF</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title60">Producto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Estado</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.demMorReclamanteList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!dem.oficinaGestora}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!dem.nif}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!dem.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title68">{!dem.producto}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.estado}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.demMorCotitularExist}">
+                            <lightning:card title="Cotitulares">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Fecha cierre</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Oficina Gestora</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">NIF</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Resolución</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">I. Reclamado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title60">Producto</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Estado</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.demMorCotitularList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!dem.oficinaGestora}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!dem.nif}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!dem.resolucion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!dem.importeRec}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title68">{!dem.producto}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.estado}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <!-- Concursos -->
+            <aura:if isTrue="{!v.concursosExist}">
+                <div style="margin-bottom: 20px;margin-top: 20px;">
+                    <lightning:card title="Concursos - Reclamantes y Cotitulares" iconName="utility:custom_apps">
+                        <aura:if isTrue="{!v.concursosReclamanteExist}">
+                            <lightning:card title="Reclamantes">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">ID Reclamación</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Temática</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Producto/Servicio</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Documento Rec</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">Documento Res</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title60">Importe abonado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Fecha cierre</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.concursosReclamanteList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!dem.idReclamacion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!dem.tematica}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!dem.productoServicio}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!dem.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!dem.docRec}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!dem.docRes}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title68">{!dem.importeAbonado}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                        <aura:if isTrue="{!v.concursosCotitularExist}">
+                            <lightning:card title="Reclamantes">
+                                <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title54">ID Reclamación</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title55">Temática</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title56">Producto/Servicio</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title57">Estado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title58">Documento Rec</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title59">Documento Res</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title60">Importe abonado</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Fecha alta</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="title61">Fecha cierre</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <aura:iteration items="{!v.concursosReclamanteList}" var="dem">
+                                                <tr>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title62">{!dem.idReclamacion}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title63">{!dem.tematica}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title64">{!dem.productoServicio}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title65">{!dem.estado}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title66">{!dem.docRec}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title67">{!dem.docRes}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title68">{!dem.importeAbonado}€</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.fechaAlta}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="title69">{!dem.fechaCierre}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </lightning:card>
+                        </aura:if>
+                    </lightning:card>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.showEmptyMessage}">
+                <div style="margin-top: 20px;">No se han encontrado antecedentes.</div>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

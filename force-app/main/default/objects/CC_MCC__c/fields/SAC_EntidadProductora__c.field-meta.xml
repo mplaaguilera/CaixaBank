@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EntidadProductora__c</fullName>
+    <label>Entidad productora</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Bankia</fullName>
+                <default>false</default>
+                <label>Bankia</label>
+            </value>
+            <value>
+                <fullName>Caixabank, S.A.</fullName>
+                <default>false</default>
+                <label>Caixabank, S.A.</label>
+            </value>
+            <value>
+                <fullName>Caixabank Asset Management</fullName>
+                <default>false</default>
+                <label>Caixabank Asset Management</label>
+            </value>
+            <value>
+                <fullName>Caixabank Consumer Finance, S.A.</fullName>
+                <default>false</default>
+                <label>Caixabank Consumer Finance, S.A.</label>
+            </value>
+            <value>
+                <fullName>Caixabank Money to Pay</fullName>
+                <default>false</default>
+                <label>Caixabank Money to Pay</label>
+            </value>
+            <value>
+                <fullName>Caixabank Payments &amp; Consumer</fullName>
+                <default>false</default>
+                <label>Caixabank Payments &amp; Consumer</label>
+            </value>
+            <value>
+                <fullName>Caixabank Payments E.F.C. E.P,S.A.U.</fullName>
+                <default>false</default>
+                <label>Caixabank Payments E.F.C. E.P,S.A.U.</label>
+            </value>
+            <value>
+                <fullName>Caser Bankia Mediación</fullName>
+                <default>false</default>
+                <label>Caser Bankia Mediación</label>
+            </value>
+            <value>
+                <fullName>Comercia Global Payments entidad de pago, S.L.</fullName>
+                <default>false</default>
+                <label>Comercia Global Payments entidad de pago, S.L.</label>
+            </value>
+            <value>
+                <fullName>Corporación Hipoteca Mutual</fullName>
+                <default>false</default>
+                <label>Corporación Hipoteca Mutual</label>
+            </value>
+            <value>
+                <fullName>Mapfre Bankia Mediación</fullName>
+                <default>false</default>
+                <label>Mapfre Bankia Mediación</label>
+            </value>
+            <value>
+                <fullName>Microbank</fullName>
+                <default>false</default>
+                <label>Microbank</label>
+            </value>
+            <value>
+                <fullName>Otras empresas ajenas al grupo CXB</fullName>
+                <default>false</default>
+                <label>Otras empresas ajenas al grupo CXB</label>
+            </value>
+            <value>
+                <fullName>Resto Bankia Mediación</fullName>
+                <default>false</default>
+                <label>Resto Bankia Mediación</label>
+            </value>
+            <value>
+                <fullName>Sa Nostra Vida Bankia Mediación</fullName>
+                <default>false</default>
+                <label>Sa Nostra Vida Bankia Mediación</label>
+            </value>
+            <value>
+                <fullName>Segurcaixa</fullName>
+                <default>false</default>
+                <label>Segurcaixa</label>
+            </value>
+            <value>
+                <fullName>Telefonica Consumer Finance</fullName>
+                <default>false</default>
+                <label>Telefonica Consumer Finance</label>
+            </value>
+            <value>
+                <fullName>Vidacaixa, S.A. de Seguros y Reaseguros</fullName>
+                <default>false</default>
+                <label>Vidacaixa, S.A. de Seguros y Reaseguros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

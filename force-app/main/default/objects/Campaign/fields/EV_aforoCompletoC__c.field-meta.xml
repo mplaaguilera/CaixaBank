@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_aforoCompletoC__c</fullName>
+    <description>Campo boolean para conocer si se ha superado el numero de plazas del evento</description>
+    <formula>EV_NumeroDePlazas__c &lt;= EV_InscritosVirtualesC__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Aforo Virtual Completo Evento</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

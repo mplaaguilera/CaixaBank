@@ -1,0 +1,17 @@
+<design:component>
+	<design:attribute name="expandAccordion" label="Expand accordion section"
+					  description="Expand accordion section"
+					  default="true"/>
+	<design:attribute name="titleAccordion" label="Accordion title"
+					  description="Accordion title"
+					  required="false"/>
+	<design:attribute name="titleCard" label="Title Card"
+					  description="Title component"
+					  required="false"/>
+	<design:attribute name="iconCard" label="Image card"
+					  description="Image of the component related with the title"
+					  required="false" default="standard:product_request"/>
+	<design:attribute name="oppType" label="Opportunity type"
+					  description="Type of Opportunity to show"
+					  datasource="All, Vigentes, Historico" default="All"/>
+</design:component>

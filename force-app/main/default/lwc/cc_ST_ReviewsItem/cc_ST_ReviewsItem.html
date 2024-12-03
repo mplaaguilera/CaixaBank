@@ -1,0 +1,58 @@
+<template>
+  <div class="body_component">
+
+      <article class="slds-card slds-m-around_x-large">
+        <div class="slds-card__header slds-grid">
+          <header class="slds-media slds-media_center slds-has-flexi-truncate">
+
+
+            <div class="slds-media__figure">
+              <span class="slds-icon_container slds-icon-standard-account" title="account">
+                <img style="border-radius: 11px;" src={msg.App_Image__c} />
+                <span class="slds-assistive-text">Logo</span>
+              </span>
+            </div>
+            <div class="slds-media__body">
+              <h2 class="slds-text-heading_small">{msg.App__c}</h2>
+              <h2 class="slds-card__header-title">{msg.Title__c}</h2>
+              <h2 class="slds-card__header-title">De {msg.Author_Name__c}</h2>
+            </div>
+          </header>
+          <img style="border-radius: 11px;" src={logo} />
+         
+          <div class="slds-no-flex" >
+              <div class="slds-grid">
+                  <div><lightning-icon icon-name="utility:favorite" alternative-text="1" size="x-small"></lightning-icon></div>
+                  <div if:true={dosestrellas}><lightning-icon icon-name="utility:favorite" alternative-text="1" size="x-small"></lightning-icon></div>
+                  <div if:true={tresestrellas}><lightning-icon icon-name="utility:favorite" alternative-text="1" size="x-small"></lightning-icon></div>
+                  <div if:true={cuatroestrellas}><lightning-icon icon-name="utility:favorite" alternative-text="1" size="x-small"></lightning-icon></div>
+                  <div if:true={cincoestrellas}><lightning-icon icon-name="utility:favorite" alternative-text="1" size="x-small"></lightning-icon></div>
+              </div> 
+              <br>
+              <h2 class="slds-card__header-title" >
+                  <div if:false={existeCaso} >
+                      <lightning-button variant="brand" label="Crear Caso" title="CrearCaso" onclick={crearcaso} class="slds-m-left_x-small"></lightning-button>
+                      <div if:true={pending} >
+                          <lightning-spinner alternative-text="Loading"></lightning-spinner>
+                      </div>
+                  </div>
+                  <div if:true={existeCaso}>
+                    <div if:false={existeCasoAbierto}>
+                    </div>
+                    <div if:true={existeCasoAbierto}>
+                      <lightning-button variant="destructive" label={msg.Case__r.CaseNumber} title={msg.Case__r.CaseNumber} onclick={navigateToRecordViewPage} class="slds-m-left_x-small"></lightning-button>
+                    </div>
+                  </div>        
+                </h2>
+                
+          </div>
+        </div>
+
+        <p class="slds-p-horizontal_small">{msg.Content__c}</p>
+
+      </article>
+
+  
+
+  </div>
+</template>

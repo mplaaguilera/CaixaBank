@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Contacto__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Contacto</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 OR 2) AND 3</booleanFilter>
+        <filterItems>
+            <field>Contact.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CC_Colaborador</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CC_Empleado</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.Email</field>
+            <operation>notEqual</operation>
+            <value></value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Colaboradores</relationshipLabel>
+    <relationshipName>Contactos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Respuesta_Modificar__c</fullName>
+    <label>Modificar canal respuesta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Email</fullName>
+                <default>false</default>
+                <label>Email</label>
+            </value>
+            <value>
+                <fullName>Comentarios APPs</fullName>
+                <default>false</default>
+                <label>Comentarios APPs</label>
+            </value>
+            <value>
+                <fullName>Twitter</fullName>
+                <default>false</default>
+                <label>Twitter</label>
+            </value>
+            <value>
+                <fullName>Carta</fullName>
+                <default>false</default>
+                <label>Carta</label>
+            </value>
+            <value>
+                <fullName>Phone</fullName>
+                <default>false</default>
+                <label>Teléfono</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

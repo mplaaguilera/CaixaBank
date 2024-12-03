@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Intent__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que relaciona la unidad minima de conversation unit con su detalle (de hijo a padre)</description>
+    <label>Intent</label>
+    <referenceTo>CC_ConversationUnit__c</referenceTo>
+    <relationshipLabel>Conversations</relationshipLabel>
+    <relationshipName>Conversations</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,252 @@
+<aura:component controller="SEG_MCC_Buscador_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="campos" type="String[]" default = "['CaseNumber', 'SEG_Detalle__c', 'CC_MCC_Motivo__c', 'CC_MCC_ProdServ__c', 'CC_MCC_Tematica__c', 'OwnerId', 'Status', 'CC_MCC_Tematica__r.Name', 'CC_MCC_ProdServ__r.Name', 'CC_MCC_Motivo__r.Name', 'RecordTypeId', 'RecordType.DeveloperName']"/>
+    <aura:attribute name="objectList" type="Object[]"/>
+    <aura:attribute name="searching" type="Boolean"/>
+    <aura:attribute name="alternateDisplayField" type="String[]" default="['CC_Tematica_Formula__c', 'CC_Producto_Servicio_Formula__c', 'Name']" description="Display the secondary set of fields. Keep it less than two."/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    <aura:attribute name="idTimeout" type="String"/>
+    <aura:attribute name="idTimeoutFade" type="String"/>
+    <aura:attribute name="selectedIndex" type="Integer"/>
+    <aura:attribute name="lookupInputFocused" type="Boolean" default="false"/>
+    <aura:attribute name="selectedObject" type="Object"/>
+    <aura:attribute name="selectedObjectDisplayName" type="String" default=""/>
+    <aura:attribute name="lookupId" type="String" default="" description="Set this to the id of the record that is looked up. Based on this the data will be loaded on further loading of the page."/>
+    <aura:attribute name="value" type="Object" description="This will be set to the value of the selected object.You can access this from your component"/>
+    <aura:attribute name="queryErrorMessage" type="String" default=""/>
+    <aura:attribute name="ldsError" type="String"/>
+    <aura:attribute name="queryErrorFound" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarBuscador" type="Boolean" default="false"/>
+    <aura:attribute name="showDetalle" type="Boolean" default="false"/>
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <!--<aura:handler name="init" value="{!this}" action="{!c.cargarMCC}"/>-->
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="FULL"
+    fields="{!v.campos}" targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}"/>
+
+    <!--UI-->
+    <!--Clasificación actual del caso-->
+    <aura:if isTrue="{!!empty(v.caso.CC_MCC_Tematica__r.Name.length)}">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon class="cc-azul-mcc" iconName="custom:custom64" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Clasificación MCC actual del caso</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div style="padding-top: 5px; padding-bottom: 7px; padding-left: 0.2rem; background-color: #fafbff; border-radius: 5px; border-style: solid; border-width: 1px; border-color: #d2d5d5; cursor: pointer;" onclick="{!c.mostrarBuscador}">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                    <span style="padding-left: 8px;"/>
+                    <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Tematica__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                    <aura:if isTrue="{!v.caso.CC_MCC_ProdServ__r.Name.length > 0}">
+                        <span class="cc_flecha">→</span>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_ProdServ__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.caso.CC_MCC_Motivo__r.Name.length > 0}">
+                        <span class="cc_flecha">→</span>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Motivo__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.caso.SEG_Detalle__r.Name.length > 0}">
+                        <span class="cc_flecha">→</span>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.SEG_Detalle__r.Name}" fontWeight="500" enteredValue="@@@"/> 
+                    </aura:if>   
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <span style="padding-right: 10px;">
+                        <span>
+                            <lightning:button iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" title="Abrir buscador de clasificaciones"/> 
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--<aura:set attribute="else">
+        <aura:if isTrue="{!!empty(v.caso.CC_MCC_Motivo__r.Name.length)                                                                                                                                                                                                                          }">
+            <div style="padding-top: 5px; padding-bottom: 7px; padding-left: 0.2rem; background-color: #fafbff; border-radius: 5px; border-style: solid; border-width: 1px; border-color: #d2d5d5; cursor: pointer;" onclick="{!c.mostrarBuscador}">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <div class="slds-col">
+                        <span style="padding-left: 8px;"/>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Tematica__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                        <span class="cc_flecha">→</span>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_ProdServ__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                        <span class="cc_flecha">→</span>
+                        <c:CC_MCC_Buscador_Badge text="{!v.caso.CC_MCC_Motivo__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                        <aura:if isTrue="{!v.showDetalle}">
+                            <span class="cc_flecha">→</span>
+                            <c:CC_MCC_Buscador_Badge text="{!v.caso.SEG_Detalle__r.Name}" fontWeight="500" enteredValue="@@@"/>
+                        </aura:if>
+                    </div>
+                    <div class="slds-col slds-grow-none">
+                        <span style="padding-right: 10px;">  
+                            <span>
+                                <lightning:button iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" title="Abrir buscador de clasificaciones"/>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+    </aura:set>-->
+        <!--Card-->
+        <aura:if isTrue="{!v.mostrarBuscador}">
+            <div style="height: 0.9rem;"/>
+            <article class="slds-card">
+                <!--Cabecera de la card-->
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container">
+                                <lightning:icon class="cc-azul-mcc" iconName="custom:custom64" size="small"/>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Buscador de clasificaciones</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <!--Cuerpo de la card-->
+                <div class="slds-card__body slds-card__body_inner">
+                <!--Buscador-->
+                <div class="slds-grid slds-gutters slds-gutters_x-small">
+                    <!--Columna 1 (campo de búsqueda)-->
+                    <div class="slds-col" style="width: 100%;">
+                        <aura:if isTrue="{!empty(v.selectedObjectDisplayName)}">
+                            <!--Campo de búsqueda sin elemento seleccionado-->
+                            <span onkeyup="{!c.searchRecords}">
+                                <lightning:input name="lookUpInputElement" aura:id="lookUpInputElement" label="Buscar clasificación" value="{!v.enteredValue}" type="search" onchange="{!c.searchRecords}" onfocus="{!c.inputInFocus}" placeholder="buscar temática, producto/servicio, motivo..." autocomplete="off"/>
+                            </span>
+                            <!--Resultados de la búsqueda-->
+                            <aura:if isTrue="{!and(v.objectList.length > 0, v.lookupInputFocused)}">
+                                <div aura:id="resultadosBusqueda" id="listbox-unique-id" role="listbox" style="position: absolute; width: 100%;">
+                                    <ul class="slds-dropdown slds-dropdown_length-10" role="presentation" style="max-width: none; width: 100%; height: 200px;">
+                                        <aura:iteration items="{!v.objectList}" var="obj" indexVar="ind">
+                                            <li role="presentation" class="{!v.selectedIndex == ind ? 'slds-has-focus highlightDark' : 'slds-has-focus'}" data-current-index="{!ind}" onclick="{!c.onRowSelected}" onmouseover="{!c.showColorOnMouseEnter}" onmouseout="{!c.hideColorOnMouseLeave}">
+                                                <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                    <span class="slds-media__figure">
+                                                        <span class="slds-icon_container" title="Clasificación">
+                                                            <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="small"/>
+                                                        </span>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <c:CC_MCC_Buscador_Resultado object="{!obj}" alternateFieldList="{!v.alternateDisplayField}" enteredValue="{!v.enteredValue}" helpText="{!obj.CC_Detalle__c}"/>
+                                                    </span>
+                                                </span>
+                                            </li>
+
+                                            <aura:if isTrue="{!ind != (v.objectList.length-1)}">
+                                                <hr class="hrStyle"/>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                            
+                            <!--Sin resultados-->
+                            <aura:if isTrue="{!v.objectList.length == 0 &amp;&amp; v.enteredValue != '' &amp;&amp; v.lookupInputFocused}">
+                                <div aura:id="sinResultadosBusqueda" role="listbox" class="cc-fade-in" style="position: absolute; left: 0; right: 103px;">
+                                    <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-is-relative" role="presentation">
+                                        <li role="presentation">
+                                            <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                
+                                                <span class="slds-media__body" style="{!and(!v.searching, !v.queryErrorFound) ? '' : 'display:none;'}">
+                                                    <span class="slds-listbox__option-text_entity">
+                                                        <center>
+                                                            Sin resultados.
+                                                            <span style="{!v.enteredValue.length lt 3 ? '' : 'display:none;'}">(introducir un mínimo de 3 caracteres).</span>
+                                                        </center>
+                                                    </span>
+                                                </span>
+                                                <span class="slds-media__body" style="{!!v.searching ? 'display:none' : ''}">
+                                                    <center>
+                                                        <div style="height:1rem;">
+                                                            <div role="status" class="slds-spinner slds-spinner_small slds-spinner_brand">
+                                                                <span class="slds-assistive-text">Cargando...</span>
+                                                                <div class="slds-spinner__dot-a"></div>
+                                                                <div class="slds-spinner__dot-b"></div>
+                                                            </div>
+                                                        </div>
+                                                    </center>
+                                                </span>
+                                                <span class="slds-media__body" style="{! v.queryErrorFound ? '' : 'display:none;'}">
+                                                    <span class="slds-listbox__option-text_entity">
+                                                        <center>
+                                                            <b>Error en la búsqueda: {!v.queryErrorMessage}</b>
+                                                        </center>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                            <!--Fin resultados de búsqueda-->
+                            
+                            <aura:set attribute="else">
+                                <!--Campo de búsqueda con elemento seleccionado-->
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="combobox-unique-id">Buscar clasificación</label>
+                                    {!v.selectedObject.CC_Tematica_Formula__c}
+                                    {!v.selectedObject.CC_Producto_Servicio_Formula__c}
+                                    {!v.selectedObject.SEG_Motivo_Formula__c}
+                                    {!v.selectedObject.SEG_Detalle_Formula__c}
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right">
+                                            <span class="cc-fade-in" style="position: absolute; display: inline-block; padding-top: 3px; padding-left: 12px;">
+                                                <lightning:avatar variant="circle" fallbackIconName="custom:custom62" size="small" style="margin-bottom: 4px;"/>
+                                                <span style="padding-left: 12px;"/>
+                                                <aura:if isTrue="{!v.selectedObject.CC_Tematica_Formula__c.length > 0}">
+                                                    <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.CC_Tematica_Formula__c}" fontWeight="500" enteredValue="@@@"/>
+                                                </aura:if>
+
+                                                <aura:if isTrue="{!v.selectedObject.CC_Producto_Servicio_Formula__c.length > 0}">
+                                                    <span class="cc_flecha">→</span>
+                                                    <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.CC_Producto_Servicio_Formula__c}" fontWeight="500" enteredValue="@@@"/> 
+                                                </aura:if>
+
+
+                                                <aura:if isTrue="{!v.showDetalle}">
+                                                    <aura:if isTrue="{!v.selectedObject.SEG_Motivo_Formula__c.length > 0}">
+                                                        <span class="cc_flecha">→</span>
+                                                        <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.SEG_Motivo_Formula__c}" fontWeight="500" enteredValue="@@@"/>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!v.selectedObject.SEG_Detalle_Formula__c.length > 0}">
+                                                        <span class="cc_flecha">→</span>
+                                                        <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.SEG_Detalle_Formula__c}" fontWeight="500" enteredValue="@@@"/>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        <span class="cc_flecha">→</span>
+                                                        <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.SEG_Motivo_Formula__c}" fontWeight="500" enteredValue="@@@"/>
+                                                        <span class="cc_flecha">→</span>
+                                                        <c:CC_MCC_Buscador_Badge text="{!v.selectedObject.Name}" fontWeight="500" enteredValue="@@@"/>
+                                                    </aura:set>
+                                                </aura:if>
+
+
+                                            </span>
+                                            <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id" role="textbox" disabled="true"/>
+                                            <lightning:buttonIcon iconName="utility:close" size="small" onclick="{!c.removeSelectedOption}" variant="bare" class="slds-input__icon slds-input__icon_right"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </aura:if>
+</aura:component>

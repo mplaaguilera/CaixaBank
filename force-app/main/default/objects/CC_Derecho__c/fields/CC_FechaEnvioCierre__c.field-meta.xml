@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_FechaEnvioCierre__c</fullName>
+    <description>Fecha en la que el agente da por cerrado el caso o envía el derecho a GDPR.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha de envío/cierre</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

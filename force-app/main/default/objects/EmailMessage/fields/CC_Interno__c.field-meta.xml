@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Interno__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>El mensaje de correo electrónico no se añadirá al histórico de mensajes que se incluye al final de los correos salientes dirigidos a clientes.</inlineHelpText>
+    <label>Interno</label>
+    <type>Checkbox</type>
+</CustomField>

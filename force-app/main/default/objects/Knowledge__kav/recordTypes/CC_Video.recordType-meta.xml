@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Video</fullName>
+    <active>true</active>
+    <description>Permite crear nuevos artículos que adjunten videos formativos.</description>
+    <label>Vídeo</label>
+    <picklistValues>
+        <picklist>CC_Canal_Resolucion__c</picklist>
+        <values>
+            <fullName>Accionista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Activo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>App</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apple Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Atención al Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Banca Digital CNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bloqueos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CaixaBankNow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cajeros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clases Pasivas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Código de Buenas Prácticas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Domiciliaciones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Emisiones PromoCaixa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleados</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Extranjero</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Formulario web</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google Play</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ImaginBank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Incidencias Técnicas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Junta Andalucia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>M2P Asistencia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Microbank</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Now in Sales-MAC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Feedback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Oficina Preventiva</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pago Móvil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pasivo y Valores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Postventa CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>RRHH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recaudación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Redsys-Sermepa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Centrales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Servicios Generales</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SmartPhones</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Clientes CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte Empleados CompraEstrella</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Soporte PSU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tarjetas y Comercios</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Valija digital</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Virtualización de Proveedores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Web</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CC_Tipo__c</picklist>
+        <values>
+            <fullName>Cliente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empleado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CSBD_NombresProductos__c</picklist>
+        <values>
+            <fullName>Deposito Bonificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mascotas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Alarmas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Auto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Auto TR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Hogar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Jubilación</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Salud</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyBox Vida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyCard</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MyCard Imagin</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nomina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Nómina</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Previsión Profesional</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seviam</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

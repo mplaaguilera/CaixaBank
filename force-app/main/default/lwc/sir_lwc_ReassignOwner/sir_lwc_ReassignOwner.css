@@ -1,0 +1,82 @@
+.assign-lookup {
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+.lookup-cmp {
+	margin-left: 5em;
+}
+
+.table-container {
+	height: 25rem;
+}
+.total-data-text {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+}
+.select-obj {
+	width: 100%;
+	padding-left: 1rem;
+	padding-bottom: 1rem;
+}
+.footer-filter {
+	width: fit-content;
+	margin-left: auto;
+	margin-right: 0;
+}
+/*
+.slds-form-element{
+	margin-left: 5em;
+}
+*/
+.slds-form-element_horizontal .slds-form-element__control, .slds-form_horizontal .slds-form-element .slds-form-element__control, .slds-form_stacked .slds-form-element_horizontal .slds-form-element__control {
+    padding-left: 25%;
+    clear: none;
+}
+
+.buttonAlign{
+    text-align: right;
+    margin-top: 1rem;
+	padding-top: 0.5rem;
+}
+
+.buttonStyle{
+    margin-left: 20%;
+}
+
+.divPadding{
+	padding-top: 1rem;
+}
+
+.title{
+	font-weight: bold;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+    vertical-align: -webkit-baseline-middle;
+}
+
+.totalText{
+	margin-right: 1rem;
+}
+
+.dt-outer{
+	height: 90%!important;
+}
+
+.table-container-paginacion{
+	margin-bottom: 60px;
+}
+
+
+.buttonMarginOcultar {
+	margin-top: -30px;
+    margin-right: 10px;
+}
+
+.paddingBottom{
+	padding-bottom: 100px;
+}
+
+.marginBottom {
+	margin-left: 80px;
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Consultas</fullName>
+    <booleanFilter>(1 AND 2 AND 3) OR (1 AND 4)</booleanFilter>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>NAME</columns>
+    <columns>OWNER_NAME</columns>
+    <columns>SEG_Grupo__c</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>SAC_CasoRelacionado__c</columns>
+    <columns>CASES.CLOSED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SAC_Consulta</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Rechazado,SAC_013</value>
+    </filters>
+    <filters>
+        <field>OWNER_NAME</field>
+        <operation>notEqual</operation>
+        <value>Pte. Asignar</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Rechazado,SAC_013</value>
+    </filters>
+    <label>SAC-Todas las consultas</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

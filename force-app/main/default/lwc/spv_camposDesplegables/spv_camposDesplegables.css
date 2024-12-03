@@ -1,0 +1,26 @@
+.subseccion {
+    margin-left: 20px;
+}
+
+.cuerpo-subseccion {
+    margin-left: 40px;
+}
+
+.cuerpo-seccion {
+    margin-left: 20px;
+}
+
+.elemento-form {
+    padding-right: 25px;
+    
+}
+
+
+
+.contenedor {
+    display: flex;
+}
+
+.mi-boton {
+    margin-bottom: 10px;
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_2N_CANALES_ESCRITOS_Case</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_MCC_Tematica__c</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>OWNER_NAME</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Cerrado,Rechazado</value>
+    </filters>
+    <label>Cola 2N Canales Escritos</label>
+    <queue>CC_2N_CANALES_ESCRITOS</queue>
+    <sharedTo>
+        <group>PublicGroup_2N_CANALES_ESCRITOS</group>
+    </sharedTo>
+</ListView>

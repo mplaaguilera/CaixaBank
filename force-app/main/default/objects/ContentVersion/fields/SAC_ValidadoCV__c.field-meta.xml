@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidadoCV__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si esta checkeado se le añadirá al título el casenumber y se podrá adjuntar en la etapa 1 y 3 de la redacción</description>
+    <label>SAC_ValidadoCV</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,4 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <c:seg_addOperation name="Añadir número de operaciones" recordId="{!v.recordId}" onclose="{!c.handleClose}" />  
+</aura:component>

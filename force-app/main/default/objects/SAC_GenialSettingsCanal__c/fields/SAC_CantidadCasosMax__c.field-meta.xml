@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_CantidadCasosMax__c</fullName>
+    <description>Cantidad máxima de casos que se podrán enviar a la IA en un día.
+Si la cantidad actual de casos recibidos en un día supera este máximo ya no se enviará ningún caso más ese día.
+Si la cantidad máxima esta vacía no se hará la comprobación por cantidad de casos.</description>
+    <externalId>false</externalId>
+    <label>Cantidad Casos Max</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

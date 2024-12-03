@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_E2E__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo End to End del caso. Su función es recoger el campo E2E desde el MCC de cualquiera de las pretensiones a la reclamación.</description>
+    <label>End to end</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

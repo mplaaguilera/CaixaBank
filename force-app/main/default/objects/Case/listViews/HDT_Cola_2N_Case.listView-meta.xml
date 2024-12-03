@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Cola_2N_Case</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CC_MCC_Tematica__c</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>OS_Situacion_SR__c</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Owner_Anterior__c</columns>
+    <filterScope>Queue</filterScope>
+    <label>2N Cola HDT</label>
+    <queue>HDT_Cola_2N</queue>
+    <sharedTo>
+        <group>HDT_Cola_2N</group>
+    </sharedTo>
+</ListView>

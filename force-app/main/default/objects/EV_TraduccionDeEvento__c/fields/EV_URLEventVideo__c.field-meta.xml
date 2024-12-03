@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLEventVideo__c</fullName>
+    <description>Url del video del evento para newsletter volver ver el evento.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Url del video del evento para newsletter volver ver el evento.</inlineHelpText>
+    <label>URL video del evento</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Pretensiones_de_mis_grupos</fullName>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>NAME</columns>
+    <columns>OWNER_NAME</columns>
+    <columns>SEG_Grupo__c</columns>
+    <columns>SAC_EsPrincipal__c</columns>
+    <columns>CASES.PRIORITY</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SAC_Pretension</value>
+    </filters>
+    <filters>
+        <field>SAC_Es_mi_grupo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>SAC-Pretensiones de mis grupos</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

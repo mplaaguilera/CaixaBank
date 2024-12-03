@@ -1,0 +1,87 @@
+lightning-icon.iconoHeader {
+	--sds-c-icon-color-background: rgb(16, 124, 173);
+}
+
+div.divVistaPrevia {
+	border: 1px solid rgb(201, 201, 201);
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	border-radius: 4px;
+}
+
+div.divVistaPrevia > iframe {
+	height: 100%;
+	width: 100%;
+	border-style: none;
+	border-radius: 3px;
+}
+
+div.divEdicion {
+	height: 533px;
+}
+
+div.divEdicion iframe {
+	height: 533px;
+	width: 100%;
+	border-style: none;
+}
+
+div.divEdicion span.spanCargandoEditor {
+	height: 100%;
+	width: 100%;
+	border: 2px solid #eee;
+	border-radius: 10px;
+}
+
+span.spanPrevisualizacionDesactualizada {
+	bottom: 13px;
+	color: white;
+	background-color: rgb(186, 5, 23);
+	border: 1px solid white;
+	border-radius: 6px;
+	visibility: hidden;
+	opacity: 0.0;
+	transition: visibility 88ms linear, opacity 88ms linear;
+	cursor: default;
+}
+
+section.modalGenerarDocumento.slds-hidden span.spanPrevisualizacionDesactualizada {
+	visibility: hidden;
+	opacity: 0.0;
+}
+
+span.spanPrevisualizacionDesactualizada.visible {
+	visibility: visible;
+	opacity: 0.9;
+}
+
+span.spanPrevisualizacionDesactualizada > lightning-icon {
+	position: relative;
+	top: -1px;
+	--slds-c-icon-color-foreground-default: white;
+}
+
+:host {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+/*
+lightning-input-rich-text {
+	--slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+	--slds-c-textarea-sizing-min-height: 588px;
+}
+*/
+
+button.slds-modal__close:hover > lightning-icon {
+	--slds-c-icon-color-foreground-default: var(--slds-c-button-text-color-hover, var(--sds-c-button-text-color-hover, var(--lwc-brandAccessibleActive,rgba(21, 73, 102, 1))));
+}
+
+lightning-button,
+lightning-button-icon {
+	--slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}

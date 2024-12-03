@@ -1,0 +1,30 @@
+<template>
+	<article class="slds-card">
+		<div class="slds-card__header slds-grid">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:link" size="small"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">Enlaces al Terminal Financiero</h2>
+				</div>
+				<div class="slds-media__figure">
+					<lightning-button-icon icon-name="utility:refresh" class="slds-m-left_xx-small" onclick={cargarLinks}></lightning-button-icon>
+				</div>
+			</header>
+		</div>
+		<div lwc:if={listLinks} class="slds-card__body slds-card__body_inner">
+			<ol lwc:if={listLinks.length} class="listaEnlaces slds-var-p-vertical_xx-small slds-var-p-horizontal_small">
+				<template for:each={listLinks} for:item="link">
+					<li key={link.label} >
+						<span class="enlace slds-truncate" title={link.label} data-url={link.url} data-nif={link.nif} data-trazadonif={link.trazadoNif} onclick={abrirEnlace}>
+							<lightning-icon icon-name="utility:new_window" size="x-small" class="slds-var-m-right_small slds-is-relative" style="top: -2px;"></lightning-icon>
+							<span>{link.label}</span>
+						</span>
+					</li>
+				</template>
+			</ol>
+			<div lwc:else class="slds-var-p-around_xx-small slds-text-color_weak">Sin enlaces que mostrar</div>
+		</div>
+	</article>
+</template>

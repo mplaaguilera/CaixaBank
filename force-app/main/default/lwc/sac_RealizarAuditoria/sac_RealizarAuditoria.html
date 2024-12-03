@@ -1,0 +1,77 @@
+<template>
+    <template if:true={reclamacionCerrada}>
+        <template if:false={auditoriaRealizada}>
+            <template if:true={tienePermisos}>
+                <div class="slds-clearfix">
+                    <button class="slds-button slds-button_outline-brand slds-button_stretch" style="height:60px;font-size:medium" onclick={mostrarModalRealizarAuditoria}>Realizar auditoría reclamación</button>
+                </div>
+            </template>
+        </template>
+    </template>
+
+    
+    <!-- Modal Realizar Auditoría -->
+    <template if:true={modalRealizarAuditoria}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!-- Botón cerrar superior y cabecera -->
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalRealizarAuditoria}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Realizar auditoría reclamación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_large">
+                    <!-- Modal/Popup Box LWC body starts here -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-auditoria">
+                        <lightning-input type="text" name="input" label="Nombre" placeholder="Nombre de la auditoría" required="true" onchange={handleChangeNombreAuditoria}></lightning-input><br>
+                        <div if:true={requeridoNombre} style="color:red">
+                            Por favor, debe rellenar el nombre de la auditoría.
+                        </div> 
+                        <lightning-combobox
+                            name="slaCalidad"
+                            label="SLA Calidad"
+                            value={value}
+                            options={auditoriaSLACalidad.data.values}
+                            placeholder="SLA Calidad"
+                            onchange={handleChangeSLACalidadAuditoria} 
+                            required="true">
+                        </lightning-combobox>
+                        <div if:true={requeridoSLACalidad} style="color:red">
+                            Por favor, debe rellenar el SLA calidad de la auditoría.
+                        </div>
+                        <br>
+                        <div class="slds-combobox_container">
+                            <lightning-dual-listbox
+                            name="tipoAuditoria"
+                            label="Tipo de auditoría"
+                            value={value}
+                            placeholder="Seleccione un motivo"
+                            options={listTipos.data.values}
+                            onchange={handleChangeTipoAuditoria} 
+                            required="true"></lightning-dual-listbox>
+                        </div>  
+                        <div if:true={requeridoTipo} style="color:red">
+                            Por favor, debe seleccionar al menos un tipo de auditoría.
+                        </div>                              
+                    </div>
+                </div>
+                
+                <!-- Botones Cancelar y Confirmar -->
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancelar" onclick={cerrarModalRealizarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="Confirmar" onclick={confirmarRealizarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+     <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

@@ -1,0 +1,41 @@
+<template>
+    <!-- Vinculadas -->
+    <div class="slds-container">
+        <div>
+            <div class="slds-box slds-box_small">
+                <h1 slot="title" class="card-title">
+                    <lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small"></lightning-icon>
+                    {labels.oppVinculadas}
+                    <lightning-icon icon-name="utility:link" class="card-title-icon" size="xx-small"></lightning-icon>
+                </h1>
+                <template if:true={recInfo} for:each={recInfo} for:item="optyTask">
+                    <div key={optyTask.Id} >
+                        <c-cibe_-Detail-Opp-Related ondatareport={handleDataPadre} customactivityopp={optyTask.AV_Opportunity__c} editable={editable} event={rId} onrefreshlinkrelated={refreshCmp} principal={optyTask.AV_IsMain__c} single={isSingleOpp} ></c-cibe_-Detail-Opp-Related>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <!-- Posibles Vinculos -->
+        <div class="not-first-card">
+            <div class="slds-box slds-box_small ">
+                <h1 slot="title" class="card-title">
+                    <lightning-icon class="slds-media__figure" icon-name="standard:opportunity" size="small" style="background-color: rgb(145 145 145);"></lightning-icon>
+                    {labels.oppDisponibles}
+                    <div class="slds-float_right">
+                        <lightning-button-group>
+                            <lightning-button-icon icon-name="utility:refresh" size="small" onclick={refreshCmp}></lightning-button-icon>
+                        </lightning-button-group>
+                    </div>
+                </h1>
+                <template if:true={listOpp} for:each={listOpp} for:item="opty">
+                    <div key={opty.Id}>
+                        <c-cibe_-Detail-Opp-Un-Related customactivityopp={opty.Id} event={rId} onrefreshlinkunrelated={refreshCmp} ></c-cibe_-Detail-Opp-Un-Related>
+                    </div>
+                </template>        
+            </div>
+        </div>
+        <template if:true={showSpinner}> 
+            <lightning-spinner alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+        </template>
+    </div>
+</template>

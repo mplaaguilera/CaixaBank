@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_EnviarAcuse__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Marca para el envío de acuses de recibo</description>
+    <label>Enviar acuse</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

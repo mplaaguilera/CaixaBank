@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EmailRepresentante_OK__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>check si el correo del representante es ok</description>
+    <label>Correo electrónico OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

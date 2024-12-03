@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Mis_Oportunidades_No_Activas</fullName>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>CSBD_Estado__c</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>OPPORTUNITY.AMOUNT</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Pendiente Interno,Pendiente Cliente</value>
+    </filters>
+    <label>Mis oportunidades no activas</label>
+</ListView>

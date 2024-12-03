@@ -1,0 +1,16 @@
+<template>
+    <lightning-card  title="Lista de Emails de la consulta">
+        <div slot="actions">
+            <div class="slds-float_right">
+              <lightning-button
+                  variant="border-filled"
+                  title="Refrescar"
+                  onclick={handleRefreshClick}
+                  icon-name="utility:refresh"
+                  class="slds-p-around_xxx-small">
+              </lightning-button>
+            </div>
+          </div>
+        <lightning-datatable data={emails} columns={columns} key-field="Id" hide-checkbox-column></lightning-datatable>        
+    </lightning-card> 
+</template>

@@ -1,0 +1,14 @@
+public with sharing class CC_Llamada_Casos_Controller {
+
+    @AuraEnabled
+    public static List<Case> getCasos(Id recordId) {
+        List<Id> casosId = new List<Id>();
+        for (Task tarea : [SELECT WhatId FROM Task
+                            WHERE CC_Llamada_Id__c = :recordId AND RecordType.DeveloperName IN ('CC_Task', 'OS_Task', 'SACH_Task')]) {
+            casosId.add(tarea.WhatId);
+        }
+        
+        return [SELECT CaseNumber, Status, Subject, CC_Canal_Procedencia__c, CC_MCC_Tematica__r.Name
+                FROM Case WHERE Id IN :casosId ORDER BY CreatedDate ASC LIMIT 25];
+    }
+}

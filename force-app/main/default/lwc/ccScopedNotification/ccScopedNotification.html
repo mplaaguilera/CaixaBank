@@ -1,0 +1,18 @@
+<template>
+
+    <article class={articleClass} style={articleStyle}>
+        <div class="slds-card__body" style="margin: unset;">
+            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title={mensaje}>
+                        <lightning-icon variant={iconoVariant} icon-name={iconoNombre} size="x-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>{mensaje}</p>
+                </div>
+            </div>
+        </div>
+    </article>
+
+</template>

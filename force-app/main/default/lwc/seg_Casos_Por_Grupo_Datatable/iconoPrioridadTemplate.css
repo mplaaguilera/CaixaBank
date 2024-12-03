@@ -1,0 +1,11 @@
+.Low {
+    --sds-c-icon-color-foreground-default: #4bca82;
+}
+
+.Medium {
+    --sds-c-icon-color-foreground-default: #ffb75d;
+}
+
+.High {
+    --sds-c-icon-color-foreground-default: #c23a35;
+}

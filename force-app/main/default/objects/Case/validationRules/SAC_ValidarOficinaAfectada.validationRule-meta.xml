@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidarOficinaAfectada</fullName>
+    <active>true</active>
+    <description>Antes de resolver se comprueba que el campo de oficina afectada esta completo</description>
+    <errorConditionFormula>IF(
+AND(
+NOT($Permission.SAC_ByPass),
+RecordType.DeveloperName = &apos;SAC_Reclamacion&apos;,
+ISCHANGED(Status),
+OR(
+ISPICKVAL(Status, &apos;SAC_004&apos;),
+ISPICKVAL(Status, &apos;Cerrado&apos;)),
+ISBLANK( CC_Oficina_Afectada_Lookup__c)
+),
+true,
+false
+)</errorConditionFormula>
+    <errorMessage>Hay que introducir la oficina afectada</errorMessage>
+</ValidationRule>

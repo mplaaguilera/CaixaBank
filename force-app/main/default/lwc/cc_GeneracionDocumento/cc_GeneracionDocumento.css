@@ -1,0 +1,7 @@
+.TextAreaFull {
+    text-align: left;
+}
+
+:host {
+    --sds-c-textarea-sizing-min-height: 83vh;
+}

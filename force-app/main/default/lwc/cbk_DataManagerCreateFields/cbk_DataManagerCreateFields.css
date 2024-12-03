@@ -1,0 +1,74 @@
+div.datatableContainer {
+    border: 1px solid rgb(201, 201, 201);
+    border-radius: 4px;
+}
+
+lightning-button-icon, lightning-button-menu, lightning-combobox, lightning-lookup, lightning-input-field {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+lightning-button {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+    --slds-c-button-success-color-background: #4caa5a;
+    --slds-c-button-success-text-color: white;
+    --slds-c-button-success-color-border: rgb(201, 201, 201);
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+    --slds-c-input-color-border-focus: rgb(19, 13, 13);
+}
+
+lightning-icon.iconoSolicitud {
+    --slds-c-icon-color-background: rgb(6, 165, 154);
+}
+
+.prova{
+    --slds-c-icon-color-foreground-default: orange;
+    --slds-c-icon-color-background: gray;
+}
+
+div.slds-section > div.slds-section__content {
+    padding: 10px 10px 0 10px;
+}
+
+div.divPath {
+    margin: 14px 0 6px 0;
+    pointer-events: none;
+}
+
+lightning-progress-step.slds-is-incomplete,
+lightning-progress-step.slds-is-incomplete::before,
+lightning-progress-step.slds-is-incomplete::after {
+    color: rgb(24, 24, 24);
+    background: #d8d8d8;
+}
+
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Approved']),
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Approved'])::before,
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Approved'])::after {
+    /* columns: white; */
+    background: #4bca82;
+}
+
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Denied']),
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Denied'])::before,
+lightning-progress-step.slds-is-active:has(span.slds-path__title[data-label='Denied'])::after {
+    /* columns: white; */
+    background: #c23a35;
+}
+
+div.bordeInferior {
+    border-bottom: 1px solid #c9c9c9;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+div.slds-section > h3.slds-section__title > button > lightning-icon.slds-section__title-action-icon {
+    transition: transform 60ms linear;
+    transform-origin: center;
+}
+
+div.slds-section > h3.slds-section__title > button.slds-section__title-action {
+    line-height: 32px;
+}

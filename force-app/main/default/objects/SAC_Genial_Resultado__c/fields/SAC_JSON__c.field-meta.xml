@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_JSON__c</fullName>
+    <description>json devuelto por la integración de SAC_GENIAL_WS</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>JSON</label>
+    <length>131072</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

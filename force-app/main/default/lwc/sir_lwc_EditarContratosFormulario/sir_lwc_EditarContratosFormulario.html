@@ -1,0 +1,74 @@
+<template> 
+    <header class="slds-modal__header">
+        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Editar Contratos Formulario</h2>
+    </header>    
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+        <template if:true={mostrarParteCero}>  
+            <h3 class="slds-modal__title slds-hyphenate">{tituloMensaje} </h3><br/>  
+            <p>{mensajeInicial}</p>      
+        </template>
+        
+        <template if:true={mostrarContratosDeuda}>    
+            <h3 class="slds-modal__title slds-hyphenate">Seleccione los contratos con impago </h3><br/>         
+            <lightning-datatable
+                key-field="idContract"
+                data={contratosConDeuda}
+                columns={columnsContratoDeuda}
+                selected-rows={preSelectedContractConDeuda}
+                onrowselection={getSelectedIdConDeuda}>
+            </lightning-datatable>
+        </template>
+
+        <template if:true={noHayContratosDeuda}>
+            <h3 class="slds-modal__title slds-hyphenate">Seleccione los contratos con impago </h3><br/>              
+            Este cliente no tiene contratos con deuda.
+        </template>  
+
+        <br/>
+        <template if:true={mostrarContratosSinDeuda}> 
+            <h3 class="slds-modal__title slds-hyphenate">Seleccione los contratos sin impago </h3><br/>     
+            <lightning-datatable
+                key-field="idContract"
+                data={contratosSinDeuda}
+                columns={columnsContratoSinDeuda}
+                selected-rows={preSelectedContractSinDeuda}
+                onrowselection={getSelectedIdSinDeuda}>
+            </lightning-datatable>
+        </template>              
+
+        <template if:true={noHayContratosSin}>   
+            <h3 class="slds-modal__title slds-hyphenate">Seleccione los contratos sin impago </h3><br/>          
+            Este cliente no tiene contratos sin deuda.
+        </template> 
+        
+        <br/>
+        <template if:true={mostrarError}> 
+            <div class="slds-modal__content slds-p-around_medium error" >
+                <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+                    <div class="slds-notify_container slds-is-relative">
+                        <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                            <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                            </svg>
+                            </span>
+                            <div class="slds-notify__content">
+                            <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError}></lightning-formatted-rich-text> </h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>          
+        </template>   
+    </div>
+        
+    <footer class="slds-modal__footer">
+        <button class="slds-button slds-button_neutral" onclick={closeAction} disabled={disableCancel}>Cancelar</button>
+        <template if:true={mostrarContinuar}>
+            <button class="slds-button slds-button_brand" onclick={continuar} disabled={disableContinuar}>Continuar</button>
+        </template>
+        <template if:true={mostrarCrear}>
+            <button class="slds-button slds-button_brand" onclick={guardar} disabled={disableSave}>Guardar</button>
+        </template>
+    </footer>
+</template>

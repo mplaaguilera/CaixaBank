@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Picklist</fullName>
+    <active>true</active>
+    <label>CBK Picklist</label>
+    <picklistValues>
+        <picklist>CBK_Project__c</picklist>
+        <values>
+            <fullName>CC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CIBE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cops</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MCs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MCs Solution</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MCs Solution EMP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>OT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SAC</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

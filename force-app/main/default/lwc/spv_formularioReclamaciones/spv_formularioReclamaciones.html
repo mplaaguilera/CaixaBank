@@ -1,0 +1,517 @@
+<template>
+    <lightning-record-edit-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c" onsubmit={handleSubmit} onsuccess={handleSuccess}>
+    <lightning-messages> </lightning-messages>
+        <!-- Seccion Información General -->
+        <div class={toggleIconGeneral}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-general" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableGeneral}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Información general</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-reclamante">
+                <lightning-record-view-form record-id={recordId} object-api-name="Case">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                        <div class="slds-col slds-size_5-of-12">
+                            <lightning-output-field field-name="CC_RefExterna__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_7-of-12">
+                            <lightning-output-field field-name="SAC_NombreContacto__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_5-of-12">
+                            <lightning-output-field field-name="CC_SuppliedNIF__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_7-of-12">
+                            <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                                <lightning-output-field field-name="SEG_Grupo__c"> </lightning-output-field>
+                            </lightning-record-view-form>
+                        </div>
+                        <div class="slds-col slds-size_5-of-12">
+                            <lightning-output-field field-name="SAC_Letrado__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_7-of-12">
+                            <lightning-output-field field-name="OwnerId"> </lightning-output-field>
+                        </div>
+                    </div>
+                </lightning-record-view-form>
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                    <div class="slds-col slds-size_5-of-12">
+                        <lightning-output-field field-name="SPV_FechaPropuesta__c"> </lightning-output-field>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <lightning-input-field field-name="SPV_Importe__c" read-only={camposReadOnly}> </lightning-input-field>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_LetradoRevisor__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_LetradoRevisor__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Seccion Antecedentes SAC -->
+        <div class={toggleIconAntecentes}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-antecedentes" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableAntecentes}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Antecedentes SAC</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-antecedentes">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ResumenResolucion__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ResumenResolucion__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ResolucionRemitidaEnPlazo__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ResolucionRemitidaEnPlazo__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                            <lightning-output-field field-name="SAC_FechaRecepcion__c"> </lightning-output-field>
+                        </lightning-record-view-form>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <lightning-record-view-form record-id={casoSAC} object-api-name="Case">
+                            <lightning-output-field field-name="ClosedDate"> </lightning-output-field>
+                        </lightning-record-view-form>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ReclamacionMalFuncionamiento__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ReclamacionMalFuncionamiento__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesMalFuncionamiento__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesMalFuncionamiento__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ActuacionCumpleCriterios__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ActuacionCumpleCriterios__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesCriteriosBDE__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesCriteriosBDE__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- Seccion Valoración documentación disponible -->
+        <div class={toggleIconValoracion}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-valoracion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableValoracion}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Valoración documentación disponible</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-valoracion">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_DisponeDocumentacion__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_DisponeDocumentacion__c" onchange={handleOptionChangeDisponeDocumentacion}> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesDocumentacion__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesDocumentacion__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <template lwc:if={mostrarDocumentacionNecesaria}>
+                        <div class="slds-col slds-size_12-of-12">
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-output-field field-name="SPV_DocumentacionNecesaria__c"> </lightning-output-field>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_DocumentacionNecesaria__c"> </lightning-input-field>
+                            </template>
+                        </div>
+                    </template>
+                </div> 
+            </div>
+        </div>
+        <!-- Seccion Comprobaciones realizadas -->
+        <div class={toggleIconComprobaciones}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-comprobaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableComprobaciones}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Comprobaciones realizadas</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-comprobaciones">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_InformacionPrecontractual__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_InformacionPrecontractual__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <!-- ▫	Contratos: Se visualizarán mediante la integración con Contratos y será una lista relacionada visible donde se agruparán los contratos del reclamante relativos al expediente informados por el letrado en las pretensiones. -->
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_CambiosDeCondiciones__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_CambiosDeCondiciones__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ComunicacionLiquidaciones__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ComunicacionLiquidaciones__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_JustificantesOperaciones__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_JustificantesOperaciones__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ComunicacionOficinaCliente__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ComunicacionOficinaCliente__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_AntecedentesCumplimiento__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_AntecedentesCumplimiento__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_CumplimientoCondicionesPactadas__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_CumplimientoCondicionesPactadas__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_InformeOficina__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_InformeOficina__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- Seccion Pretensiones/Alegaciones -->
+        <!-- Se debe mostrar solo cuando la reclamación está en alegaciones -->
+        <template lwc:if={estadoAlegaciones}>
+            <div class={toggleIconAlegaciones}>
+                <h1 class="slds-section__title">
+                    <button aria-controls="expando-unique-id-alegaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableAlegaciones}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title"> Pretensiones/Alegaciones</span>
+                    </button>
+                </h1>
+                <div class="slds-section__content" id="expando-unique-id-alegaciones">
+                    <template for:each={pretensiones} for:item="pretension">
+                        <lightning-record-view-form key={pretension.Id} record-id={pretension.Id} object-api-name="Case">
+                            <div  class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap">
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="CaseNumber"> </lightning-output-field>
+                                </div> 
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="Subject"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_CriterioBDEMateriaFuente__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_Documentacion__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_DecisionAlegaciones__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_ObservacionesDecisionAlegaciones__c"> </lightning-output-field>
+                                </div>
+                                <!-- o	Observaciones Documentación: (un campo por cada documento) A rellenar por el letrado en la pretensión. -->
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                            </div> 
+                        </lightning-record-view-form>
+                    </template>
+                </div>
+            </div>
+        </template>
+        <!-- Seccion Pretensiones/Allanamiento -->
+        <!-- Se debe mostrar solo cuando la reclamación está en allanamiento -->
+        <template lwc:if={estadoAllanamiento}>
+            <div class={toggleIconAllanamiento}>
+                <h1 class="slds-section__title">
+                    <button aria-controls="expando-unique-id-allanamiento" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableAllanamiento}>
+                    <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                        <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                    </svg>
+                    <span class="slds-truncate" title="Section Title"> Pretensiones/Allanamiento</span>
+                    </button>
+                </h1>
+                <div class="slds-section__content" id="expando-unique-id-allanamiento">
+                    <template for:each={pretensiones} for:item="pretension">
+                        <lightning-record-view-form key={pretension.Id} record-id={pretension.Id} object-api-name="Case">
+                            <div  class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap">
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="CaseNumber"> </lightning-output-field>
+                                </div> 
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="Subject"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_CriterioBDEMateriaFuente__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_DecisionAllanamiento__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning-output-field field-name="SPV_Documentacion__c"> </lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                            </div> 
+                        </lightning-record-view-form>
+                    </template>
+                </div>
+            </div>
+        </template>
+        <!-- Seccion Valoración sobre el fondo de la reclamación -->
+        <div class={toggleIconFondo}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-fondo" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableFondo}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Valoración sobre el fondo de la reclamación</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-fondo">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ExisteDefensaJuridicaSuficiente__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesDefensaJuridica__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesDefensaJuridica__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ConllevaRiesgoReputacional__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ConllevaRiesgoReputacional__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesRiesgoReputacional__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesRiesgoReputacional__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ExisteCriterioRespectoTipologia__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ExisteCriterioRespectoTipologia__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesExisteCriterio__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesExisteCriterio__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_5-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_RiesgoInformeDesfavorable__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_RiesgoInformeDesfavorable__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_7-of-12">
+                        <template lwc:if={camposReadOnly}>
+                            <lightning-output-field field-name="SPV_ObservacionesInformeDesfavorable__c"> </lightning-output-field>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesInformeDesfavorable__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- Seccion Propuesta del letrado -->
+        <div class={toggleIconPropuesta}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-propuesta" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandablePropuesta}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Propuesta del letrado</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-propuesta">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                        <template lwc:if={estadoAllanamiento}>
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-output-field field-name="SPV_PropuestaLetradoAllanamiento__c"> </lightning-output-field>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_PropuestaLetradoAllanamiento__c"> </lightning-input-field>
+                            </template>
+                        </template>
+                        <template lwc:if={estadoAlegaciones}>
+                            <template lwc:if={camposReadOnly}>
+                                <lightning-output-field field-name="SPV_PropuestaLetradoAlegaciones__c"> </lightning-output-field>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-field field-name="SPV_PropuestaLetradoAlegaciones__c"> </lightning-input-field>
+                            </template>
+                        </template>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- Seccion Resolución AJN -->
+        <div class={toggleIconResolucion}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-resolucion" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableResoluciona}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Resolución AJN</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-resolucion">
+                <lightning-record-view-form record-id={idFormularioCaso} object-api-name="SPV_Formulario__c">
+                    <lightning-messages> </lightning-messages>
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-output-field field-name="SPV_TipoRespuesta__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-output-field field-name="SPV_MotivoRechazo__c"> </lightning-output-field>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-output-field field-name="SPV_ObservacionesAJ__c"> </lightning-output-field>
+                        </div>
+                    </div> 
+                </lightning-record-view-form>
+            </div>
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                </div>
+            </div>
+        </div>
+        <!-- Seccion Observaciones -->
+        <!-- <div class={toggleIconObservaciones}>
+            <h1 class="slds-section__title">
+                <button aria-controls="expando-unique-id-observaciones" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableObservaciones}>
+                <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                </svg>
+                <span class="slds-truncate" title="Section Title"> Observaciones</span>
+                </button>
+            </h1>
+            <div class="slds-section__content" id="expando-unique-id-observaciones">
+                <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                    <div class="slds-col slds-size_1-of-1">
+                        <lightning-input-field field-name="SPV_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                        <template lwc:if={camposReadOnly}>
+                        </template>
+                        <template lwc:else>
+                            <lightning-input-field field-name="SPV_ObservacionesAJ__c"> </lightning-input-field>
+                        </template>
+                    </div>
+                </div>   
+            </div>
+            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap"> 
+                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- spinner -->
+        <template lwc:if={spinnerLoading}>
+            <div class="slds-p-around_x-large">
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+            </div>
+        </template>
+    </lightning-record-edit-form>
+</template>

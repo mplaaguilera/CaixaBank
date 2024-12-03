@@ -1,0 +1,16 @@
+.THIS {
+}
+
+.THIS .forceContentFileCard{
+    width: initial !important;
+}
+
+.THIS .myClass{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.THIS .slds-modal__content{
+    overflow: initial;
+}

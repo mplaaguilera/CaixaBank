@@ -1,0 +1,113 @@
+<template>
+    <!--Spinner para simular la carga de los PO-->
+    <div if:true={casesSpinner} class="slds-spinner_inline spinner-padding">
+        <lightning-spinner variant="brand" 
+                           alternative-text="Loading Cases"     
+                           size="medium">
+        </lightning-spinner>
+    </div>
+    <!--Seccion donde se mostraran todos los PO del evento en un Datatable-->
+    <template if:true={showDT}>
+        <div style="height: 550px;">
+            <lightning-datatable
+                    key-field="id"
+                    data={recordsToDisplay}
+                    columns={showColumns}
+                    onrowaction={handleRowActions}
+                    hide-checkbox-column>      
+            </lightning-datatable>
+        </div>
+        <footer class="slds-modal__footer">
+            <template if:false={disabledButton}>
+                <lightning-button variant="brand" label={label.EV_CALCULAR_PO} onclick={callVolumenPO} class="slds-m-left_x-small"></lightning-button>
+            </template>
+            <template if:true={disabledButton}>
+                <lightning-button variant="brand" label={label.EV_CALCULAR_PO} class="slds-m-left_x-small" disabled></lightning-button>
+            </template> 
+        </footer>
+    </template>
+    <!--Seccion donde se mostraran todos los PO calculados y apareceran todos los activos-->
+    <template if:true={successCalcPO}>
+        <div style="height: 550px;">
+            <lightning-datatable
+                    key-field="id" 
+                    data={recordsToDisplayActive}
+                    columns={showColumnsActive}
+                    hide-checkbox-column>      
+            </lightning-datatable>
+        </div>
+        <footer class="slds-modal__footer">
+            <!--<button class="slds-button slds-button_brand" onclick={recalcularPO}>{label.EV_RECALCULAR_PO}</button>--> 
+            <template if:false={disabledButton}>
+                <lightning-button variant="brand" label={label.EV_CONFIRMAR_PO} onclick={checkPO}  class="slds-m-left_x-small"></lightning-button>
+            </template>
+            <template if:true={disabledButton}>
+                <lightning-button variant="brand" label={label.EV_CONFIRMAR_PO}  class="slds-m-left_x-small" disabled></lightning-button>
+            </template> 
+        </footer>
+    </template>
+    <!--Seccion donde se abre un popup de edicion del PO-->
+    <template if:true={openPopup}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium openpublic" id="modal-content-id-1">
+                    <lightning-record-edit-form record-id={recordIdRow} object-api-name="EV_CriterioPublicoObjetivo__c">
+                        <lightning-input-field field-name="EV_Activo__c" onchange={handleFieldChangeActive}></lightning-input-field>
+                        <lightning-input-field field-name="EV_TipoCriterio__c" onchange={handleFieldChangeTipoCriterio} disabled={isChildCampaign}></lightning-input-field>
+                        <!--<template if:true={indicador}>
+                            <lightning-input-field field-name="EV_ValorCriterio__c" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input-field>
+                        </template>
+                        <template if:true={saturation}>
+                            <lightning-input-field field-name="EV_ValorCriterio__c" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input-field>
+                        </template>-->
+                        <template if:true={channel}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionscanales} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                        <template if:true={idioma}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionsidiomas} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                        <template if:true={localOrgUnit_DES_DAN}>
+                            <c-ev_multi-select-lookup label-name="Search Account" object-api-name= "Account" field-api-names="Id,Name" filter-field-api-name="Name" icon-name="standard:account" onretrieve={selectItemEventHandler} onremove={deleteItemEventHandler} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-lookup>
+                        </template>
+                        <template if:true={localOrgUnit_DES_DT}>
+                            <c-ev_multi-select-lookup label-name="Search Account" object-api-name= "Account" field-api-names="Id,Name" filter-field-api-name="Name" icon-name="standard:account" onretrieve={selectItemEventHandler} onremove={deleteItemEventHandler} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-lookup>
+                        </template>
+                        <template if:true={location}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionsProvincia} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                        <template if:true={recipient_Age_Maxima}>
+                            <lightning-input-field field-name="EV_ValorCriterio__c" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input-field>
+                        </template>
+                        <template if:true={recipient_Age_Minima}>
+                            <lightning-input-field field-name="EV_ValorCriterio__c" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input-field>
+                        </template>
+                        <template if:true={recipient_Client_ClientBusiness}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionsCartera} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                        <template if:true={recipient_Client_ClientSegment}>
+                            <lightning-input-field field-name="EV_ValorCriterio__c" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input-field>
+                        </template>
+                        <!--<template if:true={recipient_client_cod_interlocutor}>
+                            <lightning-input label="Valor del criterio" type="number" max-length="4" onchange={handleFieldChangeValorCriterio} disabled={editValorCriterio} required={isRequired}></lightning-input>
+                        </template>-->
+                        <template if:true={recipient_Client_COD_OFICINA_AVE}>
+                            <c-ev_multi-select-lookup label-name="Search Account" object-api-name= "Account" field-api-names="Id,Name" filter-field-api-name="Name" icon-name="standard:account" onretrieve={selectItemEventHandler} onremove={deleteItemEventHandler} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-lookup>
+                        </template>
+                        <template if:true={recipient_gender}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionsPerson} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                        <template if:true={recipient_person_personType}>
+                            <c-ev_multi-select-Combobox label="Multi Select Combobox" ismultiselect={multiselect} options={optionsClientType} selectedvalues={selectedValue} onprogressvaluechange={hanldeProgressValueChange} disabled={editValorCriterio} required={isRequired}></c-ev_multi-select-combobox>
+                        </template>
+                    </lightning-record-edit-form>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">{label.EV_CANCEL}</button>
+                    <button class="slds-button slds-button_brand" onclick={saveRecords} title="OK">{label.EV_SAVE}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>       
+</template>

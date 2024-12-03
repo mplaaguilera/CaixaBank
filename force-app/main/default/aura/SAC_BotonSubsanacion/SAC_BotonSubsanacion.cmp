@@ -1,0 +1,209 @@
+<aura:component controller="SAC_LCMP_UpdateStatus"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="existenDatos" type="Boolean" />
+    <aura:attribute name="esPropietario" type="Boolean" />
+    <aura:attribute name="recordType" type="String" />
+    <aura:attribute name="alta" type="Boolean" />
+    <aura:attribute name="analisis" type="Boolean" />
+    <aura:attribute name="openModalSubsanacion" type="Boolean" />
+    <aura:attribute name="isModalOpenSubsanacion" type="Boolean" />
+    <aura:attribute name="openModalIdioma" type="Boolean" />
+    <aura:attribute name="isModalOpenIdioma" type="Boolean" />
+    <aura:attribute name="isLoading" type="Boolean" />
+    <aura:attribute name="values" type="List" />
+    <aura:attribute name="motivoSeleccionado" type="String" />
+    <aura:attribute name="idTemplateCliente" type="String" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" />
+    <aura:attribute name="necesitaGestionLlamada" type="Boolean" default="false"/>
+    <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
+
+
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="procedencia" type="String" />
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+    <aura:attribute name="ficherosBorrados" type="String[]" />
+    <aura:attribute name="copia" type="String" />
+    <aura:attribute name="copiaOculta" type="String" />
+    <aura:attribute name="acuseReciboEnviado" type="Boolean" default="false" />
+    <aura:attribute name="idiomaInformado" type="Boolean" default="false" />
+
+
+    <aura:attribute name="metodoEnvio" type="String" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    
+    <div class='slds-grid '>
+        <div class='slds-col slds-size_1-of-3' style="padding-top: 4px;">
+            <aura:if isTrue="{!v.recordType=='reclamacion'}">
+                <!-- <c:SAC_AcuseReciboCartaPostal recordId="{!v.recordId}" />  -->
+            </aura:if>
+        </div>
+        <div class="slds-grid slds-size_1-of-3 slds-align_absolute-center">
+            <aura:if isTrue="{!v.existenDatos}">
+            <aura:if isTrue="{!v.esPropietario}">
+                
+                <div>
+
+                    <div style="padding-top: 4px;" align="Center">
+                        <!--Boton de Pretension-->
+                        <aura:if isTrue="{!v.recordType=='pretension'}">
+                            <aura:if isTrue="{!or(v.alta, v.analisis)}">
+
+                                <lightning:button label="Subsanación" iconname="" onclick="{!c.openModalSubsanacion}">
+                                </lightning:button>
+
+                            </aura:if>
+                        </aura:if>
+
+                        <!--Boton de Reclamacion-->
+                        <aura:if isTrue="{!v.recordType=='reclamacion'}">
+
+                            <aura:if isTrue="{!v.alta}">
+
+                                <lightning:button label="Subsanación" iconname="" onclick="{!c.openModalIdioma}">
+                                </lightning:button>
+
+                            </aura:if>
+
+                            <aura:if isTrue="{!v.analisis}">
+
+                                <lightning:button label="Subsanación" iconname="" onclick="{!c.clickReclamacion}">
+                                </lightning:button>
+
+                            </aura:if>
+                        </aura:if>
+                    </div>
+
+                    <!--Modal de Subsanación-->
+                    <aura:if isTrue="{!v.isModalOpenSubsanacion}">
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."
+                                variant="brand" size="large" class="slds-hide" />
+                            <div class="slds-modal__container">
+                                <!-- Modal/Popup Box LWC header here -->
+                                <header class="slds-modal__header">
+                                    <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.closeModalSubsanacion }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                                    <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Tipo de
+                                        Subsanación y reclamar datos</h2>
+                                </header>
+                                <!-- Modal/Popup Box LWC body starts here -->
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                                    <div class="slds-combobox_container">
+                                        <lightning:select name="Motivo" label="Selecciona un motivo:" aura:id="motivo"
+                                            value="{!v.motivoSeleccionado}" onchange="{!c.modifiaMotivo}" required="true">
+                                            <option value="">Seleccione un motivo</option>
+                                            <aura:iteration items="{!v.values}" var="motivo">
+                                                <option text="{!motivo}" value="{!motivo}" />
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                    <br></br>
+                                    <aura:if isTrue="{!v.metodoEnvio == 'Email'}">
+                                        <c:SAC_GestionEmails usarComponente="{!v.usarComponente}"
+                                            procedencia="{!v.procedencia}" para="{!v.para}" copia="{!v.copia}" copiaOculta="{!v.copiaOculta}"
+                                            cuerpo="{!v.cuerpo}" asunto="{!v.asunto}" caso="{!v.caso}"
+                                            ficherosAdjuntos="{!v.ficherosAdjuntos}"
+                                            ficherosBorrados="{!v.ficherosBorrados}"
+                                            idsFicherosAdjuntos="{!v.idsFicherosAdjuntos}" />
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.metodoEnvio == 'SAC_CartaPostal'}">
+                                        <c:SAC_EnvioCartaPostal recordId="{!v.recordId}" procedencia="subsanación" />
+                                    </aura:if>
+                                </div>
+                                <!-- Modal/Popup Box LWC footer starts here -->
+                                <footer class="slds-modal__footer">
+                                    <button class="slds-button slds-button_neutral" onclick="{!c.closeModalSubsanacion}"
+                                        title="Cancel">Cancelar</button>
+                                    <button class="slds-button slds-button_brand" onclick="{!c.setSubsanacion}"
+                                        title="OK">Subsanar</button>
+                                </footer>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open"></div>
+                    </aura:if>
+
+
+                    <!--Modal de Modal de aviso revisar idioma-->
+                    <aura:if isTrue="{!v.isModalOpenIdioma}">
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."
+                                variant="brand" size="large" class="slds-hide" />
+                            <div class="slds-modal__container">
+                                <!-- Modal/Popup Box LWC header here -->
+                                <header class="slds-modal__header">
+                                    <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.closeModalIdioma }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                                    <h2 id="modal-heading-04" class="slds-text-heading_medium slds-hyphenate">Revisión del idioma de la reclamación</h2>
+                                </header>
+                                <!-- Modal/Popup Box LWC body starts here -->
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                                    <p>Para <b>asegurar la correcta finalización del alta </b> , recuerde realizar las siguientes validaciones:</p><br/>
+                                    <p>&ensp;&ensp;1. El campo <b>IDIOMA </b>de la pestaña <b>Detalles</b> se corresponde con el idioma del escrito del reclamante.</p>
+                                    <aura:if isTrue="{!v.acuseReciboEnviado}">
+                                        <p>&ensp;&ensp;2. Se ha enviado el acuse de recibo en el idioma del escrito del reclamante.</p> <!-- , de forma manual, -->
+                                    </aura:if>
+                                    <br/>
+                                    <lightning:input type="checkbox" label="Confirmo que he realizado las validaciones" value="{!v.checkConfirmacionValidacion}" checked="{!v.checkConfirmacionValidacion}" />
+                                    <br/>
+                                    <aura:if isTrue="{!v.acuseReciboEnviado}">
+                                        <p>Se va a finalizar el alta y pasar el caso al siguiente estado.<br/></p>
+                                        <aura:set attribute="else">
+                                            <p>Se va a finalizar el alta, se procederá al envío del acuse de recibo y se pasará el caso al siguiente estado.<br/>
+                                            </p> 
+                                        </aura:set>
+                                    </aura:if>   
+                                    <p><b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b></p>                               
+                                </div>
+                                <!-- Modal/Popup Box LWC footer starts here -->
+                                <footer class="slds-modal__footer">
+                                    <button class="slds-button slds-button_neutral" onclick="{!c.closeModalIdioma}"
+                                        title="Cancel">Cancelar</button>
+                                    <button class="slds-button slds-button_brand" onclick="{!c.aceptarAvisoIdioma}"
+                                        title="OK">Aceptar</button>
+                                </footer>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open"></div>
+                    </aura:if>
+
+
+                </div>
+                <div>
+                    <c:sAC_EstadosReclamacion recordId="{!v.recordId}" />
+                </div>
+                
+            </aura:if>
+        </aura:if>
+        </div>
+        <div class="slds-grid slds-size_1-of-3 slds-align_absolute-center" style="padding-left: 18px;">
+            <aura:if isTrue="{!v.recordType=='pretension'}">
+                <aura:if isTrue="{!v.necesitaGestionLlamada}">
+                    <c:SAC_AcompanyamientoLlamada recordId="{!v.recordId}" />
+                </aura:if>
+            </aura:if>
+        </div>        
+    </div>
+</aura:component>

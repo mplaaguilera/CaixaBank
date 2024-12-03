@@ -1,0 +1,525 @@
+<aura:component controller="CC_Clasificacion_Casos_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="recordDataError" type="String"/>
+    <aura:attribute name="recordLoaded" type="Boolean" default="false"/>
+    <aura:attribute name="recordEditFormLoaded" type="Boolean" default="false"/>
+    <aura:attribute name="cerrarCaso" type="Boolean" default="false"/>
+    <aura:attribute name="guardando" type="Boolean" default="false"/>
+    <aura:attribute name="estadoInicial" type="String"/>
+    <aura:attribute name="casoPromoCaixa" type="Boolean" default="false"/>
+    <aura:attribute name="casoFCO" type="Boolean" default="false"/>
+    <aura:attribute name="cambiarEstadoPendienteColaborador" type="Boolean" default="false"/>
+	<aura:attribute name="cambiarEstadoActivo" type="Boolean" default="false"/>
+	<aura:attribute name="continuarGuardarCerrar" type="Boolean" default="false"/>
+	<aura:attribute name="guardarCaso" type="Boolean" default="false"/>
+
+	<aura:attribute name="noCerrarFCO" type="Boolean" default="false"/>
+	
+    <aura:attribute name="casoOrigen" type="Object"/>
+	<aura:attribute name="mostrarAvisoOperativaOficina" type="Boolean" default="false"/>
+	<aura:attribute name="mostrarComponenteOperativaDerivar" type="Boolean" default="false"/>
+	<aura:attribute name="comboboxesInformados" type="Map" default="{canalOperativo: false, tematica: false, producto: false, motivo: false, causa: false, solucion: false, campaña: false, reaperturaValida: false}"/>
+    <aura:attribute name="tematicaAnterior" type="String" default = ""/>
+    <aura:attribute name="productoAnterior" type="String" default = ""/>
+    <aura:attribute name="motivoAnterior" type="String" default = ""/>
+    <aura:attribute name="retipificar" type="Boolean" default = "false"/>
+	<aura:attribute name="cierroCaso" type="Boolean" default = "false"/>
+    <aura:attribute name="opcionesCanalOperativo" type="List" default="[]"/>
+    <aura:attribute name="opcionesTematicas" type="List" default="[]"/>
+    <aura:attribute name="opcionesProductos" type="List" default="[]"/>
+    <aura:attribute name="opcionesMotivos" type="List" default="[]"/>
+    <aura:attribute name="opcionesCausas" type="List" default="[]"/>
+    <aura:attribute name="opcionesSoluciones" type="List" default="[]"/>
+    <aura:attribute name="opcionesCampanas" type="List" default="[]"/>
+    <aura:attribute name="opcionesErrores" type="List" default="[]"/>
+    <aura:attribute name="opcionesMccCargadas" type="Map" default="{canalesOperativos: false, tematicas: false, productos: false, motivos: false, causas: false, soluciones: false, campanas: false, erroresTf7: false}"/>
+	<aura:attribute name="tieneActividad" type="Boolean" default = "false"/>
+	<aura:attribute name="voyACerrar" type="Boolean" default = "false"/>
+	<aura:attribute name="botonGuardarCerrar" type="Boolean" default = "false"/>
+	<aura:attribute name="seleccionado" type="String"/>
+
+    <aura:registerEvent name="refresh" type="c:CC_Refresh_MCC_Clasificar"/>
+    <aura:handler event="c:CC_Refresh_MCC_Clasificar" action="{!c.recordDataReload}"/>
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--Permite saltos de línea en el cuerpo de los Toast-->
+    <aura:html tag="style">.toastMessage.forceActionsText{white-space: pre-line !important;}</aura:html>
+    
+    <force:recordData aura:id="recordData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="Status, CaseNumber, RecordTypeId, RecordType.Name, AccountId, RecordType.DeveloperName, IsClosed, CC_Canal_Procedencia__c,
+			CC_En_Tercer_Nivel__c, CC_Grupo_3N__c, CC_Canal_Operativo__c, CC_MCC_Tematica__c, CC_MCC_Tematica__r.Name,
+			CC_MCC_ProdServ__c, CC_MCC_ProdServ__r.Name, CC_MCC_Motivo__c, CC_MCC_Motivo__r.Name, CC_MCC_Motivo__r.CC_No_autenticar_TF__c, CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c, CC_MCC_Causa__c, CC_MCC_Causa__r.Name, CC_MCC_Solucion__c, CC_MCC_Solucion__r.Name, CC_Tematica__c, CC_Producto_Servicio__c,
+			CC_Motivo__c, CC_Causa__c, CC_Solucion__c, Origin, CC_Campana__c, CC_Campana__r.Name, CC_Error_TF7__c,
+			CC_Canal_Resolucion__c, ContactId, CC_No_Identificado__c, Canal_del_Empleado__c, CC_Representante__c, 
+			CBK_Case_Extension_Id__r.CC_FAQ__r.Name, CBK_Case_Extension_Id__r.CC_FAQ__r.CC_URL__c, CC_MCC_Solucion__r.CC_Agrupacion_Solucion__c"
+        targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.recordDataError}"/>
+
+    <!--UI-->
+	<aura:if isTrue="{!v.recordLoaded}">
+		<div class="{!v.recordEditFormLoaded ? '' : 'slds-hide'}">
+			<!--Card Clasificar-->
+			<article class="slds-card" style="padding-top: 0.6rem;">
+				<!--Cabecera de la card-->
+				<div class="slds-card__header slds-grid" style="margin-bottom: 0.3rem;">
+					<header class="slds-media slds-media_center slds-has-flexi-truncate">
+						<div class="slds-media__figure">
+							<span class="slds-icon_container">
+								<lightning:icon iconName="custom:custom62" size="small"/>
+							</span>
+						</div>
+						<div class="slds-media__body">
+							<h2 class="slds-card__header-title">
+								<span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Clasificación</span>
+							</h2>
+						</div>
+					</header>
+				</div>
+
+				<!--Cuerpo de la card-->
+				<div role="listitem">
+					<div class="slds-form-element slds-form-element_stacked slds-is-editing">
+						<div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+							<aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'CC_Cliente'}">
+								<div class="slds-col slds-size_1-of-4">
+									<div class="slds-var-m-around_xx-small">
+										<lightning:combobox aura:id="selectItemCanalOperativo" label="Canal operativo" placeholder="--Selecciona un canal operativo--" onchange="{!c.handleCanalOperativoSeleccionado}" onfocus="{!c.comboboxCanalesOperativosFocus}" options="{!v.opcionesCanalOperativo}" disabled="{!v.caso.IsClosed || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.canalesOperativos}"/>
+									</div>
+								</div>
+							</aura:if>
+							<div class="{!'slds-col ' + (v.caso.RecordType.DeveloperName == 'CC_Cliente' ? 'slds-size_1-of-4' : 'slds-size_1-of-3')}">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemTematica" label="Temática" placeholder="--Selecciona una temática--" onchange="{!c.handleTematicaSeleccionada}" onfocus="{!c.comboboxTematicasFocus}" options="{!v.opcionesTematicas}" disabled="{!v.caso.IsClosed || and(v.caso.RecordType.DeveloperName == 'CC_Cliente', !v.comboboxesInformados.canalOperativo) || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.tematicas}"/>
+								</div>
+							</div>
+							<div class="{!'slds-col ' + (v.caso.RecordType.DeveloperName == 'CC_Cliente' ? 'slds-size_1-of-4' : 'slds-size_1-of-3')}">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemProducto" label="Producto/Servicio" placeholder="--Seleccione un producto/servicio--" onchange="{!c.handleProductoSeleccionado}" onfocus="{!c.comboboxProductosFocus}" options="{!v.opcionesProductos}" disabled="{!v.caso.IsClosed || v.guardando || !v.comboboxesInformados.tematica}" spinnerActive="{!!v.opcionesMccCargadas.productos}"/>
+								</div>
+							</div>
+							<div class="{!'slds-col ' + (v.caso.RecordType.DeveloperName == 'CC_Cliente' ? 'slds-size_1-of-4' : 'slds-size_1-of-3')}">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemMotivo" label="Motivo" placeholder="--Seleccione un motivo--" onchange="{!c.funcionesMotivo}" onfocus="{!c.comboboxMotivosFocus}" options="{!v.opcionesMotivos}" disabled="{!v.caso.IsClosed || !v.comboboxesInformados.producto || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.motivos}"/>
+								</div>
+							</div>
+						</div>
+						<div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemCausa" label="Causa" placeholder="--Seleccione una causa--" onchange="{!c.handleCausaSeleccionada}" onfocus="{!c.comboboxCausasFocus}" options="{!v.opcionesCausas}" disabled="{!v.caso.IsClosed || !v.comboboxesInformados.motivo || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.causas}"/>
+								</div>
+							</div>
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemSolucion" label="Solución" placeholder="--Seleccione una solución--" onfocus="{!c.comboboxSolucionesFocus}" options="{!v.opcionesSoluciones}" disabled="{!v.caso.IsClosed || !v.comboboxesInformados.causa || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.soluciones}"/>
+								</div>
+							</div>
+						</div>
+						<div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+							<div class="slds-col slds-size_1-of-2">
+								<div class="slds-var-m-around_xx-small">
+									<lightning:combobox aura:id="selectItemCampana" label="Campaña" placeholder="--Seleccione una campaña--" onfocus="{!c.comboboxCampanasFocus}" options="{!v.opcionesCampanas}" disabled="{!v.caso.IsClosed || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.campanas}"/>
+								</div>
+							</div>
+							<aura:if isTrue="{!or(v.caso.RecordType.Name == 'Empleado', v.caso.RecordType.DeveloperName == 'CC_CSI_Bankia')}">
+								<div class="slds-col slds-size_1-of-2">
+									<div class="slds-var-m-around_xx-small">
+										<lightning:combobox aura:id="selectItemErroresTF7" label="Error TF7" placeholder="--Seleccione un error--" onfocus="{!c.comboboxErroresTF7Focus}" options="{!v.opcionesErrores}" disabled="{!v.caso.IsClosed || v.guardando}" spinnerActive="{!!v.opcionesMccCargadas.erroresTf7}"/>
+									</div>
+								</div>
+							</aura:if>
+						</div>
+					</div>
+				</div>
+			</article>
+
+			<!--Card Datos de gestión-->
+			<article class="slds-card" style="padding-top: 0.5rem;">
+				<!--Cabecera de la card-->
+				<div class="slds-card__header slds-grid" style="margin-bottom: 0px;">
+					<header class="slds-media slds-media_center slds-has-flexi-truncate">
+						<div class="slds-media__figure">
+							<span class="slds-icon_container"><lightning:icon iconName="standard:case" size="small"/></span>
+						</div>
+						<div class="slds-media__body">
+							<h2 class="slds-card__header-title">
+								<span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Datos de gestión</span>
+							</h2>
+						</div>
+					</header>
+				</div>
+				<div role="listitem">
+					<div class="slds-form-element slds-form-element_stacked slds-is-editing">
+						<br/>
+						<lightning:recordEditForm aura:id="recordEditForm" recordId="{!v.recordId}" objectApiName="Case" onload="{!c.recordEditFormOnLoad}"
+													onsuccess="{!c.recordEditFormOnSuccess}" onerror="{!c.recordEditFormOnError}">
+							<div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField fieldName="Origin" disabled="true"/>
+								</div>
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField aura:id="inputCanalProcedencia" fieldName="CC_Canal_Procedencia__c" disabled="true"/>
+								</div>
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField fieldName="CC_Canal_Resolucion__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+								</div>
+
+								<aura:if isTrue="{!v.caso.RecordType.DeveloperName != 'CC_Cliente'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Canal_Operativo__c" fieldName="CC_Canal_Operativo__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'CC_Cliente'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="x" fieldName="CC_Sistema_Operativo__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName != 'CC_CSI_Bankia',v.caso.Origin != 'Propuestas de mejora')}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField fieldName="CC_Tipo_Gestion__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField aura:id="CC_Tipo_Contacto__c" fieldName="CC_Tipo_Contacto__c" disabled="{!v.caso.IsClosed || v.guardando}" onchange="{!c.mccClasificacionRapida}"/>
+								</div>
+
+								<aura:if isTrue="{!v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Idioma__c" fieldName="CC_Idioma__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-col slds-size_1-of-2">
+										<lightning:inputField fieldName="CC_Resolucion__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+                                
+                                <aura:if isTrue="{! v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-col slds-size_1-of-2">
+										<lightning:inputField fieldName="CC_Resolucion2Nivel__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+                                <aura:if isTrue="{!v.caso.Origin == 'FAQ'}">
+									<div class="slds-col slds-col slds-size_1-of-2">
+										<lightning:inputField fieldName="CC_FAQ_Id__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName == 'CC_Empleado',v.caso.CC_Canal_Procedencia__c == 'Oficina Feedback')}">
+									<div class="slds-col slds-size_1-of-2">
+                                        <!--FAQ: 
+                                        <lightning:formattedUrl value="{!v.caso.CBK_Case_Extension_Id__r.CC_FAQ__r.CC_URL__c}" label="{!v.caso.CBK_Case_Extension_Id__r.CC_FAQ__r.Name}"/>-->
+										<lightning:outputField fieldName="CC_URL_FAQ__c"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{!v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-1 ">
+										<lightning:inputField  aura:id="CC_Detalles_Consulta__c" fieldName="CC_Detalles_Consulta__c" disabled="{!v.guardando || or(v.caso.IsClosed, !(v.casoPromoCaixa) &amp;&amp; (v.caso.CC_En_Tercer_Nivel__c))}" class="slds-form-element_1-col "/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{!v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-1">
+										<lightning:inputField  aura:id="DetallesSolucion" fieldName="CC_Detalles_Solucion__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}" class="slds-form-element_1-col"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName == 'CC_Empleado',v.caso.Origin != 'Propuestas de mejora')}">
+									<div class="slds-col slds-size_1-of-1">
+										<lightning:inputField  aura:id="CC_Detalle_Solucion_Confidencial__c" fieldName="CC_Detalle_Solucion_Confidencial__c" disabled="{!v.guardando || v.caso.IsClosed || v.caso.CC_Canal_Resolucion__c != 'Clases Pasivas' &amp;&amp; v.caso.CC_Canal_Resolucion__c != 'RRHH'}" class="slds-form-element_1-col"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName != 'CC_CSI_Bankia',v.caso.Origin != 'Propuestas de mejora')}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField fieldName="CC_Registro_de_escrito__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{!v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-2 ">
+										<lightning:outputField  fieldName="CC_Canal_Respuesta__c" />
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName != 'CC_CSI_Bankia',v.caso.Origin != 'Propuestas de mejora')}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField  fieldName="CC_Aqumetrix__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+									</div>
+								</aura:if>
+
+								<aura:if isTrue="{!v.caso.Origin != 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField  aura:id="modificarResp" fieldName="CC_Canal_Respuesta_Modificar__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField aura:id="CC_Oficina_Afectada_Lookup__c" fieldName="CC_Oficina_Afectada_Lookup__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+								</div>
+
+								<aura:if isTrue="{! and(v.caso.RecordType.DeveloperName != 'CC_CSI_Bankia',v.caso.Origin != 'Propuestas de mejora')}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Importe_Reclamado__c" fieldName="CC_Importe_Reclamado__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+									</div>
+									<aura:if isTrue="{!v.caso.Origin == 'Propuestas de mejora'}">
+										<div class="slds-col slds-size_1-of-2">
+											<lightning:inputField aura:id="CC_Importe_Abonado__c" fieldName="CC_Importe_Abonado__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+										</div>
+									</aura:if>
+								</aura:if>
+
+
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField aura:id="Canal_del_Empleado__c" fieldName="Canal_del_Empleado__c" disabled="{!v.caso.IsClosed || v.guardando || v.caso.CC_En_Tercer_Nivel__c}"/>
+								</div>
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:inputField aura:id="comentarios" fieldName="Comments" disabled="{!v.caso.IsClosed || v.guardando}"/>
+								</div>
+								<aura:if isTrue="{!v.casoPromoCaixa}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Numero_Pedido__c" fieldName="CC_Numero_Pedido__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+								<aura:if isTrue ="{!v.caso.CC_Canal_Procedencia__c == 'Formulario Consultas Operativas'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Reapertura_Valida__c" fieldName="CC_Reapertura_Valida__c" disabled="{!v.caso.IsClosed || v.guardando}"/>
+									</div>
+								</aura:if>
+
+								<!--Campos Propuestas de Mejora -->
+								<aura:if isTrue="{!v.caso.Origin == 'Propuestas de mejora'}">
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Titulo_Propuesta__c" fieldName="CC_Titulo_Propuesta__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Descripcion_Problematica__c" fieldName="CC_Descripcion_Problematica__c"  />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Descripcion_Propuesta__c" fieldName="CC_Descripcion_Propuesta__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Observaciones__c" fieldName="CC_Observaciones__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Volumen_Mensual__c" fieldName="CC_Volumen_Mensual__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Estado_Propuesta__c" fieldName="CC_Estado_Propuesta__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Fecha_Prevista__c" fieldName="CC_Fecha_Prevista__c" />
+									</div>
+									<div class="slds-col slds-size_1-of-2">
+										<lightning:inputField aura:id="CC_Fecha_Implantacion__c" fieldName="CC_Fecha_Implantacion__c" />
+									</div>
+								</aura:if>
+
+								<div class="slds-col slds-size_1-of-2">
+									<lightning:outputField fieldName="CC_Resuelto_Primer_Contacto__c"/>
+								</div>
+
+								<div class="slds-col slds-size_1-of-2">
+									<div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col" >
+										<label class="slds-form-element__label" for="cambiarPendienteColaborador" style="max-width: none;">
+											Cambiar estado a &quot;Pendiente colaborador&quot;
+										</label>
+										<lightning:helptext content="Al guardar el caso con esta casilla marcada, se cambiará su estado a &quot;Pendiente colaborador&quot; y se reabrirá la última actividad de tipo &quot;Traslado a colaborador&quot; cerrada." style="display: contents; padding-top: none; float:none;"/>
+										<lightning:input class="slds-form-element__control" style="padding-top: 2px; padding-left: 17.5rem;" type="checkbox" aura:id="cambiarEstadoPendienteColaborador" checked="{!v.cambiarEstadoPendienteColaborador}" disabled="true"/>
+									</div>
+								</div>
+								<!--Check de cambiar estado a Activo cuando el estado es pendiente cliente-->	
+									<div class="slds-col slds-size_1-of-2">
+										<div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col" >
+											<label class="slds-form-element__label" for="cambiarEstadoActivo" style="max-width: none;">
+												Cambiar estado a &quot;Activo&quot;
+											</label>
+											<lightning:helptext content="Al guardar el caso con esta casilla marcada, se cambiará su estado a &quot;Activo&quot;" style="display: contents; padding-top: none; float:none;"/>
+											<lightning:input class="slds-form-element__control" style="padding-top: 2px; padding-left: 13.5rem;" type="checkbox" aura:id="cambiarEstadoActivo" checked="{!v.cambiarEstadoActivo}" disabled="true"/>
+										</div>
+									</div>
+								<!--Fila para los botones-->
+									<div class="slds-col slds-size_1-of-1" style="text-align: right;">
+
+
+									<aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'CC_Cliente' &amp;&amp; v.caso.CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c != null &amp;&amp; v.caso.CC_MCC_Motivo__r.CC_Tipo_Ficha_TF__c != '' &amp;&amp; v.caso.AccountId != null}">
+										<!-- Ini: Botón añadido por Moises Cano US969672 -->
+										<lightning:button aura:id="linksTF" label="TF" onclick="{!c.validacionesLinksTF}" disabled="{!v.caso.IsClosed || v.guardando}" /> &nbsp;
+
+									</aura:if>
+									<!-- Fin: Botón añadido por Moises Cano US969672  -->
+									<lightning:button aura:id="submitGuardar" label="Guardar" variant="{! v.cambiarEstadoPendienteColaborador ? 'destructive-text' : 'neutral'}" onclick="{!c.gestionaGuardarCerrar}" disabled="{!v.caso.IsClosed || v.guardando}"/> &nbsp;
+									<lightning:button aura:id="submitGuardarCerrar" variant="Brand" label="Guardar y cerrar" onclick="{!c.gestionaGuardarCerrar}" disabled="{!v.caso.IsClosed || v.cambiarEstadoPendienteColaborador || v.guardando}"/>&nbsp;
+								</div>
+							</div>
+
+							<!-- Controles ocultos para actualizar para aprovechar la recordEditForm para hacer la actualización -->
+							<aura:if isTrue="{!v.caso.RecordType.DeveloperName == 'CC_Cliente'}">
+								<lightning:inputField aura:id="canalOperativoSeleccionadoOculto" fieldName="CC_Canal_Operativo__c" class="slds-hide"/>
+								<lightning:inputField aura:id="derivar" fieldName="CC_Derivar__c" class="slds-hide"/>
+							</aura:if>
+
+							<lightning:inputField aura:id="tematicaSeleccionadaOculto" fieldName="CC_MCC_Tematica__c" class="slds-hide"/>
+							<lightning:inputField aura:id="productoSeleccionadoOculto" fieldName="CC_MCC_ProdServ__c" class="slds-hide"/>
+							<lightning:inputField aura:id="motivoSeleccionadoOculto" fieldName="CC_MCC_Motivo__c" class="slds-hide"/>
+							<lightning:inputField aura:id="causaSeleccionadaOculto" fieldName="CC_MCC_Causa__c" class="slds-hide"/>
+							<lightning:inputField aura:id="solucionSeleccionadaOculto" fieldName="CC_MCC_Solucion__c" class="slds-hide"/>
+							<lightning:inputField aura:id="cerradoOperativa" fieldName="CC_Cerrado_Operativa__c" class="slds-hide"/>
+							<lightning:inputField aura:id="estado" fieldName="Status" class="slds-hide"/>
+							<lightning:inputField aura:id="campanaSeleccionadaOculto" fieldName="CC_Campana__c" class="slds-hide"/>
+							<lightning:inputField aura:id="errorTerminalSeleccionadoOculto" fieldName="CC_Error_TF7__c" class="slds-hide"/>
+							<lightning:inputField aura:id="tematicaInternaSeleccionadaOculto" fieldName="CC_Tematica__c" class="slds-hide"/>
+							<lightning:inputField aura:id="productoInternoSeleccionadaOculto" fieldName="CC_Producto_Servicio__c" class="slds-hide"/>
+							<lightning:inputField aura:id="motivoInternoSeleccionadaOculto" fieldName="CC_Motivo__c" class="slds-hide"/>
+							<lightning:inputField aura:id="causaInternaSeleccionadaOculto" fieldName="CC_Causa__c" class="slds-hide"/>
+							<lightning:inputField aura:id="solucionInternaSeleccionadaOculto" fieldName="CC_Solucion__c" class="slds-hide"/>
+							<lightning:inputField aura:id="valoracionIAOculto" fieldName="CC_Valoracion_AI__c" class="slds-hide"/>
+							<lightning:inputField fieldName="RecordTypeId" class="slds-hide"/>
+						</lightning:recordEditForm>
+					</div>
+				</div>
+			</article>
+		</div>
+	</aura:if>
+
+    <!--Modal para cerrar caso origen-->
+	<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="modalCerrarCasoOrigen" onkeydown="{!c.modalCerrarCasoOrigenTeclaPulsada}">
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCerrarCasoOrigenCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">¿Cerrar también el caso origen?</h2>
+            </header>
+
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <lightning:layoutItem size="12" padding="around-medium">
+                    <p>El caso que has cerrado está vinculado con el siguiente caso origen:</p>
+                    <div class="slds-grid slds-gutters_direct-xx-small slds-var-m-left_xx-large slds-var-m-right_xx-large slds-var-m-top_x-large slds-var-m-bottom_x-large slds-border_right slds-border_bottom slds-border_left slds-border_top cc_divInfoCasoOrigen">
+                        <div class="slds-col slds-col slds-var-m-left_large" style="position: relative; top: 13px;">
+                            <lightning:icon iconName="standard:case" size="small"/>
+                        </div>
+                        <div class="slds-col">
+                            <article class="slds-card slds-var-m-bottom_xx-large">
+                                <div class="slds-card__body slds-card__body_inner">
+                                    <span style="font-weight: 400;">
+                                        <lightning:button variant="base" class="brandTextLink" label="{!'Caso ' + v.casoOrigen.CaseNumber}" onclick="{!c.modalCerrarCasoOrigenNavegar}"/>
+                                    </span>
+                                    <dl class="slds-dl_horizontal">
+                                        <dt class="slds-dl_horizontal__label"> <p class="slds-truncate">Temática:</p></dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                            <p class="slds-truncate">{!v.casoOrigen.tematicaName}</p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label"><p class="slds-truncate">Fecha de apertura:</p></dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                            <p class="slds-truncate">
+                                                <lightning:formattedDateTime value="{!v.casoOrigen.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false"/>
+                                            </p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label"><p class="slds-truncate">Estado:</p></dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                            <p class="slds-truncate">{!v.casoOrigen.Status}</p>
+                                        </dd>
+                                        <dt class="slds-dl_horizontal__label"><p class="slds-truncate" title="Asunto">Asunto:</p></dt>
+                                        <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                            <p class="slds-truncate">{!v.casoOrigen.Subject}</p>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <p class="slds-var-m-top_small slds-var-m-bottom_large" style="font-weight: 500;">¿Quieres cerrar también el caso origen?</p>
+
+                    <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center slds-var-m-left_xx-large slds-var-m-right_x-large">
+                        <div class="slds-col">
+                            <lightning:icon iconName="utility:info_alt" size="x-small"/>
+                        </div>
+                        <div class="slds-col slds-text-color_weak" style="font-size: 11px;">
+                            El caso origen se cerrará con los mismos valores del caso de seguimiento para los campos "Causa", "Solución" (si ambos comparten "Motivo") y "Detalles solución".
+                        </div>
+                    </div>
+                </lightning:layoutItem>
+            </div>
+
+            <!--Pie del modal-->
+            <footer class="slds-modal__footer">
+                <div align="right">
+                    <lightning:button aura:id="modalCerrarCasoOrigenCancelar" label="Cancelar" onclick="{!c.modalCerrarCasoOrigenCerrar}"/>
+                    <lightning:button aura:id="modalCerrarCasoOrigenConfirmar" variant="brand" label="Cerrar caso origen" iconName="utility:close" onclick="{!c.confirmarCerrarCasoOrigen}" class="slds-var-m-left_small"/>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+	<!--Modal para mostrar aviso operativa oficina-->
+	<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" aura:id="modalOperativaOficina" onkeydown="{!c.modalCerrarDerivarTeclaPulsada}">
+		<div class="slds-modal__container">
+			<!--Cabecera del modal-->
+			<header class="slds-modal__header">
+				<lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalDerivarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+				<!--Título-->
+				<h2 class="slds-text-heading_medium slds-hyphenate">Operativa Derivar</h2>
+			</header>
+			<!--Contenido del modal-->
+			<div class="slds-modal__content slds-var-p-around_medium" align="center">
+				<p>Nos consta que no has podido resolver la consulta del cliente. ¿Quieres ejecutar la operativa de derivar?</p>
+			</div>
+			<!--Pie del modal-->
+			<footer class="slds-modal__footer">
+				<div align="right">
+					<lightning:button aura:id="modalCerrarCasoOrigenCancelar" variant="brand" label="No" onclick="{!c.modalDerivarCerrar}" class="slds-var-m-left_small"/>
+					<!--<aura:if isTrue="{!v.cerrarCaso}">
+						<lightning:button aura:id="submitGuardarCerrar" variant="brand" label="No" onclick="{!c.gestionaGuardarCerrar}" class="slds-var-m-left_small"/>
+						<aura:set attribute="else">
+							<lightning:button aura:id="submitGuardar" variant="brand" label="No" onclick="{!c.gestionaGuardarCerrar}" class="slds-var-m-left_small"/>
+						</aura:set>
+					</aura:if>-->
+					<lightning:button aura:id="modalCerrarCasoOrigenConfirmar" variant="brand" label="Si" onclick="{!c.handleModalDerivar}" class="slds-var-m-left_small"/>
+				</div>
+			</footer>
+		</div>
+	</section>
+
+	<aura:if isTrue="{!v.mostrarComponenteOperativaDerivar}">
+		<c:cc_Operativa_Oficina recordId="{!v.recordId}" onmodalcerrado="{!c.handleModalDerivarCerrado}"/>
+	</aura:if>
+
+	<!-- Spinner de guardado -->
+	<!--
+    <aura:if isTrue="{!v.guardando}">
+        <div aura:id="backdropGuardando" class="slds-backdrop slds-backdrop_open" style="position: abolute; border-radius: 4px;"/>
+        <section aura:id="modalGuardando" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal">
+            <div class="slds-modal__container" style="width: fit-content;">
+                <div class="slds-modal__content slds-is-relative" style="border-radius: 4px; min-width: unset; padding: 1.5rem 2.9rem 1.4rem 2.9rem;">
+                    <div class="slds-grid slds-grid_align-center">
+                        <div class="slds-col" style="margin-right: 24px;">
+                            <div style="position: relative; top: 8px;">
+                                <span role="status" class="slds-spinner slds-spinner_x-small slds-spinner_brand" style="position: absolute;">
+                                    <div class="slds-spinner__dot-a"></div>
+                                    <div class="slds-spinner__dot-b"></div>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            Actualizando datos del caso...
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </section>
+    </aura:if>
+	-->
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div class="slds-backdrop" aura:id="backdrop"/>
+
+</aura:component>

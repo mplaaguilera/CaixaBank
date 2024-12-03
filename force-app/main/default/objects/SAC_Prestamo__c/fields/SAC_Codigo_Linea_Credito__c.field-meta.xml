@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Codigo_Linea_Credito__c</fullName>
+    <description>Código de la línea de crédito asociada al préstamo</description>
+    <externalId>false</externalId>
+    <label>Código Línea Crédito</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

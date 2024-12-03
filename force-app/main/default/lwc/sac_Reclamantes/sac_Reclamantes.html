@@ -1,0 +1,338 @@
+<template>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos del caso... por favor espere
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                            </div>
+                            <br/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <!--Lightning card principal con los reclamantes a mostrar-->
+    <lightning-card icon-name="standard:customers" title="Reclamantes" variant="narrow" class="slds-is-relative slds-border_bottom">
+        <div class="slds-card__body slds-card__body_inner">
+            <template if:true={mostrarReclamantePrincipal}>
+                <strong>Reclamante principal:</strong>
+                <br/><br/>
+                <!--Empieza el bucle que muestra los reclamantes principales-->
+                <template for:each={reclamantePrincipal} for:item="reclamantePrin">
+                    <!--Icono del reclamante principal-->
+                    <lightning-icon key={reclamantePrin.Id} icon-name="standard:avatar" alternative-text="avatar" title="Reclamante principal" class="slds-m-right_x-small"></lightning-icon>
+                    <!--Botón con el nombre del reclamante que te lleva al registro de este. Con mouseover que muestra el popover -->
+                    <lightning-button variant="base" label={reclamantePrin.SAC_Account__r.Name} name={reclamantePrin.SAC_Account__c} key={reclamantePrin.Id} onclick={navigateToAccount}
+                                      data-target-id={reclamantePrin.SAC_Account__c} onmouseover={handleMouseover} onmouseleave={handleMouseLeave} onmousemove={handleMouseover}></lightning-button>
+                    <!--Icono de aviso en caso de que la oficina del gestor sea diferente de la oficina del cliente -->
+                    <template if:true={reclamantePrin.OficinaDiferente}>
+                        <lightning-icon key={reclamantePrin.Id} icon-name="utility:warning" alternative-text="warning" size="xx-small" title="La oficina del gestor y la oficina del cliente son diferentes." class="slds-p-left_x-small"></lightning-icon>
+                    </template>
+                    <!--Botón para eliminar el reclamante principal-->
+                    <lightning-button variant="brand" label="Eliminar" title="Elimina el reclamante principal" class="slds-float_right"
+                                      name={reclamantePrin.Id} key={reclamantePrin.Id} onclick={comprobarEliminarOElegir}>
+                    </lightning-button>
+                    <!--Botón para añadir datos no alfabetizados el reclamante principal-->
+                    <lightning-button variant="brand" label="Datos no alfabetizados" title="Añadir datos no alfabetizados" class="slds-float_right slds-p-right_small"
+                                        name={reclamantePrin.Id} key={reclamantePrin.Id}  data-id={reclamantePrin.Id} data-emailnoalf={reclamantePrin.SAC_EmailNoAlf__c}
+                                        data-tlfnoalf={reclamantePrin.SAC_TelefonoNoAlf__c} data-direccionnoalf={reclamantePrin.SAC_DireccionNoAlf__c} onclick={mostrarDatosNoAlfabetizados}>
+                    </lightning-button>
+                    <div key={reclamantePrin.Id}>
+                        <!-- Check tiene datos no alfabetizados -->
+                        <br/>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <p class="slds-text-color_weak slds-m-right_x-small">Tiene datos no alfabetizados</p>
+                            <lightning-input type="checkbox" disabled checked={reclamantePrin.SAC_TieneDatosNoAlf__c}></lightning-input>
+                        </div>
+                        <br/>
+                        <!--Mostrar si es empleado-->
+                        <template if:true={reclamantePrin.SAC_Empleado__c}>
+                            <br/>
+                            <p class="slds-text-color_weak">Es empleado</p>
+                            <br/>
+                        </template>
+                        <template if:true={esReclamacion}>
+                            <template if:true={mostrarCaractPrincipal} for:each={reclamantePrin.caracteristicas} for:item="caracteristica">
+                                <div class="tooltip-container" key={caracteristica.Id}>
+                                    <!-- <p onmouseover={mostrarTooltip} onmouseout={ocultarTooltip} onmousemove={mostrarTooltip}>{caracteristica.CC_Caracteristica__r.Name}</p> -->
+                                    <lightning-button variant="base" label={caracteristica.CC_Caracteristica__r.Name} name={caracteristica.CC_Caracteristica__r.Name} 
+                                          data-target-id={caracteristica.CC_Caracteristica__c} onmouseover={mostrarTooltip} onmouseleave={ocultarTooltip} onmousemove={mostrarTooltip}></lightning-button>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </template>
+            </template>
+
+            <template if:true={mostrarReclamanteSecundario}>
+                <br/><br/><strong>Reclamantes secundarios:</strong>
+                <br/><br/>
+                <!--Empieza el bucle que muestra los reclamantes secundarios-->
+                <template for:each={reclamantesSecundarios} for:item="reclamanteSecu">
+                    <!--Icono del reclamante secundario-->
+                    <lightning-icon key={reclamanteSecu.Id} icon-name="standard:avatar_loading" alternative-text="avatar_loading" title="Reclamante secundario" class="slds-m-right_x-small"></lightning-icon>
+                    <!--Botón con el nombre del reclamante que te lleva al registro de este. Con mouseover que muestra el popover-->
+                    <lightning-button variant="base" label={reclamanteSecu.SAC_Account__r.Name} name={reclamanteSecu.SAC_Account__c} key={reclamanteSecu.Id} onclick={navigateToAccount}
+                                      data-target-id={reclamanteSecu.SAC_Account__c} onmouseover={handleMouseover} onmouseleave={handleMouseLeave} onmousemove={handleMouseover}></lightning-button>
+                    <!--Icono de aviso en caso de que la oficina del gestor sea diferente de la oficina del cliente -->
+                    <template if:true={reclamanteSecu.OficinaDiferente}>
+                        <lightning-icon key={reclamanteSecu.Id} icon-name="utility:warning" alternative-text="warning" size="xx-small" title="La oficina del cliente y la del gestor son diferentes" class="slds-p-left_x-small"></lightning-icon>
+                    </template>
+                    <!--botón para cambiar el reclamante principal-->
+                    <lightning-button variant="brand" label="Cambiar a principal" title="Cambia el reclamante principal" class="slds-float_right"
+                                      name={reclamanteSecu.Id} key={reclamanteSecu.Id} onclick={comprobarCasosAbiertosCliente}></lightning-button>
+                    <!--botón para eliminar el reclamante secundario-->
+                    <lightning-button variant="brand" label="Eliminar" title="Elimina el reclamante secundario" class="slds-float_right slds-p-right_small"
+                                        name={reclamanteSecu.Id} key={reclamanteSecu.Id} onclick={eliminarReclamanteSecundario}></lightning-button>
+                    <!--Botón para añadir datos no alfabetizados el reclamante secundario-->
+                    <lightning-button variant="brand" label="Datos no alfabetizados" title="Añadir datos no alfabetizados" class="slds-float_right slds-p-right_small"
+                                        name={reclamanteSecu.Id} key={reclamanteSecu.Id}  data-id={reclamanteSecu.Id} data-emailnoalf={reclamanteSecu.SAC_EmailNoAlf__c}
+                                        data-tlfnoalf={reclamanteSecu.SAC_TelefonoNoAlf__c} data-direccionnoalf={reclamanteSecu.SAC_DireccionNoAlf__c} onclick={mostrarDatosNoAlfabetizados}>
+                    </lightning-button>
+                    
+                    
+                    <br key={reclamanteSecu.Id}/><br key={reclamanteSecu.Id}/>
+
+                    <div key={reclamanteSecu.Id}>
+                        <!-- Check tiene datos no alfabetizados -->
+                        <br/>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <p class="slds-text-color_weak slds-m-right_x-small">Tiene datos no alfabetizados</p>
+                            <lightning-input type="checkbox" disabled checked={reclamanteSecu.SAC_TieneDatosNoAlf__c}></lightning-input>
+                        </div>
+                        <br/>
+                        <!--Mostrar si es empleado-->
+                        <template if:true={reclamanteSecu.SAC_Empleado__c}>
+                            <br/>
+                            <p class="slds-text-color_weak">Es empleado</p>
+                            <br/>
+                        </template>
+                        <template if:true={esReclamacion}>
+                            <template if:true={mostrarCaractSecund} for:each={reclamanteSecu.caracteristicas} for:item="caracteristica">
+                                <div class="tooltip-container" key={caracteristica.Id}>
+                                    <!-- <p onmouseover={mostrarTooltip} onmouseout={ocultarTooltip} onmousemove={mostrarTooltip}>{caracteristica.CC_Caracteristica__r.Name}</p> -->
+                                    <lightning-button variant="base" label={caracteristica.CC_Caracteristica__r.Name} name={caracteristica.CC_Caracteristica__r.Name} 
+                                          data-target-id={caracteristica.CC_Caracteristica__c} onmouseover={mostrarTooltip} onmouseleave={ocultarTooltip} onmousemove={mostrarTooltip}></lightning-button>
+                                </div>
+                            </template>
+                        </template>    
+                        <br/>
+                    </div>
+                </template>
+            </template>
+        </div>
+
+        <!--Popover para las caracteristicas-->
+        <template if:true={mostrarInfo} >
+            <section aria-describedby="dialog-body-id-110" aria-label="Dialog Title" class="slds-popover slds-popover_walkthrough slds-popover_feature slds-nubbin_right" style={posicionCursor} role="dialog">
+                <div class="slds-popover__body">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <div class="slds-media">
+                                <div class="slds-media__body">
+                                    <lightning-record-view-form object-api-name="CC_Caracteristica__c" record-id={mostrarInfo}>
+                                        <div class="headerClass">
+                                            <P><lightning-output-field field-name={namecaract} variant="label-hidden" class="wololo"></lightning-output-field></P>
+                                        </div>
+                                        <div class="contenidoClass">
+                                            <div class="slds-grid">
+                                                <lightning-output-field field-name={descCaract}></lightning-output-field>
+                                            </div>
+                                        </div>
+                                    </lightning-record-view-form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </template>
+        
+        <!--Popover para las accounts-->
+        <template if:true={idPopUp} >
+            <section aria-describedby="dialog-body-id-110" aria-label="Dialog Title" class="slds-popover slds-popover_walkthrough slds-popover_feature slds-nubbin_right" style={posicionCursor} role="dialog">
+                <div class="slds-popover__body">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <div class="slds-media">
+                                <div class="slds-media__body">
+                                    <lightning-record-view-form object-api-name="Account" record-id={idPopUp}>
+                                        <div class="headerClass">
+                                            <P><lightning-output-field field-name={nameField} variant="label-hidden" class="wololo"></lightning-output-field></P>
+                                        </div>
+                                        <div class="contenidoClass">
+                                            <div class="slds-grid">
+                                                <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name={CC_Numero_Documento__cField}></lightning-output-field>
+                                                    <lightning-output-field field-name={PhoneField}></lightning-output-field>
+                                                    <lightning-output-field field-name={PersonMobilePhoneField}></lightning-output-field>
+                                                    <lightning-output-field field-name={PersonEmailField}></lightning-output-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-2">
+                                                    <lightning-output-field field-name={AV_EAPGestor__cField}></lightning-output-field>
+                                                    <lightning-output-field field-name={BillingAddressField}></lightning-output-field>
+                                                    <lightning-output-field field-name={CC_OficinaGestoraId__cField}></lightning-output-field>
+                                                    <div class="slds-p-left_xx-small">
+                                                        <lightning-record-view-form if:true={idPopUpContact} object-api-name="Contact" record-id={idPopUpContact}>
+                                                            <label class="slds-form-element__label " for="form-element-01" style='color: rgb(243, 242, 242);'>Oficina del gestor</label> 
+                                                            <lightning-output-field field-name={CC_OficinaNombre__cField} variant="label-hidden"></lightning-output-field>
+                                                        </lightning-record-view-form>     
+                                                    </div>                                             
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-record-view-form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </template>
+    </lightning-card>
+
+    <!--Modal eliminar reclamante principal. Esta ventana te permite cambiar el principal a eliminar por un secundario-->
+    <template if:true={ventanaEliminarReclamante}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarVentanaEliminar}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Elija el nuevo reclamante principal</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" style="overflow: initial;" id="modal-content-id-2">
+                    <lightning-combobox style="overflow: initial;"
+                                name="progress"
+                                label="Seleccione el nuevo reclamante principal"
+                                value=""
+                                placeholder="Seleccione el nuevo reclamante principal"
+                                options={options}
+                                onchange={handleChangeComboBox}
+                                required
+                        ></lightning-combobox>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarVentanaEliminar} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={comprobarOpcionCombobox} title="OK">Cambiar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--ModalMultiplesCasosMismoCliente-->
+    <template if:true={modalMultiplesCasos}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalMultiplesCasos}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Propiedad de la reclamación</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Existe alguna reclamación en curso asociada al mismo cliente
+                        gestionándose por otro gestor. Si asigna esta reclamación a este cliente, se reasignará
+                        la reclamación a dicho gestor.</p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarModalMultiplesCasos} title="Cancel">Cancelar</button>
+                    <!--Si el pop up se muestra por querer cambiar el principal desde un secundario, tengo el siguiente botón-->
+                    <template if:false={comprobarDesdeEliminarPrinc}>
+                        <button class="slds-button slds-button_brand" onclick={cambiarReclamantePrincipal} title="OK">Guardar</button>
+                    </template>
+                    <!--Si el pop up se muestra por querer cambiar el principal desde la pantalla de borrar el principal, tengo el siguiente botón-->
+                    <template if:true={comprobarDesdeEliminarPrinc}>
+                        <button class="slds-button slds-button_brand" onclick={eliminarCambiandoPrincipal} title="OK">Guardar</button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!--Modal datos no alfabetizados. Esta ventana te permite editar/informar los datos no alfabetizados de un reclamante -->
+    <template if:true={modalDatosNoAlf}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick={cerrarModalDatosNoAlf}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-09" class="slds-text-heading_medium slds-hyphenate">Datos no alfabetizados del reclamante</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" style="overflow: initial;" id="modal-content-id-9">
+                    <div class="slds-grid slds-wrap">
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="emailNoAlf" label="Email" type="email" onchange={handleInputChange} value={emailNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="telefonoNoAlf" label="Teléfono" type="text" onchange={handleInputChange} value={telefonoNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_2-of-2 slds-p-top_small slds-p-left_small slds-p-right_small">
+                        <h3><strong>Dirección postal</strong></h3>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="direccionNoAlf" label="Dirección" type="text" onchange={handleInputChange} value={direccionNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="codigoPostalNoAlf" label="Código postal" type="text" onchange={handleInputChange} value={codigoPostalNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="poblacionNoAlf" label="Población" type="text" onchange={handleInputChange} value={poblacionNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="provinciaNoAlf" label="Provincia" type="text" onchange={handleInputChange} value={provinciaNoAlf}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <lightning-input data-my-id="paisNoAlf" label="País" type="text" onchange={handleInputChange} value={paisNoAlf}></lightning-input>
+                      </div>
+                    </div>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={cerrarModalDatosNoAlf} title="Salir">Salir</button>
+                    <button class="slds-button slds-button_brand" onclick={guardarDatosNoAlf} title="Guardar">Guardar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+</template>

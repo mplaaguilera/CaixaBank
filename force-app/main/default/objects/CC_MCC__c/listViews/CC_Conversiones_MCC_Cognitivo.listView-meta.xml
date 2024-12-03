@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Conversiones_MCC_Cognitivo</fullName>
+    <columns>CC_Fecha_Vigencia_Inicio__c</columns>
+    <columns>NAME</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Espacio_Cognitivo__c</columns>
+    <columns>CC_Categoria_Cognitivo__c</columns>
+    <columns>CC_Canal_Procedencia_Equivalente__c</columns>
+    <columns>CC_WebMCCTematica__c</columns>
+    <columns>CC_WebMCCProducto__c</columns>
+    <columns>CC_Equivalencia_Formulario__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.Conversion_MCC_Cognitivo</value>
+    </filters>
+    <label>Conversiones MCC Cognitivo</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+    </sharedTo>
+</ListView>

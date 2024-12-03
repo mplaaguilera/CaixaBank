@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Segmento__c</fullName>
+    <description>Segmento del que se selecciona los canales de comunicación.</description>
+    <label>Segmento</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>BPA</fullName>
+                <default>false</default>
+                <label>Banca Particulares</label>
+            </value>
+            <value>
+                <fullName>NEG</fullName>
+                <default>false</default>
+                <label>Negocios</label>
+            </value>
+            <value>
+                <fullName>BPE</fullName>
+                <default>false</default>
+                <label>Banca Premier</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <label>Banca Privada</label>
+            </value>
+            <value>
+                <fullName>EMP</fullName>
+                <default>false</default>
+                <label>Empresas</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <label>Todos</label>
+            </value>
+            <value>
+                <fullName>MIC</fullName>
+                <default>false</default>
+                <label>Microempresas</label>
+            </value>
+            <value>
+                <fullName>WEALTH</fullName>
+                <default>false</default>
+                <label>Wealth</label>
+            </value>
+            <value>
+                <fullName>AgroBank</fullName>
+                <default>false</default>
+                <label>AgroBank</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

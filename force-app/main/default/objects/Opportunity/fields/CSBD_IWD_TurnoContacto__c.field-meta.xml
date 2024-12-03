@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_IWD_TurnoContacto__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CSBD_Turno_Contacto__c, &apos;Mañana&apos;), &apos;MANYANA&apos;, IF(ISPICKVAL(CSBD_Turno_Contacto__c, &apos;Tarde&apos;), &apos;TARDE&apos;, &apos;CUALQUIERHORA&apos;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Turno Contacto iWD</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

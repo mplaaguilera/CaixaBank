@@ -1,0 +1,71 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <lightning-card title={titulotabla} icon-name="standard:case">
+        <div slot="actions">
+          <div class="slds-float_right">              
+              <lightning-button-icon
+                  icon-name="utility:refresh"
+                  title="Refrescar"
+                  onclick={handleRefreshClick}>
+              </lightning-button-icon>
+          </div>
+        </div>
+            <div class="slds-form-element__control tabla-pretensiones">
+                <div if:true={hayPretensiones}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                  <thead>
+                    <tr class="slds-line-height_reset">
+                      <th class="" scope="col">
+                        <div class="slds-truncate" title="Numero Caso">CaseNumber</div>
+                      </th>
+                      <th class="" scope="col">
+                        <div class="slds-truncate" title="Asunto">Subject</div>
+                      </th>
+                      <th class="" scope="col">
+                        <div class="slds-truncate" title="Date">Date/Time Opened</div>
+                      </th>
+                      <th class="" scope="col">
+                        <div class="slds-truncate" title="Estado">Estado</div>
+                      </th>
+                      <th class="" scope="col">
+                        <div class="slds-truncate"  title="Validacion MCC">Validacion MCC</div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={pretensionesPorColumnas} for:item="prete">
+                      <tr key={prete.Id}>
+                        <th scope="col">
+                          <lightning-button onclick={navigateToRecord} data-value={prete.idCaso} label={prete.numeroCaso} variant="base">{prete.numeroCaso}</lightning-button>
+                        </th>
+                        <th scope="col">
+                          <lightning-button onclick={navigateToRecord} data-value={prete.idCaso} label={prete.asunto} variant="base">{prete.asunto}</lightning-button>
+                        </th>
+                        <th scope="col">
+                          <div>{prete.formattedCreateDate}</div>
+                        </th>
+                        <th scope="col">
+                          <div>{prete.status}</div>
+                        </th>
+                        <th scope="col">
+                            <div>
+                               <lightning-input type="checkbox"  value={prete.idCaso} checked={prete.validacionMCC} onchange={handleChange} disabled={comprobarStatus}></lightning-input> 
+                            </div>
+                          </th>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+                </div>
+               <div if:false={hayPretensiones}>
+                <p>No hay creadas pretensiones </p>
+               </div> 
+            </div>
+            <template if:true={spinnerLoading}>
+              <div class="spinner">
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+              </div>
+            </template>
+    </lightning-card>
+    </div>
+</template>

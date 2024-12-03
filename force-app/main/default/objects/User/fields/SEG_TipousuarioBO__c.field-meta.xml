@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_TipousuarioBO__c</fullName>
+    <label>Tipo usuario BO</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>General</fullName>
+                <default>false</default>
+                <label>General</label>
+            </value>
+            <value>
+                <fullName>FFEE</fullName>
+                <default>false</default>
+                <label>FFEE</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

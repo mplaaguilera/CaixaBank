@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Causas_Inactivas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Motivo__c</columns>
+    <columns>CC_Producto_Servicio_Formula__c</columns>
+    <columns>CC_Producto_Servicio__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Causa</value>
+    </filters>
+    <filters>
+        <field>CC_Activo__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente,Empleado,Cliente/Empleado,Prejubilado,Proveedor / Empleado</value>
+    </filters>
+    <label>Causas Inactivas</label>
+    <sharedTo>
+        <group>Coordinadores</group>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

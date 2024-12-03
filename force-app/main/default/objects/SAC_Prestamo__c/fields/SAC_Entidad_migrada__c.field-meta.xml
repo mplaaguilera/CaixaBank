@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Entidad_migrada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Flag que indica si la entidad de origen del préstamo ha sido o no migrada (toma los valores “SÍ” o “NO”)</description>
+    <label>Entidad migrada</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

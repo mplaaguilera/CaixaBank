@@ -1,0 +1,16 @@
+.alignDerecha{
+    text-align: right !important;
+}
+
+.alignIzquierda{
+    text-align: left !important;
+}
+
+.alignCentro{
+    text-align: center !important;
+    padding-bottom: 1%;
+}
+.container{
+    margin-left: 1%;
+    margin-right: 1%;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MarcaSenior__c</fullName>
+    <description>Recuperamos si el cliente es Senior</description>
+    <formula>INCLUDES(AV_IndicadoresClientes__c, &apos;23&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Marca Senior</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

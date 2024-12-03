@@ -1,0 +1,17 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome,lightning:availableForFlowScreens" controller="SAC_LCMP_GestionEmails" access="global">
+    <!-- ATTRIBUTES FROM DESIGN -->
+    <aura:attribute name="para"  type="String"/>
+    <aura:attribute name="CC"  type="String"/>
+    <aura:attribute name="asunto"  type="String"/>
+    <aura:attribute name="cuerpo"  type="String"/>
+    <aura:attribute name="procedencia"  type="String"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="sesion"  type="String" default="00D7Y000000H1eJ!AQMAQMc.U1Nv7Rql1CET2rTYjnKszYO90azmF8Gx3SxRnGM.aJ39Qojlf4_dO19YiWyiv0D524GQCeSsdDyelas5VM7G29fz"/>
+    <aura:attribute name="caso"  type="Case"/>
+    <aura:attribute name="recordId"  type="String"/>
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <c:SAC_GestionEmails para="{!v.para}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}"/>
+
+</aura:component>

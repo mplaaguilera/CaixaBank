@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MCC__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo utilizado para relacionar con el objeto MCC</description>
+    <label>MCC</label>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Previsiones</relationshipLabel>
+    <relationshipName>Previsiones</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

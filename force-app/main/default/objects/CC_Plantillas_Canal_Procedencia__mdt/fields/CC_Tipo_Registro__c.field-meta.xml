@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_Registro__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Tipo de registro</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CC_Cliente</fullName>
+                <default>true</default>
+                <label>CC_Cliente</label>
+            </value>
+            <value>
+                <fullName>CC_Empleado</fullName>
+                <default>false</default>
+                <label>CC_Empleado</label>
+            </value>
+            <value>
+                <fullName>CC_Empleado_CSI</fullName>
+                <default>false</default>
+                <label>CC_Empleado_CSI_Bankia</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

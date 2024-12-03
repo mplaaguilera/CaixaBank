@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Motivos_CAM</fullName>
+    <columns>RECORDTYPE</columns>
+    <columns>NAME</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>AM_Buzon_origen_CAM__c</columns>
+    <columns>CC_Codigo_Externo__c</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente (CAM),Empleado (CAM),Cliente (CAM)/Empleado (CAM)</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Motivo</value>
+    </filters>
+    <label>Motivos CAM</label>
+    <sharedTo>
+        <group>AM_Buzon_Carteras</group>
+        <group>AM_Buzon_Fondos</group>
+        <group>AM_Buzon_Valores</group>
+    </sharedTo>
+</ListView>

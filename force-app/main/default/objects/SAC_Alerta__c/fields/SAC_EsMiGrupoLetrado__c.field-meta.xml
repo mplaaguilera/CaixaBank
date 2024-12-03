@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EsMiGrupoLetrado__c</fullName>
+    <formula>IF(ISBLANK(SAC_GrupoPropietarioPretensionId__c) , false, CONTAINS($User.SAC_GruposPerteneciente__c, SAC_GrupoPropietarioPretensionId__c))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Es mi grupo letrado</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

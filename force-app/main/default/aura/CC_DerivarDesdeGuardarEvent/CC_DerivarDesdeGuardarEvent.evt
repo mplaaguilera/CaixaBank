@@ -1,0 +1,3 @@
+<aura:event type="APPLICATION" description="Sirve para poder realizar traslados y remitidos desde el boton guardar y guardar y cerrar a traves de la operativa derivar">
+    <aura:attribute name="realizarOperativaDerivar" type="Boolean"/>
+</aura:event>

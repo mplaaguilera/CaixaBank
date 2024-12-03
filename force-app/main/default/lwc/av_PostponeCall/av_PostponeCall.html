@@ -1,0 +1,39 @@
+<template>
+    <lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+		<div class="PostponeCall-form">
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Fecha">Recordar el</label>
+						<div class="slds-form-element__control">
+							<lightning-input type="date" id="ReminderDate" name="ReminderDateTime" date-style="short" value={reminderDate} onchange={handleChangeReminderDate} disabled={disableBtn}></lightning-input>
+						</div>
+					</div>
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Hora">a las</label>
+						<div class="slds-form-element__control">
+							<lightning-input type="time" name="ReminderDateTime" id="ReminderTime" value={reminderTime}  onchange={handleChangeReminderTime} disabled={disableBtn}></lightning-input>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
+						<label class="slds-form-element__label " for="Comentario">Comentario</label>
+						<div class="slds-form-element__control">
+							<lightning-input type="text" maxlength="150" name="comentario" id="Comentario" value={comment} onchange={handleChangeComment} disabled={disableBtn}></lightning-input>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div slot="footer" class="buttonAlign">
+			<button type="submit" class="slds-button slds-button_stretch buttonStyle" data-id="btnGrabar" disabled={disableBtn} onclick={handleSave}>Grabar</button>
+		</div>
+	</lightning-card>
+    
+</template>

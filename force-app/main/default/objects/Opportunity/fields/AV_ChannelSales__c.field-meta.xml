@@ -1,0 +1,1276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ChannelSales__c</fullName>
+    <description>Canal de la venta</description>
+    <label>Canal de la venta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>000000000</fullName>
+                <default>false</default>
+                <label>NO INFORMADO</label>
+            </value>
+            <value>
+                <fullName>010000000</fullName>
+                <default>false</default>
+                <label>OPERATIVA RED GENERICA</label>
+            </value>
+            <value>
+                <fullName>010010000</fullName>
+                <default>false</default>
+                <label>OFICINA / TERMINAL FINANCIERO</label>
+            </value>
+            <value>
+                <fullName>010010010</fullName>
+                <default>false</default>
+                <label>TERMINAL FINANCIERO - VENTANA COMERCIAL</label>
+            </value>
+            <value>
+                <fullName>010010020</fullName>
+                <default>false</default>
+                <label>TERMINAL FINANCIERO - FLASH COMERCIAL</label>
+            </value>
+            <value>
+                <fullName>010010030</fullName>
+                <default>false</default>
+                <label>TERMINAL FINANCIERO - FICHA SIF PANTALLA</label>
+            </value>
+            <value>
+                <fullName>010010040</fullName>
+                <default>false</default>
+                <label>TERMINAL FINANCIERO - FICHA SIF IMPRESA</label>
+            </value>
+            <value>
+                <fullName>010010070</fullName>
+                <default>false</default>
+                <label>CANAL OFICINA (CANAL COMERCIAL CON CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>010010080</fullName>
+                <default>false</default>
+                <label>TELEMARKETING</label>
+            </value>
+            <value>
+                <fullName>010010090</fullName>
+                <default>false</default>
+                <label>OFICINA - SERVICIOS DE DIGITALIZACION</label>
+            </value>
+            <value>
+                <fullName>010010100</fullName>
+                <default>false</default>
+                <label>CANAL OFICINA - AGENTES FINANCIEROS</label>
+            </value>
+            <value>
+                <fullName>010010110</fullName>
+                <default>false</default>
+                <label>CANAL OFICINA - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>010020000</fullName>
+                <default>false</default>
+                <label>SERVICIOS CENTRALES</label>
+            </value>
+            <value>
+                <fullName>010020010</fullName>
+                <default>false</default>
+                <label>MESA EJECUCION RETAIL (CENTRO APERTURA 5079)</label>
+            </value>
+            <value>
+                <fullName>010020020</fullName>
+                <default>false</default>
+                <label>CANAL BOX - MERCADOS (CENTRO APERTURA 5279)</label>
+            </value>
+            <value>
+                <fullName>010020030</fullName>
+                <default>false</default>
+                <label>MESA RENTA VARIABLE BANCA PRIVADA (CENTRO 9400)</label>
+            </value>
+            <value>
+                <fullName>010020040</fullName>
+                <default>false</default>
+                <label>SERVICIO ATENCION PERMANENTE (4223)</label>
+            </value>
+            <value>
+                <fullName>010020050</fullName>
+                <default>false</default>
+                <label>TELEFONIA</label>
+            </value>
+            <value>
+                <fullName>010030000</fullName>
+                <default>false</default>
+                <label>INTRANET</label>
+            </value>
+            <value>
+                <fullName>010040000</fullName>
+                <default>false</default>
+                <label>OPER OFICINA - CANAL EXTERNO RENTING - GENERICO</label>
+            </value>
+            <value>
+                <fullName>010050000</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO FINANCIACION AL CONSUMO - GENERICO</label>
+            </value>
+            <value>
+                <fullName>010060000</fullName>
+                <default>false</default>
+                <label>GENERICO</label>
+            </value>
+            <value>
+                <fullName>010060010</fullName>
+                <default>false</default>
+                <label>BACK OFFICE SSBB CAIXABANK</label>
+            </value>
+            <value>
+                <fullName>010060020</fullName>
+                <default>false</default>
+                <label>BACK OFFICE SSBB FILIALES(GDS)</label>
+            </value>
+            <value>
+                <fullName>010060030</fullName>
+                <default>false</default>
+                <label>CALL CENTER ASISTENCIA TARJETAS</label>
+            </value>
+            <value>
+                <fullName>010060040</fullName>
+                <default>false</default>
+                <label>CALL CENTER BLOQUEOS TARJETAS</label>
+            </value>
+            <value>
+                <fullName>010060050</fullName>
+                <default>false</default>
+                <label>CONTROL SERVICIO PRODUCCION INFORMATICA</label>
+            </value>
+            <value>
+                <fullName>010060060</fullName>
+                <default>false</default>
+                <label>INTERNACIONAL</label>
+            </value>
+            <value>
+                <fullName>010060070</fullName>
+                <default>false</default>
+                <label>FILIALES(IAR, BKB, IRE, FAC, SGP)</label>
+            </value>
+            <value>
+                <fullName>010060080</fullName>
+                <default>false</default>
+                <label>CALL CENTER HELP DESK LOE</label>
+            </value>
+            <value>
+                <fullName>010060090</fullName>
+                <default>false</default>
+                <label>BPO TESORERIA</label>
+            </value>
+            <value>
+                <fullName>010060100</fullName>
+                <default>false</default>
+                <label>MENUS TERMINAL</label>
+            </value>
+            <value>
+                <fullName>010060110</fullName>
+                <default>false</default>
+                <label>CALL CENTER HELP DESK AS</label>
+            </value>
+            <value>
+                <fullName>010060120</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO GESTION RECLAMACIONES (GENERICO)</label>
+            </value>
+            <value>
+                <fullName>010060130</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO MICROBANK</label>
+            </value>
+            <value>
+                <fullName>010060140</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO CAIXARENTING</label>
+            </value>
+            <value>
+                <fullName>010070000</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO CALL CENTER - ASISTENCIA TARJETAS</label>
+            </value>
+            <value>
+                <fullName>010070010</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO CALL CENTER - BLOQUEOS TARJETAS</label>
+            </value>
+            <value>
+                <fullName>010070020</fullName>
+                <default>false</default>
+                <label>ABSIS CLOUD</label>
+            </value>
+            <value>
+                <fullName>010070030</fullName>
+                <default>false</default>
+                <label>ABSIS CLOUD - APLICACION LVALVA</label>
+            </value>
+            <value>
+                <fullName>010070040</fullName>
+                <default>false</default>
+                <label>CANAL ABSIS CLOUD - APLICACION RCORCO</label>
+            </value>
+            <value>
+                <fullName>010080000</fullName>
+                <default>false</default>
+                <label>OPER OFICINA - TELEFONIA - BANCA TELEFONICA</label>
+            </value>
+            <value>
+                <fullName>010080010</fullName>
+                <default>false</default>
+                <label>BLACKBERRY</label>
+            </value>
+            <value>
+                <fullName>010080020</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO MICROBANK (GENERICO)</label>
+            </value>
+            <value>
+                <fullName>010090000</fullName>
+                <default>false</default>
+                <label>OPERATIVA OFICINA - CANAL EXTERNO - GENERICO</label>
+            </value>
+            <value>
+                <fullName>010090010</fullName>
+                <default>false</default>
+                <label>ASI</label>
+            </value>
+            <value>
+                <fullName>010090020</fullName>
+                <default>false</default>
+                <label>SINCO</label>
+            </value>
+            <value>
+                <fullName>010100000</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO CONTROL SERVICIO - PROD.INFORMATICA</label>
+            </value>
+            <value>
+                <fullName>010110000</fullName>
+                <default>false</default>
+                <label>CREDIFIMO</label>
+            </value>
+            <value>
+                <fullName>010120000</fullName>
+                <default>false</default>
+                <label>APLICACIONES TESORERIA</label>
+            </value>
+            <value>
+                <fullName>020010000</fullName>
+                <default>false</default>
+                <label>TERMINAL DE AUTOSERVICIO PROPIO GENERICO</label>
+            </value>
+            <value>
+                <fullName>020010010</fullName>
+                <default>false</default>
+                <label>CAJERO PROPIO</label>
+            </value>
+            <value>
+                <fullName>020010020</fullName>
+                <default>false</default>
+                <label>SERVICAIXA</label>
+            </value>
+            <value>
+                <fullName>020010030</fullName>
+                <default>false</default>
+                <label>CAJERO AS-21</label>
+            </value>
+            <value>
+                <fullName>020010040</fullName>
+                <default>false</default>
+                <label>TERMINAL PUNTO DE VENTA (TPV) PROPIO</label>
+            </value>
+            <value>
+                <fullName>020010050</fullName>
+                <default>false</default>
+                <label>CAJERO PROPIO DESPLAZADO</label>
+            </value>
+            <value>
+                <fullName>020020000</fullName>
+                <default>false</default>
+                <label>INTERNET</label>
+            </value>
+            <value>
+                <fullName>020030000</fullName>
+                <default>false</default>
+                <label>LINEA ABIERTA GENERICA</label>
+            </value>
+            <value>
+                <fullName>020030010</fullName>
+                <default>false</default>
+                <label>CAIXABANKNOW WEB</label>
+            </value>
+            <value>
+                <fullName>020030020</fullName>
+                <default>false</default>
+                <label>LINEA ABIERTA WINDOWS</label>
+            </value>
+            <value>
+                <fullName>020030030</fullName>
+                <default>false</default>
+                <label>CYBERPACK</label>
+            </value>
+            <value>
+                <fullName>020030040</fullName>
+                <default>false</default>
+                <label>CAIXABANKNOW APP</label>
+            </value>
+            <value>
+                <fullName>020030050</fullName>
+                <default>false</default>
+                <label>LO FACEBOOK</label>
+            </value>
+            <value>
+                <fullName>020040010</fullName>
+                <default>false</default>
+                <label>TELEFONO GSM</label>
+            </value>
+            <value>
+                <fullName>020040020</fullName>
+                <default>false</default>
+                <label>CAIXABANKNOW MOVIL</label>
+            </value>
+            <value>
+                <fullName>020040030</fullName>
+                <default>false</default>
+                <label>BANCA TELEFONICA</label>
+            </value>
+            <value>
+                <fullName>020050000</fullName>
+                <default>false</default>
+                <label>TELEVISION DIGITAL</label>
+            </value>
+            <value>
+                <fullName>020060000</fullName>
+                <default>false</default>
+                <label>TERMINAL AUTOSERVICIO ALIE GENERICO (INTERCAMBIO)</label>
+            </value>
+            <value>
+                <fullName>020060010</fullName>
+                <default>false</default>
+                <label>CAJERO ALIE</label>
+            </value>
+            <value>
+                <fullName>020060020</fullName>
+                <default>false</default>
+                <label>TERMINAL PUNTO DE VENTA (TVP) ALIE</label>
+            </value>
+            <value>
+                <fullName>020070000</fullName>
+                <default>false</default>
+                <label>BOURSORAMA</label>
+            </value>
+            <value>
+                <fullName>030010011</fullName>
+                <default>false</default>
+                <label>VISITA &quot;ENTRANTE&quot; (DE CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030010012</fullName>
+                <default>false</default>
+                <label>VISITA &quot;SALIENTE&quot; (DE EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030010021</fullName>
+                <default>false</default>
+                <label>LLAMADA TELEFONICA &quot;ENTRANTE&quot; (CLIENTE A EMPLADO)</label>
+            </value>
+            <value>
+                <fullName>030010022</fullName>
+                <default>false</default>
+                <label>LLAMADA TELEFONICA &quot;SALIENTE&quot; (EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030010050</fullName>
+                <default>false</default>
+                <label>IMAGIN - WEB</label>
+            </value>
+            <value>
+                <fullName>030010060</fullName>
+                <default>false</default>
+                <label>HOME BANKING - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>030010070</fullName>
+                <default>false</default>
+                <label>ASISTENTE COGNITIVO IMAGINBANK HOMEBANKING</label>
+            </value>
+            <value>
+                <fullName>030010080</fullName>
+                <default>false</default>
+                <label>ASISTENTE COGNITIVO BANCA TELEFONICA COMO NOW</label>
+            </value>
+            <value>
+                <fullName>030020011</fullName>
+                <default>false</default>
+                <label>CARTA &quot;ENTRANTE&quot; (DE CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030020012</fullName>
+                <default>false</default>
+                <label>CARTA &quot;SALIENTE&quot; (DE EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030020021</fullName>
+                <default>false</default>
+                <label>COMUNICADO &quot;ENTRANTE&quot; (DE CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030020022</fullName>
+                <default>false</default>
+                <label>COMUNICADO &quot;SALIENTE&quot; (DE EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030020031</fullName>
+                <default>false</default>
+                <label>CUPO &quot;ENTRANTE&quot; (DE CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030020041</fullName>
+                <default>false</default>
+                <label>CARTA AL DIRECTOR &quot;ENTRANTE&quot; (CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030020042</fullName>
+                <default>false</default>
+                <label>CARTA AL DIRECTOR &quot;SALIENTE&quot; (EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030020052</fullName>
+                <default>false</default>
+                <label>INFONEWS</label>
+            </value>
+            <value>
+                <fullName>030020060</fullName>
+                <default>false</default>
+                <label>LINEA ABIERTA LOCK DE HOMEBANKING-TELEFONIA</label>
+            </value>
+            <value>
+                <fullName>030020070</fullName>
+                <default>false</default>
+                <label>IMAGINBANK</label>
+            </value>
+            <value>
+                <fullName>030020080</fullName>
+                <default>false</default>
+                <label>IMAGIN - WAP</label>
+            </value>
+            <value>
+                <fullName>030020090</fullName>
+                <default>false</default>
+                <label>TELEFONIA - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>030020100</fullName>
+                <default>false</default>
+                <label>ASISTENTE COGNITIVO IMAGINBANK TELEFONIA</label>
+            </value>
+            <value>
+                <fullName>030020110</fullName>
+                <default>false</default>
+                <label>ASISTENTE COGNITIVO WAP</label>
+            </value>
+            <value>
+                <fullName>030020120</fullName>
+                <default>false</default>
+                <label>ASISTENTE COGNITIVO WAP IMAGINBANK</label>
+            </value>
+            <value>
+                <fullName>030030011</fullName>
+                <default>false</default>
+                <label>FAX &quot;ENTRANTE&quot; (DE CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030030012</fullName>
+                <default>false</default>
+                <label>FAX &quot;SALIENTE&quot; (DE EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030030021</fullName>
+                <default>false</default>
+                <label>CORREO ELECTRONICO &quot;ENTRANTE&quot; (CLIENTE A EMPLEADO)</label>
+            </value>
+            <value>
+                <fullName>030030022</fullName>
+                <default>false</default>
+                <label>CORREO ELECTRONICO &quot;SALIENTE&quot; (EMPLEADO A CLIENTE)</label>
+            </value>
+            <value>
+                <fullName>030040020</fullName>
+                <default>false</default>
+                <label>PORTAL CAIXA</label>
+            </value>
+            <value>
+                <fullName>030040050</fullName>
+                <default>false</default>
+                <label>PORTAL FUNDACION</label>
+            </value>
+            <value>
+                <fullName>030050000</fullName>
+                <default>false</default>
+                <label>API</label>
+            </value>
+            <value>
+                <fullName>030060000</fullName>
+                <default>false</default>
+                <label>API IMAGINBANK</label>
+            </value>
+            <value>
+                <fullName>030070000</fullName>
+                <default>false</default>
+                <label>TELEFONIA SIN SESION</label>
+            </value>
+            <value>
+                <fullName>040010000</fullName>
+                <default>false</default>
+                <label>C3 (COSTUMER CONTACT CENTER)</label>
+            </value>
+            <value>
+                <fullName>040020000</fullName>
+                <default>false</default>
+                <label>CANAL EXTERNO</label>
+            </value>
+            <value>
+                <fullName>040030000</fullName>
+                <default>false</default>
+                <label>TGT</label>
+            </value>
+            <value>
+                <fullName>040040000</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERN SERVICIOS - GENERICO</label>
+            </value>
+            <value>
+                <fullName>040040010</fullName>
+                <default>false</default>
+                <label>READY TO BUY</label>
+            </value>
+            <value>
+                <fullName>040050000</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERN SERVICIOS - INTRANET</label>
+            </value>
+            <value>
+                <fullName>040050010</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERN SERVICIOS - REGISTRO CERTIFICADOS</label>
+            </value>
+            <value>
+                <fullName>040050020</fullName>
+                <default>false</default>
+                <label>DERIVADOS DE MERCADOS</label>
+            </value>
+            <value>
+                <fullName>040050030</fullName>
+                <default>false</default>
+                <label>INTRANET EXTERNALIZ.SERVICIOS - APLICACION RCORCO</label>
+            </value>
+            <value>
+                <fullName>040060000</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERN SERVICIOS - ENVIO MENSAJES SMS</label>
+            </value>
+            <value>
+                <fullName>040060010</fullName>
+                <default>false</default>
+                <label>LINEA ABIERTA SMS</label>
+            </value>
+            <value>
+                <fullName>040070000</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERN SERVICIOS - SWIFT</label>
+            </value>
+            <value>
+                <fullName>040080000</fullName>
+                <default>false</default>
+                <label>GENERICO DE PORTAL</label>
+            </value>
+            <value>
+                <fullName>040080010</fullName>
+                <default>false</default>
+                <label>SOCIAL APPS DE PORTAL</label>
+            </value>
+            <value>
+                <fullName>040080020</fullName>
+                <default>false</default>
+                <label>COMUNIDADES SOCIALES DE PORTAL</label>
+            </value>
+            <value>
+                <fullName>040080030</fullName>
+                <default>false</default>
+                <label>ALTA100X100</label>
+            </value>
+            <value>
+                <fullName>040090000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 1</label>
+            </value>
+            <value>
+                <fullName>040090010</fullName>
+                <default>false</default>
+                <label>PORTAL</label>
+            </value>
+            <value>
+                <fullName>040090020</fullName>
+                <default>false</default>
+                <label>APLICACIONES</label>
+            </value>
+            <value>
+                <fullName>040090030</fullName>
+                <default>false</default>
+                <label>MOVIL</label>
+            </value>
+            <value>
+                <fullName>040090040</fullName>
+                <default>false</default>
+                <label>AREA PRIVADA PORTAL</label>
+            </value>
+            <value>
+                <fullName>040090050</fullName>
+                <default>false</default>
+                <label>BACKOFFICE MONEY TO PAY</label>
+            </value>
+            <value>
+                <fullName>040100000</fullName>
+                <default>false</default>
+                <label>BPO - SERVICIOS BANCARIOS - GENERICO</label>
+            </value>
+            <value>
+                <fullName>040100010</fullName>
+                <default>false</default>
+                <label>BPO-SERVICIOS BANCARIOS(PROCESOS ESPECIALES)</label>
+            </value>
+            <value>
+                <fullName>040100020</fullName>
+                <default>false</default>
+                <label>OPERACIONES DE MERCADOS</label>
+            </value>
+            <value>
+                <fullName>040110000</fullName>
+                <default>false</default>
+                <label>TCR-SIO GENERICO</label>
+            </value>
+            <value>
+                <fullName>040110010</fullName>
+                <default>false</default>
+                <label>TCR-SIO HOST FRACCIONAMIENTO POR SMS</label>
+            </value>
+            <value>
+                <fullName>040110030</fullName>
+                <default>false</default>
+                <label>TCR-SIO - MQ DENEGACIONES</label>
+            </value>
+            <value>
+                <fullName>040120000</fullName>
+                <default>false</default>
+                <label>CONTROL DEL FRAUDE</label>
+            </value>
+            <value>
+                <fullName>040140000</fullName>
+                <default>false</default>
+                <label>SIEBEL</label>
+            </value>
+            <value>
+                <fullName>040140010</fullName>
+                <default>false</default>
+                <label>CPD BRITISH TELECOM (SIEBEL)</label>
+            </value>
+            <value>
+                <fullName>040140020</fullName>
+                <default>false</default>
+                <label>SIEBEL - CRMGDS</label>
+            </value>
+            <value>
+                <fullName>040150000</fullName>
+                <default>false</default>
+                <label>GYD TARJETAS</label>
+            </value>
+            <value>
+                <fullName>040160000</fullName>
+                <default>false</default>
+                <label>MORPHO TARJETAS</label>
+            </value>
+            <value>
+                <fullName>040170000</fullName>
+                <default>false</default>
+                <label>BATCH SSMM</label>
+            </value>
+            <value>
+                <fullName>040170010</fullName>
+                <default>false</default>
+                <label>OTRMED</label>
+            </value>
+            <value>
+                <fullName>040180000</fullName>
+                <default>false</default>
+                <label>BOLSA ABIERTA - STOCKTACTICS</label>
+            </value>
+            <value>
+                <fullName>040190000</fullName>
+                <default>false</default>
+                <label>PLATAFORMA GESTION TELEMATICA IMPUESTOS</label>
+            </value>
+            <value>
+                <fullName>040200000</fullName>
+                <default>false</default>
+                <label>YAAP MONITISE (YAAP)</label>
+            </value>
+            <value>
+                <fullName>040200010</fullName>
+                <default>false</default>
+                <label>YAAP IBM (YAAP)</label>
+            </value>
+            <value>
+                <fullName>040210000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 2</label>
+            </value>
+            <value>
+                <fullName>040210010</fullName>
+                <default>false</default>
+                <label>PETICIONES POR WIFI</label>
+            </value>
+            <value>
+                <fullName>040210020</fullName>
+                <default>false</default>
+                <label>PETICIONES POR Q-MATIC</label>
+            </value>
+            <value>
+                <fullName>040220000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 3</label>
+            </value>
+            <value>
+                <fullName>040220010</fullName>
+                <default>false</default>
+                <label>CENTRO DE NOTIFICACIONES</label>
+            </value>
+            <value>
+                <fullName>040220020</fullName>
+                <default>false</default>
+                <label>SMARTPHONE - LLAMADAS NO ATENDIDAS</label>
+            </value>
+            <value>
+                <fullName>040230000</fullName>
+                <default>false</default>
+                <label>ERSTE (WEB)</label>
+            </value>
+            <value>
+                <fullName>040230010</fullName>
+                <default>false</default>
+                <label>ERSTE (HOMEBANKING)</label>
+            </value>
+            <value>
+                <fullName>040230020</fullName>
+                <default>false</default>
+                <label>ERSTE (OFICINAS)</label>
+            </value>
+            <value>
+                <fullName>040240000</fullName>
+                <default>false</default>
+                <label>BPI (WEB)</label>
+            </value>
+            <value>
+                <fullName>040240010</fullName>
+                <default>false</default>
+                <label>BPI (HOMEBANKING)</label>
+            </value>
+            <value>
+                <fullName>040240020</fullName>
+                <default>false</default>
+                <label>BPI (OFICINAS)</label>
+            </value>
+            <value>
+                <fullName>040250000</fullName>
+                <default>false</default>
+                <label>REDSYS (GENERICO)</label>
+            </value>
+            <value>
+                <fullName>040250010</fullName>
+                <default>false</default>
+                <label>IBERPAY-ISCT (TRANSFERENCIAS INMEDIATAS)</label>
+            </value>
+            <value>
+                <fullName>040260000</fullName>
+                <default>false</default>
+                <label>PROMOCIONES COMERCIALES A CLIENTES</label>
+            </value>
+            <value>
+                <fullName>040270000</fullName>
+                <default>false</default>
+                <label>FINANCIACION AL CONSUMO</label>
+            </value>
+            <value>
+                <fullName>040280000</fullName>
+                <default>false</default>
+                <label>GIFT CARD AREA</label>
+            </value>
+            <value>
+                <fullName>040290000</fullName>
+                <default>false</default>
+                <label>EPAY</label>
+            </value>
+            <value>
+                <fullName>040300000</fullName>
+                <default>false</default>
+                <label>TELECOR</label>
+            </value>
+            <value>
+                <fullName>040310000</fullName>
+                <default>false</default>
+                <label>GESTION DE IDENTIDADES</label>
+            </value>
+            <value>
+                <fullName>040340000</fullName>
+                <default>false</default>
+                <label>INDRA</label>
+            </value>
+            <value>
+                <fullName>040350000</fullName>
+                <default>false</default>
+                <label>DISASHOP</label>
+            </value>
+            <value>
+                <fullName>040360000</fullName>
+                <default>false</default>
+                <label>CECA</label>
+            </value>
+            <value>
+                <fullName>040360010</fullName>
+                <default>false</default>
+                <label>PAGOS ELECTRONICOS EALIA</label>
+            </value>
+            <value>
+                <fullName>040370000</fullName>
+                <default>false</default>
+                <label>TRECEDIS</label>
+            </value>
+            <value>
+                <fullName>040380000</fullName>
+                <default>false</default>
+                <label>SENDFILE</label>
+            </value>
+            <value>
+                <fullName>040390000</fullName>
+                <default>false</default>
+                <label>CAMPAÑAS DE MARKETING</label>
+            </value>
+            <value>
+                <fullName>040400000</fullName>
+                <default>false</default>
+                <label>PRINCIPIOS INTERACTIVOS</label>
+            </value>
+            <value>
+                <fullName>040410000</fullName>
+                <default>false</default>
+                <label>GEMALTO</label>
+            </value>
+            <value>
+                <fullName>040420000</fullName>
+                <default>false</default>
+                <label>PROMOCAIXA</label>
+            </value>
+            <value>
+                <fullName>040440010</fullName>
+                <default>false</default>
+                <label>FUNDACION - CAIXAPROINFANCIA</label>
+            </value>
+            <value>
+                <fullName>040450000</fullName>
+                <default>false</default>
+                <label>API MANAGER</label>
+            </value>
+            <value>
+                <fullName>040460000</fullName>
+                <default>false</default>
+                <label>CAIXARENTING</label>
+            </value>
+            <value>
+                <fullName>040470000</fullName>
+                <default>false</default>
+                <label>WEB FINANCIAL GROUP</label>
+            </value>
+            <value>
+                <fullName>040480000</fullName>
+                <default>false</default>
+                <label>IMO</label>
+            </value>
+            <value>
+                <fullName>040490000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 4</label>
+            </value>
+            <value>
+                <fullName>040490010</fullName>
+                <default>false</default>
+                <label>SOCIAL APPS CAIXABANK</label>
+            </value>
+            <value>
+                <fullName>040490020</fullName>
+                <default>false</default>
+                <label>IMAGINBANK APPS</label>
+            </value>
+            <value>
+                <fullName>040500000</fullName>
+                <default>false</default>
+                <label>INCIDENCIAS SMS</label>
+            </value>
+            <value>
+                <fullName>040510000</fullName>
+                <default>false</default>
+                <label>BCR RUMANIA - WEB</label>
+            </value>
+            <value>
+                <fullName>040510010</fullName>
+                <default>false</default>
+                <label>BCR RUMANIA - HOMEBANKING</label>
+            </value>
+            <value>
+                <fullName>040510020</fullName>
+                <default>false</default>
+                <label>BCR RUMANIA - OFICINAS</label>
+            </value>
+            <value>
+                <fullName>040520000</fullName>
+                <default>false</default>
+                <label>VIVIENDA ASEQUIBLE</label>
+            </value>
+            <value>
+                <fullName>040530000</fullName>
+                <default>false</default>
+                <label>GOOD DEAL</label>
+            </value>
+            <value>
+                <fullName>040550000</fullName>
+                <default>false</default>
+                <label>APLICACIONES TESORERIA Deprecated</label>
+            </value>
+            <value>
+                <fullName>040550010</fullName>
+                <default>false</default>
+                <label>TREBDI PARA CANAL NEUTRO</label>
+            </value>
+            <value>
+                <fullName>040550020</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERNALIZACION SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>040550030</fullName>
+                <default>false</default>
+                <label>APLICACION BDIBDI</label>
+            </value>
+            <value>
+                <fullName>040560000</fullName>
+                <default>false</default>
+                <label>OPER.EXT.SERV.-GESTION RIESGO Y ACTIVO-GENERICO</label>
+            </value>
+            <value>
+                <fullName>040560010</fullName>
+                <default>false</default>
+                <label>OPER.EXT.SERV.-GESTION RIESGO Y ACTIVO-APL.GEOGEO</label>
+            </value>
+            <value>
+                <fullName>040560020</fullName>
+                <default>false</default>
+                <label>OPERATIVA EXTERNALIZACION SERVICIOS Deprecated</label>
+            </value>
+            <value>
+                <fullName>040570000</fullName>
+                <default>false</default>
+                <label>VIDACAIXA - GENERICO</label>
+            </value>
+            <value>
+                <fullName>040570010</fullName>
+                <default>false</default>
+                <label>PORTAL PRESTACIONES VIDACAIXA</label>
+            </value>
+            <value>
+                <fullName>040580020</fullName>
+                <default>false</default>
+                <label>APLICACIONES MOVILES DIRECCION - APLICACION POGPOG</label>
+            </value>
+            <value>
+                <fullName>040590000</fullName>
+                <default>false</default>
+                <label>TERMINAL EFECTIVO ASISTIDO</label>
+            </value>
+            <value>
+                <fullName>040600000</fullName>
+                <default>false</default>
+                <label>ENZYME</label>
+            </value>
+            <value>
+                <fullName>040610000</fullName>
+                <default>false</default>
+                <label>ORDENES DE MERCADO ABONO GARANTIAS</label>
+            </value>
+            <value>
+                <fullName>040620000</fullName>
+                <default>false</default>
+                <label>EXTRANET ABSIS</label>
+            </value>
+            <value>
+                <fullName>040620010</fullName>
+                <default>false</default>
+                <label>TESTAMENTARIAS</label>
+            </value>
+            <value>
+                <fullName>040620020</fullName>
+                <default>false</default>
+                <label>EXTRANET ABSIS - GOBIERNO DE PRODUCTOS</label>
+            </value>
+            <value>
+                <fullName>040620030</fullName>
+                <default>false</default>
+                <label>MERCHANTS DE TARJETAS PREPAGO</label>
+            </value>
+            <value>
+                <fullName>040630000</fullName>
+                <default>false</default>
+                <label>IDENTIFICACION DE OBJETOS DIGITALES</label>
+            </value>
+            <value>
+                <fullName>040640000</fullName>
+                <default>false</default>
+                <label>PREMIA</label>
+            </value>
+            <value>
+                <fullName>040650000</fullName>
+                <default>false</default>
+                <label>CENTRALITA DE ALCATEL - GENERICO</label>
+            </value>
+            <value>
+                <fullName>040650010</fullName>
+                <default>false</default>
+                <label>CALLME VMCISCO</label>
+            </value>
+            <value>
+                <fullName>040660000</fullName>
+                <default>false</default>
+                <label>BUILDINGCENTER</label>
+            </value>
+            <value>
+                <fullName>040670000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 5</label>
+            </value>
+            <value>
+                <fullName>040670010</fullName>
+                <default>false</default>
+                <label>DERIVADOS MERCADOS ORGANIZADOS</label>
+            </value>
+            <value>
+                <fullName>040680000</fullName>
+                <default>false</default>
+                <label>EBA-EUROPEAN BANKING AUTHORITY - GENERICO</label>
+            </value>
+            <value>
+                <fullName>040680010</fullName>
+                <default>false</default>
+                <label>EBA - ISCT (TRANSFERENCIAS INMEDIATAS)</label>
+            </value>
+            <value>
+                <fullName>040690000</fullName>
+                <default>false</default>
+                <label>SIOPEIA - GEBROS</label>
+            </value>
+            <value>
+                <fullName>040700000</fullName>
+                <default>false</default>
+                <label>POWERCURVE</label>
+            </value>
+            <value>
+                <fullName>040710000</fullName>
+                <default>false</default>
+                <label>INFORMES DE SOLVENCIA Y REGISTRO DE LA PROPIEDAD</label>
+            </value>
+            <value>
+                <fullName>040720000</fullName>
+                <default>false</default>
+                <label>PRODUCCION INFORMATICA</label>
+            </value>
+            <value>
+                <fullName>040720010</fullName>
+                <default>false</default>
+                <label>PROD.INFOR.-APL.EINAOL(AVERIAS DE OFIC. Y LINEAS)</label>
+            </value>
+            <value>
+                <fullName>040730000</fullName>
+                <default>false</default>
+                <label>TRANSACTION ALERTS SYSTEM</label>
+            </value>
+            <value>
+                <fullName>040740000</fullName>
+                <default>false</default>
+                <label>ASSET LIABILITY MANAGEMENT (ALM)</label>
+            </value>
+            <value>
+                <fullName>040760000</fullName>
+                <default>false</default>
+                <label>CAIXABANK PAYMENTS</label>
+            </value>
+            <value>
+                <fullName>040760010</fullName>
+                <default>false</default>
+                <label>CAIXABANK PAYMENTS - ERPNAV</label>
+            </value>
+            <value>
+                <fullName>040770000</fullName>
+                <default>false</default>
+                <label>MONITORIZACION ELK COMERCIOS Y TARJETAS</label>
+            </value>
+            <value>
+                <fullName>040770010</fullName>
+                <default>false</default>
+                <label>MONITORIZACION ELK COMERCIOS Y TARJETAS - MONMDP</label>
+            </value>
+            <value>
+                <fullName>040770020</fullName>
+                <default>false</default>
+                <label>MONITORIZACION ELK COMERCIOS Y TARJETAS - MGEELK</label>
+            </value>
+            <value>
+                <fullName>040780000</fullName>
+                <default>false</default>
+                <label>CONSEJO GENERAL DEL NOTARIADO</label>
+            </value>
+            <value>
+                <fullName>040790000</fullName>
+                <default>false</default>
+                <label>GLOBAL EXCHANGE</label>
+            </value>
+            <value>
+                <fullName>040810000</fullName>
+                <default>false</default>
+                <label>ABSIS CLOUD CORPORATIVO</label>
+            </value>
+            <value>
+                <fullName>040820000</fullName>
+                <default>false</default>
+                <label>GOOGLE CLOUD</label>
+            </value>
+            <value>
+                <fullName>040850000</fullName>
+                <default>false</default>
+                <label>SERVIHABITAT</label>
+            </value>
+            <value>
+                <fullName>040860000</fullName>
+                <default>false</default>
+                <label>ADOBE CAMPAIGN</label>
+            </value>
+            <value>
+                <fullName>040870000</fullName>
+                <default>false</default>
+                <label>FINREACH</label>
+            </value>
+            <value>
+                <fullName>040920000</fullName>
+                <default>false</default>
+                <label>CANAL NEUTRO - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>040930000</fullName>
+                <default>false</default>
+                <label>SKIDATA</label>
+            </value>
+            <value>
+                <fullName>040940000</fullName>
+                <default>false</default>
+                <label>PLEXUS - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>040950000</fullName>
+                <default>false</default>
+                <label>TRACUS - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>040960000</fullName>
+                <default>false</default>
+                <label>CLEARPASS - ASISTENTE COGNITIVO</label>
+            </value>
+            <value>
+                <fullName>040970000</fullName>
+                <default>false</default>
+                <label>GENERICO Deprecated 6</label>
+            </value>
+            <value>
+                <fullName>040990000</fullName>
+                <default>false</default>
+                <label>FND</label>
+            </value>
+            <value>
+                <fullName>041020000</fullName>
+                <default>false</default>
+                <label>INSTALADORA TPV INGENICO</label>
+            </value>
+            <value>
+                <fullName>041030000</fullName>
+                <default>false</default>
+                <label>INSTALADORA TPV NECOMPLUS</label>
+            </value>
+            <value>
+                <fullName>050010000</fullName>
+                <default>false</default>
+                <label>BATCH SIN IDENTIFICAR</label>
+            </value>
+            <value>
+                <fullName>050020000</fullName>
+                <default>false</default>
+                <label>AUTOMATICOS TLE</label>
+            </value>
+            <value>
+                <fullName>050020010</fullName>
+                <default>false</default>
+                <label>RENOVACION AUTOMATICA</label>
+            </value>
+            <value>
+                <fullName>050030000</fullName>
+                <default>false</default>
+                <label>ORDENES AUTOMATICAS VALORES</label>
+            </value>
+            <value>
+                <fullName>060010000</fullName>
+                <default>false</default>
+                <label>TRANSMISION DIRECTA</label>
+            </value>
+            <value>
+                <fullName>060020000</fullName>
+                <default>false</default>
+                <label>TRANSMISION OFI/TAD</label>
+            </value>
+            <value>
+                <fullName>060030000</fullName>
+                <default>false</default>
+                <label>TRANSMISION LOE</label>
+            </value>
+            <value>
+                <fullName>060030010</fullName>
+                <default>false</default>
+                <label>TRANSMISION LOE - EMISION</label>
+            </value>
+            <value>
+                <fullName>060040000</fullName>
+                <default>false</default>
+                <label>TRANSMISION EMPRESAS DE SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>060050000</fullName>
+                <default>false</default>
+                <label>ORDENES DIRECTAS VALORES</label>
+            </value>
+            <value>
+                <fullName>990000000</fullName>
+                <default>false</default>
+                <label>NO SE HA PODIDO IDENTIFICAR CANAL DE COMUNICACION</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

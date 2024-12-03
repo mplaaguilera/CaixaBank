@@ -1,0 +1,15 @@
+h5 {
+    padding: 1em 1em 0 1em;
+}
+
+lightning-icon {
+    margin-right: 0.5em;
+}
+
+.customNotification{
+    text-align: left;
+}
+
+.links {
+    font-weight: normal !important;
+}

@@ -1,0 +1,50 @@
+<template>
+    <lightning-card  variant="Narrow"  title="Contratos activos del cliente" icon-name="standard:account" size="small">
+        <div class="slds-grid slds-gutters slds-m-left_x-small">
+            <div class="slds-col slds-size_2-of-3">
+                Consultar contratos del cliente              
+            </div>
+            <div class="slds-col slds-size_1-of-3 ">
+                <div class="slds-float_right">
+                    <lightning-button variant="brand" label="Solicitar" title="Solicitar" onclick={solicitarContratos} class="slds-m-right_medium"></lightning-button>
+                </div>                
+            </div> 
+            
+        </div>
+    </lightning-card>   
+    <!-- modal start -->      
+   <template if:true={isShowModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+            <!-- modal header start -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={hideModalBox}>
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Contratos</h2>
+            </header>
+
+            <!-- modal body start -->
+            <div class="slds-box slds-theme_default  slds-scrollable">
+                <lightning-card>
+                    <template if:true={listContratos} for:each={listContratos} for:item="contrato">
+                        <div key={contrato}>
+                            <c-sac_-contrato-detail con={contrato} record-id={recordId} customer-id={customerId}></c-sac_-contrato-detail> 
+                        </div>
+                    </template>
+                </lightning-card>
+            </div>
+
+            <!-- modal footer start-->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={hideModalBox}>Cancel</button>
+            </footer>
+
+            </div>
+        </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!-- modal end -->   
+      
+</template>

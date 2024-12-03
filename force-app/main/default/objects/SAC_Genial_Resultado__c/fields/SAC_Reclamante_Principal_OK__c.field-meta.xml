@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Reclamante_Principal_OK__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>se informará a SI si el reclamante principal propuesto por la IA es el reclamante principal del caso</description>
+    <label>Reclamacion IA Reclamante_Principal_OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

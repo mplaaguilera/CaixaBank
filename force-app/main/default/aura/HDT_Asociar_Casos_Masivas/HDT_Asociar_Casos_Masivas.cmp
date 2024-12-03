@@ -1,0 +1,183 @@
+<aura:component controller="HDT_Asociar_Casos_Masivas" implements="force:hasRecordId,force:lightningQuickAction,flexipage:availableForRecordHome">
+
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="agrupador" type="CC_Agrupador__c"/>
+    <aura:attribute name="deshabilitado" type="Boolean" default="true"/>
+    <aura:attribute name="errorLds" type="String"/>
+    <aura:attribute name="procesando" type="Boolean" default="false"/>
+    <aura:attribute name="maximoCasos" type="Integer"/>
+    <aura:attribute name="lookupCasoValue" type="String" default=""/>
+    <aura:attribute name="lookupCasoResultados" type="Case[]"/>
+    <aura:attribute name="lookupCasoSeleccionado" type="Case"/>
+    <aura:attribute name="lookupCasoTimeoutTeclaPulsada" type="String"/>
+    <aura:attribute name="datatableColumnas" type="List" default="[]"/>
+    <aura:attribute name="casos" type="Case[]" default="[]"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <force:recordData aura:id="agrupadorData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="Name, CC_Estado__c" targetFields="{!v.agrupador}" targetError="{!v.errorLds}" recordUpdated="{!c.agrupadorDataUpdated}"/>
+
+    <article class="slds-card">
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning:button label="Asociar casos" iconName="action:new_child_case" onclick="{!c.abrirModalAsociarCasos}"></lightning:button>
+        </div>
+    </article>
+
+    <div aura:id="backdropModalAsociarCasos" class="slds-backdrop"/>
+
+    <section aura:id="modalAsociarCasos" role="dialog" tabindex="-1" class="slds-modal slds-modal_small" aria-modal="true" onkeydown="{!c.modalAsociarCasosOnkeydown}">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalAsociarCasos}" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Asociar casos</h2>
+                <p class="slds-var-m-top_x-small">Selecciona los casos que quieres asociar con el agrupador {!v.agrupador.Name}.</p>
+            </header>
+
+            <div class="slds-modal__content slds-var-p-around_x-large">
+
+                <!--Spinner-->
+                <aura:if isTrue="{!v.procesando}">
+                    <lightning:spinner variant="brand"/>
+                </aura:if>
+
+                <aura:if isTrue="{!v.deshabilitado}">
+                    <div class="slds-align_absolute-center slds-var-m-around_large">
+                        Solo se pueden vincular casos a agrupadores en estado "Activo" o "Pendiente revisión solución".
+                    </div>
+
+                    <aura:set attribute="else">
+                        <!--Buscador de casos-->
+                        <div class="containerItem slds-form-element slds-var-p-bottom_small">
+                            <div class="slds-form-element__control">
+                                <aura:if isTrue="{!v.lookupCasoSeleccionado}">
+                                    <div class="slds-combobox_container slds-has-selection">
+                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                                                <span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+                                                    <lightning:icon iconName="standard:case" size="x-small"/>
+                                                </span>
+                                                <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+                                                    <span class="slds-truncate">{!v.lookupCasoSeleccionado.CaseNumber}</span>
+                                                </div>
+                                                <span class="slds-input__icon slds-input__icon_right" style="pointer-events: initial; top: calc(50% - 1px);">
+                                                    <lightning:buttonIcon iconName="utility:close" size="small" variant="bare" tooltip="Deseleccionar" onclick="{!c.lookupCasoDeseleccionar}"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="slds-combobox_container">
+                                            <div aura:id="lookupCaso" class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none" onkeydown="{!c.lookupCasoInputOnkeydown}">
+                                                    <lightning:input aura:id="lookupCasoInput" label="Añadir caso" type="search" autoComplete="off" placeholder="Buscar por número de caso" value="{!v.lookupCasoValue}" onchange="{!c.lookupCasoOnchange}" onfocus="{!c.lookupCasoAbrir}" onblur="{!c.lookupCasoCerrar}" disabled="{!v.casos.length > v.maximoCasos}"/>
+                                                </div>
+                                                <aura:if isTrue="{!v.lookupCasoResultados.length}">
+                                                    <div class="slds-dropdown slds-dropdown_length-with-icon-10 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <aura:iteration items="{!v.lookupCasoResultados}" var="resultado">
+                                                                <li role="presentation" class="slds-listbox__item" onclick="{!c.lookupCasoSeleccionar}" data-id="{!resultado.Id}">
+                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                        <span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -2px;">
+                                                                            <lightning:icon iconName="standard:case" size="small"/>
+                                                                        </span>
+                                                                        <span class="slds-media__body">
+                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity" style="font-weight: 500;">{!resultado.CaseNumber}</span>
+                                                                            <span class="slds-listbox__option-meta slds-listbox__option-meta_entity slds-text-color_weak" style="font-weight: 300; padding-top: 1px;">
+                                                                                {!resultado.fechaApertura}
+                                                                                <aura:if isTrue="{!resultado.nombreTematica}">
+                                                                                    <span class="separador">•</span>
+                                                                                    {!resultado.nombreTematica}
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!resultado.Subject}">
+                                                                                    <span class="separador">•</span>
+                                                                                    {!resultado.Subject}
+                                                                                </aura:if>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </aura:iteration>
+                                                        </ul>
+                                                    </div>
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!v.lookupCasoValue}">
+                                                            <div class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                    <li role="presentation" class="slds-listbox__item">
+                                                                        <div aria-selected="true" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option" style="cursor: default;">
+                                                                            <span class="slds-media__body">
+                                                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity slds-text-color_weak">No hay resultados.</span>
+                                                                            </span>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de casos seleccionados -->
+                        <div class="slds-var-m-top_small">
+                            <label class="slds-form-element__label">Casos seleccionados</label>
+                            <div style="min-height: 350px; border-style: solid; border-width: 1px; border-color: #D0D0D0; border-radius: 4px; position: relative;">
+                                <lightning:datatable
+                                columns="{!v.datatableColumnas}"
+                                data="{!v.casos}"
+                                keyField="Id"
+                                onrowaction="{!c.datatableOnrowaction}"
+                                hideCheckboxColumn="true"
+                                columnWidthsMode="auto"
+                                sortedBy="CreatedDate"
+                                sortedDirection="desc"/>
+                            </div>
+                        </div>
+                    </aura:set>
+                </aura:if>
+
+            </div>
+
+            <footer class="slds-modal__footer">
+                <div class="slds-grid slds-gutters_direct-x-small slds-grid_align-spread slds-grid_vertical-align-center">
+                    <div class="slds-col slds-text-color_weak slds-var-m-left_x-small">
+                        {!v.casos.length} casos seleccionados.
+                    </div>
+                    <div class="slds-col">
+                        <lightning:button label="Vincular casos" variant="brand" onclick="{!c.abrirModalConfirmacion}" disabled="{!!v.casos.length}"/>
+                        <lightning:button aura:id="modalAsociarCasosCancelar" label="Cancelar" onclick="{!c.cerrarModalAsociarCasos}" class="slds-var-m-left_small"/>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal de confirmación-->
+    <section role="dialog" aura:id="modalConfirmacion" class="slds-modal" aria-modal="true" style="z-index: 9020;" onkeydown="{!c.modalConfirmacionOnkeydown}">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalConfirmacion}" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                <!--Título-->
+                <h2 class="slds-text-heading_medium slds-hyphenate">Confirmación</h2>
+            </header>
+            <div class="slds-modal__content slds-var-p-around_xx-large">
+                <div class="slds-align_absolute-center slds-var-m-bottom_x-large" style="font-weight: 500;">Los {!v.casos.length} casos seleccionados se vincularán al agrupador {!v.agrupador.Name}.</div>
+                <div class="slds-text-color_weak slds-align_absolute-center">¿Estás seguro de que quieres continuar?</div>
+            </div>
+            <footer class="slds-modal__footer submodal">
+                <lightning:button variant="brand" label="Confirmar" onclick="{!c.vincularAgrupadores}"/>
+                <lightning:button aura:id="modalConfirmacionCancelar" label="Cancelar" onclick="{!c.cerrarModalConfirmacion}" />
+            </footer>
+        </div>
+    </section>
+    <div aura:id="backdropConfirmacion" class="slds-backdrop" style="z-index: 9010;"/>
+
+</aura:component>

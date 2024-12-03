@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Relationships_with_other_Groups</fullName>
+    <description>WA de oportunidades</description>
+    <displayedFields>
+        <field>SEG_Cargos_Operativa__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>SEG_Cargos_en_la_empresa__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <displayedFields>
+        <field>SEG_Reportar_temas_nuevos__c</field>
+        <isFieldManaged>false</isFieldManaged>
+        <isRequired>false</isRequired>
+    </displayedFields>
+    <label>Relationships_with_other_Groups</label>
+</FieldSet>

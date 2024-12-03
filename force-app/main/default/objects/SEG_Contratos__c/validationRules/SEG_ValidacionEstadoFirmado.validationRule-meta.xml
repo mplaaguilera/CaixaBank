@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ValidacionEstadoFirmado</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( ISPICKVAL( SEG_Estado__c  , &quot;Firmado&quot;) ,  SEG_AdjuntoFirmadoPDF__c = FALSE)</errorConditionFormula>
+    <errorDisplayField>SEG_Estado__c</errorDisplayField>
+    <errorMessage>Para cambiar el estado a &quot;Firmado&quot; debe existir un PDF firmado.</errorMessage>
+</ValidationRule>

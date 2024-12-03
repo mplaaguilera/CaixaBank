@@ -1,0 +1,285 @@
+<template>
+	<div class="filter-card">
+		<lightning-card variant="Narrow">
+            <div class="slds-m-around_medium">
+                <div class="slds-m-top_none slds-m-around_small slds-float_right"> 
+                    <lightning-button  class=" slds-m-top_none" label={labels.newOppor} onclick={handleClickOppo} ></lightning-button>
+                    <template if:true={isShowFlowAction}>
+                        <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-03" class="slds-modal slds-fade-in-open slds-modal_small">
+                            <div class="slds-modal__container">
+                                <lightning-button-icon class="slds-button slds-button_icon slds-modal__close" variant="container" icon-name="utility:close" icon-class="slds-icon-text-light" size="medium" onclick={hideFlowAction}></lightning-button-icon>
+                                <div class="slds-modal__header">
+                                    <h1 id="modal-heading-03" class="slds-modal__title slds-hyphenate">{flowlabel}</h1>
+                                </div>
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-3">
+                                    <div class="slds-is-relative">
+                                        <lightning-flow flow-api-name={flowName} flow-input-variables={inputFlowVariables} onstatuschange={handleStatusChange}> </lightning-flow>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+                    </template>
+                </div>
+                <h1 slot="title">
+                    <lightning-icon class="slds-m-left_medium" icon-name="standard:search" alternative-text="Filtros de búsqueda" title="Search"></lightning-icon>
+                    <b><span class="slds-truncate slds-card__header">{labels.filtroB}</span></b>
+                </h1>
+            </div>
+
+			<div if:true={showDetail}>
+				<!-- Parte de arriba -->
+				<div>
+					<div class="slds-grid slds-gutters slds-m-around_x-small">
+						<div class="slds-col slds-size_1-of-4 ">
+							<lightning-combobox data-field="redes" label={labels.redeSeg} options={picklistValues2} name="inputField2" value={inputValue2} onchange={handleValueChange2} placeholder={redesValue}>
+							</lightning-combobox>
+						</div>
+						<div class="slds-col slds-size_1-of-4 ">
+							<lightning-combobox data-field="sectores" label={labels.sectorPai} options={picklistValues3} name="inputField3" value={inputValue3} onchange={handleValueChange3} placeholder={sectorValue}  >
+							</lightning-combobox>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<lightning-combobox data-field="centro" label={labels.centCar} options={picklistValues4} name="inputField4" value={inputValue4} onchange={handleValueChange4} placeholder={centrosValue} >
+							</lightning-combobox>
+						</div>
+                        <div class="slds-col slds-size_1-of-4">
+							<lightning-combobox data-field="equipoOpo" label={labels.equipoOppo} options={optionsParticipe} name="equipoOpo" value={participeFilter} placeholder="--Seleccionar--" onchange={handleValueChangeEquipoOpo} >
+							</lightning-combobox>
+						</div>
+					</div>
+				</div>
+                <!-- Fin Parte de arriba -->
+				<!-- Segunda de arriba -->
+				<div>
+                    <div class="slds-col slds-size_1-of-4 slds-form_vertical slds-m-around_x-small slds-float_right">
+                            <div class="slds-col slds-size_1-of-4 slds-float_left">
+                                <lightning-input type="toggle" class="another-office" onchange={handleMisClientes} checked={isMisClientes} name="misClientes" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4 slds-float_left">
+                                <label class="slds-form-element__label">Mis Clientes</label>  
+                            </div>
+                            <div class="slds-col slds-size_1-of-4 slds-float_left">
+                                <lightning-input type="toggle" class="another-office" onchange={handleESG} checked={isESG} name="esg" variant="label-hidden" message-toggle-active="" message-toggle-inactive=""></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4 slds-float_left">
+                                <label class="slds-form-element__label">ESG</label>  
+                        </div>
+                    </div>
+                    <!-- Fin Segunda fila -->
+					
+                </div>
+                <br>
+				<!-- Fin parte de arriba -->
+                <!-- Parte de Medio -->
+                    <div class="slds-m-vertical_large">
+						<div data-id="lookup2" class="slds-grid slds-gutters slds-m-around_xx-small slds-border_top ">
+                            <!-- Stage -->
+							<div class="slds-col slds-size_1-of-4 ">
+								<!--<lightning-input  type="text" name="Etapa" label="Etapa de la Oportunidad" onchange={handleChangeStage}></lightning-input>-->
+                                <lightning-combobox data-field="Etapa" label={labels.etapaOpo} options={optionsOppoStatus} name="Etapa" value={statusFilter} onchange={handleChangeEtapa} >
+                                </lightning-combobox>
+                            </div>
+							<!-- Pais -->
+							<div class="slds-col slds-size_1-of-4 ">
+								<!--<lightning-input  type="text" name="Pais" label="Pais de la Oportunidad" onchange={handleChangePais}></lightning-input>-->
+                                <lightning-combobox data-field="pais" label={labels.pais} options={optionsPais} name="pais" value={paisFilter} onchange={handleChangePais} >
+                                </lightning-combobox>
+							</div>
+							<!-- Cierre -->
+							<div class="slds-col slds-size_1-of-4 ">
+								<lightning-input  type="date" name="endDateInterval" options={optionFecha} label={labels.fechaCierre} value={fechaCierreFilter} onchange={handleChangeDueDate2}></lightning-input>
+							</div>
+							<!-- Industria Internacional  Buscará los valores de corporate bankin España cuando redes sea surcursales o ORS -->
+                            <div class="slds-col slds-size_1-of-4">
+                                <lightning-combobox data-field="industriaInter" disabled={disabledIndustria}  label={labels.industriaInter} options={optionsIndustria} name="industraInter" value={industriaFilter} placeholder="--Seleccionar--" onchange={handleValueChangeIndustria} >
+                                </lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                <!-- Fin parte de medio -->
+                <!-- Parte de abajo -->
+                <div if:true={redesDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <!-- Employee's multiselection -->
+                            <h5 ><strong>Redes Segmentos seleccionadas</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedRedes} for:item="redes" >
+                                    <div key={redes.bucleId} class="slds-m-around_xxx-small">
+                                        <lightning-pill label={redes.label} name={redes.value} onremove={unSelectRedes}>
+                                                <lightning-icon icon-name="standard:user"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={sectoresDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <h5 ><strong>Sectores Paises seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedSect} for:item="sector" >
+                                    <div key={sector.bucleId} class="slds-m-around_xxx-small">
+                                        <lightning-pill label={sector.label} name={sector.value} onremove={unSelectSector}>
+                                                <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={centrosDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <!-- Employee's multiselection -->
+                            <h5 ><strong>Centros Cartera seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedCent} for:item="centro" >
+                                    <div key={centro.bucleId} class="slds-m-around_xxx-small" >						
+                                        <lightning-pill  label={centro.label} name ={centro.value} onremove={unSelectCentro}>
+                                                <lightning-icon icon-name="standard:user"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={equiposDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <h5 ><strong>Equipo oportunidad seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedParticipe} for:item="equipo" >
+                                    <div key={equipo.bucleId} class="slds-m-around_xxx-small">
+                                        <lightning-pill label={equipo.label} name={equipo.value} onremove={unSelectEquipo}>
+                                                <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={statusDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <!-- Employee's multiselection -->
+                            <h5 ><strong>Etapas seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedStatus} for:item="status" >
+                                    <div key={status.bucleId} class="slds-m-around_xxx-small" >
+                                        <lightning-pill label={status.label} name={status.value} onremove={unSelectStatus}>
+                                                <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={paisesDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <h5 ><strong>Paises seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedPais} for:item="pais" >
+                                    <div key={pais.bucleId} class="slds-m-around_xxx-small" >
+                                        <lightning-pill label={pais.label} name={pais.value} onremove={unSelectPais}>
+                                                <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={fechaDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <h5 ><strong>Fecha Cierre seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                    <div class="slds-m-around_xxx-small">
+                                        <template for:each={selectedFech} for:item="fecha" >
+                                            <div key={fecha.bucleId} class="slds-m-around_xxx-small" >
+                                                <lightning-pill label={fecha.label} name={fecha.value} onremove={unSelectFecha}>
+                                                        <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                                </lightning-pill>
+                                            </div>
+                                        </template>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div if:true={industriaDiv}>
+                    <div class="slds-grid slds-gutters slds-form_vertical slds-m-around_x-small">
+                        <div class="slds-col slds-size_1-of-4">
+                            <h5 ><strong>Industria Internacional seleccionados</strong></h5>
+                            <div class="slds-list_horizontal">
+                                <template for:each={selectedInd} for:item="industria" >
+                                    <div key={industria.bucleId} class="slds-m-around_xxx-small">
+                                        <lightning-pill label={industria.label} name={industria.value} onremove={unSelectIndustria}>
+                                                <lightning-icon icon-name="standard:stage"  alternative-text="user"></lightning-icon>
+                                        </lightning-pill>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<!-- Fin parte de abajo -->
+				<!-- Botonera -->
+				<div class="slds-m-around_x-small slds-float_right">
+                    <lightning-button class="slds-m-horizontal_medium" variant="brand" label={labels.exportar} onclick={exportData} disabled={buttExp}></lightning-button>
+					<lightning-button class="slds-m-horizontal_medium" label={labels.reset}  onclick={resetFilters}></lightning-button>
+					<lightning-button class="slds-m-horizontal_medium" variant="brand" label={labels.buscar}  onclick={handleSearchData} disabled={buttonDisabled}></lightning-button>
+				</div>
+				<!-- Fin Botonera-->
+			</div>
+		</lightning-card>
+	</div>
+	<br>
+	<br>
+    <br>
+	<br>
+	<div>
+		<lightning-card if:true={firstSearch} variant="Narrow" class="table-container slds-m-top_medium" title="Resultados de la búsqueda" icon-name={iconName}>
+			<div class="total-data-text slds-text-align_right slds-m-right_medium" >
+				<!-- <lightning-formatted-text class="slds-text-title--caps totalText" value={totalRecountCount}></lightning-formatted-text>-->
+				<div class="help-text">
+					<p if:true={helpMessage}><lightning-formatted-text value={recordLimit}></lightning-formatted-text></p>
+				</div>
+			</div>
+            <div if:true={data}  class="slds-m-around_medium" style={height}> 
+                    <c-cibe_-custom-datatable
+                        key-field="Id"
+                        data={data}
+                        errors={errors}
+                        columns={columns} 
+                        min-column-width="150"
+                        hide-checkbox-column>
+                    </c-cibe_-custom-datatable>
+            </div>
+				<br/>
+                <div>
+                    <lightning-layout horizontal-align="space">
+                        <lightning-layout-item flexibility="auto">
+                            <lightning-button label={labels.anterior} icon-name="utility:chevronleft"  onclick={previousHandler}  disabled={getHasPrevious}></lightning-button>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto">
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="auto">
+                            <lightning-button label={labels.posterior} icon-name="utility:chevronright" icon-position="right" onclick={nextHandler}  disabled={getHasNext}></lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+			<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>
+			
+		</lightning-card>
+	</div>
+</template>

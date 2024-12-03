@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Motivo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Motivo</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>Se debe añadir un Motivo del Tipo Segmentos.</errorMessage>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>C - Motivo</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Tipo_Cliente__c</field>
+            <operation>equals</operation>
+            <value>Segmentos, Segmentos FFEE, Segmentos CSE, Segmentos BC CE INST, Cliente (COPS), Empleado (COPS), Cliente (COPS)/Empleado (COPS)</value>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Producto_Servicio__c</field>
+            <operation>equals</operation>
+            <valueField>$Source.SEG_Producto__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>$Source.CBK_Negocio__c</field>
+            <operation>equals</operation>
+            <value>Segmentos, Cops</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Clasificación Rápida (Motivo)</relationshipLabel>
+    <relationshipName>SEG_ClasificacionRapida_Motivo</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

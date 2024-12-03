@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Mostrar búsqueda" >
+    <aura:attribute name="showBuscar" type="Boolean"  />   
+    <aura:attribute name="recordId" type="String"  /> 
+    <aura:attribute name="idioma" type="String"  /> 
+    <aura:attribute name="areaChat" type="String" />
+    <aura:attribute name="espacio" type="String" />
+</aura:event>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Valores booleanos que pueden consultarse fácilmente en Apex mediante la función CC_MetodosUtiles.modificadorApex(String nombreModificadorApex) para realizar seleccionar en caliente entre distintos comportamientos.
+
+POR DEFECTO SE CREAN DESACTIVADOS</description>
+    <label>Modificador Apex</label>
+    <pluralLabel>Modificadores Apex</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

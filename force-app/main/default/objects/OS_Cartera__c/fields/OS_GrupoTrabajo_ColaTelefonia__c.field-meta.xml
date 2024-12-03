@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_GrupoTrabajo_ColaTelefonia__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Grupo de Trabajo</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Grupo_Colaborador__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Grupo de Trabajo</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Colas Telefonía</relationshipLabel>
+    <relationshipName>Carteras_Cola_Telefonia</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

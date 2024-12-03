@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Estado__c</fullName>
+    <description>Firmado: Para poder modificar el estado del contrato a firmado el usuario ha de incluir en documentos firmados de dicho registro un PDF.
+No Firmado: Es el estado en el que el sistema realiza las reclamaciones automáticas definidas.
+Reclamaciones agotadas: Estado una vez finalizadas todas las reclamaciones definidas en el proceso y que hará que el sistema realice el envío a gestor o a cola de trabajo definida.
+No reclamar: Es el estado que el usuario escoge cuando el cliente indica que irá físicamente a la oficina a firmarlo por ejemplo.</description>
+    <label>Estado</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Firmado</fullName>
+                <default>false</default>
+                <label>Firmado</label>
+            </value>
+            <value>
+                <fullName>No firmado</fullName>
+                <default>true</default>
+                <label>No firmado</label>
+            </value>
+            <value>
+                <fullName>No reclamar</fullName>
+                <default>false</default>
+                <label>No reclamar</label>
+            </value>
+            <value>
+                <fullName>Reclamaciones agotadas</fullName>
+                <default>false</default>
+                <label>Reclamaciones agotadas</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validation_Rules__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>If true then all the validation rules will be skipped.</description>
+    <inlineHelpText>True -&gt; skip all validation rules
+False -&gt; execution the validation rules</inlineHelpText>
+    <label>Validation Rules</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

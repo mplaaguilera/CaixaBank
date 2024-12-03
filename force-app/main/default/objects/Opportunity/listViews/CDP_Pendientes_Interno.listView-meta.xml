@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CDP_Pendientes_Interno</fullName>
+    <columns>OPPORTUNITY.CREATED_DATE</columns>
+    <columns>OPPORTUNITY.CLOSE_DATE</columns>
+    <columns>OPPORTUNITY.NAME</columns>
+    <columns>CSBD_Now_NIF__c</columns>
+    <columns>CSBD_Telefono_Solicitud__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CSBD_Estado__c</columns>
+    <columns>OPPORTUNITY.STAGE_NAME</columns>
+    <columns>CSBD_Resolucion__c</columns>
+    <columns>CORE.USERS.FULL_NAME</columns>
+    <columns>CSBD_Fecha_abandono__c</columns>
+    <columns>CSBD_Pantalla_Abandono__c</columns>
+    <columns>CSBD_Motivo_error__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OPPORTUNITY.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Opportunity.CSBD_PROAutomatica</value>
+    </filters>
+    <filters>
+        <field>CSBD_Estado__c</field>
+        <operation>equals</operation>
+        <value>Pendiente Interno</value>
+    </filters>
+    <label>CDP Pendientes Interno</label>
+    <sharedTo>
+        <group>CSBD_Empleados</group>
+        <group>CSBD_Gerentes</group>
+    </sharedTo>
+</ListView>

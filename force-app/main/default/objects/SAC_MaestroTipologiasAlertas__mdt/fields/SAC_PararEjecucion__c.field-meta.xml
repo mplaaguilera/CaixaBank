@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PararEjecucion__c</fullName>
+    <description>Número de horas en la que la reprogramación de la alerta debe ser parada aunque se cumplan las condiciones para ejecutarla. Debe estar informada en la última plantilla de la cadena de ejecución. Si no se informa se ejecutará repetidamente hasta que no se cumplan las condiciones para continuar ejecutándose.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Parar Ejecución</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

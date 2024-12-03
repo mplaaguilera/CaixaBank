@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_SLA_Envio_Maximo__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(CC_Tiempo_Gestion_h__c &gt;=0 &amp;&amp; CC_Tiempo_Gestion_h__c &lt; 2,&apos;Menos de 2 horas&apos;,IF(CC_Tiempo_Gestion_h__c &gt;=2 &amp;&amp; CC_Tiempo_Gestion_h__c &lt; 4,&apos;Menos de 4 horas&apos;,IF(CC_Tiempo_Gestion_h__c &gt;= 4 ,&apos;Más de 4 horas&apos;,&apos;&apos;) ))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>SLA Envío Máximo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

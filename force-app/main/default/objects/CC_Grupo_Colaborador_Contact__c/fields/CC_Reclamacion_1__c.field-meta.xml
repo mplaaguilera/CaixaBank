@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Reclamacion_1__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para poder marcar si el contacto o usuario van en copia de la primera reclamación automática.</description>
+    <label>Reclamación 1</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

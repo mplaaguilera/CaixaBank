@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Tareas del Gestor" icon-name="standard:task">
+        <div lwc:if={records.length} class="slds-var-m-around_medium">
+            <ul class="slds-list_dotted" style="margin-left: 20px;">
+                <template for:each={records} for:item="record">
+                    <li key={record.RecordId} class="slds-var-m-bottom_small slds-var-p-horizontal_small">
+                        <div class="slds-media__body">
+                            <div class="slds-grid slds-grid_align-spread slds-timeline__trigger" style="padding-left: 0px;">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                    <span class="slds-truncate" lwc:if={record.Subject} title={record.Subject} style="font-weight: 500;">
+                                        <a class="slds-text-link" onclick={navigate} data-record-id={record.RecordId}>{record.Subject}</a>
+                                    </span>
+                                </div>
+                                <div class="slds-timeline__actions_inline slds-text-color_weak slds-truncate">
+                                    <p>{record.ShortDate}</p>
+                                </div>
+                            </div>
+                            <div class="slds-text-body_small slds-text-color_weak">
+                                <div class="slds-grid slds-grid_align-spread slds-timeline__trigger" style="padding-top: 0px; padding-left: 0px;">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-truncate">
+                                        Asignada a&nbsp;
+                                        <a class="slds-text-link slds-truncate" onclick={navigate} data-record-id={record.AssignedId}>{record.Assigned}</a>
+                                    </div>
+                                    <div class="slds-timeline__actions_inline slds-text-color_weak">
+                                        <p>{record.Estado}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </lightning-card>
+</template>

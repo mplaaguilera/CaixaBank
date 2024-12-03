@@ -1,0 +1,3 @@
+trigger EV_CampaignMemberHistoryTrigger on CampaignMember (before insert, before update, before delete, after insert, after update, after delete, after undelete) {
+    EV_TriggerFactory.createTriggerDispatcher(CampaignMember.sObjectType);
+}

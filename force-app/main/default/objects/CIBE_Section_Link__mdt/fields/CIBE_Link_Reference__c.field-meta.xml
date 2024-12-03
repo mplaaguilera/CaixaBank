@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Link_Reference__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>CIBE Link Reference</label>
+    <referenceTo>CIBE_Link__mdt</referenceTo>
+    <relationshipLabel>CIBE Sections Links</relationshipLabel>
+    <relationshipName>CIBE_Sections_Links</relationshipName>
+    <required>false</required>
+    <type>MetadataRelationship</type>
+    <unique>false</unique>
+</CustomField>

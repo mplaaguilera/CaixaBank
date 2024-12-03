@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Empresa_Proveedora_Logo__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CSBD_Empresa_Proveedora__c, &apos;imaginBank&apos;),
+IMAGE(&apos;/resource/imaginBank_Logo2&apos;, &apos;imaginBank&apos;),
+IF(ISPICKVAL(CSBD_Empresa_Proveedora__c,&apos;CaixaBank&apos;),
+IMAGE(&apos;/resource/Caixabankbis_Logo&apos;,&apos;Caixabank&apos;),
+IF(ISPICKVAL(CSBD_Empresa_Proveedora__c,&apos;Now In Soporte&apos;),&apos;Now In Soporte&apos;,
+IF(ISPICKVAL(CSBD_Empresa_Proveedora__c,&apos;Now In Empleado&apos;),&apos;Now In Empleado&apos;,
+IMAGE(&apos;/resource/InTouch_2_Logo&apos;,&apos;InTouch&apos;)
+)
+)
+)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Empresa proveedora</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

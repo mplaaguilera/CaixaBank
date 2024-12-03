@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Escala_Maestra_Desde__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>Este rango solo aplica para oportunidades vinculadas a clientes para los que se conoce su escala maestra.</inlineHelpText>
+    <label>Escala maestra - Desde</label>
+    <precision>2</precision>
+    <required>false</required>
+    <scale>1</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

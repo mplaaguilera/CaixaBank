@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NumPersoOrig__c</fullName>
+    <description>Identificador NumPerso original (master) para fusionar los contactos / clientes</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>Identificador NumPerso original (master) para fusionar los contactos / clientes</inlineHelpText>
+    <label>NUMPERSO Original</label>
+    <length>15</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Pendiente_Caso_Cerrado</fullName>
+    <active>true</active>
+    <description>Un caso no puede pasar de estado cerrado a algún estado pendiente directamente y sin pasar por el estado activo.</description>
+    <errorConditionFormula>OR(
+AND( 
+ISCHANGED(Status), 
+ISPICKVAL(Status,&quot;Pendiente Colaborador&quot;),
+ISPICKVAL(PRIORVALUE(Status), &apos;Cerrado&apos;)),
+AND( 
+ISCHANGED(Status), 
+ISPICKVAL(Status,&quot;Pendiente Cliente&quot;),
+ISPICKVAL(PRIORVALUE(Status), &apos;Cerrado&apos;)),
+AND( 
+ISCHANGED(Status), 
+ISPICKVAL(Status,&quot;Pendiente Interno&quot;),
+ISPICKVAL(PRIORVALUE(Status), &apos;Cerrado&apos;)))</errorConditionFormula>
+    <errorMessage>Debe reactivar el caso antes de poder realizar otras operativas.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EnviadoPorGrupoProveedor__c</fullName>
+    <description>Campo para comprobar si el usuario pertenece al grupo de la reclamación del escalado.</description>
+    <formula>IF(ISBLANK(SAC_CasoEscalado__r.SEG_Grupo__c) , false, CONTAINS($User.SAC_GruposPerteneciente__c, SAC_CasoEscalado__r.SEG_Grupo__c ))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Enviado por grupo proveedor</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

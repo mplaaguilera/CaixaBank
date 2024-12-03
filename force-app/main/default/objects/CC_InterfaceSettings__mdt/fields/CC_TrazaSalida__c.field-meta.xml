@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TrazaSalida__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador si se guarda el mensaje de respuesta de la integración</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Indicador si se guarda el mensaje de respuesta de la integración</inlineHelpText>
+    <label>Traza Salida</label>
+    <type>Checkbox</type>
+</CustomField>

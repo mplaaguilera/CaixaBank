@@ -1,0 +1,15 @@
+<apex:page standardController="SAC_Accion__c" extensions="SAC_DevolverTareasGrupoVF" recordSetVar="records" lightningStylesheets="true">      
+     <apex:form id="form"> 
+        <apex:pageBlock >
+        <apex:pageMessages />
+            <apex:pageBlockButtons rendered="{!If( mostrar,true,false)}">       
+            <apex:commandButton value="Aceptar" action="{!save}" reRender="form">			
+            	<apex:param name="usario"
+                            value="{!$User.Id}"
+                            assignTo="{!idUsuario}"/>               
+            </apex:commandButton>                  
+            <apex:commandButton action="{!cancel}" value="Cancel" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>         
+    </apex:form>
+</apex:page>

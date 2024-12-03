@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Entidad__c</fullName>
+    <description>Entidad para la validación de entidad.</description>
+    <label>Entidad</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_001</fullName>
+                <default>false</default>
+                <label>Caixabank</label>
+            </value>
+            <value>
+                <fullName>SAC_002</fullName>
+                <default>false</default>
+                <label>Caixabank, S.A.</label>
+            </value>
+            <value>
+                <fullName>SAC_003</fullName>
+                <default>false</default>
+                <label>Caixabank Consumer Finance, S.A.</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>Caixabank Asset Management</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>Corporación Hipoteca Mutual</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Caixabank Payments E.F.C. E.P,S.A.U.</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Vidacaixa, S.A. de Seguros y Reaseguros</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Segurcaixa</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Microbank</label>
+            </value>
+            <value>
+                <fullName>SAC_010</fullName>
+                <default>false</default>
+                <label>CAIXABANK ELECTRONIC MONEY, EDE, S.L.</label>
+            </value>
+            <value>
+                <fullName>SAC_011</fullName>
+                <default>false</default>
+                <label>Telefonica Consumer Finance</label>
+            </value>
+            <value>
+                <fullName>SAC_012</fullName>
+                <default>false</default>
+                <label>Bankia</label>
+            </value>
+            <value>
+                <fullName>SAC_013</fullName>
+                <default>false</default>
+                <label>Comercia Global Payments entidad de pago, S.L.</label>
+            </value>
+            <value>
+                <fullName>SAC_014</fullName>
+                <default>false</default>
+                <label>Corporación Hipotecaria Mutual</label>
+            </value>
+            <value>
+                <fullName>SAC_015</fullName>
+                <default>false</default>
+                <label>Caixabank Payments &amp; Consumer</label>
+            </value>
+            <value>
+                <fullName>SAC_016</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

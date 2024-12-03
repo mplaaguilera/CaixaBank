@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Task_Compact_Layout</fullName>
+    <fields>Subject</fields>
+    <fields>ActivityDate</fields>
+    <fields>Status</fields>
+    <fields>CC_Tipo_Cierre__c</fields>
+    <fields>CC_Llamada_Id__c</fields>
+    <label>Task Compact Layout COPS</label>
+</CompactLayout>

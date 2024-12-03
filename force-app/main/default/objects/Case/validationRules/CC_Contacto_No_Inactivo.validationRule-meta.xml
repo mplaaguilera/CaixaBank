@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Contacto_No_Inactivo</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(NOT(BEGINS(RecordType.DeveloperName, &apos;SAC_&apos;)),PRIORVALUE( ContactId ) != ContactId,Contact.CC_Inactivo__c = TRUE)</errorConditionFormula>
+    <errorDisplayField>ContactId</errorDisplayField>
+    <errorMessage>El contacto seleccionado no debe estar marcado como inactivo.</errorMessage>
+</ValidationRule>

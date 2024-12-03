@@ -1,0 +1,104 @@
+<aura:component description="AV_ListContractCLI" controller="AV_FichaCliente_Integration"
+				implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId,force:lightningQuickAction" access="global">
+
+
+	<!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="titleCard"		type="String"/>
+	<aura:attribute name="iconCard"		 type="String"/>
+
+	<!-- PRIVATE FOR COMPONENT -->
+	<aura:attribute name="commercialProducts"	 type="AV_FichaCliente_Integration.CommercialProductsDataResponse"/>
+	<aura:attribute name="userId" type="String"/>
+	<aura:attribute name="valueTitleCard"   type="String"/>
+
+	<!-- INIT AURA COMPONENT -->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+	<lightning:workspaceAPI aura:id="workspace" />
+	<lightning:quickActionAPI aura:id="quickActionAPI" />
+
+	<lightning:card>
+		<aura:set attribute="title">
+			<aura:if isTrue="{!not(empty(v.iconCard))}">
+				<lightning:icon alternativeText="IconCard" iconName="{!v.iconCard}" size="medium" class="slds-m-around--small"/>
+			</aura:if>
+			{!$Label.c.AV_ContratosVigentes}
+			
+		</aura:set>
+		<aura:set attribute="actions">
+			<lightning:button iconName="utility:refresh" onclick="{!c.doInit}" title="Refrescar listado" />
+		</aura:set>
+		<aura:if isTrue="{!(v.commercialProducts.contractsToShow.length > 0)}">
+			<div>
+				<div class="slds-grid slds-p-around_medium slds-m-left_xx-large higlightStyle">
+					{!format($Label.c.AV_DetalleContratos, v.commercialProducts.totalNumberOfContracts, v.commercialProducts.totalBalance)}
+				</div>
+				
+				<aura:iteration items="{!v.commercialProducts.contractsToShow}" var="auxContract">
+					<div class="slds-grid slds-p-around_medium slds-m-left_xx-large">
+						<lightning:icon alternativeText="IconCard" iconName="standard:contract" size="medium" class="slds-m-right--small slds-size_1-of-4 iconWidth"/>
+						<div class="slds-col slds-size_1-of-4">
+							<dl>
+								<dt>
+									<p title="Contrato">{!$Label.c.AV_Contrato}: </p>
+								</dt>
+								<dd class="slds-tile__meta">
+									<p>
+										<span class="itemStyle" title="{!'Id Contrato: ' + auxContract.id}">
+											{!auxContract.id}
+										</span>
+									</p>
+								</dd>
+							</dl>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<dl>
+								<dt>
+									<p title="Descripción">{!$Label.c.AV_Descripcion}: </p>
+								</dt>
+								<dd class="slds-tile__meta">
+									<p>
+										<span title="{!'Descripción Contrato: ' + auxContract.description}">
+											{!auxContract.description}
+										</span>
+									</p>
+								</dd>
+							</dl>
+						</div>
+						<div class="slds-col slds-size_1-of-4">
+							<dl>
+								<dt>
+									<p title="Importe">{!$Label.c.AV_Importe}: </p>
+								</dt>
+								<dd class="slds-tile__meta">
+									<p>
+										<span title="{!'Balance Contrato: ' + auxContract.balance}">
+											<lightning:formattedNumber value="{!auxContract.balance}" style="currency" currencyCode="EUR" minimumFractionDigits="2" maximumFractionDigits="2"/>
+										</span>
+									</p>
+								</dd>
+							</dl>
+						</div>
+					</div>
+				</aura:iteration>
+				<div class="slds-grid slds-gutters slds-p-bottom_medium slds-p-top_medium">
+					<div class="slds-col slds-size_2-of-3">
+					</div>
+					<div class="slds-col">
+						<div class="slds-float_right slds-m-right_x-large">
+							<p class="itemStyle" title="Número de contratos más:">
+								{!$Label.c.AV_NumeroContratosExtra}: {!v.commercialProducts.numberOfContractsNotShown}
+							</p>
+						</div>									
+					</div>
+				</div>
+			</div>
+			<aura:set attribute="else">
+				<div class="slds-p-around_medium slds-m-left_xx-large">
+					{!$Label.c.AV_SinContratosVigentes}
+				</div>				
+			</aura:set>
+		</aura:if>
+		<lightning:spinner aura:id="mySpinner"/>
+	</lightning:card>
+</aura:component>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Pie_Firma__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;), &quot;Contact Center Clients&quot;,
+IF(ISPICKVAL(CC_Idioma__c, &quot;es&quot;), &quot;Contact Center Clientes&quot;,
+IF(ISPICKVAL(CC_Idioma__c, &quot;en&quot;), &quot;Customer Contact Center&quot;, 
+&quot;Contact Center Clientes&quot;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Pie de Firma</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

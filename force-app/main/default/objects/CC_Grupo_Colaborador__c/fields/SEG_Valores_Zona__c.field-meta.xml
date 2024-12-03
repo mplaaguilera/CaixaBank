@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Valores_Zona__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF ( INCLUDES (  SEG_Zona__c , &quot;Corporativa Madrid&quot; ), &quot;1;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Empresas Barcelona&quot; ), &quot;2;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Empresas Castilla La Mancha&quot; ), &quot;3;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Empresas Cataluña&quot; ), &quot;4;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Empresas Madrid&quot; ), &quot;5;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Empresas Valencia&quot; ), &quot;6;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Canarias&quot; ), &quot;7;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Catalunya&quot; ), &quot;8;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Centro&quot; ), &quot;9;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Este&quot; ), &quot;a;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Norte&quot; ), &quot;b;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Instituciones Sur&quot; ), &quot;c;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;UGE Barcelona&quot; ), &quot;d;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;UGE Norte&quot; ), &quot;e;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;UGE Valencia&quot; ), &quot;f;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;UGE Centro&quot; ), &quot;g;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;CSE&quot; ), &quot;h;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;Créditos Sindicados&quot; ), &quot;i;&quot;,null ) &amp;
+IF ( INCLUDES ( SEG_Zona__c , &quot;ESB&quot; ), &quot;j;&quot;,null )</formula>
+    <label>Valores Zona</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

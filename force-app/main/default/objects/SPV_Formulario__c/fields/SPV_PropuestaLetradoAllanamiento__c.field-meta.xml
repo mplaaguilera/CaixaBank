@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_PropuestaLetradoAllanamiento__c</fullName>
+    <description>Campo picklist que indica la propuesta del letrado de allanamiento del formulario de la reclamación</description>
+    <label>Propuesta del letrado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Allanamiento</fullName>
+                <default>false</default>
+                <label>Allanamiento</label>
+            </value>
+            <value>
+                <fullName>Allanamiento previo intento de desistimiento</fullName>
+                <default>false</default>
+                <label>Allanamiento previo intento de desistimiento</label>
+            </value>
+            <value>
+                <fullName>Defensa</fullName>
+                <default>false</default>
+                <label>Defensa</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

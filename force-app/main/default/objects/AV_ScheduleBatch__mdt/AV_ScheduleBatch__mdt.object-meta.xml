@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Metadata para incluir el nombre y el horario de los batches</description>
+    <label>Schedule Batch</label>
+    <pluralLabel>Schedule Batches</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

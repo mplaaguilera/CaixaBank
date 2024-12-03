@@ -1,0 +1,78 @@
+<aura:component controller="CSBD_Opportunity_Crear_Controller" implements="force:lightningQuickAction,flexipage:availableForAllPageTypes">
+
+    <!--Atributos-->
+    <aura:attribute name="fechaCierreInicial" type="String" default=""/>
+    <aura:attribute name="creando" type="Boolean" default="false"/>
+    <aura:attribute name="opcionesRecordType" type="List" default="[]"/>
+    <aura:attribute name="recordTypeId" type="String"/>
+    <aura:attribute name="recordTypeIdForHipoteca" type="String"/>
+
+    <aura:attribute name="contador" type="Integer" default="0"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:utilityBarAPI aura:id="utilitybar"/>
+
+    <aura:html tag="style">div.slds-utility-panel__body{overflow: visible;}</aura:html>
+
+    <div class="slds-var-m-horizontal_medium">
+        <header class="slds-media slds-media_center slds-has-flexi-truncate slds-var-m-left_small" style="padding-top: 10px;">
+            <div class="slds-media__figure slds-is-relative" style="top: -1px;">
+                <lightning:icon iconName="standard:opportunity" size="small"/>
+            </div>
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span class="slds-card__header-link slds-truncate">Alta manual de oportunidad</span>
+                </h2>
+            </div>
+        </header>
+
+        <aura:if isTrue="{!v.creando}">
+            <div>
+                <lightning:spinner variant="brand" size="large" alternativeText="Creando oportunidad..."/>
+            </div>
+        </aura:if>
+
+        <div class="slds-var-p-horizontal_small slds-var-p-top_large" style="height: 313px;">
+            <lightning:combobox aura:id="comboboxRecordTypes" label="Tipo de oportunidad" options="{!v.opcionesRecordType}" value="{!v.recordTypeId}" onchange="{!c.seleccionarOpcionRecordType}" required="true" dropdownAlignment="bottom-left"/>
+            <!-- <aura:if isTrue="{!!empty(v.recordTypeId)}"> -->
+                <div style="height: 9px;"/>
+
+                <lightning:recordEditForm aura:id="formulario" objectApiName="Opportunity" recordTypeId="{!v.recordTypeId}" onsuccess="{!c.success}" onerror="{!c.error}">
+                    <lightning:messages /> <!--Mensajes de error al guardar-->
+
+                    <!--Campos no visibles-->
+                    <div class="slds-hide" >
+                        <lightning:inputField aura:id="inputName" fieldName="Name" value="temp"/>
+                        <lightning:inputField aura:id="inputEtapa" fieldName="StageName" value="Solicitud" disabled="true"/>
+                        <aura:if isTrue="{!v.recordTypeId == v.recordTypeIdForHipoteca}">
+                            <lightning:inputField aura:id="inputNoIdentificado" fieldName="CSBD_No_Identificado__c" value="{!true}" disabled="true"/>
+                        </aura:if>
+                    </div>
+
+                    <!--2 columnas-->
+                    <div class="slds-grid slds-gutters_direct-x-small">
+                        <div class="slds-col">
+                            <lightning:inputField fieldName="CSBD_Empresa_Proveedora__c" value="CaixaBank" disabled="{!empty(v.recordTypeId)}"/>
+                        </div>
+                        <div class="slds-col slds-grow-none">
+                            <lightning:inputField fieldName="CloseDate" value="{!v.fechaCierreInicial}" disabled="true"/>
+                        </div>
+                    </div>
+                    <!--1 columna-->
+                    <lightning:inputField aura:id="inputTitulo" fieldName="CSBD_Titulo__c" disabled="{!empty(v.recordTypeId)}"/>
+                    <lightning:inputField aura:id="inputDescripcion" fieldName="Description" disabled="{!empty(v.recordTypeId)}"/>
+                    <lightning:outputField fieldName="OwnerId"/>
+                </lightning:recordEditForm>
+            <!-- </aura:if> -->
+        </div>
+
+        <footer class="slds-card__footer slds-var-m-top_medium slds-var-p-right_x-small" style="text-align: right;">
+            <lightning:button label="Cerrar" onclick="{!c.cerrarPanel}" /> &nbsp; <!--style="margin-right: 0.5rem;"-->
+            <lightning:button aura:id="botonEnviar" label="Crear oportunidad" variant="brand" onclick="{!c.enviar}" disabled="{!empty(v.recordTypeId) || v.creando}"/>
+        </footer>
+
+    </div>
+
+</aura:component>

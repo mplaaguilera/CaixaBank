@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Todos</fullName>
+    <columns>NAME</columns>
+    <columns>CSBD_Record_Type_Oportunidad__c</columns>
+    <columns>CSBD_Orden__c</columns>
+    <columns>CSBD_Empresa_Proveedora__c</columns>
+    <columns>CSBD_Importe_Desde__c</columns>
+    <columns>CSBD_Importe_Hasta__c</columns>
+    <columns>CSBD_Escala_Maestra_Desde__c</columns>
+    <columns>CSBD_Escala_Maestra_Hasta__c</columns>
+    <columns>CSBD_Denegada__c</columns>
+    <columns>CSBD_Enviar_Correo_Auto__c</columns>
+    <columns>CSBD_Circuito_Contratacion_Online__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Todos los registros</label>
+</ListView>

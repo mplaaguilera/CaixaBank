@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_FAQ__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo para relacionar un caso con una faq</description>
+    <label>FAQ</label>
+    <referenceTo>CC_FAQ__c</referenceTo>
+    <relationshipLabel>Cases Extension</relationshipLabel>
+    <relationshipName>Cases_Extension</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ParaCC__c</fullName>
+    <description>Campo que indica si la dirección asociada debe ir en Para, Copia o Copia Oculta.</description>
+    <label>Para/CC</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Para</fullName>
+                <default>false</default>
+                <label>Para</label>
+            </value>
+            <value>
+                <fullName>CC</fullName>
+                <default>false</default>
+                <label>CC</label>
+            </value>
+            <value>
+                <fullName>CCO</fullName>
+                <default>false</default>
+                <label>CCO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

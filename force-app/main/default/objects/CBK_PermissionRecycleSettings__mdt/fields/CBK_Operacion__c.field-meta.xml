@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Operacion__c</fullName>
+    <description>Lista de selección donde se indicará la operación a realizar: Sustitución/Baja de Permission Set, Permission Set Group o PermissionSet License</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Operación</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CBK_Baja_PSL</fullName>
+                <default>false</default>
+                <label>Baja PermissionSetLicense</label>
+            </value>
+            <value>
+                <fullName>CBK_Baja_PS</fullName>
+                <default>false</default>
+                <label>Baja PermissionSet</label>
+            </value>
+            <value>
+                <fullName>CBK_Baja_PSG</fullName>
+                <default>false</default>
+                <label>Baja PermissionSetGroup</label>
+            </value>
+            <value>
+                <fullName>CBK_Modificacion_PSL_PSL</fullName>
+                <default>false</default>
+                <label>Modificación PermissionSetLicense</label>
+            </value>
+            <value>
+                <fullName>CBK_Modificacion_PS_PS</fullName>
+                <default>false</default>
+                <label>Modificación PermissionSet por PermissionSet</label>
+            </value>
+            <value>
+                <fullName>CBK_Modificacion_PS_PSG</fullName>
+                <default>false</default>
+                <label>Modificación PermissionSet por PermissionSetGroup</label>
+            </value>
+            <value>
+                <fullName>CBK_Modificacion_PSG_PS</fullName>
+                <default>false</default>
+                <label>Modificación PermissionSetGroup por PermissionSet</label>
+            </value>
+            <value>
+                <fullName>CBK_Modificacion_PSG_PSG</fullName>
+                <default>false</default>
+                <label>Modificación PermissionSetGroup por PermissionSetGroup</label>
+            </value>
+            <value>
+                <fullName>CBK_Exclusion_PS</fullName>
+                <default>false</default>
+                <label>Exclusión del proceso de reciclaje (Permission Set)</label>
+            </value>
+            <value>
+                <fullName>CBK_Exclusion_CP</fullName>
+                <default>false</default>
+                <label>Exclusión del proceso de reciclaje (Custom Permission)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,53 @@
+<aura:component controller="CSBD_Llamada_Oportunidad_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+    <aura:attribute name="cargando" type="Boolean" default="true"/>
+    <aura:attribute name="idOportunidad" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon iconName="standard:opportunity" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="#" class="slds-card__header-link slds-truncate" style="font-size: 16px;" onclick="{!c.abrirDetalleOportunidad}">
+                            <span>Detalle Oportunidad</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner">
+            <aura:if isTrue="{!v.cargando}">
+                <lightning:spinner size="small" />
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.idOportunidad}">
+                        <lightning:recordViewForm recordId="{!v.idOportunidad}" objectApiName="Opportunity">
+                            <!--Grid con 2 columnas-->
+                            <div class="slds-grid slds-gutters slds-wrap">
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning:outputField fieldName="Name"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:outputField fieldName="CSBD_Estado__c"/>
+                                    <lightning:outputField fieldName="CSBD_Importe_Producto_Principal__c"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:outputField fieldName="StageName"/>
+                                    <lightning:outputField fieldName="CSBD_Limite_Prestamos_Oficinas__c"/>
+                                </div>
+                            </div>
+                        </lightning:recordViewForm>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+        </div>
+    </article>
+</aura:component>

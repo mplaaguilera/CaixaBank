@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Funcion__c</fullName>
+    <description>Lista de posibles funciones que se pueden aplicar para el enmascaramiento del campo indicado.</description>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <label>Función a aplicar</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Nombre</fullName>
+                <default>true</default>
+                <label>Nombre</label>
+            </value>
+            <value>
+                <fullName>Apellido</fullName>
+                <default>false</default>
+                <label>Apellido</label>
+            </value>
+            <value>
+                <fullName>Nombre completo</fullName>
+                <default>false</default>
+                <label>Nombre completo</label>
+            </value>
+            <value>
+                <fullName>Fecha pasada</fullName>
+                <default>false</default>
+                <label>Fecha pasada</label>
+            </value>
+            <value>
+                <fullName>Fecha futura</fullName>
+                <default>false</default>
+                <label>Fecha futura</label>
+            </value>
+            <value>
+                <fullName>Correo electrónico</fullName>
+                <default>false</default>
+                <label>Correo electrónico</label>
+            </value>
+            <value>
+                <fullName>Nif</fullName>
+                <default>false</default>
+                <label>Nif</label>
+            </value>
+            <value>
+                <fullName>Cif</fullName>
+                <default>false</default>
+                <label>Cif</label>
+            </value>
+            <value>
+                <fullName>Ocultar texto</fullName>
+                <default>false</default>
+                <label>Ocultar texto</label>
+            </value>
+            <value>
+                <fullName>Teléfono móvil</fullName>
+                <default>false</default>
+                <label>Teléfono móvil</label>
+            </value>
+            <value>
+                <fullName>Teléfono fijo</fullName>
+                <default>false</default>
+                <label>Teléfono fijo</label>
+            </value>
+            <value>
+                <fullName>Valor nulo</fullName>
+                <default>false</default>
+                <label>Valor nulo</label>
+            </value>
+            <value>
+                <fullName>Texto vacío</fullName>
+                <default>false</default>
+                <label>Texto vacío</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

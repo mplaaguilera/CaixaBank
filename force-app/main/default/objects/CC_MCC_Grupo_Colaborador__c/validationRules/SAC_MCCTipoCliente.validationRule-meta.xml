@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MCCTipoCliente</fullName>
+    <active>true</active>
+    <description>Validation rule para verificar que los usuarios de SAC solo pueden crear registro con tipo cliente SAC</description>
+    <errorConditionFormula>AND (
+			 AND(
+				    !$Permission.CBK_BypassValidationRules,
+        !$Permission.SAC_BypassValidationRules								
+				),
+				AND(
+				    $Profile.Name = &apos;SAC_General&apos;,
+								NOT(ISPICKVAL( SPV_Tipo_Cliente__c, &quot;SAC&quot;))
+				)
+)</errorConditionFormula>
+    <errorDisplayField>SPV_Tipo_Cliente__c</errorDisplayField>
+    <errorMessage>Solo se pueden crear registros del tipo cliente SAC</errorMessage>
+</ValidationRule>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NoRespondido__c</fullName>
+    <businessStatus>Active</businessStatus>
+    <defaultValue>false</defaultValue>
+    <description>Utilizado para marcar cuando una operativa no ha sido respondida por el empleado</description>
+    <label>No respondido</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ReclamacionSP</fullName>
+    <description>Support process para las reclamaciones de supervisores</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Alta</fullName>
+        <default>true</default>
+    </values>
+    <values>
+        <fullName>Análisis</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Cerrado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Descartado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Envío Organismos</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Negociación</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente respuesta Organismos</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Rectificacion</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

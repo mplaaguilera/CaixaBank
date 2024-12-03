@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_FormulaNegocio__c</fullName>
+    <description>Muestra el valor del campo Negocio con saltos de linea</description>
+    <externalId>false</externalId>
+    <formula>IF(INCLUDES( AV_Negocio__c , &quot;EMP&quot;), $Label.CIBE_BancaEmpresas + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;COR&quot;), $Label.CIBE_BancaCorporativa + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;BPR&quot;), $Label.CIBE_BancaPrivada + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;BPA&quot;), $Label.CIBE_BancaParticulares + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;NEG&quot;), $Label.CIBE_Negocios + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;CIB&quot;), &quot;Corporate Institutions Banking&quot; + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;MIC&quot;), $Label.CIBE_BancaEmprendedores + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;PRO&quot;), $Label.CIBE_BancaPromotores + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;BPE&quot;), $Label.CIBE_BancaPremier + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;INT&quot;), $Label.CIBE_Internacional + BR(), NULL) +
+IF(INCLUDES( AV_Negocio__c , &quot;SEG&quot;), &quot;Seguros&quot; + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;BPO&quot;),  $Label.CIBE_BancaPrivadaOficina + BR() , NULL)  + 
+IF(INCLUDES( AV_Negocio__c , &quot;POT&quot;),  $Label.CIBE_ClientesPotenciales + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;BAI&quot;),  $Label.CIBE_BancaPrivadaAsesoramientoIndependiente + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;BIO&quot;),  $Label.CIBE_BancaPrivadaAsesoramientoIndependienteOficina + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;BIR&quot;),  $Label.CIBE_BancaPrivadaRelacionada + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;CMX&quot;),  $Label.CIBE_EspecialistaComex + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;TES&quot;),  $Label.CIBE_EspecialistaTesoreria + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;FIN&quot;),  $Label.CIBE_EspecialistaFinanciacion + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;MOR&quot;),  $Label.CIBE_EspecialistaMorosidad + BR(), NULL)   +
+IF(INCLUDES( AV_Negocio__c , &quot;RIE&quot;),  $Label.CIBE_AnalistaRiesgo + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;BCO&quot;),  $Label.CIBE_BancosCorresponsales + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;OFI&quot;),  $Label.CIBE_GestionadaOficina + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;OTR&quot;),  $Label.CIBE_GestionadaOtrosGestores + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;PDT&quot;),  $Label.CIBE_PendienteAsignacion + BR(), NULL)   + 
+IF(INCLUDES( AV_Negocio__c , &quot;INS&quot;),  $Label.CIBE_BancaInstituciones, NULL)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Negocio</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

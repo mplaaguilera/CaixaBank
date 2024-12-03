@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PurgeProcess_ActiveProcess</fullName>
+    <active>true</active>
+    <description>Regla para controlar que un proceso de purgado solo pueda activado en el caso de encontrarse en estado autorizado</description>
+    <errorConditionFormula>AND(NOT(ISPICKVAL(CBK_Estado__c, &apos;Autorizado&apos;)), CBK_Activo__c == true)</errorConditionFormula>
+    <errorMessage>Un proceso de purgado no puede encontrarse activo si no se encuentra en el estado autorizado.</errorMessage>
+</ValidationRule>

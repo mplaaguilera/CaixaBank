@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Empleado_Cuenta</fullName>
+    <active>true</active>
+    <description>Impide que un contacto de tipo distinto a Empleado cops pueda asociarse a cuenta de tipo Buzon COPS.</description>
+    <errorConditionFormula>Account.RecordType.DeveloperName == &apos;OS_Buzon_Account&apos; &amp;&amp; RecordType.DeveloperName &lt;&gt; &apos;OS_Buzon_Contact&apos;</errorConditionFormula>
+    <errorMessage>Una cuenta de tipo Buzon COPS sólo puede tener contactos de tipo Empleado Buzon COPS y viceversa.</errorMessage>
+</ValidationRule>

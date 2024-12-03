@@ -1,0 +1,7 @@
+<aura:component implements="lightning:isUrlAddressable">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="param1" type="String"></aura:attribute>
+    {!v.param1}
+    <lightning:workspaceAPI aura:id="workspace" />
+    <c:av_PrioritizedClientsToManage></c:av_PrioritizedClientsToManage>
+</aura:component>

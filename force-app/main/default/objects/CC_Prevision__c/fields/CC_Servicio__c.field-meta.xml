@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Servicio__c</fullName>
+    <label>Servicio</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ACTIVO</fullName>
+                <default>false</default>
+                <label>ACTIVO</label>
+            </value>
+            <value>
+                <fullName>BUILDINGCENTER</fullName>
+                <default>false</default>
+                <label>BUILDINGCENTER</label>
+            </value>
+            <value>
+                <fullName>DOMICILIACIONES</fullName>
+                <default>false</default>
+                <label>DOMICILIACIONES</label>
+            </value>
+            <value>
+                <fullName>EXTRANJERO</fullName>
+                <default>false</default>
+                <label>EXTRANJERO</label>
+            </value>
+            <value>
+                <fullName>INCIDENCIAS TÉCNICAS</fullName>
+                <default>false</default>
+                <label>INCIDENCIAS TÉCNICAS</label>
+            </value>
+            <value>
+                <fullName>LÍNEA ABIERTA</fullName>
+                <default>false</default>
+                <label>LÍNEA ABIERTA</label>
+            </value>
+            <value>
+                <fullName>MARKETING</fullName>
+                <default>false</default>
+                <label>MARKETING</label>
+            </value>
+            <value>
+                <fullName>PASIVO Y VALORES</fullName>
+                <default>false</default>
+                <label>PASIVO Y VALORES</label>
+            </value>
+            <value>
+                <fullName>RECAUDACIÓN</fullName>
+                <default>false</default>
+                <label>RECAUDACIÓN</label>
+            </value>
+            <value>
+                <fullName>RECURSOS HUMANOS</fullName>
+                <default>false</default>
+                <label>RECURSOS HUMANOS</label>
+            </value>
+            <value>
+                <fullName>SERVICIO</fullName>
+                <default>false</default>
+                <label>SERVICIO</label>
+            </value>
+            <value>
+                <fullName>SERVICIOS GENERALES</fullName>
+                <default>false</default>
+                <label>SERVICIOS GENERALES</label>
+            </value>
+            <value>
+                <fullName>SMARTPHONES</fullName>
+                <default>false</default>
+                <label>SMARTPHONES</label>
+            </value>
+            <value>
+                <fullName>TARJETAS Y COMERCIOS</fullName>
+                <default>false</default>
+                <label>TARJETAS Y COMERCIOS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

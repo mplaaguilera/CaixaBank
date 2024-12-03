@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_EventoPrivado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Boolean que marca si el evento va a mostrarse en el catálogo público o no.</description>
+    <inlineHelpText>En caso de ser un evento privado, no se hará difusión del mismo en RRSS corporativas o de colaboradores de CaixaBank talks.</inlineHelpText>
+    <label>Evento Privado</label>
+    <trackHistory>true</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

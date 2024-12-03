@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_AllTriggerHandlerAssociations</fullName>
+    <columns>MasterLabel</columns>
+    <columns>CBK_ObjectApiName__c</columns>
+    <columns>CBK_TriggerEvent__c</columns>
+    <columns>CBK_HandlerClassName__c</columns>
+    <columns>CBK_ActiveParent__c</columns>
+    <columns>DeveloperName</columns>
+    <columns>CBK_ValidationHandlerEmail__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Trigger Handler Associations</label>
+    <language>en_US</language>
+</ListView>

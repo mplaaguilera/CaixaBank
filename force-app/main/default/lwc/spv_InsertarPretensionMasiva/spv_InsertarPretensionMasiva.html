@@ -1,0 +1,186 @@
+<template>
+
+
+    <div class="slds-clearfix">
+        <div class="slds-float_right">
+            <template if:true={tienePermisosEditar}>
+                <lightning-button variant= "brand" onclick={abrirModalPretensiones} title="NuevaPretension" label= "Nueva pretensión"></lightning-button>
+             </template>
+             <template if:false={tienePermisosEditar}>
+                <lightning-button variant= "brand"  title="NuevaPretension" label= "Nueva pretensión" disabled="true"></lightning-button>
+             </template>
+        </div>
+    </div>
+    
+    <!--Modal pretensiones-->
+    <template if:true={modalPretensiones}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container modal_pretensiones">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon icon-name="utilityclose"  onclick={cerrarModalPretensiones} alternative-text="close" title="Settings" variant="bare-inverse"></lightning-button-icon>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Nueva pretensión</h2>
+                    </header>
+                    <div class="slds-modal__content modal_pretensiones_content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="buscador">
+                            
+                          <!-- <c:sac_BuscadorMCC aura:id="lwcBusquedaMCC" onsenddata={receiveLWCData} nuevaPretension="true"></c:sac_BuscadorMCC> -->
+                          <c-spv_-buscador-m-c-c id="lwcBusquedaMcc" nueva-pretension=true onsenddata={receiveLWCData}></c-spv_-buscador-m-c-c>
+                        </div>
+                        <div class="tabla">
+                            <table id="tablaId" class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Id"></div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Temática">Temática</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Producto/Servicio">Producto/Servicio</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Motivo">Motivo</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Detalle">Detalle</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="PrincipalTitle" title="Principal">Principal</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Id"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                   
+                                    <template if:true={mostrarClasificacionMCC} for:each={listMCC} for:item="obj"  for:index = "index">
+                                             
+                                            <tr class="slds-hint-parent" key={obj.objeto.Id}>
+                                               
+                                                <td style="font-weight: bold">
+                                                     <b key={obj.objeto.Id}>{obj.indice}.</b>
+                                                </td> 
+
+                                                <td data-label="Tematica" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                    <div class="slds-truncate" key={obj.objeto.Id} title={obj.objeto.CC_Tematica_Formula__c}>{obj.objeto.CC_Tematica_Formula__c}</div>
+                                                </td>
+
+                                                <td data-label="Prod/Serv"  style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                    <div class="slds-truncate" key={obj.objeto.Id} title={obj.objeto.CC_Producto_Servicio_Formula__c}>{obj.objeto.CC_Producto_Servicio_Formula__c}</div>
+                                                </td>
+
+                                                <td data-label="Motivo" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                    <div class="slds-truncate" key={obj.objeto.Id} title={obj.objeto.SEG_Motivo_Formula__c}>{obj.objeto.SEG_Motivo_Formula__c}</div>
+                                                </td>
+                                                
+                                                <td data-label="Detalle" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                    <div class="slds-truncate" key={obj.objeto.Id} title={obj.objeto.Name}>{obj.objeto.Name}</div>
+                                                </td>  
+
+                                                <td data-label="Principal">
+                                                    <div class="Principal" key={obj.objeto.Id}>
+                                                        <input type="checkbox" id="miElementoCheckbox" data-index={index} />
+                                                      </div>
+                                                </td>
+
+                                                <td data-label="Borrar"> 
+                                                    <a onclick={eliminarRegistro} key={obj.objeto.Id} data-record={index}>
+                                                        <lightning-icon icon-name="utility:delete" size="x-small" alternative-text="Delete"></lightning-icon>
+                                                        <span class="slds-assistive-text">Delete</span>
+                                                    </a>                                            
+                                                </td> 
+                                                
+                                          </tr>
+                                    </template>
+                                 <!-- <aura:iteration items="{!v.listMCC}"  var="a" indexVar="index">
+                                        <tr class="slds-hint-parent">
+                                            <td style="font-weight: bold">
+                                                <b>{!index + 1}.</b>
+                                            </td>
+                                            <td data-label="Tematica" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.CC_Tematica_Formula__c}">{!a.CC_Tematica_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Prod/Serv" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.CC_Producto_Servicio_Formula__c}">{!a.CC_Producto_Servicio_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Motivo" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.SEG_Motivo_Formula__c}">{!a.SEG_Motivo_Formula__c}</div>
+                                            </td>
+                                            <td data-label="Detalle" style="white-space: normal; text-overflow:ellipsis; overflow: hidden; max-width:1px;">
+                                                <div class="slds-truncate" title="{!a.Name}">{!a.Name}</div>
+                                            </td>
+                                            <td data-label="Principal">
+                                                <div class="Principal">
+                                                    <input type="checkbox" id="miElementoCheckbox" data-index="{!index}" />
+                                                  </div>
+                                            </td>
+                                            <td data-label="Borrar"> 
+                                                <a onclick="{!c.eliminarRegistro}" data-record="{!index}">
+                                                    <lightning-icon iconName="utility:delete" size="x-small" alternativeText="Delete"></lightning-icon>
+                                                    <span class="slds-assistive-text">Delete</span>
+                                                </a>                                            
+                                            </td>
+                                        </tr>
+                                    </aura:iteration> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant= "neutral" onclick={cerrarModalPretensiones} title="Cancelar" label= "Cancelar"></lightning-button>
+                        <lightning-button  style="padding-left: 8px;" variant= "brand" onclick={generarPretensiones} title="Generar" label= "Generar pretensiones"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!--Modal existe pretension principal-->
+        <template if:true={modalReemplazarPrincipal}>
+            <section role="dialog"  tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open slds-modal_small" id="modal_ExistePret">
+                <div class="slds-modal__container_existe_principal" align = "center">
+                <div class="slds-modal__header">
+                    <h1 id="modal-heading-02" class="slds-modal__title slds-hyphenate">Ya existe una pretensión principal</h1>
+                </div>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                    <p style="text-align: center;">Ya existe una pretensión principal para esta reclamación. ¿Desea cambiar la pretensión principal?</p>
+                </div>
+                <div class="slds-modal__footer slds-modal__footer_directional">
+                    <div class = "botonIzquierdo">
+                    <lightning-button variant= "neutral" onclick={cerrarModalReemplazarPretension} title="Atrás" label= "Atrás"></lightning-button>
+                </div>
+                <div class="botonDerecho">
+                    <lightning-button  style="padding-left: 8px;" variant= "brand" onclick={generarPretensiones} title="botonReemplazar" label= "Sí"></lightning-button>
+                </div>
+                </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+        </template>
+
+    <!--Loading-->
+    <template if:true={isLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                <b>Creando las pretensiones... por favor espere.</b>
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+	
+
+</template>

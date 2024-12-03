@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ResultadoPostImpuestos__c</fullName>
+    <description>Campo &quot;Cuentas Resultados con Code = &apos;C0495000&apos; &quot; del Estado Financiero importado en la integración GBL</description>
+    <label>Resultados después Impuestos</label>
+    <precision>16</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Documentacion_No_Localizada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si la documentación que no se localiza es de un préstamo promotor</inlineHelpText>
+    <label>Documentación no localizada (promotor)</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Procedencia_Mensaje_Automatico__c</fullName>
+    <label>Procedencia Mensaje Automático</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Bienvenida</fullName>
+                <default>false</default>
+                <label>Bienvenida</label>
+            </value>
+            <value>
+                <fullName>Buscar FAQ</fullName>
+                <default>false</default>
+                <label>Buscar FAQ</label>
+            </value>
+            <value>
+                <fullName>Buscar FAQ ya ofrecida</fullName>
+                <default>false</default>
+                <label>Buscar FAQ ya ofrecida</label>
+            </value>
+            <value>
+                <fullName>Finalizar</fullName>
+                <default>false</default>
+                <label>Finalizar</label>
+            </value>
+            <value>
+                <fullName>Forzar Fin</fullName>
+                <default>false</default>
+                <label>Forzar Fin</label>
+            </value>
+            <value>
+                <fullName>No Soportada</fullName>
+                <default>false</default>
+                <label>No Soportada</label>
+            </value>
+            <value>
+                <fullName>Cambio de idioma</fullName>
+                <default>false</default>
+                <label>Cambio de idioma</label>
+            </value>
+            <value>
+                <fullName>Bienvenida confidencial</fullName>
+                <default>false</default>
+                <label>Bienvenida confidencial</label>
+            </value>
+            <value>
+                <fullName>Franja Dia</fullName>
+                <default>false</default>
+                <label>Franja Dia</label>
+            </value>
+            <value>
+                <fullName>Reformular</fullName>
+                <default>false</default>
+                <label>Reformular</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

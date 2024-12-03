@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NewArchitecture__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo utilizado para los webservices de portal para el objeto custom Campaign Member C</description>
+    <inlineHelpText>Marcar en caso de utilizar la nueva arquitectura</inlineHelpText>
+    <label>Nueva Arquitectura</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

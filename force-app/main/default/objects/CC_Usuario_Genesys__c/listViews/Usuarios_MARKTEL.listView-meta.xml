@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usuarios_MARKTEL</fullName>
+    <columns>NAME</columns>
+    <columns>CC_DN__c</columns>
+    <columns>CC_User__c</columns>
+    <columns>CC_Acceso__c</columns>
+    <columns>CC_Negocio__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>NAME</field>
+        <operation>startsWith</operation>
+        <value>1787,1788</value>
+    </filters>
+    <label>Usuarios MARKTEL</label>
+</ListView>

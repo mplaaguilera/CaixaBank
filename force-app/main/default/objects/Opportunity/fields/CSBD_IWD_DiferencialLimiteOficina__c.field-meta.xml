@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_IWD_DiferencialLimiteOficina__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(CSBD_Dif_Importe_Preconcedido_Label__c == &apos;Positivo&apos;, &apos;Y&apos;, IF(CSBD_Dif_Importe_Preconcedido_Label__c == &apos;Sin límite&apos;, &apos;&apos;, &apos;N&apos;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Diferencial Límite Oficina iWD</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_ValidationEventToCancelled</fullName>
+    <active>true</active>
+    <description>No permitir que los gestores puedan cambiar el evento a el estado de Cancelado.</description>
+    <errorConditionFormula>AND(
+   ISCHANGED(CSBD_Evento_Estado__c),
+   ISPICKVAL(CSBD_Evento_Estado__c, &apos;Cancelado&apos;),
+			NOT($Permission.CIBE_ByPassVR),
+   OR(
+      RecordType.DeveloperName = &apos;CIBE_EventoCliente&apos;,
+      RecordType.DeveloperName = &apos;CIBE_EventodelGestor&apos;
+   )
+)</errorConditionFormula>
+    <errorMessage>Utiliza el botón &quot;Eliminar&quot; para cancelar este evento</errorMessage>
+</ValidationRule>

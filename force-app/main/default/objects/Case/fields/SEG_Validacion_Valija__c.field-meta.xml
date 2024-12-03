@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Validacion_Valija__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo control para evitar la validación que impide cambiar el propietario y el grupo del aso.</description>
+    <label>Validación Valija</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Change_RecordType</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+AND(NOT(ISBLANK(CC_Id_Maximo__c)),
+  				ISCHANGED(RecordTypeId)))</errorConditionFormula>
+    <errorMessage>No se puede cambiar el tipo de registro en una incidencia ya enviada a Maximo.</errorMessage>
+</ValidationRule>

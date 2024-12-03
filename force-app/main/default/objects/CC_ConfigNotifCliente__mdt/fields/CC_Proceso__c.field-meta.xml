@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Proceso__c</fullName>
+    <description>Proceso al que afecta la configuración</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Proceso al que afecta la configuración</inlineHelpText>
+    <label>Proceso</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CC_AcuseRecibo</fullName>
+                <default>true</default>
+                <label>Acuse recibo</label>
+            </value>
+            <value>
+                <fullName>CC_SegOperativa</fullName>
+                <default>false</default>
+                <label>Seguimiento operativa</label>
+            </value>
+            <value>
+                <fullName>CC_NotIncidencia</fullName>
+                <default>false</default>
+                <label>Cierre incidencia</label>
+            </value>
+            <value>
+                <fullName>Notificacion OTP OK</fullName>
+                <default>false</default>
+                <label>Notificacion OTP OK</label>
+            </value>
+            <value>
+                <fullName>Notificacion OTP KO</fullName>
+                <default>false</default>
+                <label>Notificacion OTP KO</label>
+            </value>
+            <value>
+                <fullName>CC_Contacto_Intermedio_AC</fullName>
+                <default>false</default>
+                <label>Contacto Intermedio AC</label>
+            </value>
+            <value>
+                <fullName>CC_Contacto_Intermedio_Preventivas</fullName>
+                <default>false</default>
+                <label>Contacto Intermedio Preventiva</label>
+            </value>
+            <value>
+                <fullName>Notificacion OTP Imagin OK</fullName>
+                <default>false</default>
+                <label>Notificacion OTP Imagin OK</label>
+            </value>
+            <value>
+                <fullName>Notificacion OTP Imagin KO</fullName>
+                <default>false</default>
+                <label>Notificacion OTP Imagin KO</label>
+            </value>
+            <value>
+                <fullName>Caso</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Caso</label>
+            </value>
+            <value>
+                <fullName>Tarea</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tarea</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

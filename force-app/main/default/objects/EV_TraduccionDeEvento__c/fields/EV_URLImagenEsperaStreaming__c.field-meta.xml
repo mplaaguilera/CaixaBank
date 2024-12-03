@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenEsperaStreaming__c</fullName>
+    <description>Banner de espera evento virtual. Tamaño imagen (1920x1080)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Banner de espera evento virtual (1920x1080px)</inlineHelpText>
+    <label>URL Imagen de Espera Streaming</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

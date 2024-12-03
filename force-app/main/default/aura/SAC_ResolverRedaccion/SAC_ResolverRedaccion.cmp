@@ -1,0 +1,185 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="fechaRes" type="String" />
+    <aura:attribute name="senRes" type="String" />
+    <aura:attribute name="checkMail" type="Boolean" default="false" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="mostrarMotivoDemora" type="Boolean" default="false" />
+    <aura:attribute name="optionsDemora" type="List" />
+    <aura:attribute name="selectedValues" type="List" default="[]" />
+    <aura:attribute name="selectedValue" type="String"/>
+
+    <aura:attribute name="labelInformacion" type="string" default="Selecciona el/los motivos de la demora"/>
+    <aura:attribute name="caracteresMin" type="Integer" default="1" />
+    <aura:attribute name="mostrarMotivosDemora" type="Boolean" default="false"/>
+    <aura:attribute name="cadenaBusqueda"   type="String" default=""/>
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="multiSelect" 	type="Boolean" default="true"/>
+    <aura:attribute name="values" 		type="List"   default="" description="Selected value in Multi Select" />
+    <aura:attribute name="value" 		type="String" default="" description="Selected value in single Select" />
+    <aura:attribute name="comentarios"   type="String" default=""/>
+    <aura:attribute name="comentarioObligatorio"   type="Boolean" default="false"/>
+    <aura:attribute name="isLoading2" type="Boolean" default="false" />
+
+    <aura:attribute name="listaDemora" 		type="List"   default="" />
+    <aura:attribute name="almacenarDatos" 	type="Boolean" default="false"/>
+    <aura:attribute name="modalAvisoResolver" type="Boolean" default="false" />
+
+    <aura:registerEvent name="appEvent" type="c:SAC_PertimiteEmailRedaccion"/>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Cargando" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+ <!-- Se puede usar el cmp porque es el owner de la reclamación + está en estado Redacción -->
+    <aura:if isTrue="{!v.usarComponente}">
+        <div class="slds-box" style="padding-top: 12px">
+
+            <h1 style="padding: 8px; font-size: 15px"><b>Fecha de resolución: <lightning:formattedDateTime
+                        year="numeric" month="2-digit" day="2-digit" value='{!v.fechaRes}'>
+                    </lightning:formattedDateTime>
+                </b></h1>
+            <div class="slds-grid">
+                <div class="slds-col slds-size_3-of-12" style="padding: 8px; margin: 8px;">
+                    <lightning:button label="Resolver Reclamación" variant="brand" onclick='{!c.abrirModalAvisoResolver}' />
+                </div>
+                <div class="slds-col slds-size_3-of-12" style="padding: 8px; margin: 8px;">
+                    <aura:if isTrue="{!or(v.senRes=='SAC_002', v.senRes=='SAC_003')}">
+                        <c:sAC_ResolverNegociarRedaccion recordId ="{!v.recordId}" checkMail = "{!v.checkMail}"/>
+                    </aura:if>
+                </div>
+                <div class="slds-col slds-size_6-of-12">
+                    <lightning:input type="checkbox" label="No enviar comunicación al cliente" value="{!v.checkMail}"
+                        checked="{!v.checkMail}" />
+                    <!--onchange="{!c.cambiaCheck}"-->
+                </div>
+            </div>
+        </div>
+
+        <aura:set attribute="else" >
+            <div class="slds-box" style="padding-top: 12px">
+                <h1 style="padding: 8px; font-size: 15px"><b>Fecha de resolución: <lightning:formattedDateTime
+                            year="numeric" month="2-digit" day="2-digit" value='{!v.fechaRes}'>
+                        </lightning:formattedDateTime>
+                    </b></h1>
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_6-of-12" style="padding: 8px; margin: 8px;">
+                        <lightning:button label="Resolver Reclamación" variant="brand" onclick='{!c.setModal}' disabled="true" />
+                    </div>
+                    <div class="slds-col slds-float_right">
+                        <lightning:input type="checkbox" label="No enviar comunicación al cliente" value="{!v.checkMail}"  disabled="true"
+                            checked="{!v.checkMail}" />
+                        <!--onchange="{!c.cambiaCheck}"-->
+                    </div>
+                </div>
+            </div>
+
+        </aura:set> 
+    </aura:if>
+
+    <aura:if isTrue="{!v.mostrarMotivoDemora}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open  "> <!-- slds-modal_small -->
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalDemora }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Motivos de la demora</h2> 
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                    La reclamación tiene el SLA Regulatorio sobrepasado, por favor, indique los motivos de la demora para poder continuar.
+                    <aura:if isTrue="{!not(empty(v.optionsDemora))}">
+                        <div class="c-container"  > 
+                            <aura:if isTrue="{!!empty(v.labelInformacion)}">
+                                <br/>
+                                <label class="slds-form-element__label">{!v.labelInformacion}</label>
+                                <lightning:helptext content="Este campo es obligatorio."/>
+                            </aura:if>
+                            <!-- selector de motivos -->
+                            <div class="slds-combobox_container">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                        <lightning:input   disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Seleccione el motivo deseado..." onclick="{!c.mostrarOpciones}" onblur="{!c.handleBlur}" value="{!v.cadenaBusqueda}" autoComplete="off" variant="label-hidden" id="combobox-id-1" readonly="true"  />  <!-- required="true" onkeyup="{!c.filtroBusqueda}" -->
+                                        <lightning:icon class="slds-input__icon" iconName="utility:down" size="x-small" alternativeText="search"/>
+                                    </div>
+                                </div>
+                            </div>  
+                            <!-- Lista de motivos -->
+                            <aura:if isTrue="{!v.mostrarMotivosDemora}">  
+                                <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" >
+                                    <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                        <!-- Mostrar los motivos -->
+                                        <aura:iteration items="{!v.optionsDemora}" var="option" >
+                                            <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarMotivo}">
+                                                <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>      
+                                </div> 
+                            </aura:if>
+                        </div>
+                       
+                    </aura:if>
+                    <aura:iteration items="{!v.optionsDemora}" var="option">
+                        <aura:if isTrue="{!option.selected}">
+                            <lightning:pill class="slds-m-around_xxx-small" name="{!option.Name}" label="{!option.Name}" onremove="{!c.removePill}"/>
+                        </aura:if>
+                    </aura:iteration>
+
+                    <br/>
+                    <br/>
+                    <lightning:textarea name="input3" label="Comentarios" placeholder="Escriba aquí para añadir comentarios..." value="{!v.comentarios}"/>
+                    
+                    <!--Botón confirmar-->
+                    <div class="slds-float--right slds-p-top_x-large">
+                            <lightning:button variant="brand" label="Confirmar" title="Confirmar" onclick="{!c.confirmarMotivos}" />
+                    </div>
+                    <!--Botón cerrar-->
+                    <div class="slds-float--left slds-p-top_x-large">
+                        <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalDemora }"/>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <!--Modal aviso revisar mccs-->
+    <aura:if isTrue="{!v.modalAvisoResolver}">
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalAvisoResolver }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Atención</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Va a proceder a cerrar el plazo de resolución (SLA) y lanzar las tareas a los grupos resolutores. Recuerde realizar el envío de la carta.</p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.comprobarSLA }" title="OK">Aceptar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+
+</aura:component>

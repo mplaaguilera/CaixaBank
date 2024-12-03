@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Acompanante__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Check para dar la posiblidad de añadir acompañante en el formulario</inlineHelpText>
+    <label>Posibilidad añadir acompañante</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

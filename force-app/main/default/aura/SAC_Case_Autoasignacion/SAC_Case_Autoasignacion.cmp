@@ -1,0 +1,11 @@
+<aura:component controller="SAC_Case_Operativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+    
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="user" type="String"/>
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <!--refreshView-->
+   <!--  <aura:handler event="force:refreshView" action="{! c.init}" />-->
+</aura:component>

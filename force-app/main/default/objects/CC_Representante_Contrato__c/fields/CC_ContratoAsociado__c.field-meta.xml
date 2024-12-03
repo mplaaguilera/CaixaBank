@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ContratoAsociado__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Contrato asociado al representante</description>
+    <inlineHelpText>Contrato asociado al representante</inlineHelpText>
+    <label>Contrato asociado</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Representante_Contrato__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Contrato</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Representante_Contrato__c</referenceTo>
+    <relationshipLabel>Representantes y Contratos (Contrato asociado)</relationshipLabel>
+    <relationshipName>Representantes_o_Contratos1_del</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

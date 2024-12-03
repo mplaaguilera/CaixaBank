@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Contratos</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(
+    AND ( SEG_CRContratos__c = TRUE,  ISBLANK (SEG_ReclamacionesContratos__c)),
+				AND (NOT (ISBLANK( SEG_ReclamacionesContratos__c)), SEG_CRContratos__c = FALSE))</errorConditionFormula>
+    <errorMessage>Si la CR es de Contratos hay que informar la Reclamación, y al revés.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,37 @@
+<template>
+
+	<article class="slds-card">
+		<div class="slds-card__header slds-grid slds-page-header">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:catalog" size="small" class="headerIcon"></lightning-icon>
+				</div>
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">
+						<span>Buscador de clasificaciones</span>
+					</h2>
+				</div>
+			</header>
+		</div>
+		<div class="slds-card__body slds-card__body_inner">
+			<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xx-small">
+				<div class="slds-col slds-grow-none">
+					<span class="slds-form-element__label slds-is-relative" style="top: -1px;">Color</span>
+				</div>
+				<div class="slds-col">
+					<!-- darkseagreen darkturquoise deepskyblue lightcoral orchid orangered-->
+					<lightning-input
+						type="color"
+						value={color}
+						variant="label-hidden"
+						onchange={inputOnchange}>
+					</lightning-input>
+				</div>
+			</div>
+		</div>
+		<footer class="slds-card__footer" style="text-align: end;">
+			<lightning-button label="Guardar" variant="brand" onclick={guardar}></lightning-button>
+		</footer>
+	</article>
+
+</template>

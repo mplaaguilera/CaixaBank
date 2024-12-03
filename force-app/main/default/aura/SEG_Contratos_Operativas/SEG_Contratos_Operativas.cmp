@@ -1,0 +1,163 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-29-2021
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+  Modifications Log 
+  Ver   Date         Author                               Modification
+  1.0   03-29-2021   ChangeMeIn@UserSettingsUnder.SFDoc   Initial Version
+-->
+<aura:component controller="SEG_Contratos_Operativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="user" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="esPropietario" type="Boolean" default="false"/>
+
+    <!--Renderizar modales-->
+	<aura:attribute name="rendermostrarModalImportacion" type="Boolean" default="false"/>
+    <aura:attribute name="rendermostrarficherocreado" type="Boolean" default="false"/>
+    <aura:attribute name="loadingUpdateFicheros" type="Boolean" default="false"/>
+   
+
+    <!--Input-->
+    <aura:attribute name="modalGrupo" type="Boolean" default="false"/>
+    <aura:attribute name="modalRechazar" type="Boolean" default="false"/> 
+    <aura:attribute name="modalCerrar" type="Boolean" default="false"/>
+    <aura:attribute name="modalCola" type="Boolean" default="false"/> 
+    <aura:attribute name="observacionesGrupo" type="Boolean" default="false"/>
+    <aura:attribute name="modalResp" type="Boolean" default="false"/>
+    
+    <aura:attribute name="grupos" type="List" />
+    <aura:attribute name="plantillas" type="List" />
+    <aura:attribute name="selectedPlantilla" type="String" />
+    <aura:attribute name="selectedGroup" type="String" />
+    <aura:attribute name="resultados" type="List" /> 
+    <aura:attribute name="selectedResul" type="String" />
+
+    <aura:attribute name="numeroContratos" type="Integer" default=""/>
+
+    <!--Atributos Ficheros Anexos en modo tabla-->
+    <aura:attribute name="dataAnexos" type="Object"/>
+    <aura:attribute name="columnasAnexos" type="List"/>
+    <aura:attribute name="currentSelectedRowsAnexos" type="List" default="0"/>
+    <aura:attribute name="defaultRows" type="List" default="[]" description="reset selected rows..." />
+
+    <!--Atributos de casos asociados al contrato-->
+    <aura:attribute name="casNum" type="List" />
+    <aura:attribute name="caseSelected" type="String" />
+    <aura:attribute name="caso2updEmSR" type="String"/>
+
+    <!--Importar emails y archivos de sr relacionada-->
+    <aura:attribute name="casosImportar" type="List" />
+    <aura:attribute name="selectedSR" type="String" />
+
+    <aura:handler event="force:refreshView" action="{! c.cerrarModalCasos2}"/>
+    <!--WorkspaceAPI-->
+    <lightning:workspaceAPI aura:id="workspace" /> 
+
+    <!--Acceso a las quick actions-->
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+    
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div class="slds-backdrop" aura:id="backdrop"/>
+
+    <!--Botones supeditados a que se coja contexto-->
+        <div style="padding-top: 4px" align="center"> 
+
+        <!--Botón traer emails y archivos SR relacionadas-->
+            <!--Botón traer emails y archivos SR relacionadas-->
+        <aura:if isTrue="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado')}">
+            <lightning:button aura:id="botonImportar" label="Importar archivos Casos" iconName="standard:work_type_group" onclick="{!c.abrirModalImportarFicheros}" disabled="true" />
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonImportar" label="Importar archivos Casos" iconName="standard:work_type_group" onclick="{!c.abrirModalImportarFicheros}" disabled="false" />
+        </aura:set>
+        </aura:if>
+            <aura:if isTrue="{!v.rendermostrarModalImportacion}">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">          
+                    <div class="slds-modal__container">
+                        <div align = 'left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-form-element__control" >  
+                                    <div align="center">
+                                    <lightning:icon iconName="action:share_file"></lightning:icon>
+                                    <span class="slds-text-heading_small slds-truncate">
+                                        Importar anexos de caso a contratos
+                                    </span>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    </div>
+                                    Seleccionar Caso                                
+                                    <lightning:combobox aura:id="casNum" name="Casos" label="Casos relacionados" 
+                                    placeholder="Seleccionar Casos..."
+                                    value="{!v.caseSelected}"
+                                    options="{!v.casNum}"/>
+
+                                    
+                                </div>	
+                            </div>
+                        <footer class="slds-modal__footer">    
+                            <button class="slds-button slds-button_outline-brand" onclick="{!c.cerrarModalCasos}">Salir</button>
+                            <button class="slds-button slds-button_brand" onclick="{!c.abrirModalSeleccionarFicheros}">Seleccionar ficheros</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+                <aura:if isTrue="{!v.loadingUpdateFicheros}">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">          
+                    <div class="slds-modal__container">
+                        <div align = 'left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-form-element__control" >  
+                                    <div align="center">
+                                    <lightning:icon iconName="action:share_file"></lightning:icon>
+                                    <span class="slds-text-heading_small slds-truncate">
+                                        Ficheros y anexos del caso seleccionado
+                                    </span>
+                                    <br></br>
+                                    Ficheros del caso: <br></br>
+                                    <div class="slds-scrollable_y" style="height:10rem">
+                                        <lightning:datatable 
+                                            columns="{!v.columnasAnexos}"
+                                            data="{!v.dataAnexos}"
+                                            keyField="ContentDocumentId"
+                                            selectedRows="{!v.currentSelectedRowsAnexos}"
+                                            onrowselection="{!c.selectedRowsAnexos}"/>
+                                        </div>
+                                        <br></br>
+                                    
+                                    </div>	
+                                </div>
+                            </div>
+                        <footer class="slds-modal__footer">    
+                            <button class="slds-button slds-button_outline-brand" onclick="{!c.cerrarModalCasos}">Salir</button>
+                            <button class="slds-button slds-button_brand" onclick="{!c.importarFicheros}">Importar ficheros</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.rendermostrarficherocreado}">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">          
+                    <div class="slds-modal__container">
+                        <div align = 'left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-form-element__control" >  
+                                    <div align="center">
+                                    <lightning:icon iconName="action:share_file"></lightning:icon>
+                                    <span class="slds-text-heading_small slds-truncate">
+                                        Fichero importado
+                                    </span>
+                                    </div>
+                                </div>	
+                            </div>
+                        <footer class="slds-modal__footer">    
+                            <button class="slds-button slds-button_outline-brand" onclick="{!c.cerrarModalCasos2}">Salir</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            </div>
+</aura:component>

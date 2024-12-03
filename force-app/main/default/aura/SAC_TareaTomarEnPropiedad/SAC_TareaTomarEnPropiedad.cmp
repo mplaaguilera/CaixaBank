@@ -1,0 +1,308 @@
+<aura:component controller="SAC_TareasOperativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+    
+    <aura:attribute name="user" type="String" />
+    <aura:attribute name="observaciones" type="String" default=""/>
+    <aura:attribute name="motivoDevolver" type="String" />
+    <aura:attribute name="estadoFinalizar" type="String" />
+    <aura:attribute name="tarea" type="SAC_Accion__c" />
+    <aura:attribute name="mostrarTomarPropiedad" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarFinalizarTarea" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarDevolver" type="Boolean" default="false" />
+    <aura:attribute name="mostrarProrrogar" type="Boolean" default="false" />
+    <aura:attribute name="mostrarNotificar" type="Boolean" default="false" />
+    <aura:attribute name="mostrarEnvioTarea" type="Boolean" default="false" />
+    <aura:attribute name="mostrarDevolverGestLet" type="Boolean" default="false" />
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isModalOpenFinalizar" type="boolean" default="false"/>
+    <aura:attribute name="isModalOpenFinalizar2" type="boolean" default="false"/>
+    <aura:attribute name="isModalObservaciones" type="boolean" default="false"/> 
+    <aura:attribute name="isModalNotificar" type="boolean" default="false"/>
+    <aura:attribute name="modalTareaFinalizada" type="boolean" default="false"/>
+    <aura:attribute name="modalDevolverGestLet" type="boolean" default="false"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    
+
+    <div style="padding-top: 4px" align="center">
+        <aura:if isTrue="{!v.mostrarTomarPropiedad}">
+            <lightning:button aura:id="botonTomarPropiedad" label="Tomar en propiedad" iconName="utility:change_owner" onclick="{!c.tomarPropiedad}" disabled="false" />
+            
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonTomarPropiedad" label="Tomar en propiedad" iconName="utility:change_owner" onclick="" disabled="true" />  
+        </aura:set>
+        </aura:if>
+        <aura:if isTrue="{!v.mostrarFinalizarTarea}">
+            <lightning:button aura:id="botonFinalizarTarea" label="Finalizar Tarea" iconName="utility:change_owner" onclick="{!c.popupFinalizar}" disabled="false" />
+        
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonFinalizarTarea" label="Finalizar Tarea" iconName="utility:change_owner" onclick="" disabled="true" />
+        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mostrarDevolver}">
+            <lightning:button aura:id="botonDevolver" label="Devolver tarea al grupo" iconName="utility:skip" onclick="{!c.devolverLaTarea}" disabled="false" />
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonDevolver" label="Devolver tarea al grupo " iconName="utility:skip" onclick="" disabled="true" />     
+        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mostrarDevolverGestLet}">
+            <lightning:button aura:id="botonDevolverGest" label="Devolver tarea al gestor/letrado" iconName="utility:skip" onclick="{!c.abrirModalDevolverGestLet}" disabled="false" />
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonDevolverGest" label="Devolver tarea al gestor/letrado" iconName="utility:skip" onclick="" disabled="true" />     
+        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mostrarProrrogar}">
+            <lightning:button aura:id="botonProrrogar" label="Prorrogar" iconName="utility:skip" onclick="{!c.popupProrrogar}" disabled="false" />
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonProrrogar" label="Prorrogar" iconName="utility:skip" onclick="" disabled="true" />
+        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mostrarNotificar}">
+            <lightning:button aura:id="botonNotificar" label="Notificar" iconName="utility:alert" onclick="{!c.popupNotificar}" disabled="false" />
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonNotificar" label="Notificar" iconName="utility:alert" onclick="" disabled="true" />
+        </aura:set>
+        </aura:if>
+
+        <aura:if isTrue="{!v.mostrarEnvioTarea}">
+            <lightning:button aura:id="botonEnvioTarea" label="Enviar tarea" iconName="utility:announcement" onclick="{!c.enviarTareaJS}" disabled="false"/>
+        <aura:set attribute="else">
+            <lightning:button aura:id="botonEnvioTarea" label="Enviar tarea" iconName="utility:announcement" onclick="" disabled="true"/>
+        </aura:set>       
+        </aura:if>
+
+        <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.."  variant="brand" size="large" class="slds-hide"/>
+
+        <aura:if isTrue="{!v.isLoading}">
+            <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                        <div class="slds-form-element__control">
+                            <div align="center">
+                                <span class="slds-text-heading_small slds-truncate">
+                                    <br/>
+                                    Actualizando los datos... por favor espere.
+                                </span>
+                                <div class="caseHolder">
+                                    <lightning:spinner alternativeText="Loading" size="medium" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Marcar nuevo plazo de prórroga</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                        <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" objectApiName="SAC_Accion__c"  onsubmit="{!c.prorrogarLaTarea}"
+                        onsuccess="{!c.handleSuccess}">
+                        <lightning:messages />
+                            <lightning:inputField fieldName="SAC_FechaVencimientoProrroga__c" />
+                            <br/>
+                            <lightning:button variant="brand" type="submit" name="update" label="Aceptar"/>
+                        </lightning:recordEditForm>
+                    </div>   
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancelar"
+                                          title="Cancelar"
+                                          onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.isModalNotificar}">         
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <!-- Modal/Popup Box Header Starts here-->
+                            <header class="slds-modal__header">
+                               <h1><b>Enviar notificación al propietario de la Acción</b></h1>
+                            </header>
+                            <!--Modal/Popup Box Body Starts here-->
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" align="left">
+                                <lightning:textarea aura:id="cuerpoNotificacion" name="text" label="Comentario" placeholder="Introduce el comentario" required="true" maxlength="200" /> 
+                            </div>                    
+                            <!--Modal/Popup Box Footer Starts here-->
+                            <footer class="slds-modal__footer">
+                                <lightning:button variant="neutral"
+                                                  label="Cancel"
+                                                  title="Cancel"
+                                                  onclick="{! c.closeModalNotificar }"/>
+                                <lightning:button variant="brand"
+                                                  label="Enviar"
+                                                  title="Enviar"
+                                                  onclick="{!c.notificar}"/>  
+                            </footer>
+                        </div>
+                    </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.isModalOpenFinalizar}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModalFinalizar }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">¿Cómo quiere finalizar la tarea?</h2>
+                    </header>
+                    
+                    <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <lightning:button variant="neutral"
+                                          label="Cancelar"
+                                          title="Cancelar"
+                                          onclick="{! c.closeModalFinalizar }"/>
+                        <lightning:button variant="neutral"
+                                          label="Descartar"
+                                          title="Descartar la tarea"
+                                          aura:id="SAC_Descartada"
+                                          onclick="{!c.popupObservaciones }"/>
+                        <lightning:button variant="neutral"
+                                          label="Finalizada Incompleta"
+                                          title="Finalizada Incompleta"
+                                          aura:id="SAC_FinalizadaIncompleta"
+                                          onclick="{!c.popupObservaciones }"/>
+                        <lightning:button variant="neutral"
+                                          label="Finalizada"
+                                          title="Finalizada"
+                                          onclick="{!c.finalizarTareaJS }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <aura:if isTrue="{!v.isModalOpenFinalizar2}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModalFinalizar2 }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">¿Cómo quiere finalizar la tarea?</h2>
+                    </header>
+                    
+                    <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <lightning:button variant="neutral"
+                                          label="Cancelar"
+                                          title="Cancelar"
+                                          onclick="{!c.closeModalFinalizar2 }"/>
+                        <lightning:button variant="neutral"
+                                          label="Añadir comentarios"
+                                          title="Añadir comentarios"
+                                          aura:id="SAC_Finalizada"
+                                          onclick="{!c.popupObservaciones }"/>
+                        <lightning:button variant="neutral"
+                                          label="Sin añadir comentarios"
+                                          title="Sin añadir comentarios"
+                                          onclick="{!c.finalizarTarea2 }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!-- Modal para los comentarios -->
+        <aura:if isTrue="{!v.isModalObservaciones}">
+        <div id="myModal" class="modal slds-scope">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Por favor, deje aquí sus comentarios</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-form-element">                          
+                          <div class="slds-form-element__control">
+                            <lightning:inputRichText value="{!v.observaciones}" aura:id="observaciones" />
+                          </div>
+                        </div>                   
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancelar"
+                                          title="Cancelar"
+                                          onclick="{! c.closeModalObservaciones }"/>
+                        <lightning:button variant="brand"
+                                          label="Guardar"
+                                          title="Guardar"
+                                          iconName="utility:save"
+                                          onclick="{! c.finalizarLaTareaObservaciones }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    </div>
+
+    <!--Modal para devolver a gestor/letrado-->
+    <aura:if isTrue="{!v.modalDevolverGestLet}">
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalDevolverGestLet }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver tarea</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                    <lightning:textarea name="inputMotivo" value="{!v.motivoDevolver}" onchange="{!c.changeMotivoDevolver}" label="Indique el motivo de la devolución:" required="true"/>
+                </div>   
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                        label="Cancelar"
+                                        title="Cancelar"
+                                        onclick="{! c.cerrarModalDevolverGestLet }"/>
+                    <lightning:button variant="brand"
+                        label="Devolver"
+                        title="Devolver"
+                        onclick="{! c.devolverTareaGestLet }"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

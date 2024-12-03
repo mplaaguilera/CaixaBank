@@ -1,0 +1,60 @@
+<apex:page controller="SAC_LCMP_GeneracionDocumento">
+    <apex:includeScript value="{!URLFOR($Resource.TinyMCE, 'tinymce/js/tinymce/tinymce.min.js')}"/>
+
+    <apex:slds />
+    <script>
+   		 window.onload = function()
+            {
+              console.log('$Resource.TinyMCE1',tinymce);
+                tinymce.init({
+                    license_key: "gpl",
+                    selector : "#textAreaId",
+                     font_formats: 'Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n;Andale Mono=andale mono,times;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sans-serif;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;',
+     				 toolbar: "undo redo | fontfamily fontsizeinput | forecolor bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat | preview",
+                     content_css: [
+                      '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                      '//www.tiny.cloud/css/codepen.min.css'
+                    ],
+                    image_advtab: true,
+                    skin: 'oxide',
+                     plugins: [
+                    			  "advlist","autolink","lists","preview",
+                                   "searchreplace","wordcount","visualchars",
+                         			"insertdatetime","table","template"
+                   			  ],
+                  
+                                  
+                  });
+            };
+    
+    	//var lexOrigin ="https://caixabankcc--devservice.sandbox.lightning.force.com";
+        var lexOrigin ='{!lexOrigin}';
+        window.addEventListener("message",function(event){
+            console.log('Called From LWLC')
+            if(event.origin !== lexOrigin){
+                //Not the expected origin
+                return;
+            }
+            console.log('Helloo',event.data)
+            tinyMCE.get('textAreaId').setContent(event.data); 
+        	console.log('Helloo 2',document.getElementById("textAreaId"),document.getElementById("textAreaId").value)
+        },false);
+    	
+    	function sendToLWC() {
+            var payload = tinyMCE.get('textAreaId').getContent();
+            var idDocumento ='{!idDocumento}';
+            console.log('idDocumento ' + idDocumento);
+            var message = {
+                name:'{!idDocumento}',
+                payload:payload
+        };
+            
+        parent.postMessage(message,lexOrigin);
+    }
+    </script> 
+
+    <textarea id="textAreaId" style="height: 80%;"></textarea>
+    <button class="slds-button slds-button_brand slds-float_right" style="margin-right:4px;margin-top:4px;" icon-name="utility:save" onclick="sendToLWC()">Guardar</button>
+    <!-- <lightning-button variant="brand" label="Guardar" icon-name="utility:check" onclick="sendToLWC()" ></lightning-button> -->
+         
+</apex:page>

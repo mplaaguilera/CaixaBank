@@ -1,0 +1,17 @@
+lightning-icon {
+    --slds-c-icon-color-background: #237cac;
+    --slds-c-icon-color-foreground-default: white;
+}
+
+span.slds-pill__action {
+    border-color: rgb(201, 201, 201);
+}
+
+div.slds-pill_container {
+    display: unset;
+    background-color: initial;
+    padding: 0;
+    min-height: initial;
+    border: none;
+    white-space: inherit;
+}

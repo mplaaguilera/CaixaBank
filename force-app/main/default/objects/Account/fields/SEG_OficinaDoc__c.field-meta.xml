@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_OficinaDoc__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Oficina de documentación asociada a la empresa</description>
+    <label>Oficina documentación</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Centro CaixaBank</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Accounts (Oficina documentación)</relationshipLabel>
+    <relationshipName>SEG_OficinaDocs</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

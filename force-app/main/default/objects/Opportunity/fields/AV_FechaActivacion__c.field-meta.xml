@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_FechaActivacion__c</fullName>
+    <description>Fecha en que la oportunidad pasa de Potencial a cualquier otro estado que no sea vencido.
+Si es nulo es que la etapa actual es Potencial.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Activación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

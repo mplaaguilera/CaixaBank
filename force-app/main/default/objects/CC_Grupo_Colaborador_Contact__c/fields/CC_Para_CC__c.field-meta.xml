@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Para_CC__c</fullName>
+    <label>Para/CC</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Para</fullName>
+                <default>true</default>
+                <label>Para</label>
+            </value>
+            <value>
+                <fullName>CC</fullName>
+                <default>false</default>
+                <label>CC</label>
+            </value>
+            <value>
+                <fullName>No enviar</fullName>
+                <default>false</default>
+                <label>No enviar</label>
+            </value>
+            <value>
+                <fullName>Solo reclamación</fullName>
+                <default>false</default>
+                <label>Solo reclamación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

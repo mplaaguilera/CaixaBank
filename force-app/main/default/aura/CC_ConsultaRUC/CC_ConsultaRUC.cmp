@@ -1,0 +1,54 @@
+<aura:component controller="CC_Consulta_RUC_Controller" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="String" description="Record ID de account"/>
+    <aura:attribute name="fechaIni" type="Date" description="fecha inicial"/>
+    <aura:attribute name="fechaFin" type="Date" description="fecha fin"/>
+    <aura:attribute name="numPerson" type="String" description="num person de la cuenta"/>
+    <aura:attribute name="contactos" type="Object"/>
+	<aura:attribute name="contactosColumns" type="List"/>
+    <aura:attribute name="contactosSelectedRows" type="Object"/>
+    <aura:attribute name="contactosNoneSelected" type="Boolean" default="true"/>
+    <aura:attribute name="contactosRow" type="Object"/>
+	     <!--Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+	 <div class="modal-header slds-modal__header slds-size_1-of-1">
+       <!-- <lightning:icon iconName="action:join_group" size="xx-small"/> -->
+        <span id="modal-heading-01" class="slds-p-left_small slds-text-heading_medium slds-hyphenate">Consulta de contactos a RUC</span> 
+    </div>
+   	        <!-- introducimos datos de la consulta -->
+    <div class="slds-form slds-modal__content slds-p-around--x-small slds-size_1-of-1 slds-is-relative" role="list">
+        <div class="slds-p-bottom_x-small" style="margin-top: 5px" Width = "120">
+            <lightning:input aura:id="fechaIni" type="date"  required="true" name="fechaIni" dateStyle="short" label="Fecha Inicio:" value="{!v.fechaIni}" Width= "120" format="dd-mm-yyyy"/>
+            <lightning:input aura:id="fechaFin" type="date" required="true" name="fechaFin" dateStyle="short" label="Fecha fin:" value="{!v.fechaFin}" format="dd-mm-yyyy" />
+        </div>
+        
+    <!--Listado-->
+    <lightning:datatable data="{!v.contactos}" columns="{!v.contactosColumns}" keyField="Id" hideCheckboxColumn="true"/>
+    <br/> 
+       
+    </div>
+ 	<div class="modal-footer slds-modal__footer slds-size_1-of-1"> 
+      <lightning:button class="slds-button slds-button_brand" label="Consultar" onclick="{!c.consultaRuc}"/>     
+    </div>
+    
+      <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 0rem !important;
+        }       
+        .slds-modal__content{
+        overflow-y: visible !important;
+        overflow-x: visible !important;
+        height: unset !important;
+        max-height: unset !important;
+        }        
+        .slds-modal__container{
+        width: 50% !important;
+        max-width: 50% !important;
+        }
+    </aura:html>
+    
+</aura:component>

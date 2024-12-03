@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Operativo__c</fullName>
+    <label>Canal Operativo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>App BrokerNow</fullName>
+                <default>false</default>
+                <label>App BrokerNow</label>
+            </value>
+            <value>
+                <fullName>App CaixaBankPay</fullName>
+                <default>false</default>
+                <label>App CaixaBankPay</label>
+            </value>
+            <value>
+                <fullName>App CaixaBankSign</fullName>
+                <default>false</default>
+                <label>App CaixaBankSign</label>
+            </value>
+            <value>
+                <fullName>App CBKNow</fullName>
+                <default>false</default>
+                <label>App CBKNow</label>
+            </value>
+            <value>
+                <fullName>App Imagin</fullName>
+                <default>false</default>
+                <label>App Imagin</label>
+            </value>
+            <value>
+                <fullName>App imaginKids</fullName>
+                <default>false</default>
+                <label>App imaginKids</label>
+            </value>
+            <value>
+                <fullName>App imaginTeens</fullName>
+                <default>false</default>
+                <label>App imaginTeens</label>
+            </value>
+            <value>
+                <fullName>Cajero</fullName>
+                <default>false</default>
+                <label>Cajero</label>
+            </value>
+            <value>
+                <fullName>Cajero ATM NOW</fullName>
+                <default>false</default>
+                <label>Cajero ATM NOW</label>
+            </value>
+            <value>
+                <fullName>Oficina</fullName>
+                <default>false</default>
+                <label>Oficina</label>
+            </value>
+            <value>
+                <fullName>Otras App</fullName>
+                <default>false</default>
+                <label>Otras App</label>
+            </value>
+            <value>
+                <fullName>Plataforma virtual</fullName>
+                <default>false</default>
+                <label>Plataforma virtual</label>
+            </value>
+            <value>
+                <fullName>Portal CBK</fullName>
+                <default>false</default>
+                <label>Portal CBK</label>
+            </value>
+            <value>
+                <fullName>Portal Wivai</fullName>
+                <default>false</default>
+                <label>Portal Facilitea</label>
+            </value>
+            <value>
+                <fullName>RRSS</fullName>
+                <default>false</default>
+                <label>RRSS</label>
+            </value>
+            <value>
+                <fullName>Servicios Centrales</fullName>
+                <default>false</default>
+                <label>Servicios Centrales</label>
+            </value>
+            <value>
+                <fullName>Sin canal</fullName>
+                <default>false</default>
+                <label>Sin canal</label>
+            </value>
+            <value>
+                <fullName>SmartPhone</fullName>
+                <default>false</default>
+                <label>SmartPhone</label>
+            </value>
+            <value>
+                <fullName>Web CBKNow</fullName>
+                <default>false</default>
+                <label>Web CBKNow</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

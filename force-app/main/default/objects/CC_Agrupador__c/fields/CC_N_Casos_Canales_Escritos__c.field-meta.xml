@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_N_Casos_Canales_Escritos__c</fullName>
+    <externalId>false</externalId>
+    <formula>CC_Numero_Casos_Carta__c + CC_Numero_Casos_Chat__c + CC_Numero_Casos_Apps__c + CC_Numero_Casos_Email__c + CC_Numero_Casos_Fax__c + CC_Numero_Casos_FormularioTF__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Nº Casos Canales Escritos</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

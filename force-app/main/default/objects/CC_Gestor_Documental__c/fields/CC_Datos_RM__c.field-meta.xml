@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Datos_RM__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;), &quot;C.Pintor Sorolla, 2-4 46002-Valencia - NIF A08663619 - Inscrita en el Registre Mercantil de Valencia, volum 10370, foli 1, fulla número V-178351, inscripció 2ª&quot;,
+IF(ISPICKVAL(CC_Idioma__c, &quot;es&quot;), &quot;C.Pintor Sorolla, 2-4 46002-Valencia - NIF A08663619 - Inscrita en el Registro Mercantil de Valencia, tomo 10370, folio 1, hoja número V-178351, inscripción 2ª&quot;,
+IF(ISPICKVAL(CC_Idioma__c, &quot;en&quot;), &quot;C.Pintor Sorolla, 2-4 46002-Valencia - NIF A08663619 - Registered in the Mercantile Registry of Valencia, volume 10370, sheet of paper 1, page number V-178351, inscription 2ª&quot;,
+&quot;C.Pintor Sorolla, 2-4 46002-Valencia - NIF A08663619 - Inscrita en el Registro Mercantil de Valencia, tomo 10370, folio 1, hoja número V-178351, inscripción 2ª&quot;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Datos del RM</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

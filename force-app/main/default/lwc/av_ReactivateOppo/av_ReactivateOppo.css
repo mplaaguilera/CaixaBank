@@ -1,0 +1,33 @@
+.padding-layout{
+    padding-bottom:1rem
+}
+
+.label-priorizador{
+	width: 17rem;
+    margin-left:1rem;
+}
+
+.margin-layout{
+    margin-top:1rem;
+}
+
+.toogle-divCustom{
+    align-items: center;
+    text-align: center;
+}
+.customStyle{
+    position:relative;
+    overflow:hidden;
+}
+
+.custom-spin {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top:0;
+        bottom: 0;
+        background-color: white;
+}
+.slds-modal__close{
+    display: none;
+}

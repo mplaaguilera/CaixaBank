@@ -1,0 +1,22 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" extensible="true">
+    <aura:attribute name="chatCerrado" type="Boolean" default="false"/>
+    <aura:attribute name="areaChat" type="String"/>
+    <aura:if isTrue="{!v.chatCerrado == true}">
+
+    <div role="alert">
+        <span class="slds-icon_container slds-icon-utility-offline slds-m-right_x-small" title="Description of icon when needed">
+            <p><lightning:icon iconName="action:defer" alternativeText="Time-Out" size= "x-small" />
+                &nbsp;&nbsp;
+                <aura:if isTrue="{!v.areaChat=='Empleado'}">
+                    <b style="font-size:13px" >Chat cerrado por inactividad del empleado.</b>
+                </aura:if>
+                <aura:if isTrue="{!v.areaChat!='Empleado'}">
+                    <b style="font-size:13px" >Chat cerrado por inactividad del cliente.</b>
+                </aura:if>
+    
+            </p>
+        </span>
+      </div>
+    </aura:if>
+
+</aura:component>

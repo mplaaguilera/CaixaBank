@@ -1,0 +1,198 @@
+<template>
+	<article class="slds-card">
+		<div class="slds-card__header slds-grid slds-page-header" style="border-bottom: 1px solid #e3e3e3; border-radius: 4px 4px 0px 0px; padding-top: 6px; padding-bottom: 6px;">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:opportunity" size="small"></lightning-icon>
+				</div>
+				<div class="slds-media__body slds-card__header-title">
+					Acciones comerciales
+					<span lwc:if={oportunidadesHijasCount}>&nbsp;({oportunidadesHijasCount})</span>
+				</div>
+				<lightning-button-group>
+					<lightning-button label="Nueva" onclick={modal1Abrir}></lightning-button>
+					<lightning-button-menu lwc:if={habilitar2oTitular} variant="border-filled" menu-alignment="right" onselect={menuHeaderOnselect}>
+						<lightning-menu-item label="Segundo titular" value="Segundo titular"></lightning-menu-item>
+					</lightning-button-menu>
+				</lightning-button-group>
+			</header>
+		</div>
+		<div lwc:if={mostrarOportunidadesHijas} class="slds-grid slds-card__body slds-card__body_inner">
+			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
+				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">En curso</div>
+				<ul lwc:if={oportunidadesHijas.enCurso.length}>
+					<template for:each={oportunidadesHijas.enCurso} for:item="oportunidadHija">
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+							<lightning-icon icon-name="utility:more" size="x-small" class="iconVariantLight"></lightning-icon>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+						</li>
+					</template>
+				</ul>
+			</div>
+			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
+				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">Formalizadas</div>
+				<ul lwc:if={oportunidadesHijas.formalizadas.length}>
+					<template for:each={oportunidadesHijas.formalizadas} for:item="oportunidadHija">
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+							<lightning-icon variant="success" icon-name="utility:success" size="x-small"></lightning-icon>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+						</li>
+					</template>
+				</ul>
+			</div>
+			<div class="slds-col slds-size_1-of-3 slds-var-m-around_x-small">
+				<div class="slds-text-title_caps slds-var-m-bottom_large" style="font-weight: 500;">Perdidas</div>
+				<ul lwc:if={oportunidadesHijas.perdidas.length}>
+					<template for:each={oportunidadesHijas.perdidas} for:item="oportunidadHija">
+						<li key={oportunidadHija.Id} class="slds-truncate slds-var-m-vertical_small" onclick={oportunidadOnclick} data-id={oportunidadHija.Id}>
+							<lightning-icon icon-name="utility:clear" size="x-small" variant="error"></lightning-icon>
+							<span class="slds-text-link_faux slds-var-m-left_small slds-text-color_weak">{oportunidadHija.producto}</span>
+						</li>
+					</template>
+				</ul>
+			</div>
+		</div>
+		<div lwc:else style="padding-bottom: 10px; font-size: 12px;">
+			<span class="slds-align_absolute-center slds-text-color_weak">Sin acciones comerciales.</span>
+		</div>
+
+		<!--Modal 1-->
+		<template lwc:if={modal1Abierto}>
+			<section role="dialog" tabindex="-1" aria-modal="true" class="modal1 slds-modal" onkeydown={modalTeclaPulsada} data-modal="modal1">
+				<div class="slds-modal__container">
+					<!--<lightning-button-icon icon-name="utility:close" size="large" onclick={modal1Cerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon>-->
+					<button class="slds-button slds-button_icon slds-modal__close" onclick={modal1Cerrar}>
+						<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+					</button>
+					<header class="slds-modal__header">
+						<h2 class="slds-text-heading_medium slds-hyphenate">Alta de acciones comerciales</h2>
+						<p>Se creará para cada producto una acción comercial en la etapa de ventas indicada.</p>
+					</header>
+					<!-- Modal/Popup Box LWC body starts here -->
+					<div class="slds-modal__content slds-var-p-horizontal_xx-large slds-var-p-vertical_x-large">
+						<div>
+							<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Añadir productos</label>
+							<lightning-combobox class="comboboxProductos" options={comboboxProductosOptions} onchange={comboboxProductosOnchange} variant="label-hidden"></lightning-combobox>
+						</div>
+						<div lwc:if={productosSeleccionados.length} class="slds-var-m-top_small slds-var-p-around_xx-small">
+							<template for:each={productosSeleccionados} for:item="producto">
+								<span key={producto} class="slds-var-m-around_x-small">
+									<lightning-pill name={producto} label={producto} onremove={pillProductoOnremove}>
+										<lightning-icon icon-name="standard:product" size="small"></lightning-icon>
+									</lightning-pill>
+								</span>
+							</template>
+						</div>
+						<div class="slds-var-m-top_x-large">
+							<lightning-combobox class="comboboxEtapa" label="Etapa" options={comboboxEtapaOptions} onchange={comboboxEtapaOnchange} required></lightning-combobox>
+						</div>
+						<div if:true={mostrarResolucion} class="slds-var-m-top_x-large">
+							<lightning-combobox class="comboboxResolucion" label="Resolución" options={comboboxResolucionOptions} required></lightning-combobox>
+						</div>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button class="modal1Cancelar" label="Cancelar" onclick={modal1Cerrar}></lightning-button>
+						<lightning-button class="modal1Guardar slds-var-m-left_small" label="Crear acción comercial" variant="brand" onclick={modal1GuardarOnclick}></lightning-button>
+					</footer>
+				</div>
+			</section>
+		</template>
+
+		<!--Modal 2-->
+		<template lwc:elseif={modal2Abierto}>
+			<section role="dialog" tabindex="-1" aria-modal="true" class="modal2 slds-modal" onkeydown={modalTeclaPulsada} data-modal="modal2">
+				<div class="slds-modal__container">
+					<!--<lightning-button-icon icon-name="utility:close" size="large" onclick={modal2Cerrar} variant="border-filled" class="slds-modal__close"></lightning-button-icon>-->
+					<button class="slds-button slds-button_icon slds-modal__close" onclick={modal2Cerrar}>
+						<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+					</button>
+					<header class="slds-modal__header">
+						<h2 class="slds-text-heading_medium slds-hyphenate">Oportunidad para el segundo titular</h2>
+						<p class="slds-var-m-top_x-small">Se creará una copia de la oportunidad actual para el nuevo titular seleccionado.</p>
+					</header>
+					<div class="slds-modal__content slds-var-p-vertical_x-large slds-var-p-horizontal_xx-large">
+						<p class="slds-var-m-bottom_x-small">Resumen de la oportunidad</p>
+						<div class="slds-box slds-var-m-bottom_medium divResumenOportunidad">{oportunidad.fields.CSBD_Resumen__c.value}</div>
+
+						<!-- Lookup de cliente -->
+						<div class="slds-form-element slds-var-p-bottom_medium slds-var-m-top_x-large">
+							<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Segundo titular</label>
+							<div class="slds-form-element__control">
+								<template lwc:if={lookupClienteSeleccionado}>
+									<!-- Con resultado seleccionado -->
+									<div class="slds-combobox_container slds-has-selection">
+										<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+											<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+												<span class="slds-icon_container slds-combobox__input-entity-icon slds-var-m-left_xx-small">
+													<lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+												</span>
+												<div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+													<span class="slds-truncate">{lookupClienteSeleccionado.Name}</span>
+												</div>
+												<span class="slds-input__icon slds-input__icon_right" style="pointer-events: initial;">
+													<lightning-button-icon icon-name="utility:close" size="small" variant="bare" class="slds-is-relative" tooltip="Deseleccionar" style="top: -1px;" onclick={lookupClienteDeseleccionar}></lightning-button-icon>
+												</span>
+											</div>
+										</div>
+									</div>
+								</template>
+								<!-- Sin resultado seleccionado (buscador)  -->
+								<div lwc:else class="slds-combobox_container">
+									<div class="lookupCliente slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+										<!-- Input de búsqueda -->
+										<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+											<lightning-input class="lookupClienteInput" type="search" variant="label-hidden" value={lookupClienteInputValue} placeholder="Buscar cliente..." autocomplete="off" onkeydown={lookupClienteOnkeydown} onchange={lookupClienteOnchange} onfocus={lookupClienteAbrir} onblur={lookupClienteCerrar}></lightning-input>
+										</div>
+										<!-- Lista de resultados -->
+										<div lwc:if={lookupClienteResultados.length} class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+											<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+												<template for:each={lookupClienteResultados} for:item="resultado">
+													<!-- Resultado -->
+													<li key={resultado.Id} role="presentation" class="slds-listbox__item" onclick={lookupClienteSeleccionar} data-id={resultado.Id}>
+														<!-- slds-media  slds-listbox__option_entity slds-listbox__option_has-meta -->
+														<div class="slds-media slds-media_center slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+															<!-- Icono del resultado -->
+															<span class="slds-media__figure slds-listbox__option-icon slds-is-relative" style="top: -2px;">
+																<lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+															</span>
+															<span class="slds-media__body">
+																<span class="slds-listbox__option-text_entity">{resultado.Name}</span>
+																<span lwc:if={resultado.CC_Numero_Documento__c} class="slds-listbox__option-meta" style="font-weight: 300; padding-top: 1px;">{resultado.CC_Numero_Documento__c}</span>
+																<span lwc:else class="slds-listbox__option-meta" style="font-weight: 200; padding-top: 1px;">Sin número de documento</span>
+															</span>
+														</div>
+													</li>
+												</template>
+											</ul>
+										</div>
+										<div lwc:else>
+											<!-- Mensaje si no hay resultados -->
+											<div lwc:if={lookupClienteInputValue} class="slds-dropdown slds-dropdown_length-with-icon-5 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+												<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+													<li role="presentation" class="slds-listbox__item">
+														<div aria-selected="true" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option" style="cursor: default;">
+															<span class="slds-media__body">
+																<span class="slds-listbox__option-text_entity slds-text-color_weak">No hay resultados.</span>
+															</span>
+														</div>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<footer class="slds-modal__footer">
+						<lightning-button class="modal2Cancelar" label="Cancelar" onclick={modal2Cerrar}></lightning-button>
+						<lightning-button class="modal2Guardar slds-var-m-left_small" label="Duplicar oportunidad" variant="brand" onclick={modal2GuardarOnclick}></lightning-button>
+					</footer>
+				</div>
+			</section>
+		</template>
+
+		<div class="backdrop slds-backdrop"></div>
+	</article>
+
+</template>

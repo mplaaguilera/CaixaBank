@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Respuesta__c</fullName>
+    <label>Canal de respuesta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Email</fullName>
+                <default>false</default>
+                <label>Email</label>
+            </value>
+            <value>
+                <fullName>Twitter</fullName>
+                <default>false</default>
+                <label>Twitter</label>
+            </value>
+            <value>
+                <fullName>Chat</fullName>
+                <default>false</default>
+                <label>Chat</label>
+            </value>
+            <value>
+                <fullName>Comentarios Apps</fullName>
+                <default>false</default>
+                <label>Comentarios Apps</label>
+            </value>
+            <value>
+                <fullName>Carta</fullName>
+                <default>false</default>
+                <label>Carta</label>
+            </value>
+            <value>
+                <fullName>Phone</fullName>
+                <default>false</default>
+                <label>Teléfono</label>
+            </value>
+            <value>
+                <fullName>SAC_Formulario</fullName>
+                <default>false</default>
+                <label>Formulario web</label>
+            </value>
+            <value>
+                <fullName>SAC_CartaPostal</fullName>
+                <default>false</default>
+                <label>Carta postal</label>
+            </value>
+            <value>
+                <fullName>SAC_FormularioOficina</fullName>
+                <default>false</default>
+                <label>Formulario oficina</label>
+            </value>
+            <value>
+                <fullName>SAC_CXBNow</fullName>
+                <default>false</default>
+                <label>CXB Now</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

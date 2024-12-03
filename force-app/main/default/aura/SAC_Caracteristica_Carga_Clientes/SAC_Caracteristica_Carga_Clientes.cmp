@@ -1,0 +1,44 @@
+<aura:component controller="SAC_CaracteristicaCarga" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable" access="global">
+	<aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="caractRepresentante" type="Boolean" default="false" />
+    <aura:attribute name="caractCliente" type="Boolean" default="false" />
+    <aura:attribute name="comunicarCargaRepresentantes" type="Boolean" default="false" />
+    <aura:attribute name="tituloCard" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.Inicial}" />
+
+	<lightning:card title="{!v.tituloCard}" iconName="action:share_file">
+		<br/>
+		<div>
+            <p>
+                <aura:if isTrue="{!v.caractRepresentante}">
+                    Seleccione un fichero <b>.txt</b> que contenga los identificadores a cargar. Cada identificador debe ser un <b>CIF o nombre de la picklist "Despacho representante"</b> y estar separado por un salto de línea.<br/>
+                </aura:if>
+                <aura:if isTrue="{!v.caractCliente}">
+                    Seleccione un fichero <b>.txt</b> que contenga los identificadores a cargar. Cada identificador debe ser un <b>número de documento</b> y estar separado por un salto de línea.<br/>
+                </aura:if>               
+                <br/>
+                <div>
+                    <div style="display:inline-block; vertical-align: top;">Ejemplo:</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 8px; padding-bottom: 8px; margin-left: 20px; border:1px solid lightgray; display:inline-block;">
+                        <aura:if isTrue="{!v.caractRepresentante}">
+                            <code>12345678Z</code><br/>
+                            <code>31935001F</code><br/>
+                            <code>Nombre Despacho</code><br/>
+                        </aura:if>
+                        <aura:if isTrue="{!v.caractCliente}">
+                            <code>12345678Z</code><br/>
+                            <code>31935001F</code><br/>
+                            <code>22710134A</code><br/>
+                        </aura:if>
+                    </div>
+                </div>
+            </p>
+        </div>
+        <br/>
+		<c:sac_Caracteristica_Carga name="sac_Caracteristica_Carga" recordId="{!v.recordId}" onclickcancelar="{!c.handleClickCancelar}" onclickaceptar="{!c.handleClickAceptar}" onshowlogtoast="{!c.handleShowLogToast}"/>
+	</lightning:card>
+    <aura:if isTrue="{!v.comunicarCargaRepresentantes}">
+        <c:sac_CargarCaracteristicaRepresentante name="sac_CargarCaracteristicaRepresentante" recordId="{!v.recordId}" cargaMasiva="{!v.comunicarCargaRepresentantes}"/>
+    </aura:if>
+</aura:component>

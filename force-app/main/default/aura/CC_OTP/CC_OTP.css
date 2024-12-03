@@ -1,0 +1,17 @@
+.THIS .error-message {
+    background-color: #a71930; /* Red background */
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+.THIS .error-icon {
+    margin-right: 10px;
+}
+
+.THIS .texto-informativo {
+    color: black;
+    font-style: italic;
+    font-size: smaller;
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_SoloPretPpal__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo booleano para indicar si solo buscar reclamaciones por su pretensión principal o por cualquiera de sus pretensiones</description>
+    <label>Tomar solo pretensión principal</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

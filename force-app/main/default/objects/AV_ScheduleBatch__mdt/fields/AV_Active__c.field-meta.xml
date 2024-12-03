@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Active__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Flag to indicate the status of the batch process</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Active</label>
+    <type>Checkbox</type>
+</CustomField>

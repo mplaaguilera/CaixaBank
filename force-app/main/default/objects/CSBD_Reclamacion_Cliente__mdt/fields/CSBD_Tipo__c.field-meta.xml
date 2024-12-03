@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Tipo__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Tipo</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Enviar correo electrónico</fullName>
+                <default>false</default>
+                <label>Enviar correo electrónico</label>
+            </value>
+            <value>
+                <fullName>Enviar SMS</fullName>
+                <default>false</default>
+                <label>Enviar SMS</label>
+            </value>
+            <value>
+                <fullName>Cerrar oportunidad</fullName>
+                <default>false</default>
+                <label>Cerrar oportunidad</label>
+            </value>
+            <value>
+                <fullName>Sin acciones</fullName>
+                <default>false</default>
+                <label>Sin acciones</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

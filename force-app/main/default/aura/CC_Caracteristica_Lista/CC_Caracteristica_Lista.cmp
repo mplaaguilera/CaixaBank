@@ -1,0 +1,28 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="CC_Caracteristica" access="global" >
+    
+    <aura:attribute name="gridData" type="Object"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="numCar" type="Integer"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <lightning:card variant="Narrow" title="Detalle de las características" iconName="standard:announcement">
+        
+        <p class="slds-p-horizontal_small">
+            <aura:if isTrue="{!v.numCar > 0}">
+                <lightning:accordion aura:id="accordion" allowMultipleSectionsOpen="true">
+                    <aura:iteration items="{!v.gridData}" var="item" indexVar="itemIndex">
+                        <lightning:accordionSection name="{!item.CC_Caracteristica__r.Name}" label="{!item.CC_Caracteristica__r.Name}">
+                            <p><b>Detalle: </b>{!item.CC_Caracteristica__r.CC_Descripcion__c}</p>
+                        </lightning:accordionSection>
+                    </aura:iteration>
+                </lightning:accordion>
+            </aura:if>
+            <aura:if isTrue="{!v.numCar == 0}">
+                <p><b>Sin características.</b></p>
+            </aura:if>
+
+        </p>
+
+    </lightning:card>
+</aura:component>

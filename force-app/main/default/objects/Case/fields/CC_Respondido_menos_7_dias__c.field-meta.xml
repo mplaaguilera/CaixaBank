@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Respondido_menos_7_dias__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(AND((ClosedDate - CreatedDate) &lt; 7,ISPICKVAL(Origin , &quot;Email&quot;), ISPICKVAL(CC_Canal_Respuesta__c, &quot;Carta&quot;)),  1, 
+	IF(AND((ClosedDate - CreatedDate) &lt; 21, ISPICKVAL(Origin , &quot;Email&quot;), ISPICKVAL(CC_Canal_Respuesta__c, &quot;Carta&quot;), ISPICKVAL(CC_Tipo_Contacto__c, &quot;Petición documentación&quot;)),  1, 0))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Respondido &lt; 7 días</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

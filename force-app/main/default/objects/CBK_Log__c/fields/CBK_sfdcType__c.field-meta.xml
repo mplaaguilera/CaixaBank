@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_sfdcType__c</fullName>
+    <label>sfdcType</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Entrada</fullName>
+                <default>false</default>
+                <label>Entrada</label>
+            </value>
+            <value>
+                <fullName>Resultado</fullName>
+                <default>false</default>
+                <label>Resultado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

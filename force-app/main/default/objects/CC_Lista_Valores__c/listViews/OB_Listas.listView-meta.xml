@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_Listas</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activa__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Lista_Valores__c.CC_Lista_Valores</value>
+    </filters>
+    <filters>
+        <field>NAME</field>
+        <operation>startsWith</operation>
+        <value>Outbound</value>
+    </filters>
+    <label>Todas las listas Outbound</label>
+    <sharedTo>
+        <role>OB_Generico</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_AnalyticsStage__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(StageName,&apos;Potencial&apos;),&apos;Potenciales&apos;,
+IF(ISPICKVAL(StageName,&apos;Vencido&apos;),&apos;Vencidas&apos;,
+IF(ISPICKVAL(StageName,&apos;En gestión/insistir&apos;),&apos;Planificadas&apos;,
+IF(
+ISPICKVAL(StageName,&apos;No apto&apos;)
+|| ISPICKVAL(StageName,&apos;Con venta&apos;) 
+|| ISPICKVAL(StageName,&apos;Cerrado positivo&apos;) 
+|| ISPICKVAL(StageName,&apos;No interesado&apos;) 
+,&apos;Gestionadas&apos;,&apos;&apos;))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Etapa Analytics</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

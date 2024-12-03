@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Llamada_Grabacion</fullName>
+    <availability>online</availability>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <height>600</height>
+    <linkType>url</linkType>
+    <masterLabel>Abrir grabación</masterLabel>
+    <openType>sidebar</openType>
+    <protected>false</protected>
+    <url>https://urldefense.proofpoint.com/v2/url?u=https-3A__cccontent-2Dpre1.multipre.objst1cd2.lacaixa.es_rest_007402e33c0e5f36-5F6806001.mp3&amp;d=DwMGaQ&amp;c=jf_iaSHvJObTbx-siA1ZOg&amp;r=KoM9ggjPfIEuREmjxE_HeWOp5uCT39ltYjx0mk26RgU&amp;m=29ItWSDwxGEry7cM7FvUxdlhlGuctpghR1IulEy-Vmw&amp;s=HxdsU9aw_T-kcOCY5bSFV-2kM5-BJjZcGqCUvZNF6Bs&amp;e=</url>
+</WebLink>

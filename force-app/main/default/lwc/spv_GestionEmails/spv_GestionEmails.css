@@ -1,0 +1,51 @@
+.TextAreaFull {
+    transition: all .5s ease-in-out!important;
+    transform: translateY(5px); 
+    position: relative;
+    z-index: 99;
+    width: 90vw;
+    left: 5vw; 
+    top: calc(-50vh + 55%) !important;
+    height: 90vw;
+	max-height: 85vh;
+    --sds-c-textarea-sizing-min-height: calc(-50vh + 55%);
+    --sds-c-textarea-sizing-max-height: calc(-50vh + 55%);
+    /*calc(-50vw + 60%) !important;*/
+    /*height: 90vh;*/
+}
+
+.TextAreaFull:last-child .slds-rich-text-editor{
+	/* height: 90vw;
+	max-height: 85vh; */
+}
+.TextAreaFull {
+    
+    }
+
+    /* .THIS.TextAreaFull {
+        --slds-c-textarea-sizing-min-height: 100%;       
+        --slds-c-textarea-sizing-max-height: 100%;    
+   } */
+
+.modalInputAbierto {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    left: calc(-50vw + 50%) !important;
+    top: calc(-50vh + 50%) !important;
+}
+
+.botonAmpliar {
+    top: -29px;
+    left: 5px;
+    position: relative;
+}
+
+.botonDesampliar {
+    left: 95vw;
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid #16325c;
+}

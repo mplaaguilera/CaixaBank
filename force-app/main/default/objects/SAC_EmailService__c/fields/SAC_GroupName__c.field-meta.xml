@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GroupName__c</fullName>
+    <description>Indica el developer Name de la cola que va a ser asignada. No es obligatorio rellenarlo. En caso de no rellenarlo, no se rellenará Queue por defecto en el campo Cola de trabajo.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Indica el developer Name de la cola que va a ser asignada. No es obligatorio rellenarlo. En caso de no rellenarlo, no se rellenará Queue por defecto en el campo Cola de trabajo.</inlineHelpText>
+    <label>Name del grupo</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

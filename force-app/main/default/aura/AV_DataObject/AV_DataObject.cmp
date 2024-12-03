@@ -1,0 +1,145 @@
+<!--********************************************************************************************************************
+Name:	  AV_DataObject
+Copyright © 2020  CaixaBank
+=======================================================================================================================
+Proposito: Component to show related SObject information based on fieldset.
+=======================================================================================================================
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY			AUTHOR				DATE				Description
+1.0			Display Data		David Rufo			13/04/2020			Init version
+1.1			Display Data		Carolina Alonso		15/07/2020			Add C2C logic for phone fields
+1.2			US331148			Daniel Rodriguez	15/03/2022			Add if phone to plataforma hipotecaria
+
+*********************************************************************************************************************-->
+<aura:component implements="force:hasRecordId" description="Display data from SObject" controller="AV_SObjectRelatedInfoCController"  access="global">
+
+	<!-- ATTRIBUTES FROM DESIGN -->
+	<aura:attribute name="objectApiName"	type="String"/>
+	<aura:attribute name="filterType"	   	type="String"/>
+	<aura:attribute name="filterField"	  	type="String"/>
+	<aura:attribute name="fieldSetName"	 	type="String"/>
+	<aura:attribute name="displayLabel"	 	type="String"/>
+	<aura:attribute name="columnNum"		type="String"/>
+	<aura:attribute name="readOnly"		 	type="Boolean"/>
+	<aura:attribute name="allowEditMode"	type="Boolean"/>
+	<aura:attribute name="density"		  	type="String"/>
+	<aura:attribute name="textStyle"		type="String"/>
+	<aura:attribute name="contentStyle"	 	type="String"/>
+	
+
+	<!-- PRIVATE FOR COMPONENT -->
+	<aura:attribute name="filterObjectId"   type="String"/>
+	<aura:attribute name="fields"		   	type="FieldSetMember[]"/>
+	<aura:attribute name="numberColumns"	type="Integer" default="12"/>
+	<aura:attribute name="labelTask"	 	type="String"/>
+
+	<!-- INIT AURA COMPONENT -->
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<!-- LWC COMPONENT CLI PREMIUM API CALL -->
+	<!--<c:av_Update_Cli_Premium recid="{!v.recordId}" onrefresh="{!c.doInit}" />-->
+	
+	<!-- ATTRIBUTES FOR C2C -->
+	<aura:attribute name="phoneType"	type="String" default="PHONE"/>
+	<aura:attribute name="phoneTypePlataformaH"	type="String" default="Teléfono"/>
+
+	<!-- CONTENT -->
+	<div class="c-container">
+		<lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+		<!-- Edit button on top -->
+		<div aura:id="divEditButton" class="slds-clearfix slds-p-around--x-small">
+			<div class="slds-float_right">
+				<lightning:buttonIcon iconName="utility:edit" class="slds-col_bump-left" iconClass="slds-button__icon_hint"
+									  variant="bare" alternativeText="{!$Label.c.AV_CMP_EditRecord}" onclick="{!c.editToogle}"/>
+			</div>
+		</div>
+
+		<!-- RECORD EDIT FORM -->
+		<aura:if isTrue="{!!v.readOnly}">
+            <lightning:recordEditForm aura:id="recordEditForm"
+									  recordId="{!v.filterObjectId}"
+									  objectApiName="{!v.filterType}"
+									  onsubmit="{!c.handleSubmit}"
+									  onsuccess="{!c.handleSuccess}"
+									  onerror="{!c.handleError}"
+									  class="slds-p-around--small"
+									  density="{!v.density}">
+	
+				<!-- FIELDS Section -->
+				<div class="slds-grid slds-grid_vertical">
+					<lightning:layout horizontalAlign="stretch" verticalAlign="stretch" multipleRows="true">
+						<aura:iteration items="{!v.fields}" var="field">
+							<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">
+								<lightning:inputField  fieldName="{!field.fieldPath}" class="slds-p-around--small" />
+							</lightning:layoutItem>
+						</aura:iteration>
+					</lightning:layout>
+				</div>
+	
+				<!-- The buttons Cancel and Update in the Editing mode -->
+				<div aura:id="divCreateUpdate" class="slds-align--absolute-center slds-p-top--small">
+					<lightning:button variant="neutral" class="slds-m-horizontal--xx-small"
+									  name="Cancel" label="{!$Label.c.AV_CMP_Cancel}" onclick="{!c.editToogle}"/>
+	
+					<lightning:button variant="brand" class="slds-m-horizontal--xx-small"
+									  type="submit" name="update" label="{!empty(v.recordId)? $Label.c.AV_CMP_CreateRecord : $Label.c.AV_CMP_UpdateRecord}" />
+				</div>
+			</lightning:recordEditForm>
+		</aura:if>
+		
+		<!-- RECORD VIEW FORM -->
+		<aura:if isTrue="{!v.readOnly}">
+			<lightning:recordViewForm aura:id="recordViewForm"
+									recordId="{!v.filterObjectId}"
+									objectApiName="{!v.filterType}"
+									class="slds-p-around--small"
+									density="{!v.density}">
+
+				<!-- FIELDS Section -->
+				<div class="slds-grid slds-grid_vertical">
+					<aura:if isTrue="{!v.fieldSetName != 'AV_PlataformaHipotecaria'}">
+					<lightning:layout horizontalAlign="stretch" verticalAlign="stretch" multipleRows="true">
+							<aura:iteration items="{!v.fields}" var="field">
+								<aura:if isTrue="{!v.phoneType == field.type}">
+									<!--PHONE-->
+									<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">
+										<p>
+											<span class="{!'slds-form-element__label' + v.textStyle + ' ' + v.contentStyle}">{!field.label}</span>
+										</p>
+										<lightning:button iconName="action:call" iconPosition="left" title="{!$Label.c.AV_CMP_C2C_Call}" label="{!field.value}" onclick="{!c.makeCall}" variant="base"/>
+									</lightning:layoutItem>
+									<aura:set attribute="else">
+										<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">	
+												<lightning:outputField fieldName="{!field.fieldPath}" variant="{!v.displayLabel}" class="{!v.textStyle + ' ' + v.contentStyle}"/>									
+										</lightning:layoutItem>
+									</aura:set>
+								</aura:if>
+							</aura:iteration>
+					</lightning:layout>
+					</aura:if>		
+					<aura:if isTrue="{!v.fieldSetName == 'AV_PlataformaHipotecaria'}">
+							<lightning:layout horizontalAlign="stretch" verticalAlign="stretch" multipleRows="true">
+								<aura:iteration items="{!v.fields}" var="field">
+									<aura:if isTrue="{!v.phoneTypePlataformaH == field.label}">
+										<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">
+											<p>
+												<span class="{!'slds-form-element__label' + v.textStyle + ' ' + v.contentStyle}">{!field.label}</span>
+											</p>
+											<lightning:button iconName="action:call" iconPosition="left" title="{!$Label.c.AV_CMP_C2C_Call}" label="{!field.value}" onclick="{!c.makeCall}" variant="base"/>
+										</lightning:layoutItem>
+										<aura:set attribute="else">
+										<lightning:layoutItem size="{!v.numberColumns}" class="slds-p-around--xx-small">	
+												<lightning:outputField fieldName="{!field.fieldPath}" variant="{!v.displayLabel}" class="{!v.textStyle + ' ' + v.contentStyle}"/>									
+										</lightning:layoutItem>
+									</aura:set>
+									</aura:if>
+								</aura:iteration>
+							</lightning:layout>
+					</aura:if>			
+				</div>
+			</lightning:recordViewForm>
+		</aura:if>
+	</div>
+
+</aura:component>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Comunicacion_Compact_Layout</fullName>
+    <fields>CC_Telefono_Correo_Formula__c</fields>
+    <fields>RecordTypeId</fields>
+    <fields>CC_ContactoId__c</fields>
+    <label>CC_Canal_Comunicacion_Compact_Layout</label>
+</CompactLayout>

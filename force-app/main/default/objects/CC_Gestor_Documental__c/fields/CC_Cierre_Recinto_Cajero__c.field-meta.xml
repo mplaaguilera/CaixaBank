@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cierre_Recinto_Cajero__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si el cliente se queja del cierre del recinto de cajero</inlineHelpText>
+    <label>Queja cierre recinto de cajero</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

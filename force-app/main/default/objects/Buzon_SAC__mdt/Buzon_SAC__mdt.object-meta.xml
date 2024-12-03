@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Custom metadata type donde añadimos las direcciones de correo de salida a las que no queremos mandar ningún correo desde Salesforce.</description>
+    <label>Buzón Salida Lista Negra SAC</label>
+    <pluralLabel>Buzones Salida Lista Negra SAC</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

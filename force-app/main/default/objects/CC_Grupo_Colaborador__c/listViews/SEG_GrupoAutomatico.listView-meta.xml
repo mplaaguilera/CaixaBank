@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoAutomatico</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_Organizacion__c</columns>
+    <columns>SEG_Zona__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Grupo_Colaborador__c.SEG_GrupoAutomaticoSegmentos</value>
+    </filters>
+    <filters>
+        <field>SEG_GrupoSegmentos__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Grupo Automático SEG</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

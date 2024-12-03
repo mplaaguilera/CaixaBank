@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_Dependencia__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Proceso de purgado que ha de ejecutarse previamente al proceso de purgado (Dependecia de este proceso respecto al indicado en este campo).</description>
+    <label>Proceso de purgado predecesor</label>
+    <referenceTo>CBK_PurgeProcess__c</referenceTo>
+    <relationshipLabel>Dependent Purge Processes</relationshipLabel>
+    <relationshipName>Purge_Processes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

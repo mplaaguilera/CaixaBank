@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Llamadas_extracci_n_NICE</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Servicio_Genesys__c</columns>
+    <columns>CC_ConnId__c</columns>
+    <columns>CC_Fecha_Inicio__c</columns>
+    <columns>CC_Extension__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Fecha_Inicio__c</field>
+        <operation>equals</operation>
+        <value>2/14/2020 12:00 AM</value>
+    </filters>
+    <filters>
+        <field>CC_Servicio_Genesys__c</field>
+        <operation>equals</operation>
+        <value>Tarjetas</value>
+    </filters>
+    <label>Llamadas - extracción NICE</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+    </sharedTo>
+</ListView>

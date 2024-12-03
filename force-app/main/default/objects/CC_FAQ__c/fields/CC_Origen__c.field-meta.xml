@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Origen__c</fullName>
+    <label>Origen</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>App</fullName>
+                <default>false</default>
+                <label>App</label>
+            </value>
+            <value>
+                <fullName>Web</fullName>
+                <default>false</default>
+                <label>Web</label>
+            </value>
+            <value>
+                <fullName>Chat GINA</fullName>
+                <default>false</default>
+                <label>Chat GINA</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

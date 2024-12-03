@@ -1,0 +1,242 @@
+<aura:component controller="SEG_BuscadorCR" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+
+    <aura:attribute name="caso" type="Case"/>
+    <!--<aura:attribute name="casoEdit" type="Case"/>-->
+    <aura:attribute name="objectList" type="Object[]" default="[]" description="This is the list of record that are shown in the dropdown when a user enters a text."/>
+    <aura:attribute name="searching" type="Boolean"/>
+    <aura:attribute name="alternateDisplayField" type="String[]" default="['Name']" description="Display the secondary set of fields. Keep it less than two."/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    <aura:attribute name="idTimeout" type="String"/>
+    <aura:attribute name="selectedIndex" type="Integer"/>
+    <aura:attribute name="lookupInputFocused" type="Boolean" default="false"/>
+    <aura:attribute name="selectedObject" type="Object"/>
+    <aura:attribute name="selectedObjectDisplayName" type="String" default=""/>
+    <aura:attribute name="lookupId" type="String" default="" description="Set this to the id of the record that is looked up. Based on this the data will be loaded on further loading of the page."/>
+    <aura:attribute name="value" type="Object" description="This will be set to the value of the selected object.You can access this from your component"/>
+    <aura:attribute name="queryErrorMessage" type="String" default=""/>
+    <aura:attribute name="ldsError" type="String"/>
+    <aura:attribute name="queryErrorFound" type="Boolean" default="false"/>
+    <aura:attribute name="guardando" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarBuscador" type="Boolean" default="false"/>
+    <aura:attribute name="esPropietario" type="Boolean" default="false"/>
+	<aura:attribute name="recordTypeCase" type="String"/>
+    <aura:attribute name="campos" type="String[]" default = "['CaseNumber', 'OwnerId', 'Status', 'RecordTypeId', 'RecordType.DeveloperName', 'SEG_ClasificacionRapida__c', 'SEG_ClasificacionRapida__r.Name', 'SEG_Organizacion__c', 'SEG_Zona__c']"/>
+
+    <!-- Bind variable para integrar en otros LC-->
+    <aura:attribute name="crId" type="String"/>
+    <aura:attribute name="integratedMode" type="Boolean" default="false"/>
+    <aura:attribute name="botonSeleccion" type="String" default="Seleccionar"/>
+
+    <!--Lightning Data Service-->
+     <!--<force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="FULL"
+        fields="CaseNumber, OwnerId, Status, RecordTypeId, RecordType.DeveloperName, SEG_ClasificacionRapida__c, SEG_ClasificacionRapida__r.Name, SEG_Organizacion__c"
+        targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}" mode="EDIT"/>
+     -->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="{!v.campos}" targetFields="{!v.caso}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}" mode="EDIT"/>
+
+    <!--<force:recordData aura:id="caseDataEdit" recordId="{!v.recordId}" layoutType="FULL"
+        fields="SEG_ClasificacionRapida__c"
+        targetFields="{!v.casoEdit}" recordUpdated="{!c.recordDataUpdated}" targetError="{!v.ldsError}" mode="EDIT"/>
+    -->
+        
+
+    <!--UI-->
+    <!--Clasificación actual del caso-->
+    <aura:if isTrue="{!v.caso.SEG_ClasificacionRapida__r.Name.length > 0}">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon class="cc-azul-mcc" iconName="custom:custom64" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Clasificación rápida actual del caso</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div style="padding-top: 5px; padding-bottom: 7px; padding-left: 0.2rem; background-color: #fbfcfe; border-radius: 5px; border-style: solid; border-width: 1px; border-color: #d2d5d5; cursor: pointer;" onclick="{!c.mostrarBuscador}">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <!--<div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Clasificación rápida actual</span>
+                    </h2>
+                </div>-->
+                <div class="slds-col">
+                    <span style="padding-left: 8px;"/>
+                    <c:CC_MCC_Buscador_Badge text="{!v.caso.SEG_ClasificacionRapida__r.Name}" fontWeight="500" enteredValue="@@@"/>  
+                </div>                
+                <div class="slds-col slds-grow-none">
+                    <span style="padding-right: 10px;">
+                        <lightning:button iconName="{!v.mostrarBuscador ? 'utility:close' : 'utility:search'}" variant="bare" title="Abrir buscador de clasificaciones"/>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+
+    <!--Card-->
+    <aura:if isTrue="{!v.mostrarBuscador}">
+        <div style="height: 0.9rem;"/>
+        <article class="slds-card">
+            <aura:if isTrue="{!!v.integratedMode}">
+                <!--Cabecera de la card-->
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container">
+                                <lightning:icon class="cc-azul-mcc" iconName="custom:custom64" size="small"/>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Buscador de clasificaciones rápidas</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+            </aura:if>
+            <!--Cuerpo de la card-->
+            <div class="slds-card__body slds-card__body_inner">
+                <!--Buscador-->
+                <div class="slds-grid slds-gutters slds-gutters_x-small">
+                    <!--Columna 1 (campo de búsqueda)-->
+                    <div class="slds-col">
+                        <aura:if isTrue="{!v.selectedObjectDisplayName == undefined || v.selectedObjectDisplayName == ''}">
+                            <!--Campo de búsqueda sin elemento seleccionado-->
+                            <span onkeyup="{!c.searchRecords}">
+                                <lightning:input disabled="{!v.caso.Status == 'Cerrado' || v.caso.Status == 'Rechazado'}" name="lookUpInputElement" aura:id="lookUpInputElement" label="Buscar clasificación" value="{!v.enteredValue}" type="search" onblur="{!c.inputBlurred}" onchange="{!c.searchRecords}" onfocus="{!c.inputInFocus}" placeholder="buscar clasificación rápida por nombre..."/>
+                            </span>
+                            <!--Resultados de la búsqueda-->
+                            <aura:if isTrue="{!and(v.objectList.length > 0, v.lookupInputFocused)}">
+                                <div id="listbox-unique-id" role="listbox">
+                                    <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-is-relative" role="presentation">
+                                        <aura:iteration items="{!v.objectList}" var="obj" indexVar="ind">
+                                            <li role="presentation" class="{!v.selectedIndex == ind ? 'slds-has-focus highlightDark' : 'slds-has-focus'}" data-current-index="{!ind}" onclick="{!c.onRowSelected}" onmouseover="{!c.showColorOnMouseEnter}" onmouseout="{!c.hideColorOnMouseLeave}">
+                                                <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                    <span class="slds-media__figure">
+                                                        <span class="slds-icon_container" title="Clasificación">
+                                                            <lightning:icon iconName="custom:custom62" size="small"/>
+                                                            <span class="slds-assistive-text">Clasificación rápida</span>
+                                                        </span>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <c:CC_MCC_Buscador_Resultado object="{!obj}" alternateFieldList="{!v.alternateDisplayField}" enteredValue="{!v.enteredValue}" helpText="{!obj.Name}"/>
+                                                    </span>
+                                                </span>
+                                            </li>
+
+                                            <aura:if isTrue="{!ind != (v.objectList.length-1)}">
+                                                <hr class="hrStyle"/>
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                            
+                            <!--Sin resultados-->
+                            <aura:if isTrue="{!v.objectList.length == 0 &amp;&amp; v.enteredValue != '' &amp;&amp; v.lookupInputFocused}">
+                                <div role="listbox">
+                                    <ul class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-is-relative" role="presentation">
+                                        <li role="presentation">
+                                            <span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                
+                                                <span class="slds-media__body" style="{!and(!v.searching, !v.queryErrorFound) ? '' : 'display:none;'}">
+                                                    <span class="slds-listbox__option-text_entity">
+                                                        <center>
+                                                            Sin resultados.
+                                                            <span style="{!v.enteredValue.length lt 3 ? '' : 'display:none;'}">(introducir un mínimo de 3 caracteres).</span>
+                                                        </center>
+                                                    </span>
+                                                </span>
+                                                <span class="slds-media__body" style="{!!v.searching ? 'display:none' : ''}">
+                                                    <center>
+                                                        <div style="height:1rem;">
+                                                            <div role="status" class="slds-spinner slds-spinner_small slds-spinner_brand">
+                                                                <span class="slds-assistive-text">Cargando...</span>
+                                                                <div class="slds-spinner__dot-a"></div>
+                                                                <div class="slds-spinner__dot-b"></div>
+                                                            </div>
+                                                        </div>
+                                                    </center>
+                                                </span>
+                                                <span class="slds-media__body" style="{! v.queryErrorFound ? '' : 'display:none;'}">
+                                                    <span class="slds-listbox__option-text_entity">
+                                                        <center>
+                                                            <b>Error en la búsqueda: {!v.queryErrorMessage}</b>
+                                                        </center>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                            <!--Fin resultados de búsqueda-->
+
+                            <aura:set attribute="else">
+                                <!--Campo de búsqueda con elemento seleccionado-->
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="combobox-unique-id">Buscar clasificación rápida</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right">
+                                            <span class="slds-icon_container slds-combobox__input-entity-icon" style="padding-left:5px;">
+                                                <lightning:icon iconName="custom:custom62" size="x-small"/>
+                                            </span>
+
+                                            <input type="text" class="slds-input slds-combobox__input" id="combobox-unique-id" role="textbox" disabled="true" value="{!v.selectedObjectDisplayName}"/>
+                                            <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick="{!c.removeSelectedOption}">
+                                                <lightning:icon iconName="utility:close" size="x-small"/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+
+                    <!--Columna 2 (botón de guardado en Inner para la pantalla del caso.)-->
+                    <aura:if isTrue="{!!v.integratedMode}">
+                        <div class="slds-col slds-grow-none" style="padding-top: 21px;">
+                            <lightning:button variant="brand" class="slds-button slds-float_right" label="Guardar" onclick="{!c.guardar}" disabled="{! !v.esPropietario || v.caso.Status == 'Cerrado' || v.caso.Status == 'Rechazado' || v.selectedObjectDisplayName == '' || v.guardando || v.caso.SEG_Organizacion__c == null || v.caso.SEG_Zona__c == null}"/>&nbsp;
+                        </div>
+                    </aura:if>
+                </div>
+                    <!--Botón para selecionar en el modo de selección integrada en operativa.-->
+                    <aura:if isTrue="{!v.integratedMode}">
+                        <div class="slds-col slds-grow-none" style="padding-top: 21px;">
+                            <lightning:button variant="brand" class="slds-button slds-float_right" label="{!v.botonSeleccion}" onclick="{!c.seleccionarCR}" disabled="{! v.selectedObjectDisplayName == '' || v.botonSeleccion == 'Confirmado!'}"/>&nbsp;
+                        </div>
+                    </aura:if>
+            </div>
+        </article>
+    </aura:if>
+
+    <!-- Spinner de carga -->
+    <aura:if isTrue="{!v.guardando}">
+        <div aura:id="backdropGuardando" class="slds-backdrop"/>
+        <section aura:id="modalGuardando" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal">
+            <div class="slds-modal__container" style="width: fit-content;">
+                <div class="slds-modal__content slds-is-relative" style="border-radius: 4px; min-width: unset; padding: 1.5rem 2.9rem 1.4rem 2.9rem;">
+                    <div class="slds-grid slds-grid_align-center">
+                        <div class="slds-col" style="margin-right: 24px;">
+                            <div style="position: relative; top: 8px;">
+                                <span role="status" class="slds-spinner slds-spinner_x-small slds-spinner_brand" style="position: absolute;">
+                                    <span class="slds-assistive-text">Actualizando datos del caso..</span>
+                                    <div class="slds-spinner__dot-a"></div>
+                                    <div class="slds-spinner__dot-b"></div>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="slds-col">
+                            Actualizando datos del caso...
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </section>
+    </aura:if>
+</aura:component>

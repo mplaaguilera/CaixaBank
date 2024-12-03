@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ContadorCheckInVirtual__c</fullName>
+    <defaultValue>0</defaultValue>
+    <description>Contador que registra las veces que se ha ingresado a la página de check in virtual. Lo actualiza portales</description>
+    <externalId>false</externalId>
+    <label>Contador CheckIn virtual</label>
+    <precision>2</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

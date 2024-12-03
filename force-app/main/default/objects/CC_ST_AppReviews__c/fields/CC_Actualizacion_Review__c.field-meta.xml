@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Actualizacion_Review__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Cuando llega un comentario sobre otro comentario marcamos como actualizado para que no genere respuesta automatica</description>
+    <label>Actualización Review</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Entrada_Caixabank_Talks_Case</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CC_Flag_Prioridad_Formulario__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>CC_MCC_Tematica__c</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>CC_Ultima_Interaccion__c</columns>
+    <columns>CASES.STATUS</columns>
+    <filterScope>Queue</filterScope>
+    <label>Entrada Caixabank Talks</label>
+    <queue>CC_Entrada_Caixabank_Talks</queue>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,89 @@
+<apex:page standardController="SAC_Accion__c" extensions="SAC_NotificarTareasReclamacionVF" recordSetVar="records" lightningStylesheets="true" applyHtmlTag="false" showHeader="false">
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <apex:slds />
+    <style>
+        .modal {
+            display: none;
+        }
+        .errorMsg1 {
+            display: none;
+        }
+    </style>
+
+    <apex:form id="form">
+
+        <apex:actionFunction action="{!save}" name="guardar" reRender="main" oncomplete="closeModal();" >
+            <apex:param name="mensaje" value="" /> 
+        </apex:actionFunction>
+
+        <apex:pageBlock >
+            <apex:pageMessages escape="false" />
+            <apex:pageBlockButtons location="bottom" rendered="{!If( mostrar,true,false)}">  
+                <apex:commandButton value="Aceptar" status="status" 
+                reRender="main, modal" oncomplete="$('#myModal').modal({backdrop:'static'}).show(); return false;" />   		               
+            <apex:commandButton action="{!cancel}" value="Cancelar" />
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        
+
+        <div id="myModal" class="modal slds-scope">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Introduce el mensaje de la notificación </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="Mensaje">
+                            <abbr class="slds-required" title="required">* </abbr>Mensaje</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="mensaje" placeholder="Escribe aquí el texto…" class="slds-input" />
+                        </div>
+                        <div class="slds-form-element__control errorMsg1" id="errorMsg">
+                            <br />
+                            <span style="color: red"> Por favor, introduce un mensaje. </span>
+                        </div>
+                        </div>                   
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <commandbutton class="slds-button slds-button_neutral" onclick="closeModal(); return false;">Cancelar</commandbutton>
+                        <commandbutton class="slds-button slds-button_brand" onclick="enviar();">Enviar</commandbutton>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+
+        <apex:actionFunction action="{!enviarNotificaciones}" name="enviarNoti" oncomplete="closeModal();" >               
+                <apex:param name="mensaje" value="" />
+        </apex:actionFunction>
+
+        <script>
+            function mostrarModal(){
+                $('#myModal').modal({backdrop:'static'}).show(); return false;
+            }
+
+            function closeModal() {                
+                $('#myModal').modal('hide');
+                document.getElementById('mensaje').value = '';
+            }
+                
+            function enviar(){
+                var mensaje = document.getElementById('mensaje').value;
+                if(mensaje != ''){
+                    enviarNoti(mensaje);
+                    return true;
+                }
+                else{
+                    $('#errorMsg').removeClass('errorMsg1');
+                    return true;
+                }
+                
+            }
+	   
+        </script>
+
+    </apex:form>
+</apex:page>

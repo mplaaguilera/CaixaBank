@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Marca__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Enlace de Marca hacia Case</description>
+    <label>Case</label>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Característica Detalles</relationshipLabel>
+    <relationshipName>Caracter_stica_Detalles</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

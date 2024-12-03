@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>PS que da acceso al Integration User a campos necesarios en los DataSync de ciertos objetos de Analytics</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.AV_Cliente__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.AV_Origen__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.AV_Origen__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>CBK_DataQuality</label>
+</PermissionSet>

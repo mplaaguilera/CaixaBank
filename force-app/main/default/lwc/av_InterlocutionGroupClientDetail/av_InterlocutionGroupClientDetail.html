@@ -1,0 +1,56 @@
+<template>    
+    <div if:true={interlocExist} >
+        <lightning-card >
+            <div class="cmpStyle">
+
+                <h1>
+                <lightning-icon icon-name="standard:household" size="medium"></lightning-icon>
+               <strong style="margin-left:.25rem">{title}</strong>
+                </h1>
+                <div class="slds-grid" style ="margin-top:1.5rem">
+                    <div class="slds-col slds-size_5-of-12">
+                        <div>
+
+                            <p style ="margin-bottom:.2rem">Interlocutor</p>
+                            <div><a name={mainInterloc.Id} onclick={getUserLink}>{mainInterloc.Name}</a></div>
+                        </div>  
+                        <div style="margin-top:.75rem">
+
+                            <p style ="margin-bottom:.2rem">Miembros ({membersCount})</p>
+                            <template for:each={members} for:item="member">
+                                <div key={member.id}>
+                                    <a name={member.id} onclick={getUserLink} href="#">{member.name}</a>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- <div class="slds-col slds-size_2-of-12"></div> -->
+                    <div class="slds-col slds-size_7-of-12">
+                        <div>
+                            <p>
+
+                                <lightning-icon icon-name="standard:opportunity" class="icon-style" size="small"></lightning-icon>
+                                &nbsp;&nbsp;Oportunidades ({countOppos})
+                            </p>
+                        </div>
+                        <div>
+                            <p>
+                                <lightning-icon icon-name="standard:event" class="icon-style" size="small"></lightning-icon>
+                                &nbsp;&nbsp;Eventos ({countEvents})
+                            </p>
+                        </div>
+                        <div>
+                            <p>
+
+                                <lightning-icon icon-name="standard:task" class="icon-style" size="small"></lightning-icon>
+                               &nbsp;&nbsp;Tareas ({countTasks})
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p slot="footer"><a href="#" name={groupId} onclick={getGroupFlexi}>Ver todo</a></p>
+            </lightning-card>
+        </div>
+    </template>

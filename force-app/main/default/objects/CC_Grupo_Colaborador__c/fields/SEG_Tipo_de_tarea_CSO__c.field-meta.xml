@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Tipo_de_tarea_CSO__c</fullName>
+    <label>Tipo de tarea CSO</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>SEG_Tipo_de_tarea_CSO</valueSetName>
+    </valueSet>
+</CustomField>

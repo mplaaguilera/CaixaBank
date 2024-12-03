@@ -1,0 +1,124 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{titulo} Acción - {nombreProceso}</h2>
+            </header>
+            
+            <template if:true={formularioVisible}>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+                        <div class="slds-size_1-of-1" >
+                            
+                            <template if:true={errorGeneral}>
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="status" id="errorGeneral">                  
+                                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                                            </svg>
+                                        </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small"><lightning-formatted-text value={mensajeError} ></lightning-formatted-text> </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+<!--
+                            <template if:true={errorFecha}>
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="status" id="errorFecha">                  
+                                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                                            </svg>
+                                        </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+
+                            
+                            <template if:true={errorComentario}>
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="status" id="errorComentario">                  
+                                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                                            </svg>
+                                        </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+-->
+
+
+                            <div class="slds-m-around_x-small">
+                                <lightning-record-edit-form object-api-name="SIREC__SIREC_obj_acciones__c" id="accionNew" record-type-id={recordIdAccion}>
+                                    <lightning-input-field field-name="SIREC__SIREC_fld_responsable__c" label="Responsable" value={userId} onchange={changeResponsable} disabled={disableResponsable} required> </lightning-input-field>
+                                    <lightning-input-field field-name="SIREC__SIREC_fld_fechaContacto__c" label="Fecha de Contacto" value={fechaContacto} onchange={changeFecha} disabled={disableFechaContacto} required> </lightning-input-field>
+                                    <lightning-input-field field-name="SIREC__SIREC_fld_tipo__c" label="Tipo" value={valueTipo} onchange={changeTipo} disabled={disableTipo} required> </lightning-input-field>
+                                    <lightning-input-field field-name="SIREC__SIREC_fld_accion__c" label="Acción" value={valueAccion} onchange={changeAccion} disabled={disableAcciones} required> </lightning-input-field>
+                                    <lightning-combobox style="padding:0px 4px 0px 4px" name="Interviniente" label="Interviniente" placeholder="Seleccione una opción" value={interviniente} options={optionsInterviniente} onchange={changeInterviniente}  disabled={disableInterviniente} required="true"></lightning-combobox>
+                                    <lightning-combobox style="padding:0px 4px 0px 4px" name="Resultado" label="Resultado" placeholder="Seleccione una opción" value={valueResultado} options={optionsResultado} onchange={changeResultado} disabled={disableResultado}></lightning-combobox>
+                                    <template if:true={activarFechaCompromiso}>
+                                        <lightning-input-field field-name="SIR_FechaCompromisoPago__c" label="Fecha Compromiso de Pago" value={fechaCompromisoPago} onchange={changeFechaCompromisoPago} disabled={disableFechaCompromiso}> </lightning-input-field>
+                                    </template> 
+                                    <lightning-input-field field-name="SIREC__SIREC_fld_comentarios__c" label="Comentarios" value={comentarios} onchange={changeComentarios} disabled={disableComentario} > </lightning-input-field>
+                                </lightning-record-edit-form>
+                            </div>
+                        </div>                               
+                    </div>             
+                </div>
+            </template>
+            <template if:true={errorPropietario}>
+                <div class="slds-modal__content slds-p-around_medium" >
+                    <div class="slds-grid slds-wrap slds-form slds-align_absolute-center">
+                        <div class="slds-notify_container slds-is-relative">
+                            <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                                <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                                    </svg>
+                                </span>
+                            <div class="slds-notify__content">
+                                    <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                                </div>
+                            </div>
+                        </div>                           
+                    </div>             
+                </div>
+            </template>
+
+
+            <template if:true={mensajeKO}>
+                <div class="slds-notify_container slds-is-relative">
+                    <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                        <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                            </svg>
+                        </span>
+                        <div class="slds-notify__content">
+                            <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                            {codigoError}
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={cancel} disabled={disabledCerrar}>Cancelar</button>
+                <template if:true={botonGuardar}>
+                    <button class="slds-button slds-button_brand" onclick={save} disabled={disabledGuardar}>{nombreBoton}</button>        
+                </template>
+            </footer>
+        </div>
+    </section>
+</template>

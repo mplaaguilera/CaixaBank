@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Chat Idioma CA</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Activo_Chat_GINA__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_AreaCfg__c</field>
+        <value xsi:type="xsd:string">CC_IdiomaChat</value>
+    </values>
+    <values>
+        <field>CC_Orden__c</field>
+        <value xsi:type="xsd:double">2.0</value>
+    </values>
+    <values>
+        <field>Descriptivo__c</field>
+        <value xsi:type="xsd:string">Idiomas disponibles en el canal de entrada chat</value>
+    </values>
+    <values>
+        <field>Nombre__c</field>
+        <value xsi:type="xsd:string">ca</value>
+    </values>
+    <values>
+        <field>Valor_Numerico_Entero__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Valor_Texto__c</field>
+        <value xsi:type="xsd:string">Catalán</value>
+    </values>
+</CustomMetadata>

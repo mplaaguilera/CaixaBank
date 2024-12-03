@@ -1,0 +1,607 @@
+<template>
+	<!-- Botones -->
+	<div style="padding-top: 4px;">
+		<div class="slds-grid slds-wrap slds-grid_align-center" style="gap: 8px;">
+			<div class="slds-col" if:true={permisos.HDT_Trasladar_Colaborador}>
+				<lightning-button data-id="Trasladar Colaborador" label="Trasladar a colaborador" icon-name="utility:email" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={permisos.HDT_Remitir_Colaborador}>
+				<lightning-button data-id="Remitir Colaborador" label="Remitir a colaborador" icon-name="utility:email" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonTrasladar3N}>
+				<lightning-button data-id="Trasladar 3N" label="Trasladar a 3N" icon-name="utility:change_owner" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonDevolver1N}>
+				<lightning-button data-id="Devolver Nivel 1" label="Devolver a 1N" icon-name="utility:change_owner" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonRechazar1N}>
+				<lightning-button data-id="Rechazar Nivel 1" label="Rechazar traslado" icon-name="utility:change_owner" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={permisos.HDT_Asociar_Incidencia}>
+				<lightning-button data-id="Trasladar Incidencia" label="Trasladar a incidencia" icon-name="utility:custom_apps" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonTomarPropiedad}>
+				<lightning-button data-id="Autoasignarme" label="Tomar propiedad" icon-name="utility:change_owner" onclick={onClickAutoasignarme}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonSolicitarInfoChat}>
+				<lightning-button data-id="Solicitud Info Chat" label="Solicitud Información" icon-name="utility:chat" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={mostrarBotonSolicitarInfoPhone}>
+				<lightning-button data-id="Solicitud Info Phone" label="Solicitud Información" icon-name="utility:sms" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col" if:true={permisos.HDT_Responder_Empleado}>
+				<lightning-button data-id="Responder Cliente Email" label="Responder" icon-name="action:email" onclick={validacionesOperativa}></lightning-button>
+			</div>
+			<div class="slds-col">
+				<lightning-button data-id="Vincular llamada" label="Vincular llamada" icon-name="utility:call" onclick={vincularLlamadaEnCurso}></lightning-button>
+			</div>
+		</div>
+	</div>
+
+	<!--Modal para trasladar/remitir a colaborador-->
+	<section role="dialog" tabindex="-1" aria-modal="true" data-id="ModalboxColab" class="slds-modal modalTrasladar" onkeydown={modalTrasladarColaboradorTeclaPulsada}>
+		<div class="slds-modal__container">
+			<!-- Cabecera del modal -->
+			<lightning-button-icon
+				label="Cerrar"
+				icon-name="utility:close"
+				size="large"
+				onclick={cerrarModalTrasladarColaborador}
+				variant="border-filled"
+				class="slds-button slds-button_icon slds-modal__close">
+			</lightning-button-icon>
+			<!-- Título -->
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">{remitirGrupoColaborador}</h1>
+				<p class="slds-var-m-top_x-small">{remitirSeleccionaGrupo}</p>
+			</div>
+			<!-- Contenido del modal -->
+			<div class="slds-modal__content slds-var-p-left_xx-large slds-var-p-right_xx-large" style="overflow: initial;">
+				<lightning-layout-item size="12" padding="around-small">
+					<!--Buscador de todos los grupos-->
+					<template lwc:if={verTodosLosGrupos}>
+						<div data-id="searchRes" class="slds-form-element slds-lookup" data-select="single">
+							<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Grupo colaborador</label>
+							<div class="slds-form-element__control">
+								<div class="slds-input-has-icon slds-input-has-icon_right">
+									<div class="slds-show" data-id="lookup-pill">
+										<lightning-input class="inputBuscarGruposTrasladar" type="search" onchange={inputBuscarGruposOnChange} placeholder="Buscar grupo colaborador..." variant="label-hidden" onfocus={inputBuscarGruposTrasladarOnFocus} onblur={inputBuscarGruposTrasladarOnBlur} onkeydown={inputOnKeyDown} data-operativa="Trasladar"></lightning-input>
+									</div>
+								</div>
+							</div>
+							<!--Resultados del buscador de todos los grupos-->
+							<template lwc:if={resultadosGruposMostrar}>
+								<!-- sldsValidatorIgnoreNextLine -->
+								<div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-10" role="listbox">
+									<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+										<template lwc:if={resultadosGruposMostrar}>
+											<template for:each={resultadosGrupos} for:item="grupo">
+												<li key={grupo.Id} role="presentation" class="slds-listbox__item" style="list-style-type: none;" onclick={obtenerPlantillasGrupoBuscar} data-id={grupo.Id} data-name={grupo.Name} data-operativa="Trasladar">
+													<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" title={grupo.Name}>
+														<span class="slds-media__figure slds-listbox__option-icon">
+															<lightning-icon icon-name="custom:custom15" size="x-small"></lightning-icon>
+														</span>
+														<span class="slds-media__body">
+															<span class="slds-listbox__option-text_entity">{grupo.Name}</span>
+														</span>
+													</div>
+												</li>
+											</template>
+											<template lwc:if={resultadosGruposSinDatos}>
+												<li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+													<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center slds-text-color_weak" role="option">
+														Sin resultados.
+													</div>
+												</li>
+											</template>
+										</template>
+									</ul>
+								</div>
+							</template>
+						</div>
+					</template>
+					<!-- Desplegable de grupos relacionados con la clasificación -->
+					<template lwc:else>
+						<lightning-combobox data-id="selectGroups" label="Grupos relacionados con la clasificación" placeholder="Seleccione un valor" options={optionsGrupo} onchange={obtenerPlantillasGrupo} required></lightning-combobox>
+					</template>
+					<!-- Toggle para cambiar entre ver los colaboradores para el MCC o todos los colaboradores -->
+                    <div class="slds-grid slds-grid_align-end slds-var-m-top_small">
+						<lightning-input
+						data-id="checkbox"
+						class="toggleVerTodosLasGruposTrasladar"
+						type="toggle"
+						label="Mostrar todos los grupos"
+						checked={verTodosLosGrupos}
+						onchange={allGrupos}
+						message-toggle-active=""
+						message-toggle-inactive="">
+					</lightning-input>
+					</div>
+
+					<!--Desplegable de plantillas-->
+					<!--Desplegablamos el combobox para seleccionar la plantilla del grupo seleccionado-->
+					<template lwc:if={grupoSeleccionado}>
+						<template if:false={verTodasLasPlantillas}>
+							<lightning-combobox
+								data-id="plantillaSeleccionada"
+								label="Plantilla"
+								placeholder="Seleccione un valor"
+								options={optionsPlantilla}
+								onchange={seleccionarPlantilla}
+								required>
+							</lightning-combobox>
+						</template>
+						<!--AHORA VAMOS A BUSCAR A LA PLANTILLA POR NOMBRE - BUSCADOR -->
+						<template lwc:if={verTodasLasPlantillas}>
+							<!--Buscador de todas las plantillas -->
+							<div class="slds-form-element slds-lookup slds-var-m-top_small" data-select="single">
+								<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+								<div class="slds-form-element__control">
+									<div class="slds-input-has-icon slds-input-has-icon_right">
+										<div class="slds-show">
+											<lightning-input class="inputBuscarPlantillasTrasladar" type="search" onchange={inputBuscarPlantillasOnChange} placeholder="Buscar plantilla de correo..." variant="label-hidden" onfocus={inputBuscarPlantillasTrasladarOnFocus} onblur={inputBuscarPlantillasTrasladarOnBlur} onkeydown={inputOnKeyDown} data-operativa="Trasladar"></lightning-input>
+										</div>
+									</div>
+								</div>
+								<!--Resultados del buscador de todas las plantillas-->
+								<template lwc:if={resultadosPlantillasMostrar}>
+									<!-- sldsValidatorIgnoreNextLine -->
+									<div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-10" role="listbox">
+										<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+											<template lwc:if={resultadosPlantillasSinDatos}>
+												<li role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+													<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center slds-text-color_weak" role="option">
+														Sin resultados.
+													</div>
+												</li>
+											</template>
+											<template lwc:else for:each={plantillasFiltro} for:item="plantilla">
+												<li key={plantilla.value}
+													role="presentation"
+													class="slds-listbox__item"
+													style="list-style-type: none;"
+													onclick={seleccionarPlantilla}
+													data-id={plantilla.value}
+													data-name={plantilla.label}
+													data-operativa="Trasladar">
+													<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option" title={plantilla.label}>
+														<span class="slds-media__figure slds-listbox__option-icon">
+															<lightning-icon icon-name="standard:template" size="x-small"></lightning-icon>
+														</span>
+														<span class="slds-media__body">
+															<span class="slds-listbox__option-text_entity">{plantilla.label}</span>
+														</span>
+													</div>
+												</li>
+											</template>
+										</ul>
+									</div>
+								</template>
+							</div>
+						</template>
+						<!-- TOGGLE PARA RECOGER TODOS LAS PLANTILLAS DEL GRUPO SELECCIONADO -->
+						<div class="slds-grid slds-grid_align-end slds-var-m-top_small">
+							<lightning-input
+								class="toggleVerTodasLasPlantillasTrasladar"
+								type="toggle"
+								label="Mostrar todas las plantillas"
+								onchange={toggleVerTodasLasPlantillasOnChange}
+								message-toggle-active=""
+								message-toggle-inactive=""
+								data-operativa="Trasladar">
+							</lightning-input>
+						</div>
+					</template>
+				</lightning-layout-item>
+			</div>
+			<!-- Fin del Contenido del modal -->
+			<!--Pie del modal-->
+			<footer class="slds-modal__footer">
+				<template lwc:if={remitir}>
+					<lightning-button class="modalTrasladarTrasladar" icon-name="utility:email" variant="brand" label="Remitir a colaborador" onclick={remitirColaborador}></lightning-button>
+				</template>
+				<template lwc:else>
+					<lightning-button
+						class="modalTrasladarTrasladar"
+						variant="brand"
+						label="Trasladar a colaborador"
+						icon-name="utility:email"
+						onclick={trasladarColaborador}>
+				</lightning-button>
+				</template>
+				<lightning-button class="modalTrasladarCancelar slds-float_right slds-var-m-left_small" label="Cancelar" onclick={cerrarModalTrasladarColaborador}></lightning-button>
+			</footer>
+		</div>
+	</section>
+	<!--FIN - Modal para trasladar/remitir a colaborador-->
+
+	<!--Modal para responder a Empleado-->
+	<section role="dialog" tabindex="-1" data-id="ModalboxResponderCliente" aria-modal="true" class="slds-modal" onkeydown={modalResponderClienteTeclaPulsada}>
+		<div class="slds-modal__container">
+			<!--Cabecera del modal-->
+			<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalResponderCliente} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">Responder al empleado</h1>
+				<p class="slds-var-m-top_x-small">Seleccione la plantilla de correo a usar para responder al empleado.</p>
+			</div>
+			<!--Contenido del modal-->
+			<div class="slds-modal__content slds-var-p-around_x-large" style="overflow: initial;">
+				<lightning-combobox data-id="selectItemIdioma" label="Idioma" placeholder="-Selecciona un idioma-" required message-when-value-missing="Debe seleccionar un idioma" onchange={handleCarpetaIdiomaSeleccionada} options={opcionesIdiomaFolder}></lightning-combobox>
+				<br />
+				<template if:true={carpetaIdiomaSeleccionada}>
+					<lightning-combobox data-id="selectItemTratamiento" label="Tratamiento" placeholder="-Selecciona un tratamiento-" required message-when-value-missing="Debe seleccionar un tratamiento" onchange={handleCarpetaTratamientoSeleccionada} options={opcionesTratamientoFolder}></lightning-combobox>
+					<br />
+				</template>
+				<template if:true={uncheckedPlantillaProcesoFinal}>
+					<lightning-combobox data-id="selectItemPlantilla" label="Plantilla" placeholder="-Selecciona una plantilla-" required onchange={seleccionarPlantilla} options={optionsPlantillaResponder}></lightning-combobox>
+				</template>
+				<template if:true={procesoFinalSeleccion}>
+					<template if:true={uncheckedPlantilla}>
+						<div if:true={plantillaSeleccionada} class="slds-combobox_container slds-has-selection">
+							<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+								<label class="slds-form-element__label"><abbr class="slds-required">*</abbr>Plantilla</label>
+								<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+									<span class="slds-icon_container slds-combobox__input-entity-icon" title="Account">
+										<lightning-icon icon-name="standard:template" size="x-small"></lightning-icon>
+									</span>
+									<button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-expanded="false" aria-haspopup="listbox">
+										<span class="slds-truncate">{plantillaSeleccionada.Name}</span>
+									</button>
+									<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" title="Borrar selección" onclick={deseleccionarPlantilla2}>
+										<lightning-icon icon-name="utility:close" size="x-small"></lightning-icon>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div if:false={plantillaSeleccionada} class="slds-combobox_container">
+							<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+								<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+									<lightning-input type="search" value={SearchKeyWordPlantilla} label="Plantilla" onchange={teclaPulsadaLookupPlantilla2} placeholder="Buscar plantilla..." required></lightning-input>
+								</div>
+								<!-- sldsValidatorIgnoreNextLine -->
+								<div if:true={listOfSearchRecordsPlantilla.length} class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-7" role="listbox">
+									<ul class="slds-listbox slds-listbox_vertical" role="presentation">
+										<template for:each={listOfSearchRecordsPlantilla} for:item="singleRecPlantilla" for:index="index">
+											<li key={singleRecPlantilla.Id} role="presentation" class="slds-listbox__item" style="list-style-type: none;">
+												<div class="slds-media slds-media_center slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" onclick={handleComponentEventPlantilla2} title={singleRecPlantilla.Name} data-id={singleRecPlantilla.Id}>
+													<span class="slds-media__figure slds-listbox__option-icon">
+														<lightning-icon icon-name="standard:template" size="x-small"></lightning-icon>
+													</span>
+													<span class="slds-media__body">
+														<span class="slds-listbox__option-text_entity" title={singleRecPlantilla.Name}>{singleRecPlantilla.Name}</span>
+													</span>
+												</div>
+											</li>
+										</template>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</template>
+				</template>
+				<div if:false={procesoFinalSeleccion} class="slds-var-m-top_medium" align="right">
+					<lightning-input data-id="checkboxPlantilla" type="toggle" label="Ver todas las plantillas" checked={uncheckedPlantilla} message-toggle-active="" message-toggle-inactive="" style="width: fit-content;" onchange={checkboxPlantillaChange}></lightning-input>
+				</div>
+			</div>
+
+			<!--Pie-->
+			<footer class="slds-modal__footer">
+				<lightning-button variant="brand" label="Responder al empleado" icon-name="utility:email" onclick={responderCliente}></lightning-button>
+				<lightning-button class="modalResponderEmpleadoCancelar slds-var-m-left_small" label="Cancelar" onclick={cerrarModalResponderCliente}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<!--Modal 3Nivel-->
+	<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" data-id="Modalbox3Nivel" onkeydown={modalTrasladar3NTeclaPulsada}>
+		<div class="slds-modal__container">
+			<!--Cabecera del modal-->
+			<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalTrasladar3N} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+			<!--Título-->
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">Trasladar a tercer nivel</h1>
+				<p class="slds-var-m-top_x-small">Seleccione el grupo de tercer nivel al que escalar el caso.</p>
+			</div>
+			<!--Contenido del modal-->
+			<div class="slds-modal__content slds-var-p-around_x-large" style="overflow: initial;">
+				<div class="slds-grid slds-grid_align-end slds-var-m-top_small">
+					<lightning-input
+						data-id="checkbox"
+						type="toggle"
+						label="Mostrar todos los grupos"
+						checked={verTodosLosGrupos3N}
+						onchange={allGrupos3N}
+						message-toggle-active="" message-toggle-inactive="">
+					</lightning-input>
+				</div>
+				<!--Desplegable de grupos asociados al MCC-->
+
+				<!--Lookup de grupos de tercer nivel-->
+				<template lwc:if={verTodosLosGrupos3N}>
+					<div class="searchResGroup slds-form-element slds-lookup" data-select="single">
+						<label class="slds-form-element__label">Grupo de tercer nivel</label>
+						<div class="slds-form-element__control">
+							<div class="slds-input-has-icon slds-input-has-icon_right">
+								<div lwc:if={resultadoGrupoTercerNivelName} data-id="lookup-pill-group" class="slds-pill-container">
+									<span class="slds-pill">
+										<span class="slds-pill__label">{resultadoGrupoTercerNivelName}</span>
+										<lightning-button-icon icon-name="utility:close" variant="bare" onclick={deseleccionarGrupo3N} alternative-text="Cerrar"></lightning-button-icon>
+									</span>
+								</div>
+								<div lwc:else data-id="lookupFieldGroup">
+									<lightning-input type="search" value={resultadoGrupoTercerNivelName} variant="label-hidden" placeholder="Buscar grupos de 3N..." onchange={teclaPulsadaLookupGrupo3N}></lightning-input>
+								</div>
+							</div>
+						</div>
+						<div class="slds-text-body_small">{message}</div>
+						<ul class="slds-listbox slds-listbox_vertical" id="listaDesplegable" role="presentation">
+							<template lwc:if={Grupo3NNoSeleccionado} for:each={resultadosGrupoTercerNivel} for:item="resultadoGrupoTercerNivel" for:index="index">
+								<li key={resultadoGrupoTercerNivel.Id} role="presentation" class="slds-listbox__item slds-show" style="list-style-type: none;">
+									<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" onclick={resultadoGrupoTercerNivelOnclick} title={resultadoGrupoTercerNivel.Name} data-id={resultadoGrupoTercerNivel.Id} data-name={resultadoGrupoTercerNivel.Name} data-cola={resultadoGrupoTercerNivel.CC_Queue_Traslado__c}>
+										<span class="slds-media__figure slds-listbox__option-icon">
+											<lightning-icon icon-name="custom:custom15" size="x-small"></lightning-icon>
+										</span>
+										<span class="slds-media__body">
+											<span class="slds-listbox__option-text_entity" title={resultadoGrupoTercerNivel.Name}>{resultadoGrupoTercerNivel.Name}</span>
+										</span>
+									</div>
+								</li>
+							</template>
+						</ul>
+					</div>
+				</template>
+				<template lwc:else>
+					<lightning-combobox
+						label="Grupos relacionados con la clasificación"
+						placeholder="Selecciona un valor"
+						options={resultadosGrupoTercerNivel}
+						onchange={seleccionarGrupo3N}
+						data-id="selectGroups3N"
+						required>
+					</lightning-combobox>
+				</template>
+
+			</div>
+			<!--Pie-->
+			<footer class="slds-modal__footer">
+				<lightning-button variant="brand" label="Trasladar a 3N" icon-name="utility:change_owner" onclick={trasladar3N} disabled={deshabilitarEscalar}></lightning-button>
+				<lightning-button class="modalTrasladar3NCancelar slds-float_right slds-var-m-left_small" label="Cancelar" onclick={cerrarModalTrasladar3N}></lightning-button>
+			</footer>
+		</div>
+	</section>
+	<!-- FIN Modal 3Nivel-->
+
+	<!--Modal para solicitud de información-->
+	<section role="dialog" tabindex="-1" data-id="ModalboxSolicitarInfo" aria-modal="true" class="slds-modal" onkeydown={modalSolicitarInfoTeclaPulsada}>
+		<div class="slds-modal__container">
+			<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalSolicitarInfo} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-hyphenate">Solicitud Información</h1>
+				<p class="slds-var-m-top_x-small">Selecciona la plantilla de correo a usar para la solicitud de información al cliente.<br /></p>
+			</div>
+			<div class="slds-modal__content slds-var-p-around_xx-large" style="padding-top: 12px; padding-bottom: 16px; overflow: initial;">
+				<lightning-layout-item size="12" padding="around-small">
+					<lightning-combobox
+						data-id="selectItemIdiomaSol"
+						label="Idioma"
+						placeholder="-Selecciona un idioma-"
+						required
+						message-when-value-missing="Debes seleccionar un idioma"
+						onchange={handleCarpetaIdiomaSeleccionada}
+						options={opcionesIdiomaFolder}>
+					</lightning-combobox>
+					<br />
+					<template lwc:if={carpetaIdiomaSeleccionada}>
+						<lightning-combobox data-id="selectItemTratamientoSol" name="tratamiento" label="Tratamiento" placeholder="-Selecciona un tratamiento-" value="" required dropdown-alignment="right" variant="standard" message-when-value-missing="Debe seleccionar un tratamiento" onchange={handleCarpetaTratamientoSeleccionada} options={opcionesTratamientoFolder}></lightning-combobox>
+						<br />
+					</template>
+					<template lwc:if={procesoFinalSeleccion}>
+						<lightning-combobox data-id="selectItemPlantillaSol" name="plantilla" label="Plantilla" placeholder="-Selecciona una plantilla-" value="" required dropdown-alignment="right" variant="standard" message-when-value-missing=" " onchange={seleccionarPlantilla} options={optionsPlantillaResponder}></lightning-combobox>
+					</template>
+					<br />
+				</lightning-layout-item>
+				<div style="height:4rem;"></div>
+			</div>
+			<!--Pie-->
+			<footer class="slds-modal__footer">
+				<lightning-button variant="Brand" label="Solicitud Información" onclick={solicitarInfo} disabled={isPlantillaSeleccionadaNull}></lightning-button>
+				<lightning-button class="slds-float_right slds-var-m-left_small" label="Cancelar" onclick={cerrarModalSolicitarInfo}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<!--Modal cita gestor-->
+	<section role="dialog" data-id="modalCitaGestor" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown={modalCitaGestorTeclaPulsada}>
+		<div class="slds-modal__container">
+			<header class="slds-modal__header">
+				<!--Icono de cierre-->
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={modalCitaGestorCerrar} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+				<!--Título-->
+				<h2 class="slds-text-heading_medium slds-hyphenate">Agendar cita con gestor</h2>
+			</header>
+			<div class="slds-modal__content slds-var-p-around_large slds-is-relative cc_modalCitaGestor_modalContent">
+				<template lwc:if={cargandoGestor}>
+					<div style="height: 55px;" align="center">
+						<lightning-spinner size="small" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+					</div>
+				</template>
+				<template lwc:if={numeroGestoresKO}>
+					<div style="margin: 10px">
+						<span style="margin-right: 10px" class="slds-icon_container">
+							<lightning-icon icon-name="utility:warning" variant="warning" size="small"></lightning-icon>
+						</span>
+						<b>No es posible agendar un evento</b>
+						<p style="margin-top: 10px">{mensajeErrorInt}</p>
+					</div>
+				</template>
+				<template lwc:else>
+					<template lwc:if={tieneGestor}>
+						<div style="margin:10px;">
+							<div style="font-size: 14px;font-weight: 700;">Nuevo evento</div>
+							<div style="margin-top:10px;">
+								<template lwc:if={esClienteDigital}>
+									<lightning-select data-id="tipoCita" name="tipoCita" label="Tipo de cita" required>
+										<option value="43">Llamada telefónica</option>
+									</lightning-select>
+								</template>
+								<template lwc:else>
+									<lightning-select name="tipoCita" label="Tipo de cita" required onchange={resetDisponibilidadConsultada}>
+										<option value="42">Entrevista</option>
+										<option value="43">Llamada telefónica</option>
+									</lightning-select>
+								</template>
+								<div class="slds-grid slds-gutters">
+									<div class="slds-col slds-size_2-of-2">
+										<lightning-input data:id="asuntoEvento" name="asuntoEvento" required label="Asunto" maxlength="200"></lightning-input>
+									</div>
+								</div>
+								<template lwc:if={gestorBackupActivo}>
+									<div style="font-size:14px;font-weight:700; margin-top:15px">Asignado a</div>
+									<div style="margin-top:10px;">
+										<span style="padding-right:10px;" class="slds-icon">
+											<lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+										</span>
+										{nombreGestor}
+									</div>
+									<div style="margin-top:15px;">
+										<template if:false={gestorAsignadoCoincide}>
+											<span style="margin-right: 5px" class="slds-icon_container">
+												<lightning-icon icon-name="utility:info_alt" size="small"></lightning-icon>
+											</span>
+											El gestor disponible para su atención no coincide con el asignado al cliente: {nombreGestorAsignado}.
+										</template>
+									</div>
+									<div>
+										<div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">Fecha y hora</div>
+										<template if:false={disponibilidadConsultada}>
+											<lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadGestor}></lightning-button>
+										</template>
+										<template lwc:if={disponibilidadConsultada}>
+											<div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+												<div class="slds-col slds-size_1-of-2">
+													<lightning-combobox data:id="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadGestor}></lightning-combobox>
+												</div>
+												<div class="slds-col slds-size_1-of-2">
+													<lightning-combobox data:id="horasDisponibilidad" label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad}></lightning-combobox>
+												</div>
+											</div>
+										</template>
+									</div>
+								</template>
+								<div>
+									<div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">Otros gestores</div>
+									<lightning-input data-id="gestorBackupActivo" name="checkbox" type="toggle" checked={gestorBackupActivo} onchange={mostrarGestorBackup} message-toggle-active="Gestor backup" disabled></lightning-input>
+								</div>
+								<template lwc:if={gestorBackupActivoDos}>
+									<template lwc:if={existeBackup}>
+										<div class="slds-col slds-size_1-of-1" style="margin-top:15px; margin-bottom:10px;">
+											<lightning-combobox data-id="gestoresBackup" label="Gestor backup" placeholder="--Seleccione un gestor--" options={gestoresBackup} onchange={resetDisponibilidadConsultada}></lightning-combobox>
+											<div>
+												<div style="font-size:14px;font-weight:700; margin-top:15px; margin-bottom:10px;">Fecha y hora</div>
+												<template if:false={disponibilidadConsultada}>
+													<lightning-button label="Consultar disponibilidad" icon-name="utility:search" title="Consultar disponibilidad" onclick={consultarFechasDisponibilidadBackup}></lightning-button>
+												</template>
+												<template lwc:if={disponibilidadConsultada}>
+													<div class="slds-grid slds-gutters cc_modalCitaGestor_div_comboboxes">
+														<div class="slds-col slds-size_1-of-2">
+															<lightning-combobox data-id="fechasDisponibilidad" label="Fecha" placeholder="--Seleccione una fecha--" options={fechasDisponibilidad} onchange={consultarHorasDisponibilidadBackup}></lightning-combobox>
+														</div>
+														<div class="slds-col slds-size_1-of-2">
+															<lightning-combobox data-id="horasDisponibilidad" label="Hora" placeholder="--Seleccione una hora--" options={horasDisponibilidad}></lightning-combobox>
+														</div>
+													</div>
+												</template>
+											</div>
+										</div>
+									</template>
+									<template lwc:else>
+										<div style="margin-top:15px;">
+											<span style="margin-right: 5px; margin-left: 5px;" class="slds-icon_container">
+												<lightning-icon icon-name="utility:info_alt" size="small"></lightning-icon>
+											</span>
+											No existen backups asignados al gestor de este cliente.
+										</div>
+									</template>
+								</template>
+							</div>
+						</div>
+					</template>
+					<template lwc:else>
+						<div style="margin: 10px">
+							<span style="margin-right: 10px" class="slds-icon_container">
+								<lightning-icon icon-name="utility:warning" variant="warning" size="small"></lightning-icon>
+							</span>
+							<b>No es posible agendar un evento</b>
+							<p style="margin-top: 10px">El cliente relacionado con este caso no tiene un gestor asignado. </p>
+						</div>
+					</template>
+				</template>
+			</div>
+			<div class="slds-modal__footer">
+				<lightning-button label="Confirmar cita" variant="brand" icon-name="utility:event" disabled={disponibilidadConsultada} onclick={confirmarCitaGestor}></lightning-button>
+				<lightning-button data-id="modalCitaGestorCancelar" label="Cancelar" onclick={modalCitaGestorCerrar} class="slds-var-m-left_small"></lightning-button>
+			</div>
+		</div>
+	</section>
+
+	<!--Modal para devolver a 1N/Rechazar traslado-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" data-id="ModalboxDevolver1N" onkeydown={modalDevolver1NTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+                <!--Icono de cierre-->
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalDevolver1N} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <!--Título-->
+				<div class="slds-modal__header">
+					<h1 class="slds-modal__title slds-text-heading_medium slds-hyphenate">{remitirDevolver1N}</h1>
+					<p class="slds-var-m-top_x-small">{tipodetareamensaje}
+						<br/>
+						El motivo quedará registrado en la actividad de traslado a tercer nivel del caso.
+					</p>
+				</div>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+				<template lwc:if={tipodetareadevolver}>
+					<div class="slds-form-element__control">
+                        <lightning-input
+							name="inputMotivoDevolucion"
+							data-id="inputMotivoDevolucion"
+							label="Motivo de la devolución:"
+							value=''
+							required="true"
+							message-when-value-missing="Debe informar un motivo">
+						</lightning-input>
+                        <lightning-input
+							data-id="ampliarInfo"
+							type="checkbox"
+							onchange={toogleAmpliarInfoDevolver1N}
+							label="Ampliar información"
+							name="checkboxAmpliarInformacion"
+							checked={ampliarInformacionDevolucion1N}>
+						</lightning-input>
+                    </div>
+				</template>
+				<template lwc:if={tipodetarearechazar}>
+					<div class="slds-form-element__control">
+                        <lightning-input
+							data-id="inputMotivoDevolucion"
+							name="input1"
+							label="Motivo del rechazo:"
+							value=''
+							required="true"
+							message-when-value-missing="Debe informar un motivo">
+						</lightning-input>
+   			        </div>
+				</template>
+            </div>
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button class="slds-button slds-button_brand" variant="Brand" label={remitirDevolver1NFooter} onclick={devolver1N}></lightning-button>
+                <lightning-button class="slds-var-m-left_small" variant="Neutral" label="Cancelar" onclick={cerrarModalDevolver1N}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+	<!--Backdrop para los modales-->
+	<div class="slds-backdrop" data-id="backdrop"></div>
+
+</template>

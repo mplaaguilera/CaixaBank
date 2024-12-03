@@ -1,0 +1,569 @@
+<template>
+
+    <article lwc:if={oportunidad} class="slds-card slds-var-m-top_medium slds-var-p-horizontal_medium">
+
+        <div class="campos slds-card__body slds-card__body_inner">
+
+            <!-- Datos de los medios de pago -->
+            <div class="slds-section slds-var-m-bottom_small slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="datosMediosPago" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Datos de los medios de pago</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="datosMediosPago">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="Provisión fondos vendedor" type="number" formatter="currency" step="0.01" value={mediosPago.provisionFondosVendedor} variant="label-inline" data-campo="provisionFondosVendedor" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="Provisión fondos comprador" type="number" formatter="currency" step="0.01" value={mediosPago.provisionFondosComprador} variant="label-inline" data-campo="provisionFondosComprador" onchange={campoOnchange}> </lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="Cancelación cargas previas" type="number" formatter="currency" step="0.01" value={mediosPago.cancelacionCargasPrevias} variant="label-inline" data-campo="cancelacionCargasPrevias" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2"></div>
+                        <div class="slds-col slds-size_1-of-1"></div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del comprador" value={mediosPago.ibanComprador} variant="label-inline" data-campo="ibanComprador" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2"></div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 1" value={mediosPago.ibanVendedor1} variant="label-inline" data-campo="ibanVendedor1" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 2" value={mediosPago.ibanVendedor2} variant="label-inline" data-campo="ibanVendedor2" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 3" value={mediosPago.ibanVendedor3} variant="label-inline" data-campo="ibanVendedor3" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 4" value={mediosPago.ibanVendedor4} variant="label-inline" data-campo="ibanVendedor4" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 5" value={mediosPago.ibanVendedor5} variant="label-inline" data-campo="ibanVendedor5" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 6" value={mediosPago.ibanVendedor6} variant="label-inline" data-campo="ibanVendedor6" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 7" value={mediosPago.ibanVendedor7} variant="label-inline" data-campo="ibanVendedor7" onchange={campoOnchange}> </lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 8" value={mediosPago.ibanVendedor8} variant="label-inline" data-campo="ibanVendedor8" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 9" value={mediosPago.ibanVendedor9} variant="label-inline" data-campo="ibanVendedor9" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input label="IBAN del vendedor 10" value={mediosPago.ibanVendedor10} variant="label-inline" data-campo="ibanVendedor10" onchange={campoOnchange}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagos -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="pagos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Pagos</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="pagos">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Compraventa" type="number" formatter="currency" step="0.01" value={oportunidad.fields.CSBD_PrecioInmueble__c.value} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Entrega a cuenta" type="number" formatter="currency" step="0.01" value={oportunidad.fields.CSBD_AportacionInicial__c.value} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Provisión fondos prop. vendedor" type="number" formatter="currency" step="0.01" value={mediosPago.pagosProvisionFondosVendedor} variant="label-inline" data-campo="pagosProvisionFondosVendedor" onchange={campoOnchange}> </lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="TOTAL de pagos al vendedor" type="number" formatter="currency" step="0.01" value={pagosTotal} variant="label-inline" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desglose de pagos -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="desglosePagos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Desglose de pagos</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content sectionContentDesglosePagos" id="desglosePagos">
+                    <div class="slds-grid slds-gutters_direct-medium slds-wrap slds-var-m-top_medium">
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 1</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos1Nombre} variant="label-hidden" data-campo="desglosePagos1Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos1Importe} variant="label-hidden" data-campo="desglosePagos1Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos1Iban} variant="label-hidden" data-campo="desglosePagos1Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 2</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos2Nombre} variant="label-hidden" data-campo="desglosePagos2Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos2Importe} variant="label-hidden" data-campo="desglosePagos2Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos2Iban} variant="label-hidden" data-campo="desglosePagos2Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 3</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos3Nombre} variant="label-hidden" data-campo="desglosePagos3Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos3Importe} variant="label-hidden" data-campo="desglosePagos3Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos3Iban} variant="label-hidden" data-campo="desglosePagos3Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 4</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos4Nombre} variant="label-hidden" data-campo="desglosePagos4Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos4Importe} variant="label-hidden" data-campo="desglosePagos4Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos4Iban} variant="label-hidden" data-campo="desglosePagos4Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 5</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos5Nombre} variant="label-hidden" data-campo="desglosePagos5Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos5Importe} variant="label-hidden" data-campo="desglosePagos5Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos5Iban} variant="label-hidden" data-campo="desglosePagos5Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 6</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos6Nombre} variant="label-hidden" data-campo="desglosePagos6Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos6Importe} variant="label-hidden" data-campo="desglosePagos6Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos6Iban} variant="label-hidden" data-campo="desglosePagos6Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 7</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos7Nombre} variant="label-hidden" data-campo="desglosePagos7Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos7Importe} variant="label-hidden" data-campo="desglosePagos7Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos7Iban} variant="label-hidden" data-campo="desglosePagos7Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 8</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos8Nombre} variant="label-hidden" data-campo="desglosePagos8Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos8Importe} variant="label-hidden" data-campo="desglosePagos8Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos8Iban} variant="label-hidden" data-campo="desglosePagos8Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 9</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos9Nombre} variant="label-hidden" data-campo="desglosePagos9Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_medium">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos9Importe} variant="label-hidden" data-campo="desglosePagos9Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos9Iban} variant="label-hidden" data-campo="desglosePagos9Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8">
+                            <span class="slds-form-element__label" style="font-weight: 500;">Beneficiario 10</span>
+                        </div>
+                        <div class="slds-col slds-size_3-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Nombre/Apellidos</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos10Nombre} variant="label-hidden" data-campo="desglosePagos10Nombre" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">Importe</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={mediosPago.desglosePagos10Importe} variant="label-hidden" data-campo="desglosePagos10Importe" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xxx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">IBAN</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input value={mediosPago.desglosePagos10Iban} variant="label-hidden" data-campo="desglosePagos10Iban" onchange={campoOnchange}> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-8"></div>
+                        <div class="slds-col slds-size_3-of-8"></div>
+                        <div class="slds-col slds-size_2-of-8">
+                            <div class="slds-grid slds-gutters_direct-xx-small">
+                                <div class="slds-col slds-grow-none">
+                                    <span class="slds-form-element__label slds-var-m-right_small">TOTAL</span>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input type="number" formatter="currency" step="0.01" value={desgloseTotalImportes} variant="label-hidden" disabled> </lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_2-of-8"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desembolso del préstamo -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="desembolsoPrestamo" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Desembolso del préstamo</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="desembolsoPrestamo">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Importe del préstamo" type="number" formatter="currency" step="0.01" value={oportunidad.fields.Amount.value} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Provisión de fondos prop. comprador" type="number" formatter="currency" step="0.01" value={mediosPago.desembolsoPrestamoPrevision} variant="label-inline" data-campo="desembolsoPrestamoPrevision" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="TOTAL líquido desembolso préstamo" type="number" formatter="currency" step="0.01" value={desembolsoPrestamoTotal} variant="label-inline" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- A aportar por el cliente -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="aportarCliente" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">A aportar por el cliente</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="aportarCliente">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="TOTAL de pagos al vendedor" type="number" formatter="currency" step="0.01" value={pagosTotal} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="IVA" type="number" formatter="currency" step="0.01" value={aportarClienteIva} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="TOTAL líquido desembolso préstamo" type="number" formatter="currency" step="0.01" value={desembolsoPrestamoTotal} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="TOTAL de importe a aportar" type="number" formatter="currency" step="0.01" value={aportarClienteTotalImporte} variant="label-inline" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notaría -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="notaria" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Notaría</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="notaria">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Nombre de la notaría" value={mediosPago.notariaNombre} variant="label-inline" data-campo="notariaNombre" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Dirección y teléfono de la notaría" value={mediosPago.notariaDireccion} variant="label-inline" data-campo="notariaDireccion" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Nombre del oficial que gestiona la operación" value={mediosPago.notariaOficialNombre} variant="label-inline" data-campo="notariaOficialNombre" onchange={campoOnchange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Correo electrónico que gestiona operación" value={mediosPago.notariaOficialCorreo} variant="label-inline" data-campo="notariaOficialCorreo" onchange={campoOnchange}></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Totales -->
+            <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <button aria-controls="totales" aria-expanded="true" class="slds-button slds-section__title-action" onclick={seccionOnclick}>
+                        <lightning-icon icon-name="utility:switch" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+                        <span class="slds-truncate">Totales</span>
+                    </button>
+                </h3>
+                <div class="slds-section__content" id="totales">
+                    <div class="slds-grid slds-gutters_direct-x-small slds-wrap slds-var-m-top_medium">
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Total de fondos propios" type="number" formatter="currency" step="0.01" value={totalFondosPropios} variant="label-inline" disabled></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input label="Total de donación" type="number" formatter="currency" step="0.01" value={totalDonacion} variant="label-inline" disabled></lightning-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="slds-card__footer slds-var-p-top_large" style="margin-top: 0px; text-align: end;">
+            <!-- <lightning-button label="Cancelar" disabled={botonesCancelarGuardarDisabled} onclick={deshacerCambios}></lightning-button> -->
+            <lightning-button label="Guardar" variant="brand" class="slds-var-m-left_small" disabled={botonesCancelarGuardarDisabled} onclick={guardar}></lightning-button>
+        </footer>
+    </article>
+</template>

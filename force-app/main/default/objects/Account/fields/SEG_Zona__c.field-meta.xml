@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Zona__c</fullName>
+    <description>Determina la &apos;Zona&apos; a la que pertenece el caso. Se trata de un campo que depende del campo &apos;Organización&apos;</description>
+    <label>Zona</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SEG_Organizacion__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Corporativa</fullName>
+                <default>false</default>
+                <label>Corporativa</label>
+            </value>
+            <value>
+                <fullName>Créditos Sindicados</fullName>
+                <default>false</default>
+                <label>Créditos Sindicados</label>
+            </value>
+            <value>
+                <fullName>CSE</fullName>
+                <default>false</default>
+                <label>CSE</label>
+            </value>
+            <value>
+                <fullName>Empresas Andalucía</fullName>
+                <default>false</default>
+                <label>Empresas Andalucía</label>
+            </value>
+            <value>
+                <fullName>Empresas Andalucía Occidental-Extremadura</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Empresas Andalucía Occidental-Extremadura</label>
+            </value>
+            <value>
+                <fullName>Empresas Andalucía Oriental</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Empresas Andalucía Oriental</label>
+            </value>
+            <value>
+                <fullName>Empresas Baleares</fullName>
+                <default>false</default>
+                <label>Empresas Baleares</label>
+            </value>
+            <value>
+                <fullName>Empresas Barcelona</fullName>
+                <default>false</default>
+                <label>Empresas Barcelona</label>
+            </value>
+            <value>
+                <fullName>Empresas Canarias</fullName>
+                <default>false</default>
+                <label>Empresas Canarias</label>
+            </value>
+            <value>
+                <fullName>Empresas Castilla La Mancha</fullName>
+                <default>false</default>
+                <label>Empresas Castilla La Mancha</label>
+            </value>
+            <value>
+                <fullName>Empresas Castilla y León</fullName>
+                <default>false</default>
+                <label>Empresas Castilla y León</label>
+            </value>
+            <value>
+                <fullName>Empresas Cataluña</fullName>
+                <default>false</default>
+                <label>Empresas Cataluña</label>
+            </value>
+            <value>
+                <fullName>Empresas Ebro</fullName>
+                <default>false</default>
+                <label>Empresas Ebro</label>
+            </value>
+            <value>
+                <fullName>Empresas Madrid</fullName>
+                <default>false</default>
+                <label>Empresas Madrid</label>
+            </value>
+            <value>
+                <fullName>Empresas Murcia</fullName>
+                <default>false</default>
+                <label>Empresas Murcia</label>
+            </value>
+            <value>
+                <fullName>Empresas Norte</fullName>
+                <default>false</default>
+                <label>Empresas Norte</label>
+            </value>
+            <value>
+                <fullName>Empresas Valencia</fullName>
+                <default>false</default>
+                <label>Empresas Valencia</label>
+            </value>
+            <value>
+                <fullName>ESB</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>ESB</label>
+            </value>
+            <value>
+                <fullName>Export Finance</fullName>
+                <default>false</default>
+                <label>Export Finance</label>
+            </value>
+            <value>
+                <fullName>Instituciones Canarias</fullName>
+                <default>false</default>
+                <label>Instituciones Canarias</label>
+            </value>
+            <value>
+                <fullName>Instituciones Cataluña</fullName>
+                <default>false</default>
+                <label>Instituciones Cataluña</label>
+            </value>
+            <value>
+                <fullName>Instituciones Catalunya</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Instituciones Catalunya</label>
+            </value>
+            <value>
+                <fullName>Instituciones Centro</fullName>
+                <default>false</default>
+                <label>Instituciones Centro</label>
+            </value>
+            <value>
+                <fullName>Instituciones Este</fullName>
+                <default>false</default>
+                <label>Instituciones Este</label>
+            </value>
+            <value>
+                <fullName>Instituciones Norte</fullName>
+                <default>false</default>
+                <label>Instituciones Norte</label>
+            </value>
+            <value>
+                <fullName>Instituciones Sur</fullName>
+                <default>false</default>
+                <label>Instituciones Sur</label>
+            </value>
+            <value>
+                <fullName>Oficinas Representación</fullName>
+                <default>false</default>
+                <label>Oficinas Representación</label>
+            </value>
+            <value>
+                <fullName>Operaciones</fullName>
+                <default>false</default>
+                <label>Operaciones</label>
+            </value>
+            <value>
+                <fullName>Seguimiento</fullName>
+                <default>false</default>
+                <label>Seguimiento</label>
+            </value>
+            <value>
+                <fullName>Soporte</fullName>
+                <default>false</default>
+                <label>Soporte</label>
+            </value>
+            <value>
+                <fullName>Soporte Pymes 1</fullName>
+                <default>false</default>
+                <label>Soporte Pymes 1</label>
+            </value>
+            <value>
+                <fullName>Soporte Pymes 2</fullName>
+                <default>false</default>
+                <label>Soporte Pymes 2</label>
+            </value>
+            <value>
+                <fullName>Soporte Pymes 3</fullName>
+                <default>false</default>
+                <label>Soporte Pymes 3</label>
+            </value>
+            <value>
+                <fullName>Soporte Pymes 4</fullName>
+                <default>false</default>
+                <label>Soporte Pymes 4</label>
+            </value>
+            <value>
+                <fullName>Sucursales Internacionales</fullName>
+                <default>false</default>
+                <label>Sucursales Internacionales</label>
+            </value>
+            <value>
+                <fullName>UGE Barcelona</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>UGE Barcelona</label>
+            </value>
+            <value>
+                <fullName>UGE Centro</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>UGE Centro</label>
+            </value>
+            <value>
+                <fullName>UGE Norte</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>UGE Norte</label>
+            </value>
+            <value>
+                <fullName>UGE Valencia</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>UGE Valencia</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Banca Corporativa</controllingFieldValue>
+            <valueName>Corporativa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Andalucía</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Baleares</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Barcelona</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Castilla La Mancha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Castilla y León</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Ebro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Madrid</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Murcia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Norte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Empresas</controllingFieldValue>
+            <valueName>Empresas Valencia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Centro</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Este</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Norte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Instituciones</controllingFieldValue>
+            <valueName>Instituciones Sur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Centro Soporte Especialistas</controllingFieldValue>
+            <valueName>CSE</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Créditos Sindicados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Export Finance</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Operaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Seguimiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Financiación Estructurada</controllingFieldValue>
+            <valueName>Soporte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 1</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 2</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 3</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>PYMES</controllingFieldValue>
+            <valueName>Soporte Pymes 4</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banca Internacional</controllingFieldValue>
+            <valueName>Oficinas Representación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Banca Internacional</controllingFieldValue>
+            <valueName>Sucursales Internacionales</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

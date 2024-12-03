@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ErrorCola__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador si el registro de la cola de espacios a cargar se ha procesado con errores</description>
+    <inlineHelpText>Indicador si el registro de la cola de espacios a cargar se ha procesado con errores</inlineHelpText>
+    <label>Error procesado cola</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

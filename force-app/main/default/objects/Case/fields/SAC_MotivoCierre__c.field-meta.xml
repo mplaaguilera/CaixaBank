@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MotivoCierre__c</fullName>
+    <description>Campo que recoge el motivo redactado cuando un usuario cierra una reclamación forzando la resolución</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Motivo cierre</label>
+    <length>1350</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

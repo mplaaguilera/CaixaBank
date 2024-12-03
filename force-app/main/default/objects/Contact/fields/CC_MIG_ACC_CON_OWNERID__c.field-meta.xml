@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MIG_ACC_CON_OWNERID__c</fullName>
+    <formula>IF(OwnerId=Account.OwnerId , true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>MIG_ACC_CON_OWNERID</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

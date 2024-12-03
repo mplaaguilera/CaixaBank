@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ProductoFichaExperiencia</fullName>
+    <active>true</active>
+    <compactLayoutAssignment>AV_ProductoFicha_Experiencia</compactLayoutAssignment>
+    <label>ProductoFicha Experiencia</label>
+</RecordType>

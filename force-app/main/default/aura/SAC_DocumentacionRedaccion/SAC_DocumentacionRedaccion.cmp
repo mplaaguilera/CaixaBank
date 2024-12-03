@@ -1,0 +1,207 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="filetype" type="List" default="['.PDF']" />
+    <aura:attribute name="multiple" type="Boolean" default="false" />
+    <aura:attribute name="archivoSubido" type="Boolean" default="false" />
+    <aura:attribute name="disabled" type="Boolean" default="true" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+    <aura:attribute name="modalAdjuntar" type="Boolean" default="false" />
+    <aura:attribute name="stringRed" type="String" default="ResolucionRedaccion" />
+    <aura:attribute name="checkBoton" type="Boolean" default="false" />
+    <aura:attribute name="listaIds" type="String[]" />
+    <aura:attribute name="nombrePDF" type="String" />
+    <aura:attribute name="documentoResolucion" type="ContentDocumentLink" />
+    <aura:attribute name="selectedContentVersionId" type="Id" />
+    <aura:attribute name="contentVersions" type="List" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="hayDocs" type="Boolean" default="false" />
+
+
+    <aura:attribute name="tieneDocGuardado" type="Boolean" default="false" />
+    <aura:attribute name="carpetaRaiz" type="String" default="SAC_PlantillasRedaccion" />
+
+    <aura:registerEvent name="appEvent" type="c:SAC_PertimiteEmailRedaccion"/>
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+    <aura:handler event="force:refreshView" action="{! c.doInit}" />
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Cargando" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.usarComponente}">
+        <div class="slds-box">
+            <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Documentación resolución:</b></h1>
+            <div class="slds-grid slds-align-center" style="padding: 12px;">
+
+                <div class="slds-col" align="center">
+                    <div class="slds-float_left">                   
+                            <aura:if isTrue="{!v.tieneDocGuardado}"> 
+                                    <c:sAC_GeneracionDocumento aura:id="lwcGenDoc" recordId="{!v.recordId}" onsenddata="{!c.receiveLWCDataDocumento}"/>
+                                <aura:set attribute="else">
+                                        <c:sac_RecuperarPlantillasRedaccion aura:id="lwcGenDocPlantillas" recordId="{!v.recordId}" carpetaRaiz="{!v.carpetaRaiz}" onsenddataguardado="{!c.receiveLWCDataGuardado}"  onsenddatagenerar="{!c.receiveLWCDataGenerar}" />
+                                </aura:set>
+                            </aura:if>
+
+                    </div>
+
+                    <div class="slds-float_right">
+                        <aura:if isTrue="{!v.archivoSubido}"> 
+                            <lightning:icon iconName="doctype:attachment" alternativeText="Adjunto" title="Adjunto"
+                                        size="small" />
+                            <lightning:badge label="{!v.documentoResolucion.ContentDocument.Title}" /> 
+                         <lightning:button variant="base" label="Ver Documento" onclick="{!c.previsualizarDoc}" /> 
+                        </aura:if>
+                        <br></br>
+                        <lightning:button variant="brand" label="Adjuntar resolución" name="fileUploader" onclick="{!c.muestraModalAdjuntar}"  />
+                                           
+                        <!-- <lightning:fileUpload label="Adjuntar resolución" name="fileUploader" multiple="true"
+                            fileFieldName="SAC_StringRedaccion_fileupload__c" fileFieldValue="{!v.stringRed}"
+                            accept="{!v.filetype}" recordId="{!v.recordId}"
+                            onuploadfinished="{!c.handleUploadFinished}" /> -->
+                    </div>
+
+                    <aura:if isTrue="{!v.checkBoton}">
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            <div class="slds-modal__container">
+                                <header class="slds-modal__header">
+                                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.deshacer }"
+                                        alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                                        Confirme
+                                        la
+                                        operación</h2>
+                                </header>
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                    <p>Va a proceder a subir y reemplazar un archivo existente ya en el sistema:
+                                        <b>¿Está seguro de que quiere ejecutar la operación?</b>
+                                    </p>
+                                </div>
+                                <footer class="slds-modal__footer">
+
+                                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                                        onclick="{! c.deshacer }" />
+
+                                    <lightning:button variant="brand" label="OK" title="OK" onclick="{!c.continuar}" />
+                                </footer>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open"></div>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <aura:set attribute="else">
+            <div class="slds-box">
+                <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Documentación resolución:</b></h1>
+                <div class="slds-grid slds-align-center" style="padding: 12px;">
+
+                    <div class="slds-col" align="center">
+                        <div class="slds-float_left">
+                            <aura:if isTrue="{!v.tieneDocGuardado}">
+                                <c:sAC_GeneracionDocumento aura:id="lwcGenDoc" recordId="{!v.recordId}" onsenddata="{!c.receiveLWCDataDocumento}" botonDisabled="true"/>
+
+                                <aura:set attribute="else">
+                                    <c:sac_RecuperarPlantillasRedaccion aura:id="lwcGenDocPlantillas" recordId="{!v.recordId}" carpetaRaiz="{!v.carpetaRaiz}" botonDisabled="true"/>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+
+                        <div class="slds-float_right">
+                            <aura:if isTrue="{!v.archivoSubido}">
+                                {!v.documentoResolucion}
+                            </aura:if>
+<!-- 
+                            <lightning:fileUpload label="Adjuntar resolución" name="fileUploader" multiple="true"
+                                fileFieldName="SAC_StringRedaccion_fileupload__c" fileFieldValue="{!v.stringRed}"
+                                accept="{!v.filetype}" recordId="{!v.recordId}"
+                                onuploadfinished="{!c.handleUploadFinished}" disabled="true"/> -->
+                        </div>
+
+                        <aura:if isTrue="{!v.checkBoton}">
+                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                <div class="slds-modal__container">
+                                    <header class="slds-modal__header">
+                                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.deshacer }"
+                                            alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
+                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                                            Confirme
+                                            la
+                                            operación</h2>
+                                    </header>
+                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                        <p>Va a proceder a subir y reemplazar un archivo existente ya en el sistema:
+                                            <b>¿Está seguro de que quiere ejecutar la operación?</b>
+                                        </p>
+                                    </div>
+                                    <footer class="slds-modal__footer">
+
+                                        <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                                            onclick="{! c.deshacer }" />
+
+                                        <lightning:button variant="brand" label="OK" title="OK"
+                                            onclick="{!c.continuar}" />
+                                    </footer>
+                                </div>
+                            </section>
+                            <div class="slds-backdrop slds-backdrop_open"></div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+        </aura:set>
+    </aura:if>
+
+     <!-- Modal para adjuntar archivo de respuesta-->
+     <aura:if isTrue="{!v.modalAdjuntar}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{!c.ocultaModalAdjuntar}" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                       Adjuntar resolución</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Seleccione un documento para la resolución: </p>
+                    <br/>
+                    <lightning:spinner variant="brand" size="small" alternativeText="Loading" class="{!v.isLoading ? 'slds-show' : 'slds-hide'}"/>
+                    <aura:if isTrue="{!v.hayDocs}">
+                        <p>No hay documentos validados para seleccionar, debes tener documentos validados en el bloque de Respuesta dentro de la seccion de Docs</p>
+                    </aura:if>
+                    <aura:iteration items="{!v.contentVersions}" var="cv">
+                        <div class="slds-p-around_small">
+                            <lightning:input type="radio" name="contentVersion" label="{!cv.Title}" value="{!cv.Id}" onchange="{!c.handleContentVersionSelection}" />
+                        </div>
+                    </aura:iteration>
+                    <br/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Volver" title="volver"
+                        onclick="{!c.ocultaModalAdjuntar}" />
+                        <aura:if isTrue="{!v.hayDocs}">
+                            <lightning:button variant="brand" label="Continuar" title="Continuar" onclick="{!c.handleUploadFinished}" disabled="true"/>
+                            <aura:set attribute="else">
+                                <lightning:button variant="brand" label="Continuar" title="Continuar" onclick="{!c.handleUploadFinished}"/>
+                            </aura:set>
+                        </aura:if>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

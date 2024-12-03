@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_NumeroContrato</fullName>
+    <active>true</active>
+    <description>No permite enviar la tarea a GGH sin un numero de contrato</description>
+    <errorConditionFormula>AND(
+				AND(
+				    !$Permission.CBK_BypassValidationRules,
+				    !$Permission.SPV_BypassValidationRules
+								),
+				OR(RecordType.DeveloperName = &apos;SPV_MaestroDeTareas&apos;,RecordType.DeveloperName = &apos;SPV_Acciones&apos;),
+				ISCHANGED(SAC_Estado__c),
+				ISPICKVAL(SAC_Estado__c, &apos;SAC_PendienteAsignar&apos;),
+				SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c = &apos;SPV_GGH&apos;,
+				ISBLANK(SAC_NumeroContrato__c)
+    )</errorConditionFormula>
+    <errorMessage>El número de contrato debe estar informado</errorMessage>
+</ValidationRule>

@@ -1,0 +1,41 @@
+<template>
+    <lightning-card icon-name="standard:topic2" title="Información Cualitativa" variant="narrow" class="slds-border_bottom">
+        <div style="padding-left: 20px; padding: right 20px;">
+            <template if:true={mapaSecciones}>
+                <div class="slds-grid slds-wrap">
+                    <template for:each={mapaSecciones} for:item="mapaKey">
+                        <div key={mapaKey.key} class="slds-col slds-size_4-of-12">
+                            <details open>
+                                <summary class="slds-button slds-section__title-action">                            
+                                    <h3 class="slds-section__title">                                
+                                        {mapaKey.key}                                
+                                    </h3></summary>
+                                <template if:true={mapaKey.value}>
+                                    <div class="objeto">
+                                    <template for:each={mapaKey.value} for:item="object">  
+                                            <lightning-input type="checkbox" 
+                                            key={object.Name} 
+                                            label={object.Name} 
+                                            value={object.Name}
+                                            checked={object.Selecionado} 
+                                            disabled={desabilitado}
+                                            onchange={handleChange}> </lightning-input>
+                                    </template>
+                                    </div> 
+                                </template>                            
+                            </details><br>
+                        </div>
+                    </template>
+                </div>
+            </template>  
+            <template if:false={desabilitado}>
+                <lightning-button variant="brand"                 
+                label="Guardar" 
+                title="Primary action" 
+                onclick={handleClick} 
+                disabled={desabilitado}
+                ></lightning-button>                
+            </template>         
+        </div>       
+    </lightning-card>    
+</template>

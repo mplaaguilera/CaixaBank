@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_HasAnexo__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Allowing to check if has attachments manually</description>
+    <label>SEG_HasAnexo</label>
+    <type>Checkbox</type>
+</CustomField>

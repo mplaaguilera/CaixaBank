@@ -1,0 +1,7 @@
+<aura:component controller="SAC_TareasOperativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="tarea" type="SAC_Accion__c"/>
+    <aura:attribute name="user" type="String"/>
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+</aura:component>

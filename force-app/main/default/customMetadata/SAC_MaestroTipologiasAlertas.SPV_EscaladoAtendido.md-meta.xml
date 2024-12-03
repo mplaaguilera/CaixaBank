@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Escalado atendido</label>
+    <protected>false</protected>
+    <values>
+        <field>SAC_Condiciones__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_Destinatarios__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_NotiPlantillaHTML__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SAC_Notifica_Colaboradores__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SAC_OrgWideAddress__c</field>
+        <value xsi:type="xsd:string">Caixabank SPV</value>
+    </values>
+    <values>
+        <field>SAC_PararEjecucion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_Plantilla__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_Prioridad__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_RequiereAlerta__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SAC_RequiereEmail__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SAC_RequiereNotificacion__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>SAC_SiguienteEjecucion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_Texto_Notificacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_TiempoEjecucion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SAC_Tipo__c</field>
+        <value xsi:type="xsd:string">SPV_007</value>
+    </values>
+    <values>
+        <field>SAC_Titulo_Notificacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,81 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,lightning:availableForFlowScreens" access="global">
+    <aura:attribute name="iconName" type="String"/>
+	<aura:attribute name="titleName" type="String"/>
+	<aura:attribute name="titleName2" type="String"/>
+
+	<aura:attribute name="newRecord" type="Boolean"/>
+	<aura:attribute name="isEvent" type="Boolean"/>
+	<aura:attribute name="subject" type="String"/>
+	<aura:attribute name="startDate" type="String"/>
+	<aura:attribute name="clientName" type="String"/>
+	<aura:attribute name="recId" type="String"/>
+	<aura:attribute name="recTaskId" type="String"/>
+	<aura:attribute name="taskDate" type="String"/>
+	<aura:attribute name="taskPriority" type="String"/>
+	<aura:attribute name="obj" type="String"/>
+	<aura:attribute name="controlEventNoPla" type="Boolean"/>
+	<aura:attribute name="errorFlow" type="String"/>
+
+	<aura:attribute name="sobjecttype" type="String" default="{!v.sObjectName}"/>
+
+	<aura:attribute name="isOpen" type="boolean" default="false"/>
+	<aura:attribute name="isOpenOpp" type="boolean" default="false"/>
+    <aura:attribute name="titleFlow" type="String"/>
+
+    <aura:if isTrue="{!v.isOpen}">
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<!-- ###### MODAL BOX HEADER ######-->
+				<header class="slds-modal__header">
+					<lightning:buttonIcon iconName="utility:close"
+										onclick="{! c.closeModel }"
+										alternativeText="close"
+										variant="bare-inverse"
+										class="slds-modal__close"/>
+					<h2 class="slds-text-heading_medium slds-hyphenate">{!v.titleFlow}</h2>
+				</header>
+				<!--###### MODAL BOX BODY ######-->
+				<div class="slds-modal__content slds-p-around_medium">
+					<lightning:flow aura:id="AV_NuevaTarea" onstatuschange="{!c.statusChange}"/>
+					<lightning:flow aura:id="AV_NuevoEvento" onstatuschange="{!c.statusChange}"/>
+				</div>
+			</div>		
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+		<!--###### MODAL BOX Part END Here ######-->
+	</aura:if>
+	<aura:if isTrue="{!v.isOpenOpp}">
+		<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+			<div class="slds-modal__container">
+				<!-- ###### MODAL BOX HEADER ######-->
+				<header class="slds-modal__header">
+					<lightning:buttonIcon iconName="utility:close"
+										onclick="{! c.closeModel }"
+										alternativeText="close"
+										variant="bare-inverse"
+										class="slds-modal__close"/>
+					<h2 class="slds-text-heading_medium slds-hyphenate">{!v.titleFlow}</h2>
+				</header>
+				<!--###### MODAL BOX BODY ######-->
+				<div class="slds-modal__content slds-p-around_medium">
+					<lightning:flow aura:id="AV_NuevaOportunidadScreenFlow" onstatuschange="{!c.statusChange}"/>
+				</div>
+			</div>		
+		</section>
+		<div class="slds-backdrop slds-backdrop_open"></div>
+		<!--###### MODAL BOX Part END Here ######-->
+	</aura:if>
+	<aura:if isTrue="{!v.newRecord}">
+		<aura:if isTrue="{!!v.isEvent}">
+			<c:av_TaskDetail subject="{!v.subject}" startdate="{!v.startDate}" client="{!v.clientName}" taskPriority="{!v.taskPriority}"></c:av_TaskDetail>
+		</aura:if>
+		<aura:if isTrue="{!v.isEvent}">
+			<c:av_EventDetail subject="{!v.subject}" startdate="{!v.startDate}" client="{!v.clientName}"></c:av_EventDetail>
+		</aura:if>		
+		<c:av_ListOpportunities recid="{!v.recId}" sobjname="{!v.obj}" eventnoplanificado="{!v.controlEventNoPla}" newrecord="{!v.newRecord}" onlaunchflow="{!c.launchFlow}" ontextflow="{!c.textErrorFlow}"></c:av_ListOpportunities>
+		<!--<c:av_NewOppFlow onlaunchflow="{!c.launchFlowOpp}"></c:av_NewOppFlow>-->
+		<aura:set attribute="else">
+			<c:av_ListOpportunities recid="{!v.recordId}" sobjname="{!v.sobjecttype}" newrecord="{!v.newRecord}" onlaunchflow="{!c.launchFlow}"></c:av_ListOpportunities>
+    	</aura:set>
+	</aura:if>
+</aura:component>

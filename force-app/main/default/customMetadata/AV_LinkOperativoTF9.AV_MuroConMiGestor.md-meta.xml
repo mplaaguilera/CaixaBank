@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Muro</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_Activo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>AV_Order__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>AV_Seccion__c</field>
+        <value xsi:type="xsd:string">Account,Task,Event,Opportunity,AV_ProductClient__c</value>
+    </values>
+    <values>
+        <field>AV_Url__c</field>
+        <value xsi:type="xsd:string">https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/peaRedirect.tf7?pea=CA.OFI.MuroConMiGestorMensajes.muro&amp;origen=salesforce&amp;_vmcNewTab=true&amp;params=idCliente%3D{numperso}%26nombre%3D{firstname}%20{lastname}%26nif%3D{nif}</value>
+    </values>
+</CustomMetadata>

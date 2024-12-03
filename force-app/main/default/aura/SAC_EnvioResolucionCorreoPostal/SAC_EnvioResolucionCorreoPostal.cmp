@@ -1,0 +1,170 @@
+<aura:component controller="SAC_LCMP_EnvioResolucionCorreoPostal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable,flexipage:availableForAllPageTypes"
+    access="global">
+
+    <aura:attribute name="caseId" type="id" />
+    <aura:attribute name="nombreTitular" type="String" />
+    <aura:attribute name="direccionTotal" type="String" />
+    <aura:attribute name="direccion" type="String" />
+    <aura:attribute name="poblacion" type="String" />
+    <aura:attribute name="provincia" type="String" />
+    <aura:attribute name="pais" type="String" />
+    <aura:attribute name="codigoPostal" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+
+    <aura:attribute name="idCarta" type="id" default="" />
+    <aura:attribute name="procedencia" type="String" default="redacción" />
+
+    <aura:attribute name="documentoRedaccion" type="ContentDocument" />
+    <aura:attribute name="idDocumentoRedaccion" type="String" />
+    <aura:attribute name="idVersion" type="String" />
+
+    <aura:attribute name="clickActivado" type="Boolean" default="false" />
+    <aura:attribute name="isLoading" type="Boolean" />
+
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="copia" type="String" />
+    <aura:attribute name="copiaOculta" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="idDoc" type="String[]" />
+
+    <aura:attribute name="modalValidarDoc" type="Boolean" default="false" />
+    <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
+
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.inicio}" />
+    <aura:handler event="force:refreshView" action="{! c.init}" />
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-box myClass" style="padding: 14px; margin: 9px;" >
+
+            <div class="slds-text-longform"  alignment-bump="bottom">
+
+                <h1 style="font-size: 15px"><b>El canal de contacto para este cliente es correo postal</b></h1>
+
+                <p style="font-weight:bold; color: red;">Compruebe que los datos postales sean correctos.</p>
+
+                <h1 style="padding-top: 12px; font-size: 14px"><b>Datos de envío:</b></h1>
+
+                <div style="line-height : 2px; margin-left: 14px">
+                    <p>{!v.nombreTitular}</p>
+                    <p>{!v.direccion}</p>
+                    <p>{!v.codigoPostal}</p>
+                    <p>{!v.poblacion} </p>
+                    <p>{!v.provincia} </p>
+                </div>
+            </div>
+            <div style="margin-top: 12px; margin-left: 16px">
+                <lightning:button variant="brand" label="Modificar datos envío" title="Modificar"
+                    onclick="{! c.clickModificar }" />
+            </div>
+        </div>
+
+        <div class="slds-col slds-box"
+            style="padding: 14px; margin: 9px; text-align:center">
+            <div style="margin: auto">
+                <lightning:fileCard fileId="{!v.idDocumentoRedaccion}" />
+            </div>
+            <div align='right' style="margin-top: 8px;">
+                <lightning:button variant="brand" label="Enviar" title="Enviar" onclick="{!c.abrirModalValidarDoc}" /> <!-- !c.finalizar-->
+            </div>
+        </div>
+    </div>
+
+
+    <lightning:recordEditForm aura:id="editForm" recordId="{!v.idCarta}"
+                        objectApiName="SAC_DocumentoEnvio__c" onsuccess="{!c.handleSuccess}"
+                        onsubmit="{!c.handleSubmit}">
+                        <lightning:messages />
+                        <lightning:inputField fieldName="SAC_Caso__c" value="{!v.recordId}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_TipoDocumento__c" value="{!v.procedencia}"
+                            class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Direccion__c" value="{!v.direccion}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Poblacion__c" value="{!v.poblacion}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_CP__c" value="{!v.codigoPostal}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Provincia__c" value="{!v.provincia}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Pais__c" value="{!v.pais}" class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Documento__c" value="{!v.idDocumentoRedaccion}"
+                            class="slds-hide" />
+                        <lightning:inputField fieldName="SAC_Version__c" value="{!v.idVersion}" class="slds-hide" />
+
+                        <lightning:button class="slds-m-top_small slds-show slds-hide" type="submit"
+                            label="Actualizar previsualización" />
+        </lightning:recordEditForm>
+
+
+
+    <aura:if isTrue="{!v.clickActivado}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" onclick="{! c.ocultaModal }" alternativeText="close"
+                        variant="bare-inverse" class="slds-modal__close" />
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                        Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="height: 350px;">
+
+                    <lightning:input name="input1" label="Dirección" required="true" value="{!v.direccion}"/>
+                    <lightning:input name="input2" label="Código postal" required="true" value="{!v.codigoPostal}"/>
+                    <lightning:input name="input3" label="Población" required="true" value="{!v.poblacion}"/>
+                    <lightning:input name="input4" label="Provincia" required="true" value="{!v.provincia}"/>
+                    
+                    <lightning:combobox aura:id="selectorPais" name="status" label="País"
+                        placeholder="--Seleccione un país--"
+                        value="{!v.paisSeleccionado}"
+                        onchange="{!c.cambioPais}"
+                        options="{!v.options}"/>
+
+                    <br/>
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                        onclick="{! c.ocultaModal }" />
+                    <lightning:button variant="brand" label="Guardar" title="OK" onclick="{!c.guardarDatos}" />
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.modalValidarDoc}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalValidarDoc }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirme la operación</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Para <b>garantizar la seguridad e integridad de la información </b> en materia de protección de datos, <u>recuerde realizar las siguientes validaciones</u>:</p><br/>
+                    <p>&ensp;&ensp;1. La <b>carta de respuesta </b>y demás <b>documentación adjunta</b> se corresponde con el reclamante</p>
+                    <p>&ensp;&ensp;2. El envío se realiza al <b>destinatario correcto</b></p>
+                    <br/>
+                    <lightning:input type="checkbox" label="Confirmo que he realizado las validaciones" value="{!v.checkConfirmacionValidacion}" checked="{!v.checkConfirmacionValidacion}" />
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.cerrarModalValidarDoc }" />
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.validarDocumentacion }" title="Confirmar">Confirmar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

@@ -1,0 +1,113 @@
+<template>
+
+	<lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+
+	<!--dashboards sin donut charts-->
+	<template if:false={showDonutCharts}>
+		<article class="slds-card slds-is-relative min-size card-temp" style="position: relative;
+		padding: 0.5rem;
+		border: 1px solid rgb(221, 219, 218);
+		border-radius: 0.25rem;
+		background-clip: padding-box;
+		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);" onclick={navigateToReport}>
+			<div class="card-title min-size-title slds-text-align_center" title={title}>{title} </div><!-- cursor-default -->
+			<div class="slds-card__body slds-card__body_inner num-records-container">
+				<span class="cursor-default no-select">{numRecords}</span>
+			</div>
+		</article>
+	</template>
+
+	<!--dashboards con donut charts-->
+	<template if:true={showDonutCharts}>
+		<lightning-layout>
+			<lightning-layout-item  >
+				<div class="custom-box">
+					<template if:false={showNumbers}>    
+						<article class="slds-card  card-temp-donut-chart" style="position: relative;
+						padding: 0.5rem;
+						border: 1px solid rgb(221, 219, 218);
+						border-radius: 0.25rem;
+						background-clip: padding-box;
+						box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);">
+							<div class="slds-grid slds-grid_vertical "> 
+								<article class="slds-card ">
+									<div class="card-title min-size-title slds-text-align_center" title={title}>{title}<!-- cursor-default --></div>
+									<div class="slds-grid_vertical-align-center ">
+										<canvas name={metadataChartName} height="100rem" width="200rem" lwc:dom="manual"></canvas>	
+									</div>
+								</article>
+								<div>
+									<template if:true={showLegendClients} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Priorizador">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Priorizador">Priorizador</div> <br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Experiencia Cliente">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id="Experiencia Cliente">Experiencia de Cliente </div><br>
+										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id="Iniciativa Gestor/a">Iniciativa Gestor </div><br>
+										<div class="dot-light-blue" onclick={navigateToReportWithFilterLegend} data-id="Alertas Comerciales" >  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id="Alertas Comerciales">Alertas Comerciales </div><br>
+										<div class="dot-lighter-blue" onclick={navigateToReportWithFilterLegend} data-id="Onboarding Intouch" >  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id="Onboarding Intouch">Onboarding Intouch</div>
+									</template>
+									<template if:true={showLegendConversations} >
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend}  data-id="Llamadas">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend}  data-id="Llamadas">Llamadas </div><br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Muro">  </div>
+										<div class="inline" onclick={navigateToReportWithFilterLegend} data-id="Muro">Muro </div><br>
+										<div class="dot-intermediate-blue" onclick={navigateToReportWithFilterLegend} data-id="Stop&Go">  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id="Stop&Go">Stop&Go </div>
+									</template>
+									<template if:true={showLegendAppointments}>
+										<div class="dot-dark-blue" onclick={navigateToReportWithFilterLegend} data-id="Salida','001">  </div>
+										<div class="inline legend-margin" onclick={navigateToReportWithFilterLegend} data-id="Salida','001">Origen Cliente </div><br>
+										<div class="dot-blue" onclick={navigateToReportWithFilterLegend} data-id="Entrada','002">  </div>
+										<div class="inline slds-m-bottom_small" onclick={navigateToReportWithFilterLegend} data-id="Entrada','002">Origen Gestor </div>
+									</template>
+									<template if:true={showLegendTasks}>
+										<div class="dot-dark-blue legend-margin">  </div>
+										<div class="inline">Tareas</div>
+									</template>
+									<template if:true={showLegendWarnings}>
+										<div class="dot-dark-blue legend-margin">  </div>
+										<div class="inline">Avisos</div><br>
+									</template>
+									<div if:true={showButton} class= "custom_button">
+										<button class = "inner_button"   
+										onclick={goMassReassign}> <a >No asignados</a>	 </button>
+							<!-- <lightning-button variant="brand-outline" label="No asignados" onclick={handleClick} ></lightning-button> -->
+
+									</div>
+								</div>
+							</div>
+						</article>
+					</template>
+					<template if:true={showNumbers}>   
+						<article class="slds-card  card-temp-donut-chart" style="position: relative;
+							padding: 0.5rem;
+							border: 1px solid rgb(221, 219, 218);
+							border-radius: 0.25rem;
+							background-clip: padding-box;
+							box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);" onclick={navigateToReport}>
+								<div class="card-title min-size-title slds-text-align_center" title={title}>{title} </div><!-- cursor-default -->
+								<div class="slds-card__body slds-card__body_inner num-records-container">
+									<span class="cursor-default no-select">{numRecords}</span>
+								</div>
+						
+		
+
+						</article>
+					</template>
+					<!-- <template if:true={showButton}> -->
+						<!-- <lightning-layout> -->
+							<!-- <lightning-button variant="brand-outline" label="Brand Outline" title="Primary action with lighter look" onclick={handleClick} class="slds-m-left_x-small"></lightning-button> -->
+				
+						<!-- </lightning-layout>	 -->
+					<!-- </template> -->
+	
+				</div>
+			</lightning-layout-item>
+		
+		</lightning-layout>
+	</template>
+
+</template>

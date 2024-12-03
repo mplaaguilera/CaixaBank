@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TMS_Cambio_propietario</fullName>
+    <active>true</active>
+    <description>Validation rule para que los usuarios de Testamentarías no puedan cambiar el propietario del caso de forma manual.</description>
+    <errorConditionFormula>AND(
+				    AND(
+				NOT($Permission.CBK_BypassValidationRules),
+				NOT($Permission.TMS_BypassValidationRules)
+												),
+				AND($UserRole.Name  = &apos;Testamentarías&apos;,
+				NOT($Permission.TMS_CP_Admin) , 
+				ISCHANGED(OwnerId)
+			)
+				)</errorConditionFormula>
+    <errorMessage>No es posible cambiar el propietario de un expediente.</errorMessage>
+</ValidationRule>

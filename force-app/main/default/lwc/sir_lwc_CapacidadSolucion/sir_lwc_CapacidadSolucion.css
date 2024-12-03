@@ -1,0 +1,50 @@
+th, td {
+    border: 1px solid lightgrey;
+    padding: 5px;
+    border-radius: 25px;
+}
+
+
+.textCenter {
+    text-align: center;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.negrita {
+    font-weight: bold;
+}
+
+.noBordes {
+    border: 0px solid !important;
+}
+
+.noLabel{
+    margin-top: -15px;
+}
+.semiNegrita {
+    font-weight: 600;
+}
+.input lightning-input{
+    display:inline-block;
+}
+details > summary {
+    padding: 4px;
+    background-color: #eeeeee;
+    outline: none;
+}
+.noBorder{
+    border: none;
+}
+.classCenter{
+    text-align: center;
+}
+.negrita {
+    font-weight: bold;
+}
+
+.slds-input[readonly]{
+    padding-left: 10px;
+}

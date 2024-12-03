@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Capacidad_Proveedores_Chat</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Cliente_Empleado__c</columns>
+    <columns>CC_Tipo_Chat_Transcript__c</columns>
+    <columns>CC_Queue_Name__c</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>CC_Proveedor__c</columns>
+    <columns>CC_Capacidad__c</columns>
+    <columns>CC_Prioridad__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Capacidad_Proveedores__c.CC_Chat</value>
+    </filters>
+    <label>Capacidad Proveedores - Chat</label>
+    <sharedTo>
+        <group>CC_Coordinadores</group>
+        <group>CC_Supervisor</group>
+        <group>Coordinadores</group>
+    </sharedTo>
+</ListView>

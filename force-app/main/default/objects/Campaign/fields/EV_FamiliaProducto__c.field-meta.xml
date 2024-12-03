@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_FamiliaProducto__c</fullName>
+    <description>Familia de producto del evento, cuando el evento es de esta categoría.</description>
+    <inlineHelpText>Informar la familia del producto.</inlineHelpText>
+    <label>Familia del Producto</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>test</fullName>
+                <default>false</default>
+                <label>test</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

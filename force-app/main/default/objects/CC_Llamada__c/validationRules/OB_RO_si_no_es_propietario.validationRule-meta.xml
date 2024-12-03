@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OB_RO_si_no_es_propietario</fullName>
+    <active>true</active>
+    <description>Solo el propietario de una llamada de Outbound puede modificarla</description>
+    <errorConditionFormula>AND(
+   BEGINS(RecordType.DeveloperName, &apos;OB_&apos;),
+   $User.Id &lt;&gt; OwnerId,
+   BEGINS($Profile.Name, &apos;OB_&apos;),
+   NOT(ISCHANGED(OwnerId))
+)</errorConditionFormula>
+    <errorMessage>Solo el propietario de la llamada puede modificarla</errorMessage>
+</ValidationRule>

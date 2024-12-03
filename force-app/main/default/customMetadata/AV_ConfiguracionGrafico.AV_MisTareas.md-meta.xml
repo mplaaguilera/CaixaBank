@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Mis Tareas</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_BackgroundColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_BorderColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Data__c</field>
+        <value xsi:type="xsd:string">SELECT COUNT() FROM Task WHERE Status IN (&apos;Open&apos;,&apos;Pendiente no localizado&apos;) AND RecordType.DeveloperName IN (&apos;AV_AlertaComercial&apos;,&apos;AV_Priorizador&apos;,&apos;AV_Onboarding&apos;,&apos;AV_Otros&apos;,&apos;AV_MorosidadNormativa&apos;,&apos;AV_ConversacionPendiente&apos;,&apos;AV_ContactosGCF&apos;,&apos;AV_ExperienciaCliente&apos;) AND Subject != null AND AV_Origen__c != null AND (Priority IN (&apos;Y&apos;,&apos;A&apos;,&apos;M&apos;) OR Priority = null) AND (AV_Tipo__c IN (&apos;030&apos;,&apos;001&apos;,&apos;LMD&apos;,&apos;CTO&apos;,&apos;VLD&apos;,&apos;ESE&apos;,&apos;CTF&apos;) OR AV_Tipo__c = null) and (ActivityDate &gt; TODAY) AND OwnerId = &apos;#userId&apos;</value>
+    </values>
+    <values>
+        <field>AV_FilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Orden__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Redirect__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>AV_ReportName__c</field>
+        <value xsi:type="xsd:string">AV_MyTasks</value>
+    </values>
+    <values>
+        <field>AV_TipoGrafico__c</field>
+        <value xsi:type="xsd:string">bar</value>
+    </values>
+    <values>
+        <field>AV_UserBackgroundColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,0.5)</value>
+    </values>
+    <values>
+        <field>AV_UserBorderColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,1)</value>
+    </values>
+    <values>
+        <field>AV_UserFilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

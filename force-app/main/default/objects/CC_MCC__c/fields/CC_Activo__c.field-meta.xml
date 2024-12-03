@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Activo__c</fullName>
+    <formula>IF( ( NOT(ISBLANK(CC_Fecha_Vigencia_Fin__c)) &amp;&amp; NOW() &gt;= CC_Fecha_Vigencia_Inicio__c &amp;&amp; NOW() &lt; CC_Fecha_Vigencia_Fin__c ) || ( ISBLANK(CC_Fecha_Vigencia_Fin__c) &amp;&amp; NOW() &gt;= CC_Fecha_Vigencia_Inicio__c ), true, false)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Activo</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

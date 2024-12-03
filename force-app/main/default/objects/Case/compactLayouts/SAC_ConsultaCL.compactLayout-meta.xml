@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ConsultaCL</fullName>
+    <fields>Subject</fields>
+    <fields>SEG_Prioridad_flag__c</fields>
+    <fields>CC_Idioma__c</fields>
+    <fields>Status</fields>
+    <fields>CC_SuppliedOrigen__c</fields>
+    <fields>CC_Canal_Procedencia__c</fields>
+    <fields>SAC_DerivadoA__c</fields>
+    <label>SAC Consulta compact layout</label>
+</CompactLayout>

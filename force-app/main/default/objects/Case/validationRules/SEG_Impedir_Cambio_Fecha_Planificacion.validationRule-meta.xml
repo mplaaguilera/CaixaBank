@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Impedir_Cambio_Fecha_Planificacion</fullName>
+    <active>true</active>
+    <description>No es posible cambiar la fecha de planificación de un caso ya planificado. Desplanifique el caso y planifíquelo de nuevo.</description>
+    <errorConditionFormula>AND(
+OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;, RecordType.DeveloperName == &apos;SEG_Seguimiento&apos;),
+ISPICKVAL(Status, &apos;Planificado&apos;),
+ISCHANGED(SEG_Fecha_planificaci_n__c),
+NOT(ISBLANK(PRIORVALUE(SEG_Fecha_planificaci_n__c)))
+)</errorConditionFormula>
+    <errorDisplayField>SEG_Fecha_planificaci_n__c</errorDisplayField>
+    <errorMessage>No es posible cambiar la fecha de planificación de un caso ya planificado. Desplanifique el caso y planifíquelo de nuevo.</errorMessage>
+</ValidationRule>

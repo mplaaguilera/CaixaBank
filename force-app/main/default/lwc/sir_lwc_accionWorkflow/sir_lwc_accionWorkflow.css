@@ -1,0 +1,13 @@
+.slds-form-element__label{
+    font-weight: 500;
+    font-size: 14px;
+    width: 100%;
+}
+
+:host {
+    --sds-c-textarea-sizing-min-height: 120px;
+}
+
+.slds-modal__content{
+    height: 660px;
+}

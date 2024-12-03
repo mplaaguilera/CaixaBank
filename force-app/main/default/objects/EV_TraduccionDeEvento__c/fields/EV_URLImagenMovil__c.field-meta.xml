@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenMovil__c</fullName>
+    <description>Página de detalle del Portal. Tamaño imagen (739x418)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Página de detalle del Portal (739x418px)</inlineHelpText>
+    <label>URL Imagen Detalle Portal</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

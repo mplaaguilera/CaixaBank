@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Segunda licencia custom para analytics ya que la otra no se le pueden asignar más.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Einstein Analytics User 2</label>
+    <license>EinsteinAnalyticsPlusPsl</license>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>WaveTabularDownload</name>
+    </userPermissions>
+</PermissionSet>

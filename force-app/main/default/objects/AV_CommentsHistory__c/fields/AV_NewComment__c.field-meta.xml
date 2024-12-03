@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_NewComment__c</fullName>
+    <description>Campo de tipo long text area que contiene el valor del comentario nuevo</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>New Comment</label>
+    <length>4000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Procedencia__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Canal Procedencia</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>AC</fullName>
+                <default>true</default>
+                <label>AC</label>
+            </value>
+            <value>
+                <fullName>Accionista</fullName>
+                <default>false</default>
+                <label>Accionista</label>
+            </value>
+            <value>
+                <fullName>MicroBank</fullName>
+                <default>false</default>
+                <label>MicroBank</label>
+            </value>
+            <value>
+                <fullName>PromoCaixa</fullName>
+                <default>false</default>
+                <label>PromoCaixa</label>
+            </value>
+            <value>
+                <fullName>Soporte cliente compra Estrella</fullName>
+                <default>false</default>
+                <label>Soporte cliente compra Estrella</label>
+            </value>
+            <value>
+                <fullName>Soporte Empleados CompraEstrella</fullName>
+                <default>false</default>
+                <label>Soporte Empleados CompraEstrella</label>
+            </value>
+            <value>
+                <fullName>CSI</fullName>
+                <default>false</default>
+                <label>CSI</label>
+            </value>
+            <value>
+                <fullName>ImaginBank</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>ImaginBank</label>
+            </value>
+            <value>
+                <fullName>Soporte Clientes CompraEstrella</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Soporte Clientes CompraEstrella</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

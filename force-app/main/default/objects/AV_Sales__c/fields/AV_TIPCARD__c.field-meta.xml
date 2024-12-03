@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TIPCARD__c</fullName>
+    <description>TIPCARD</description>
+    <label>TIPCARD</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>F</fullName>
+                <default>false</default>
+                <label>Tarjeta Física</label>
+            </value>
+            <value>
+                <fullName>H</fullName>
+                <default>false</default>
+                <label>CaixaBank Pay</label>
+            </value>
+            <value>
+                <fullName>S</fullName>
+                <default>false</default>
+                <label>Samsung Pay</label>
+            </value>
+            <value>
+                <fullName>P</fullName>
+                <default>false</default>
+                <label>PERSONAL</label>
+            </value>
+            <value>
+                <fullName>V</fullName>
+                <default>false</default>
+                <label>ViaT</label>
+            </value>
+            <value>
+                <fullName>T</fullName>
+                <default>false</default>
+                <label>Pulsera/TAG</label>
+            </value>
+            <value>
+                <fullName>I</fullName>
+                <default>false</default>
+                <label>Imagin Pay</label>
+            </value>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>Apple Pay</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Samsung Pay VTS</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>Fitbit Pay</label>
+            </value>
+            <value>
+                <fullName>G</fullName>
+                <default>false</default>
+                <label>Garmin Pay</label>
+            </value>
+            <value>
+                <fullName>W</fullName>
+                <default>false</default>
+                <label>Huawei Pay</label>
+            </value>
+            <value>
+                <fullName>X</fullName>
+                <default>false</default>
+                <label>CaixaBank Pay VTS</label>
+            </value>
+            <value>
+                <fullName>Y</fullName>
+                <default>false</default>
+                <label>Imagin Pay VTS</label>
+            </value>
+            <value>
+                <fullName>E</fullName>
+                <default>false</default>
+                <label>HIPOTECARIA</label>
+            </value>
+            <value>
+                <fullName>O</fullName>
+                <default>false</default>
+                <label>OTRAS GARANTÍAS</label>
+            </value>
+            <value>
+                <fullName>C</fullName>
+                <default>false</default>
+                <label>HIPOTECARIO DE PROMOCIÓN</label>
+            </value>
+            <value>
+                <fullName>D</fullName>
+                <default>false</default>
+                <label>DESCONECTADA</label>
+            </value>
+            <value>
+                <fullName>J</fullName>
+                <default>false</default>
+                <label>INMEDIATA</label>
+            </value>
+            <value>
+                <fullName>Z</fullName>
+                <default>false</default>
+                <label>OTROS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

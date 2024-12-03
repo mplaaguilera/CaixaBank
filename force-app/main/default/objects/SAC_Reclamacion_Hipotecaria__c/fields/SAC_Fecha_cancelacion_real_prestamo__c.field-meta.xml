@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Fecha_cancelacion_real_prestamo__c</fullName>
+    <description>Fecha de cancelación real del préstamo</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha cancelación real del préstamo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

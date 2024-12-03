@@ -1,0 +1,49 @@
+.THIS .backgroundColor-green {
+    background-color: #e6fff0;
+    min-height: 48px;
+    transition: 0.24s;
+}
+
+.THIS .backgroundColor-green:hover {
+    background-color: #d0ffd2;
+    min-height: 48px;
+}
+
+.THIS .backgroundColor-red {
+    background-color: #ffe6e6;
+    min-height: 48px;
+    transition: 0.24s;
+}
+
+.THIS .backgroundColor-red:hover {
+    background-color: #ffd6d6;
+    min-height: 48px;
+}
+
+.THIS .backgroundColor-blue {
+    background-color: #dfedff;
+    min-height: 48px;
+    transition: 0.24s;
+}
+
+.THIS .backgroundColor-blue:hover {
+    background-color: #cfddff;
+    min-height: 48px;
+}
+
+.THIS button.slds-button.slds-button_neutral,
+.THIS button.slds-button.slds-button_destructive,
+.THIS button.slds-button.slds-button_text-destructive,
+.THIS button.slds-button.slds-button_icon-border,
+.THIS button.slds-combobox__input,
+.THIS textarea.slds-textarea,
+.THIS select.slds-select,
+.THIS input.slds-input,
+.THIS div.slds-dropdown,
+.THIS ul.slds-dropdown,
+.THIS button.slds-button_icon-border-filled,
+.THIS span.slds-pill,
+.THIS div.slds-rich-text-editor,
+.THIS span.slds-file-selector__button {
+    border-color: rgb(201, 201, 201);
+}

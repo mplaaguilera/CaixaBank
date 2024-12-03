@@ -1,0 +1,43 @@
+<template>
+    <div if:true={showFinished} class="container-div">
+<lightning-spinner  if:true={showSpinner}  alternative-text="Loading" size="medium" class="spin-cls spinner-block" style="z-index: 3;"></lightning-spinner>
+
+        <div class="cardMargin">
+            <c-av_-finished-task-report-opp task-id={taskId}></c-av_-finished-task-report-opp>
+        </div>
+        <div class="cardMargin">
+			<div class="slds-box messageWarning cardMargin slds-align_absolute-center">
+				<div>
+					<p>Para reportar correctamente las oportunidades es necesario:</p>
+					<ol class="slds-list_ordered">
+						<li>Actualizar el listado de las oportunidades vinculadas a la tarea.</li>
+						<li>Informar el estado y detalle de las oportunidades vinculadas.</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+
+    <div class="cardMargin">
+        <c-av_-list-opportunities recid={taskIds} sobjname='Task' isreport=true ondatareport={handleDataReport} onrefreshlink={handleRefresh}></c-av_-list-opportunities>
+    </div>
+    <div if:true={showNewoppo}>
+        <lightning-card>
+            <lightning-button-icon icon-name="utility:close" alternative-text="Cancelar creación de oportunidad" class="slds-m-left_xx-small close-button" title="Cancelar creación de oportunidad" onclick={handelCancelNewOpp}></lightning-button-icon>
+            <div class="cardMargin">
+                <c-av_-new-opportunity-editable taskid={taskIds} default-stage="En gestión/insistir" ondata={handleDataOpp}></c-av_-new-opportunity-editable>
+            </div>
+        </lightning-card>
+    </div>
+    <div class="cardMargin">
+        <lightning-button if:false={showNewoppo} label="Crear una nueva oportunidad" title="Crear oportunidad" icon-name="utility:add" class="slds-m-left_x-small" onclick={handleNewOpp}></lightning-button>
+    </div>
+    <div class="postionButton">
+        <c-av_-pending-tasks if:true={pendingTask} record-id={taskIds} ondata={handleDataPendingTask}></c-av_-pending-tasks>
+    </div>
+    <div class="slds-docked-form-footer">
+        <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={cancelButton} onclick={handleCancel}>Cancelar</button>
+        <button type="submit" class="slds-button slds-button_stretch buttonStyle" disabled={saveButton} onclick={handleSave}>Grabar Reporte</button>
+    </div>
+</div>
+<!-- <lightning-spinner if:true={showSpinner}  alternative-text="Loading" size="medium" class="spin-cls spinner-block" style="z-index: 3;"></lightning-spinner> -->
+</template>

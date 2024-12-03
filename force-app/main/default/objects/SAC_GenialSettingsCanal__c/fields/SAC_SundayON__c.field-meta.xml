@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_SundayON__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si es un domingo, solo se podrán enviar casos a la IA si este check está a true.
+Por defecto estará unchecked.</description>
+    <label>Domingo Activado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

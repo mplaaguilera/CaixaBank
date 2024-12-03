@@ -1,0 +1,38 @@
+.chev-icon{
+    vertical-align: top;
+}
+.linked-contrato-button{
+    float: right;
+}
+.contrato-title{
+    text-decoration: none;
+    color: #006dcc;
+    vertical-align: -webkit-baseline-middle;
+}
+.section-div{
+    display: inherit;
+    overflow: auto;
+    margin: 0.2rem;
+}
+.sec-form{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.column-header {
+    vertical-align: top;
+    text-align: justify;
+    padding-bottom: 20px;
+    padding-right: 10px;
+}
+.solicitarContratos{
+    float: right;
+}
+.opaque-card {
+    opacity: 0.5; /* Ajusta el valor de opacidad según tus necesidades */
+  }
+.column-cell {
+    vertical-align: top;
+    text-align: justify;
+    padding-bottom: 5px;
+    padding-right: 10px;
+}

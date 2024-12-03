@@ -1,0 +1,532 @@
+<template>
+
+	<section lwc:ref="modalAutenticacionOtp" role="dialog" tabindex="-1" aria-modal="true" class={modalAutenticacionOtpClass} onkeydown={modalTeclaPulsada}>
+		<div class="slds-modal__container">
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={salir}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<div class="slds-modal__header">
+				<h1 class="slds-modal__title slds-hyphenate" tabindex="-1">Autenticación segura del cliente</h1>
+				<p class="slds-var-m-top_x-small">Iniciar un proceso de autenticación segura para verificar la identidad del cliente.</p>
+			</div>
+
+			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_medium slds-var-p-horizontal_xx-large">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
+				<article class="slds-card slds-var-m-top_large">
+					<div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small" style="text-align: end;">
+						<div class="slds-col">
+							<div class="divTitulo slds-truncate" style="margin: 0;">Nueva autenticación segura:</div>
+						</div>
+						<div class="slds-col slds-grow-none">
+							<lightning-button-group>
+								<lightning-button class="botonClienteDigital" label="Cliente digital" icon-name='utility:push' onclick={iniciarAutenticacion} data-nivel="Cliente Digital" disabled={componente.spinner}></lightning-button>
+								<lightning-button class="botonNivel2" label="Nivel 2" icon-name='utility:sms' onclick={iniciarAutenticacion} data-nivel="Nivel 2" disabled={componente.spinner}></lightning-button>
+								<lightning-button lwc:ref="botonEmergencia" class={botonEmergenciaAttribs.class} label="Emergencia" icon-name={botonEmergenciaAttribs.iconName} onclick={iniciarAutenticacion} data-nivel="Emergencia" disabled={componente.spinner}></lightning-button>
+							</lightning-button-group>
+						</div>
+					</div>
+				</article>
+
+				<article class="slds-card" style="margin-top: 28px;">
+					<div class="slds-page-header">
+						<div class="slds-page-header__row">
+							<div class="slds-page-header__col-title">
+								<div class="slds-media">
+									<div class="slds-media__figure">
+										<lightning-icon icon-name="standard:opportunity" size="small"></lightning-icon>
+									</div>
+									<div class="slds-media__body">
+										<div class="slds-page-header__name">
+											<div class="slds-page-header__name-title">
+												<h1>
+													<span lwc:if={oportunidad} class="slds-media__body slds-card__header-title slds-truncate slds-is-relative slds-text-color_weak" style="top: 3px; font-size: 13.5px; font-weight: 400;">
+														<span class="slds-truncate">Autenticaciones seguras en curso para la oportunidad</span>
+														<span class="slds-truncate" style="font-weight: 600;">&nbsp;{oportunidad._identificador}</span>
+													</span>
+												</h1>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-page-header__col-actions" style="padding-bottom: 0;">
+								<div class="slds-page-header__controls">
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px; margin-right: 2px;">
+										<span class="slds-text-body_small">&nbsp;{datatableData.datatableEnCurso.length} items</span>
+									</div>
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div lwc:if={datatableData.datatableEnCurso.length} class="datatableContainer">
+						<lightning-datatable
+							columns={datatableColumns.datatableEnCurso}
+							data={datatableData.datatableEnCurso}
+							key-field="Id"
+							hide-checkbox-column
+							column-widths-mode="auto"
+							min-column-width=55
+							wrap-text-max-lines=3
+							sorted-by="CreatedDate"
+							sorted-direction="desc"
+							onrowaction={datatablesOnrowaction}>
+						</lightning-datatable>
+					</div>
+					<div lwc:else class="mensajeSinRegistrosContainer">
+						<div class="slds-var-m-around_large slds-text-color_weak">No existen autenticaciones seguras en curso para la oportunidad actual.</div>
+					</div>
+				</article>
+
+				<article class="slds-card slds-var-m-bottom_large" style="margin-top: 29px;">
+					<div class="slds-page-header">
+						<div class="slds-page-header__row">
+							<div class="slds-page-header__col-title">
+								<div class="slds-media">
+									<div class="slds-media__figure">
+										<lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+									</div>
+									<div class="slds-media__body">
+										<div class="slds-page-header__name">
+											<div class="slds-page-header__name-title">
+												<h1>
+													<span lwc:if={oportunidad} class="slds-media__body slds-card__header-title slds-truncate slds-is-relative slds-text-color_weak" style="top: 3px; font-size: 13.5px; font-weight: 400;">
+														<span class="slds-truncate"> Otras autenticaciones seguras del cliente&nbsp;</span>
+														<span class="slds-truncate slds-text-link_faux" title={oportunidad._accountName} onclick={navegarDetalleCliente} style="font-weight: 600; text-transform: uppercase;">
+															{oportunidad._accountName}
+														</span>
+													</span>
+												</h1>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-page-header__col-actions" style="padding-bottom: 0;">
+								<div class="slds-page-header__controls">
+									<div class="slds-page-header__control slds-var-m-right_small">
+										<div class="slds-grid slds-grid_vertical-align-center">
+											<div class="slds-col">
+												<label lwc:if={oportunidad} class="slds-form-element__label" style="padding-right: 1px;">Solo de la oportunidad {oportunidad.fields.CSBD_Identificador__c.value}</label>
+											</div>
+											<div class="slds-col">
+												<div style="transform: scale(0.75);">
+													<lightning-input type="toggle" message-toggle-active="" message-toggle-inactive="" variant="label-hidden" onchange={toggleHistoricoFiltradoOnchange}></lightning-input>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px; margin-right: 2px;">
+										<span class="slds-text-body_small">&nbsp;{datatableData.datatableHistoricoFiltrada.length} items</span>
+									</div>
+									<div class="slds-page-header__control slds-is-relative" style="top: 3px;">
+										<button class="botonActualizar slds-button slds-button_icon slds-button_icon-bare" title="Actualizar" onclick={botonRefrescarOnclick}>
+											<lightning-icon icon-name="utility:refresh" size="xx-small"></lightning-icon>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div lwc:if={datatableData.datatableHistorico.length} class="datatableContainer" style="height: 214px;">
+						<lightning-datatable
+							columns={datatableColumns.datatableHistorico}
+							data={datatableData.datatableHistoricoFiltrada}
+							key-field="Id"
+							hide-checkbox-column
+							column-widths-mode="auto"
+							min-column-width=55
+							wrap-text-max-lines=3
+							sorted-by="CreatedDate"
+							sorted-direction="desc"
+							onrowaction={datatablesOnrowaction}>
+						</lightning-datatable>
+					</div>
+					<div lwc:else class="mensajeSinRegistrosContainer">
+						<div class="slds-var-m-around_large slds-text-color_weak">El cliente no tiene otras autenticaciones seguras.</div>
+					</div>
+				</article>
+			</div>
+
+			<div class="slds-modal__footer">
+				<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+					<div class="slds-col" style="text-align: start;">
+						<!-- Menús de desarrollo -->
+						<div lwc:if={componente.usuarioDesarrollador} class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xx-small">
+							<div class="slds-col">
+								<lightning-button-group class="menusDesarrollo" style="margin-left: 8px;">
+									<lightning-button-menu icon-name="utility:bug" menu-alignment="bottom-left" tooltip="Desarrollo: utilidades" onselect={menuDevOnselect}>
+										<lightning-menu-subheader label="Depuración" class="menuSubheader_small slds-dropdown_medium"></lightning-menu-subheader>
+										<lightning-menu-divider></lightning-menu-divider>
+										<lightning-menu-item value="finModoDesarrollo" label="Finalizar modo de desarrollo" prefix-icon-name="utility:bug"></lightning-menu-item>
+										<lightning-menu-divider></lightning-menu-divider>
+										<lightning-menu-item value="eliminarAutenticacionesCliente" label="Eliminar autenticaciones del cliente" prefix-icon-name="utility:delete"></lightning-menu-item>
+										<lightning-menu-divider></lightning-menu-divider>
+										<lightning-menu-item value="mostrarNombreAutenticaciones" label="Mostrar el nombre de las autenticaciones" prefix-icon-name="utility:shield"></lightning-menu-item>
+										<lightning-menu-divider></lightning-menu-divider>
+										<lightning-menu-item value="aux" label="aux" prefix-icon-name="utility:threedots"></lightning-menu-item>
+										<lightning-menu-item value="debugger" label="Iniciar depuración" prefix-icon-name="utility:apex"></lightning-menu-item>
+									</lightning-button-menu>
+									<lightning-button-menu icon-name="utility:system_and_global_variable" variant="" menu-alignment="bottom-left" tooltip="Desarrollo: simular respuestas" onselect={menuDevOnselect}>
+										<lightning-menu-subheader label="Cliente digital" class="menuSubheader_small slds-dropdown_small"></lightning-menu-subheader>
+										<lightning-menu-item lwc:ref="simular.enviarPush.ok" value="simular.enviarPush.ok" label="Envío de push OK" prefix-icon-name="utility:success"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.enviarPush.ko" value="simular.enviarPush.ko" label="Envío de push KO" prefix-icon-name="utility:warning"></lightning-menu-item>
+										<lightning-menu-divider></lightning-menu-divider>
+										<lightning-menu-subheader label="Nivel 2" class="menuSubheader_small slds-dropdown_small"></lightning-menu-subheader>
+										<lightning-menu-item lwc:ref="simular.validarRespuestas.ok" value="simular.validarRespuestas.ok" label="Respuestas correctas" prefix-icon-name="utility:success"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.validarRespuestas.ko" value="simular.validarRespuestas.ko" label="Respuestas incorrectas" prefix-icon-name="utility:warning"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.enviarOtp.ok" value="simular.enviarOtp.ok" label="Envío de OTP OK" prefix-icon-name="utility:success"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.enviarOtp.ko" value="simular.enviarOtp.ko" label="Envío de OTP KO" prefix-icon-name="utility:warning"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.validarOtp.ok" value="simular.validarOtp.ok" label="Validación de OTP OK" prefix-icon-name="utility:success"></lightning-menu-item>
+										<lightning-menu-item lwc:ref="simular.validarOtp.ko" value="simular.validarOtp.ko" label="Validación de OTP KO" prefix-icon-name="utility:warning"></lightning-menu-item>
+									</lightning-button-menu>
+								</lightning-button-group>
+							</div>
+							<div class="slds-col" style="color: #784200; font-weight: 300;">
+								MODO DE DESARROLLO
+							</div>
+						</div>
+					</div>
+					<div class="slds-col slds-grow-none">
+						<lightning-button class="modalBotonCerrar" lwc:ref="modalBotonCerrar" label="Cerrar" onclick={salir} disabled={componente.spinner}></lightning-button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Modal preguntas nivel 2 -->
+	<section lwc:ref="modalPreguntasNivel2" role="dialog" tabindex="-1" aria-modal="true" class="modalPreguntasNivel2 slds-modal" onkeydown={modalPreguntasNivel2TeclaPulsada}>
+		<div class="slds-modal__container" style="min-width: 39rem;">
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={cerrarModalPreguntasNivel2} disabled={componente.spinner}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">
+					Preguntas de validación&nbsp;
+					<span style="font-weight: 300;">(Nivel 2)</span>
+				</h2>
+				<p class="slds-var-m-top_x-small">Introduce las respuestas que proporcione el cliente a fin de confirmar su identidad.</p>
+			</header>
+			<div class="slds-modal__content slds-is-relative slds-var-p-top_x-small slds-var-p-bottom_large slds-var-p-horizontal_x-large">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
+
+				<div class="slds-var-m-top_large slds-var-m-bottom_medium slds-align_absolute-center">
+					<div class="slds-grid slds-wrap" style="width: 87%;">
+
+						<!-- Pregunta 1 -->
+						<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_medium" style="top: 6px;">
+							<span class="numPregunta numPregunta1">1</span>
+							<label class="slds-form-element__label negrita" style="font-size: 13px;">
+								<abbr class="slds-required">*</abbr>{n2Preguntas.pregunta1.inputLabel}
+							</label>
+						</div>
+						<div class="slds-col slds-size_2-of-5 slds-var-m-top_medium">
+							<lightning-input
+								lwc:ref="n2InputPregunta1"
+								type={n2Preguntas.pregunta1.inputType}
+								min={n2Preguntas.pregunta1.inputMin}
+								max={n2Preguntas.pregunta1.inputMax}
+								max-length={n2Preguntas.pregunta1.inputMaxLength}
+								placeholder={n2Preguntas.pregunta1.inputPlaceholder}
+								variant="label-hidden"
+								required
+								class="inputPregunta negrita slds-var-m-right_small"
+								onkeypress={inputPreguntaOnkeypress}>
+							</lightning-input>
+						</div>
+						<div lwc:if={n2Preguntas.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
+							<div class="slds-grid slds-gutters_direct-xx-small">
+								<div class="slds-col" style="line-height: 18px; font-weight: 300;">
+									{n2Preguntas.pregunta1.textoAyuda}
+								</div>
+							</div>
+						</div>
+
+						<div lwc:if={n2Preguntas.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_large slds-var-m-bottom_x-small">
+							<hr/>
+						</div>
+
+						<!-- Pregunta 2 -->
+						<div class="slds-col slds-size_3-of-5 slds-is-relative slds-var-m-top_x-large" style="top: 6px;">
+							<span class="numPregunta numPregunta2">2</span>
+							<label class="slds-form-element__label negrita" style="font-size: 13px;">
+								<abbr class="slds-required">*</abbr>{n2Preguntas.pregunta2.inputLabel}
+							</label>
+						</div>
+						<div class="slds-col slds-size_2-of-5 slds-var-m-top_x-large">
+							<lightning-input
+								lwc:ref="n2InputPregunta2"
+								type={n2Preguntas.pregunta2.inputType}
+								min={n2Preguntas.pregunta2.inputMin}
+								max={n2Preguntas.pregunta2.inputMax}
+								max-length={n2Preguntas.pregunta2.inputMaxLength}
+								placeholder={n2Preguntas.pregunta2.inputPlaceholder}
+								variant="label-hidden"
+								required
+								class="inputPregunta negrita slds-var-m-right_small"
+								onkeypress={inputPreguntaOnkeypress}>
+							</lightning-input>
+						</div>
+						<div lwc:if={n2Preguntas.pregunta2.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_x-small slds-var-m-bottom_medium slds-text-color_weak" style="padding-left: 31px;">
+							<div class="slds-grid slds-gutters_direct-xx-small">
+								<div class="slds-col" style="line-height: 18px; font-weight: 300;">
+									{n2Preguntas.pregunta2.textoAyuda}
+								</div>
+							</div>
+						</div>
+
+						<!-- Botón Validar -->
+						<div lwc:if={n2Preguntas.pregunta1.textoAyuda} class="slds-col slds-size_1-of-1 slds-var-m-top_medium slds-var-m-bottom_x-small">
+							<hr/>
+						</div>
+
+						<div class="slds-align_absolute-center slds-var-m-top_large">
+							<lightning-button class="botonValidar" label="Validar" icon-name="utility:thunder" variant="brand" onclick={modalPreguntasNivel2Validar} data-respuesta="Válido" disabled={componente.spinner}></lightning-button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<footer class="slds-modal__footer">
+				<lightning-button label="Cerrar" onclick={cerrarModalPreguntasNivel2} disabled={componente.spinner}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<!-- Modal validar código OTP -->
+	<section lwc:ref="modalValidarOtp" role="dialog" tabindex="-1" aria-modal="true" class="modalValidarOtp slds-modal" onkeydown={modalValidarOtpTeclaPulsada}>
+		<div class="slds-modal__container">
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={cerrarModalValidarOtp} disabled={componente.spinner}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">
+					Validar código <span style="font-weight: 300;">&nbsp;({nivel})</span>
+				</h2>
+				<p class="slds-var-m-top_x-small">
+					Validar el código de un solo uso (<i>One Time Password</i>) enviado al cliente.</p>
+			</header>
+			<div class="slds-modal__content slds-is-relative" style="text-align: center;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;"></lightning-spinner>
+				</div>
+				<div lwc:if={autenticacionPendValidar} class="slds-var-p-top_x-large slds-var-p-bottom_xx-large slds-align_absolute-center" style="display: block;">
+					<div class="slds-form-element slds-form-element_stacked slds-var-m-top_small">
+						<label class="slds-form-element__label slds-var-m-bottom_large"><abbr class="slds-required" style="margin-right: 3px;">*</abbr>Código OTP recibido por el cliente</label>
+						<div class="slds-form-element__control">
+							<input lwc:ref="inputOtp1" data-posicion="1" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="1" maxlength=1 autocomplete="false"></lightning-input>
+							<input lwc:ref="inputOtp2" data-posicion="2" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="2" maxlength=1 autocomplete="false"></lightning-input>
+							<input lwc:ref="inputOtp3" data-posicion="3" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="3" maxlength=1 autocomplete="false"></lightning-input>
+							<input lwc:ref="inputOtp4" data-posicion="4" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="4" maxlength=1 autocomplete="false"></lightning-input>
+							<input lwc:ref="inputOtp5" data-posicion="5" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="5" maxlength=1 autocomplete="false"></lightning-input>
+							<input lwc:ref="inputOtp6" data-posicion="6" class="inputOtp" onfocus={inputOtpOnfocus} onkeydown={inputOtpOnkeydown} oninput={inputOtpOninput} placeholder="6" maxlength=1 autocomplete="false"></lightning-input>
+						</div>
+					</div>
+
+					<div class="slds-grid slds-grid_align-center slds-gutters_direct-xx-small slds-var-m-top_xx-large slds-text-color_weak">
+						<div class="slds-col">
+							<lightning-icon class="iconoAzul slds-is-relative" icon-name="utility:sms" size="x-small" style="top: -1px;"></lightning-icon>
+						</div>
+						<div class="slds-col">
+							Enviado el&nbsp;<lightning-formatted-date-time value={autenticacionPendValidar.CC_Fecha_Envio__c} year="numeric" month="numeric" day="numeric"></lightning-formatted-date-time>
+							&nbsp;a las&nbsp;<lightning-formatted-date-time value={autenticacionPendValidar.CC_Fecha_Envio__c} hour="2-digit" minute="2-digit"></lightning-formatted-date-time>.
+						</div>
+						<div class="slds-col" style="font-weight: 300;">
+							<span class="slds-text-link_reset slds-text-link" onclick={modalValidarOtpNoRecibido}>
+								El cliente no ha recibido el código.
+							</span>
+						</div>
+					</div>
+
+					<div class="csbd-var-m-top_xxx-large" style="text-align: center;">
+						<lightning-button lwc:ref="modalValidarOtpValidar" class="botonValidar" label="Validar" icon-name="utility:thunder" variant="brand" onclick={modalValidarOtpValidar} disabled={componente.spinner}></lightning-button>
+					</div>
+				</div>
+			</div>
+			<footer class="slds-modal__footer">
+				<div class="slds-grid slds-grid_align-spread">
+					<div class="slds-col">
+						<lightning-button label="Descartar" icon-name="utility:delete" variant="destructive-text" onclick={modalValidarOtpCancelar} disabled={componente.spinner}></lightning-button>
+					</div>
+					<div class="slds-col">
+						<lightning-button label="Cerrar" onclick={cerrarModalValidarOtp} class="slds-var-m-left_small" disabled={componente.spinner}></lightning-button>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</section>
+
+	<!-- Modal validar notificación push -->
+	<section lwc:ref="modalValidarPush" role="dialog" tabindex="-1" aria-modal="true" class="modalValidarPush slds-modal" onkeydown={modalValidarPushTeclaPulsada}>
+		<div class="slds-modal__container">
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={modalValidarPushCancelar} disabled={componente.spinner}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">
+					Validar notificación
+					<span style="font-weight: 300;">&nbsp;({nivel})</span>
+				</h2>
+				<p class="slds-var-m-top_x-small">
+					Validar la notificación <i>push</i> enviada al dispositivo del cliente.
+				</p>
+			</header>
+			<div class="slds-modal__content slds-is-relative" style="text-align: center;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;"></lightning-spinner>
+				</div>
+
+				<div lwc:if={autenticacionPendValidar} class="slds-grid slds-grid_align-center slds-gutters_direct-xx-small slds-var-m-top_xx-large slds-text-color_weak">
+					<div class="slds-col">
+						<lightning-icon class="iconoAzul slds-is-relative" icon-name="utility:push" size="x-small" style="top: -1px;"></lightning-icon>
+					</div>
+					<div class="slds-col">
+						Enviada el&nbsp;<lightning-formatted-date-time value={autenticacionPendValidar.CC_Fecha_Envio__c} year="numeric" month="numeric" day="numeric"></lightning-formatted-date-time>
+						&nbsp;a las&nbsp;<lightning-formatted-date-time value={autenticacionPendValidar.CC_Fecha_Envio__c} hour="2-digit" minute="2-digit"></lightning-formatted-date-time>.
+					</div>
+					<div class="slds-col" style="font-weight: 300;">
+						<span class="slds-text-link_reset slds-text-link" onclick={modalValidarPushNoRecibido}>
+							El cliente no ha recibido la notificación.
+						</span>
+					</div>
+				</div>
+
+				<div class="slds-var-m-top_xx-large slds-var-m-bottom_xx-large" style="text-align: center;">
+					<lightning-button lwc:ref="modalValidarPushValidar" class="botonValidar" label="Validar" icon-name="utility:thunder" variant="brand" onclick={modalValidarPushValidar} disabled={componente.spinner}></lightning-button>
+				</div>
+			</div>
+			<footer class="slds-modal__footer" style="text-align: start;">
+				<lightning-button label="Descartar" icon-name="utility:delete" variant="destructive-text" onclick={modalValidarPushCancelar} disabled={componente.spinner}></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<!-- Modal preguntas emergencia -->
+	<section lwc:ref="modalPreguntasEmergencia" role="dialog" tabindex="-1" aria-modal="true" class="modalPreguntasEmergencia slds-modal slds-modal_medium" onkeydown={modalPreguntasEmergenciaTeclaPulsada}>
+		<div class="slds-modal__container">
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close" onclick={cerrarModalPreguntasEmergencia} disabled={componente.spinner}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">
+					Preguntas de validación
+					<span style="font-weight: 300;">&nbsp;(Emergencia)</span>
+				</h2>
+				<p class="slds-var-m-top_x-small">Confirma la identidad del cliente a partir de sus respuestas a las preguntas.</p>
+			</header>
+			<div class="slds-modal__content slds-is-relative slds-var-p-vertical_medium slds-var-p-horizontal_x-large" style="overflow-y: auto;">
+				<div lwc:if={componente.spinner} align="center">
+					<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Cargando..."></lightning-spinner>
+				</div>
+				<div lwc:if={preguntasEmergencia.basicas.length} class="slds-section slds-is-open">
+					<h3 class="slds-section__title slds-theme_shade">
+						<span class="slds-truncate slds-var-p-horizontal_small">Preguntas básicas</span>
+					</h3>
+					<div aria-hidden="false" class="slds-section__content">
+						<ul class="slds-var-m-horizontal_medium">
+							<template for:each={preguntasEmergencia.basicas} for:item="pregunta">
+								<div key={pregunta.id} class="divPregunta">
+									<lightning-input type="checkbox" label={pregunta.valor}></lightning-input>
+								</div>
+							</template>
+						</ul>
+					</div>
+				</div>
+				<div lwc:if={preguntasEmergencia.aleatorias.length} class="slds-section slds-is-open slds-var-m-top_x-large">
+					<h3 class="slds-section__title slds-theme_shade">
+						<span class="slds-truncate slds-var-p-horizontal_small">Preguntas aleatorias</span>
+					</h3>
+					<div aria-hidden="false" class="slds-section__content">
+						<ul class="slds-var-m-horizontal_medium">
+							<template for:each={preguntasEmergencia.aleatorias} for:item="pregunta">
+								<div key={pregunta.id} class="divPregunta">
+									<lightning-input type="checkbox" label={pregunta.valor}></lightning-input>
+								</div>
+							</template>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<footer class="slds-modal__footer">
+				<div class="slds-grid slds-grid_align-spread">
+					<div class="slds-col">
+						<lightning-button lwc:ref="modalPreguntasEmergenciaCancelar" class="modalCancelar" label="Cerrar" onclick={cerrarModalPreguntasEmergencia} disabled={componente.spinner}></lightning-button>
+					</div>
+					<div class="slds-col slds-grow-none">
+						<div class="slds-grid slds-gutters_direct-xx-small">
+							<div class="slds-col" style="width: 122px;">
+								<lightning-button label="Válido" icon-name="utility:check" onclick={modalPreguntasEmergenciaFinalizar} data-respuesta="Válido" stretch class="modalPreguntasBotonValido" disabled={componente.spinner}></lightning-button>
+							</div>
+							<div class="slds-col" style="width: 122px;">
+								<lightning-button label="No válido" icon-name="utility:close" onclick={modalPreguntasEmergenciaFinalizar} data-respuesta="No válido" stretch class="modalPreguntasBotonNoValido" disabled={componente.spinner}></lightning-button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</section>
+
+	<!-- Modal iniciar nuevo intento -->
+	<section lwc:ref="modalNuevoIntento" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown={modalNuevoIntentoTeclaPulsada}>
+		<div class="slds-modal__container">
+			<!-- sldsValidatorIgnoreNextLine -->
+			<button class="buttonIconCerrarModal slds-button slds-button_icon slds-modal__close slds-theme_alert-texture" onclick={cerrarModalNuevoIntento} disabled={componente.spinner}>
+				<lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+			</button>
+			<!-- sldsValidatorIgnoreNextLine -->
+			<header class="slds-modal__header">
+				<h2 class="slds-text-heading_medium slds-hyphenate">Nuevo intento de autenticación</h2>
+				<p class="slds-var-m-top_x-small">Selecciona el tipo de autenticación para el nuevo intento.</p>
+			</header>
+			<div class="slds-modal__content slds-var-p-vertical_xx-large">
+				<div class="slds-grid slds-grid_align-center slds-grid_vertical-align-center slds-gutters_direct-x-small">
+					<div class="slds-col">
+						<div class="slds-truncate" style="margin: 0;">Iniciar nuevo intento de autenticación segura:</div>
+					</div>
+					<div class="slds-col slds-grow-none">
+						<lightning-button-group>
+							<lightning-button class="botonClienteDigital" label="Cliente digital" onclick={iniciarAutenticacion} data-nivel="Cliente Digital" disabled={componente.spinner}></lightning-button>
+							<lightning-button class="botonNivel2" label="Nivel 2" onclick={iniciarAutenticacion} data-nivel="Nivel 2" disabled={componente.spinner}></lightning-button>
+						</lightning-button-group>
+					</div>
+				</div>
+			</div>
+			<footer class="slds-modal__footer">
+				<lightning-button lwc:ref="modalNuevoIntentoCancelar" label="Cerrar" onclick={cerrarModalNuevoIntento} class="slds-var-m-left_small"></lightning-button>
+			</footer>
+		</div>
+	</section>
+
+	<!-- Modal de mensaje informativo -->
+	<section lwc:ref="modalMensaje" role="dialog" tabindex="-1" aria-modal="true" class="modalMensaje slds-modal">
+		<div class="slds-modal__container slds-align_absolute-center">
+			<div class="slds-modal__content slds-is-relative" style="border-radius: 7px; padding: 22px 45px 19px 45px; width: fit-content;">
+				<div class="slds-align_absolute-center">
+					<div class="slds-grid slds-gutters_direct-medium slds-grid_vertical-align-center">
+						<div class="slds-col slds-shrink-none" style="margin-left: -5px; font-size: 13.5px; letter-spacing: 0.1px;">
+							<span lwc:if={modalMensaje.iconName} class="modalMensajeIcono">
+								<lightning-icon icon-name={modalMensaje.iconName} size="small" class={modalMensaje.iconClass}></lightning-icon>
+							</span>
+							{modalMensaje.mensaje}
+						</div>
+						<div lwc:if={modalMensaje.spinner} class="slds-col slds-is-relative" style="top: -1px;">
+							<lightning-spinner size="x-small" variant="brand"></lightning-spinner>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div lwc:ref="backdropModal" class="backdrop slds-backdrop" role="presentation"></div>
+</template>

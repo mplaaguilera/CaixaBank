@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_EmailReciclado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Usamos este campo para determinar el color en el componente de envío de correos, si es reciclado el color será gris.</description>
+    <label>SEG_EmailReciclado</label>
+    <type>Checkbox</type>
+</CustomField>

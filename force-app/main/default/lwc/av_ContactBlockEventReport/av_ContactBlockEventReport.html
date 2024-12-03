@@ -1,0 +1,90 @@
+<template>
+    <br>
+    <div>
+        <span> 
+            <lightning-icon size="small" icon-name="utility:event"></lightning-icon><strong>&nbsp;&nbsp; Informa el tipo de contacto </strong>
+        </span>
+    </div>
+    <br>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <form>
+                <fieldset>
+                    <div style="display: inline-block; margin-right: 25px;">
+                        <input type="radio" data-id="lmd" id="llamada" name="option" value="LMD" onchange={handleOptionChange}>
+                        <label for="llamada" style="margin-left: 5px;">Llamada</label>
+                    </div>
+                    <div style="display: inline-block; margin-right: 25px;">
+                        <input type="radio" data-id="cto" id="cita-en-mi-oficina" name="option" value="CTO" onchange={handleOptionChange}>
+                        <label for="cita-en-mi-oficina" style="margin-left: 5px;">Cita en mi oficina</label>
+                    </div>
+                    <div style="display: inline-block; margin-right: 25px;">
+                        <input type="radio" data-id="ctf" id="cita-telefonica" name="option" value="CTF" onchange={handleOptionChange}>
+                        <label for="cita-telefonica" style="margin-left: 5px;">Cita telefónica</label>
+                    </div>
+                    <div style="display: inline-block; margin-right: 25px;">
+                        <input type="radio" data-id="vld" id="videollamada" name="option" value="VLD" onchange={handleOptionChange}>
+                        <label for="videollamada" style="margin-left: 5px;">Videollamada</label>
+                    </div>
+                    <div style="display: inline-block; margin-right: 25px;">
+                        <input type="radio" data-id="ctooc" id="cita-otra-oficina" name="option" value="CTOOC" onchange={handleOptionChange}>
+                        <label for="cita-otra-oficina" style="margin-left: 5px;">Cita en otra oficina</label>
+                    </div>
+                        <div style="display: inline-block; margin-right: 25px;">
+                            <input type="radio" data-id="001" id="visita-gestor" name="option" value="001" onchange={handleOptionChange}>
+                            <label for="visita-gestor" style="margin-left: 5px;">Visita del gestor</label>
+                        </div>
+                </fieldset>
+            </form>
+        </div>
+        <div style="margin-left: 10px;">
+            <div style="display: inline-block; margin-right: 15px">
+                <lightning-input type="datetime" size="10" data-id='dtInput' value={now} onchange={handleDateChange} date-style="short"></lightning-input>
+            </div>
+            <div style="display: inline-block; margin-right: 15px">
+                <lightning-combobox  label="Duración" name="duracion" placeholder="Duración" options={optionsDuration} onchange={handleChangeDuration} value ={durationValueInitial} ></lightning-combobox>
+            </div>
+            <div if:true={showOffice} style="display: inline-block; margin-right: 15px">
+                <c-av_-lookup class="lookup-cmp slds-size_1-of-5"
+                    data-id="clookup5"
+                    selection={initialSelectionOffice}
+                    onsearch={handleSearchOffice}
+                    onselectionchange={handleSelectionChange}
+                    fieldlabel="Oficina"
+                    placeholder={officePlaceholder}
+                    is-multi-entry={isMultiEntry2}
+                    required>
+                </c-av_-lookup>
+            </div>
+
+            <div if:true={islegalentity} style="display: inline-block; margin-right: 15px">
+                <c-av_-lookup class="lookup-cmp slds-size_1-of-5"
+                    data-id="clookup6"
+                    selection={initialSelection}
+                    onsearch={handleSearchContact}
+                    onclick={handleSearchContactClick}
+                    onselectionchange={handleSelectionChange}
+                    fieldlabel="Persona de contacto"
+                    placeholder={contactPlaceholder}
+                    is-multi-entry={isMultiEntry2}>
+                </c-av_-lookup>
+            </div>
+            <div if:true={showLocation} style="display: inline-block;">
+                <lightning-input type="text" label="Ubicación" name="ubicacion" onchange={handleChangeLocation} value ={location}></lightning-input>
+            </div>
+        </div>
+        <div if:true={isbpr} style="margin-top: 10px; margin-left: 10px;">
+            <lightning-input type="checkbox" label="Entrevista memorable" onchange={handleMemorableInterview}></lightning-input>
+        </div>
+
+        <div style="margin-top: 10px; margin-left: 10px;">
+            <lightning-input type="checkbox" label="Cita No comercial (Gestión Operativa)" onchange={handleCheckboxChange} value={showComentary}></lightning-input>
+        </div>
+    
+        <div style="margin-top: 10px; margin-left: 10px; margin-right: 10px;">
+            <lightning-textarea label="Comentario" name="comentario" onchange={handleComment}></lightning-textarea>
+        </div>
+        <br>         
+    </article>
+    <br>
+</template>

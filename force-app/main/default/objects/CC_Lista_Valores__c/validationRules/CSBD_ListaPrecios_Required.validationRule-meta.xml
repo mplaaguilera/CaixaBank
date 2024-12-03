@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_ListaPrecios_Required</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    NOT($Permission.CSBD_ByPassVR),
+    RecordType.DeveloperName = &apos;CSBD_TablaPrecios&apos;,
+    OR(
+         ISBLANK(CSBD_TablaPrecios_Producto2__c),
+         ISBLANK(TEXT(CSBD_TablaPrecios_Plazo__c)),
+         ISBLANK(TEXT(CSBD_TablaPrecios_CategoriaTitular__c))
+    )
+)</errorConditionFormula>
+    <errorMessage>Producto, plazo y categoría del titular son obligatorios.</errorMessage>
+</ValidationRule>

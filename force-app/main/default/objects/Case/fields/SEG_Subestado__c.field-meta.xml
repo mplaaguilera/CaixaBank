@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Subestado__c</fullName>
+    <label>Subestado</label>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Status</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Subestado1</fullName>
+                <default>false</default>
+                <label>Subestado1</label>
+            </value>
+            <value>
+                <fullName>Pendiente aplicación reglas de CR</fullName>
+                <default>false</default>
+                <label>Pendiente aplicación reglas de CR</label>
+            </value>
+            <value>
+                <fullName>Pendiente clasificación Cognitive</fullName>
+                <default>false</default>
+                <label>Pendiente clasificación Cognitive</label>
+            </value>
+            <value>
+                <fullName>Pendiente asignación grupo por MCC</fullName>
+                <default>false</default>
+                <label>Pendiente asignación grupo por MCC</label>
+            </value>
+            <value>
+                <fullName>Pendiente asignación de propietario</fullName>
+                <default>false</default>
+                <label>Pendiente asignación de propietario</label>
+            </value>
+            <value>
+                <fullName>Pendiente valija</fullName>
+                <default>false</default>
+                <label>Pendiente valija</label>
+            </value>
+            <value>
+                <fullName>Incongruencia reglas de clasificación</fullName>
+                <default>false</default>
+                <label>Incongruencia reglas de clasificación</label>
+            </value>
+            <value>
+                <fullName>En curso</fullName>
+                <default>false</default>
+                <label>En curso</label>
+            </value>
+            <value>
+                <fullName>Reactivada por comunicación de cliente</fullName>
+                <default>false</default>
+                <label>Reactivada por comunicación de cliente</label>
+            </value>
+            <value>
+                <fullName>Incidencia Valija</fullName>
+                <default>false</default>
+                <label>Incidencia Valija</label>
+            </value>
+            <value>
+                <fullName>Casos vinculados pendientes</fullName>
+                <default>false</default>
+                <label>Casos vinculados pendientes</label>
+            </value>
+            <value>
+                <fullName>Contratos pendientes</fullName>
+                <default>false</default>
+                <label>Contratos pendientes</label>
+            </value>
+            <value>
+                <fullName>En canal BPO</fullName>
+                <default>false</default>
+                <label>En canal BPO</label>
+            </value>
+            <value>
+                <fullName>En canal Valija</fullName>
+                <default>false</default>
+                <label>En canal Valija</label>
+            </value>
+            <value>
+                <fullName>En canal Valija pendiente recepción justificantes</fullName>
+                <default>false</default>
+                <label>En canal Valija pendiente recepción justificantes</label>
+            </value>
+            <value>
+                <fullName>En colaborador</fullName>
+                <default>false</default>
+                <label>En colaborador</label>
+            </value>
+            <value>
+                <fullName>En Gestor Operativo de la empresa</fullName>
+                <default>false</default>
+                <label>En Gestor Operativo de la empresa</label>
+            </value>
+            <value>
+                <fullName>Por agrupación</fullName>
+                <default>false</default>
+                <label>Por agrupación</label>
+            </value>
+            <value>
+                <fullName>Tareas finalizadas</fullName>
+                <default>false</default>
+                <label>Tareas finalizadas</label>
+            </value>
+            <value>
+                <fullName>Por gestor</fullName>
+                <default>false</default>
+                <label>Por gestor</label>
+            </value>
+            <value>
+                <fullName>Lista negra</fullName>
+                <default>false</default>
+                <label>Lista negra</label>
+            </value>
+            <value>
+                <fullName>Por duplicidad</fullName>
+                <default>false</default>
+                <label>Por duplicidad</label>
+            </value>
+            <value>
+                <fullName>Por comunicación de cliente</fullName>
+                <default>false</default>
+                <label>Por comunicación de cliente</label>
+            </value>
+            <value>
+                <fullName>Planificado manualmente</fullName>
+                <default>false</default>
+                <label>Planificado manualmente</label>
+            </value>
+            <value>
+                <fullName>Rechazada</fullName>
+                <default>false</default>
+                <label>Rechazada</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta Colaborador</fullName>
+                <default>false</default>
+                <label>Recibida respuesta Colaborador</label>
+            </value>
+            <value>
+                <fullName>Pendiente Robot</fullName>
+                <default>false</default>
+                <label>Pendiente Robot</label>
+            </value>
+            <value>
+                <fullName>Envío cierre Cliente</fullName>
+                <default>false</default>
+                <label>Envío cierre Cliente</label>
+            </value>
+            <value>
+                <fullName>Envío cierre Colaborador</fullName>
+                <default>false</default>
+                <label>Envío cierre Colaborador</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta Cliente</fullName>
+                <default>false</default>
+                <label>Envío pendiente respuesta Cliente</label>
+            </value>
+            <value>
+                <fullName>Gestionada por BO</fullName>
+                <default>false</default>
+                <label>Gestionada por BO</label>
+            </value>
+            <value>
+                <fullName>Gestionada por CSO</fullName>
+                <default>false</default>
+                <label>Gestionada por CSO</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta Gestor</fullName>
+                <default>false</default>
+                <label>Recibida respuesta Gestor</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª reclamación Cliente</fullName>
+                <default>false</default>
+                <label>Envío 1ª reclamación Cliente</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª reclamación Gestor *</fullName>
+                <default>false</default>
+                <label>Envío 1ª reclamación Gestor *</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª reclamación Colaborador</fullName>
+                <default>false</default>
+                <label>Envío 1ª reclamación Colaborador</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª reclamación Colaborador WS</fullName>
+                <default>false</default>
+                <label>Envío 1ª reclamación Colaborador WS</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª reclamación otros</fullName>
+                <default>false</default>
+                <label>Envío 1ª reclamación otros</label>
+            </value>
+            <value>
+                <fullName>Gestión BPM</fullName>
+                <default>false</default>
+                <label>Gestión BPM</label>
+            </value>
+            <value>
+                <fullName>Pte Alta/Modificación Cliente</fullName>
+                <default>false</default>
+                <label>Pte Alta/Modificación Cliente</label>
+            </value>
+            <value>
+                <fullName>Incidencia BPM</fullName>
+                <default>false</default>
+                <label>Incidencia BPM</label>
+            </value>
+            <value>
+                <fullName>Despacho BPM</fullName>
+                <default>false</default>
+                <label>Despacho BPM</label>
+            </value>
+            <value>
+                <fullName>Finalizado BPM</fullName>
+                <default>false</default>
+                <label>Finalizado BPM</label>
+            </value>
+            <value>
+                <fullName>Con propietario anterior</fullName>
+                <default>false</default>
+                <label>Con propietario anterior</label>
+            </value>
+            <value>
+                <fullName>Contratos recibidos firmados</fullName>
+                <default>false</default>
+                <label>Contratos recibidos firmados</label>
+            </value>
+            <value>
+                <fullName>Contratos Pendientes de recibir firmados</fullName>
+                <default>false</default>
+                <label>Contratos Pendientes de recibir firmados</label>
+            </value>
+            <value>
+                <fullName>Fichas enviadas</fullName>
+                <default>false</default>
+                <label>Fichas enviadas</label>
+            </value>
+            <value>
+                <fullName>Sin propietario anterior</fullName>
+                <default>false</default>
+                <label>Sin propietario anterior</label>
+            </value>
+            <value>
+                <fullName>Rechazada No procede</fullName>
+                <default>false</default>
+                <label>Rechazada No procede</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta Colaborador WS *</fullName>
+                <default>false</default>
+                <label>Recibida respuesta Colaborador WS *</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta otros</fullName>
+                <default>false</default>
+                <label>Recibida respuesta otros</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta Cliente</fullName>
+                <default>false</default>
+                <label>Recibida respuesta Cliente</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta Gestor *</fullName>
+                <default>false</default>
+                <label>Recibida respuesta Gestor *</label>
+            </value>
+            <value>
+                <fullName>En gestor operativa/gestor comercial</fullName>
+                <default>false</default>
+                <label>En gestor operativa/gestor comercial</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta Gestor</fullName>
+                <default>false</default>
+                <label>Envío pendiente respuesta Gestor</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta Colaborador</fullName>
+                <default>false</default>
+                <label>Envío pendiente respuesta Colaborador</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta Colaborador WS</fullName>
+                <default>false</default>
+                <label>Envío pendiente respuesta Colaborador WS</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta otros</fullName>
+                <default>false</default>
+                <label>Envío pendiente respuesta otros</label>
+            </value>
+            <value>
+                <fullName>Envío planificación Colaborador WS</fullName>
+                <default>false</default>
+                <label>Envío planificación Colaborador WS</label>
+            </value>
+            <value>
+                <fullName>Envío cierre Colaborador WS</fullName>
+                <default>false</default>
+                <label>Envío cierre Colaborador WS</label>
+            </value>
+            <value>
+                <fullName>Envío cierre otros</fullName>
+                <default>false</default>
+                <label>Envío cierre otros</label>
+            </value>
+            <value>
+                <fullName>Envío cierre Gestor *</fullName>
+                <default>false</default>
+                <label>Envío cierre Gestor *</label>
+            </value>
+            <value>
+                <fullName>Por Fecha Planificación</fullName>
+                <default>false</default>
+                <label>Por Fecha Planificación</label>
+            </value>
+            <value>
+                <fullName>Envío 2ª reclamación Cliente</fullName>
+                <default>false</default>
+                <label>Envío 2ª reclamación Cliente</label>
+            </value>
+            <value>
+                <fullName>Envío 2ª reclamación Gestor *</fullName>
+                <default>false</default>
+                <label>Envío 2ª reclamación Gestor *</label>
+            </value>
+            <value>
+                <fullName>Envío 2ª reclamación Colaborador</fullName>
+                <default>false</default>
+                <label>Envío 2ª reclamación Colaborador</label>
+            </value>
+            <value>
+                <fullName>Envío 3ª reclamación Cliente</fullName>
+                <default>false</default>
+                <label>Envío 3ª reclamación Cliente</label>
+            </value>
+            <value>
+                <fullName>Envío 3ª reclamación Gestor *</fullName>
+                <default>false</default>
+                <label>Envío 3ª reclamación Gestor *</label>
+            </value>
+            <value>
+                <fullName>Envío 3ª reclamación Colaborador</fullName>
+                <default>false</default>
+                <label>Envío 3ª reclamación Colaborador</label>
+            </value>
+            <value>
+                <fullName>Pte llamada reclamación</fullName>
+                <default>false</default>
+                <label>Pte llamada reclamación</label>
+            </value>
+            <value>
+                <fullName>Reclamaciones agotadas</fullName>
+                <default>false</default>
+                <label>Reclamaciones agotadas</label>
+            </value>
+            <value>
+                <fullName>Seguimiento contratos</fullName>
+                <default>false</default>
+                <label>Seguimiento contratos</label>
+            </value>
+            <value>
+                <fullName>Sin resultado</fullName>
+                <default>false</default>
+                <label>Sin resultado</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente de respuesta jurídica</fullName>
+                <default>false</default>
+                <label>Envío pendiente de respuesta jurídica</label>
+            </value>
+            <value>
+                <fullName>Recibida respuesta jurídica</fullName>
+                <default>false</default>
+                <label>Recibida respuesta jurídica</label>
+            </value>
+            <value>
+                <fullName>Analisis</fullName>
+                <default>false</default>
+                <label>Análisis</label>
+            </value>
+            <value>
+                <fullName>Allanamiento</fullName>
+                <default>false</default>
+                <label>Allanamiento</label>
+            </value>
+            <value>
+                <fullName>Alegaciones</fullName>
+                <default>false</default>
+                <label>Alegaciones</label>
+            </value>
+            <value>
+                <fullName>Desistimiento</fullName>
+                <default>false</default>
+                <label>Desistimiento</label>
+            </value>
+            <value>
+                <fullName>Envio Organismos</fullName>
+                <default>false</default>
+                <label>Envío a Organismos</label>
+            </value>
+            <value>
+                <fullName>Pendiente respuesta Organismos</fullName>
+                <default>false</default>
+                <label>Pendiente respuesta Organismos</label>
+            </value>
+            <value>
+                <fullName>Revision</fullName>
+                <default>false</default>
+                <label>Revisión</label>
+            </value>
+            <value>
+                <fullName>Ejecucion y Pendiente Respuesta Organismo</fullName>
+                <default>false</default>
+                <label>Ejecución y Pendiente Respuesta Organismo</label>
+            </value>
+            <value>
+                <fullName>Negociacion</fullName>
+                <default>false</default>
+                <label>Negociación</label>
+            </value>
+            <value>
+                <fullName>Cerrada y en Ejecucion</fullName>
+                <default>false</default>
+                <label>Cerrada y en Ejecución</label>
+            </value>
+            <value>
+                <fullName>Cerrada allanamiento</fullName>
+                <default>false</default>
+                <label>Cerrada allanamiento</label>
+            </value>
+            <value>
+                <fullName>Cerrada alegaciones</fullName>
+                <default>false</default>
+                <label>Cerrada alegaciones</label>
+            </value>
+            <value>
+                <fullName>Cerrada desistimiento</fullName>
+                <default>false</default>
+                <label>Cerrada desistimiento</label>
+            </value>
+            <value>
+                <fullName>Cerrada Erronea</fullName>
+                <default>false</default>
+                <label>Cerrada Errónea</label>
+            </value>
+            <value>
+                <fullName>Cerrada descarte</fullName>
+                <default>false</default>
+                <label>Cerrada descarte</label>
+            </value>
+            <value>
+                <fullName>SPV_Rectificar</fullName>
+                <default>false</default>
+                <label>Rectificar</label>
+            </value>
+            <value>
+                <fullName>SPV_No_rectificar</fullName>
+                <default>false</default>
+                <label>No rectificar</label>
+            </value>
+            <value>
+                <fullName>Con propietario anterior en la cola del caso</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Con propietario anterior en la cola del caso</label>
+            </value>
+            <value>
+                <fullName>Envío 1ª</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío 1ª</label>
+            </value>
+            <value>
+                <fullName>Envío pendiente respuesta Gestor *</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío pendiente respuesta Gestor *</label>
+            </value>
+            <value>
+                <fullName>Envío planificación Cliente</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío planificación Cliente</label>
+            </value>
+            <value>
+                <fullName>Envío planificación Colaborador</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío planificación Colaborador</label>
+            </value>
+            <value>
+                <fullName>Envío planificación Gestor *</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío planificación Gestor *</label>
+            </value>
+            <value>
+                <fullName>Envío planificación otros</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Envío planificación otros</label>
+            </value>
+            <value>
+                <fullName>Pendiente validación empresa/contacto</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Pendiente validación empresa/contacto</label>
+            </value>
+            <value>
+                <fullName>Planificada</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Planificada</label>
+            </value>
+            <value>
+                <fullName>Por planificación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Por planificación</label>
+            </value>
+            <value>
+                <fullName>Usuario asignado BO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Usuario asignado BO</label>
+            </value>
+            <value>
+                <fullName>Usuario asignado CSO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Usuario asignado CSO</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
+            <valueName>Analisis</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
+            <valueName>Allanamiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
+            <valueName>Alegaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
+            <valueName>Desistimiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_002</controllingFieldValue>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
+            <valueName>Negociacion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <valueName>Pendiente aplicación reglas de CR</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <valueName>Pendiente clasificación Cognitive</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <valueName>Pendiente asignación grupo por MCC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Pendiente asignación de propietario</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <valueName>Pendiente valija</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <valueName>Incongruencia reglas de clasificación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>En curso</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Reactivada por comunicación de cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Incidencia Valija</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Casos vinculados pendientes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Contratos pendientes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En canal BPO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En canal Valija</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En canal Valija pendiente recepción justificantes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En Gestor Operativo de la empresa</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Por agrupación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Tareas finalizadas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Por gestor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Descartado</controllingFieldValue>
+            <valueName>Lista negra</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Descartado</controllingFieldValue>
+            <valueName>Por duplicidad</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <valueName>Por comunicación de cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <valueName>Planificado manualmente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Descartado</controllingFieldValue>
+            <valueName>Rechazada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Pendiente Robot</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío cierre Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío cierre Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Envío pendiente respuesta Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Gestionada por BO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Gestionada por CSO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta Gestor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Gestión BPM</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Pte Alta/Modificación Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Incidencia BPM</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Despacho BPM</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Finalizado BPM</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Con propietario anterior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Contratos recibidos firmados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Contratos Pendientes de recibir firmados</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Fichas enviadas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Sin propietario anterior</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Descartado</controllingFieldValue>
+            <valueName>Rechazada No procede</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta Colaborador WS *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta otros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta Gestor *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>En gestor operativa/gestor comercial</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Envío pendiente respuesta Gestor</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Abierto</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <controllingFieldValue>Reabierto</controllingFieldValue>
+            <controllingFieldValue>New</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Envío pendiente respuesta Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Envío pendiente respuesta Colaborador WS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Envío pendiente respuesta otros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <valueName>Envío planificación Colaborador WS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío cierre Colaborador WS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío cierre otros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío cierre Gestor *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Por Fecha Planificación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Seguimiento contratos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Sin resultado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Pendiente</controllingFieldValue>
+            <valueName>Envío pendiente de respuesta jurídica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Planificado</controllingFieldValue>
+            <controllingFieldValue>Activo</controllingFieldValue>
+            <valueName>Recibida respuesta jurídica</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>Envio Organismos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_EnvioOrganismos</controllingFieldValue>
+            <valueName>Revision</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
+            <valueName>Pendiente respuesta Organismos</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_PendienteRespuestaOrganismos</controllingFieldValue>
+            <valueName>Ejecucion y Pendiente Respuesta Organismo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 1ª reclamación Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 1ª reclamación Gestor *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 1ª reclamación Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 1ª reclamación Colaborador WS</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 1ª reclamación otros</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 2ª reclamación Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 2ª reclamación Gestor *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 2ª reclamación Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 3ª reclamación Cliente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 3ª reclamación Gestor *</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Envío 3ª reclamación Colaborador</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Pte llamada reclamación</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Reclamaciones agotadas</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada y en Ejecucion</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada allanamiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada alegaciones</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada desistimiento</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada Erronea</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cerrado</controllingFieldValue>
+            <valueName>Cerrada descarte</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
+            <valueName>SPV_Rectificar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Rectificacion</controllingFieldValue>
+            <valueName>SPV_No_rectificar</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

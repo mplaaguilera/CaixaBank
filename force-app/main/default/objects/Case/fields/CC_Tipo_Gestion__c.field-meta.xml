@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_Gestion__c</fullName>
+    <label>Tipo de gestión</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Origin</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Gestión</fullName>
+                <default>false</default>
+                <label>Gestión</label>
+            </value>
+            <value>
+                <fullName>Revisar Respuesta</fullName>
+                <default>false</default>
+                <label>Revisar Respuesta</label>
+            </value>
+            <value>
+                <fullName>Alta</fullName>
+                <default>false</default>
+                <label>Alta</label>
+            </value>
+            <value>
+                <fullName>Baja</fullName>
+                <default>false</default>
+                <label>Baja</label>
+            </value>
+            <value>
+                <fullName>Modificación</fullName>
+                <default>false</default>
+                <label>Modificación</label>
+            </value>
+            <value>
+                <fullName>Tabulada</fullName>
+                <default>false</default>
+                <label>Tabulada</label>
+            </value>
+            <value>
+                <fullName>Tabulada con gestión</fullName>
+                <default>false</default>
+                <label>Tabulada con gestión</label>
+            </value>
+            <value>
+                <fullName>Personalizada</fullName>
+                <default>false</default>
+                <label>Personalizada</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>SAC_Formulario</controllingFieldValue>
+            <controllingFieldValue>SAC_CartaPostal</controllingFieldValue>
+            <controllingFieldValue>SAC_FormularioOficina</controllingFieldValue>
+            <controllingFieldValue>SAC_CXBNow</controllingFieldValue>
+            <controllingFieldValue>Canal BPO</controllingFieldValue>
+            <controllingFieldValue>WebService</controllingFieldValue>
+            <controllingFieldValue>Oficina</controllingFieldValue>
+            <controllingFieldValue>Paquetería</controllingFieldValue>
+            <controllingFieldValue>Muro</controllingFieldValue>
+            <controllingFieldValue>Email - Revisar</controllingFieldValue>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>Whatsapp</controllingFieldValue>
+            <controllingFieldValue>CC</controllingFieldValue>
+            <controllingFieldValue>Fax</controllingFieldValue>
+            <controllingFieldValue>Solicitud de subasta</controllingFieldValue>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>Backoffice</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Comentarios Stores</controllingFieldValue>
+            <controllingFieldValue>Otros</controllingFieldValue>
+            <valueName>Gestión</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SAC_Formulario</controllingFieldValue>
+            <controllingFieldValue>SAC_CartaPostal</controllingFieldValue>
+            <controllingFieldValue>SAC_FormularioOficina</controllingFieldValue>
+            <controllingFieldValue>SAC_CXBNow</controllingFieldValue>
+            <controllingFieldValue>Canal BPO</controllingFieldValue>
+            <controllingFieldValue>WebService</controllingFieldValue>
+            <controllingFieldValue>Oficina</controllingFieldValue>
+            <controllingFieldValue>Paquetería</controllingFieldValue>
+            <controllingFieldValue>Muro</controllingFieldValue>
+            <controllingFieldValue>Email - Revisar</controllingFieldValue>
+            <controllingFieldValue>SAC_Manual</controllingFieldValue>
+            <controllingFieldValue>Whatsapp</controllingFieldValue>
+            <controllingFieldValue>CC</controllingFieldValue>
+            <controllingFieldValue>Fax</controllingFieldValue>
+            <controllingFieldValue>Solicitud de subasta</controllingFieldValue>
+            <controllingFieldValue>CallMeBack</controllingFieldValue>
+            <controllingFieldValue>Backoffice</controllingFieldValue>
+            <controllingFieldValue>CallMeNow</controllingFieldValue>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Propuestas de mejora</controllingFieldValue>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <controllingFieldValue>Chat</controllingFieldValue>
+            <controllingFieldValue>Comentarios Stores</controllingFieldValue>
+            <controllingFieldValue>Otros</controllingFieldValue>
+            <valueName>Revisar Respuesta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <valueName>Tabulada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <valueName>Tabulada con gestión</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Valija digital</controllingFieldValue>
+            <controllingFieldValue>Agenda de Riesgos</controllingFieldValue>
+            <controllingFieldValue>Phone</controllingFieldValue>
+            <controllingFieldValue>Email</controllingFieldValue>
+            <valueName>Personalizada</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>FAQ</controllingFieldValue>
+            <valueName>Alta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>FAQ</controllingFieldValue>
+            <valueName>Baja</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>FAQ</controllingFieldValue>
+            <valueName>Modificación</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ComunidadAutonoma__c</fullName>
+    <description>Campo picklist que selecciona la comunidad autónoma de la reclamación para el proyecto SPV</description>
+    <label>Comunidad autónoma</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>SPV_Organismo__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Andalucia</fullName>
+                <default>false</default>
+                <label>Andalucía</label>
+            </value>
+            <value>
+                <fullName>Aragon</fullName>
+                <default>false</default>
+                <label>Aragón</label>
+            </value>
+            <value>
+                <fullName>Canarias</fullName>
+                <default>false</default>
+                <label>Canarias</label>
+            </value>
+            <value>
+                <fullName>Cantabria</fullName>
+                <default>false</default>
+                <label>Cantabria</label>
+            </value>
+            <value>
+                <fullName>Castilla-La Mancha</fullName>
+                <default>false</default>
+                <label>Castilla-La Mancha</label>
+            </value>
+            <value>
+                <fullName>Castilla y Leon</fullName>
+                <default>false</default>
+                <label>Castilla y León</label>
+            </value>
+            <value>
+                <fullName>Cataluña</fullName>
+                <default>false</default>
+                <label>Cataluña</label>
+            </value>
+            <value>
+                <fullName>Ceuta</fullName>
+                <default>false</default>
+                <label>Ceuta</label>
+            </value>
+            <value>
+                <fullName>Comunidad de Madrid</fullName>
+                <default>false</default>
+                <label>Comunidad de Madrid</label>
+            </value>
+            <value>
+                <fullName>Comunidad Foral de Navarra</fullName>
+                <default>false</default>
+                <label>Comunidad Foral de Navarra</label>
+            </value>
+            <value>
+                <fullName>Comunidad Valenciana</fullName>
+                <default>false</default>
+                <label>Comunidad Valenciana</label>
+            </value>
+            <value>
+                <fullName>Extremadura</fullName>
+                <default>false</default>
+                <label>Extremadura</label>
+            </value>
+            <value>
+                <fullName>Galicia</fullName>
+                <default>false</default>
+                <label>Galicia</label>
+            </value>
+            <value>
+                <fullName>Islas Baleares</fullName>
+                <default>false</default>
+                <label>Islas Baleares</label>
+            </value>
+            <value>
+                <fullName>La Rioja</fullName>
+                <default>false</default>
+                <label>La Rioja</label>
+            </value>
+            <value>
+                <fullName>Melilla</fullName>
+                <default>false</default>
+                <label>Melilla</label>
+            </value>
+            <value>
+                <fullName>Pais Vasco</fullName>
+                <default>false</default>
+                <label>País Vasco</label>
+            </value>
+            <value>
+                <fullName>Principado de Asturias</fullName>
+                <default>false</default>
+                <label>Principado de Asturias</label>
+            </value>
+            <value>
+                <fullName>Region de Murcia</fullName>
+                <default>false</default>
+                <label>Región de Murcia</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Andalucia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Aragon</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Canarias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Cantabria</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Castilla-La Mancha</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Castilla y Leon</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Cataluña</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Ceuta</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Comunidad de Madrid</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Comunidad Foral de Navarra</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Comunidad Valenciana</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Extremadura</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Galicia</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Islas Baleares</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>La Rioja</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Melilla</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Pais Vasco</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Principado de Asturias</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>SPV_Consumo</controllingFieldValue>
+            <valueName>Region de Murcia</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

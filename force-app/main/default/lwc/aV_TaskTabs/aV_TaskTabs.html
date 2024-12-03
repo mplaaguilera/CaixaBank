@@ -1,0 +1,52 @@
+<template>
+	<lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+		<div class="margin">
+			<header slot="title" class="slds-page-header slds-page-header_record-home" onclick={toggleShow}>
+				<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+				<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container"></lightning-button-icon>
+				<label class="nameAccordation">Gestionar Tarea</label>
+			</header>
+			<div if:true={preventClick} class="prevent-click"></div>
+			<lightning-tabset active-tab-value="" if:true={showDetail}>
+				<div if:false={isEvent}>
+					<lightning-tab label="📝 Histórico de gestión" value="ManagementHistory">
+						<c-av_-management-history record-id={recid}></c-av_-management-history>
+					</lightning-tab>
+					<template if:false={isExperiencia}>
+						<lightning-tab if:false={disableBtn} label="✏️ No Localizado" value="NoLocalizado">
+							<c-av_-tab-not-located record-id={recid} onprogressvaluechange={hanldeProgressValueChange}></c-av_-tab-not-located>
+						</lightning-tab>
+						<lightning-tab if:false={disableBtn} label="✏️ Posponer - Llamar más tarde" value="Posponer">
+							<c-av_-postpone-call record-id={recid} onprogressvaluechange={hanldeProgressValueChange}></c-av_-postpone-call>
+						</lightning-tab>
+					</template>
+					<template if:true={isExperiencia}>	
+						<lightning-tab label="✏️ No Localizado" value="NoLocalizado2">
+							<c-av_-tab-not-located record-id={recid} onprogressvaluechange={hanldeProgressValueChange}></c-av_-tab-not-located>
+						</lightning-tab>
+						<lightning-tab label="✏️ Posponer - Llamar más tarde" value="Posponer2">
+							<c-av_-postpone-call record-id={recid} onprogressvaluechange={hanldeProgressValueChange}></c-av_-postpone-call>
+						</lightning-tab>
+						<lightning-tab label="✏️ Cerrar tarea" value="CerrarTarea">
+							<c-av_-tab-closed record-id={recid} onprogressvaluechange={hanldeProgressValueChange}></c-av_-tab-closed>
+						</lightning-tab>
+					</template>	
+					
+					<template if:false={isExperiencia}>
+						<template if:false={isCustomPermission}>
+							<lightning-tab if:false={disableBtn}  label="✏️ Cerrar tarea" value="CerrarInformar" onactive={navigateToTab}></lightning-tab>
+						</template>
+						<template if:true={isCustomPermission}>
+							<lightning-tab if:false={disableBtn}  label="✏️ Cerrar tarea" value="CerrarInformar" onactive={navigateToTabVersion2}></lightning-tab>
+						</template>
+					</template>
+				</div>
+			</lightning-tabset>
+			
+		</div>
+	</lightning-card>
+	<div if:true={showAssignPurse}>
+		<c-av_assign-purse record-id={recid}></c-av_assign-purse>
+	</div>
+</template>

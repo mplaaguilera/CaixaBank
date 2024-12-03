@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Grupo_Colaborador_Id__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Grupo colaborador</label>
+    <referenceTo>CC_Grupo_Colaborador__c</referenceTo>
+    <relationshipLabel>Activities</relationshipLabel>
+    <relationshipName>Activities_del</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

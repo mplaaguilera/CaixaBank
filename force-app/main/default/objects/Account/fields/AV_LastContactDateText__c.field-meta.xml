@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_LastContactDateText__c</fullName>
+    <description>Fecha del último evento que se ha tenido con el cliente. El valor se recalcula cada 24h.</description>
+    <externalId>false</externalId>
+    <formula>IF(     ISBLANK(AV_LastContactDate__c),     &quot;&quot;,     &quot;Fecha ult. contacto: &quot; &amp;    TEXT(
+DAY
+(DATEVALUE(AV_LastContactDate__c)))     &amp; &quot;/&quot; &amp;     TEXT(
+MONTH
+(DATEVALUE(AV_LastContactDate__c)))     &amp; &quot;/&quot; &amp;     TEXT(
+YEAR
+(DATEVALUE(AV_LastContactDate__c)))     &amp; &quot;, &quot; &amp;     TEXT(
+VALUE
+(MID(TEXT(AV_LastContactDate__c), 12, 2))) &amp; &quot;:&quot; &amp; MID(TEXT(AV_LastContactDate__c), 15, 2) )</formula>
+    <label>Último Contacto Fecha Text</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

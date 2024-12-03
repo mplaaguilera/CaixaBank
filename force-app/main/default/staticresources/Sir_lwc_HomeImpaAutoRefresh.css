@@ -1,0 +1,16 @@
+.slds-table_header-fixed_container, .slds-table--header-fixed_container{
+    background-color: white !important;
+}
+
+.rojo { 
+    background-image: url("/resource/SIR_Icons/SIR_Icons/SIR_AlertRed.png");
+	background-repeat: no-repeat;
+    background-position-x: 90px;
+    background-size: 25px;
+}
+.naranja {
+    background-image: url("/resource/SIR_Icons/SIR_Icons/SIR_AlertOrange.png");
+	background-repeat: no-repeat;
+    background-position-x: 90px;
+    background-size: 25px;
+}  

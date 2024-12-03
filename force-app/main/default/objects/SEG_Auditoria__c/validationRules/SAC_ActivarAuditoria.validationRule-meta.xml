@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ActivarAuditoria</fullName>
+    <active>true</active>
+    <description>Validación para que solo los usuarios pertenecientes al grupo responsable de la auditoría puedan editar el campo activo de la auditoria</description>
+    <errorConditionFormula>AND(
+NOT($Permission.CBK_BypassValidationRules),
+NOT($Permission.SAC_ByPass),
+OR(
+ IF(ISCHANGED(SAC_Activo__c) || ISCHANGED(SAC_FechaFin__c), IF($User.SAC_PerteneceCOPSAJ__c, false, IF(SAC_EsMiGrupo__c, false, true)), false) 				
+) 
+)</errorConditionFormula>
+    <errorMessage>No puede modificar este campo. Este usuario no pertenece al grupo responsable de la auditoría.</errorMessage>
+</ValidationRule>

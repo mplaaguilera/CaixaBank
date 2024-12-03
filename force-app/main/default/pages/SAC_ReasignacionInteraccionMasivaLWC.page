@@ -1,0 +1,21 @@
+<apex:page extensions="SAC_ReasignacionInteraccionMasiva_LWC_VF" standardController="SAC_Interaccion__c" recordSetVar="interactions" >
+<apex:includeLightning />
+    <div id="LightningComponentid" />
+    <script>
+        var arr1 = new Array();
+        var lista;
+        <apex:repeat value="{!listaInteracciones}" var="interaccion">
+            arr1.push('{!interaccion}');
+        </apex:repeat>
+        $Lightning.use("c:SAC_ReasignacionInteraccionMasivaLWC", function() {
+            $Lightning.createComponent("c:sAC_ReasignacionInteraccionMasiva",
+              { 
+                "registros": arr1,
+              },
+              "LightningComponentid",
+              function(cmp) {
+              });
+        });
+
+        </script>
+</apex:page>

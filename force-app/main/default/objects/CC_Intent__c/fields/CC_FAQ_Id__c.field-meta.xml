@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_FAQ_Id__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <label>FAQ</label>
+    <referenceTo>CC_FAQ__c</referenceTo>
+    <relationshipLabel>Intents</relationshipLabel>
+    <relationshipName>Intents</relationshipName>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

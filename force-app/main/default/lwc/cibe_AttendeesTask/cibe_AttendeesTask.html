@@ -1,0 +1,35 @@
+<template>
+    <lightning-card>
+        <h3 slot="title">
+            <lightning-icon icon-name="utility:people" size="small"></lightning-icon>
+            <span class="slds-card__header-link slds-m-left_small">{labels.participantes}:</span>
+        </h3>
+        <div slot="footer">
+            <div class="slds-grid">
+                <div class="slds-col slds-size_9-of-12 slds-text-align_left">
+                    <c-av_-lookup
+                        data-id="clookup"
+                        selection={initialSelection}
+                        errors={errors}
+                        onsearch={handleSearch}
+                        onselectionchange={handleSelectionChange}
+                        placeholder={labels.anadeParticipantesTarea}>
+                    </c-av_-lookup>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <button class="slds-button slds-button_neutral" onclick={handleSave}>{labels.anadir}</button>
+                </div>
+            </div>        
+            <div class="slds-m-around_x-small">
+                <template for:each={attendees} for:item="attendee">
+                    <lightning-pill key={attendee.id} class="slds-m-left_xxx-small" label={attendee.name} name={attendee.id} href data-contact={attendee.url} onclick={handleClick} onremove={handleRemove}>
+                        <lightning-icon icon-name="standard:contact" alternative-text={labels.participantes}></lightning-icon>
+                    </lightning-pill>
+                </template>
+            </div>
+            <template if:true={loading}>
+                <lightning-spinner alternative-text={labels.cargando} size="small"></lightning-spinner>
+            </template>
+        </div>
+    </lightning-card>
+</template>

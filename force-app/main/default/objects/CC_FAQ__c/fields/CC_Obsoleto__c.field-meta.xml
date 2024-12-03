@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Obsoleto__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicador si el espacio / categoría está obsoleto</description>
+    <inlineHelpText>Indicador si el espacio / categoría está obsoleto</inlineHelpText>
+    <label>Obsoleto (Espacio / Categoría)</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

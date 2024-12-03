@@ -1,0 +1,151 @@
+<template>
+	<lightning-card>
+		<lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+		<div class="closed-form">
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Fecha">Fecha de la gestión</label>
+						<div class="slds-form-element__control">
+							<lightning-input type="date" data-id="calendar" id="Fecha" name="ActivityDate" date-style="short" value={fecha} onchange={handleChangeDate}  disabled={disableBtn} variant="label-hidden"></lightning-input>
+						</div>
+					</div>
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label" for="Tipo">Tipo</label>
+						<div class="slds-form-element__control movePicklist">
+							<lightning-combobox name="AV_Tipo__c" id="Tipo" value={value} options={options} onchange={handleChange} disabled={disableBtn} di></lightning-combobox>
+						</div>
+					</div>
+				</div>
+				<!-- <c-av_-finished-task record-id={recordId}></c-av_-finished-task> -->
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element">
+						<abbr class="slds-required required-motivos ">*</abbr>
+						<label class="slds-form-element__label" for="motivos">Motivos principales</label>
+					</div>
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element">
+						<abbr class="slds-required required-actions ">*</abbr>
+						<label class="slds-form-element__label" for="acciones">Acciones a realizar</label>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_6-of-12">
+					<abbr class="slds-required " style="display: none;">*</abbr>
+					<div class="slds-form-element slds-is-editing motivosAcciones">
+						<lightning-dual-listbox
+							class="motivosAcciones"
+							name="motivos"
+							source-label="Disponibles"
+							selected-label="Seleccionados"
+							options={optionsMotivo}
+							value={motivos}
+							onchange={handleChangeMotive}
+							disabled={disableBtn}>
+						</lightning-dual-listbox>
+					</div>
+				</div>
+				<div class="slds-col slds-size_6-of-12">
+					<abbr class="slds-required " style="display: none;">*</abbr>
+					<div class="slds-form-element slds-is-editing motivosAcciones">
+						<lightning-dual-listbox
+							class="motivosAcciones"
+							name="acciones"
+							source-label="Disponibles"
+							selected-label="Seleccionados"
+							options={optionsAcciones}
+							value={actions}
+							onchange={handleActions}
+							disabled={disableBtn}
+							required={acciones}>
+						</lightning-dual-listbox>
+					</div>
+				</div>
+			</div>
+			<div if:false={isExperiencia} class="slds-grid slds-gutters">
+				<div if:true={showState} class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label " for="Comentario">Estado</label>
+						<div class="slds-form-element__control movePicklist">
+							<lightning-combobox name="Status" id="Estado" value={valueEstado} options={optionsEstado} onchange={handleChangeEstado} disabled={disableBtn}></lightning-combobox>
+						</div>
+					</div>
+				</div>
+				<div if:true={showState} class="slds-col slds-size_6-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<label class="slds-form-element__label " for="Comentario">Comentario</label>
+						<div class="slds-form-element__control ">
+							<lightning-input type="text" maxlength="150" name="comentario" id="Comentario" value={comment} onchange={handleChangeComment} disabled={disableBtn}></lightning-input>
+						</div>
+					</div>
+				</div>
+				<div if:false={showState} class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing slds-form-element_1-col">
+						<label class="slds-form-element__label " for="ComentarioAncho">Comentario</label>
+						<div class="slds-form-element__control">
+							<lightning-input type="text" maxlength="150" name="comentario" id="ComentarioAncho" value={comment} onchange={handleChangeComment} disabled={disableBtn}></lightning-input>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element">
+						<!-- <abbr class="slds-required asterisk" >*</abbr> -->
+						<abbr class="slds-required asterisk" style="display: none;">*</abbr>
+						<label class="slds-form-element__label" for="comentarioAncho2">Comentario</label>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element__control input-comentario">
+						<lightning-input type="text" maxlength="150" name="comentarioAncho2" label="Comentario-label" variant="label-hidden" class="comentario-ancho-exp" value={comment} onchange={handleChangeComment} disabled={disableBtn} required={requiredComment}></lightning-input>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<abbr class="slds-required required-percepcion">*</abbr>
+						<label class="slds-form-element__label valoracion">¿Cómo crees que ha cambiado la percepción del cliente tras la gestión?</label>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col">
+					<div class="slds-form-element slds-is-editing">
+						<lightning-radio-group name="radioGroup"
+							options={optionsValoracion}
+							value={valoracion}
+							type="button"
+							onchange={handleValoracion}
+							disabled={disableBtn}
+							required={percepcion}
+							variant="label-hidden"></lightning-radio-group>
+					</div>
+				</div>
+			</div>
+			<div if:true={isExperiencia} class="slds-grid slds-gutters">
+				<div class="slds-col slds-size_12-of-12">
+					<div class="slds-form-element slds-form-element_horizontal slds-is-editing">
+						<p class="slds-required required-percepcion" style="display: none;">Por favor seleccione una opción</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div slot="footer" class="buttonAlign">
+			<button type="submit" class="slds-button slds-button_stretch buttonStyle" data-id="btnGrabar" disabled={disableBtn} onclick={handleSave}>Grabar</button>
+			<div if:true={isExperiencia} class="slds-form-element slds-m-top_x-small">
+				<label class="slds-form-element__label" for="acciones">Al gestionar esta tarea, el cliente recibirá una nueva encuesta para valorar su experiencia global.</label>
+			</div>
+		</div>
+	</lightning-card>
+</template>

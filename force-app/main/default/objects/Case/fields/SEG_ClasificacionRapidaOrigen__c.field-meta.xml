@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ClasificacionRapidaOrigen__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>CR inicial del caso</description>
+    <inlineHelpText>CR inicial del caso</inlineHelpText>
+    <label>Clasificación Rápida (Original)</label>
+    <referenceTo>SEG_ClasificacionRapida__c</referenceTo>
+    <relationshipLabel>Cases (Clasificación Rápida (Original))</relationshipLabel>
+    <relationshipName>Cases1</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

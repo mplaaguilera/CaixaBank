@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Extractos_Liquidacion__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si solicita extractos y/o liquidación de la tarjeta</inlineHelpText>
+    <label>Extractos y/o liquidación</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

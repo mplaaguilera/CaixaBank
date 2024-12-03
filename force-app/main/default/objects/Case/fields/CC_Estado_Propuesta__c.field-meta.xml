@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado_Propuesta__c</fullName>
+    <label>Estado propuesta</label>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Desestimada</fullName>
+                <default>false</default>
+                <label>Desestimada</label>
+            </value>
+            <value>
+                <fullName>Desestimada vigente</fullName>
+                <default>false</default>
+                <label>Desestimada vigente</label>
+            </value>
+            <value>
+                <fullName>Duplicada</fullName>
+                <default>false</default>
+                <label>Duplicada</label>
+            </value>
+            <value>
+                <fullName>Estudio Inicial</fullName>
+                <default>false</default>
+                <label>Estudio Inicial</label>
+            </value>
+            <value>
+                <fullName>Finalizada</fullName>
+                <default>false</default>
+                <label>Finalizada</label>
+            </value>
+            <value>
+                <fullName>Incorporada Proyecto</fullName>
+                <default>false</default>
+                <label>Incorporada Proyecto</label>
+            </value>
+            <value>
+                <fullName>Incumplimiento Planificación</fullName>
+                <default>false</default>
+                <label>Incumplimiento Planificación</label>
+            </value>
+            <value>
+                <fullName>Pendiente Planificación</fullName>
+                <default>false</default>
+                <label>Pendiente Planificación</label>
+            </value>
+            <value>
+                <fullName>Pendiente Valoración</fullName>
+                <default>false</default>
+                <label>Pendiente Valoración</label>
+            </value>
+            <value>
+                <fullName>Planificada</fullName>
+                <default>false</default>
+                <label>Planificada</label>
+            </value>
+            <value>
+                <fullName>Reconsiderada</fullName>
+                <default>false</default>
+                <label>Reconsiderada</label>
+            </value>
+            <value>
+                <fullName>Replanificada</fullName>
+                <default>false</default>
+                <label>Replanificada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

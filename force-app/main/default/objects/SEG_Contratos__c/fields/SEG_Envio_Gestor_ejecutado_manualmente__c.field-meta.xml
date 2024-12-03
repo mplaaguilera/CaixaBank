@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Envio_Gestor_ejecutado_manualmente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Cuando se agotan las reclamaciones el usuario puede manualmente enviar la SR al destino decidido o traspaso de SR de seguimiento de contratos a la cola de trabajo operativa decidida</description>
+    <label>Envío Gestor ejecutado manualmente</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

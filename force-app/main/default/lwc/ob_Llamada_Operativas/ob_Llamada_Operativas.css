@@ -1,0 +1,76 @@
+.slds-modal__content {
+    overflow: initial;
+}
+
+.panelWarning {
+    display: inline-block;
+    position: relative;
+    overflow: visible !important;
+    width: 44px;
+    height: 44px;
+    border-radius: 5px;
+    overflow: hidden;
+    line-height: 38px;
+    text-align: center;
+    background-color: #fbfbfb;
+    border-style: solid;
+    border-width: var(--lwc-borderWidthThin, 1px);
+    border-color: #fe933968 !important;
+}
+
+.reproductorAudio {
+    transform: scale(0.9);
+    opacity: 0.6;
+    border-color: rgb(193, 193, 203);
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 28px;
+}
+
+.blink {
+    animation-name: blinkKeyframes;
+    animation-iteration-count: 5;
+    animation-duration: 0.6s;
+    animation-timing-function: linear;
+    animation-direction: alternate-reverse;
+}
+
+@keyframes blinkKeyframes {
+    50% { opacity: 0.3; }
+}
+
+.fadeOut {
+    animation-name: fadeOutKeyframes;
+    animation-duration: 0.4s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeOutKeyframes {
+    from {opacity: 1;}
+    to {opacity: 0;}
+
+    from {z-index: 9999;}
+    to {z-index: 9999;}
+}
+
+@keyframes fadeOutSlowKeyframes {
+    from {opacity: 1;}
+    to {opacity: 0;}
+
+    from {z-index: 9999;}
+    to {z-index: 9999;}
+}
+
+.fadeIn {
+    animation-name: fadeInKeyframes;
+    animation-duration: 0.4s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInKeyframes {
+    from {opacity: 0;}
+    to {opacity: 1;}
+
+    from {z-index: 9999;}
+    to {z-index: 9999;}
+}

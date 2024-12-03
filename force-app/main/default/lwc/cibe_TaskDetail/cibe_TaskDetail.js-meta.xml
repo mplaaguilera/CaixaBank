@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="urn:metadata.tooling.soap.sforce.com" fqn="av_TaskDetail">
+    <apiVersion>49.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Task Detail</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="subject" type="String" label="Subject" role="inputOnly"/>
+            <property name="startdate" type="DateTime" label="Start Date" role="inputOnly"/>
+            <property name="client" type="String" label="Client" role="inputOnly"/>
+            <property name="taskPriority" type="String" label="Priority" role="inputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

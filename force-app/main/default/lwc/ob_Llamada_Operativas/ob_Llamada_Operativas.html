@@ -1,0 +1,173 @@
+<template>
+    <!--Botonera-->
+    <article class="slds-card" style="box-shadow: none;">
+        <div class="slds-card__body" style="padding-left: 11px; padding-right: 11px;">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col slds-col slds-grow-none">
+                    <!--Botones para iniciar operativas-->
+                    <div style="background-color: #fbfbfb; padding: 5px 0px 5px 0px; border-style: solid; border-radius: 5px; border-width: 1px; border-color: #e9e9f3;">
+                        <lightning-button label="Tomar propiedad" icon-name="utility:change_owner" onclick={tomarPropiedad} disabled={esPropietario} class="slds-var-m-left_small slds-var-m-right_large"></lightning-button>
+                        <lightning-button label="Reenviar a GDD" icon-name="utility:send" onclick={modalReenviarGddAbrir} class="slds-var-m-right_large" variant={botonReenviarGddVariant} disabled={botonReenviarGddDisabled}></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-col slds-grid_vertical-align-center slds-grow-none">
+                    <div if:true={estadoError}>
+                        <!--Icono de errores-->
+                        <div class="panelWarning slds-var-m-left_large" onmouseenter={abrirPopoverErrores} onmouseleave={cerrarPopoverErrores}>
+                            <lightning-icon icon-name="utility:warning" variant="warning" size="small" class="blink"></lightning-icon>
+                            <!--Popover de detalle de los errores-->
+                            <div class="anchor slds-float_left popover fadeIn" style="display: none; position: absolute; top: 47px; left: -4px;">
+                                <div class="slds-popover slds-popover_large slds-popover_warning slds-nubbin_top-left" style="text-align: left; line-height: normal;" role="dialog">
+                                    <div if:false={tareasError} align="center">
+                                        <lightning-spinner size="small"></lightning-spinner>
+                                    </div>
+                                    <div if:true={tareasError}>
+                                        <header class="slds-popover__header">
+                                            <div class="slds-media slds-media_center slds-has-flexi-truncate ">
+                                                <div class="slds-media__body">
+                                                    <h2 class="slds-truncate slds-text-heading_small" style="font-weight: 500;">Errores</h2>
+                                                </div>
+                                            </div>
+                                        </header>
+                                        <div class="slds-text-longform">
+                                            <!--Cuerpo del popover-->
+                                            <div if:false={tareasError} align="center">
+                                                <lightning-spinner size="small"></lightning-spinner>
+                                            </div>
+                                            <div if:true={tareasError} class="slds-grid slds-grid_vertical slds-gutters slds-gutters_small">
+                                                <template for:each={tareasError} for:item="llamada">
+                                                    <div class="slds-col" key={llamada.key}>
+                                                        <div class="slds-grid slds-border_bottom" style="margin: 8px 0px 8px 0px;">
+                                                            <div class="slds-col slds-shrink-none">
+                                                                <span class="slds-text-body_small slds-text-color_weak">{llamada.value.CreatedDate}</span><br />
+                                                                <!-- <span style="font-weight: 500;">{llamada.value.Subject}</span> -->
+                                                                <span class="slds-text-link" style="font-weight: 500; cursor: pointer;" onclick={abrirTarea} data-idtarea={llamada.value.Id}>
+                                                                    {llamada.value.Subject}
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-col slds-grow-none">
+                                                                <template for:each={llamada.value.errores} for:item="error">
+                                                                    <div key={error}>
+                                                                        &bull;&nbsp;{error}<br /><br />
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Reproductor de audio-->
+                <div class="slds-col slds-shrink-none slds-var-m-left_large">
+                    <div if:true={mostrarReproductorAudio}>
+                        <audio class="reproductorAudio" controls controlslist="nodownload" preload="none">
+                            Este navegador no permite la reproducción integrada de las grabaciones.
+                        </audio>
+                    </div>
+                </div>
+                <div class="slds-col slds-grow-none">
+                    <!--Operativas de validación-->
+                    <div style="background-color: #f2f8fb; padding: 5px 0px 5px 0px; border-style: solid; border-radius: 5px; border-width: 1px; border-color: #e0e0e0;">
+                        <lightning-button label="Validar" icon-name="utility:success" onclick={abrirModalValidar} disabled={validarRechazarDisabled} class="slds-var-m-left_small slds-var-m-right_large"></lightning-button>
+                        <lightning-button label="Rechazar" variant="destructive-text" icon-name="utility:clear" onclick={abrirModalRechazar} disabled={validarRechazarDisabled} class="slds-var-m-right_small"></lightning-button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </article>
+
+    <!--Modales-->
+    <div class="slds-backdrop modalBackdrop"></div>
+    <!--Fondo de los modales-->
+
+    <!--Modal para validar-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalValidar" onkeydown={modalValidarTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalValidar} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"><label>Cerrar</label></lightning-button-icon>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Validar</h2>
+                <p class="slds-var-m-top_x-small">
+                    Valida el contenido de la grabación de la llamada.
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <div class="slds-text-color_success" style="text-align: center; padding: 15px; font-weight: 500;">
+                    La grabación de la llamada se registrará como VÁLIDA.
+                </div>
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button variant="brand" label="Validar" icon-name="utility:success" onclick={validar} class="slds-var-m-left_x-small slds-var-m-right_small"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small slds-float_right botonValidarCancelar" label="Cancelar" onclick={cerrarModalValidar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para rechazar-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalRechazar" onkeydown={modalRechazarTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModalRechazar} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Rechazar</h2>
+                <p class="slds-var-m-top_x-small">
+                    Rechaza el contenido de la grabación de la llamada.
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <div class="slds-text-color_error" style="text-align: center; padding: 15px; font-weight: 500;">
+                    La grabación de la llamada se registrará como NO VÁLIDA.
+                </div>
+                <div style="padding-left: 90px; padding-right: 90px; padding-top: 8px; padding-bottom: 12px;">
+                    <lightning-record-edit-form object-api-name="CC_Llamada__c" record-id={recordId}>
+                        <lightning-input-field class="motivoRechazo" field-name="OB_Motivo_Rechazo__c" required></lightning-input-field>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button variant="destructive" label="Rechazar" icon-name="utility:clear" onclick={rechazar} disabled={botonRechazarRechazarDisabled} class="slds-var-m-left_x-small slds-var-m-right_small botonRechazarRechazar"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small slds-float_right botonRechazarCancelar" label="Cancelar" onclick={cerrarModalRechazar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+    <!--Modal para reenviar a GDD-->
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal modalReenviarGdd" onkeydown={modalReenviarGddTeclaPulsada}>
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <lightning-button-icon icon-name="utility:close" size="large" onclick={modalReenviarGddCerrar} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Reenviar a GDD</h2>
+                <p class="slds-var-m-top_x-small">
+                    Marcar llamada para su envío a GDD
+                </p>
+            </header>
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-var-p-around_medium">
+                <div style="text-align: center; padding: 15px;">
+                    La llamada se incluirá en el próximo envío a GDD. ¿Desea continuar?
+                </div>
+            </div>
+
+            <!--Pie-->
+            <footer class="slds-modal__footer">
+                <lightning-button variant="brand" label="Reenviar a GDD" icon-name="utility:send" onclick={reenvioGdd} class="slds-var-m-left_x-small slds-var-m-right_small"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small slds-float_right modalReenviarGddBotonCancelar" label="Cancelar" onclick={modalReenviarGddCerrar}></lightning-button>
+            </footer>
+        </div>
+    </section>
+
+</template>

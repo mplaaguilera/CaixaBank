@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_BotonGestor__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Botón para controlar si en Portal se va a mostrar el botón &apos;contacta con tu gestor&apos;</description>
+    <inlineHelpText>Opcional. Sólo para eventos con clientes eapizados</inlineHelpText>
+    <label>Botón &quot;contacta con tu gestor&quot;</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

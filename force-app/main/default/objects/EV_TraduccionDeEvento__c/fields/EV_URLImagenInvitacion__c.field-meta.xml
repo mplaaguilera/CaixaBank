@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenInvitacion__c</fullName>
+    <description>Imagen de invitación y &quot;En directo&quot; de NOW. Tamaño imagen (640x371). La imagen a portal llega desde Brightcove - portal no la coge del servicio.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Imagen de invitación y &quot;En directo&quot; de NOW (640x371px)</inlineHelpText>
+    <label>URL Imagen Invitación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

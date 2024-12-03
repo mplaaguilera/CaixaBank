@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Campanya</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Campanya&apos;,
+   OR (
+      ISBLANK(OB_Codigo_Externo__c),
+      LEN(OB_Codigo_Externo__c) &lt; 3,
+      AND (
+         OB_Multimes__c,
+         LEN(OB_Codigo_Externo__c) &gt; 3
+      ),
+      OB_Fecha_Expiracion__c &lt;= OB_Fecha_Activacion__c
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

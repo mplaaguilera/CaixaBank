@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>HDT_Llamadas_Desborde</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Fecha_Inicio__c</columns>
+    <columns>CC_Fecha_Fin__c</columns>
+    <columns>CC_Servicio__c</columns>
+    <columns>CC_ANI__c</columns>
+    <columns>CC_Contacto__c</columns>
+    <columns>CC_Asunto__c</columns>
+    <columns>CC_Idioma__c</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Llamada__c.HDT_Empleado</value>
+    </filters>
+    <filters>
+        <field>HDT_Desborde__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>HDT_Desborde_Gestionado__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <label>HDT - Llamadas por desborde</label>
+    <sharedTo>
+        <group>SAC_GrupoAdministradoresApp</group>
+        <roleAndSubordinates>HDT</roleAndSubordinates>
+    </sharedTo>
+</ListView>

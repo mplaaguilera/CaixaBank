@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Espacio__c</fullName>
+    <label>Espacio</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>liniaObertaWSLOE</fullName>
+                <default>false</default>
+                <label>Línea Abierta de LOE</label>
+            </value>
+            <value>
+                <fullName>NeoApp</fullName>
+                <default>false</default>
+                <label>NeoApp</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tipologiareparto__c</fullName>
+    <label>Grupo de tipología de reparto</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Comisiones</fullName>
+                <default>false</default>
+                <label>Comisiones</label>
+            </value>
+            <value>
+                <fullName>GGH</fullName>
+                <default>false</default>
+                <label>GGH</label>
+            </value>
+            <value>
+                <fullName>Activo</fullName>
+                <default>false</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>CaixaBank Consumer Finance</fullName>
+                <default>false</default>
+                <label>CaixaBank Consumer Finance</label>
+            </value>
+            <value>
+                <fullName>Canal &amp; Otros Servicios</fullName>
+                <default>false</default>
+                <label>Canal &amp; Otros Servicios</label>
+            </value>
+            <value>
+                <fullName>Día a Día</fullName>
+                <default>false</default>
+                <label>Día a Día</label>
+            </value>
+            <value>
+                <fullName>GGH &amp; Comisión apertura</fullName>
+                <default>false</default>
+                <label>GGH &amp; Comisión apertura</label>
+            </value>
+            <value>
+                <fullName>GGH &amp; Comisión apertura &amp; Interés demora</fullName>
+                <default>false</default>
+                <label>GGH &amp; Comisión apertura &amp; Interés demora</label>
+            </value>
+            <value>
+                <fullName>GGH &amp; Interés demora</fullName>
+                <default>false</default>
+                <label>GGH &amp; Interés demora</label>
+            </value>
+            <value>
+                <fullName>GGH &amp; Suelo</fullName>
+                <default>false</default>
+                <label>GGH &amp; Suelo</label>
+            </value>
+            <value>
+                <fullName>INDRA AC</fullName>
+                <default>false</default>
+                <label>INDRA AC</label>
+            </value>
+            <value>
+                <fullName>Letrado Activo</fullName>
+                <default>false</default>
+                <label>Letrado Activo</label>
+            </value>
+            <value>
+                <fullName>Letrado Activo &amp; GGH</fullName>
+                <default>false</default>
+                <label>Letrado Activo &amp; GGH</label>
+            </value>
+            <value>
+                <fullName>Letrado Pasivo &amp; Cobros</fullName>
+                <default>false</default>
+                <label>Letrado Pasivo &amp; Cobros</label>
+            </value>
+            <value>
+                <fullName>Letrado Seguros</fullName>
+                <default>false</default>
+                <label>Letrado Seguros</label>
+            </value>
+            <value>
+                <fullName>Letrado Servicios Inversión</fullName>
+                <default>false</default>
+                <label>Letrado Servicios Inversión</label>
+            </value>
+            <value>
+                <fullName>Letrado Tarjetas</fullName>
+                <default>false</default>
+                <label>Letrado Tarjetas</label>
+            </value>
+            <value>
+                <fullName>Letrado Testamentarías</fullName>
+                <default>false</default>
+                <label>Letrado Testamentarías</label>
+            </value>
+            <value>
+                <fullName>LOPD AC</fullName>
+                <default>false</default>
+                <label>LOPD AC</label>
+            </value>
+            <value>
+                <fullName>Pasivo &amp; Cobros</fullName>
+                <default>false</default>
+                <label>Pasivo &amp; Cobros</label>
+            </value>
+            <value>
+                <fullName>Pendiente Clasificar</fullName>
+                <default>false</default>
+                <label>Pendiente Clasificar</label>
+            </value>
+            <value>
+                <fullName>Seguros</fullName>
+                <default>false</default>
+                <label>Seguros</label>
+            </value>
+            <value>
+                <fullName>Seguros_SegurCaixa</fullName>
+                <default>false</default>
+                <label>Seguros SegurCaixa</label>
+            </value>
+            <value>
+                <fullName>Seguros VidaCaixa</fullName>
+                <default>false</default>
+                <label>Seguros VidaCaixa</label>
+            </value>
+            <value>
+                <fullName>Tarjetas &amp; Canal Cajeros</fullName>
+                <default>false</default>
+                <label>Tarjetas &amp; Canal Cajeros</label>
+            </value>
+            <value>
+                <fullName>Testamentarías</fullName>
+                <default>false</default>
+                <label>Testamentarías</label>
+            </value>
+            <value>
+                <fullName>Zaragoza</fullName>
+                <default>false</default>
+                <label>Zaragoza</label>
+            </value>
+            <value>
+                <fullName>Seguros - Bankia Vida</fullName>
+                <default>false</default>
+                <label>Seguros - Bankia Vida</label>
+            </value>
+            <value>
+                <fullName>Seguros_VidaCaixa</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Seguros_VidaCaixa</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

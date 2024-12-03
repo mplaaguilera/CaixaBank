@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Motivo_Derivacion__c</fullName>
+    <description>Motivo de la derivación KPI Agente</description>
+    <label>Motivo de la derivación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Por KO autenticación</fullName>
+                <default>false</default>
+                <label>Por KO autenticación</label>
+            </value>
+            <value>
+                <fullName>Por limitación de protocolo</fullName>
+                <default>false</default>
+                <label>Por limitación de protocolo</label>
+            </value>
+            <value>
+                <fullName>Resto derivación</fullName>
+                <default>false</default>
+                <label>Resto derivación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

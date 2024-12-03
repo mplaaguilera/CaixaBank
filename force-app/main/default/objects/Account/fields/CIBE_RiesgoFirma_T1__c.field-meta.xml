@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_RiesgoFirma_T1__c</fullName>
+    <description>Campo &quot;RIESGOS DE FIRMA&quot; T1 de la columna &quot;Saldo medio&quot; de TF importado en la integración IGC</description>
+    <label>Riesgo de firma</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

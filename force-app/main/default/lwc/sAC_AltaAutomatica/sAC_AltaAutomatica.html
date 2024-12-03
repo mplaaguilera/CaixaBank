@@ -1,0 +1,36 @@
+<template>
+    <template lwc:if={SAC_AltaAutomatica__c}>
+        <article class="slds-card" style="margin-bottom: -18px; background-color: rgb(234,245,251);
+        border-color: rgb(53,156,213)">
+        <div class="slds-card__header slds-grid ">
+            <div class="slds-float_left">
+                <span>Esta reclamación fue dada de alta automáticamente</span> 
+            </div>
+            </div>
+        </article>
+        <br/>
+    </template>
+    <template lwc:if={mostrarAvisoCopiaMasiva}>
+        <article class="slds-card" style="margin-bottom: -18px; background-color: rgb(246, 255, 162);
+        border-color: rgb(241, 219, 20)">
+        <div class="slds-card__header slds-grid ">
+            <div class="slds-float_left">
+                <span>{avisoCopiaMasiva}</span> 
+            </div>
+            </div>
+        </article>
+        <br/>
+    </template>
+    <template if:true={mostrarAvisoM2P}>
+        <template for:each={listaAvisoM2P} for:item="aviso">
+            <article class="slds-card" style="margin-bottom: -18px; background-color:darkorange;
+            border-color:darkorange" key={aviso}>
+                <div class="slds-card__header slds-grid ">
+                    <div class="slds-float_left">
+                        <span>{aviso}</span>
+                    </div>
+                </div>
+            </article>
+        </template>
+    </template>
+</template>

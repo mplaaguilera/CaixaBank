@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_PAN_Encriptado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo interno para controlar que el pan se ha encriptado y no se vuelva a encriptar en el BU del caso.</description>
+    <label>PAN Encriptado(interno)</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

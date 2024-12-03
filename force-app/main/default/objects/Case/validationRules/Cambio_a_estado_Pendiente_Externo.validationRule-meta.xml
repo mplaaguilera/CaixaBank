@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cambio_a_estado_Pendiente_Externo</fullName>
+    <active>false</active>
+    <description>Asegurarse que el usuario es consciente que está realizando un cambio manual a estado Pendiente Externo</description>
+    <errorConditionFormula>ISPICKVAL( Status , &apos;Pendiente Colaborador&apos;)  &amp;&amp;  CC_Cambio_Estado_Pendiente_Externo__c = FALSE</errorConditionFormula>
+    <errorDisplayField>CC_Cambio_Estado_Pendiente_Externo__c</errorDisplayField>
+    <errorMessage>Si cambias manualmente el estado a &apos;Pendiente Colaborador&apos;, no se realizará el envío del Caso al colaborador. Confirma que deseas realizar el cambio marcando el flag &apos;Deseo cambiar a estado Pendiente Colaborador&apos;.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agrupador__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Agrupador asociado</description>
+    <inlineHelpText>Agrupador asociado</inlineHelpText>
+    <label>Agrupador</label>
+    <referenceTo>CC_Agrupador__c</referenceTo>
+    <relationshipLabel>Notificaciones cierre</relationshipLabel>
+    <relationshipName>CC_AgrPlantillas</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

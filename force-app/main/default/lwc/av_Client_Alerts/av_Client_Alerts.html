@@ -1,0 +1,33 @@
+<template>
+    <lightning-card>
+        <div class="container">
+            <div>
+                <button class="slds-button test-id__section-header-button slds-section__title-action" title="Alertas" onclick={toggleShowAlerts}>
+                    <lightning-icon if:true={showAlert} icon-name="utility:chevrondown" size="xx-small" class="chev"></lightning-icon>
+                    <lightning-icon if:false={showAlert} icon-name="utility:chevronright" size="xx-small" class="chev"></lightning-icon>
+                    {label.alertsSectionLabel} ({listSize})
+                </button>
+            </div>
+            <div if:true={showAlert}>
+                <div if:true={alerts} class="alertContainer">
+                    <template for:each={alerts} for:item="alert">                        
+                        <div key={alert.key} class="notificationCard">
+                            <section class="notification" role="dialog">
+                                <div class="customNotification">
+                                    <div class="slds-media__body">
+                                        <span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" class="warnIcon">
+                                                    <path d="M51.4 42.5l-22.9-37c-1.2-2-3.8-2-5 0L.6 42.5C-.8 44.8.6 48 3.1 48h45.8c2.5 0 4-3.2 2.5-5.5zM26 40c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3zm3-9c0 .6-.4 1-1 1h-4c-.6 0-1-.4-1-1V18c0-.6.4-1 1-1h4c.6 0 1 .4 1 1v13z"></path>
+                                                </svg>
+                                            {alert.value}
+                                        </span>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template>

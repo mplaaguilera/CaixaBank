@@ -1,0 +1,111 @@
+<aura:component controller="CC_Email_CI_SendController" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId,lightning:actionOverride,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome">
+    
+    
+
+    <!--Acceso a las quick actions-->
+    <lightning:quickActionAPI aura:id="quickActionAPI"/>
+    
+    
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="Id" />    
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
+    <aura:attribute name="plantillaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="opcionesOperativaFolder" type="List" default="[]"/>
+
+    <aura:attribute name="optionsPlantillaResponder" type="List" />
+    <aura:attribute name="carpetaOperativaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaOperativa" type="String"/>
+    <aura:attribute name="opcionesIdiomaFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaIdiomaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaIdioma" type="String"/> 
+    <aura:attribute name="procesoFinalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaFinal" type="String" default=""/>   
+    <aura:attribute name="tipoOperativa" type="String" />
+    <aura:attribute name="picklistFirstOptionsPlantilla" type="Object[]"/>
+    <aura:attribute name="picklistFirstOptionsGrupo" type="Object[]"/>
+    <aura:attribute name="plantillaSeleccionadaValue" type="String" />
+    <aura:attribute name="plantillaSeleccionadaName" type="String" />
+    <aura:attribute name="plantillaEstaSeleccionada" type="Boolean" default="false" />
+    <aura:attribute name="actualFirstOptionPlantilla" type="String"/>
+	<aura:attribute name="actualFirstOptionGrupo" type="String" />
+    <aura:attribute name="actualFirstOptionPlantillaSolicitud" type="String"/>  
+    <aura:attribute name="optionsPlantilla" type="List" />
+    <aura:attribute name="optionsPlantillaSolicitud" type="List" />
+    <aura:attribute name="carpetaRaiz" type="String" default = "CC_CI_Operativas"/>
+    <aura:attribute name="botonAceptar" type="Boolean" default = "false"/>
+    <aura:attribute name="botonEnviarCorreoActivo" type="Boolean" default = "false"/>
+    <aura:attribute name="grupoPublicoName" type="String" default = "CC_Grupo_Publico_Test"/>
+    <aura:attribute name="grupoPublicoList" type="List" default="[]"/>
+    
+     <!--Botonera-->
+    <div style="padding: 7px 0px 7px 0px; background-color: white; border-radius: 4px" align="center">
+        <lightning:button aura:id="botonEnviarCorreo" label="Enviar correo" iconName="action:email" title="Enviar correo" onclick="{!c.abrirModalEnviarCorreo}" disabled="{!v.botonEnviarCorreoActivo}"/>
+    </div>
+    
+    
+    <!--Componente Lightning/ Card-->
+    <!--<aura:handler name="init" value="{! this }" action="{! c.iniciar }"/>-->
+	<!--Modal para enviar correo-->
+	<section role="dialog" tabindex="-1" aura:id="ModalboxEnviarCorreoAgrupador" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+    	<div class="slds-modal__container">
+        	<!--Cabecera del modal-->
+        	<header class="slds-modal__header">
+            	<!--Icono de cierre-->
+            	<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Cerrar" onclick="{!c.cerrarModalEnviarCorreo}">
+                	<span class="slds-icon_container" title="Cerrar">
+                    	<lightning:icon iconName="utility:close" size="small"/>
+                	</span>
+                	<span class="slds-assistive-text">Cerrar</span>
+            	</button>
+            	<!--Título-->
+            	<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Enviar correo</h2>
+            	<p class="slds-m-top_x-small">
+                	Seleccione la plantilla a usar para envío de correo al cliente.<br/>
+            	</p>
+        	</header>
+        	<!--Contenido del modal-->
+        	<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+            	<lightning:layoutItem size="12" padding="around-small"> 
+                	<lightning:combobox aura:id="selectItem" name="operativa" label="Operativa"
+                                    	placeholder="-Selecciona una operativa-"
+                                    	value=""
+                                    	required="false"
+                                    	dropdownAlignment="right"
+                                    	variant="standard"
+                                    	onchange="{!c.handleCarpetaIdiomaSeleccionada}"
+                                    	options="{!v.opcionesOperativaFolder}"/>
+                	<br/>
+
+
+            	<aura:if isTrue="{!v.procesoFinalSeleccion}">
+                	<lightning:combobox aura:id="selectItemPlantillaSol" name="plantilla" label="Plantilla"
+                                    	placeholder="-Selecciona una plantilla-"
+                                    	value=""
+                                    	required="true"
+                                    	dropdownAlignment="right"
+                                    	variant="standard"
+                                    	messageWhenValueMissing=" "
+                                    	onchange="{!c.seleccionarPlantilla}"
+                                    	options="{!v.opcionesPlantilla}"/>
+                	<br/>           
+            	</aura:if>    
+
+
+                	<!--<lightning:combobox aura:id="plantillaSeleccionadaSolicitud" name="general" label="Plantillas:" placeholder="Seleccione un valor" options="{!v.optionsPlantillaSolicitud}" onchange="{!c.seleccionarPlantilla}" required = "true" />-->
+            	</lightning:layoutItem>
+            	<div style="height:4rem;"/>
+        	</div>
+        
+        	<!--Pie-->
+        	<footer class="slds-modal__footer">
+                <aura:if isTrue="{!v.plantillaSeleccionada}">
+            		<lightning:button class="slds-float_right slds-button slds-button_brand" label="Cargar Plantilla" onclick="{!c.cargarPlantilla}" />
+                 </aura:if>   
+            	<lightning:button class="slds-float_right" label="Cancelar" onclick="{!c.cerrarModalEnviarCorreo}" />
+        	</footer>
+    	</div>
+	</section>
+	<!--Fondo para el modal de solicitar info-->
+	<div class="slds-backdrop" aura:id="ModalbackdropEnviarCorreo"/>
+    
+</aura:component>

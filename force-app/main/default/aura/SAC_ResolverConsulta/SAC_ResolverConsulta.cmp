@@ -1,0 +1,18 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    
+    <aura:attribute name="para"  type="String"/>
+    <aura:attribute name="CC"  type="String"/>
+    <aura:attribute name="asunto"  type="String"/>
+    <aura:attribute name="cuerpo"  type="String"/>
+    <aura:attribute name="procedencia"  type="String"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="caso"  type="Case"/>
+    <aura:attribute name="recordId"  type="String"/>    
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />    
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+    <aura:registerEvent name="cmpEvent" type="c:SAC_ResolverConsultaEvt"/>
+
+    <c:SAC_GestionEmails para="{!v.para}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}"/>
+
+</aura:component>

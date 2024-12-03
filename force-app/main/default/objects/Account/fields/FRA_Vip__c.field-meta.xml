@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FRA_Vip__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para registrar la información sobre clientes VIP de CGF, proyecto HUB Fraude</description>
+    <label>FRA Vip</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

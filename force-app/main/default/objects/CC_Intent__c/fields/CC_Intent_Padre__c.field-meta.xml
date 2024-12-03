@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Intent_Padre__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Intent padre de la customización</description>
+    <inlineHelpText>Intent padre de la customización</inlineHelpText>
+    <label>Intent Padre</label>
+    <referenceTo>CC_Intent__c</referenceTo>
+    <relationshipLabel>Intents</relationshipLabel>
+    <relationshipName>Intents</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

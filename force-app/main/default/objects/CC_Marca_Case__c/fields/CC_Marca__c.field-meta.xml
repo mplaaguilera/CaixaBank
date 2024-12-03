@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Marca__c</fullName>
+    <label>Marca</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Caracteristica__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Marca</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Caracteristica__c</referenceTo>
+    <relationshipLabel>Marcas de un caso</relationshipLabel>
+    <relationshipName>Marcas_de_un_Caso</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

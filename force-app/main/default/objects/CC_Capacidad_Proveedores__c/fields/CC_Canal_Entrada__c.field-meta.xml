@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Entrada__c</fullName>
+    <defaultValue>&quot;Email&quot;</defaultValue>
+    <label>Canal de entrada</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>CC_Canal_de_entrada</valueSetName>
+    </valueSet>
+</CustomField>

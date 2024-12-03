@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ModificarRT</fullName>
+    <active>true</active>
+    <errorConditionFormula>IF( RecordTypeId != null &amp;&amp; RecordTypeId != &apos;&apos; , 
+			IF( ISCHANGED(RecordTypeId),true,false) , false)</errorConditionFormula>
+    <errorMessage>No puedes modificar el Tipo de Registro una vez creada la tarea.</errorMessage>
+</ValidationRule>

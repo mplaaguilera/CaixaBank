@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidationResolutionOther</fullName>
+    <active>true</active>
+    <description>Validacion de cuando se elige la opcion Otros de Resolucion y el campo Coemntario esta vacio</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.AV_AvoidBulkApi),
+				$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+				ISPICKVAL(AV_Resolution__c, &quot;Otros&quot;),
+				( ISBLANK(AV_Comment__c) )
+			)</errorConditionFormula>
+    <errorDisplayField>AV_Comment__c</errorDisplayField>
+    <errorMessage>Por favor, debe añadir algun comentario.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,17 @@
+.card-title{
+    font-weight: bold;
+    font-size: 1em;
+}
+.card-title-icon{
+    margin-left: 0.3rem;
+}
+.spin-cls{
+    display: block;
+}
+.not-first-card{
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+.client-opps-icon{
+    margin-right: 1rem;
+}

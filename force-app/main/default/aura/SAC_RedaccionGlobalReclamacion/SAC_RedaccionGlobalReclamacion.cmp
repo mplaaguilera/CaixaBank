@@ -1,0 +1,135 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="archivoSubido" type="Boolean" default="false" />
+    <aura:attribute name="usarComponente" type="Boolean" default="false" />
+
+    <aura:attribute name="senRes" type="String" />
+    <aura:attribute name="argRes" type="String" />
+    <aura:attribute name="motivoInad" type="String" />
+    <aura:attribute name="options" type="String[]" />
+    <aura:attribute name="optionsMotivo" type="String[]" />
+
+
+    <aura:attribute name="fechaRes" type="String" />
+    <aura:attribute name="checkMail" type="Boolean" default="false" />
+
+    <aura:attribute name="etapa1" type="Boolean" default="true" />
+    <aura:attribute name="etapa2" type="Boolean" default="false" />
+    <aura:attribute name="etapa3" type="Boolean" default="false" />
+
+    <aura:attribute name="caso" type="Case" />
+    <aura:attribute name="metodoEnvio" type="String" />
+
+
+    <aura:attribute name="correoCaso" type="String" />
+    <aura:attribute name="asunto" type="String" />
+    <aura:attribute name="cuerpo" type="String" />
+    <aura:attribute name="para" type="String" />
+    <aura:attribute name="CCO" type="String" />
+    <aura:attribute name="checkActivado" type="Boolean" />
+    <aura:attribute name="procedencia" type="String" default="SAC_003" />
+    <aura:attribute name="ficherosAdjuntos" type="ContentDocument[]" default="[]" />
+    <aura:attribute name="documentoResolucion" type="ContentDocumentLink" />
+    <aura:attribute name="validacionEscalado" type="Boolean" default="false" />
+    <aura:attribute name="validacionLlamadaSeguimiento" type="Boolean" default="false" />
+    <aura:attribute name="validacionEscaladoPresi" type="Boolean" default="true" />
+    <aura:attribute name="mensaje" type="String" />
+    <aura:attribute name="tieneContratos" type="Boolean" />
+    <aura:attribute name="esInadmision" type="Boolean" default="false" />
+    <aura:attribute name="comunicacionCliente" type="Boolean" default="false" />
+
+
+    <aura:attribute name="isLoading" type="Boolean" />
+
+    <aura:handler event="force:refreshView" action="{! c.doInit}" />
+
+
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <aura:handler event="c:SAC_PertimiteEmailRedaccion" action="{!c.handleApplicationEvent}" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" />
+
+    <aura:if isTrue="{!or(v.caso.Status == 'Cerrado', v.caso.Status == 'SAC_004') &amp;&amp; v.metodoEnvio == 'Email' &amp;&amp; v.comunicacionCliente == true}">
+        <div class="slds-align_absolute-center" style="height:5rem">
+            <div>
+                <c:SAC_ReenvioRedaccionEmail recordId="{!v.recordId}" />
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if
+        isTrue="{!or(v.caso.Status == 'Cerrado', v.caso.Status == 'SAC_004') &amp;&amp; v.metodoEnvio == 'SAC_CartaPostal' &amp;&amp; v.comunicacionCliente == true}">
+        <div class="slds-align_absolute-center" style="height:5rem">
+            <div>
+                <c:SAC_ReenvioRedaccionCartaPostal recordId="{!v.recordId}" />
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.caso.Status == 'SAC_003'}">
+        <lightning:accordion aura:id="accordion" activeSectionName="A">
+
+            <lightning:accordionSection name="A" label="Escrito de Respuesta (Etapa 1)">
+                <!--    <aura:if isTrue="{!v.etapa2}">
+                    <lightning:icon iconName="utility:success"  variant="Success" />
+                </aura:if> -->
+                <c:SAC_DocumentacionRedaccion recordId="{!v.recordId}" documentoResolucion="{!v.documentoResolucion}"
+                    usarComponente="{!v.usarComponente}" />   <!--archivoSubido="{!v.archivoSubido}" -->
+            </lightning:accordionSection>
+            <lightning:accordionSection name="B" label="Sentido de Resolución (Etapa 2)">
+                <aura:if isTrue="{!v.etapa2}">
+                    <c:SAC_SentidoResolucionRedaccion recordId="{!v.recordId}" senRes="{!v.senRes}" argRes="{!v.argRes}"
+                        options="{!v.options}" optionsMotivo="{!v.optionsMotivo}" usarComponente="{!v.usarComponente}" esInadmision="{!v.esInadmision}" motInad="{!v.motivoInad}"/>
+                    <aura:set attribute="else">
+                        <h1>Finalice primero la etapa 1 para continuar.</h1>
+                    </aura:set>
+                </aura:if>
+            </lightning:accordionSection>
+            <lightning:accordionSection name="C" label="Resolución (Etapa 3)">
+                <aura:if isTrue="{!v.etapa3}">
+                       <aura:if isTrue="{!v.validacionLlamadaSeguimiento == true}">
+                            <aura:if isTrue="{!and(v.validacionEscalado == false &amp;&amp; v.validacionEscaladoPresi == true &amp;&amp; v.tieneContratos == true)}">
+                                <c:SAC_ResolverRedaccion recordId="{!v.recordId}" fechaRes="{!v.fechaRes}" checkMail="{!v.checkMail}" usarComponente="{!v.usarComponente}" senRes="{!v.senRes}"/>
+                                <aura:if isTrue="{!and(v.metodoEnvio == 'Email', !v.checkMail)}">
+                                    <c:SAC_GestionEmails ficherosAdjuntos="{!v.ficherosAdjuntos}" para="{!v.para}" copiaOculta="{!v.CCO}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" caso="{!v.caso}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" seleccionarReclamacion="true" />
+                                </aura:if>
+                                <aura:if isTrue="{!and(v.metodoEnvio == 'SAC_CartaPostal' &amp;&amp; v.usarComponente &amp;&amp; !v.checkMail)}">
+                                    <c:SAC_EnvioResolucionCorreoPostal recordId="{!v.recordId}" />
+                                </aura:if>
+                            </aura:if>                       
+                        
+                            <aura:if isTrue="{!v.mensaje}">
+                                <div class="slds-align_absolute-center">
+                                    <h1 style="color: red;">No puede resolver. {!v.mensaje}</h1>
+                                </div>
+                            </aura:if>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.mensaje}">
+                                    <div class="slds-align_absolute-center">
+                                        <h1 style="color: red;">No puede resolver. {!v.mensaje}</h1>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="slds-align_absolute-center">
+                                            <h1 style="color: red;">No puede resolver. Tiene llamadas de acompañamiento pendientes.</h1>
+                                        </div>
+                                    </aura:set>                                    
+                                </aura:if>
+                            </aura:set>  
+                        </aura:if>
+                    <aura:set attribute="else">
+                        <h1>Finalice primero la etapa 2 para continuar.</h1>
+                    </aura:set>
+                </aura:if>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </aura:if>
+</aura:component>

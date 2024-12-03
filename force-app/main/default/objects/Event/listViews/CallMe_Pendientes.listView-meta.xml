@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CallMe_Pendientes</fullName>
+    <columns>SUBJECT</columns>
+    <columns>CSBD_Evento_Estado__c</columns>
+    <columns>START_DATE_TIME</columns>
+    <columns>END_DATE_TIME</columns>
+    <columns>WHAT_NAME</columns>
+    <columns>AV_Tipo__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>DUE_DATE</field>
+        <operation>lessOrEqual</operation>
+        <value>TODAY</value>
+    </filters>
+    <filters>
+        <field>END_DATE</field>
+        <operation>greaterOrEqual</operation>
+        <value>TODAY</value>
+    </filters>
+    <filters>
+        <field>CSBD_Evento_Estado__c</field>
+        <operation>notEqual</operation>
+        <value>Completado,Cancelado,Gestionada Positiva,Cerrado</value>
+    </filters>
+    <label>CallMe Pendientes</label>
+    <sharedTo>
+        <group>TMS_Admin</group>
+        <group>TMS_Generico</group>
+    </sharedTo>
+</ListView>

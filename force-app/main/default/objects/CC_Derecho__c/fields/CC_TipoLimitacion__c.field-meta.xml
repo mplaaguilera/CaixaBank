@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TipoLimitacion__c</fullName>
+    <description>Propiedad del derecho de Limitación.</description>
+    <label>Tipo de limitación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Tipo 1 - subsidiario</fullName>
+                <default>false</default>
+                <label>Tipo 1 - subsidiario</label>
+            </value>
+            <value>
+                <fullName>Tipo 2 - propio</fullName>
+                <default>false</default>
+                <label>Tipo 2 - propio</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

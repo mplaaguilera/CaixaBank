@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tercero__c</fullName>
+    <description>Campo que detalla si una tarea esta pendiente por tercero en las tareas en estado Pendiente</description>
+    <label>Tercero</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Alfabético</fullName>
+                <default>false</default>
+                <label>Alfabético</label>
+            </value>
+            <value>
+                <fullName>AON</fullName>
+                <default>false</default>
+                <label>AON</label>
+            </value>
+            <value>
+                <fullName>Asesoría FIscal</fullName>
+                <default>false</default>
+                <label>Asesoría FIscal</label>
+            </value>
+            <value>
+                <fullName>Asesoría médica</fullName>
+                <default>false</default>
+                <label>Asesoría médica</label>
+            </value>
+            <value>
+                <fullName>Blanqueo</fullName>
+                <default>false</default>
+                <label>Blanqueo</label>
+            </value>
+            <value>
+                <fullName>Comisiones de control</fullName>
+                <default>false</default>
+                <label>Comisiones de control</label>
+            </value>
+            <value>
+                <fullName>Contabilidad</fullName>
+                <default>false</default>
+                <label>Contabilidad</label>
+            </value>
+            <value>
+                <fullName>Gestoras</fullName>
+                <default>false</default>
+                <label>Gestoras</label>
+            </value>
+            <value>
+                <fullName>Inversiones</fullName>
+                <default>false</default>
+                <label>Inversiones</label>
+            </value>
+            <value>
+                <fullName>Jurídica</fullName>
+                <default>false</default>
+                <label>Jurídica</label>
+            </value>
+            <value>
+                <fullName>Línea Abierta</fullName>
+                <default>false</default>
+                <label>Línea Abierta</label>
+            </value>
+            <value>
+                <fullName>Marketing</fullName>
+                <default>false</default>
+                <label>Marketing</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>Sistemas</fullName>
+                <default>false</default>
+                <label>Sistemas</label>
+            </value>
+            <value>
+                <fullName>Técnica</fullName>
+                <default>false</default>
+                <label>Técnica</label>
+            </value>
+            <value>
+                <fullName>Pendiente SCX-SAC</fullName>
+                <default>false</default>
+                <label>Pendiente SCX-SAC</label>
+            </value>
+            <value>
+                <fullName>Pendiente SCX-Ejec.</fullName>
+                <default>false</default>
+                <label>Pendiente SCX-Ejec.</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-GCI</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-GCI</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-Prest. Ind.</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-Prest. Ind.</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-Gest. Colect.</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-Gest. Colect.</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-Prest. Colect.</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-Prest. Colect.</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-PPI</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-PPI</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-PPO</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-PPO</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-TradeMk</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-TradeMk</label>
+            </value>
+            <value>
+                <fullName>Pendiente VCX-DG</fullName>
+                <default>false</default>
+                <label>Pendiente VCX-DG</label>
+            </value>
+            <value>
+                <fullName>Oficina</fullName>
+                <default>false</default>
+                <label>Oficina</label>
+            </value>
+            <value>
+                <fullName>Servicios Centrales</fullName>
+                <default>false</default>
+                <label>Servicios Centrales</label>
+            </value>
+            <value>
+                <fullName>Cumplimientos</fullName>
+                <default>false</default>
+                <label>Cumplimientos</label>
+            </value>
+            <value>
+                <fullName>Pricing</fullName>
+                <default>false</default>
+                <label>Pricing</label>
+            </value>
+            <value>
+                <fullName>Activo</fullName>
+                <default>false</default>
+                <label>Activo</label>
+            </value>
+            <value>
+                <fullName>CCDA</fullName>
+                <default>false</default>
+                <label>CCDA</label>
+            </value>
+            <value>
+                <fullName>Extracto</fullName>
+                <default>false</default>
+                <label>Extracto</label>
+            </value>
+            <value>
+                <fullName>Fact Hipotecari</fullName>
+                <default>false</default>
+                <label>Fact Hipotecari</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ValidacionNegocio</fullName>
+    <active>true</active>
+    <description>Validation para que no permita poner un negocio distinto a SAC cuando la regla de validación sea de SAC</description>
+    <errorConditionFormula>AND(
+					 ISPICKVAL(SEG_Reglas_Clasificacion__r.CBK_Negocio__c , &quot;SAC&quot;),
+					 OR(ISCHANGED(CBK_Negocio__c),ISNEW()), 
+					 NOT(ISPICKVAL(CBK_Negocio__c, &quot;SAC&quot;))
+)</errorConditionFormula>
+    <errorDisplayField>CBK_Negocio__c</errorDisplayField>
+    <errorMessage>El negocio informado no es correcto.</errorMessage>
+</ValidationRule>

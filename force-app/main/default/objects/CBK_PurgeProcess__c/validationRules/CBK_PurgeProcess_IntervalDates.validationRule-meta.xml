@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_PurgeProcess_IntervalDates</fullName>
+    <active>true</active>
+    <description>VR para que los días del intervalo de borrado tengan como número de días de antigüedad máxima un valor superior al de los días de antigüedad mínima para el purgado.</description>
+    <errorConditionFormula>IF(
+				NOT(OR(ISNULL(CBK_diasAntiguedadMaxima__c), CBK_diasAntiguedadMaxima__c==0)) ,
+				CBK_diasAntiguedadMaxima__c &lt;=  CBK_diasAntiguedadMinima__c,
+				false)</errorConditionFormula>
+    <errorMessage>El valor indicado para el número de días de antigüedad máxima debe ser un valor superior al número de días de antigüedad mínima para el proceso de purgado.</errorMessage>
+</ValidationRule>

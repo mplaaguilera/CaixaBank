@@ -1,0 +1,64 @@
+span.spanReferencia {
+    margin-left: 4px;
+    font-style: italic;
+}
+
+ul.listaAtributos {
+    line-height: 30px;
+}
+
+ul.listaAtributos > li.atributo {
+    border-radius: 6px;
+    will-change: background-color;
+    transition: background-color 90ms linear;
+}
+
+ul.listaAtributos > li.atributo:hover {
+    background-color: #f1f6fc;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoNombre {
+    font-weight: 500;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoValor {
+    margin-left: 14px;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoValor > span:not(.atributoValorSinValor) {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoValor span.atributoValorSinValor {
+    color: #909090;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid span.iconoCopiar {
+    position: relative;
+    top: -1px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 65ms linear, opacity 65ms linear;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoNombre:hover span.iconoCopiar {
+    visibility: visible;
+    opacity: 0.85;
+}
+
+ul.listaAtributos > li.atributo > div.slds-grid > div.atributoValor:hover span.iconoCopiar {
+    visibility: visible;
+    opacity: 0.85;
+}
+
+lightning-button {
+	--slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+lightning-input {
+	--slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+}

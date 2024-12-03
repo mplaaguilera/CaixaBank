@@ -1,0 +1,236 @@
+<template>
+
+    <article class="slds-card slds-var-m-bottom_xx-large slds-var-m-horizontal_small slds-var-m-top_x-small" style="background-color: rgb(243, 243, 243); box-shadow: none;">
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning-progress-indicator current-step={releaseSeleccionada}>
+                <template for:each={releasesName} for:item="estado">
+                    <lightning-progress-step key={estado} label={estado} value={estado}></lightning-progress-step>
+                </template>
+            </lightning-progress-indicator>
+        </div>
+    </article>
+
+    <article class="slds-card slds-var-m-bottom_xx-large slds-var-m-horizontal_small slds-var-m-top_x-small" style="box-shadow: none;">
+        <div class="slds-page-header bordeInferior">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure slds-is-relative" style="top: 2px;">
+                            <lightning-icon icon-name="custom:custom57"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-text-color_weak">Alta de solicitudes</span>
+                                        <span class="slds-page-header__title slds-truncate">Mis solicitudes</span>
+                                    </h1>
+                                </div><div class="slds-page-header__name-switcher">
+                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <!-- sldsValidatorIgnoreNextLine -->
+                                        <lightning-button-icon icon-name="utility:down" variant="bare" class="slds-var-m-left_xx-small slds-is-relative" style="top: -1px;"></lightning-button-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__controls">
+                    <div class="slds-page-header__control">
+                        <lightning-button-group>
+                            <lightning-button label="Nueva" onclick={nuevaSolicitud}></lightning-button>
+                            <lightning-button class="botonClonar" label="Clonar" disabled onclick={clonarSolicitud}></lightning-button>
+                            <lightning-button class="botonRechazar" label="Rechazar" disabled onclick={rechazarSolicitud}></lightning-button>
+                        </lightning-button-group>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-meta">
+                    <p class="slds-page-header__meta-text slds-text-body_small slds-var-m-left_xx-small">
+                        <span lwc:if={datatableSolicitudes.data}>{datatableSolicitudes.data.length} registros • Actualizado el {datatableSolicitudes.fechaActualizacion}.</span>
+                        <span lwc:else class="slds-text-color_weak">Sin elementos que mostrar.</span>
+                    </p>
+                </div>
+                <div class="slds-page-header__col-controls">
+                    <div class="slds-grid slds-grid_vertical-align-start slds-gutters_direct-xx-small">
+                        <!--
+                        <div class="slds-col slds-grow-none">
+                            <lightning-input class="inputBuscarEnLista inputShadowFocusNone" type="search" variant="label-hidden" placeholder="Buscar en esta lista..." disabled={cargandoCasos} onkeydown={inputBuscarEnListaKeydown}></lightning-input>
+                        </div>
+                        -->
+                        <div class="slds-col">
+                            <div class="slds-page-header__controls">
+                                <div class="slds-page-header__control">
+                                    <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                        <lightning-button-menu variant="border-filled" icon-name="utility:settings" menu-alignment="right" onselect={menuOpcionesListaOnselect}>
+                                            <lightning-menu-item value="restablecerTamañoColumnas" label="Restablecer anchuras de columna"></lightning-menu-item>
+                                        </lightning-button-menu>
+                                    </div>
+                                </div>
+                                <div class="slds-page-header__control">
+                                    <!-- sldsValidatorIgnoreNextLine -->
+                                    <lightning-button-icon icon-name="utility:refresh" variant="border-filled" onclick={botonActualizarOnclick}></lightning-button-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Lista de solicitudes-->
+        <div class="slds-card__body slds-card__body_inner" style="margin: 0; padding: 0; border-radius: 4px;">
+            <!-- sldsValidatorIgnoreNextLine -->
+            <c-cbk_-data-manager_-datatable
+                class="datatableSolicitudes"
+                columns={datatableSolicitudes.columns}
+                data={datatableSolicitudes.data}
+                key-field="Id"
+                max-row-selection=1
+                column-widths-mode="auto"
+                onrowselection={datatableOnrowselection}
+                onsort={datatableSolicitudesOnsort}
+                sorted-by={datatableSolicitudes.sortedBy}
+                sorted-direction={datatableSolicitudes.sortedDirection}>
+            </c-cbk_-data-manager_-datatable>
+        </div>
+    </article>
+
+    <!--Detalle de la solicitud-->
+    <article class="slds-card slds-var-m-around_small">
+        <div class="slds-card__header slds-grid slds-wrap slds-var-p-top_small slds-var-p-bottom_medium bordeInferior" style="background-color: #f3f3f3;">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate slds-var-m-left_x-small">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="custom:custom57" size="small"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <div class="slds-page-header__name">
+                        <div class="slds-page-header__name-title slds-is-relative" style="font-size: 15px; font-weight: 500; top: -1px;">
+                            <span>{solicitudSeleccionada.Name}</span>
+                            <span class="slds-var-m-horizontal_small" style="font-size: 18px;">·</span>
+                            <span class="slds-truncate">{solicitudSeleccionada.API_Name__c}</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="divPath slds-col slds-size_1-of-1">
+                <lightning-progress-indicator current-step={solicitudSeleccionada.Status__c} type="path" variant="base">
+                    <template for:each={estados} for:item="estado">
+                        <lightning-progress-step key={estado} label={estado} value={estado}></lightning-progress-step>
+                    </template>
+                </lightning-progress-indicator>
+            </div>
+        </div>
+
+        <div class="slds-card__body slds-card__body_inner slds-var-p-vertical_xxx-small" style="min-height: 500px;">
+            <lightning-record-edit-form class="ref" object-api-name="CBK_DataManager__c" record-id={solicitudSeleccionada.Id} onsuccess={recordeditformOnsuccess}>
+                <lightning-messages></lightning-messages>
+                <div class="slds-form" role="list">
+
+                    <div class="section-layout-container slds-section slds-is-open">
+                        <h3 class="slds-section__title slds-truncate slds-var-p-around_xx-small slds-theme_shade" style="border-radius: 4px;">
+                            <!-- sldsValidatorIgnoreNextLine -->
+                            <button class="slds-button slds-section__title-action" aria-expanded="true" onclick={seccionOnclick}>
+                                <lightning-icon class="slds-section__title-action-icon slds-var-m-left_xx-small slds-var-m-right_small" icon-name="utility:switch" size="x-small"></lightning-icon>
+                                <span class="slds-truncate" style="font-size: 14px;">Solicitud</span>
+                            </button>
+                        </h3>
+                        <div class="slds-section__content">
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Status__c" required disabled></lightning-input-field>
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Release__c" required class="req"></lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-layout-container slds-section slds-is-open">
+                        <h3 class="slds-section__title slds-truncate slds-var-p-around_xx-small slds-theme_shade" style="border-radius: 4px;">
+                            <!-- sldsValidatorIgnoreNextLine -->
+                            <button class="slds-button slds-section__title-action" aria-expanded="true" onclick={seccionOnclick}>
+                                <lightning-icon class="slds-section__title-action-icon slds-var-m-left_xx-small slds-var-m-right_small" icon-name="utility:switch" size="x-small"></lightning-icon>
+                                <span class="slds-truncate" style="font-size: 14px;">Campo</span>
+                            </button>
+                        </h3>
+                        <div class="slds-section__content">
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Object__c" required class="req"></lightning-input-field>
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Data_Type__c" required class="req"></lightning-input-field>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="API_Name__c" required class="req"></lightning-input-field>
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Length__c" required class="req"></lightning-input-field>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="RecordTypeName__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="FK_PK__c"></lightning-input-field>
+                                </div>
+                            </div>
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-output-field field-name="Field_Type__c"></lightning-output-field>
+                                </div>
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="External_ID__c"></lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-layout-container slds-section slds-is-open">
+                        <h3 class="slds-section__title slds-truncate slds-var-p-around_xx-small slds-theme_shade" style="border-radius: 4px;">
+                            <!-- sldsValidatorIgnoreNextLine -->
+                            <button class="slds-button slds-section__title-action" aria-expanded="true" onclick={seccionOnclick}>
+                                <lightning-icon class="slds-section__title-action-icon slds-var-m-left_xx-small slds-var-m-right_small" icon-name="utility:switch" size="x-small"></lightning-icon>
+                                <span class="slds-truncate" style="font-size: 14px;">Proyectos</span>
+                            </button>
+                        </h3>
+                        <div class="slds-section__content">
+                            <div class="slds-form__row">
+                                <div class="slds-form__item" role="listitem">
+                                    <lightning-input-field field-name="Proyectos__c" class="slds-form-element_1-col req" variant="label-hidden" required style="width: 100%;"></lightning-input-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </lightning-record-edit-form>
+        </div>
+
+        <footer class="slds-card__footer recordEditFormFooter" style="text-align: right;">
+            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                <div class="slds-col">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <lightning-button-icon icon-name="utility:bug" onclick={debug}></lightning-button-icon>
+                    <lightning-input type="toggle" label="Usuario de Oficina Técnica" checked={usuarioOt} message-toggle-active="" message-toggle-inactive="" style="display: inline-block;" onchange={toggleUsuarioOtOnchange}></lightning-input>
+                </div>
+                <div class="slds-col">
+                    <lightning-button label="Cancelar" onclick={cancelar}></lightning-button>
+                    <lightning-button label="Guardar" class="slds-var-m-left_small" onclick={guardar}></lightning-button>
+                    <template lwc:if={usuarioOt}>
+                        <lightning-button class="botonSolicitar slds-var-m-left_small" label="Denegar" icon-name="utility:close" variant="destructive" onclick={guardar}></lightning-button>
+                        <lightning-button class="botonSolicitar slds-var-m-left_small" label="Aprovar" icon-name="utility:check" variant="success" onclick={guardar}></lightning-button>
+                    </template>
+                    <lightning-button lwc:else class="botonSolicitar slds-var-m-left_small" label="Solicitar" icon-name="utility:breadcrumbs" variant="brand" onclick={guardar}></lightning-button>
+                </div>
+            </div>
+        </footer>
+    </article>
+
+    <div style="height: 16px;"></div>
+</template>

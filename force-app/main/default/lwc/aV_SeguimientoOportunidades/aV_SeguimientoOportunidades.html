@@ -1,0 +1,11 @@
+<template>
+  <div if:true={showSpinner}>
+    <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium"
+      class="spin-cls"></lightning-spinner>
+  </div>
+  <div class="divContainer" if:false={showSpinner} lwc:dom="manual"></div>
+  <!--
+  <lightning-spinner if:true={isLoaded} alternative-text="Loading...">
+  </lightning-spinner>
+-->
+</template>

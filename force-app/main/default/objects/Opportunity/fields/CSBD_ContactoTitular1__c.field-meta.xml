@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_ContactoTitular1__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Titular 1</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Contact.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CSBD_TitularHipoteca</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Opportunities (Contact)</relationshipLabel>
+    <relationshipName>OportunidadesTitular1</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

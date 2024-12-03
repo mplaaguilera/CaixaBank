@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Empleado_Cargado_Manualmente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Para los contactos de tipo Empleado, indica si se ha cargado manualmente. Los contactos con esta marca son
+ignorados por las actualizaciones del batch de carga de empleados.</description>
+    <label>Empleado cargado manualmente</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

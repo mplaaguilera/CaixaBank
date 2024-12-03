@@ -1,0 +1,40 @@
+<template>
+    <template if:true={hayTematica}>
+        <div class="divClasificacionActual" style="padding-top: 6px; padding-bottom: 7px;padding-left: 0.2rem;background-color: #fafbff;border-radius: 5px;border-style: solid;border-width: 1px;border-color: #d2d5d5;
+        cursor: pointer;">
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                    <span style="padding-left: 6px;"></span>
+                    <lightning-avatar variant="circle" fallback-icon-name="custom:custom62" size="x-small" class="slds-var-m-right_medium" style="position: relative; top: -2px;"></lightning-avatar>
+                    <span class="slds-badge"></span>    
+                    <lightning-badge label={tematicaData} style="border-style: solid; border-radius: 6px; border-color: #2259A4;background-color: #fafbff; box-sizing: border-box; height: 24px; font-size: small; color: black; padding-bottom: 3px; white-space: pre;"></lightning-badge>
+                    <span class="cc_flecha"> → </span>
+                    <lightning-badge label={productoData} style="border-style: solid; border-radius: 6px; border-color: #2259A4;background-color: #fafbff; box-sizing: border-box; height: 24px; font-size: small; color: black; padding-bottom: 3px; white-space: pre;" ></lightning-badge>
+                    <span class="cc_flecha"> → </span>
+                    <lightning-badge label={motivoData} style="border-style: solid; border-radius: 6px; border-color: #2259A4; background-color: #fafbff;box-sizing: border-box; height: 24px; font-size: small; color: black; padding-bottom: 3px; white-space: pre;"></lightning-badge>
+                    <span class="cc_flecha"> → </span>
+                    <lightning-badge label={detalleData} style="border-style: solid; border-radius: 6px; border-color: #2259A4; background-color: #fafbff;box-sizing: border-box; height: 24px; font-size: small; color: black; padding-bottom: 3px; white-space: pre;"></lightning-badge>
+                </div>
+                <template if:false={readOnly}>
+                    <div class="slds-col slds-grow-none">
+                        <span style="padding-right: 10px;">
+                            <lightning-button-stateful
+                                style="border: none;"
+                                icon-name-when-off="utility:search"
+                                icon-name-when-on="utility:close"
+                                icon-name-when-hover="utility:close"
+                                selected={isSelected}
+                                onclick={handleClick}> 
+                                <!-- pendiente quitar borde -->
+                            </lightning-button-stateful>
+                        </span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+    <template if:true={mostrarBuscador}>
+        <div style="height: 0.5rem;"></div>
+        <c-spv_-buscador-m-c-c onsenddata={recieveDataLWC} cambio-m-c-c="true" puede-guardar={puedeGuardar} record-id={recordId}></c-spv_-buscador-m-c-c>
+    </template>
+</template>

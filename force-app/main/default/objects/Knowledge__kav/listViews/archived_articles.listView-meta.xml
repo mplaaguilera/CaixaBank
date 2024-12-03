@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>archived_articles</fullName>
+    <columns>ARTICLE_NUMBER</columns>
+    <columns>TITLE</columns>
+    <columns>CC_Canal_Resolucion__c</columns>
+    <columns>ARCHIVED_DATE</columns>
+    <columns>CBK_Codigo_Externo_Tematica__c</columns>
+    <columns>CBK_Codigo_Externo_Producto__c</columns>
+    <columns>CBK_Codigo_Externo_Motivo__c</columns>
+    <columns>CBK_Codigo_Externo_Causa__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>PUBLISH_STATUS</field>
+        <operation>equals</operation>
+        <value>3</value>
+    </filters>
+    <label>Artículos archivados</label>
+</ListView>

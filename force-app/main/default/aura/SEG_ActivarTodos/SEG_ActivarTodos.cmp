@@ -1,0 +1,29 @@
+<aura:component controller="SEG_ActivarUsuarios_Controller" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+ <aura:attribute name="recordId" type="String" />
+<aura:attribute name="selectedRecords" type="String[]" />
+<aura:attribute name="query" type="String" default="Select Id,SEG_Usuario__r.Name,SEG_ActivoCSO__c  From SEG_UsuariosCSO__c WHERE SEG_GrupoCSO__c = '@RecordId'" />
+<aura:attribute name="columns" type="String" default="[{ label: 'Usuario', fieldName: 'SEG_Usuario__r', type: 'url', sortable: true,typeAttributes: {label: {fieldName: 'SEG_Usuario__r_Name'},target:'_self'}} ,{ label: 'Activo CSO', fieldName: 'SEG_ActivoCSO__c', type: 'boolean', sortable : true }]" />
+
+<div class="modal-header slds-modal__header">
+	<h2 class="title slds-text-heading--medium slds-hyphenate">Activar Todos</h2>
+</div>
+ <div>
+<div style="height: 300px;">
+<c:dataTable aura:id="dataTable"  name="Activar Todos" recordId="{!v.recordId}" 
+			query="{!v.query}"
+			columns = "{!v.columns}"
+			selectedAll = "true"
+			selectedRecords = "{!v.selectedRecords}"
+			onselection="{!c.handleSelection}"/>
+</div> 
+</div>
+<div class="modal-footer slds-modal__footer">
+<lightning:button label="Activar" onclick="{!c.handleClickActivar}" />
+<aura:html tag="style">
+        .slds-modal__container {
+         min-width: 55%;
+        }
+    </aura:html>  
+
+</div>
+</aura:component>

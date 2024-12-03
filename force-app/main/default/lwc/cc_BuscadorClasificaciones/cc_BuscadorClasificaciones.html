@@ -1,0 +1,181 @@
+<template>
+	<div class="slds-card contenedor">
+		<!--Clasificación actual del caso-->
+		<div lwc:if={mostrarClasificacionActual} class="clasificacionActual slds-grid slds-grid_vertical-align-center" title="Clasificación actual" onmousedown={clasificacionActualOnmousedown} style="cursor: pointer;">
+			<div class="slds-col slds-truncate" title={caso.clasificacionCompleta}>
+				<lightning-icon icon-name="custom:custom62" size="small" class="slds-var-m-right_small slds-is-relative" style="top: -2px; transform: scale(0.9);"></lightning-icon>
+				<span class="badgeClasificacionActual" style={caso.styleTematica}>{caso.fields.CC_MCC_Motivo__r.value.fields.CC_Producto_Servicio__r.value.fields.CC_Tematica__r.displayValue}</span>
+				<span class="flecha">→</span>
+				<span class="badgeClasificacionActual" style={caso.styleProducto}>{caso.fields.CC_MCC_Motivo__r.value.fields.CC_Producto_Servicio__r.displayValue}</span>
+				<span class="flecha">→</span>
+				<span class="badgeClasificacionActual" style={caso.styleMotivo}>{caso.fields.CC_MCC_Motivo__r.displayValue}</span>
+				<span lwc:if={caso.fields.CC_MCC_Motivo__r.value.fields.CC_Detalle__c.value} style="position: relative; top: -1px; margin-left: 1rem;">
+					<lightning-helptext icon-name="utility:info_alt" content={caso.fields.CC_MCC_Motivo__r.value.fields.CC_Detalle__c.value} tabindex="-1"></lightning-helptext>
+				</span>
+			</div>
+			<div class="slds-col slds-grow-none slds-shrink-none">
+				<span style="margin-right: 6px;">
+					<lightning-button-icon class="botonMostrarOcultar" icon-name="utility:search" variant="bare" tooltip="Mostrar buscador de clasificaciones"></lightning-button-icon>
+				</span>
+			</div>
+		</div>
+
+		<!--Buscador-->
+		<article class="buscador slds-card buscadorOculto slds-hidden" style="background-color: transparent;">
+			<div class="slds-card__body slds-card__body_inner" style="margin: 0px 0px 5px 0px; padding-left: 0px; padding-right: 0px;">
+				<!--Buscador-->
+				<div class="slds-grid slds-gutters slds-grid_vertical-align-center slds-gutters_xx-small" style="padding: 0px 6px 0px 6px;">
+					<!--Columna para campo de búsqueda + resultados-->
+					<div class="slds-col" style="z-index: 91; padding-top: 8px;">
+						<template if:false={clasificacionSeleccionada}>
+							<!--Campo de búsqueda sin elemento seleccionado-->
+							<div class="slds-combobox-group">
+								<!--Desplegable de tipo de búsqueda-->
+								<div class="slds-combobox_object-switcher slds-combobox-addon_start menuTipoBusqueda">
+									<div class="slds-form-element">
+										<div class="slds-form-element__control">
+											<div class="slds-combobox_container" onclick={menuTipoBusquedaOnclick}>
+												<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
+													<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+														<button type="button" class="slds-input_faux slds-combobox__input slds-combobox__input-value" aria-controls="menuTipoBusquedaResultados" aria-expanded="false" aria-haspopup="listbox" style="width: fit-content;"> <!-- style="width: fit-content;"-->
+															<span style="position: relative; top: 1px; width: fit-content;">{tipoBusqueda.nombre}</span><label></label>
+														</button>
+														<span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right" style="top: calc(50% - 1px);">
+															<lightning-icon class="iconoOpcionesTipoBusqueda" icon-name="utility:down" size="xx-small" style="position: relative; top: 2px;"></lightning-icon>
+														</span>
+													</div>
+													<div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_x-small slds-dropdown_left menuTipoBusquedaResultados" role="listbox" id="menuTipoBusquedaResultados">
+														<ul class="slds-listbox slds-listbox_vertical" role="presentation" onclick={eventStopPropagation}>
+															<template for:each={opcionesTipoBusqueda} for:item="opcionTipoBusqueda">
+																<li key={opcionTipoBusqueda.nombre} role="presentation" class="slds-listbox__item">
+																	<div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" data-nombre-tipo-busqueda={opcionTipoBusqueda.nombre} onclick={seleccionarTipoBusqueda}>
+																		<span class="slds-media__figure slds-listbox__option-icon" style="margin-top: 3px;">
+																			<span class="slds-icon_container slds-current-color">
+																				<lightning-icon icon-name="utility:check" size="x-small" class={opcionTipoBusqueda.iconoClasslist}></lightning-icon>
+																			</span>
+																		</span>
+																		<span class="slds-media__body">
+																			<span class="slds-truncate">{opcionTipoBusqueda.nombre}</span>
+																		</span>
+																	</div>
+																</li>
+															</template>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!--Input de búsqueda-->
+								<div class="slds-combobox_container slds-has-selection">
+									<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+										<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+											<lightning-input type="search" class="inputBuscar" value={valorBusqueda} onfocus={inputBuscarOnfocus} onchange={inputBuscarOnchange} onkeydown={inputBuscarOnkeydown} onclick={inputBuscarOnclick} placeholder={tipoBusqueda.inputBuscarPlaceholder} disabled={soloLectura} variant="label-hidden"></lightning-input>
+										</div>
+										<!--Resultados-->
+										<div class="divResultados divResultadosOculto">
+											<!-- sldsValidatorIgnoreNextLine -->
+											<div class="slds-dropdown slds-dropdown_fluid slds-is-relative slds-dropdown_length-10" role="listbox">
+												<ul class="listaResultados slds-listbox slds-listbox_vertical" role="presentation">
+													<template lwc:if={mostrandoRecientes}>
+														<li role="presentation" onclick={eventStopPropagation}>
+															<div class="slds-grid slds-gutters_direct-x-small slds-grid_align-spread" style="padding: 6px 21px 8px 20px;">
+																<div class="slds-col">
+																	<span class="tituloListaResultados">Clasificaciones usadas recientemente</span>
+																</div>
+																<div class="slds-col">
+																	<span class="slds-text-color_weak">Introduce 3 caracteres para iniciar la búsqueda.</span>
+																</div>
+															</div>
+														</li>
+													</template>
+													<template lwc:else>
+														<li role="presentation" onclick={eventStopPropagation}>
+															<div class="slds-grid slds-gutters_direct-x-small" style="padding: 6px 24px 8px 20px;">
+																<div class="slds-col">
+																	<span class="tituloListaResultados">Coincidencias</span>
+																</div>
+															</div>
+														</li>
+														<template if:false={hayResultados}>
+															<li role="presentation" onclick={eventStopPropagation}>
+																<div class="slds-grid slds-gutters_direct-x-small" style="padding: 6px 24px 8px 21px;">
+																	<div class="slds-col">
+																		<span style="color: #3c3c3c;">No se encontraron resultados.</span>
+																	</div>
+																</div>
+															</li>
+														</template>
+													</template>
+													<template lwc:if={hayResultados} for:each={resultados} for:item="resultado">
+														<li class="resultado" key={resultado.Id} role="presentation" onmousedown={resultadoOnmousedown} data-id={resultado.Id}>
+															<span class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-var-m-left_x-small slds-var-m-right_x-small slds-var-p-left_medium spanResultado" role="option" style="padding-top: 1px; padding-bottom: 1px;">
+																<span class="slds-media__figure" style="margin: 1px 14px 0px 8px; padding-top: 2px;">
+																	<span class="slds-icon_container">
+																		<lightning-icon variant="bare" icon-name="custom:custom62" size="small" style="transform: scale(0.8);"></lightning-icon>
+																	</span>
+																</span>
+																<span class="slds-media__body">
+																	<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+																		<div class="slds-col" style="position: relative; top: -1px;">
+																			<span class={resultado.classListTematica} style={resultado.styleTematica}>{resultado.CC_Producto_Servicio__r.CC_Tematica__r.Name}</span>
+																			<span class="flecha">→</span>
+																			<span class={resultado.classListProducto} style={resultado.styleProducto}>{resultado.CC_Producto_Servicio__r.Name}</span>
+																			<span class="flecha">→</span>
+																			<span class={resultado.classListMotivo} style={resultado.styleMotivo}>{resultado.Name}</span>
+																		</div>
+																		<div lwc:if={resultado.CC_Detalle__c} class="slds-col slds-grow-none " style="position: relative; top: -3px;">
+																			<lightning-helptext icon-name="utility:info_alt" content={resultado.CC_Detalle__c}></lightning-helptext>
+																		</div>
+																	</div>
+																</span>
+															</span>
+															<hr style="margin: 3px;">
+														</li>
+													</template>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</template>
+
+						<template lwc:if={clasificacionSeleccionada}>
+							<div class="slds-form-element clasificacionSeleccionada">
+								<div class="slds-form-element__control">
+									<div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right">
+										<span class="clasificacionSeleccionadaContenido slds-truncate" title={clasificacionSeleccionada.clasificacionCompleta}>
+											<span class="slds-var-m-left_x-small slds-var-m-right_small" style="font-size: 12px; cursor: default;">Clasificación seleccionada:</span>
+											<span style="padding-left: 2px;"></span>
+											<span class="badgeResultado" style={clasificacionSeleccionada.styleTematica}>{clasificacionSeleccionada.CC_Producto_Servicio__r.CC_Tematica__r.Name}</span>
+											<span class="flecha">→</span>
+											<span class="badgeResultado" style={clasificacionSeleccionada.styleProducto}>{clasificacionSeleccionada.CC_Producto_Servicio__r.Name}</span>
+											<span class="flecha">→</span>
+											<span class="badgeResultado" style={clasificacionSeleccionada.styleMotivo}>{clasificacionSeleccionada.Name}</span>
+										</span>
+										<input type="text" class="slds-input slds-combobox__input inputClasificacionSeleccionada" role="textbox" disabled />
+										<span style="position: absolute; top: 6px; right: 10px;">
+											<lightning-button-icon class="slds-input__icon_right" icon-name="utility:close" variant="bare" onclick={deseleccionarResultado} tooltip="Deseleccionar"></lightning-button-icon>
+										</span>
+									</div>
+								</div>
+							</div>
+						</template>
+					</div>
+					<!--Columna para botón de guardado)-->
+					<div lwc:if={botonGuardarMostrar} class="slds-col slds-grow-none" style="padding-top: 7px;">
+						<lightning-button class="botonGuardar" label={botonGuardarLabel} onclick={guardar} disabled={botonGuardarDisabled}></lightning-button>
+					</div>
+					<!--Columna para warning de caso no clasificado-->
+					<div lwc:if={recordId} class="warningNoClasificado slds-col slds-grow-none" style="padding: 5px 0px 0px 4px;">
+						<lightning-helptext icon-name="utility:info_alt" content="Caso pendiente de clasificar" tabindex="-1"></lightning-helptext>
+					</div>
+				</div>
+			</div>
+		</article>
+	</div>
+
+	<div class="slds-backdrop backdropSuave"></div>
+</template>

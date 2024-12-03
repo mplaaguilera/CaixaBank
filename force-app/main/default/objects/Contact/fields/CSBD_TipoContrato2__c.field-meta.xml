@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_TipoContrato2__c</fullName>
+    <label>Tipo de contrato</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Autónomo</fullName>
+                <default>false</default>
+                <label>Autónomo</label>
+            </value>
+            <value>
+                <fullName>Autónomo (en nómina)</fullName>
+                <default>false</default>
+                <label>Autónomo (en nómina)</label>
+            </value>
+            <value>
+                <fullName>Contrato fijo</fullName>
+                <default>false</default>
+                <label>Contrato fijo</label>
+            </value>
+            <value>
+                <fullName>Contrato temporal</fullName>
+                <default>false</default>
+                <label>Contrato temporal</label>
+            </value>
+            <value>
+                <fullName>Desempleado</fullName>
+                <default>false</default>
+                <label>Desempleado</label>
+            </value>
+            <value>
+                <fullName>Empleado público</fullName>
+                <default>false</default>
+                <label>Empleado público</label>
+            </value>
+            <value>
+                <fullName>Otro</fullName>
+                <default>false</default>
+                <label>Otro</label>
+            </value>
+            <value>
+                <fullName>Interino</fullName>
+                <default>false</default>
+                <label>Interino</label>
+            </value>
+            <value>
+                <fullName>Contrato fijo discontinuo</fullName>
+                <default>false</default>
+                <label>Contrato fijo discontinuo</label>
+            </value>
+            <value>
+                <fullName>Funcionari de carrera</fullName>
+                <default>false</default>
+                <label>Funcionari de carrera</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

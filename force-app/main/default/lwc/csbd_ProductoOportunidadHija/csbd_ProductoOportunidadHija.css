@@ -1,0 +1,29 @@
+.iconVariantLight {
+    --sds-c-icon-color-foreground-default: #a0a2aa;
+}
+
+.divResumenOportunidad {
+    padding: 9px 12px;
+    background-color: #f8f8f8;
+    min-height: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-line;
+}
+
+.modal2 .slds-modal__content {
+    overflow: initial;
+}
+
+lightning-button, lightning-button-menu, lightning-input, lightning-combobox {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+    --slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+button.slds-modal__close:hover > lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-c-button-text-color-hover, var(--lwc-brandAccessibleActive, rgba(21, 73, 102, 1)));
+}

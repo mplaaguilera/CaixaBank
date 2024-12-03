@@ -1,0 +1,128 @@
+.THIS .fondo {
+    background-color: #f4f6f9;
+/*min-width: 225px;*/
+border-right: 1px solid #e7e7e7;
+    }
+.THIS .navigation1 {
+background-color: #f4f6f9;
+/*min-width: 225px;*/
+
+}
+
+.THIS .navigation2 {
+/*min-width: 225px;*/
+border-right: 1px solid #e7e7e7;
+}
+.THIS .archivos{
+    /*min-width: 400px;*/
+    border-right: 1px solid #e7e7e7;
+    width: 100%;
+}
+
+.THIS .slds-file-selector{
+    display: flex;
+}
+.THIS .slds-file-selector__dropzone{
+    height: 110px;
+    width: -webkit-fill-available;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{ /*the right label*/
+    font-size: 100%;
+}
+
+.THIS .ficherosincluidos{
+    padding: var(--lwc-spacingXxxSmall,0.125rem);
+    border: var(--lwc-borderWidthThin,1px) dashed var(--lwc-colorBorder,rgb(221, 219, 218));
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+    margin-bottom: 5px;
+    z-index: 9;
+    position: relative;
+    background-color: white;
+    min-height: 33px;
+}
+/*
+.THIS .deaparece{
+    transition: all .3s ease-in-out !important;
+    transform: translateY(100%) scaleY(0);
+    transition: all .2s ease-in-out !important;
+    position: absolute;
+    z-index: 10;
+    background-color: white;
+    width: 100%;
+    overflow: hidden;
+ }
+ 
+ .THIS .aparece {    
+    transition: all .5s ease-in-out!important;
+     transform: translateY(0px); 
+     position: absolute;
+     z-index: 10;
+     background-color: white;
+     width: 100%;
+     overflow: hidden;
+}
+*/
+
+.THIS .deaparece{
+    transition: all .3s ease-in-out !important;
+    transform: translateY(100%) scaleY(0);
+    transition: all .2s ease-in-out !important;
+    position: fixed;
+    z-index: 10;
+    background-color: white;
+    overflow: hidden;
+    bottom: 0;
+    max-height: 50vh;
+    width: 100vw;
+    left: calc(-50vw + 50%);
+ }
+ 
+ .THIS .aparece {    
+    transition: all .5s ease-in-out!important;
+     transform: translateY(0px); 
+     position: fixed;
+     z-index: 10;
+     background-color: white;
+     overflow: hidden;
+     right: 0;
+     bottom: 0;
+     max-height: 50vh;
+     width: 100vw;
+    left: calc(-50vw + 50%);
+}
+.THIS .scrollerSize {
+    height: 300px;
+    margin-bottom: 10px;
+}
+
+.THIS .blockSF{
+    background-color: #333333;
+    z-index: 8;
+    position: fixed;
+    opacity: 0.3;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+.THIS .dark-background{
+    background-color: #16325c;
+    color: #fff;
+}
+
+.THIS .contenedorPrincipal{
+    width: 100%;
+    margin-right: 12px;
+}
+
+.THIS .infoFile
+{
+    width:auto;
+    margin-left: 12PX;
+}

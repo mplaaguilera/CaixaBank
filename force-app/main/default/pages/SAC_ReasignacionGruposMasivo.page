@@ -1,0 +1,64 @@
+<apex:page standardController="Case" extensions="SAC_ReasignacionGruposVF" recordSetVar="records" lightningStylesheets="true" applyHtmlTag="false" showHeader="false">
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+    
+    
+    <apex:slds />
+    <style>
+        .modal {
+        display: none;
+        }
+    </style>
+    
+    
+    <apex:form id="form"> 
+        <apex:pageBlock id="pregunta"> 
+            <apex:pageBlockSection title="Selecciona que elementos quiere reasignar" collapsible="false" rendered="{!If( mostrar,true,false)}">
+                <apex:selectList value="{!decision}" multiselect="false" size="1">
+                    <apex:selectOption itemValue="aSeleccionar" itemLabel="(Seleccionar)"/>
+                    <apex:selectOption itemValue="Reclamaciones" itemLabel="Reclamaciones"/>
+                    <apex:selectOption itemValue="Pretensiones" itemLabel="Pretensiones"/>
+                    <apex:actionSupport event="onchange" rerender="out"/>
+                </apex:selectList>
+
+                <apex:pageBlockTable value="{!listaSeleccionados}" var="item">
+                    <apex:column value="{!item.CaseNumber}"/>
+                    <apex:column value="{!item.SEG_Grupo__c}"/>
+                    <apex:column value="{!item.OwnerId}"/>
+                    <apex:column value="{!item.Status}"/>
+                </apex:pageBlockTable>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+
+        <apex:pageBlock id="out">            
+            <apex:pageBlockButtons location="bottom" rendered="{!If( mostrar,true,false)}">  
+                <apex:commandButton action="{!save}" value="Guardar"  status="sts" reRender="all"/>		               
+                <apex:commandButton action="{!cancel}" value="Cancelar" />
+            </apex:pageBlockButtons>            
+            <apex:pageMessages />
+            
+            <apex:pageBlockSection title="Selecciona el grupo al que se reasignarán los casos" collapsible="false" rendered="{!If( mostrar,true,false)}">
+                <apex:selectList value="{!selectedValor1}" multiselect="false" size="1"  rendered="{!decision = 'Reclamaciones'}">
+                    <apex:selectOptions value="{!gruposProveedores}"/>
+                    <apex:actionSupport event="onchange" rerender="sample1"/>
+                </apex:selectList>
+
+                <apex:selectList value="{!selectedValor2}" multiselect="false" size="1" rendered="{!decision = 'Pretensiones'}">
+                    <apex:selectOptions value="{!gruposLetrados}"/>
+                    <apex:actionSupport event="onchange" rerender="sample2"/>
+                </apex:selectList>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <apex:actionstatus id="sts">
+            <apex:facet name="start">
+                <apex:outputPanel >
+                <img src="/img/loading32.gif" width="25" height="25" align="middle" />
+                <apex:outputLabel value="Loading..."/>
+            </apex:outputPanel>
+            </apex:facet>
+        </apex:actionstatus>  
+            
+    </apex:form>    
+</apex:page>

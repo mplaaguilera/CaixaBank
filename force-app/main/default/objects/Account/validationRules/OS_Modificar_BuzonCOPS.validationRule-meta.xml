@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Modificar_BuzonCOPS</fullName>
+    <active>true</active>
+    <description>Bloquear la creación o modificación de una cuenta Buzon COPS para perfiles que no sean de COPS ni administradores.</description>
+    <errorConditionFormula>RecordType.DeveloperName == &apos;OS_Buzon_Account&apos; &amp;&amp; $Profile.Name &lt;&gt; &apos;OS_Responsable&apos; &amp;&amp; $Profile.Name &lt;&gt; &apos;OS_Operador&apos; &amp;&amp; $Profile.Name &lt;&gt; &apos;System Administrator&apos; &amp;&amp; $Profile.Name &lt;&gt; &apos;Administrador del sistema&apos;</errorConditionFormula>
+    <errorMessage>No se permite crear o modificar una cuenta Buzon COPS.</errorMessage>
+</ValidationRule>

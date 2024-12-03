@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Empleado__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Empleado</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Contact (Empleado)</relationshipLabel>
+    <relationshipName>Empleado</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

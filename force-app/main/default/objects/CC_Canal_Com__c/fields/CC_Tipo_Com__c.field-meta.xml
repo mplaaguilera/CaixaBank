@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tipo_Com__c</fullName>
+    <description>Tipo de teléfono</description>
+    <inlineHelpText>Tipo de teléfono</inlineHelpText>
+    <label>Tipo comunicación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>CC_Tipo_Telf</valueSetName>
+    </valueSet>
+</CustomField>

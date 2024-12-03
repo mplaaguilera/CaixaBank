@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>4</label>
+    <protected>false</protected>
+    <values>
+        <field>Acci_n__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Configuraci_n_de_Store__c</field>
+        <value xsi:type="xsd:string">CaixaBank_Sign_Apple</value>
+    </values>
+    <values>
+        <field>Crear_Caso__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Estado_Caso__c</field>
+        <value xsi:type="xsd:string">Activo</value>
+    </values>
+    <values>
+        <field>Post_Proceso__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

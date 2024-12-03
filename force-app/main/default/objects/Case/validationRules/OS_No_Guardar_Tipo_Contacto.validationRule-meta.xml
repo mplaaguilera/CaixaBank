@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_No_Guardar_Tipo_Contacto</fullName>
+    <active>true</active>
+    <description>Regla de validación para que no permita guardar y asociar una cuenta y contacto de tipo cliente si es un caso de empleados y viceversa.</description>
+    <errorConditionFormula>AND(
+  CC_Admin__c != TRUE,
+  $User.LastName &lt;&gt; &apos;System&apos;,
+  OR(
+    AND(
+      RecordType.DeveloperName == &apos;OS_Empleado&apos;,
+      OR(
+        Account.RecordType.DeveloperName == &apos;CC_Cliente&apos;,
+        Contact.RecordType.DeveloperName == &apos;CC_Cliente&apos;,
+        Account.RecordType.DeveloperName == &apos;CC_ClientePA&apos;
+      )
+    )
+    ,
+    AND(
+      RecordType.DeveloperName == &apos;OS_Cliente&apos;,
+      OR(
+        Account.RecordType.DeveloperName == &apos;CC_CentroCaixaBank&apos;,
+        Account.RecordType.DeveloperName == &apos;CC_Generico&apos;,
+				Contact.RecordType.DeveloperName == &apos;CC_Empleado&apos;,
+				Account.RecordType.DeveloperName == &apos;OS_Buzon_Account&apos;,
+				Contact.RecordType.DeveloperName == &apos;OS_Buzon_Contact&apos;
+      
+      )
+    )
+  )
+)</errorConditionFormula>
+    <errorMessage>No se puede guardar y asociar una cuenta y contacto de tipo cliente si es un caso de empleados y viceversa.</errorMessage>
+</ValidationRule>

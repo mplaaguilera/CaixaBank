@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tamano_Maximo_Attach__c</fullName>
+    <description>En este campo definiremos el tamaño máximo de adjuntos para la o las integraciones reflejada en Balanceo Integraciones</description>
+    <externalId>false</externalId>
+    <inlineHelpText>En este campo definiremos el tamaño (MB) máximo de adjuntos para las integraciones reflejada en Balanceo Integraciones</inlineHelpText>
+    <label>Tamaño Máximo Adjuntos</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

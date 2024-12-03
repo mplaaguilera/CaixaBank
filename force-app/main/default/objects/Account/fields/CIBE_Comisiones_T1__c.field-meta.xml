@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Comisiones_T1__c</fullName>
+    <description>campo &quot;Comisiones Gestion/Gastos T1 asociados&quot; del TF importado en la integración IGC</description>
+    <label>Comisiones</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

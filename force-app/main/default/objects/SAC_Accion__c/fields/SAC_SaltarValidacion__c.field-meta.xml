@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_SaltarValidacion__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Check para saltar la custom validation de ser el propietario de la acción, para asi poder cambiar el estado sin ser el owner en un flow</description>
+    <label>Saltar validación</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

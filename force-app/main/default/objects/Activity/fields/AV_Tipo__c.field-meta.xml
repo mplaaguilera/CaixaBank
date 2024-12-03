@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Tipo__c</fullName>
+    <description>tipo de tarea</description>
+    <label>Tipo</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CTO</fullName>
+                <default>false</default>
+                <label>Cita en la oficina</label>
+            </value>
+            <value>
+                <fullName>CTF</fullName>
+                <default>false</default>
+                <label>Cita telefónica</label>
+            </value>
+            <value>
+                <fullName>EC</fullName>
+                <default>false</default>
+                <label>Entrevista centro</label>
+            </value>
+            <value>
+                <fullName>VC</fullName>
+                <default>false</default>
+                <label>Visita Cliente</label>
+            </value>
+            <value>
+                <fullName>VLD</fullName>
+                <default>false</default>
+                <label>Videollamada</label>
+            </value>
+            <value>
+                <fullName>CTOOC</fullName>
+                <default>false</default>
+                <label>Cita en otra oficina CaixaBank</label>
+            </value>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Visita del gestor</label>
+            </value>
+            <value>
+                <fullName>LT</fullName>
+                <default>false</default>
+                <label>Llamada telefónica</label>
+            </value>
+            <value>
+                <fullName>LMD</fullName>
+                <default>false</default>
+                <label>Llamada</label>
+            </value>
+            <value>
+                <fullName>ESE</fullName>
+                <default>false</default>
+                <label>Email,sms,etc</label>
+            </value>
+            <value>
+                <fullName>030</fullName>
+                <default>false</default>
+                <label>Muro</label>
+            </value>
+            <value>
+                <fullName>FH</fullName>
+                <default>false</default>
+                <label>Firma hipoteca</label>
+            </value>
+            <value>
+                <fullName>OFT</fullName>
+                <default>false</default>
+                <label>Tarea Oficina</label>
+            </value>
+            <value>
+                <fullName>COTF</fullName>
+                <default>false</default>
+                <label>Comentario TF</label>
+            </value>
+            <value>
+                <fullName>022</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Atención al cliente interno</label>
+            </value>
+            <value>
+                <fullName>012</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Banca teléfono</label>
+            </value>
+            <value>
+                <fullName>006</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta</label>
+            </value>
+            <value>
+                <fullName>032</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita anulada</label>
+            </value>
+            <value>
+                <fullName>037</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita anulada gestor</label>
+            </value>
+            <value>
+                <fullName>031</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita previa</label>
+            </value>
+            <value>
+                <fullName>042</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita previa entrevista</label>
+            </value>
+            <value>
+                <fullName>043</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita previa llamada</label>
+            </value>
+            <value>
+                <fullName>041</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cita previa visita</label>
+            </value>
+            <value>
+                <fullName>005</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Comunicado</label>
+            </value>
+            <value>
+                <fullName>050</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Comunicado comercial</label>
+            </value>
+            <value>
+                <fullName>027</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Contacto comercial</label>
+            </value>
+            <value>
+                <fullName>047</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Contacto comercial BPR</label>
+            </value>
+            <value>
+                <fullName>029</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Contacto protocolo</label>
+            </value>
+            <value>
+                <fullName>049</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Contacto protocolo BPR</label>
+            </value>
+            <value>
+                <fullName>071</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Contratación telefónica</label>
+            </value>
+            <value>
+                <fullName>014</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cupón</label>
+            </value>
+            <value>
+                <fullName>016</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Email</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Entrevista</label>
+            </value>
+            <value>
+                <fullName>010</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Eurocaixa</label>
+            </value>
+            <value>
+                <fullName>025</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Formación</label>
+            </value>
+            <value>
+                <fullName>062</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Grabación de llamada</label>
+            </value>
+            <value>
+                <fullName>011</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Internet</label>
+            </value>
+            <value>
+                <fullName>033</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Live</label>
+            </value>
+            <value>
+                <fullName>036</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Live CMN</label>
+            </value>
+            <value>
+                <fullName>034</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Live Chat</label>
+            </value>
+            <value>
+                <fullName>035</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Live Videochat</label>
+            </value>
+            <value>
+                <fullName>004</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Llamada cliente</label>
+            </value>
+            <value>
+                <fullName>003</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Llamada oficina</label>
+            </value>
+            <value>
+                <fullName>007</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Mailing centralizado</label>
+            </value>
+            <value>
+                <fullName>017</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Multicanal</label>
+            </value>
+            <value>
+                <fullName>009</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Obsequio</label>
+            </value>
+            <value>
+                <fullName>072</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Onboarding no útil</label>
+            </value>
+            <value>
+                <fullName>070</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Onboarding útil</label>
+            </value>
+            <value>
+                <fullName>019</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>061</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Outlook</label>
+            </value>
+            <value>
+                <fullName>000</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Privada</label>
+            </value>
+            <value>
+                <fullName>020</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reunión</label>
+            </value>
+            <value>
+                <fullName>063</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Revisión ficha</label>
+            </value>
+            <value>
+                <fullName>018</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>SMS/PUSH</label>
+            </value>
+            <value>
+                <fullName>013</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Servicajero</label>
+            </value>
+            <value>
+                <fullName>021</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tarea</label>
+            </value>
+            <value>
+                <fullName>024</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tarea administración</label>
+            </value>
+            <value>
+                <fullName>023</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tarea middleoffice</label>
+            </value>
+            <value>
+                <fullName>008</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Telemarketing</label>
+            </value>
+            <value>
+                <fullName>015</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Televisión digital</label>
+            </value>
+            <value>
+                <fullName>038</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Video Lync</label>
+            </value>
+            <value>
+                <fullName>028</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Videoconferencia</label>
+            </value>
+            <value>
+                <fullName>048</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Videoconferencia BPR</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,12 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" access="global">
+    
+    <!-- INIT AURA COMPONENT -->
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <aura:handler event="lightning:tabFocused" action="{!c.onTabFocused}"/>
+    
+    <c:sir_lwc_Comunicaciones
+        aura:id="mcchild"
+        recordId="{!v.recordId}"
+    />
+
+</aura:component>

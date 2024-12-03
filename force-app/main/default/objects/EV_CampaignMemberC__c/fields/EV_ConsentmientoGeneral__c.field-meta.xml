@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ConsentmientoGeneral__c</fullName>
+    <description>Consentimiento general</description>
+    <formula>IF( EV_LeadId__c != null ,  EV_LeadId__r.EV_ConsentimientoGeneral__c , IF( EV_ContactId__c != null, EV_ContactId__r.EV_ConsentimientoGeneral__c , false) )</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Consentimiento comercial no cliente</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TareaRelacionada__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo que relaciona una tarea con otra según unos criterios específicos</description>
+    <label>Tarea relacionada</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>$Source.OwnerId</field>
+            <operation>equals</operation>
+            <valueField>SAC_Accion__c.CreatedById</valueField>
+        </filterItems>
+        <filterItems>
+            <field>$Source.Id</field>
+            <operation>notEqual</operation>
+            <valueField>SAC_Accion__c.Id</valueField>
+        </filterItems>
+        <filterItems>
+            <field>SAC_Accion__c.RecordTypeId</field>
+            <operation>notEqual</operation>
+            <value>Accion Responder</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>SAC_Accion__c</referenceTo>
+    <relationshipLabel>Acciones</relationshipLabel>
+    <relationshipName>Acciones</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

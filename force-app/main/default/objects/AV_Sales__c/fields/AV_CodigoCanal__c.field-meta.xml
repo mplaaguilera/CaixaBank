@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CodigoCanal__c</fullName>
+    <description>Field used in reports to know the Canal codes</description>
+    <externalId>false</externalId>
+    <formula>IF(AV_IndicadorR2B__c = &apos;S&apos;,&apos;R2B&apos;,
+IF( ISPICKVAL(AV_Canal__c  , &apos;010010000&apos;) , &apos;Oficina&apos;, 
+IF( OR(ISPICKVAL(AV_Canal__c  , &apos;020030010&apos;), ISPICKVAL(AV_Canal__c  , &apos;020030040&apos;), ISPICKVAL(AV_Canal__c  , &apos;020040020&apos;)), &apos;Now&apos;,
+IF( ISPICKVAL(AV_Canal__c  , &apos;030020070&apos;), &apos;ImaginBank&apos;, &apos;Otros&apos;))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Código Canal</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

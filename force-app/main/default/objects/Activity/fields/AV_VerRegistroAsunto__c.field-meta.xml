@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_VerRegistroAsunto__c</fullName>
+    <description>Ver el asunto en la ficha de cliente y que sea un enlace seleccionable para acceder al detalle de la tarea/evento</description>
+    <externalId>false</externalId>
+    <formula>IF(!ISBLANK(Subject),HYPERLINK(&quot;/lightning/r/Task/&quot;+ Id +&quot;/view&quot;, Subject, &quot;_self&quot;), 
+HYPERLINK(&quot;/lightning/r/Task/&quot;+ Id +&quot;/view&quot;, &quot;-&quot;, &quot;_self&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Ver Registro Asunto</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

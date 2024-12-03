@@ -1,0 +1,14 @@
+<template>
+    <lightning-card>
+        <div class="slds-m-around_medium">
+            <template if:true={chatCerrado.data}>
+                <div class="slds-m-vertical_medium">
+                    <lightning-icon icon-name="action:defer" alternative-text="Time-Out" variant="timeout" size="x-small">
+                    </lightning-icon>
+                    &nbsp;&nbsp;
+                    <b style="font-size:13px" >Chat cerrado por inactividad del cliente.</b>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

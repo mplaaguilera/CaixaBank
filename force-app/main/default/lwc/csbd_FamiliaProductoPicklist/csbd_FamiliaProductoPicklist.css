@@ -1,0 +1,29 @@
+.buttonIconBrand {
+    --slds-c-icon-color-foreground: rgb(21, 73, 102);
+}
+
+.formularioOrigen {
+    background-color: #fafafa;
+    padding: 8px 22px 19px 22px;
+    border-radius: 6px;
+}
+
+div.slds-form-element {
+    transition: background-color 120ms linear;
+}
+
+div.slds-form-element.slds-is-edited {
+    background-color: rgb(251, 243, 224);
+}
+
+div.slds-form-element lightning-button-icon.undo {
+    display: none;
+}
+
+div.slds-form-element.slds-is-edited lightning-button-icon.undo {
+    display: block;
+}
+
+.section-content-grid {
+    padding: 0 12px 12px 12px;
+}

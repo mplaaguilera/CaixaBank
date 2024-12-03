@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Motivo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Motivo</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordType.DeveloperName</field>
+            <operation>equals</operation>
+            <value>CC_Motivo</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.CC_Producto_Servicio__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Producto_Servicio__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.CC_Activo__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Agrupadores (Motivo)</relationshipLabel>
+    <relationshipName>Agrupadores2</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

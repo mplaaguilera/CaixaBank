@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Adeterminar</fullName>
+    <columns>NAME</columns>
+    <columns>SEG_Estado__c</columns>
+    <columns>SEG_GrupoCSO__c</columns>
+    <columns>SEG_IDServicio__c</columns>
+    <columns>SEG_Operativa__c</columns>
+    <columns>SEG_Valor__c</columns>
+    <columns>SEG_NumeroSR__c</columns>
+    <columns>SEG_Usuariogenerador__c</columns>
+    <columns>SEG_Tematica__c</columns>
+    <columns>SEG_Producto__c</columns>
+    <columns>SEG_Motivo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>SEG_Estado__c</field>
+        <operation>equals</operation>
+        <value>Revisar,Ignorar</value>
+    </filters>
+    <label>Fotos en estado &quot;Ignorar&quot; y &quot;Revisar&quot;</label>
+</ListView>

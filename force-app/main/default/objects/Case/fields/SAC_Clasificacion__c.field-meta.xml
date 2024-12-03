@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Clasificacion__c</fullName>
+    <description>Clasificación para las consultas de COPS</description>
+    <label>Clasificación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_AJ</fullName>
+                <default>false</default>
+                <label>AJ</label>
+            </value>
+            <value>
+                <fullName>SAC_BDEAlegaciones</fullName>
+                <default>false</default>
+                <label>BDE Alegaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_BDEAllanamientos</fullName>
+                <default>false</default>
+                <label>BDE Allanamientos</label>
+            </value>
+            <value>
+                <fullName>SAC_BDERectificaciones</fullName>
+                <default>false</default>
+                <label>BDE Rectificaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_ContactCenter</fullName>
+                <default>false</default>
+                <label>Contact Center</label>
+            </value>
+            <value>
+                <fullName>SAC_CNMVAlegaciones</fullName>
+                <default>false</default>
+                <label>CNMV Alegaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_CNMVAllanamientos</fullName>
+                <default>false</default>
+                <label>CNMV Allanamientos</label>
+            </value>
+            <value>
+                <fullName>SAC_CNMVRectificaciones</fullName>
+                <default>false</default>
+                <label>CNMV Rectificaciones</label>
+            </value>
+            <value>
+                <fullName>SAC_Consumo</fullName>
+                <default>false</default>
+                <label>Consumo</label>
+            </value>
+            <value>
+                <fullName>SAC_DGS</fullName>
+                <default>false</default>
+                <label>DGS</label>
+            </value>
+            <value>
+                <fullName>SAC_Incidencias</fullName>
+                <default>false</default>
+                <label>Incidencias</label>
+            </value>
+            <value>
+                <fullName>SAC_Informes</fullName>
+                <default>false</default>
+                <label>Informes</label>
+            </value>
+            <value>
+                <fullName>SAC_Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>SAC_SAC</fullName>
+                <default>false</default>
+                <label>SAC</label>
+            </value>
+            <value>
+                <fullName>SAC_ConsultasReclamacionesSAC</fullName>
+                <default>false</default>
+                <label>Consultas Reclamaciones SAC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

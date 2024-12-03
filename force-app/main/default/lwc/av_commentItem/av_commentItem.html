@@ -1,0 +1,57 @@
+<template>
+        <div class={divClass}>
+          <div class="slds-media">
+            <div class="slds-media__figure">
+              <div class="slds-timeline__icon tm-div">
+                  <lightning-icon icon-name={iconName} class="slds-timeline__icon"></lightning-icon>
+              </div>
+            </div>
+            <div class="slds-media__body">
+              <lightning-layout>
+                  <lightning-layout-item class="layout-item-pad-top" size="10" small-device-size="7" medium-device-size="7" large-device-size="7" padding="around-small">
+                      <div class="div-inline">
+                          <h1>
+                              <a class="va-top" onclick={viewRecord}>{item.subject}</a>
+                          </h1>
+                          <div>
+                              <label>{item.comment}</label>
+                          </div>
+                      </div>
+                  </lightning-layout-item>
+
+
+                  <lightning-layout-item class="layout-item-pad-top " size="1" small-device-size="1" medium-device-size="1" large-device-size="1"  padding="around-small">
+
+                    <p if:true={isType}>{item.contactType}</p>
+                  
+                    <p if:true={isProduct}>{item.product}</p>
+
+                    <p if:true={isChannel}>{item.caseChannel}</p>
+
+                  </lightning-layout-item>
+
+                  <lightning-layout-item class="layout-item-pad-top slds-m-left_large slds-m-right_medium" size="1" small-device-size="1" medium-device-size="1" large-device-size="1" padding="around-small">
+
+                    <p if:true={isStatus}>{item.status}</p>
+
+                  </lightning-layout-item>
+
+
+                  <lightning-layout-item class="layout-item-pad-top slds-m-left_small" size="1" small-device-size="1" medium-device-size="1" large-device-size="1" padding="around-small">
+
+                    <p if:true={isEmployee}>{item.employee}</p>
+
+                  </lightning-layout-item>
+
+
+                  <lightning-layout-item class="layout-item-pad-top " size="2" small-device-size="2" medium-device-size="2" large-device-size="2" padding="around-small">
+
+                    <p if:true={isDate}>{item.dateField}</p>
+                                                    
+                  </lightning-layout-item>
+
+              </lightning-layout>
+            </div>
+          </div>
+        </div>
+</template>

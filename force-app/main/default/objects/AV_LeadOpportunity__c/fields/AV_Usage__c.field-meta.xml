@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Usage__c</fullName>
+    <label>Uso de la vivienda</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>01</fullName>
+                <default>false</default>
+                <label>Residencia principal</label>
+            </value>
+            <value>
+                <fullName>02</fullName>
+                <default>false</default>
+                <label>Residencia secundaria</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GrupoEmpresaNumPer__c</fullName>
+    <description>Numperso del grupo económico asociado a la cuenta</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Numperso del grupo económico asociado a la cuenta</inlineHelpText>
+    <label>NumPerso grupo económico</label>
+    <length>25</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

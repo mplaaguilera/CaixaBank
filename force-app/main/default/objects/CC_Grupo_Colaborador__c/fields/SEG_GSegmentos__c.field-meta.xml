@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GSegmentos__c</fullName>
+    <formula>IF( 
+				OR(RecordType.Name = &quot;Grupo Operativo Segmentos&quot;, 
+							RecordType.Name = &quot;Grupo Automático Segmentos&quot;,
+							CreatedBy.Profile.Name = &quot;SEG_Usuario_CaixaBank&quot;,  
+							CreatedBy.UserRole.Name = &quot;Segmentos&quot;,  
+			    CreatedBy.UserRole.Name = &quot;BO&quot;, 
+			    CreatedBy.UserRole.Name = &quot;Global BO&quot;, 
+			    CreatedBy.UserRole.Name = &quot;Global CSO&quot;),
+				TRUE,
+				FALSE)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Grupo Segmentos</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

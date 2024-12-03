@@ -1,0 +1,79 @@
+lightning-button {
+	--slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+lightning-input {
+	--slds-c-input-color-border: rgb(201, 201, 201);
+	--slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+div.slds-dropdown {
+	border-color: rgb(201, 201, 201);
+}
+
+section.slds-modal.modalSeleccionarPlantilla {
+	text-align: initial;
+	outline-style: none;
+}
+
+section.slds-modal.modalSeleccionarPlantilla > div.slds-modal__container > div.slds-modal__content  {
+	min-height: 380px;
+}
+
+div.slds-modal__content {
+    overflow: auto;
+}
+
+li.liplantilla{
+	cursor: pointer;
+}
+
+li.liplantilla + .liplantilla{
+	cursor: pointer;
+	margin-top: 10px;
+}
+
+
+lightning-breadcrumbs.ruta {
+	font-size: 15px;
+	--slds-c-breadcrumbs-spacing-inline-start: 13px;
+	--slds-c-breadcrumbs-spacing-inline-end: 16px;
+}
+
+ol.itemsCarpeta {
+	margin-left: 8px;
+	list-style: none;
+	line-height: 36px;
+}
+
+li.itemCarpeta > lightning-button-icon.botonVerPlantilla {
+	opacity: 0;
+	transition: opacity 50ms linear;
+}
+
+li.itemCarpeta:hover > lightning-button-icon.botonVerPlantilla {
+	opacity: 1;
+}
+
+li.itemCarpeta > span {
+	cursor: pointer;
+}
+
+li.itemCarpeta > span > span.itemCarpetaLabel {
+	position: relative;
+	top: 2px;
+}
+
+li.itemCarpeta > span:hover > span.itemCarpetaLabel {
+	border-bottom: 1px solid;
+}
+
+lightning-vertical-navigation-item-icon.carpeta {
+	--slds-c-icon-color-foreground-default: #939393;
+}
+
+lightning-vertical-navigation-item-icon.reciente {
+	--slds-c-icon-color-background: #818181;
+}

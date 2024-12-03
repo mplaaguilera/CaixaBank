@@ -1,0 +1,8 @@
+.slds-modal__content {
+    overflow: visible;
+    overflow-y: visible;
+}
+
+.modalBody{
+    position: relative;
+  }

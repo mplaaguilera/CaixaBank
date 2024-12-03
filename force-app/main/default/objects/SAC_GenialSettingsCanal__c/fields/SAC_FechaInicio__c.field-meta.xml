@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaInicio__c</fullName>
+    <description>Fecha de inicio a partir de la cual la IA podrá recibir casos
+Los casos que lleguen antes de esta fecha no se enviarán a la IA, actuará como si estuviese siempre apagada.
+Si está vacío no se aplica la restricción por fechas.</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>Fecha Inicio</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

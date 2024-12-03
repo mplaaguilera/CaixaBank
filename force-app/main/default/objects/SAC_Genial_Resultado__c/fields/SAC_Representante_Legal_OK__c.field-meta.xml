@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Representante_Legal_OK__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>se informará a SI si el representante legal propuesto por la IA es el representante legal del caso</description>
+    <label>Reclamacion IA Representante_Legal_OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_NumeroCuenta</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( ISCHANGED(SAC_Estado__c) ,
+					 ISPICKVAL(SAC_Estado__c, &apos;SAC_PendienteAsignar&apos;)
+	,  SAC_MaestroAccionesReclamacion__r.SAC_DeveloperName__c = &apos;GGH&apos;
+	,    ISBLANK(SAC_NCuentaAbono__c))</errorConditionFormula>
+    <errorMessage>El número de cuenta de abono debe estar informado.</errorMessage>
+</ValidationRule>

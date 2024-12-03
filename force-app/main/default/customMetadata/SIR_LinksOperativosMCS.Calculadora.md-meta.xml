@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Calculadora</label>
+    <protected>false</protected>
+    <values>
+        <field>SIR_Activo__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SIR_Externo__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>SIR_Orden__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>SIR_Seccion__c</field>
+        <value xsi:type="xsd:string">Cargas financieras</value>
+    </values>
+    <values>
+        <field>SIR_Url2__c</field>
+        <value xsi:type="xsd:string">https://pro01.tf7.lacaixa.es/CA.OFI/AdmisionActivoTramitacion/simulacionPRS.tf7?_flowId=simulacionPRS-flow</value>
+    </values>
+</CustomMetadata>

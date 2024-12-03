@@ -1,0 +1,58 @@
+<aura:component>
+	<aura:attribute name="object" type="Object"/>
+    <aura:attribute name="info0" type="String"/>
+    <aura:attribute name="info1" type="String"/>
+    <aura:attribute name="info2" type="String"/>
+    <aura:attribute name="info3" type="String"/>
+    <aura:attribute name="alternateFieldList" type="String[]"/>
+    <aura:attribute name="alternateFieldValueList" type="String[]"/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    <aura:attribute name="helpText" type="String[]"/>
+    <aura:attribute name="helpTextValue" type="String"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <span class="slds-listbox__option-meta slds-listbox__option-meta_entity" style="vertical-align: center;">
+
+        <div class="slds-grid">
+            <!--Columna 1 (niveles clasificación)-->
+            <div class="slds-col">
+                {!v.helpTextValue}
+                <aura:iteration items="{!v.alternateFieldValueList}" var="field" indexVar="i">
+                    <!--Temática-->
+                    <aura:if isTrue="{!i == 0 &amp;&amp; field != null &amp;&amp; field != undefined}">
+                    <c:CC_MCC_Buscador_Badge text="{!field}" enteredValue="{!v.enteredValue}"/>
+                    </aura:if>
+
+                    <!--Producto/Servicio o Motivo (precedidos por flecha)-->
+                    <aura:if isTrue="{!i > 0 &amp;&amp; field != null &amp;&amp; field != undefined}">
+                        <span class="cc_flecha">→</span><c:CC_MCC_Buscador_Badge text="{!field}" enteredValue="{!v.enteredValue}"/>
+                    </aura:if>
+                    <!-- <aura:iteration items ="{!v.helpTextValue}" var="help" indexVar="j"> -->
+                        <aura:if isTrue="{!i==0 &amp;&amp; v.info0 != null}">
+                            <lightning:helptext content="{!v.info0}"/>
+                        </aura:if>
+                        <aura:if isTrue="{!i==1 &amp;&amp; v.info1 != null}">
+                            <lightning:helptext content="{!v.info1}"/>
+                        </aura:if>
+                        <aura:if isTrue="{!i==2 &amp;&amp; v.info2 != null}">
+                            <lightning:helptext content="{!v.info2}"/>
+                        </aura:if>
+                        <aura:if isTrue="{!i==3 &amp;&amp; v.info3 != null}">
+                            <lightning:helptext content="{!v.info3}"/>
+                        </aura:if>
+                    <!-- </aura:iteration> -->
+
+                </aura:iteration>
+
+            </div>
+            <!--Columna 2 (icono para mostrar la descripción del motivo)-->
+            <div class="slds-col slds-grow-none">
+                <!-- <aura:if isTrue="{!v.helpText != null}">
+                    <lightning:helptext content="{!v.helpText}"/>
+                </aura:if> -->
+            </div>
+        </div>
+    </span>
+</aura:component>

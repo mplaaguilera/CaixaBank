@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Linea__c</fullName>
+    <description>Línea</description>
+    <label>Línea</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Click MyHome Premium</fullName>
+                <default>false</default>
+                <label>Click MyHome Premium</label>
+            </value>
+            <value>
+                <fullName>Click MyHome</fullName>
+                <default>false</default>
+                <label>Click MyHome</label>
+            </value>
+            <value>
+                <fullName>Imagin, Convenio</fullName>
+                <default>false</default>
+                <label>Imagin, Convenio</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

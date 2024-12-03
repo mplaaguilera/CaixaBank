@@ -1,0 +1,245 @@
+<template>  
+    <template if:true={cargando}>
+        <div class="backgroundInverse">
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+        </div>
+    </template>
+    <template if:false={bError}>
+    
+    <article class="slds-card slds-card_boundary slds-m-bottom_medium">
+        <lightning-card  title={label.evolucionCirbe} style="display: block">
+            <div id="canvas3" class="chart3 slds-p-horizontal_small slds-m-bottom_x-large" onclick={clickHandler}
+            style="position: center;" lwc:dom="manual"></div>
+            <div slot="footer">
+                <a class="" href={url}> 
+                    <lightning-icon icon-name="utility:new_window" alternative-text="Approved" title="Approved" size="x-small"></lightning-icon>
+                    <span class='slds-m-left_small'>{label.detalle}</span>    
+                </a>
+            </div>
+        </lightning-card>
+    </article>
+    <div class="slds-grid slds-gutters slds-m-bottom_medium"> 
+        <div class="slds-col slds-size_1-of-2"> 
+            <article class="slds-card slds-card_boundary">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span>{label.porDispDirecto}</span>
+                        </h2>
+                    </div>
+                    </header>
+                </div>
+                <div id="canvas1" class="chart slds-align_absolute-center slds-m-bottom_x-large" onclick={clickHandler}
+                style="position: center;" lwc:dom="manual"></div>
+            </article>
+        </div>
+        <div class="slds-col slds-size_1-of-2">  
+            <article class="slds-card slds-card_boundary">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span>{label.porDispIndirecto}</span>
+                        </h2>
+                    </div>
+                    </header>
+                </div>
+                <div id="canvas2" class="chart2 slds-align_absolute-center slds-m-bottom_x-large" onclick={clickHandler}
+                style="position: center;" lwc:dom="manual"></div>
+            </article>
+        </div>
+    </div>
+    
+    <article class="slds-card slds-card_boundary slds-scrollable_x">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span>{label.directo}</span>
+                </h2>
+            </div>
+            </header>
+        </div>
+        <div class="slds-table--header-fixed_container" style="width:100%;">
+            <div class="slds-scrollable_x" style="width:100%;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" aria-labelledby="element-with-table-label other-element-with-table-label">
+                    <thead>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="" scope="col" style="width:25%">
+                        <div class="slds-truncate" title="concepto"></div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title={label.fechaDatos}>{label.fechaDatos} {cxbRefresh}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title={label.fechaDatos}>{label.fechaDatos} {otherRefresh}</div>
+                        </th>
+                        <th class="" scope="col" colspan="2">
+                            <div class="slds-truncate" title="% dispuesto cuota CXB/otras entidates"></div>
+                        </th>
+                    </tr>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="concepto" scope="col" style="width:25%">
+                        <div class="slds-truncate" title={label.concepto}>{label.concepto}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title={label.posicionesCXB}>{label.posicionesCXB}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title={label.posicionesOtros}>{label.posicionesOtros}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2">
+                            <div class="slds-truncate" title={label.dispCuota}>{label.dispCuota}</div>
+                        </th>
+                    </tr>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.concepto}></div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.dispuesto}>{label.dispuesto}</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.disponible}>{label.disponible}</div>
+                        </th>
+                        <th class="" scope="col">
+                        <div class="slds-truncate" title={label.dispuesto}>{label.dispuesto}</div>
+                        </th>
+                        <th class="" scope="col">
+                        <div class="slds-truncate" title={label.disponible}>{label.disponible}</div>
+                        </th>
+                        <th class="" scope="col" colspan="2">
+                            <div class="slds-truncate" title={label.dispCuota}></div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={directData} for:item="direct">
+                            <tr class="slds-hint-parent" key={direct.concepto}>
+                                <td class="concepto" data-label="concepto">
+                                    <div class="slds-truncate" title={label.concepto}>{direct.concepto}</div>
+                                </td>
+                                <td data-label="Dispuesto CXB">
+                                    <div class="slds-truncate" title={label.dispuesto}>{direct.dispuesto}</div>
+                                </td>
+                                <td data-label="Disponible CXB">
+                                    <div class="slds-truncate" title={label.disponible}>{direct.disponible}</div>
+                                </td>
+                                <td data-label="Dispuesto Otros">
+                                <div class="slds-truncate" title={label.dispuesto}>{direct.dispuestoEnt}</div>
+                                </td>
+                                <td data-label="Disponible Otros">
+                                <div class="slds-truncate" title={label.disponible}>{direct.disponibleEnt}</div>
+                                </td>
+                                <td data-label="Porcentaje Cuota Dispuesto CXB" colspan="2">
+                                    <div class="slds-truncate" title={label.dispCuota}>{direct.porcentaje}%</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </article>
+    <article class="slds-card slds-card_boundary">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+            <div class="slds-media__body">
+                <h2 class="slds-card__header-title">
+                    <span>{label.indirecto}</span>
+                </h2>
+            </div>
+            </header>
+        </div>
+        <div class="slds-table--header-fixed_container" style="width:100%;">
+            <div class="slds-scrollable_x" style="width:100%;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" aria-labelledby="element-with-table-label other-element-with-table-label">
+                    <thead>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="" scope="col" style="width:25%">
+                        <div class="slds-truncate" title="Concepto"></div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title="refresco CXB">{label.fechaDatos} {cxbRefresh}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title="refresco otras entidades">{label.fechaDatos} {otherRefresh}</div>
+                        </th>
+                        <th class="" scope="col" colspan="2">
+                            <div class="slds-truncate" title="% dispuesto cuota CXB/otras entidates"></div>
+                        </th>
+                    </tr>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="concepto" scope="col" style="width:25%">
+                        <div class="slds-truncate" title="Concepto" colspan="1">{label.concepto}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title="Posiciones en CXB(p.e Miles €)">{label.posicionesCXB}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2" style="width:25%">
+                        <div class="slds-truncate" title="Posiciones en otras entidades(p.e Miles €)">{label.posicionesOtros}</div>
+                        </th>
+                        <th class="textCenter" scope="col" colspan="2">
+                            <div class="slds-truncate" title={label.dispCuota}>{label.dispCuota}</div>
+                        </th>
+                    </tr>
+                    <tr class="slds-line-height_reset slds-table_col-bordered">
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.concepto}></div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.dispuesto}>{label.dispuesto}</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title={label.disponible}>{label.disponible}</div>
+                        </th>
+                        <th class="" scope="col">
+                        <div class="slds-truncate" title={label.dispuesto}>{label.dispuesto}</div>
+                        </th>
+                        <th class="" scope="col">
+                        <div class="slds-truncate" title={label.disponible}>{label.disponible}</div>
+                        </th>
+                        <th class="" scope="col" colspan="2">
+                            <div class="slds-truncate" title="porcentaje"></div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={indirectData} for:item="indirect">
+                            <tr class="slds-hint-parent" key={indirect.concepto}>
+                                <td class="concepto" data-label={label.concepto}>
+                                    <div class="slds-truncate" title={label.concepto}>{indirect.concepto}</div>
+                                </td>
+                                <td data-label={label.dispuesto}>
+                                    <div class="slds-truncate" title={label.dispuesto}>{indirect.dispuesto}</div>
+                                </td>
+                                <td data-label={label.disponible}>
+                                    <div class="slds-truncate" title={label.disponible}>{indirect.disponible}</div>
+                                </td>
+                                <td data-label={label.dispuesto}>
+                                <div class="slds-truncate" title={label.dispuesto}>{indirect.dispuestoEnt}</div>
+                                </td>
+                                <td data-label={label.disponible}>
+                                <div class="slds-truncate" title={label.disponible}>{indirect.disponibleEnt}</div>
+                                </td>
+                                <td data-label={label.dispCuota} colspan="2">
+                                    <div class="slds-truncate" title={label.dispCuota}>{indirect.porcentaje}%</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </article>
+    </template>
+    <template if:true={bError}>
+        <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+            <img src="/img/chatter/Desert.svg" class="slds-illustration__svg" alt=""/>
+            <div class="slds-text-color_weak">
+                <h3 class="slds-text-heading_medium">{error}</h3>
+            </div>
+        </div>
+    </template>
+</template>

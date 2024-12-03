@@ -1,0 +1,109 @@
+<template>
+    <!--Inincio cabecera-->
+        <div class="slds-page-header slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">  
+                        <div class="slds-media__figure" >
+                            <lightning-icon data-id="falseIcon" icon-name="standard:report"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body" style="margin-right:20%">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <ul class="slds-list_horizontal">
+                                            <li class="slds-m-right_x-small">
+                                                <span>Informe: Mis clientes</span>
+                                            </li>
+                                        </ul>
+                                        <span class= "slds-page-header__title slds-truncate">Clientes a gestionar priorizados</span>
+                                    </h1>
+                                </div>
+                            </div>    
+                        </div> 
+                        <div class = "miDiv">                         
+                            <lightning-button  label="Consultar más oportunidades" onclick={navigateToMassReassignOwnerOpps}></lightning-button>
+                        </div>     
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!--Fin Cabebecera-->
+
+    <br>
+    <article if:true={renderComponent} class="slds-card">
+            <div data-id="lookup2" class="slds-grid customHeader" >
+                <div class="slds-col slds-size-9-of-12" style="padding:.5rem 0"><strong>Filtrar clientes</strong></div>
+                <div class="slds-size-3-of-12 buttonAlign">
+                    <lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
+                    <lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={handleSearchData}
+                    disabled={buttonDisabled}></lightning-button>
+                    <lightning-button-icon  icon-name="utility:refresh" alternative-text="Reload" slot="actions" onclick={handleSearchData}></lightning-button-icon>  
+                </div>
+            </div>  
+            <input type="text" data-id="falseInput" style="opacity:0;position:absolute;width:1px">
+        
+            
+            <div class="slds-border_top margin-right-search">
+
+                <div data-id="lookup1" class="" style="padding-top:1rem">            
+                </div>
+
+                <lightning-input class="slds-size_1-of-4" type="text" name="subject" placeholder= "Buscar asunto..." onchange={handleChangeSubject}></lightning-input>
+                    
+                <div  style="width:fit-content">
+                    <lightning-combobox data-id="" name="origen" style="width:10rem"
+                        options={optionsOrigen} placeholder="Origen" onchange={handleChangeOrigen} value={origenFilter}>
+                    </lightning-combobox>
+                </div>
+                
+                
+                   
+                
+                <div class="div-checkbox slds-grid">
+                    <lightning-input name="recordTypes" label="Preconcedido" type="checkbox" onchange={handleChangePreconcedido} checked={preconcedidoFilter}></lightning-input>
+                    <lightning-input name="status" label="MyBox" type="checkbox" onchange={handleChangeMyBox} checked={myBoxFilter}></lightning-input>
+                    <lightning-input name="owner" label="Target Auto" type="checkbox" onchange={handleChangeTargetAuto} checked={targetAutoFilter}></lightning-input>
+                </div>
+            </div>  
+
+
+
+    <div class="slds-border_top">
+
+        <div if:true={origenDiv} class=" slds-grid margin-pill">
+            <template for:each={originSelect} for:item="origen" >
+                <div key={origen.bucleId} class="origen-select" data-id="origen.id">
+                    <span class="slds-pill" style="margin:8px .6rem 8px 0" >
+                        <span class="slds-pill__label customPill" >{origen.typeLabel}<a href="#">{origen.label}</a></span>
+                        <lightning-button-icon icon-name="utility:close" style="margin:-3px 0 0 5px"
+                            variant="bare" name={origen.value} onclick={unSelectOrigen}>    
+                        </lightning-button-icon>
+                    </span>                
+                </div>                  
+            </template>
+        </div>
+
+    </div>
+        
+            
+</article>
+<br>
+    <lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium"
+    class="spin-cls"></lightning-spinner>
+
+    <template if:true={showTable}>
+        <lightning-datatable data={dataClient}
+            columns={columns} 
+            key-field="Id"
+            default-sort-direction={defaultSortDirection}
+            sorted-by={sortedBy}
+            sorted-direction={sortDirection}
+            onsort={handleSortData}
+            hide-checkbox-column
+            >
+        </lightning-datatable>
+    </template>
+
+    
+</template>

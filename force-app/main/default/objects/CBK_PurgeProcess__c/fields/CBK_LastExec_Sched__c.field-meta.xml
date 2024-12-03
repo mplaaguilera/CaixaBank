@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_LastExec_Sched__c</fullName>
+    <description>Fecha de ejecución planificada (Planificación Última Ejecución en FW Batch)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Para el calculo de la próxima ejecución se ha de tener en cuenta que se utilizará la siguiente fecha/hora calculada en función de este dato así como los valores de periodicidad y días hábiles.</inlineHelpText>
+    <label>Fecha/hora Calculo Planificación Purgado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Faqs</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Nombre__c</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>CC_Lookup_App__c</columns>
+    <columns>CC_Espacio__c</columns>
+    <columns>CC_Categoria__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CC_GlobalId__c</columns>
+    <columns>CC_FAQ_Ident__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_FAQ__c.CC_FAQ,CC_FAQ__c.CC_FAQ_Custom</value>
+    </filters>
+    <filters>
+        <field>CC_Lookup_App__c</field>
+        <operation>equals</operation>
+        <value>CC_OFICINAS</value>
+    </filters>
+    <label>Faqs</label>
+</ListView>

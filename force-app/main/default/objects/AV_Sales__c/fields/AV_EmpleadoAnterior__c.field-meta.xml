@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_EmpleadoAnterior__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Empleado anterior de la venta</description>
+    <label>Empleado Anterior</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Ventas (Empleado Anterior)</relationshipLabel>
+    <relationshipName>Ventas4</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

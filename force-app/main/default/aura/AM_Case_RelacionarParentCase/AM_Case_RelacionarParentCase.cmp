@@ -1,0 +1,37 @@
+<aura:component controller="AM_Case_RelacionarParentCase_Controller" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+
+    <!-- Atributos del componente -->
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="selectedCaseNumber" type="Id" />
+
+       <!--UI-->
+    <!--Card-->
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+           <header class="slds-media slds-media_center slds-has-flexi-truncate">
+               <div class="slds-media__figure">
+                   <lightning:icon iconName="standard:case" size="small" class="cc_azul_cuenta"/>
+               </div>
+               <div class="slds-media__body">
+                   <h2 class="slds-card__header-title">
+                       <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Relacionar Caso</span>
+                   </h2>
+               </div>
+           </header>
+       </div>
+       <div>
+            <div class="slds-col slds-size_1-of-2">
+                <lightning:recordEditForm aura:id="asocAgrup" recordId="{!v.recordId}" objectApiName="Case" density="comfy" >
+                    <lightning:messages />
+                    <lightning:inputField aura:id="ParentCase" fieldName="ParentId" variant="label-hidden" value="{!v.selectedCaseNumber}" onchange="{!c.casoSelect}"/>
+                </lightning:recordEditForm>
+            </div>
+            <div class="slds-col slds-size_2-of-2">
+                <lightning:button label="Relacionar" iconName="utility:merge" variant="brand" onclick="{!c.relacionarConParentCase}" disabled="{!empty(v.selectedCaseNumber)}"/>
+            </div>
+        </div>
+
+   </article>
+
+</aura:component>

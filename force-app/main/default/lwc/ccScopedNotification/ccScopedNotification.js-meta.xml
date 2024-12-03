@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="ccScopedNotification">
+    <apiVersion>50.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property label="Tema" name="tema" type="String" datasource="Claro, Oscuro, Éxito, Advertencia, Error"/>
+            <property label="Cabecera con textura" name="texture" type="Boolean"/>
+            <property label="Icono" name="icono" type="String" datasource="alert, announcement, attach, archive, ban, broadcast, call, case, check, clear, groups, info, lock, unlock, warning"/>
+            <property label="Mensaje" name="mensaje" type="String"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

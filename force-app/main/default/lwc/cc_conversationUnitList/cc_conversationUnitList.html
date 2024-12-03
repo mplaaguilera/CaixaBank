@@ -1,0 +1,148 @@
+<template>
+    <!-- spinner -->
+    <!--<template if:true={spinnerLoading}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br />
+                                Actualizando los datos... por favor espere
+                            </span>
+                            <div class="caseHolder">
+                                <lightning-spinner alternative-text="Loading" size="large" variant="brand">
+                                </lightning-spinner>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>-->
+
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid slds-theme_shade slds-box" style="padding:8px">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-standard-account" title="chat">
+                        <lightning-icon icon-name="standard:live_chat" size="small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <div class="slds-grid slds-gutters slds-grid_vertical-align-center">
+                        <div class="slds-col slds-size_11-of-12">
+                            <h2 class="slds-card__header-title">
+                                <p class="slds-card__header-link slds-truncate" title="Intents vinculados a la llamada">
+                                    <span>Intents vinculados a la llamada ({conversaciones.length})</span>
+                                </p>
+                            </h2>
+                        </div>
+                        <!--<div class="slds-col slds-size_1-of-12">
+                            <button class="slds-button slds-button_icon slds-button_icon-border" title="Refresh" alternative-text="Refresh" onclick={recuperarClick}>
+                                <svg class="slds-button__icon" aria-hidden="true">
+                                    <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.28.0#refresh"></use>
+                                </svg>
+                            </button>
+                        </div>-->
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <template if:true={hayDatos}>
+                <div class="slds-scrollable_y" style="height:15rem;">
+                    <article class="slds-card margin-card">
+                        <div class="slds-card__header">
+                            <lightning-accordion>
+                                <template for:each={conversaciones} for:item="unidad">
+                                    <lightning-accordion-section key={unidad.padreConver.Id} label={unidad.padreConver.label} icon-name="standard:live_chat_visitor">
+                                        <header key={unidad.padreConver.Id} id={unidad.padreConver.Id} class="slds-media slds-media_center slds-has-flexi-truncate">
+                                            
+                                            <div class="slds-media__body">
+                                                <h2 class="slds-card__header-title slds-grid slds-wrap">
+                                                    <div style="width: 100%; padding-bottom: 1rem;">
+                                                        <div class="slds-grid slds-gutters">
+                                                            <div class="slds-col slds-size_3-of-12">
+                                                        
+                                                                <p> 
+                                                                    Fecha Inicio: <lightning-formatted-date-time value={unidad.padreConver.CC_FechaInicio__c} year="2-digit" month="short" day="2-digit" hour="2-digit" minute="2-digit" second="2-digit"></lightning-formatted-date-time>
+                                                                </p>
+                                                            </div>
+                                                            <div class="slds-col slds-size_7-of-12">
+                                                                <p>
+                                                                    Fecha Fin: <lightning-formatted-date-time value={unidad.padreConver.CC_FechaFin__c} year="2-digit" month="short" day="2-digit" hour="2-digit" minute="2-digit" second="2-digit"></lightning-formatted-date-time>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </h2>
+                                                    <div style="width: 100%; padding-bottom: 1rem;">
+                                                        <div class="slds-grid slds-gutters">
+                                                            <div class="slds-col slds-size_3-of-12">
+                                                                <h2 class="slds-card__header-title slds-grid slds-wrap">
+                                                                    Resumen de la conversación:
+                                                                </h2>
+                                                            </div>
+                                                            
+                                                            <div class="slds-col slds-size_9-of-12">
+                                                                <p>{unidad.padreConver.CC_Feedback__c}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <h2 class="slds-card__header-title slds-grid slds-wrap">
+                                                    <div style="width: 100%">
+                                                        <div class="slds-grid slds-gutters">
+                                                            <div class="slds-col slds-size_3-of-12">
+                                                                Detalle del Intent
+                                                            </div>
+                                                            <div class="slds-col slds-size_7-of-12">
+                                                                <p>Texto del Intent</p>
+                                                            </div>
+                                                            <div class="slds-col slds-size_2-of-12">
+                                                                <p>TimeStamp</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h2>
+                                            </div>
+                                        </header>
+                                        <div key={unidad.padreConver.Id} style="padding-top: 4px; padding-left:1rem; padding-bottom:4px">
+                                            <hr key={unidadHijo.Id} style="margin-top: 4px;margin-bottom: 4px;"/>
+                                            <template for:each={unidad.listHijos} for:item="unidadHijo">
+                                                <div key={unidadHijo.Id} style="width: 100%">
+                                                    <div class="slds-grid slds-gutters">
+                                                        <div class="slds-col slds-size_3-of-12" style="display: table; overflow: hidden;">
+                                                            <div style="display: table-cell; vertical-align: middle;">
+                                                                <p key={unidadHijo.Id} id={unidadHijo.Id}>{unidadHijo.CC_Tipo__c}</p>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <div class="slds-col slds-size_7-of-12">
+                                                            <p key={unidadHijo.Id} id={unidadHijo.Id}>{unidadHijo.CC_Texto__c}</p>
+                                                        </div>
+                                                        <div class="slds-col slds-size_2-of-12">
+                                                            <p key={unidadHijo.Id} id={unidadHijo.Id}>
+                                                                <lightning-formatted-date-time value={unidadHijo.CC_TimeStamp__c} year="2-digit" month="short" day="2-digit" hour="2-digit" minute="2-digit" second="2-digit"></lightning-formatted-date-time>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr key={unidadHijo.Id} style="margin: 4px"/>
+                                            </template>
+                                            
+                                        </div>
+                                    </lightning-accordion-section>
+                                </template>
+                            </lightning-accordion>
+                        </div>
+                    </article>
+                    </div>
+            </template>
+            
+        </div>
+    </article>
+</template>

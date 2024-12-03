@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIR_EvitarCreacionFormulario</fullName>
+    <active>true</active>
+    <description>Se evita que los usuarios no Admin o con perfil integrador (API) creen formularios de refinanciación</description>
+    <errorConditionFormula>AND(
+$Profile.Name != &apos;System Administrator&apos;,
+NOT(CONTAINS($Profile.Name, &apos;API&apos;)),
+NOT( CONTAINS(Name, &apos;Check-List de Refinanciación&apos;))
+)</errorConditionFormula>
+    <errorMessage>No tienes permisos para crear Formularios de Refinanciación</errorMessage>
+</ValidationRule>

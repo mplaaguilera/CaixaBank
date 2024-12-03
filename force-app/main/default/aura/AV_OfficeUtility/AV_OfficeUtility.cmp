@@ -1,0 +1,27 @@
+<!--********************************************************************************************************************
+Name:	  AV_OfficeUtility
+Copyright © 2022  CaixaBank
+=======================================================================================================================
+Proposito: Used in the utility bar, it will display the offices the current user has access to
+=======================================================================================================================
+Historial
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+VERSION		USER_STORY			AUTHOR				DATE			Description
+1.0			US340902    		Víctor Santiago		03/03/2022		Init version
+
+*********************************************************************************************************************-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" description="Display offices to user" controller="AV_OfficeUtility_Controller"  access="global">
+   
+    <!-- PRIVATE FOR COMPONENT -->
+    <aura:attribute name="accs" type="Account[]"/>
+    <aura:attribute name="office" type="String"/>
+    <aura:attribute name="isRefreshed" type="Boolean" default="false"/>
+
+    <!-- INIT AURA COMPONENT -->
+    <aura:handler name="init" value="{!this}" action="{!c.getOffice}"/>
+    <aura:handler event="force:refreshView" action="{!c.getOffice}" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+    <c:av_ChangeOffice aura:id="childChangeOffice" onrefresh="{!c.refreshComponent}"/>
+
+</aura:component>

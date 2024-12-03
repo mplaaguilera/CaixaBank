@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidateEventosConClienteDescription</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISNEW(),
+LEN(Description)&gt;2000,
+RecordType.DeveloperName = &quot;AV_EventosConCliente&quot;
+)</errorConditionFormula>
+    <errorMessage>No se pueden crear Eventos con Cliente con el campo comentario con más de 2000 caracteres</errorMessage>
+</ValidationRule>

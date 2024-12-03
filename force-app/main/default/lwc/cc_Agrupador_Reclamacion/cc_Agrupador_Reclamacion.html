@@ -1,0 +1,34 @@
+<template>
+    <!--Card-->
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <!--Icono-->
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="Reclamar a Maximo">
+                        <lightning-icon icon-name="action:announcement" size="xx-small"></lightning-icon>
+                    </span>
+                    <span class="slds-assistive-text">Reclamar a Maximo</span>
+                </div>
+                <!--Título-->
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">Reclamar a Maximo</h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo-->
+        <div class="slds-card__body slds-card__body_inner">
+            <mark>Pendent especificacions integració amb Maximo</mark>
+        </div>
+
+        <!--Pie de la card-->
+        <footer class="slds-card__footer">
+            <!--Se añade la clase slds-float_left para que el botón se alinea a la izquierda en lugar de al centro que es el
+            comportamiento estándar de los pies de las cards. Se añade espacio al final para que el botón no quede "flotando"-->
+            <lightning-button class="slds-button slds-float_right" label="Reclamar" variant="brand" onclick={reclamar}></lightning-button>
+            <div style="height:33px;"></div> <!--Deja espacio para el botón-->
+        </footer>
+    </article>
+</template>

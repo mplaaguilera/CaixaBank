@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Organizaci_n_Usuario__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(INCLUDES($User.SEG_Organizaci_n__c, &quot;Banca Corporativa&quot;), &quot;Banca Corporativa&quot;, 
+			   IF(INCLUDES($User.SEG_Organizaci_n__c, &quot;Instituciones&quot;), &quot;Instituaciones&quot;, 
+								IF(INCLUDES($User.SEG_Organizaci_n__c, &quot;Financiación Estructurada&quot;), &quot;Financiación Estructurada&quot;, 
+										 IF(INCLUDES($User.SEG_Organizaci_n__c, &quot;Centro Empresas&quot;), &quot;Centro Empresas&quot;,   IF(INCLUDES($User.SEG_Organizaci_n__c, &quot;Centro Soporte Especialistas&quot;), &quot;Centro Soporte Especialistas&quot;, &quot;Error&quot;) ) )))</formula>
+    <label>Organización Usuario</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

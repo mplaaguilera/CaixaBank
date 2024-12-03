@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Cerrado_No_Editable</fullName>
+    <active>true</active>
+    <description>No se permite editar los campos de un caso cerrado.</description>
+    <errorConditionFormula>AND(
+				!($Profile.Name == &apos;System Administrator&apos;),
+				!ISNEW(),
+    OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;, RecordType.DeveloperName == &apos;SEG_Seguimiento&apos;),
+    !ISCHANGED(CC_Owner_Anterior__c),  
+    !ISCHANGED(Status),
+				!ISCHANGED(SEG_Subestado__c),
+    ISPICKVAL(Status, &apos;Cerrado&apos;),
+    NOT($Permission.SEG_EditarCasoCerrado)
+)</errorConditionFormula>
+    <errorMessage>No se permite editar los campos de un caso cerrado.</errorMessage>
+</ValidationRule>

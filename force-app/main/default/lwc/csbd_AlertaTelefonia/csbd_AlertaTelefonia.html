@@ -1,0 +1,85 @@
+<template>
+
+	<article lwc:if={alertas.tipoBonificado.mostrar} class="banner tipoBonificado slds-card slds-theme_alert-texture">
+        <div class="slds-card__body" style="margin: unset;">
+            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning-icon icon-name="utility:database" size="x-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>
+						Se ha ofrecido previamente al cliente un interés bonificado del&nbsp;
+						<span style="font-weight: 500;">{datos.tipoBonificado}%</span>.
+					</p>
+                </div>
+            </div>
+        </div>
+    </article>
+
+	<article lwc:if={alertas.productoMifid.mostrar} class="banner productoMifid slds-card slds-theme_alert-texture">
+        <div class="slds-card__body" style="margin: unset;">
+            <div class="slds-scoped-notification slds-media slds-media_center" role="status">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning-icon icon-name="utility:call" size="x-small"></lightning-icon>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <p>
+						Producto MiFID. Recuerda llamar mediante el widget de telefonía para que la llamada quede grabada.
+						<!-- sldsValidatorIgnoreNextLine -->
+						<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={cerrarModal} class="slds-var-m-left_small" data-nombre-modal="productoMifid"></lightning-click-to-dial>
+
+					</p>
+                </div>
+            </div>
+        </div>
+    </article>
+
+	<section lwc:if={alertas.productoMifid.mostrar} role="dialog" tabindex="0" aria-modal="true" class="slds-modal slds-modal_prompt productoMifid popupAlerta slds-hide">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header slds-theme_alert-texture">
+				<h1 class="slds-text-heading_medium">Producto MiFID</h1>
+			</div>
+			<div class="slds-modal__content slds-var-p-bottom_xx-large slds-var-p-top_xx-large" style="padding-left: 24px; padding-right: 24px;">
+				<p class="slds-align_absolute-center mensaje">
+					<lightning-icon icon-name="utility:info" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+					Recuerda llamar mediante el widget de telefonía para que la llamada quede grabada.
+				</p>
+
+				<p lwc:if={datos.telefonoSolicitud} class="slds-align_absolute-center slds-var-p-top_large">
+					<span class="slds-var-m-right_small slds-text-color_weak">Llamar ahora:</span>
+					<!-- sldsValidatorIgnoreNextLine -->
+					<lightning-click-to-dial value={datos.telefonoSolicitud} record-id={recordId} onclick={cerrarModal} data-nombre-modal="productoMifid"></lightning-click-to-dial>
+				</p>
+			</div>
+			<div class="slds-modal__footer slds-theme_default">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="productoMifidBotonCerrar botonCerrar slds-button slds-button_neutral slds-var-m-bottom_x-small" onclick={cerrarModal} disabled data-nombre-modal="productoMifid">Cerrar</button>
+			</div>
+		</div>
+	</section>
+
+	<section lwc:if={alertas.tipoBonificado.mostrar} role="dialog" tabindex="0" aria-modal="true" class="slds-modal slds-modal_prompt tipoBonificado popupAlerta slds-hide">
+		<div class="slds-modal__container">
+			<div class="slds-modal__header slds-theme_alert-texture">
+				<h1 class="slds-text-heading_medium">Interés bonificado ofrecido previamente</h1>
+			</div>
+			<div class="slds-modal__content slds-var-p-bottom_xx-large slds-var-p-top_xx-large" style="padding-left: 24px; padding-right: 24px;">
+				<p class="slds-align_absolute-center mensaje">
+					<lightning-icon icon-name="utility:info" size="x-small" class="slds-var-m-right_large"></lightning-icon>
+					Se ha ofrecido previamente al cliente un interés bonificado del&nbsp;<span style="font-weight: 600;">{datos.tipoBonificado}%</span>.
+				</p>
+			</div>
+			<div class="slds-modal__footer slds-theme_default">
+				<!-- sldsValidatorIgnoreNextLine -->
+				<button class="tipoBonificadoBotonCerrar botonCerrar slds-button slds-button_neutral slds-var-m-bottom_x-small" onclick={cerrarModal} disabled data-nombre-modal="tipoBonificado">Cerrar</button>
+			</div>
+		</div>
+	</section>
+
+	<div class="slds-backdrop" role="presentation"></div>
+
+</template>

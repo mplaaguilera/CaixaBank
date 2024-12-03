@@ -1,0 +1,88 @@
+section.popupAlerta {
+    visibility: hidden;
+    will-change: opacity, transform;
+    transform: translate(0, -1.2rem);
+    transition: opacity 340ms cubic-bezier(0, 0.3, 0.15, 1), transform 340ms cubic-bezier(0, 0.3, 0.15, 1), visibility 340ms linear;
+}
+
+section.popupAlerta.modalAbierto {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+section.popupAlerta div.slds-modal__header {
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+section.popupAlerta.productoMifid div.slds-modal__header {
+    background-color: rgb(255 170 66);
+}
+
+section.popupAlerta.tipoBonificado div.slds-modal__header {
+    background-color: #609fa1;
+}
+
+section.popupAlerta div.slds-modal__content {
+    font-size: 13.5px;
+}
+
+section.popupAlerta div.slds-modal__content lightning-icon {
+    position: relative;
+    will-change: opacity, transform;
+    animation: blinkKeyframes 260ms ease infinite alternate;
+}
+
+section.popupAlerta.productoMifid div.slds-modal__content lightning-icon {
+    --slds-c-icon-color-foreground-default: rgb(255 170 66);
+}
+
+section.popupAlerta.tipoBonificado div.slds-modal__content lightning-icon {
+    --slds-c-icon-color-foreground-default: #609fa1;
+}
+
+section.popupAlerta div.slds-modal__footer {
+    border-top: solid 1px rgb(229, 229, 229);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+@keyframes blinkKeyframes {
+    from {opacity: 0.3; transform: scale(1);}
+    to {opacity: 1; transform: scale(1.2);}
+}
+
+div.slds-backdrop {
+    background-color: rgba(24, 24, 24, 0.5);
+}
+
+button.botonCerrar {
+    transition: color 200ms linear;
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+button.botonCerrar:disabled {
+    background-color: #f9f9f9;
+}
+
+article.banner {
+    cursor: default;
+    color: rgb(47, 50, 50);
+}
+
+article.banner + article.banner {
+    margin-top: 12px;
+}
+
+article.banner.tipoBonificado {
+    background-color: rgba(95, 158, 160, 0.32);
+}
+
+article.banner.productoMifid {
+    color: rgb(47, 50, 50);
+    background-color: rgba(255, 140, 0, 0.24);
+}

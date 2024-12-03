@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_StatusModified</fullName>
+    <active>true</active>
+    <description>El Campo Status no puede ser modificado si el RT no es ninguno de los siguientes: &apos;Gestionar Priorizados&apos;, &apos;Alertas Comerciales&apos;, &apos;Morosidad/Normativas&apos;, &apos;Convesación Pendiente&apos; ,&apos;Onboarding&apos; o &apos;Iniciativa Gestor/a&apos;</description>
+    <errorConditionFormula>AND(
+$Profile.Name =&quot;AV_Usuario_CaixaBank&quot;,
+ISCHANGED( Status ),
+NOT(
+OR(BEGINS(RecordType.DeveloperName, &quot;AV_&quot;),
+BEGINS(RecordType.DeveloperName, &quot;CSBD_&quot;))),
+AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
+)</errorConditionFormula>
+    <errorDisplayField>Status</errorDisplayField>
+    <errorMessage>Información no editable</errorMessage>
+</ValidationRule>

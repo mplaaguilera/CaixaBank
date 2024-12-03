@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_TablasPrecios</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activa__c</columns>
+    <columns>CSBD_TablaPrecios_Producto2__c</columns>
+    <columns>CSBD_TablaPrecios_Plazo__c</columns>
+    <columns>CSBD_TablaPrecios_CategoriaTitular__c</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Lista_Valores__c.CSBD_TablaPrecios</value>
+    </filters>
+    <label>Tablas de precios CSBD</label>
+    <sharedTo>
+        <role>CSBD_Generico</role>
+    </sharedTo>
+</ListView>

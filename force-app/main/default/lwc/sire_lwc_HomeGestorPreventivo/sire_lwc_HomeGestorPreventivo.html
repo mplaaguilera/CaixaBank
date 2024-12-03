@@ -1,0 +1,135 @@
+<template>
+    <div class="first-span-detail" style="text-align:right; padding-top:10px">Última actualización <lightning-formatted-date-time value={now} year="numeric" month="short" day="2-digit" hour="2-digit"
+        minute="2-digit"></lightning-formatted-date-time></div>
+    <div class="c-container">
+        <!-- CAJAS ESTRATEGIAS -->
+        <div class="slds-box slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Procesos Pendientes de Inicio Gestión</h2>
+                <div class="slds-scrollable_y" style="max-height:450px">
+                    <lightning-layout multiple-rows >
+                        <template for:each={cajitas} for:item="caja">    
+                            <lightning-layout-item flexibility="auto" padding="around-small" key={caja} class={numCajitasFila} >                  
+                                <article class="slds-card slds-is-relative min-size card-temp styleCard dimensionesCajitas">   
+                                <div >                   
+                                    <div class={caja.clasesTitulo} title={caja.titulo}>{caja.titulo}</div>
+                                    <div class="slds-card__body slds-card__body_inner num-records-container" >
+                                        <span class={caja.clasesNumero}>{caja.numTotal}</span>
+                                    </div>
+                                    <div class="slds-text-align_center"><lightning-formatted-url value={caja.url} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></div>
+                                    <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+                                </div> 
+                                </article>                
+                            </lightning-layout-item>                
+                        </template>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+        <!-- CAJAS ESTRATEGIAS -->
+        
+        <!-- PROCESOS PENDIENTE RIESGOS -->   
+        <article class="dashGridItem slds-card slds-card_boundary flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <template if:true={usuarioLogeadoEsAnalista}>
+                    <h2 class="titulo colorTextoRojo">Procesos Pendiente Riesgos ({numTotalProcesosPendienteRiesgos})</h2>   
+                </template>
+                <template if:false={usuarioLogeadoEsAnalista}>
+                    <h2 class="titulo">Procesos Pendiente Riesgos ({numTotalProcesosPendienteRiesgos})</h2>   
+                </template>           
+                <div class="tablaAltura slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={procesosPendienteRiesgos}
+                        columns={columnsProcesoPendienteRiesgos}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={procesosPendienteRiesgosSortDirection}
+                        sorted-by={procesosPendienteRiesgoSortedBy}
+                        onsort={onHandleSortPendienteRiesgos}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosPendienteRiesgos} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS PENDIENTE RIESGOS -->  
+
+        <!-- PROCESOS PENDIENTE CONSENSO -->   
+        <article class="dashGridItem slds-card slds-card_boundary flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Procesos Pendiente Consenso ({numTotalProcesosPendienteConsenso})</h2>            
+                <div class="tablaAltura slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={procesosPendienteConsenso}
+                        columns={columnsProcesoPendienteConsenso}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={procesosPendienteConsensoSortDirection}
+                        sorted-by={procesosPendienteConsensoSortedBy}
+                        onsort={onHandleSortPendienteConsenso}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosPendienteConsenso} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS PENDIENTE CONSENSO --> 
+
+        <!-- PROCESOS GESTIONADOS CARGA ACTUAL -->   
+        <article class="dashGridItem slds-card slds-card_boundary flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Procesos Gestionados Carga Actual ({numTotalProcesosGestionadosCargaActual})</h2>            
+                <div class="tablaAltura slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={procesosGestionadosCargaActual}
+                        columns={columnsProcesoGestionadosCargaActual}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={procesosGestionadosCargaActualSortDirection}
+                        sorted-by={procesosGestionadosCargaActualSortedBy}
+                        onsort={onHandleSortCargaActual}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosGestionadosCargaActual} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS GESTIONADOS CARGA ACTUAL -->   
+          
+
+        <!-- GRAFICO -->
+        <article class="dashGridItem slds-card slds-card_boundary flexTable" dir="ltr">
+            <div style="padding-left: 10px;padding-right: 10px;padding-bottom: 10px;">
+                <c-sire_lwc_-Home-Gestor-Preventivo-Chart informe-procesos-estrategias={informeProcesosEstrategias}></c-sire_lwc_-Home-Gestor-Preventivo-Chart>
+            </div>
+        </article>
+        <!-- GRAFICO -->
+
+        <!-- TAREAS PENDIENTE SINCRONIZAR -->
+        <article class="dashGridItem slds-card slds-card_boundary flexTable" dir="ltr">
+            <div style="padding: 10px;">
+            <h2 class="titulo">Tareas pendientes de Sincronizar ({numTareasPendientes})</h2>
+            <div class="tablaAlturaSmall slds-scrollable">
+                <template if:false={showTableTareas}>
+                    <div style="padding:15px; text-align:center">No hay datos que mostrar</div>
+                </template>
+                <template if:true={showTableTareas}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={tareasPendientes}
+                        columns={columnsTareas}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={sortDirectionTareas}
+                        sorted-by={sortedByTareas}
+                        onsort={onHandleSortTareas}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </template>    
+            </div>
+            <span class="textoVerInforme"><lightning-formatted-url value={informeTareasPendientes} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>                        
+        </div>
+        </article>
+        <!-- TAREAS PENDIENTE SINCRONIZAR -->
+    </div>
+    <div lwc:dom="manual"></div>
+</template>

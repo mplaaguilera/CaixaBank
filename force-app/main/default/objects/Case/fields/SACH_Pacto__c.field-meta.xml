@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SACH_Pacto__c</fullName>
+    <description>Campo pacto usado para recibir desde el WS de PROMOR</description>
+    <inlineHelpText>Pacto desde PROMOR</inlineHelpText>
+    <label>Pacto</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>224</fullName>
+                <default>false</default>
+                <label>Pacto aprobado, suspender actuaciones</label>
+            </value>
+            <value>
+                <fullName>301</fullName>
+                <default>false</default>
+                <label>Pacto confirmado, suspender actuaciones</label>
+            </value>
+            <value>
+                <fullName>226</fullName>
+                <default>false</default>
+                <label>Pacto denegado, continuar actuaciones</label>
+            </value>
+            <value>
+                <fullName>327</fullName>
+                <default>false</default>
+                <label>Pacto incumplido, continuar actuaciones al recibir nuevo cálculo</label>
+            </value>
+            <value>
+                <fullName>299</fullName>
+                <default>false</default>
+                <label>Pacto cumplido</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

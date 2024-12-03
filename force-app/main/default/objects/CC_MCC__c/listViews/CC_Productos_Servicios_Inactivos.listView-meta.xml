@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Productos_Servicios_Inactivos</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Detalle__c</columns>
+    <columns>CC_Tematica__c</columns>
+    <columns>CC_Activo__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Producto_Servicio</value>
+    </filters>
+    <filters>
+        <field>CC_Activo__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente</value>
+    </filters>
+    <filters>
+        <field>CC_Fecha_Vigencia_Fin__c</field>
+        <operation>equals</operation>
+        <value>4/1/2023 12:00 AM</value>
+    </filters>
+    <label>Productos/Servicios Inactivos</label>
+    <sharedTo>
+        <group>Coordinadores</group>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

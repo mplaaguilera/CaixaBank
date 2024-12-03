@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_TipodeValor__c</fullName>
+    <description>Campo Tipo de Valor</description>
+    <inlineHelpText>Valor</inlineHelpText>
+    <label>Tipo de Valor</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>CBK_Negocio__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Asunto</fullName>
+                <default>false</default>
+                <label>Asunto</label>
+            </value>
+            <value>
+                <fullName>Asunto a excluir</fullName>
+                <default>false</default>
+                <label>Asunto a excluir</label>
+            </value>
+            <value>
+                <fullName>Cuerpo</fullName>
+                <default>false</default>
+                <label>Cuerpo</label>
+            </value>
+            <value>
+                <fullName>Cuerpo a excluir</fullName>
+                <default>false</default>
+                <label>Cuerpo a excluir</label>
+            </value>
+            <value>
+                <fullName>Remitente</fullName>
+                <default>false</default>
+                <label>Remitente</label>
+            </value>
+            <value>
+                <fullName>Remitente a excluir</fullName>
+                <default>false</default>
+                <label>Remitente a excluir</label>
+            </value>
+            <value>
+                <fullName>Destinatario</fullName>
+                <default>false</default>
+                <label>Destinatario</label>
+            </value>
+            <value>
+                <fullName>Destinatario CC</fullName>
+                <default>false</default>
+                <label>Destinatario CC</label>
+            </value>
+            <value>
+                <fullName>Destinatario CCO</fullName>
+                <default>false</default>
+                <label>Destinatario CCO</label>
+            </value>
+            <value>
+                <fullName>Destinatario a excluir</fullName>
+                <default>false</default>
+                <label>Destinatario a excluir</label>
+            </value>
+            <value>
+                <fullName>Destinatario CC a excluir</fullName>
+                <default>false</default>
+                <label>Destinatario CC a excluir</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Asunto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Asunto a excluir</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Cuerpo</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Cuerpo a excluir</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Remitente</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Remitente a excluir</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Destinatario</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Destinatario CC</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Destinatario CCO</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Destinatario a excluir</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Segmentos</controllingFieldValue>
+            <controllingFieldValue>Cops</controllingFieldValue>
+            <controllingFieldValue>SAC</controllingFieldValue>
+            <controllingFieldValue>Elegir negocio</controllingFieldValue>
+            <valueName>Destinatario CC a excluir</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

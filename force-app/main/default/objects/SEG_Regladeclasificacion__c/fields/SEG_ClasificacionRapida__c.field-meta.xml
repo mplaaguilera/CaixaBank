@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ClasificacionRapida__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Clasificación Rápida</label>
+    <lookupFilter>
+        <active>true</active>
+        <errorMessage>No se puede añadir Clasificaciones Rápidas inactivas.</errorMessage>
+        <filterItems>
+            <field>SEG_ClasificacionRapida__c.SEG_Inactiva__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>SEG_ClasificacionRapida__c</referenceTo>
+    <relationshipLabel>Reglas de clasificación</relationshipLabel>
+    <relationshipName>SEG_Regla_CR</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

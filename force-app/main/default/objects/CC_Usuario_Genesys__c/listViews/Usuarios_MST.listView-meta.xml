@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usuarios_MST</fullName>
+    <columns>NAME</columns>
+    <columns>CC_DN__c</columns>
+    <columns>CC_User__c</columns>
+    <columns>CC_Acceso__c</columns>
+    <columns>CC_Negocio__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>NAME</field>
+        <operation>startsWith</operation>
+        <value>1803,1804,1805,1806</value>
+    </filters>
+    <label>Usuarios MST</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

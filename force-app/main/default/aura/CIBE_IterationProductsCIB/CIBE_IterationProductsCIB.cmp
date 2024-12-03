@@ -1,0 +1,20 @@
+<aura:component description="CIBE_IterationProductsCIB" controller="CIBE_FichaProductosComponentController" implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global">
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="displayData" type="Boolean" default="true"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div class="slds-container">
+        <div class="slds-grid slds-wrap slds-grid_align-center">
+            <!--Iterate the AV_FichaProductos.cmp-->
+            <aura:iteration items="{!v.data}" var="rowData" indexVar="i">
+                <div class="slds-grid slds-var-m-around_x-small">
+                    <c:CIBE_FichaProductosCIB data="{!rowData}"/>
+                </div>
+            </aura:iteration> 
+        </div>
+        
+        <div class="outer-div">
+            <lightning:spinner aura:id="mySpinner" size="small" class="spinner"/>
+        </div>
+    </div>
+</aura:component>

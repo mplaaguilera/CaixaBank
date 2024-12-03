@@ -1,0 +1,14 @@
+<aura:component implements="lightning:isUrlAddressable,lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller = "AV_Header_Controller" access="global">
+<aura:html tag="style">
+        .slds-modal {
+        visibility: hidden;
+        display: none;
+        }
+        .slds-backdrop{
+        display: none;
+        
+        }        
+    </aura:html>
+ <lightning:workspaceAPI aura:id="workspaceCmp" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+</aura:component>

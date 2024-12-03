@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Tematica__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Temática</label>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Grupo de Trabajo</relationshipLabel>
+    <relationshipName>Grupos</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Marca_senior__c</fullName>
+    <defaultValue>false</defaultValue>
+    <label>Marca senior</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

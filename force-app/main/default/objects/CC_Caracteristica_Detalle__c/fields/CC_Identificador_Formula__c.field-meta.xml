@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Identificador_Formula__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(NOT(ISBLANK(CC_Cuenta__c)), CC_Cuenta__r.CC_Numero_Documento__c,
+    IF(NOT(ISBLANK(CC_Cliente__c)), CC_Cliente__r.CC_Numero_Documento__c,
+								IF(NOT(ISBLANK(CC_Centro_CaixaBank__c)), CC_Centro_CaixaBank__r.CC_Numero_Oficina_Empresa__c,
+								    IF(NOT(ISBLANK(CC_Empleado__c)), CC_Empleado__r.CC_Matricula__c,
+															IF(NOT(ISBLANK(SAC_Cuenta__c)), SAC_Cuenta__r.CC_Numero_Documento__c,
+                  CC_Identificador__c
+															)
+								    )
+								)
+				)
+)</formula>
+    <label>Identificador</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

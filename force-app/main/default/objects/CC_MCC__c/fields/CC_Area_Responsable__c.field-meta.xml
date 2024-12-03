@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Area_Responsable__c</fullName>
+    <description>Campo para poder informar el área responsable del producto/servicio.</description>
+    <label>Área responsable</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>00568 - C.O. AREA ORGANISMOS OFICIALES</fullName>
+                <default>false</default>
+                <label>00568 - C.O. AREA ORGANISMOS OFICIALES</label>
+            </value>
+            <value>
+                <fullName>00569 - C.O. AREA DOMICILIACIONES</fullName>
+                <default>false</default>
+                <label>00569 - C.O. AREA DOMICILIACIONES</label>
+            </value>
+            <value>
+                <fullName>1500 - CONTACT CENTER CLIENTS</fullName>
+                <default>false</default>
+                <label>01500 - CONTACT CENTER CLIENTES</label>
+            </value>
+            <value>
+                <fullName>02930 - UNIDAD DE PROMOTORES Y NEGOCIO HIPOTEC.</fullName>
+                <default>false</default>
+                <label>02930 - UNIDAD DE PROMOTORES Y NEGOCIO HIPOTEC.</label>
+            </value>
+            <value>
+                <fullName>05210 - Money to pay</fullName>
+                <default>false</default>
+                <label>05210 - Money to pay</label>
+            </value>
+            <value>
+                <fullName>05521 - GESTION OPERATIVA LEASING</fullName>
+                <default>false</default>
+                <label>05521 - GESTION OPERATIVA LEASING</label>
+            </value>
+            <value>
+                <fullName>5541 -CAIXABANK EQUIPAMENT FINANCE</fullName>
+                <default>false</default>
+                <label>05541 - CAIXABANK EQUIPMENT FINANCE</label>
+            </value>
+            <value>
+                <fullName>06201 - GESTION OPERATIVA FACTORING Y CONFIRMING</fullName>
+                <default>false</default>
+                <label>06201 - GESTION OPERATIVA FACTORING Y CONFIRMING</label>
+            </value>
+            <value>
+                <fullName>9052 - COMUNIC,RELAC.INSTIT, MARCA Y R.S.C.</fullName>
+                <default>false</default>
+                <label>09052 - COMUNIC,RELAC.INSTIT, MARCA Y R.S.C.</label>
+            </value>
+            <value>
+                <fullName>9058 - CALIDAD Y VOZ DEL CLIENTE</fullName>
+                <default>false</default>
+                <label>09058 - CALIDAD Y VOZ DEL CLIENTE</label>
+            </value>
+            <value>
+                <fullName>9105 - RECURSOS HUMANOS Y ORGANIZACIÓN</fullName>
+                <default>false</default>
+                <label>09105 - RECURSOS HUMANOS Y ORGANIZACION</label>
+            </value>
+            <value>
+                <fullName>9261 - ASESORIA JURIDICA</fullName>
+                <default>false</default>
+                <label>09261 - ASESORIA JURIDICA</label>
+            </value>
+            <value>
+                <fullName>9266 - OBRA SOCIAL</fullName>
+                <default>false</default>
+                <label>09266 - OBRA SOCIAL</label>
+            </value>
+            <value>
+                <fullName>09271 - REESTRUCTURACIONES PARTICULARES</fullName>
+                <default>false</default>
+                <label>09271 - REESTRUCTURACIONES PARTICULARES</label>
+            </value>
+            <value>
+                <fullName>9293 - MICROBANK</fullName>
+                <default>false</default>
+                <label>09293 - SOPORTE RIESGOS MICROBANK</label>
+            </value>
+            <value>
+                <fullName>9331 - POLITICAS Y PROCEDIMIENTOS DE ADMISION</fullName>
+                <default>false</default>
+                <label>09331 - RETAIL RISK</label>
+            </value>
+            <value>
+                <fullName>9383 - SECRETARIA TECNICA DE NEGOCIO</fullName>
+                <default>false</default>
+                <label>09383 - SECRETARIA TECNICA DE NEGOCIO</label>
+            </value>
+            <value>
+                <fullName>9386 - ANALISI DE GESTIO DE LA XARXA</fullName>
+                <default>false</default>
+                <label>09386 - INFORMACION DE GESTION IGC</label>
+            </value>
+            <value>
+                <fullName>09393 - RELACION CON INVERSORES</fullName>
+                <default>false</default>
+                <label>09393 - RELACION CON INVERSORES</label>
+            </value>
+            <value>
+                <fullName>9503 - MOROSIDAD</fullName>
+                <default>false</default>
+                <label>09503 - UNIDAD RIESGOS REESTRUCTURACIONES EMPR.</label>
+            </value>
+            <value>
+                <fullName>09504 - GESTION DE SERVICIOS GENERALES (Servihabitat)</fullName>
+                <default>false</default>
+                <label>09504 - GESTION DE SERVICIOS GENERALES</label>
+            </value>
+            <value>
+                <fullName>9507 - SEGURETAT</fullName>
+                <default>false</default>
+                <label>09507 - SEGURIDAD</label>
+            </value>
+            <value>
+                <fullName>9520 -BANCA DE PARTICULARES Y NEGOCIOS</fullName>
+                <default>false</default>
+                <label>09520 - COMERCIALIZACION Y TRANSFORM. COMERCIAL</label>
+            </value>
+            <value>
+                <fullName>09532 - GESTION DE EFECTIVO</fullName>
+                <default>false</default>
+                <label>09532 - GESTION DE EFECTIVO</label>
+            </value>
+            <value>
+                <fullName>9542 - COSTUMER EXPERIENCE</fullName>
+                <default>false</default>
+                <label>09542 - PARTICULARES</label>
+            </value>
+            <value>
+                <fullName>9620 - BUSINESS INTELLIGENCE</fullName>
+                <default>false</default>
+                <label>09620 - BUSINESS INTELLIGENCE</label>
+            </value>
+            <value>
+                <fullName>9636 - CUMPLIMIENTO NORMATIVO</fullName>
+                <default>false</default>
+                <label>09636 - CUMPLIMIENTO NORMATIVO</label>
+            </value>
+            <value>
+                <fullName>9664 - BANCA PRIVADA I BANCA PREMIER</fullName>
+                <default>false</default>
+                <label>09664 - BANCA PRIVADA</label>
+            </value>
+            <value>
+                <fullName>9681 - ESTRATEGIA DE MARKETING</fullName>
+                <default>false</default>
+                <label>09681 - ESTRATEGIA DE MARKETING</label>
+            </value>
+            <value>
+                <fullName>EFICIENCIA Y DIGITALIZACION DE PROCESOS 09707</fullName>
+                <default>false</default>
+                <label>09707 - EFICIENCIA Y DIGITALIZACION DE PROCESOS</label>
+            </value>
+            <value>
+                <fullName>9712 - CANAL OFICINA</fullName>
+                <default>false</default>
+                <label>09712 - CANAL OFICINA Y COMERCIALIZACION</label>
+            </value>
+            <value>
+                <fullName>9716 - EXPERIENCIA PUESTO EMPLEADO</fullName>
+                <default>false</default>
+                <label>09716 - LAB PUESTO DE TRABAJO</label>
+            </value>
+            <value>
+                <fullName>9722 - SEGURIDAD INFORMATICA</fullName>
+                <default>false</default>
+                <label>09722 - DIGITAL SECURITY</label>
+            </value>
+            <value>
+                <fullName>9727 - TECNOLOGIA DE TELECOMUNICACIONES</fullName>
+                <default>false</default>
+                <label>09727 - TECNOLOGIA DE TELECOMUNICACIONES</label>
+            </value>
+            <value>
+                <fullName>9745 - INFRAESTRUCTURAS Y SERVICIOS</fullName>
+                <default>false</default>
+                <label>09745 - INFRAESTRUCTURAS Y SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>9747 - ACTIVO Y RIESGOS</fullName>
+                <default>false</default>
+                <label>09747 - ACTIVO Y RIESGOS</label>
+            </value>
+            <value>
+                <fullName>9759 - SISTEMAS DE GESTION DE LA INFORMACION</fullName>
+                <default>false</default>
+                <label>09759 - SISTEMAS DE GESTION DE LA INFORMACION</label>
+            </value>
+            <value>
+                <fullName>9776 - SERVEIS BANCARIS</fullName>
+                <default>false</default>
+                <label>09776 - SERVICIOS BANCARIOS</label>
+            </value>
+            <value>
+                <fullName>9779 - SISTEMAS DE INFORMACION MULTICANAL</fullName>
+                <default>false</default>
+                <label>09779 - SISTEMAS DE INFORMACION MULTICANAL</label>
+            </value>
+            <value>
+                <fullName>9790 - VALORES Y FONDOS</fullName>
+                <default>false</default>
+                <label>09790 - VALORES Y FONDOS</label>
+            </value>
+            <value>
+                <fullName>9791 - SERVICIOS CORPORATIVOS A SEGMENTOS</fullName>
+                <default>false</default>
+                <label>09791 - SERVICIOS CORPORATIVOS A SEGMENTOS</label>
+            </value>
+            <value>
+                <fullName>09792 - DESARROLLO DE SERVICIOS BANCARIOS</fullName>
+                <default>false</default>
+                <label>09792 - DESARROLLO DE SERVICIOS BANCARIOS</label>
+            </value>
+            <value>
+                <fullName>9805 - ASESORIA FISCAL</fullName>
+                <default>false</default>
+                <label>09805 - ASESORIA FISCAL</label>
+            </value>
+            <value>
+                <fullName>9834 -GESTION PRESUPUESTARIA</fullName>
+                <default>false</default>
+                <label>09834 - GESTION PRESUPUESTARIA</label>
+            </value>
+            <value>
+                <fullName>09851 - DEBT CAPITAL MARKETS &amp; FICC SALES</fullName>
+                <default>false</default>
+                <label>09851 - DEBT CAPITAL MARKETS &amp; FICC SALES</label>
+            </value>
+            <value>
+                <fullName>9860 - TESORERIA</fullName>
+                <default>false</default>
+                <label>09856 - SERVEIS OPERATIUS DE TRESORERIA</label>
+            </value>
+            <value>
+                <fullName>09867 - CARTERA DE EFECTOS</fullName>
+                <default>false</default>
+                <label>09867 - CARTERA DE EFECTOS</label>
+            </value>
+            <value>
+                <fullName>09880 - PAYMENTS AND MARKETS SETTLEMENT</fullName>
+                <default>false</default>
+                <label>09880 - PAYMENTS AND MARKETS SETTLEMENT</label>
+            </value>
+            <value>
+                <fullName>09888 - PREVENCION BLANQUEO DE CAPITALES (UPBC)</fullName>
+                <default>false</default>
+                <label>09888 - PREVENCION BLANQUEO DE CAPITALES (UPBC)</label>
+            </value>
+            <value>
+                <fullName>09890 - OPERATIVA DE EXTRANJERO</fullName>
+                <default>false</default>
+                <label>09890 - OPERATIVA DE EXTRANJERO</label>
+            </value>
+            <value>
+                <fullName>09899 - CONTROL DE SERVICIOS BANCARIOS</fullName>
+                <default>false</default>
+                <label>09899 - CONTROL DE SERVICIOS BANCARIOS</label>
+            </value>
+            <value>
+                <fullName>16255-DESARROLLO DE PRODUCTOS</fullName>
+                <default>false</default>
+                <label>16255 - DESARROLLO DE PRODUCTO DE PASIVO</label>
+            </value>
+            <value>
+                <fullName>16256- PRICING Y SERVICIOS CLIENTES</fullName>
+                <default>false</default>
+                <label>16256- PRICING Y SERVICIOS CLIENTES</label>
+            </value>
+            <value>
+                <fullName>16463 - ADMISION DE RIESGOS DE PARTICULARES (16463</fullName>
+                <default>false</default>
+                <label>16463 - ADMISION DE RIESGOS DE PARTICULARES</label>
+            </value>
+            <value>
+                <fullName>16669 - SOPORTE SEGMENTOS</fullName>
+                <default>false</default>
+                <label>16669 - SOPORTE SEGMENTOS</label>
+            </value>
+            <value>
+                <fullName>16767 - SISTEMATICA Y PLANICACION COM.RETAIL</fullName>
+                <default>false</default>
+                <label>16767 - SISTEMATICA Y PLANICACION COM.RETAIL</label>
+            </value>
+            <value>
+                <fullName>16896 - AGROBANK</fullName>
+                <default>false</default>
+                <label>16896 - AGROBANK</label>
+            </value>
+            <value>
+                <fullName>16972 -  MOROSIDAD, RECUPERACIONES Y ACTIVOS ADJ.</fullName>
+                <default>false</default>
+                <label>16972 - RECUPERACIONES Y MOROSIDAD</label>
+            </value>
+            <value>
+                <fullName>17165 - MARKETING PARTICULARES</fullName>
+                <default>false</default>
+                <label>17165 - MARKETING &amp; EXPERIENCE</label>
+            </value>
+            <value>
+                <fullName>17243 - NEGOCIO BANCA RETAIL</fullName>
+                <default>false</default>
+                <label>17243 - NEGOCIO BANCA RETAIL</label>
+            </value>
+            <value>
+                <fullName>17262 - POLIT.SEG. Y CONTROL DEL R.DE CREDITO</fullName>
+                <default>false</default>
+                <label>17262 - POLIT.SEG. Y CONTROL DEL R.DE CREDITO</label>
+            </value>
+            <value>
+                <fullName>17289 - NEGOCIOS</fullName>
+                <default>false</default>
+                <label>17289 - NEGOCIOS</label>
+            </value>
+            <value>
+                <fullName>17315 - TRANSFORMACIÓN Y CTRL. ASESORÍA JURÍDICA</fullName>
+                <default>false</default>
+                <label>17315 - TRANSFORMACIÓN Y CTRL. ASESORÍA JURÍDICA</label>
+            </value>
+            <value>
+                <fullName>17502 - PAYMENTS &amp; CONSUMER</fullName>
+                <default>false</default>
+                <label>17502 - PAYMENTS &amp; CONSUMER</label>
+            </value>
+            <value>
+                <fullName>27014 - PLANIFICACION COMERCIAL</fullName>
+                <default>false</default>
+                <label>27014 - PLANIFICACION COMERCIAL</label>
+            </value>
+            <value>
+                <fullName>9261 - ASSESSORIA JURIDICA</fullName>
+                <default>false</default>
+                <label>9261 - ASSESSORIA JURIDICA</label>
+            </value>
+            <value>
+                <fullName>ARQUITECTURA ABSIS</fullName>
+                <default>false</default>
+                <label>ARQUITECTURA ABSIS</label>
+            </value>
+            <value>
+                <fullName>AUTOSERVEI CBDB</fullName>
+                <default>false</default>
+                <label>AUTOSERVEI CBDB</label>
+            </value>
+            <value>
+                <fullName>BUILDING CENTER</fullName>
+                <default>false</default>
+                <label>BUILDING CENTER</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK ASSET MANAGEMENT SGIIC, S.A.U.</fullName>
+                <default>false</default>
+                <label>CAIXABANK ASSET MANAGEMENT SGIIC, S.A.U.</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK DIGITAL BUSSINES</fullName>
+                <default>false</default>
+                <label>CAIXABANK DIGITAL BUSSINES</label>
+            </value>
+            <value>
+                <fullName>CAIXABANK FACILITIES MANAGEMENT</fullName>
+                <default>false</default>
+                <label>CAIXABANK FACILITIES MANAGEMENT</label>
+            </value>
+            <value>
+                <fullName>CBDB APPS Y COMUNIDADES LO</fullName>
+                <default>false</default>
+                <label>CBDB APPS Y COMUNIDADES LO</label>
+            </value>
+            <value>
+                <fullName>CBDB BANCA DE SERVEIS</fullName>
+                <default>false</default>
+                <label>CBDB BANCA DE SERVEIS</label>
+            </value>
+            <value>
+                <fullName>CBDB LÍNEA ABIERTA WEB Y MÓVIL</fullName>
+                <default>false</default>
+                <label>CBDB LÍNEA ABIERTA WEB Y MÓVIL</label>
+            </value>
+            <value>
+                <fullName>CBDB SEGMENTOS Y SERVICIOS</fullName>
+                <default>false</default>
+                <label>CBDB SEGMENTOS Y SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>COMERCIA GLOBAL PAYMENTS</fullName>
+                <default>false</default>
+                <label>COMERCIA GLOBAL PAYMENTS</label>
+            </value>
+            <value>
+                <fullName>FINESTRA MARC</fullName>
+                <default>false</default>
+                <label>FINESTRA MARC</label>
+            </value>
+            <value>
+                <fullName>IMAGINBANK</fullName>
+                <default>false</default>
+                <label>IMAGINTECH</label>
+            </value>
+            <value>
+                <fullName>INFRAESTRUCTURAS PLATAFORMAS</fullName>
+                <default>false</default>
+                <label>INFRAESTRUCTURAS PLATAFORMAS</label>
+            </value>
+            <value>
+                <fullName>PROMOCAIXA</fullName>
+                <default>false</default>
+                <label>WIVAI</label>
+            </value>
+            <value>
+                <fullName>SEGURCAIXA ADESLAS</fullName>
+                <default>false</default>
+                <label>SEGURCAIXA ADESLAS</label>
+            </value>
+            <value>
+                <fullName>VIDACAIXA</fullName>
+                <default>false</default>
+                <label>VIDACAIXA</label>
+            </value>
+            <value>
+                <fullName>09423 - AUDITORIA TERRITORIAL Y NEGOCIO</fullName>
+                <default>false</default>
+                <label>09423 - AUDITORIA TERRITORIAL Y NEGOCIO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

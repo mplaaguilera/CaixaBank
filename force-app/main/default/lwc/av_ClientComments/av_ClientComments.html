@@ -1,0 +1,29 @@
+<template>
+	<div if:false={refreshIco}>
+		<div style="text-align: right;">
+			<lightning-button-icon icon-name="utility:loop" variant="border-filled" alternative-text="Refresh" class="slds-m-left_xx-small" onclick={refresh}></lightning-button-icon>
+		</div>
+		<template if:true={showResults}>
+
+			<div >
+				<lightning-input type="text"  placeholder="Buscar"  value={filterValue} onchange={handleFilterValue} class="slds-m-bottom_x-small"></lightning-input>
+			</div>
+			
+			<div >
+					<template for:each={nestedMap} for:item="mapKey">
+						<p class="slds-button test-id__section-header-button slds-section__title-action slds-m-bottom_x-small"  key={mapKey.key} >
+							{mapKey.key}
+						</p>
+						<template for:each={mapKey.value} for:item="comment">
+							<c-av_comment-item item={comment} key={comment}></c-av_comment-item>
+						</template>
+					</template>
+			</div>
+
+		</template>
+
+		<span if:false={showResults}>{label.noDataFoundLabel}</span>
+	
+	</div>
+	<lightning-spinner if:true={loading} size="small" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+</template>

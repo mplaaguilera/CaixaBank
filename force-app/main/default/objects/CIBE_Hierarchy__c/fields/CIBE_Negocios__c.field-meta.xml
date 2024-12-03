@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Negocios__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lookup al valor del registro Negocios del objeto cbk_picklistValues__c</description>
+    <label>Negocios</label>
+    <referenceTo>CBK_PicklistValues__c</referenceTo>
+    <relationshipLabel>Hierarchies (Negocios)</relationshipLabel>
+    <relationshipName>Hierarchies2</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

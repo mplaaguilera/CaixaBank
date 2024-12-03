@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_VolumenPublicoObjetivo__c</fullName>
+    <description>Campo que debe rellenar adobe campaign para establecer el número de volumen propuesto para el evento en función de las variables de selección</description>
+    <externalId>false</externalId>
+    <label>Volumen público objetivo</label>
+    <precision>7</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

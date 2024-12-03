@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TMS_Servicio_Premium__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checkbox que indica si el caso tiene Servicio Premium o no, es decir, si puede enviar/recibir emails</description>
+    <label>Servicio Premium</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

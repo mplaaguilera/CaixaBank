@@ -1,0 +1,162 @@
+<template>
+	
+    <lightning-card  variant="Narrow"  title="Filtros de búsqueda" icon-name="standard:search">
+        <lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon slds-float_right buttonMarginOcultar" variant="container" onclick={toggleShow}></lightning-button-icon>
+        <lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon slds-float_right buttonMarginOcultar" variant="container" onclick={toggleShow}></lightning-button-icon>
+        
+        <div if:true={showDetail} class="slds-form_horizontal slds-grid slds-wrap">	
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+					<lightning-record-edit-form object-api-name="SIREC__SIREC_obj_proceso__c" id="clienteNew" >
+						<lightning-input-field field-name="SIREC__SIREC_fld_cliente__c" label="Cliente" value={clienteId} onchange={changeCliente}> </lightning-input-field>
+					</lightning-record-edit-form>	
+				</div>			
+            </div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+					<lightning-input type="date" name="FechaInicio" label="Fecha Inicio" value={fechaInicio} onchange={changeFechaInicio}></lightning-input>
+				</div>
+			</div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+					<lightning-combobox name="Centro" label="Centro" placeholder="Seleccione una opción" value={valueOficina} options={optionOficina} onchange={changeFiltroOficina} required></lightning-combobox>
+				</div>
+			</div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+					<lightning-combobox name="TipoRecordtype" label="Tipo proceso" placeholder="Seleccione una opción" value={valueTipoProceso} options={optionTipoProceso} onchange={changeTipoProceso}></lightning-combobox>
+				</div>
+			</div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+                	<lightning-combobox name="estrategia" label="Estrategia" placeholder="Seleccione una opción" value={valueEstrategia} options={optionEstrategia} onchange={changeEstrategia}></lightning-combobox>
+            	</div>
+			</div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+                	<lightning-combobox  name="Situacion" label="Situación" placeholder="Seleccione una opción" value={valueSituacion} options={optionSituacion} onchange={changeSituacion}></lightning-combobox>
+            	</div>
+			</div>
+			
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">
+                	<lightning-combobox name="Empleado" label="Empleado" placeholder="Seleccione una opción" value={valueEmpleado} options={optionsEmpleado} onchange={changeEmpleado} required></lightning-combobox>
+            	</div>
+			</div>
+            <div class="slds-size_1-of-4">
+				<div class=" slds-m-around_x-small">					
+					<lightning-button class="buttonStyle" variant="brand" label="Buscar" onclick={buscar} disabled={disabledBuscar}></lightning-button>
+					<lightning-button class="buttonStyle" label="Reiniciar" onclick={resetFilters}></lightning-button>
+				</div>
+            </div>
+            
+        </div>
+    </lightning-card>	
+	<div if:true={firstSearch} class="divPadding">			
+		<lightning-card if:true={firstSearch} variant="Narrow" title={tituloTabla} icon-name="custom:custom55">	
+			<span style="float: right; margin-top: -30px; margin-right: 15px;">{numRegistrosSeleccionados}</span>			
+			<div if:true={firstSearch} class="table-container table-container-paginacion">	
+				
+				<lightning-datatable data-id="divblock" key-field="enlaceProceso" 
+					data={items} 
+					columns={columns}
+					onrowselection={getSelectedName}
+					selected-rows={procesosSeleccionados}
+					default-sort-direction={defaultSortDirection}
+					sorted-direction={sortDirection}
+					sorted-by={sortedBy}
+					onsort={onHandleSort}>
+				</lightning-datatable>
+				<br/>
+				<div if:true={isMultipagina}>
+					<lightning-layout horizontal-align="space">
+						<lightning-layout-item flexibility="auto">
+							<lightning-button label="Anterior" icon-name="utility:chevronleft" onclick={previousHandler}>
+							</lightning-button>
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							Página {page} de {totalPage}
+						</lightning-layout-item>
+						<lightning-layout-item flexibility="auto">
+							<lightning-button label="Posterior" icon-name="utility:chevronright" icon-position="right"
+								onclick={nextHandler}></lightning-button>
+						</lightning-layout-item>
+					</lightning-layout>
+				</div>
+			</div>
+			<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>			
+		</lightning-card>
+	</div>
+
+	<div if:true={showAssignment} class="divPadding paddingBottom">
+		<lightning-card if:true={firstSearch} variant="Narrow" title="Asignación" icon-name="standard:avatar">			
+			<div class="slds-form_horizontal slds-grid slds-wrap">
+				<div class="slds-size_2-of-4">
+					<lightning-record-edit-form object-api-name="Contact" id="cuenta" >
+						<label class="slds-form-element__label" style="float: left;margin-left: 15%;">Centro:</label>
+						<lightning-input-field field-name="AccountId" label="Oficina" value={oficinaId} onchange={changeOficina} variant="label-hidden" > </lightning-input-field>
+					</lightning-record-edit-form>
+				</div>	
+				<div class="slds-size_1-of-4">				
+					<div class="slds-form-element">  
+						<label class="slds-form-element__label" for="combobox-id-2">{lookupLabel}</label>  
+						<div class="slds-form-element__control">  
+							<div class="slds-combobox_container">  
+								<div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aria-expanded="true" aria-haspopup="listbox" role="combobox">  
+									<template if:true={selectedValue}>  
+										<div data-key="pilldiv" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">  
+											<span class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon" title="object">  
+												<div class="slds-icon slds-icon_small" aria-hidden="true"> <lightning-icon icon-name="standard:user" size="small"></lightning-icon> </div>  
+												<span class="slds-assistive-text">Record</span>  
+											</span>  
+											<input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" id="combobox-id-5" aria-controls="listbox-id-5" role="textbox" placeholder="Select an Option" readonly value={selectedValue} />  
+											<button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right" onclick={removeRecordOnLookup} title="Remove selected option">  
+												<span class="slds-button__icon" aria-hidden="true" >  
+													<lightning-icon icon-name="utility:close" size="xx-Small" class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true"></lightning-icon>  
+												</span>  
+												<span class="slds-assistive-text">Remove selected record</span>  
+											</button>  
+										</div>  
+									</template>
+									<template if:false={selectedValue}>  
+										<div data-key="searchdiv" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">  
+											<input type="text" onfocusout={onLeave} value={searchKey} onkeyup={handleKeyChange} onchange={handleKeyChange} class="slds-input slds-combobox__input slds-has-focus" id="combobox-id-2" aria-autocomplete="list" aria-controls="listbox-id-2" role="textbox" placeholder="Search..." />  
+											<span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">  
+												<lightning-icon icon-name="utility:search" size="xx-Small" class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true"></lightning-icon>  
+											</span>  
+										</div>  
+										<template if:true={recordsList}>  
+											<div id="listbox-id-2-venu" data-key="dropdownresult" class="slds-show slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">  
+												<ul class="slds-listbox slds-listbox_vertical" role="presentation" >  
+													<template if:true={message}> <p style="margin-left:5px;"> {message}</p></template>  
+													<template for:each={recordsList} for:item="record">  
+													<li id={record.Id} key={record.Id} onclick={onRecordSelection} role="presentation" class="slds-listbox__item">  
+													<div data-key={record.Id} data-name={record.Name} class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">  
+														<span class="slds-media__figure slds-listbox__option-icon">  
+															<span class="slds-icon_container">  
+																<lightning-icon icon-name="standard:user" size="small"></lightning-icon>  
+															</span>  
+														</span>  
+														<span class="slds-media__body">  
+															<span data-key={record.Id} data-name={record.Name} class="slds-listbox__option-text slds-listbox__option-text_entity">{record.Name} </span> 
+														</span>  
+													</div>  
+													</li>  
+													</template>  
+												</ul>  
+											</div>  
+										</template>  
+									</template>  
+								</div>  
+							</div>  
+						</div>  
+					</div>
+				</div>
+				<div class="slds-size_1-of-4">
+					<lightning-button label="Asignar" onclick={handleConfirmClick} disabled={disabledButtonAsignar} class="my-office-true marginBottom"></lightning-button>
+				</div>
+			</div>		
+			<lightning-spinner if:true={showSpinner} alternative-text="Cargando..." variant="brand" size="medium" class="spin-cls" ></lightning-spinner>			
+		</lightning-card>
+	</div>	
+</template>

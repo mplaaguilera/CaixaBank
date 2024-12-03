@@ -1,0 +1,8 @@
+<template>
+    <div class="slds-grid slds-grid--vertical-align-center slds-grid--align-center" style="display: block;">
+        <canvas class="barChart" lwc:dom="manual" width="800" height="320"></canvas>        
+        <div if:false={isChartJsInitialized} class="slds-col--padded slds-size--1-of-1">
+            <lightning-spinner alternative-text="Loading" size="medium" variant={loaderVariant}></lightning-spinner>
+        </div>
+    </div>
+</template>

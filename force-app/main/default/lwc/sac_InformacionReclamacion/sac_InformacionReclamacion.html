@@ -1,0 +1,515 @@
+<template>
+    <br/>
+    <template if:true={hayReclamaciones}>
+        <lightning-card>
+            <h1 slot="title" class="titulo">Reclamaciones asociadas al cliente</h1>
+            <br/>
+            <template if:true={mostrarCasos}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Caso</th>
+                            <th scope="col">Fecha recepción</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Asunto</th>
+                            <th scope="col">Propietario</th>
+                            <th scope="col">Fecha resolución</th>
+                            <th scope="col">Sentido resolución</th>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Detalle</th>
+                            <th scope="col">Canal de procedencia</th>                            
+                            <th scope="col">Caso especial</th>
+                            <th scope="col">Caso relacionado</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={mostrarCasos} for:item="rec">
+                            <tr key={rec.idReclamacion}>
+                                <template if:true={rec.SoyReclamacion}>
+                                    <td data-id={rec.idReclamacion} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.NumeroReclamacion}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={rec.FechaRecepcionReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                    <td class="custom-bg-color">{rec.EstadoReclamacion}</td>
+                                    <td class="custom-bg-color">{rec.AsuntoReclamacion}</td>
+                                    <td data-id={rec.idOwnerCaso} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.NombreOwnerCaso}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={rec.FechaResolucionReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                    <td class="custom-bg-color">{rec.SentidoResolucionReclamacion}</td>
+                                    <td data-id={rec.idProducto} data-objeto="CC_MCC__c" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.NombreProductoReclamacion}</td>
+                                    <td data-id={rec.idDetalle} data-objeto="CC_MCC__c" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.NombreDetalleReclamacion}</td>
+                                    <td class="custom-bg-color">{rec.CanalProcedenciaReclamacion}</td>
+                                    <td class="custom-bg-color">{rec.CasoEspecialReclamacion}</td>           
+                                    <td data-id={rec.idCasoRelacionado} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{rec.CasoRelacionadoNumber}</td>
+                                    <template if:true={rec.SinRegistrosAsociados}>
+                                        <td class="custom-bg-color">
+                                        </td>
+                                    </template>
+                                    <template if:false={rec.SinRegistrosAsociados}>
+                                        <td class="custom-bg-color">
+                                            <lightning-button 
+                                                label="Desplegar" 
+                                                onclick={toggleDetails}
+                                                data-id={rec.idReclamacion}
+                                                variant="brand">
+                                            </lightning-button>
+                                        </td>
+                                    </template>
+                                </template>
+                            </tr>
+                            <template if:true={rec.showDetails}>
+                                <tr key={rec.idReclamacion}>
+                                    <td colspan="13">
+                                        <template if:true={rec.TienePretensiones}>
+                                            <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                <lightning-accordion-section name="Pretensiones" label="Pretensiones">   
+                                                    <lightning-accordion allow-multiple-sections-open>
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Caso</th>
+                                                                    <th scope="col">Es principal</th>
+                                                                    <th scope="col">Estado</th>
+                                                                    <th scope="col">Grupo de trabajo</th>
+                                                                    <th scope="col">Propietario</th>
+                                                                    <th scope="col">Producto</th>
+                                                                    <th scope="col">Detalle</th>
+                                                                    <th scope="col">Nº Contrato</th>
+                                                                    <th scope="col">Fecha resolución</th>
+                                                                    <th scope="col">Sentido resolución</th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={rec.ListaPretensiones} for:item="pret">
+                                                                    <tr key={pret.Id}>
+                                                                        <td data-id={pret.Id} data-objeto="Case" onclick={redirigirRegistro} class="record-link">{pret.CaseNumber}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-input checked={pret.SAC_EsPrincipal__c} type="checkbox" disabled></lightning-input>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{pret.Status}</td>
+                                                                        <td data-id={pret.SEG_Grupo__c} data-objeto="CC_Grupo_Colaborador__c" onclick={redirigirRegistro} class="record-link">{pret.NombreGrupoPretension}</td>
+                                                                        <td data-id={pret.OwnerId} data-objeto="User" onclick={redirigirRegistro} class="record-link">{pret.NombreOwnerPretension}</td>
+                                                                        <td data-id={pret.CC_MCC_ProdServ__c} data-objeto="CC_MCC__c" onclick={redirigirRegistro} class="record-link">{pret.NombreProductoPretension}</td>
+                                                                        <td data-id={pret.SEG_Detalle__c} data-objeto="CC_MCC__c" onclick={redirigirRegistro} class="record-link">{pret.NombreDetallePretension}</td>
+                                                                        <td>{pret.ContratosPretension}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={pret.FechaResolucionPretension} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{pret.SentidoResolucionReclamacion}</td>
+                                                                        <template if:false={pret.SinTareasAsociadas}>
+                                                                            <td>
+                                                                            </td>
+                                                                        </template>
+                                                                        <template if:true={pret.SinTareasAsociadas}>
+                                                                            <td>
+                                                                                <lightning-button 
+                                                                                    label="Desplegar" 
+                                                                                    onclick={toggleDetailsPretension}
+                                                                                    data-id={pret.Id}
+                                                                                    variant="brand">
+                                                                                </lightning-button>
+                                                                            </td>
+                                                                        </template>
+                                                                    </tr>
+                                                                    <template if:true={pret.showDetailsPretension}>
+                                                                        <tr key={rec.idReclamacion}>
+                                                                            <td colspan="11">
+                                                                                <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                                                    <lightning-accordion-section name="Tareas" label="Tareas">   
+                                                                                        <lightning-accordion allow-multiple-sections-open>
+                                                                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                                                                <thead>
+                                                                                                    <tr>
+                                                                                                        <th scope="col">Nombre</th>
+                                                                                                        <th scope="col">Maestro Acción</th>
+                                                                                                        <th scope="col">Estado</th>
+                                                                                                        <th scope="col">Equipo responsable</th>
+                                                                                                        <th scope="col">Propietario</th>
+                                                                                                        <th scope="col">Grupo creador</th>
+                                                                                                        <th scope="col">Creado por</th>
+                                                                                                        <th scope="col">Fecha creación</th>
+                                                                                                        <th scope="col">Fecha finalización</th>
+                                                                                                        <th scope="col">Importe abonado</th>
+                                                                                                    </tr>
+                                                                                                </thead>
+                                                                                                <tbody>
+                                                                                                    <template for:each={pret.listaTareasPretension} for:item="tarea">
+                                                                                                        <tr key={tarea.Id}>
+                                                                                                            <td data-id={tarea.Id} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.Name}</td>
+                                                                                                            <td data-id={tarea.SAC_MaestroAccionesReclamacion__c} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.NombreMaestroAccionTarea}</td>
+                                                                                                            <td>{tarea.SAC_Estado__c}</td>
+                                                                                                            <td data-id={tarea.SAC_EquipoResponsable__c} data-objeto="CC_Grupo_Colaborador__c" onclick={redirigirRegistro} class="record-link">{tarea.SAC_EquipoResponsable__r.Name}</td>
+                                                                                                            <td data-id={tarea.OwnerId} data-objeto="User" onclick={redirigirRegistro} class="record-link">{tarea.Owner.Name}</td>
+                                                                                                            <td>{tarea.SAC_GrupoCreadorTarea__c}</td>
+                                                                                                            <td data-id={tarea.CreatedById} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.CreatedBy.Name}</td>
+                                                                                                            <td>
+                                                                                                                <div>
+                                                                                                                    <lightning-formatted-date-time value={tarea.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                            <td>
+                                                                                                                <div>
+                                                                                                                    <lightning-formatted-date-time value={tarea.SAC_FechaDeEjecucion__c} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                            <td>{tarea.SAC_ImporteAbonar__c}</td> 
+                                                                                                        </tr>
+                                                                                                    </template>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </lightning-accordion>
+                                                                                    </lightning-accordion-section>
+                                                                                </lightning-accordion>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </template>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </lightning-accordion>
+                                                </lightning-accordion-section>
+                                            </lightning-accordion>
+                                        </template>
+
+                                        <template if:true={rec.TieneTareas}>
+                                            <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                <lightning-accordion-section name="Tareas" label="Tareas">   
+                                                    <lightning-accordion allow-multiple-sections-open>
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Nombre</th>
+                                                                    <th scope="col">Maestro Acción</th>
+                                                                    <th scope="col">Estado</th>
+                                                                    <th scope="col">Equipo responsable</th>
+                                                                    <th scope="col">Propietario</th>
+                                                                    <th scope="col">Grupo creador</th>
+                                                                    <th scope="col">Creado por</th>
+                                                                    <th scope="col">Fecha creación</th>
+                                                                    <th scope="col">Fecha finalización</th>
+                                                                    <th scope="col">Importe abonado</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={rec.ListaTareas} for:item="tarea">
+                                                                    <tr key={tarea.Id}>
+                                                                        <td data-id={tarea.Id} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.Name}</td>
+                                                                        <td data-id={tarea.SAC_MaestroAccionesReclamacion__c} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.NombreMaestroTarea}</td>
+                                                                        <td>{tarea.SAC_Estado__c}</td>
+                                                                        <td data-id={tarea.SAC_EquipoResponsable__c} data-objeto="CC_Grupo_Colaborador__c" onclick={redirigirRegistro} class="record-link">{tarea.NombreEqRespTarea}</td>
+                                                                        <td data-id={tarea.OwnerId} data-objeto="User" onclick={redirigirRegistro} class="record-link">{tarea.NombrePropietarioTarea}</td>
+                                                                        <td>{tarea.SAC_GrupoCreadorTarea__c}</td>
+                                                                        <td data-id={tarea.CreatedById} data-objeto="SAC_Accion__c" onclick={redirigirRegistro} class="record-link">{tarea.CreadoPorTarea}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={tarea.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={tarea.SAC_FechaDeEjecucion__c} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{tarea.SAC_ImporteAbonar__c}</td> 
+                                                                    </tr>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </lightning-accordion>
+                                                </lightning-accordion-section>
+                                            </lightning-accordion>
+                                        </template>
+
+                                        <template if:true={rec.TieneConsultas}>
+                                            <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                <lightning-accordion-section name="Consultas" label="Consultas">   
+                                                    <lightning-accordion allow-multiple-sections-open>
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Nombre</th>
+                                                                    <th scope="col">Fecha creación</th>
+                                                                    <th scope="col">Fecha de respuesta</th>
+                                                                    <th scope="col">Estado</th>
+                                                                    <th scope="col">Grupo</th>
+                                                                    <th scope="col">Oficina</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={rec.ListaConsultas} for:item="consulta">
+                                                                    <tr key={consulta.Id}>
+                                                                        <td data-id={consulta.Id} data-objeto="SAC_Interaccion__c" onclick={redirigirRegistro} class="record-link">{consulta.Name}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={consulta.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={consulta.SAC_FechaRespuesta__c} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{consulta.SAC_Estado__c}</td>
+                                                                        <td data-id={consulta.SAC_GrupoColaborador__c} data-objeto="CC_Grupo_Colaborador__c" onclick={redirigirRegistro} class="record-link">{consulta.NombreGrupoColabConsulta}</td>
+                                                                        <td data-id={consulta.SAC_Oficina__c} data-objeto="Account" onclick={redirigirRegistro} class="record-link">{consulta.NombreOficinaConsulta}</td>
+                                                                    </tr>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </lightning-accordion>
+                                                </lightning-accordion-section>
+                                            </lightning-accordion>
+                                        </template>
+
+                                        <template if:true={rec.TieneEscalados}>
+                                            <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                <lightning-accordion-section name="Escalados" label="Escalados">   
+                                                    <lightning-accordion allow-multiple-sections-open>
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Nombre</th>
+                                                                    <th scope="col">Fecha creación</th>                                                          
+                                                                    <th scope="col">Título</th>
+                                                                    <th scope="col">Estado</th>
+                                                                    <th scope="col">Grupo</th>
+                                                                    <th scope="col">Propietario</th>
+                                                                    <th scope="col">Conclusión</th>
+                                                                    <th scope="col">Fecha de respuesta</th>
+                                                                    <th scope="col">Escalados AJ</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={rec.ListaEscalados} for:item="escalado">
+                                                                    <tr key={escalado.Id}>
+                                                                        <td data-id={escalado.Id} data-objeto="SAC_Interaccion__c" onclick={redirigirRegistro} class="record-link">{escalado.Name}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={escalado.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{escalado.SAC_Titulo__c}</td>
+                                                                        <td>{escalado.SAC_Estado__c}</td>
+                                                                        <td data-id={escalado.SAC_GrupoColaborador__c} data-objeto="CC_Grupo_Colaborador__c" onclick={redirigirRegistro} class="record-link">{escalado.NombreGrupoColabEscalado}</td>
+                                                                        <td data-id={escalado.OwnerId} data-objeto="User" onclick={redirigirRegistro} class="record-link">{escalado.NombrePropietarioEscalado}</td>
+                                                                        <td>{escalado.SAC_Conclusion__c}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={escalado.FechaRespuestaEscalado} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td data-id={escalado.SAC_EscaladoNV3__c} data-objeto="SAC_Interaccion__c" onclick={redirigirRegistro} class="record-link">{escalado.NombreEscaladoAJ}</td>                                      
+                                                                    </tr>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </lightning-accordion>
+                                                </lightning-accordion-section>
+                                            </lightning-accordion>
+                                        </template>
+
+                                        <template if:true={rec.TieneConsultasSAC}>
+                                            <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" allow-multiple-sections-open active-section-name={activeSections}>
+                                                <lightning-accordion-section name="ConsultasSACrelacionadas" label="Consultas SAC relacionadas">   
+                                                    <lightning-accordion allow-multiple-sections-open>
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Caso</th>
+                                                                    <th scope="col">Fecha recepción</th>
+                                                                    <th scope="col">Estado</th>
+                                                                    <th scope="col">Caso relacionado</th>
+                                                                    <th scope="col">Propietario</th>
+                                                                    <th scope="col">Fecha/Hora de cierre</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <template for:each={rec.ListaConsultasSac} for:item="consulta">
+                                                                    <tr key={consulta.Id}>
+                                                                        <td data-id={consulta.Id} data-objeto="Case" onclick={redirigirRegistro} class="record-link">{consulta.CaseNumber}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={consulta.SAC_FechaRecepcion__c} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td>{consulta.Status}</td>                     
+                                                                        <td data-id={consulta.CC_CasoRelacionado__c} data-objeto="Case" onclick={redirigirRegistro} class="record-link">{consulta.CasoRelacionadoConsulta}</td>
+                                                                        <td data-id={consulta.OwnerId} data-objeto="User" onclick={redirigirRegistro} class="record-link">{consulta.Owner.Name}</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                <lightning-formatted-date-time value={consulta.ClosedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </template>
+                                                            </tbody>
+                                                        </table>
+                                                    </lightning-accordion>
+                                                </lightning-accordion-section>
+                                            </lightning-accordion>
+                                        </template>
+        
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </lightning-card>
+    </template>
+
+    <template if:true={hayConsultasSAC}>
+        <br/><br/><br/>
+        <lightning-card>
+            <h1 slot="title" class="titulo">Consultas SAC asociadas al cliente</h1>
+            <br/>
+            <template if:true={mostrarCasos}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Caso</th>
+                            <th scope="col">Fecha recepción</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Caso relacionado</th>
+                            <th scope="col">Propietario</th>
+                            <th scope="col">Fecha/Hora de cierre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={mostrarCasos} for:item="caso">
+                            <tr key={caso.idReclamacion}>
+                                <template if:true={caso.SoyConsultaSAC}>
+                                    <td data-id={caso.idReclamacion} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NumeroReclamacion}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaRecepcionReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                    <td class="custom-bg-color">{caso.EstadoReclamacion}</td>
+                                    <td data-id={caso.idCasoRelacionado} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.CasoRelacionadoNumber}</td>
+                                    <td data-id={caso.idOwnerCaso} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreOwnerCaso}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaCierreReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </lightning-card>
+    </template>
+
+    <template if:true={hayConsultasCOPS}>
+        <br/><br/><br/>
+        <lightning-card>
+            <h1 slot="title" class="titulo">Consultas COPS asociadas al cliente</h1>
+            <br/>
+            <template if:true={mostrarCasos}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Caso</th>
+                            <th scope="col">Asunto</th>
+                            <th scope="col">Fecha recepción</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Propietario</th>
+                            <th scope="col">Fecha/Hora de cierre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={mostrarCasos} for:item="caso">
+                            <tr key={caso.idReclamacion}>
+                                <template if:true={caso.SoyConsultaCOPS}>
+                                    <td data-id={caso.idReclamacion} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NumeroReclamacion}</td>
+                                    <td class="custom-bg-color">{caso.AsuntoReclamacion}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaRecepcionReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                    <td class="custom-bg-color">{caso.EstadoReclamacion}</td>
+                                    <td data-id={caso.idOwnerCaso} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreOwnerCaso}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaCierreReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </lightning-card>
+    </template>
+
+    <template if:true={hayReclamacionesCC}>
+        <br/><br/><br/>
+        <lightning-card>
+            <h1 slot="title" class="titulo">Reclamaciones de CC asociadas al cliente</h1>
+            <br/>
+            <template if:true={mostrarCasos}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Caso</th>
+                            <th scope="col">Fecha/Hora apertura</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Canal de entrada</th>
+                            <th scope="col">Tipo de contacto</th>
+                            <th scope="col">Temática</th>
+                            <th scope="col">Producto/Servicio</th>
+                            <th scope="col">Motivo</th>
+                            <th scope="col">Causa</th>
+                            <th scope="col">Solución</th>
+                            <th scope="col">Fecha/Hora de cierre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={mostrarCasos} for:item="caso">
+                            <tr key={caso.idReclamacion}>
+                                <template if:true={caso.SoyReclamacionCC}>
+                                    <td data-id={caso.idReclamacion} data-objeto="Case" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NumeroReclamacion}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaCreaciónReclamación} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                    <td class="custom-bg-color">{caso.EstadoReclamacion}</td>
+                                    <td class="custom-bg-color">{caso.CanalEntrada}</td>
+                                    <td class="custom-bg-color">{caso.TipoContacto}</td>
+                                    <td data-id={caso.idTematica} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreTematicaReclamacion}</td>
+                                    <td data-id={caso.idProducto} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreProductoReclamacion}</td>
+                                    <td data-id={caso.idMotivo} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreMotivoReclamacion}</td>
+                                    <td data-id={caso.idCausa} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreCausaReclamacion}</td>
+                                    <td data-id={caso.idSolucion} data-objeto="User" onclick={redirigirRegistro} class="custom-bg-color record-link">{caso.NombreSolucionReclamacion}</td>
+                                    <td class="custom-bg-color">
+                                        <div>
+                                            <lightning-formatted-date-time value={caso.FechaCierreReclamacion} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+        </lightning-card>
+    </template>
+
+</template>

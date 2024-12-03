@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_TareaExperienciaCliente</fullName>
+    <fields>Subject</fields>
+    <fields>Priority</fields>
+    <fields>Status</fields>
+    <fields>ActivityDate</fields>
+    <fields>CC_Fecha_Hora_Creacion__c</fields>
+    <fields>WhatId</fields>
+    <fields>AV_PersonaContactada__c</fields>
+    <label>CIBE_TareaExperienciaCliente</label>
+</CompactLayout>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_DigitoControlNIF</fullName>
+    <active>false</active>
+    <description>Validación del dígito de control. Solo aplica para formato NIF (00000000A).</description>
+    <errorConditionFormula>AND( 
+NOT ISBLANK(EV_Identificador__c), 
+
+ISNUMBER(LEFT(EV_Identificador__c, 8)), 
+
+NOT(ISNUMBER(RIGHT(EV_Identificador__c, 1))), 
+
+RIGHT(EV_Identificador__c, 1) 
+&lt;&gt; 
+CASE(MOD(VALUE(LEFT(EV_Identificador__c, 8)), 23), 
+0, &quot;T&quot;, 
+1, &quot;R&quot;, 
+2, &quot;W&quot;, 
+3, &quot;A&quot;, 
+4, &quot;G&quot;, 
+5, &quot;M&quot;, 
+6, &quot;Y&quot;, 
+7, &quot;F&quot;, 
+8, &quot;P&quot;, 
+9, &quot;D&quot;, 
+10, &quot;X&quot;, 
+11, &quot;B&quot;, 
+12, &quot;N&quot;, 
+13, &quot;J&quot;, 
+14, &quot;Z&quot;, 
+15, &quot;S&quot;, 
+16, &quot;Q&quot;, 
+17, &quot;V&quot;, 
+18, &quot;H&quot;, 
+19, &quot;L&quot;, 
+20, &quot;C&quot;, 
+21, &quot;K&quot;, 
+22, &quot;E&quot;, 
+&quot;error&quot;) 
+)</errorConditionFormula>
+    <errorDisplayField>EV_Identificador__c</errorDisplayField>
+    <errorMessage>El dígito de control no coincide con el número del NIF.</errorMessage>
+</ValidationRule>

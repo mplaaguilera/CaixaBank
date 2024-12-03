@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Proveedor_Atendido__c</fullName>
+    <description>US613535 - Stop&amp;Go Multiproveedor - Se crea para uardar el proveedor que nos envia cognitive</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <label>Proveedor Atendido</label>
+    <length>50</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

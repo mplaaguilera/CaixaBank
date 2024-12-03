@@ -1,0 +1,12 @@
+<template>
+    <c-sir_-home-header title={headerTitle} subtitle={headerSubtitle} header-icon={headerIcon} has-header={hasHeader}></c-sir_-home-header>
+    <div class="c-container">
+        <lightning-layout multiple-rows>
+            <template if:true={listCharts} for:each={listCharts} for:item="chart">
+                <lightning-layout-item size="12" small-device-size="6" medium-device-size="3" large-device-size="2" flexibility="auto" padding="around-small" key={chart}>
+                    <c-sir_lwc_-home-solutions tipos-procesos-name={chart} onrefreshinfo={updateLastRefreshInfo}></c-sir_lwc_-home-solutions>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+</template>

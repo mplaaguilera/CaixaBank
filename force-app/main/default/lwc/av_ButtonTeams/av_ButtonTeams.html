@@ -1,0 +1,17 @@
+<template>
+    <div if:true={tieneUrl}>
+        <a class="slds-button slds-button_stretch slds-button_brand" href={url} target="_blank"> 
+            <img src={icono} alt="iconTeams" class="customIcon" width="30px"> <span class='slds-m-left_small'>{labelTeams}</span>    
+        </a>
+        <!--<form action={url} method="get" target="_blank">
+            <button class="slds-button slds-button_stretch slds-button_brand" type="submit">
+				
+			</button>
+        </form>-->
+    </div>
+    <div if:false={tieneUrl}>
+        <button class="slds-button slds-button_stretch slds-button_brand" disabled>
+			<img src={icono} alt="iconTeams" class="customIcon" width="30px"> <span class='slds-m-left_small'>{labelTeams}</span>
+		</button>
+    </div>
+</template>

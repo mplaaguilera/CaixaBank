@@ -1,0 +1,142 @@
+<template>
+    <div class="first-span-detail" style="text-align:right; padding-top:10px">Última actualización <lightning-formatted-date-time value={now} year="numeric" month="short" day="2-digit" hour="2-digit"
+        minute="2-digit"></lightning-formatted-date-time></div>
+    <div class="c-container">
+        <!-- CAJAS ESTRATEGIAS -->
+        <div class="slds-box slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none">
+            <div style="padding: 10px 10px 10px 10px;">
+            <h2 class="titulo">Procesos Pendientes de Inicio Gestión</h2>
+            <lightning-layout multiple-rows>
+                <template for:each={cajitas} for:item="caja">                
+                    <lightning-layout-item size="12" small-device-size="6" medium-device-size="3" large-device-size="2" flexibility="auto" padding="around-small" key={caja} >                    
+                        <article class="slds-card slds-is-relative min-size card-temp styleCard" >                       
+                            <div class="card-title min-size-title slds-text-align_center" title={caja.titulo}>{caja.titulo}</div>
+                            <div class="slds-card__body slds-card__body_inner num-records-container" >
+                                <span class="cursor-default no-select">{caja.numTotal}</span>
+                            </div>
+                            <div class="slds-text-align_center"><lightning-formatted-url value={caja.url} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></div>
+                            <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+                        </article>                
+                    </lightning-layout-item>                
+                </template>
+            </lightning-layout>
+            </div>
+        </div>
+        <!-- CAJAS ESTRATEGIAS -->
+        
+        <!-- PROCESOS ACTIVOS -->   
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px;">
+            <h2 class="titulo">Procesos activos ({numTotalProcesosActivo})</h2>            
+            <!--<span class="textoVerInformeProcesosEstrtegias"><lightning-formatted-url value={informeProcesosEstrategias} label="Ver Informe Procesos-Estrategias" tooltip="Ver Informe Procesos-Estrategias" ></lightning-formatted-url></span>-->                       
+            <div class="tablaAltura slds-scrollable">
+            <lightning-datatable
+                key-field="id"
+                data={procesos}
+                columns={columnsProceso}
+                default-sort-direction={defaultSortDirection}
+                sorted-direction={sortDirection}
+                sorted-by={sortedBy}
+                onsort={onHandleSort}
+                hide-checkbox-column >
+            </lightning-datatable>
+            </div>
+            <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosActivos} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS ACTIVOS -->
+
+        <!-- GRAFICO -->
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px">
+                <c-Procesos-Estrategias-Chart informe-procesos-estrategias={informeProcesosEstrategias}></c-Procesos-Estrategias-Chart>
+            </div>
+        </article>
+        <!-- GRAFICO -->
+
+        <!-- FORMULARIOS PENDIENTES -->
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Formularios pendientes ({numTotalFormulariosCurso})</h2>
+                <div class="tablaAlturaSmall slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={formularios}
+                        columns={columnsFormulario}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={sortDirectionFormularioCurso}
+                        sorted-by={sortedByFormularioCurso}
+                        onsort={onHandleSortFormularioCurso}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeFormulariosPendientes} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>        
+            </div>
+        </article>
+        <!-- FORMULARIOS PENDIENTES -->
+
+        <!-- ACCIONES y FORMULARIOS PENDIENTES SINCRONIZAR-->
+        <lightning-layout multiple-rows>           
+            <lightning-layout-item size="2" padding="around-small">
+                <article class="slds-card slds-is-relative min-size card-temp styleCard" >                       
+                    <div class="card-title min-size-title slds-text-align_center" title="Acciones pendientes de Sincronizar">Acciones pendientes de Sincronizar</div>
+                    <div class="slds-card__body slds-card__body_inner num-records-container" >
+                        <span class="cursor-default no-select">{numTotalAcciones}</span>
+                    </div>                
+                    <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+                </article> 
+            </lightning-layout-item> 
+            <lightning-layout-item size="4" padding="around-small">
+                <article class="dashGridItem slds-card  flexTable" dir="ltr">
+                    <div style="padding: 10px;">
+                    <h2 class="titulo">Acciones pendientes de Sincronizar ({numTotalAcciones})</h2>
+                    <div class="tablaAlturaSmall slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={acciones}
+                        columns={columnsAcciones}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={sortDirectionAcciones}
+                        sorted-by={sortedByAcciones}
+                        onsort={onHandleSortAcciones}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                    </div>
+                    <span class="textoVerInforme"><lightning-formatted-url value={informeAcciones} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>                        
+                </div>
+                </article>              
+            </lightning-layout-item>  
+            <lightning-layout-item size="2" padding="around-small">             
+                <article class="slds-card slds-is-relative min-size card-temp styleCard" >                       
+                    <div class="card-title min-size-title slds-text-align_center" title="Formularios pendientes de Sincronizar">Formularios pendientes de Sincronizar</div>
+                    <div class="slds-card__body slds-card__body_inner num-records-container" >
+                        <span class="cursor-default no-select">{numTotalFormularios}</span>
+                    </div>                
+                    <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+                </article> 
+            </lightning-layout-item> 
+            <lightning-layout-item size="4" padding="around-small">
+                <article class="dashGridItem slds-card  flexTable" dir="ltr">
+                    <div style="padding: 10px;">
+                    <h2 class="titulo">Formularios pendientes de Sincronizar ({numTotalFormularios})</h2>
+                    <div class="tablaAlturaSmall slds-scrollable">
+                    <lightning-datatable
+                        key-field="id"
+                        data={formulariosSincronizar}
+                        columns={columnsFormularioSincronizar}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={sortDirectionFormularioSincro}
+                        sorted-by={sortedByFormularioSincro}
+                        onsort={onHandleSortFormularioSincro}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                    </div>
+                    <span class="textoVerInforme"><lightning-formatted-url value={informeFormulariosSincro} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>                       
+                </div>
+                </article>              
+            </lightning-layout-item>         
+        </lightning-layout>
+        <!-- ACCIONES y FORMULARIOS PENDIENTES SINCRONIZAR-->
+    </div>
+    <div lwc:dom="manual"></div>
+</template>

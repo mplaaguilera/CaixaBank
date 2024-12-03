@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_WebMCCProducto__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Producto a incorporar en la tipificación del caso</description>
+    <inlineHelpText>Producto a incorporar en la tipificación del caso</inlineHelpText>
+    <label>Producto MCC equivalente</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>B - Producto/Servicio</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.CC_WebMCCTematica__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Tematica__c</valueField>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>MCCs (Web MCC Producto)</relationshipLabel>
+    <relationshipName>MCCs_Producto</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

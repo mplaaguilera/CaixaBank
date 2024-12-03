@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLStreamingEvento__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+AND(ISPICKVAL( EV_CampaignId__r.EV_ProgramaDeEventos__c, &apos;014&apos; ),
+EV_CampaignId__r.EV_URLEventoVirtualExterno__c != NULL),
+EV_CampaignId__r.EV_URLEventoVirtualExterno__c,
+IF(EV_CampaignId__r.RecordType.DeveloperName == &apos;EV_Eventos_Accionistas&apos;, $CustomMetadata.EV_URL_portal__mdt.URLs.urlStreamingAccionistaPortal__c , $CustomMetadata.EV_URL_portal__mdt.URLs.urlStreamingPortal__c )&amp; IF( EV_CampaignId__r.RecordType.DeveloperName == &apos;EV_Eventos_Accionistas&apos;, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_index__c, $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_Streaming__c ) &amp; IF(ISBLANK( EV_LeadId__c ),
+IF(ISBLANK( EV_ContactId__c ),
+IF(ISBLANK( EV_AccountId__c ),&apos;es&apos;,CASE(EV_AccountId__r.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
+CASE(EV_ContactId__r.Account.AV_Idioma__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;)),
+CASE(EV_LeadId__r.EV_Idiomas__c, &apos;001&apos;, &apos;ca&apos;, &apos;002&apos;,&apos;es&apos;,&apos;010&apos;,&apos;en&apos;,&apos;es&apos;))
+&amp; $CustomMetadata.EV_URL_portal__mdt.URLs.URL_param_html__c&amp;&apos;?idEvento=&apos; &amp; EV_CampaignId__r.EV_ExternalID__c &amp;
+&apos;&amp;idInvitacion=&apos;&amp; EV_ExternalID__c
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>URL streaming de evento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

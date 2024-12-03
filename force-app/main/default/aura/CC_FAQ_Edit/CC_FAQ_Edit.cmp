@@ -1,0 +1,31 @@
+<aura:component access="global" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <lightning:conversationToolkitAPI aura:id="conversationKit" /> 
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="recordId" type="String"  />
+    <aura:attribute name="recordIdChat" type="String"  />
+    <aura:attribute name="name" type="String"  />  
+    <aura:attribute name="faqCa" type="String"  />
+    <aura:attribute name="faqEs" type="String"  />    
+    <aura:attribute name="vinculo" type="String"  />
+    <aura:attribute name="idioma" type="String"  />
+    
+    <lightning:overlayLibrary aura:id="popuplib"/>
+    
+    <lightning:recordEditForm onsubmit="{!c.handleSubmit}"
+                              onsuccess="{!c.handleSuccessMessage}"
+                              recordId="{!v.recordId}"
+                              objectApiName="CC_FAQ__c" aura:id="editForm">      
+   
+        <aura:if isTrue="{!and(v.idioma=='ca',not(empty(v.faqCa)))}">
+        	<lightning:inputField fieldName="FAQCa__c" value="{!v.faqCa}" label="Pruebaaa" />
+        </aura:if>
+        <aura:if isTrue="{!and(v.idioma=='es',not(empty(v.faqEs)))}">
+        	<lightning:inputField fieldName="FAQEs__c" value="{!v.faqEs}"/>
+        </aura:if>
+        <lightning:inputField fieldName="V_nculo__c" value="{!v.vinculo}" />
+        <div class="slds-m-top_medium">
+            <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="save" label="Enviar" onclick="{! c.sendFAQ }"/>
+        </div>
+    </lightning:recordEditForm>
+    
+</aura:component>

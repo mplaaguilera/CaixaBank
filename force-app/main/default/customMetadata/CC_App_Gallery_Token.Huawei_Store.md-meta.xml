@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Huawei_Store</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_AppId__c</field>
+        <value xsi:type="xsd:string">103154993</value>
+    </values>
+    <values>
+        <field>CC_Client_Id__c</field>
+        <value xsi:type="xsd:string">918237688451058944</value>
+    </values>
+    <values>
+        <field>CC_Client_Secret__c</field>
+        <value xsi:type="xsd:string">69F424698213C2B19B7C7F4E0964EE1B84A8B86A2B1BD38AE448664AB2E19F9A</value>
+    </values>
+    <values>
+        <field>CC_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://connect-api-dre.cloud.huawei.com/api/oauth2/v1/token</value>
+    </values>
+    <values>
+        <field>CC_ReviewId__c</field>
+        <value xsi:type="xsd:string">0b5783e039d74bc0b79b42318dddfa4d</value>
+    </values>
+</CustomMetadata>

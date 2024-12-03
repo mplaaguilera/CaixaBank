@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ActVolumen_Agrupador_Maximo</fullName>
+    <active>true</active>
+    <description>Solo permite crear una actualización de volumen sobre el agrupador que ha creado el máximo.</description>
+    <errorConditionFormula>ISBLANK(CC_Agrupador_Id__r.CC_Id_Maximo__c)</errorConditionFormula>
+    <errorMessage>Solo es posible crear una Actualización de Volumen sobre el Agrupador que ha creado el Maximo.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,89 @@
+<template>
+    <!--Reclamaciones-->
+    <!--Icono y título-->
+    <template if:true={ocultarReclamaciones}>
+        <lightning-card icon-name="standard:case" title="Reclamaciones vinculadas" variant="narrow" class="slds-border_bottom">
+            <!--Bucle con la info de los casos relacionados-->
+            <template for:each={reclamaciones} for:item="reclamacion">
+                <div key={reclamacion.Id} class="slds-size_12-of-12 slds-border_bottom slds-p-top_x-small slds-p-bottom_x-small slds-p-right_x-small">
+                     <!--<p class="slds-p-horizontal_small">{reclamacion.CaseNumber}</p>-->
+                        <lightning-button style="padding-left:8px" variant="base" id={reclamacion.Id}
+                            key={reclamacion.Id} label={reclamacion.CaseNumber}
+                            onclick={navigateToCase}>
+                            </lightning-button>
+                        <div class="slds-float_right">
+                                <lightning-button style="padding-left:8px;" variant="brand" label="Desvincular Reclamación" onclick={desvincular}
+                                id={reclamacion.Id} key={reclamacion.Id}>
+                                </lightning-button>
+                        </div>
+                    <dl class="slds-p-horizontal_small slds-list_horizontal slds-wrap">
+                        <dt class="slds-item_label slds-text-color_weak slds-m-top_x-small" title="Subject">Asunto:</dt>
+                        <dd class="slds-item_detail" title="Subject">
+                            <lightning-button variant="base" id={reclamacion.Id}
+                            key={reclamacion.Id} label={reclamacion.Subject}
+                            onclick={navigateToCase}>
+                            </lightning-button>
+                        </dd>
+                        <dt class="slds-item_label slds-text-color_weak" title="DateTimeOpened">Fecha de apertura:</dt>
+                        <dd class="slds-item_detail" title="Priority">
+                            <lightning-formatted-date-time
+                                           value={reclamacion.CreatedDate}
+                                           time-zone="UTC">
+                           </lightning-formatted-date-time>
+                        </dd>
+                        <dt class="slds-item_label slds-text-color_weak" title="Motivo">Prioridad:</dt>
+                        <dd class="slds-item_detail" title="Priority">{reclamacion.Priority}</dd>
+                      </dl>
+            </div>
+        </template>
+    </lightning-card>
+    </template>
+
+    <!--Consultas relacionadas-->
+    <template if:true={ocultarConsultas}>
+        <lightning-card icon-name="standard:case" title="Consultas vinculadas" variant="narrow" class="slds-border_bottom">
+            <!--Bucle con la info de los casos relacionados-->
+            <template for:each={consultas} for:item="consulta">
+                <div key={consulta.Id} class="slds-size_12-of-12 slds-border_bottom slds-p-top_x-small slds-p-bottom_x-small slds-p-right_x-small">
+                     <!--<p class="slds-p-horizontal_small">{consulta.CaseNumber}</p>-->
+                        <lightning-button style="padding-left:8px" variant="base" id={consulta.Id}
+                            key={consulta.Id} label={consulta.CaseNumber}
+                            onclick={navigateToCase}>
+                            </lightning-button>
+                        <div class="slds-float_right">
+
+                                <lightning-button style="padding-left:8px;" variant="brand" label="Desvincular Consulta" onclick={desvincularConsultas}
+                                id={consulta.Id} key={consulta.Id}>
+                                </lightning-button>
+
+                        </div>
+                    <dl class="slds-p-horizontal_small slds-list_horizontal slds-wrap">
+                        <dt class="slds-item_label slds-text-color_weak slds-m-top_x-small" title="Subject">Asunto:</dt>
+                        <dd class="slds-item_detail" title="Subject">
+                            <lightning-button variant="base" id={consulta.Id}
+                            key={consulta.Id} label={consulta.Subject}
+                            onclick={navigateToCase}>
+                            </lightning-button>
+                        </dd>
+                        <dt class="slds-item_label slds-text-color_weak" title="DateTimeOpened">Fecha de apertura:</dt>
+                        <dd class="slds-item_detail" title="Priority">
+                            <lightning-formatted-date-time
+                                           value={consulta.CreatedDate}
+                                           time-zone="UTC">
+                           </lightning-formatted-date-time>
+                        </dd>
+                        <dt class="slds-item_label slds-text-color_weak" title="Motivo">Prioridad:</dt>
+                        <dd class="slds-item_detail" title="Priority">{consulta.Priority}</dd>
+                      </dl>
+            </div>
+        </template>
+    </lightning-card>
+    </template>
+
+    <!-- spinner -->
+    <template if:true={spinnerLoading}>
+        <div class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+</template>

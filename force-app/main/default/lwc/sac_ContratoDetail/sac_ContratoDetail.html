@@ -1,0 +1,64 @@
+<template>
+	<div>
+		<div class="slds-section__title slds-theme_shade section-div">
+			<lightning-button-icon if:true={showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container" onclick={toggleShowDetail}></lightning-button-icon>
+			<lightning-button-icon if:false={showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container" onclick={toggleShowDetail}></lightning-button-icon>
+			<a class="contrato-title">{con.codProduct} - {con.nameProduct}</a>
+			<!---->
+		</div>
+        <div if:true={showDetail} class="sec-form">
+			<lightning-card>
+				<!--Campos-->
+				<!-- Formulario sólo lectura -->
+				<div class="slds-box slds-theme_default">
+					<div class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept">Descripción</label>
+    					<p if:true={description}>{description}</p>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept">Fecha de apertura</label>
+    					<p if:true={openingDate}>{openingDate}</p>
+					</div>
+					<div class="slds-col slds-size_1-of-3">
+						<label class="slds-form-element__label value-concept">Balance total</label>
+    					<p if:true={totalBalance}>{totalBalance}</p>
+					</div>
+				</div>
+				<!--Contratos-->
+				<div if:true={showContratos} class="slds-p-around_large">
+					<table class="tblColPad" cellpadding="4" cellspacing="4"  style="border-collapse:collapse;">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Identificador</th>
+								<th>Descripción</th>
+								<th>Balance</th> 
+							</tr>
+						</thead>
+						<tbody> 
+							<template for:each={contratos} for:item="contrato">
+								<tr key={contrato.Id}>
+									<td>
+										<lightning-button-icon data-id={contrato.id} data-description={contrato.description} icon-name="utility:link" alternative-text="Vincular contrato a la pretensión" class="slds-var-m-left_xxx-small" title="Vincular contrato a la pretensión" onclick={handleLink}></lightning-button-icon>
+									</td>
+									<td>
+										{contrato.id}
+									</td>
+									<td>
+										{contrato.description}
+									</td>
+									<td>
+										{contrato.balance}
+									</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+		 		</div>
+				 <div if:false={showContratos} class="slds-col slds-size_2-of-3">
+					No hay contratos asociados a este producto.              
+				</div>
+			</lightning-card>
+        </div>
+	</div>
+</template>

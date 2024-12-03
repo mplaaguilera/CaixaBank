@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_MarcaGrupo__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF (RecordType.DeveloperName = &apos;CC_ClientePA&apos; || RecordType.DeveloperName = &apos;CC_Cliente&apos;,
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c &amp;&amp; ISPICKVAL(AV_Segmento__c, &apos;BPR&apos;), IMAGE(&quot;/resource/CC_SeniorEmpleadoBancaPrivada&quot;,&apos;S, E y BP&apos;, 100, 240),
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c &amp;&amp; INCLUDES(AV_IndicadoresClientes__c, &apos;28&apos;) , IMAGE(&quot;/resource/CC_SeniorEmpleadoImagin&quot;,&apos;S, E e I&apos;, 100, 240),
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c &amp;&amp; AV_EAPGestor__r.AV_EmpleadoIntouch__c, IMAGE(&quot;/resource/CC_SeniorEmpleadoTouch&quot;,&apos;S, E y T&apos;, 100, 240),
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c &amp;&amp; IF(ISBLANK(AV_EAPGestor__c), true, IF(AV_EAPGestor__r.CC_Matricula__c = &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_SeniorEmpleadoSinGestor&quot;,&apos;S, E y CnG &apos;, 100, 240),
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c &amp;&amp; IF(NOT(ISBLANK(AV_EAPGestor__c)), true, IF(AV_EAPGestor__r.CC_Matricula__c != &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_SeniorEmpleadoConGestor&quot;,&apos;S, E y CsG&apos;,100,240),
+IF(CC_Empleado_Familiar__c &amp;&amp; ISPICKVAL(AV_Segmento__c, &apos;BPR&apos;), IMAGE(&quot;/resource/CC_EmpleadoPrivada&quot;,&apos;E y F y BP&apos;, 100, 160),
+IF(CC_Empleado_Familiar__c &amp;&amp; AV_EAPGestor__r.AV_EmpleadoIntouch__c, IMAGE(&quot;/resource/CC_EmpleadoTouch&quot;,&apos;E, F e T&apos;, 100, 160),
+IF(CC_Empleado_Familiar__c &amp;&amp; INCLUDES(AV_IndicadoresClientes__c, &apos;28&apos;) , IMAGE(&quot;/resource/CC_EmpleadoImagin&quot;,&apos;E, F e I&apos;,100,160), 
+IF(CC_Empleado_Familiar__c &amp;&amp; IF(ISBLANK(AV_EAPGestor__c), true, IF(AV_EAPGestor__r.CC_Matricula__c = &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_EmpleadoSinGestor&quot;,&apos;E, F y CnG&apos;, 100, 160), 
+IF(CC_Empleado_Familiar__c &amp;&amp; IF(NOT(ISBLANK(AV_EAPGestor__c)), true, IF(AV_EAPGestor__r.CC_Matricula__c != &apos;000000&apos;, true, false)),IMAGE(&quot;/resource/CC_EmpleadoConGestor&quot;,&apos;E, F y CsG&apos;, 100, 160), 
+IF(CC_MarcaSenior__c &amp;&amp; CC_Empleado_Familiar__c, IMAGE(&quot;/resource/CC_SeniorEmpleado&quot;,&apos;S, E y F&apos;, 100, 160), 
+IF(CC_MarcaSenior__c &amp;&amp; ISPICKVAL(AV_Segmento__c, &apos;BPR&apos;), IMAGE(&quot;/resource/CC_SeniorPrivada&quot;,&apos;S y BP&apos;, 100, 160), 
+IF(CC_MarcaSenior__c &amp;&amp; INCLUDES(AV_IndicadoresClientes__c, &apos;28&apos;) , IMAGE(&quot;/resource/CC_SeniorImagin&quot;,&apos;S e I&apos;,100,160), 
+IF(CC_MarcaSenior__c &amp;&amp; AV_EAPGestor__r.AV_EmpleadoIntouch__c, IMAGE(&quot;/resource/CC_SeniorTouch&quot;,&apos;S Y T&apos;, 100, 160), 
+IF(CC_MarcaSenior__c &amp;&amp; IF(ISBLANK(AV_EAPGestor__c), true, IF(AV_EAPGestor__r.CC_Matricula__c = &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_SeniorSinGestor&quot;,&apos;S y CnG&apos;, 100, 160), 
+IF(CC_MarcaSenior__c &amp;&amp; IF(NOT(ISBLANK(AV_EAPGestor__c)), true, IF(AV_EAPGestor__r.CC_Matricula__c != &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_SeniorConGestor&quot;,&apos;S y CsG&apos;, 100, 160),
+IF(CC_Empleado_Familiar__c, IMAGE(&quot;/resource/CC_EmpleadosFamiliares&quot;,&apos;E y F&apos;,80,80),
+IF(CC_MarcaSenior__c, IMAGE(&quot;/resource/CC_Senior&quot;,&apos;S&apos;,80,80),
+IF(ISPICKVAL(AV_Segmento__c, &apos;BPR&apos;), IMAGE(&quot;/resource/CC_BancaPrivada&quot;,&apos;BP&apos;,80,80),
+IF(INCLUDES(AV_IndicadoresClientes__c, &apos;28&apos;) , IMAGE(&quot;/resource/CC_ClienteImagin&quot;,&apos;I&apos;, 80, 80),
+IF(AV_EAPGestor__r.AV_EmpleadoIntouch__c, IMAGE(&quot;/resource/CC_ClienteInTouch&quot;,&apos;T&apos;,80,80),
+IF(IF(ISBLANK(AV_EAPGestor__c), true, IF(AV_EAPGestor__r.CC_Matricula__c = &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_ClienteSinGestor&quot;,&apos;CnG&apos;,80,80),
+IF(IF(NOT(ISBLANK(AV_EAPGestor__c)), true, IF(AV_EAPGestor__r.CC_Matricula__c != &apos;000000&apos;, true, false)), IMAGE(&quot;/resource/CC_ClienteConGestor&quot;,&apos;CsG&apos;,80,80),&apos;&apos;))))))))))))))))))))))),&apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Grupo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

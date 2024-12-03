@@ -1,0 +1,11 @@
+<template>
+    <lightning-card variant="Narrow" title={titulo} icon-name="custom:custom55" class="titulo">
+        <lightning-tree-grid
+            columns={gridColumns}
+            data={procesos}
+            key-field="name"
+            hide-checkbox-column="true"
+            resize-column-disabled="false"
+        ></lightning-tree-grid>        
+    </lightning-card>     
+</template>

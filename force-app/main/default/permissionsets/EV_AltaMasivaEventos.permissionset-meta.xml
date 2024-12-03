@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>EV_ImportMassEvent_Controller</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>EV_lookupEmployees_Controller</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>EV_AltaMasivaEventos</name>
+    </customPermissions>
+    <description>PS para el alta masiva de eventos</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.AV_UsuarioAsociado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.AccountId</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.CC_Matricula__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>EV_AltaMasivaEventos</label>
+</PermissionSet>

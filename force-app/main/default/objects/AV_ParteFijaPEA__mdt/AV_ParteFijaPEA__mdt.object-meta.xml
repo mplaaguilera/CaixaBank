@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Parte fija de la url que va en el camp AV_PEA__c en Oportunidades,Tareas y Eventos.</description>
+    <label>Parte fija link PEA</label>
+    <pluralLabel>Partes fijas links PEA</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Periodico_Periodicidad</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+				TEXT(Tipo__c) =&apos;Periodico&apos;,
+				ISNULL(Periodicidad__c)
+)</errorConditionFormula>
+    <errorDisplayField>Periodicidad__c</errorDisplayField>
+    <errorMessage>Debe informarse la periodicidad</errorMessage>
+</ValidationRule>

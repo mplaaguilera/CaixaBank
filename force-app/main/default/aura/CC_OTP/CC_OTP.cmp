@@ -1,0 +1,388 @@
+<aura:component controller="CC_OTP" implements="force:hasRecordId,force:lightningQuickAction" access="global">
+
+    <!-- Atributos -->
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="columnasOTPCliente" type="List"/>
+    <aura:attribute name="columnasOTPHistoricoCliente" type="List"/>
+    <aura:attribute name="otpCliente" type="Object"/>
+    <aura:attribute name="historicoOtpCliente" type="Object"/>
+    <aura:attribute name="pendienteEnvio" type="Boolean" default="false"/>
+    <aura:attribute name="pendienteValidar" type="Boolean" default="false"/>
+    <aura:attribute name="preguntasBasicas" type="Object"/>
+    <aura:attribute name="preguntasAleatorias" type="Object"/>
+    <aura:attribute name="preguntas2NivelString" type="String"/>
+    <aura:attribute name="recordIdPdteEnvio" type="String"/>
+    <aura:attribute name="recordIdPdteValidar" type="String"/>
+    <aura:attribute name="nivelSeleccionado" type="String"/>
+    <aura:attribute name="nivel" type="String"/>
+    <aura:attribute name="mensajeNoValidado" type="Boolean" default="false"/>
+
+    <aura:attribute name="comprobarValidacionesBasicas" type="Boolean" default="false"/>
+
+    <aura:attribute name="noValidado" type="Boolean" default="false"/>
+    <aura:attribute name="disabledBotones" type="Boolean" default="true"/>
+    <aura:attribute name="disabledBotonesValidar" type="Boolean" default="false"/>
+    <aura:attribute name="disabledBotonValidar" type="Boolean" default="false"/>
+    <aura:attribute name="validarRegistro" type="Boolean" default="false"/>
+    <aura:attribute type="CC_Comunicaciones__c[]" name="otpList"/>
+    <aura:attribute name="opcionesNiveles" type="Object"/>
+    <aura:attribute name="cssStyle" type="String" description="Gestión de estilos de la QuickAction. Quitar marco gris"/>
+    <aura:attribute name="idioma" type="String"/>
+
+    <aura:attribute name="llamadas" type="String"/>
+    <aura:attribute name="mostrarError" type="Boolean" default="false"/>
+    <aura:attribute name="clienteBloqueado" type="Boolean" default="false"/>
+    <aura:attribute name="nuevoIntento" type="Boolean" default="false"/>
+
+
+    <aura:attribute name="titulo" type="String"/>
+    <aura:attribute name="mensaje" type="String"/>
+
+    <aura:attribute name="tituloNuevaValidacion" type="String"/>
+    <aura:attribute name="mensajeNuevaValidacion" type="String"/>
+
+    <aura:attribute name="representante" type="Boolean" default="false"/>
+	<aura:attribute name="clienteMenor" type="Boolean" default="false"/>
+	<aura:attribute name="idCliente" type="String"/>
+    <aura:attribute name="idContacto" type="String"/>
+    <aura:attribute name="tipoCliente" type="String"/>
+    <aura:attribute name="ownerId" type="String"/>
+    <aura:attribute name="intentos" type="String"/>
+    <aura:attribute name="estadoAut" type="String"/>
+    <aura:attribute name="bEsperaSFDC" type="Boolean" default="false"/>
+    <aura:attribute name="valorInputPregunta1" type="String"/>
+    <aura:attribute name="valorInputPregunta2" type="String"/>
+    <aura:attribute name="labelPregunta1" type="String"/>
+    <aura:attribute name="labelPregunta2" type="String"/>
+    <aura:attribute name="textoAyudaPregunta1" type="String"/>
+    <aura:attribute name="textoAyudaPregunta2" type="String"/>
+
+    <aura:attribute name="maxLengthPregunta1" type="Integer" default="255"/>
+    <aura:attribute name="minLengthPregunta1" type="Integer" default="255"/>
+    <aura:attribute name="typePregunta1" type="String"/>
+    <aura:attribute name="patternPregunta1" type="String"/>
+    <aura:attribute name="caracteresNoPermitidos1" type="Boolean" default="false"/>
+
+    <aura:attribute name="maxLengthPregunta2" type="Integer" default="255"/>
+    <aura:attribute name="minLengthPregunta2" type="Integer" default="255"/>
+    <aura:attribute name="typePregunta2" type="String"/>
+    <aura:attribute name="patternPregunta2" type="String"/>
+    <aura:attribute name="caracteresNoPermitidos2" type="Boolean" default="false"/>
+
+    <aura:attribute name="validacionPregunta1" type="Boolean"/>
+    <aura:attribute name="validacionPregunta2" type="Boolean"/>
+    <aura:attribute name="datosVacios" type="Boolean" default="false"/>
+    <aura:attribute name="cuentasVacias" type="Boolean" default="false"/>
+    <aura:attribute name="OmitirSMSNvl2" type="Boolean" default="false"/>
+    <aura:attribute name="omitirPreguntasNvl2" type="Boolean" default="false"/>
+
+    <aura:attribute name="mostrarBotonEmergencia" type="Boolean" default="true"/>
+
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="simpleRecord" type="Object" />
+    
+    <lightning:quickActionAPI aura:id="quickActionAPI" />
+
+    <!-- Método de inicialización -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:unescapedHtml value="{!v.cssStyle}"/>
+
+    <force:recordData aura:id="recordLoader"
+        recordId="{!v.recordId}"
+        targetRecord="{!v.record}"
+        layoutType="FULL"
+        fields="AccountId, ContactId"
+        recordUpdated="{!c.handleRecordUpdated}"/>
+
+        <aura:if isTrue="{!v.mostrarError}">
+            <div style="background-color: #a71930; color: white; padding: 10px; border-radius: 4px; display: flex; align-items: center;">
+                <div style="margin-right: 10px;">
+                    <lightning:icon iconName="utility:error" size="small" alternativeText="Error" />
+                </div>
+                <div class="error-text slds-text-align_left">
+                    {!v.titulo}&nbsp;{!v.mensaje}
+                </div>
+                <aura:if isTrue="{!v.llamadas == false}">
+                    <div style="margin-left: auto;">
+                        <lightning:buttonIcon class="slds-button_icon slds-text-align_right" iconName="utility:refresh" title="Refrescar" onclick="{!c.doInit}"/>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:if>
+    <!-- OTPSMS asociados al caso -->
+    <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Autenticación segura del cliente">
+                            <lightning:icon iconName="utility:password" size="small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Nueva autenticación segura</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-button-group" role="group" style="padding-left: 35px;">
+              <!--  <lightning:button class="slds-button slds-button_neutral" aura:id="Nivel 1" label="Nivel 1" title="Nivel 1" onclick="{!c.seleccionarNivel}" disabled="{!v.disabledBotones}"/> -->
+                <lightning:button class="slds-button slds-button_neutral" aura:id="Nivel 2" label="Nivel 2" title="Nivel 2" onclick="{!c.segundoNivelAut}" disabled="{!v.disabledBotones}"/>
+                <aura:if isTrue="{!v.mostrarBotonEmergencia == false}">
+                    <lightning:button class="slds-button slds-button_text-destructive" aura:id="Emergencia" label="Emergencia" title="Emergencia" onclick="{!c.emergenciaAut}" disabled="{!v.disabledBotones}"/>
+                </aura:if>
+                <lightning:button class="slds-button slds-button_neutral" aura:id="Cliente Digital" label="Cliente Digital" title="Cliente Digital" onclick="{!c.clienteDigitalAut}" disabled="{!v.disabledBotones}"/>
+            </div>
+            <!-- <aura:if isTrue="{!v.bEsperaSFDC}">
+                <div class="spinnerSFDC">
+                    <lightning:spinner size="medium" alternativeText="Actualizando información..." />
+                </div>
+            </aura:if> -->
+        </article>
+    </div>
+
+     <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Autenticación segura del cliente">
+                            <lightning:icon iconName="utility:password" size="small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Autenticación segura del cliente</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <aura:if isTrue="{!v.otpCliente.length > 0}">
+                <lightning:datatable class="slds-border_bottom slds-border_left slds-border_right slds-border_top"
+                                     data="{! v.otpCliente }"
+                                     columns="{! v.columnasOTPCliente}"
+                                     keyField="id"
+                                     hideCheckboxColumn="true"
+                                     minColumnWidth="150"
+                                     onrowaction="{!c.accionRegistroController}"/>
+            </aura:if>
+            <aura:if isTrue="{!!v.otpCliente.length > 0}">
+                Sin autenticaciones seguras en curso.
+            </aura:if>
+        </article>
+    </div>
+
+    <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Histórico de autenticación segura del cliente">
+                            <lightning:icon iconName="utility:password" size="small"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Histórico de autenticaciones seguras del cliente</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <aura:if isTrue="{!v.historicoOtpCliente.length > 0}">
+                    <!-- <div style="position: relative; height: 300px; border: 1px solid rgba(201, 201, 201); border-radius: 4px;"> -->
+
+                        <lightning:datatable data="{! v.historicoOtpCliente }" columns="{! v.columnasOTPHistoricoCliente}" keyField="Id" hideCheckboxColumn="true" minColumnWidth="150"/>
+                    <!-- </div> -->
+
+            </aura:if>
+
+
+            <aura:if isTrue="{!!v.historicoOtpCliente.length > 0}">
+                Sin autenticaciones seguras anteriores.
+            </aura:if>
+        </article>
+    </div>
+
+    <!-- Modal Preguntas -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxPreguntas" onkeydown="{!c.modalPreguntasTeclaPulsada}">
+
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalPreguntas}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close" disabled="{!v.disabledBotonesValidar}"/>
+                <!--Título-->
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!'Preguntas (' + v.nivelSeleccionado + ')'}</h2>
+            </header>
+
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-is-relative slds-p-around_medium" id="modal-content-id-1">
+                <!--Spinner-->
+                <aura:if isTrue="{!v.disabledBotonesValidar}">
+                    <div><lightning:spinner size="medium" /></div>
+                </aura:if>
+                <aura:if isTrue="{!!v.noValidado}">
+                    <!--Preguntas básicas-->
+                    <aura:if isTrue="{!v.nivelSeleccionado == 'Emergencia'}">
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small">Preguntas básicas</span>
+                            </h3>
+                            <div aria-hidden="false" class="slds-section__content">
+                                <aura:iteration items="{!v.preguntasBasicas}" var="pre">
+                                    <lightning:input type="checkbox" aura:id="intentSel" label="{!pre.label}" value="{!pre.value}"/>
+                                </aura:iteration>
+                            </div>
+                        </div>
+
+                        <div style="height: 5px;"/> <!--Separador-->
+
+                        <!--Preguntas aleatorias-->
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small">Preguntas aleatorias</span>
+                            </h3>
+                            <div aria-hidden="false" class="slds-section__content">
+                                <aura:iteration items="{!v.preguntasAleatorias}" var="preAle">
+                            <lightning:input type="checkbox" aura:id="intentSel1" label="{!preAle.label}" value="{!preAle.value}"/>
+                        </aura:iteration>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!--Preguntas 2Nivel-->
+                    <aura:if isTrue="{!v.nivelSeleccionado == 'Nivel 2'}">
+                        <div class="slds-section slds-is-open">
+                            <h3 class="slds-section__title slds-theme_shade">
+                                <span class="slds-truncate slds-p-horizontal_small">Preguntas 2 Nivel</span>
+                            </h3>
+                            <div aria-hidden="false" class="slds-section__content">
+                                <lightning:input aura:id="inputPreguntas2Nivel1" type="{!v.typePregunta1}" label="{!v.labelPregunta1}" value="{!v.valorInputPregunta1}" maxlength="{!v.maxLengthPregunta1}" />
+                                <aura:if isTrue="{!v.textoAyudaPregunta1 != null}">
+                                    <div style="margin-top:10px;" class="texto-informativo">
+                                        <span style="padding-right:10px;" class="slds-icon">
+                                            <lightning:icon iconName="utility:warning" size="x-small" />
+                                        </span>
+                                        {!v.textoAyudaPregunta1}
+                                    </div>
+                                    <br/>
+                                </aura:if>
+                                <lightning:input aura:id="inputPreguntas2Nivel2" type="{!v.typePregunta2}" label="{!v.labelPregunta2}" value="{!v.valorInputPregunta2}" maxlength="{!v.maxLengthPregunta2}" />
+                                <aura:if isTrue="{!v.textoAyudaPregunta2 != null}">
+                                    <div style="margin-top:10px;">
+                                        <span style="padding-right:10px;" class="slds-icon">
+                                            <lightning:icon iconName="utility:warning" size="x-small" />
+                                        </span>
+                                        {!v.textoAyudaPregunta2}
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </div>
+                    </aura:if>
+                </aura:if>
+            </div>
+            <!--Pie del modal-->
+            <footer class="slds-modal__footer">
+                <aura:if isTrue="{!!v.noValidado}">
+                    <lightning:button class="slds-button slds-button--neutral" label="Cancelar" onclick="{!c.cerrarModalPreguntas}" disabled="{!v.disabledBotonesValidar}"/>
+                </aura:if>
+                <!--<aura:if isTrue="{!v.nivelSeleccionado != 'Nivel 2'}">-->
+                <aura:if isTrue="{!!v.noValidado}">
+                    <!--Botones validado Emergencia-->
+                    <aura:if isTrue="{!v.nivelSeleccionado == 'Emergencia'}">
+                        <lightning:button variant="success" aura:id="Validado" label="Validado" onclick="{!c.enviarSegunNivel}"/>
+                        <lightning:button variant="destructive" aura:id="No Validado" label="No Validado" onclick="{!c.enviarSegunNivel}"/>
+                    </aura:if>
+                    <!--Botones validado Nivel 2-->
+                    <aura:if isTrue="{!v.nivelSeleccionado == 'Nivel 2'}">
+                        <lightning:button variant="success" aura:id="Validado" label="Validar" onclick="{!c.enviarNivelDos}" disabled="{!v.disabledBotonesValidar}"/>
+                        <!--<lightning:button variant="destructive" aura:id="No Validado" label="No Validado" onclick="{!c.enviarNivelDos}"/>-->
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!v.noValidado}">
+                    <lightning:button class="slds-button slds-button--brand" label="Cerrar" onclick="{!c.cerrarModalPreguntas}"/>
+                </aura:if>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop" aura:id="ModalBackdropPreguntas"></div>
+    <!--Fin Modal Preguntas-->
+
+    <!--Modal Validar -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxValidar"  onkeydown="{!c.modalValidarTeclaPulsada}">
+        <div class="slds-modal__container">
+            <!--Cabecera del modal-->
+            <header class="slds-modal__header">
+                <!--Icono de cierre-->
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalValidar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                <!--Título-->
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Validar registro</h2>
+            </header>
+
+            <!--Contenido del modal-->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <lightning:recordEditForm onsubmit="{!c.validarRegistroController}"
+
+                                            recordId="{!v.recordIdPdteValidar}"
+                                            objectApiName="CC_Comunicaciones__c">
+                    <!-- the messages component is for error messages -->
+                    <lightning:messages />
+
+                    <lightning:inputField fieldName="CC_Estado__c" disabled="true" value="Pdte. Validar" />
+                    <lightning:inputField fieldName="CC_Fecha_Envio__c" disabled="true"/>
+                    <aura:if isTrue="{!v.nivel != 'Cliente Digital'}">
+                    	<lightning:inputField fieldName="CC_Codigo_OTPSMS__c" disabled="false" required="true" placeholder="*****"/>
+                    </aura:if>
+                        <!--<lightning:inputField fieldName="CC_Fecha_Validacion__c" disabled="true"/>
+                    <lightning:inputField fieldName="CC_Resultado_Validacion__c" disabled="true"/>
+                    <lightning:inputField fieldName="CC_Codigo_Error__c" disabled="true"/>-->
+
+                    <div class="slds-m-left_medium">
+                        <lightning:button aura:id="botonValidar"  variant="brand" type="submit" name="save" label="Validar" disabled="{!v.disabledBotonValidar}" />
+                        <lightning:button class="slds-button slds-button_text-destructive" onclick="{!c.noRecibido}" label="No recibido" />
+                        <lightning:button label="Cancelar" name ="cancelarModal" onclick="{!c.cancelarAut}" />
+                    </div>
+                </lightning:recordEditForm>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop" aura:id="ModalBackdropValidar"></div>
+    <!--Fin Modal Validar-->
+
+     <!--Modal queda intento de Validación -->
+     <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal" aura:id="ModalboxValidarIntento">
+        <div class="slds-modal__container">
+            <!-- Cabecera del modal -->
+            <header class="slds-modal__header" style="background-color: #f4f6f9; padding: 1rem; border-bottom: 1px solid #d8dde6;">
+                <!-- Icono de cierre -->
+                <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.cerrarModalValidar}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+                <!-- Título -->
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="margin: 0;">{!v.tituloNuevaValidacion}</h2>
+            </header>
+            
+            <!-- Contenido del modal -->
+            <div class="slds-modal__content slds-is-relative slds-p-around_medium" id="modal-content-id-1" style="padding: 1rem;">
+                <div class="slds-section slds-is-open">
+                    <h3 class="slds-section__title slds-theme_shade slds-align_absolute-center">
+                        <span class="slds-p-horizontal_small">{!v.mensajeNuevaValidacion}</span>
+                    </h3>
+                    
+                    <div class="slds-m-top_medium slds-align_absolute-center">
+                        <lightning:button class="slds-button slds-button_neutral slds-m-right_small" aura:id="Nivel 2" label="Nivel 2" title="Nivel 2" onclick="{!c.segundoNivelAut}" disabled="{!v.disabledBotones}"/>
+                        <lightning:button class="slds-button slds-button_neutral" aura:id="Cliente Digital" label="Cliente Digital" title="Cliente Digital" onclick="{!c.clienteDigitalAut}" disabled="{!v.disabledBotones}"/>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pie del modal -->
+            <footer class="slds-modal__footer" style="background-color: #f4f6f9; padding: 1rem; border-top: 1px solid #d8dde6;">
+                <lightning:button class="slds-button slds-button_brand" label="Cerrar" onclick="{!c.cerrarModalValidarDos}"/>
+            </footer>
+        </div>
+    </section>
+            <div class="slds-backdrop" aura:id="ModalBackdropValidarDos"></div>
+    <!--Fin Modal queda intento de Validación-->
+
+</aura:component>

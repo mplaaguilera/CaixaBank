@@ -1,0 +1,128 @@
+<aura:component controller="CC_Revincular_Caso_Controller" access="global" implements="force:hasRecordId,force:lightningQuickAction">
+	
+	<aura:attribute name="cssStyle" type="String"/> <!--Quitar marco gris-->
+	<aura:attribute name="recordId" type="Id"/>
+	<aura:attribute name="cargando" type="Boolean" default="true"/>
+	<aura:attribute name="procesando" type="Boolean" default="false"/>
+
+	<aura:attribute name="vcaso" type="Id" />
+	<aura:attribute name="CaseNumber" type="String"/>
+	<aura:attribute name="newCaseNumber" type="String"/>
+	<aura:attribute name="CC_ContactoRelacionado" type="String"/>
+	<aura:attribute name="oCaso" type="Case" default="{'sobjectType':'Case','Id':'','Subject':'','Description':''}"/>
+	<aura:attribute name="oCasosContacto" type="List"/>
+	<aura:attribute name="oColumnas" type="List"/>
+	<aura:attribute name="mostrarTodosLosCasos" type="Boolean" default="false"/>
+	<aura:attribute name="bVerCasosContacto" type="Boolean" default="true"/>
+	<aura:attribute name="bHabilitado" type="Boolean" default="true"/>
+	<aura:attribute name="proyecto" type="String" default="CC"/>
+	<aura:attribute name="bMensaje" type="String" default="Este caso no puede ser fusionado con otro."/>
+	
+    <!-- INI _ MOD - Jorge Argente 18/02/2022 -> Invocar onInit para comprobar el tipo de recordType finalidad proyecto CC -> US: US145644-->
+    <aura:attribute name="esRecType" type="Boolean" default="false" />
+    <!-- FIN _ MOD - Jorge Argente 18/02/2022 -> Invocar onInit para comprobar el tipo de recordType finalidad proyecto CC -> US: US145644-->
+
+    
+	<lightning:workspaceAPI aura:id="workspace"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<!--UI-->
+	<!--Card-->
+	<article class="slds-card">
+		<!--Cabecera de la card-->
+		<div class="slds-card__header slds-grid" style="padding-top: 10px;">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<span class="slds-icon_container">
+						&nbsp;<lightning:icon iconName="standard:merge" size="small"/>
+					</span>
+				</div>
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title">
+						<b>Fusionar con caso existente</b>
+					</h2>
+				</div>
+			</header>
+		</div>
+
+		<!--Cuerpo de la card-->
+		<div class="slds-card__body slds-card__body_inner">
+			<!--Mensaje de operativa no disponible-->
+			<div class="{!!v.bHabilitado ? '' : 'slds-hide'}" style="padding-left: 10px;">
+				<span class="slds-icon_container">
+					<lightning:icon iconName="utility:warning" variant="warning" size="xx-small"/>
+				</span>
+				<span>&nbsp; {!v.bMensaje}</span>
+			</div>
+			
+			<!--No mostrar todos los casos (lookup contra contacto)-->
+			<lightning:recordEditForm aura:id="asocAgrup" recordId="{!v.recordId}" objectApiName="Case" class="{!and(!v.mostrarTodosLosCasos, v.bHabilitado) ? '' : 'slds-hide'}" onload="{!c.finCargando}" density="comfy">
+				<lightning:messages />
+				<lightning:inputField aura:id="CC_ContactoRelacionado" fieldName="CC_ContactoRelacionado__c" onchange="{!c.contactoSelect}"/>
+			</lightning:recordEditForm>
+
+			<lightning:recordEditForm aura:id="asocAgrup" recordId="{!v.recordId}" objectApiName="Case" density="comfy" class="{!and(v.mostrarTodosLosCasos, v.bHabilitado) ? '' : 'slds-hide'}" >
+				<lightning:messages />
+				<lightning:inputField aura:id="CC_CasoRelacionado" fieldName="CC_CasoRelacionado__c" value="{!v.newCaseNumber}" onchange="{!c.casoSelect}"/>
+			</lightning:recordEditForm>
+
+			<!--Toggle "Mostrar todos los casos"-->
+			<div class="{!v.bHabilitado ? '' : 'slds-hide'}">
+				<lightning:input type="toggle" label="Mostrar todos los casos" class="slds-float_right" checked="{!v.mostrarTodosLosCasos}" messageToggleActive="" messageToggleInactive=""/>
+			</div>
+
+			<!--Casos del contacto seleccionado en el lookup-->
+			<div class="{!and(!v.mostrarTodosLosCasos, v.bHabilitado) ? '' : 'slds-hide'}" style="height: 250px; border-style: solid; border-width: 1px; border-color: #D0D0D0; margin-top: 40px;">
+				<!-- <div style="height: 40px"/> -->
+				<lightning:datatable columns="{!v.oColumnas}" data="{!v.oCasosContacto}" keyField="id" onrowaction="{!c.handleRowAction}" hideCheckboxColumn ="true"/>
+			</div>
+
+			<!--Mostrar todos los casos (lookup contra casos)-->
+			<div class="{!and(v.mostrarTodosLosCasos, v.bHabilitado) ? '' : 'slds-hide'}">
+				<!--Botones de ver y asociar para lookup de casos-->
+				<div style="padding-left: 5px; padding-bottom: 1.5rem;">
+					<lightning:button label="Fusionar" iconName="utility:merge" variant="brand" onclick="{!c.abrirModalConfirmacion}" disabled="{!empty(v.newCaseNumber)}"/>
+					<lightning:button label="Ver" iconName="utility:preview" onclick="{!c.verCaso}" disabled="{!empty(v.newCaseNumber)}"/>
+				</div>
+			</div>
+		</div>
+	</article>
+	
+	<!--Modal de confirmación-->
+	<section role="dialog" aura:id="modalConfirmacion" class="slds-modal" aria-modal="true" aria-describedby="modal-content-id-1">
+		<div class="slds-modal__container">
+			<header class="slds-modal__header">
+				<!--Icono de cierre-->
+				<lightning:buttonIcon iconName="utility:close" size="large" onclick="{! c.cancelModal}" alternativeText="Cerrar" variant="border-filled" class="slds-button_icon slds-modal__close"/>
+				<!--Título-->
+				<h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Fusionar casos</h2>
+			</header>
+			<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <aura:if isTrue="{!v.esRecType}">
+                    <div class="slds-text-color_error" style="padding-bottom: 5px;">El caso {!v.CaseNumber} se cerrará y sus datos se trasladarán al caso existente indicado.</div>
+                	<aura:set attribute="else">
+                    	<div class="slds-text-color_error" style="padding-bottom: 5px;">El caso {!v.CaseNumber} se eliminará y sus datos se trasladarán al caso existente indicado.</div>
+                    </aura:set>
+                </aura:if>
+				
+				<b>¿Está seguro de que quiere continuar?</b>
+			</div>
+			<footer class="slds-modal__footer">
+				<lightning:button label="Cancelar" onclick="{!c.cancelModal }" />
+				<lightning:button variant="brand" label="Fusionar" iconName="utility:merge" onclick="{!c.asociarCaso}"/>
+			</footer>
+		</div>
+	</section>
+	<div aura:id="backdropConfirmacion" class="slds-backdrop"/>
+
+	<!--Spinner (cargando recordeditform caso)-->
+	<aura:if isTrue="{!v.cargando}">
+		<lightning:spinner alternativeText="Cargando..."/>
+	</aura:if>
+
+	<!--Spinner (asociando caso)-->
+	<aura:if isTrue="{!and(v.procesando, v.bHabilitado)}">
+		<lightning:spinner variant="brand" alternativeText="Fusionando casos..."/>
+	</aura:if>
+</aura:component>

@@ -1,0 +1,15 @@
+<template>
+    <lightning-card>
+        <lightning-datatable
+            key-field="id"
+            columns={columns}
+            data={data}
+            hide-checkbox-column
+            default-sort-direction={defaultSortDirection}
+            sorted-direction={sortDirection}
+            sorted-by={sortedBy}
+            onsort={onHandleSort}>
+        </lightning-datatable>
+    </lightning-card>
+    <lightning-spinner if:true={showSpinner} alternative-text="Cargando" size="medium" class="spin-cls" style="z-index: 5;"></lightning-spinner>
+</template>

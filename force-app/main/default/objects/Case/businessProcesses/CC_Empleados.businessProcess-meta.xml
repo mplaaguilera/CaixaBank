@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Empleados</fullName>
+    <description>Support Process para casos de tipo empleado</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Activo</fullName>
+        <default>true</default>
+    </values>
+    <values>
+        <fullName>Cerrado</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>New</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente Cliente</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente Colaborador</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente Incidencia</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente Interno</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pendiente Revisión</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Rechazado</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

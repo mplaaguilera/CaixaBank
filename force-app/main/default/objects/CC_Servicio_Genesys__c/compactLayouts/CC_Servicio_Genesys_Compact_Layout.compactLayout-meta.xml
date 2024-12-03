@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Servicio_Genesys_Compact_Layout</fullName>
+    <fields>Name</fields>
+    <fields>CBK_Negocio__c</fields>
+    <fields>CC_Codigo__c</fields>
+    <fields>CC_Tipo__c</fields>
+    <fields>CC_Canal_de_Entrada__c</fields>
+    <fields>CC_Canal_Procedencia__c</fields>
+    <label>Servicio Genesys Compact Layout</label>
+</CompactLayout>

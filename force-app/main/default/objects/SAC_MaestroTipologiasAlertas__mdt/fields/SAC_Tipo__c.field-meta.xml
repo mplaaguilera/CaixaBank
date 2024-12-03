@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Tipo__c</fullName>
+    <description>Tipo de alerta</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Tipo</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_001</fullName>
+                <default>true</default>
+                <label>Respuesta a la subsanación</label>
+            </value>
+            <value>
+                <fullName>SAC_002</fullName>
+                <default>false</default>
+                <label>Respuesta a la negociación</label>
+            </value>
+            <value>
+                <fullName>SAC_003</fullName>
+                <default>false</default>
+                <label>Consulta pendiente de respuesta</label>
+            </value>
+            <value>
+                <fullName>SAC_004</fullName>
+                <default>false</default>
+                <label>Tarea atendida</label>
+            </value>
+            <value>
+                <fullName>SAC_005</fullName>
+                <default>false</default>
+                <label>Nuevo caso con mismo cliente</label>
+            </value>
+            <value>
+                <fullName>SAC_006</fullName>
+                <default>false</default>
+                <label>Nuevo correo asociado a la reclamación</label>
+            </value>
+            <value>
+                <fullName>SAC_007</fullName>
+                <default>false</default>
+                <label>Alerta SLA</label>
+            </value>
+            <value>
+                <fullName>SAC_008</fullName>
+                <default>false</default>
+                <label>Caso derivado</label>
+            </value>
+            <value>
+                <fullName>SAC_009</fullName>
+                <default>false</default>
+                <label>Nuevo gestor reclamación</label>
+            </value>
+            <value>
+                <fullName>SAC_010</fullName>
+                <default>false</default>
+                <label>Reclamación en ejecución</label>
+            </value>
+            <value>
+                <fullName>SAC_011</fullName>
+                <default>false</default>
+                <label>Devolución reclamación a alta</label>
+            </value>
+            <value>
+                <fullName>SAC_012</fullName>
+                <default>false</default>
+                <label>Consulta realizada a colaborador</label>
+            </value>
+            <value>
+                <fullName>SAC_013</fullName>
+                <default>false</default>
+                <label>Escalado atendido</label>
+            </value>
+            <value>
+                <fullName>SAC_014</fullName>
+                <default>false</default>
+                <label>Nuevo propietario del caso</label>
+            </value>
+            <value>
+                <fullName>SAC_015</fullName>
+                <default>false</default>
+                <label>Consulta vinculada a la reclamación</label>
+            </value>
+            <value>
+                <fullName>SAC_016</fullName>
+                <default>false</default>
+                <label>Notificacion de tarea</label>
+            </value>
+            <value>
+                <fullName>SAC_017</fullName>
+                <default>false</default>
+                <label>Reclamación vinculada creada</label>
+            </value>
+            <value>
+                <fullName>SAC_018</fullName>
+                <default>false</default>
+                <label>Reapertura CC</label>
+            </value>
+            <value>
+                <fullName>SAC_019</fullName>
+                <default>false</default>
+                <label>Negociación inactiva</label>
+            </value>
+            <value>
+                <fullName>SAC_020</fullName>
+                <default>false</default>
+                <label>Subsanación inactiva</label>
+            </value>
+            <value>
+                <fullName>SAC_021</fullName>
+                <default>false</default>
+                <label>Tarea atendida por GGH</label>
+            </value>
+            <value>
+                <fullName>SAC_022</fullName>
+                <default>false</default>
+                <label>Consulta respondida</label>
+            </value>
+            <value>
+                <fullName>SAC_023</fullName>
+                <default>false</default>
+                <label>Escalado devuelto</label>
+            </value>
+            <value>
+                <fullName>SPV_001</fullName>
+                <default>false</default>
+                <label>SPV Devolución reclamación a Alta</label>
+            </value>
+            <value>
+                <fullName>SPV_002</fullName>
+                <default>false</default>
+                <label>SPV Cambio Estado Análisis a Envío Organismo</label>
+            </value>
+            <value>
+                <fullName>SPV_003</fullName>
+                <default>false</default>
+                <label>SPV Devolución desde estado Envío Organismo a Análisis</label>
+            </value>
+            <value>
+                <fullName>SPV_004</fullName>
+                <default>false</default>
+                <label>SPV Consulta pendiente de respuesta</label>
+            </value>
+            <value>
+                <fullName>SPV_005</fullName>
+                <default>false</default>
+                <label>SPV Consulta respondida</label>
+            </value>
+            <value>
+                <fullName>SPV_006</fullName>
+                <default>false</default>
+                <label>SPV Nuevo escalado</label>
+            </value>
+            <value>
+                <fullName>SPV_007</fullName>
+                <default>false</default>
+                <label>SPV Escalado atendido</label>
+            </value>
+            <value>
+                <fullName>SPV_008</fullName>
+                <default>false</default>
+                <label>SPV Escalado devuelto</label>
+            </value>
+            <value>
+                <fullName>SPV_009</fullName>
+                <default>false</default>
+                <label>SPV Tarea devuelta</label>
+            </value>
+            <value>
+                <fullName>SPV_010</fullName>
+                <default>false</default>
+                <label>SPV Tarea atendida</label>
+            </value>
+            <value>
+                <fullName>SPV_011</fullName>
+                <default>false</default>
+                <label>SPV Cambio Estado Pendiente Respuesta Organismo a Análisis con complementaria</label>
+            </value>
+            <value>
+                <fullName>SPV_012</fullName>
+                <default>false</default>
+                <label>SPV Cambio Estado Alta a Análisis</label>
+            </value>
+            <value>
+                <fullName>SPV_013</fullName>
+                <default>false</default>
+                <label>SPV Reasignación letrado</label>
+            </value>
+            <value>
+                <fullName>SPV_014</fullName>
+                <default>false</default>
+                <label>SPV Cambio Estado Pendiente Respuesta Organismo a Rectificación</label>
+            </value>
+            <value>
+                <fullName>SPV_015</fullName>
+                <default>false</default>
+                <label>SPV Negociación inactiva</label>
+            </value>
+            <value>
+                <fullName>SPV_016</fullName>
+                <default>false</default>
+                <label>SPV Notificacion de tarea</label>
+            </value>
+            <value>
+                <fullName>SPV_017</fullName>
+                <default>false</default>
+                <label>SPV Entrada documentación complementaria</label>
+            </value>
+            <value>
+                <fullName>SPV_018</fullName>
+                <default>false</default>
+                <label>SPV Formulario de reclamación modificado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

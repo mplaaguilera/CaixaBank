@@ -1,0 +1,16 @@
+<template>
+    <lightning-card icon-name="standard:procedure_detail" title={tituloTabla}>
+        <lightning-button label="Reclamaciones" title="Home oficinas" onclick={goToHomeOficinas} slot="actions"></lightning-button>
+    <lightning-datatable data={ConsultasList} 
+                        columns={columns}
+                        key-field="id"                             
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={onHandleSortDirectionConsultasTareas}
+                        sorted-by={onHandleSortConsultasTareas}
+                        onsort={onHandleSortConsultasTareas}
+                        hide-checkbox-column="true">
+
+    </lightning-datatable>
+    
+    </lightning-card>
+</template>

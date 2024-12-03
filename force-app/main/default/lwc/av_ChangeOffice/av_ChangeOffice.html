@@ -1,0 +1,40 @@
+<template>
+    <div style="padding: 1rem;">
+        <p class="options-title">Seleccione la oficina a la que desea cambiar</p>
+        <lightning-input type="text" label="" placeholder="Buscar" onkeyup={handleSearch}></lightning-input>
+        <br />
+        <ul class="slds-has-dividers_bottom-space">
+            <template for:each={officeList} for:item="office">
+                <li key={office.numOficinaEmpresa} class="slds-item office-box" onclick={updateSelfUserOffice} data-id={office.numOficinaEmpresa} aria-current="true">
+                    <div class="slds-p-around_medium lgc-bg second">
+                        <lightning-tile label={office.name} type="media" href="javascript:">
+                            <lightning-icon slot="media" icon-name="standard:account"></lightning-icon>
+                            <p class="current-office" data-id="curr"></p>
+                        </lightning-tile>
+                    </div>
+                </li>
+            </template>
+        </ul>
+        <div style = "width: 100%;border:2px solid black"></div>
+        <ul class="slds-has-dividers_bottom-space">
+
+            <template for:each={officesPermitedMatrix} for:item="perm">
+                    <lightning-badge key={perm.id} label={perm.name} type="media" href="javascript:"> </lightning-badge>
+                    <template for:each={perm.offSet} for:item="office">
+                                <li  key={office.numOficinaEmpresa} class="slds-item office-box"  onclick={updateSelfUserOffice}  data-id={office.numOficinaEmpresa} aria-current="true">
+                                <!-- <li  key={office.numOficinaEmpresa} class="slds-item office-box"  onclick={readOfficeLogginInfo} data-id={office.logginInfo} aria-current="true"> -->
+                                    <div class="slds-p-around_medium lgc-bg second">
+                                        <lightning-tile label={office.name} type="media" href="javascript:">
+                                            <lightning-icon slot="media" icon-name="standard:account"></lightning-icon>
+                                            <p class="current-office" data-id="curr"></p>
+                                        </lightning-tile>
+                                    </div>
+                                </li>
+                    </template>
+            </template>
+
+
+        </ul>
+    </div>
+    <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls" style="z-index: 3;"></lightning-spinner>
+</template>

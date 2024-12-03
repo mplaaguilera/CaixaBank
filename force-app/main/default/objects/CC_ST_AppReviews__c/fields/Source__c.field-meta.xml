@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Source__c</fullName>
+    <label>Source</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Apple App Store</fullName>
+                <default>false</default>
+                <label>Apple App Store</label>
+            </value>
+            <value>
+                <fullName>Google Play Store</fullName>
+                <default>false</default>
+                <label>Google Play Store</label>
+            </value>
+            <value>
+                <fullName>Huawei App Store</fullName>
+                <default>false</default>
+                <label>Huawei App Store</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

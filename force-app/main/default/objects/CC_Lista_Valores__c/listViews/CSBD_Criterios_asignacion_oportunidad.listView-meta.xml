@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Criterios_asignacion_oportunidad</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Orden__c</columns>
+    <columns>CC_Activa__c</columns>
+    <columns>CSBD_Tipo_de_oportunidad__c</columns>
+    <columns>CSBD_Cola_Oportunidad__c</columns>
+    <columns>CSBD_Criterios_asignacion__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Lista_Valores__c.CSBD_Regla_asignacion_oportunidad</value>
+    </filters>
+    <label>CSBD - Criterios asignación oportunidad</label>
+    <sharedTo>
+        <group>CSBD_General</group>
+    </sharedTo>
+</ListView>

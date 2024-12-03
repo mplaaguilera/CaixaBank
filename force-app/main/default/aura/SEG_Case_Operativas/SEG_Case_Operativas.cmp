@@ -1,0 +1,860 @@
+<aura:component controller="SEG_Case_Operativas_Controller" implements="force:hasRecordId,flexipage:availableForRecordHome">
+
+    <aura:attribute name="iniciando" type="Integer" default="0"/>
+    <aura:attribute name="caso" type="Case"/>
+    <aura:attribute name="fullRecord" type="Case"/>
+    <aura:attribute name="gruposC" type="List"/>
+    <aura:attribute name="loadingCreandoCaso" type="Boolean" default="false"/>
+    <aura:attribute name="avisoPlanificacionCerrado" type="Boolean" default="false"/>
+    <aura:attribute name="esPropietario" type="Boolean" default="true"/>
+    <aura:attribute name="esSupervisorEstado" type="Boolean" default="false"/>
+    <aura:attribute name="errorLds" type="String"/>
+    <aura:attribute name="renderizarModales" type="Boolean" default="false"/>
+    <aura:attribute name="gruposClasificacionOptions" type="List" description="Opciones para el combobox de grupos"/>
+    <aura:attribute name="gruposClasificacionValue" type="String" description="Valor del combobox de grupos"/>
+    <aura:attribute name="literalBusquedaGrupo" type="String" description="Literal del input de búsqueda de grupos"/>
+    <aura:attribute name="literalBusquedaPlantilla" type="String" description="Literal del input de búsqueda de plantillas"/>
+    <aura:attribute name="desplanificando" type="Boolean" default="false"/>
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+
+    <aura:attribute name="observacionesGrupo" type="Boolean" default="false"/>
+    <aura:attribute name="modalSRauditoria" type="Boolean" default="false"/>
+
+    <aura:attribute name="grupos" type="List"/>
+    <aura:attribute name="plantillas" type="List"/>
+    <aura:attribute name="selectedPlantilla" type="String"/>
+    <aura:attribute name="selectedGroup" type="String"/>
+    <aura:attribute name="resultados" type="List" default="[]"/>
+    <aura:attribute name="selectedResul" type="String"/>
+
+    <aura:attribute name="numeroContratos" type="Integer" default="1"/>
+    <aura:attribute name="nombresContratos" type="String" default=""/>
+    <aura:attribute name="inputNumContrato" type="List"/>
+    <aura:attribute name="showInputsContratos" type="Boolean"/>
+    <aura:attribute name="fatalCrearContratos" type="Boolean"/>
+    <aura:attribute name="warningCrearContratos" type="Boolean"/>
+    <!--Atributos Ficheros Anexos en modo tabla-->
+    <aura:attribute name="dataAnexos" type="Object"/>
+    <aura:attribute name="columnasAnexos" type="List"/>
+    <aura:attribute name="currentSelectedRowsAnexos" type="List" default=""/>
+    <aura:attribute name="defaultRows" type="List" default="[]" description="reset selected rows..."/>
+    <!--Atributos Casos hijos creados-->
+    <aura:attribute name="casoCreadoCN" type="String"/>
+    <aura:attribute name="casoCreadoCR" type="String"/>
+    <aura:attribute name="casoCreadoGrupo" type="String"/>
+    <aura:attribute name="casoCreadoId" type="String"/>
+    <!--Atributos de Clasificación Rápida-->
+    <aura:attribute name="CRs" type="List"/>
+    <aura:attribute name="selectedCR" type="String"/>
+    <aura:attribute name="caso2updCR" type="String"/>
+    <aura:attribute name="valorMCC" type="String"/>
+
+    <!--Atributos de Emails asociados al caso-->
+    <aura:attribute name="Emailcaso" type="List"/>
+    <aura:attribute name="selectedEmailSR" type="String"/>
+    <aura:attribute name="caso2updEmSR" type="String"/>
+
+    <!--Notas tipificadas en los botones con pop up de notas-->
+    <aura:attribute name="notasTipificadas" type="List"/>
+    <aura:attribute name="selectedNotasTip" type="String" default="Sin notas"/>
+    <aura:attribute name="observacText" type="String"/>
+
+    <!--Notas tipificadas en los botones con pop up de notas-->
+    <aura:attribute name="criterioImputacion" type="String"/>
+
+    <!--Importar emails y archivos de sr relacionada-->
+    <aura:attribute name="casosImportar" type="List"/>
+    <aura:attribute name="selectedSR" type="String"/>
+    <aura:attribute name="mostrarCases" type="boolean" default="false"/>
+    <aura:attribute name="cases" type="List"/>
+    <aura:attribute name="selectedCaseId" type="String" default=""/>
+    <aura:attribute name="selectedCaseNumber" type="String" default=""/>
+
+    <!-- Buscador Grupos-->
+    <aura:attribute name="groups" type="List"/>
+    <aura:attribute name="groupName" type="String" default=""/>
+    <aura:attribute name="mostrarGrupos" type="boolean" default="false"/>
+
+    <!-- Control Org-Zona -->
+    <aura:attribute name="orgZona" type="boolean" default="false"/>
+
+    <!-- Control Org-Zona Grupos y Caso -->
+    <aura:attribute name="caseOrgZonaGroup" type="boolean" default="false"/>
+
+    <!-- Control UsuarioBO -->
+    <aura:attribute name="esUsuarioBO" type="boolean" default="false"/>
+
+    <!-- Control AOR -->
+    <aura:attribute name="aorActivo" type="boolean" default="false"/>
+
+    <!-- Control Contacto Empleado -->
+    <aura:attribute name="esContactoEmpleado" type="boolean" default="false"/>
+
+    <!-- Control cuenta pendiente Asociar -->
+    <aura:attribute name="cuentaPendiente" type="boolean" default="false"/>
+
+    <!-- Control cuenta y contacto no informados -->
+    <aura:attribute name="cuentaYContactoNoInformado" type="boolean" default="false"/>
+
+    <!-- Control rt y ps -->
+    <aura:attribute name="controlRTyPS" type="boolean" default="false"/>
+
+    <!-- Control centro no informado en casos de valija -->
+    <!--<aura:attribute name="valijaSinCentro" type="boolean" default="false"/>-->
+
+    <!-- Control Contact.Email de valija -->
+    <aura:attribute name="emailNoInformadoValija" type="boolean" default="false"/>
+
+    <!-- Control cuenta y contacto no informados (Eric) -->
+    <aura:attribute name="parentListAOR" type="list" default="[]"/>
+    <aura:attribute name="childListAOR" type="list" default="[]"/>
+    <aura:attribute name="pickListMapAOR" type="map"/>
+    <aura:attribute name="disabledChildFieldAOR" type="boolean" default="true"/>
+
+    <!-- Control botón Num.Operaciones Cambios -->
+    <aura:attribute name="numOperacionesCambio" type="boolean" default="true"/>
+
+    <!-- Atributos AOR -->
+    <aura:attribute name="objectNameAOR" type="string" default="Case"/>
+    <aura:attribute name="AORTipologiaN1API" type="string" default="SEG_AORTipologiaN1__c"/>
+    <aura:attribute name="AORTipologiaN2API" type="string" default="SEG_AORTipologia_N2__c"/>
+    <aura:attribute name="parentFieldLabel" type="string" />
+    <aura:attribute name="childFieldLabel" type="string"/>
+    <aura:attribute name="selectedValueN1" type="string" default=""/>
+    <aura:attribute name="selectedValueN2" type="string" default=""/>
+    <aura:attribute name="selectedApiN1" type="string"/>
+    <aura:attribute name="selectedApiN2" type="string"/>
+    <aura:attribute name="consultPeticionAOR" type="string"/>
+    <aura:attribute name="comentarioAOR" type="string"/>
+
+    <!--Handlers-->
+    <!--Init
+    <aura:handler name="init" value="{!this}" action="{!c.checkOrgZona}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.checkPermissionSet}"/>
+    -->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="init" value="{!this}" action="{!c.cargarNotasTipificadas}"/>
+
+    <aura:handler name="render" value="{!this}" action="{!c.metodosRenderizar}"/>
+    <aura:handler event="force:refreshView" action="{!c.checkOrgZona}" />
+
+    <!-- Control de opciones para el autoasignar y traspaso a Valija -->
+    <aura:attribute name="enviarNotificacionCaracteresRestantes" type="Integer" default="255"/>
+    <aura:attribute name="caseIdValija" type="String" default=""/>
+    <aura:attribute name="loadingDatosAdicionales" type="Boolean" default="false"/>
+    <aura:attribute name="datosAdicionalesValija" type="Boolean" default="false"/>
+    <aura:attribute name="notasManuales" type="String" default=""/>
+    <aura:attribute name="datosTrasladoCalculados" type="String" default=""/>
+    <aura:attribute name="datosImpuestosModificados" type="Boolean" default="false"/>
+
+    <!-- Control de datos para el modal de BPO -->
+    <aura:attribute name="statusCasoBPO" type="Boolean" default="false"/>
+    <aura:attribute name="notasCIF" type="String" default=""/>
+
+    <!-- Numero operaciones caso -->
+    <aura:attribute name="numOperacionesCaso" type="Integer" default="0"/>
+
+    <aura:attribute name="RTSeguimiento" type="String"/>
+
+    <!--API-->
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <!--Lightning Data Service-->
+    <!--
+        <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="COMPACT"
+        fields="Id, Status, SEG_Grupo__c, SEG_Subestado__c, OwnerId, AccountId, SEG_Detalle__c, CC_MCC_Motivo__c, CC_MCC_ProdServ__c,
+        CC_MCC_Tematica__c, SEG_Zona__c, SEG_Organizacion__c, SEG_Numero_centro__c, SEG_Numero_de_centro__c, SEG_Numero_de_centro__r.Name,
+        SEG_Numero_de_centro__r.CC_Numero_Oficina__c, SEG_ClasificacionRapida__c, SEG_Grupo_Anterior__c, SEG_Fecha_planificaci_n__c, SEG_N_operaciones_del_caso__c,
+        SEG_Identificador_AOR__c, SEG_Consulta_AOR__c, SEG_Comentario_AOR__c, SEG_AORTipologia_N2__c, SEG_AORTipologiaN1__c"
+        targetFields="{!v.caso}" targetError="{!v.errorLds}" targetRecord="{!v.casoCompleto}" recordUpdated="{!c.casoUpdatedDataService}"/>
+    -->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}"
+        fields="Id, Status, SEG_Fecha_planificaci_n__c, SEG_Grupo__c, SEG_Grupo_Anterior__c, SEG_Identificador_AOR__c,
+        SEG_Consulta_AOR__c, SEG_AORTipologiaN1__c, SEG_AORTipologia_N2__c, OwnerId, SEG_N_operaciones_del_caso__c, SEG_Numero_centro__c"
+        targetFields="{!v.caso}" targetError="{!v.errorLds}" recordUpdated="{!c.casoUpdatedDataService}" targetRecord="{!v.fullRecord}"
+    />
+
+    <!-- Para cuando entre en funcionamiento AOR:SEG_Identificador_AOR__c, SEG_Consulta_AOR__c, SEG_Comentario_AOR__c, SEG_AORTipologia_N2__c, SEG_AORTipologiaN1__c,-->
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div aura:id="backdrop" class="slds-backdrop"/>
+
+    <aura:html tag="style">.toastMessage.forceActionsText{white-space : pre-line !important;}</aura:html>
+
+    <!--Botones-->
+    <div>
+        <!--Mensaje informativo si el caso tiene una planificación vigente-->
+        <aura:if isTrue="{!v.caso.Status == 'Planificado' &amp;&amp; !empty(v.caso.SEG_Fecha_planificaci_n__c) &amp;&amp; !v.avisoPlanificacionCerrado}">
+            <div style="text-align: center;">
+                <div id="child" class="avisoPlanificacion slds-notify slds-notify_alert slds-alert_warning" role="alert" style="margin-top: 5px; margin-bottom: 15px;">
+                    <span class="slds-icon_container slds-icon-utility-warning slds-var-m-right_medium">
+                        <lightning:icon iconName="utility:clock" size="x-small" class="blink iconoAzul"/>
+                    </span>
+                    <h2>
+                        Planificado para el
+                        <span style="font-weight: 500;"><lightning:formattedDateTime value="{!v.caso.SEG_Fecha_planificaci_n__c}" year="2-digit" month="numeric" day="numeric" weekday="long"/></span>
+                        a las
+                        <span style="font-weight: 500;"><lightning:formattedDateTime value="{!v.caso.SEG_Fecha_planificaci_n__c}" hour="2-digit" minute="2-digit" hour12="false"/></span>
+                        <span>.</span>
+                        <aura:if isTrue="{!v.esPropietario}">
+                            &nbsp;
+                            <aura:if isTrue="{!!v.desplanificando}">
+                                <span style="font-weight: 300; text-decoration: underline;" class="slds-text-link_reset slds-text-link" onclick="{!c.desplanificar}">Desplanificar</span>
+                                <aura:set attribute="else">
+                                    <span>Desplanificando...</span>
+                                </aura:set>
+                            </aura:if>
+                        </aura:if>
+                    </h2>
+                    <div class="slds-notify__close">
+                        <button class="slds-button slds-button_icon slds-button_icon-small" onclick="{!c.cerrarAvisoPlanificacion}" title="Ocultar este aviso">
+                            <lightning:icon iconName="utility:close" size="xx-small"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+
+        <!--Botones-->
+        <div id="child" style="display: flex; justify-content: center; flex-wrap: wrap; row-gap: 2px; column-gap: 5px; max-width: 1010px; align-items: baseline; padding-bottom: 2px;">
+            <aura:if isTrue="{!!v.esPropietario}">
+                <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner" onclick="{!c.tomarPropiedad}" disabled="{ v.caso.SEG_Grupo__c==null || !v.orgZona}"/>
+            </aura:if>
+            <lightning:button aura:id="botonCerrarSR" label="Cerrar" iconName="action:close" onclick="{!c.modalCerrarAbrir}" disabled="{!or(v.caso.Status=='Descartado', v.caso.Status=='Cerrado') || v.cuentaPendiente || v.caso.SEG_Grupo__c==null || !v.orgZona || v.cuentaYContactoNoInformado}"/>
+            <lightning:button aura:id="botonRechazarSR" label="Rechazar" iconName="utility:error" onclick="{!c.modalRechazarAbrir}" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || v.caso.SEG_Grupo__c==null || !v.orgZona}"/>
+            <lightning:button label="Autoasignar" iconName="utility:groups" onclick="{!c.modalAutoasignarAbrir}" disabled="{!or(v.caso.Status=='Descartado' || v.caso.Status=='Cerrado' || v.caso.Status=='Pendiente') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.cuentaYContactoNoInformado}"/><!--|| v.valijaSinCentro-->
+            <lightning:button aura:id="AsignarGrupo" label="Asignar grupo" iconName="action:edit_groups" onclick="{!c.modalAsignarGrupoAbrir}" disabled="{!or(v.caso.Status=='Descartado' || v.caso.Status=='Cerrado' || v.caso.Status=='Pendiente') || and(!v.esPropietario, v.caso.SEG_Grupo__c!=null) || !v.orgZona}"/>
+            <lightning:button label="Devolver" iconName="utility:reply" onclick="{!c.modalDevolverAbrir}" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
+            <lightning:button label="Devolver a grupo anterior" iconName="utility:reply" onclick="{!c.modalDevolverGrupoAbrir}" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo_Anterior__c==null || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
+            <span style="padding-top: 6px;">
+                <lightning:buttonGroup class="slds-var-m-left_x-small slds-var-m-right_x-small">
+                    <lightning:button label="Crear caso vinculado" iconName="action:new_child_case" onclick="{!c.modalCrearVinculadosAbrir}" disabled="{!or(v.caso.Status=='Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona|| v.caseOrgZonaGroup}"/>
+                    <lightning:buttonMenu class="slds-button_last" onselect="{!c.menuCrearCaso}" menuAlignment="right">
+                        <lightning:menuItem label="Crear desde mail" value="botonCrearSR" prefixIconName="utility:email" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || v.caso.SEG_Grupo__c==null || !v.orgZona}"/>
+                    </lightning:buttonMenu>
+                </lightning:buttonGroup>
+            </span>
+            <lightning:button label="Crear contratos" iconName="utility:edit_form" onclick="{!c.modalCrearContratosAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
+            <lightning:button label="Operaciones CSO" iconName="utility:number_input" onclick="{!c.modalAnyadirOperacionAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup || v.esUsuarioBO}"/>
+            <lightning:button aura:id="botonImportar" label="Importar" iconName="utility:attach" onclick="{!c.modalImportarArchivosAbrir}" disabled="{!or(v.caso.Status=='Descartado',v.caso.Status=='Cerrado') || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
+            <lightning:button label="Canal BPO" iconName="utility:anywhere_alert" onclick="{!c.modalCanalBpoAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || v.caseOrgZonaGroup}"/>
+            <lightning:button label="Asesoría Jurídica" iconName="utility:anywhere_alert" onclick="{!c.modalAORAbrir}" disabled="{!or(v.caso.Status == 'Descartado', v.caso.Status=='Cerrado') || !v.esPropietario || v.caso.SEG_Grupo__c==null || !v.orgZona || !v.aorActivo}"/>
+        </div>
+    </div>
+
+    <!--Modales-->
+    <aura:if isTrue="{!v.renderizarModales}">
+
+        <section  aura:id="modalOperaciones" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAnyadirOperacionCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Añadir operaciones</h2>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative" id="modal-content-id-1">
+                    <aura:if isTrue="{!v.loadingCreandoCaso}">
+                        <div class="slds-spinner_container">
+                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                <span class="slds-assistive-text">Creando operaciones...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <lightning:input aura:id="idNumOperaciones" type="number" label="Número de operaciones" value="1" step="1" required="true"/><br/>
+                    <!-- Incrustar componente para buscar MCC-->
+                    <c:SEG_MCC_Buscador recordId="{#v.recordId}" lookupId="{!v.valorMCC}"/> <br/>
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas Tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}"/><br/>
+                    <lightning:textarea label="Escribe el motivo por el que añades operaciones" type="text" aura:id="idObservacionOperaciones" placeholder="Observaciones..." value="{!v.notasManuales}"/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalAnyadirOperacionCerrar" label="Cancelar" onclick="{!c.modalAnyadirOperacionCerrar}"/>
+                    <lightning:button label="Añadir Operación" variant="brand" onclick="{!c.modalAnyadirOperaciones}" disabled="{!empty(v.valorMCC)}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalAutoasignar" name="modalAutoasignar" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAutoasignarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Autoasignar</h2>
+                    <p class="slds-var-m-top_x-small">Asignación automática a grupo.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas Tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}"/>
+                    <br/>
+                    <lightning:textarea label="Escribe el motivo por el que realizas la autoasignación" type="text" aura:id="idObservacionAutoasginacion" placeholder="Observaciones..." value="{!v.notasManuales}"/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalAutoasignarBotonIniciar" label="Autoasignar" variant="brand" iconName="utility:groups" onclick="{!c.autoasignar}"/>
+                    <lightning:button aura:id="modalAutoasignarBotonCancelar" label="Cancelar" onclick="{!c.modalAutoasignarCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section role="dialog" tabindex="-1" aura:id="modalCerrar" name="modalCerrar" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCerrarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Cerrar caso</h2>
+                    <p class="slds-var-m-top_x-small">Finalizar la gestión del caso.</p>
+                </header>
+                <div aura:id="divInputResultados" class="slds-modal__content slds-var-p-around_xx-large slds-show">
+                    <lightning:combobox aura:id="resultados" name="Resultado" label="Resultado" placeholder="Buscar resultados..." value="{!v.selectedResul}" options="{!v.resultados}" required="true"/>
+                    <br/>
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas Tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}"/>
+                    <br/>
+                    <lightning:textarea label="Escribe el motivo por el que cierras el caso" type="text" aura:id="observacionCerrar" placeholder="Observaciones..."/>
+                </div>
+                <div aura:id="divBotonesNumOperaciones" class="slds-modal__content slds-var-p-around_xx-large slds-hide">
+                    <lightning:input label="Num. operaciones del caso" aura:id="idNumOperacionesCierre" value="{!v.numOperacionesCaso}"/>
+                    <br/>
+                    <p class="slds-var-m-top_x-small">Criterio de imputación</p>
+                    <lightning:input label="Criterio Imputacion" aura:id="idCriterioImputacion" value="{!v.criterioImputacion}"/>
+                    <br/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <aura:if isTrue="{!v.numOperacionesCambio}">
+                        <lightning:button aura:id="modalBotonSiguiente" label="Siguiente" variant="brand" onclick="{!c.cerrarSiguiente}" iconName="utility:forward" disabled="{!empty(v.selectedResul) || v.loadingCreandoCaso}"/>
+                            <aura:set attribute="else">
+                                <lightning:button aura:id="modalCerrarBotonIniciar" label="Cerrar caso" variant="brand" onclick="{!c.cerrarCaso}" iconName="utility:close" disabled="{!empty(v.selectedResul) || v.loadingCreandoCaso}"/>
+                            </aura:set>
+                    </aura:if>
+                    <lightning:button label="Cancelar" onclick="{!c.modalCerrarCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalCerrarAuditoria" name="modalCerrarAuditoria" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCerrarAuditoriaCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Cerrar caso</h2>
+                    <p class="slds-var-m-top_x-small">Finalizar la gestión del caso.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <h2 align="center">El caso es de tipo Auditoría y no tiene ningún registro de auditoría, ¿continuar con el cierre? </h2>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalCerrarAuditoriaBotonIniciar" label="Cerrar caso" variant="brand" iconName="utility:close" onclick="{!c.cerrarSRAuditoria}"/>
+                    <lightning:button aura:id="modalCerrarAuditoriaBotonCancelar" label="Cancelar" onclick="{!c.modalCerrarAuditoriaCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalRechazar" name="modalRechazar" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalRechazarCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Rechazar caso</h2>
+                    <p class="slds-var-m-top_x-small">Rechazar la gestión del caso.</p>
+                </header>
+                <div align='center' class="slds-modal__content slds-var-p-around_xx-large">
+                    <h2>El caso se rechazará, ¿está seguro?</h2>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalRechazarBotonIniciar" label="Rechazar caso" variant="destructive-text" iconName="utility:error" onclick="{!c.rechazarSR}"/>
+                    <lightning:button aura:id="modalRechazarBotonCancelar" label="Cancelar" onclick="{!c.modalRechazarCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalDevolver" name="modalDevolver" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalDevolverCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Devolver caso</h2>
+                    <p class="slds-var-m-top_x-small">Devolver caso.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas Tipificadas" label="Notas tipificadas" value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}" placeholder="Buscar notas tipificadas..."/>
+                    <br/>
+                    <lightning:textarea label="Escribe el motivo por el que devuelves el caso" type="text" aura:id="observacionId" placeholder="Observaciones..."/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalDevolverBotonIniciar" label="Devolver" variant="brand" iconName="utility:reply" onclick="{!c.asignarSegBO}"/>
+                    <lightning:button aura:id="modalDevolverBotonCancelar" label="Cancelar" onclick="{!c.modalDevolverCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalDevolverGrupo" name="modalDevolverGrupo" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalDevolverGrupoCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Devolver a grupo anterior</h2>
+                    <p class="slds-var-m-top_x-small">Devolver a grupo anterior.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}"/>
+                    <br/>
+                    <lightning:textarea label="Escribe el motivo por el que quieres devolver al grupo anterior" type="text" aura:id="observacion" placeholder="Observaciones..."/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalDevolverGrupoBotonIniciar" label="Devolver a grupo anterior" variant="brand" iconName="utility:reply" onclick="{!c.asignarGrupoAnterior}"/>
+                    <lightning:button aura:id="modalDevolverGrupoBotonCancelar" label="Cancelar" onclick="{!c.modalDevolverGrupoCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalAsignarGrupo" name="modalAsignarGrupo" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAsignarGrupoCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Asignar grupo</h2>
+                    <p class="slds-var-m-top_x-small">Asignar grupo.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <div class="slds-combobox_container slds-combobox-addon_end">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input
+                                    aura:id="gpName" label="Grupo"
+                                    type="search"
+                                    placeholder="Buscar grupos..."
+                                    onchange="{!c.busquedaGrupos}"
+                                    onfocus="{!c.inputBuscarGruposFocus}"
+                                    onblur="{!c.inputBuscarGruposBlur}"/>
+                            </div>
+                            <aura:if isTrue="{!v.mostrarGrupos}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="width: 100%; max-width: initial;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.groups}" var="gr">
+                                            <li role="presentation" class="slds-listbox__item">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" id="{!gr.value}" name="{!gr.label}" onclick="{!c.seleccionarGrupo}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="custom:custom15" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity">{!gr.label}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <br/>
+                    <lightning:combobox aura:id="notasTipificadas" name="Notas Tipificadas" label="Notas tipificadas" placeholder="Buscar notas tipificadas..." value="{!v.selectedNotasTip}" options="{!v.notasTipificadas}"/>
+                    <br/>
+                    <lightning:textarea label="Escribe el motivo por el que asignas el grupo" type="text" aura:id="idObservacion" placeholder="Observaciones..."/>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalAsignarGrupoBotonIniciar" label="Asignar grupo" variant="brand" iconName="action:edit_groups" onclick="{!c.asignarGrupoColaborador}" disabled="{!or(empty(v.groupName),v.loadingCreandoCaso)}"/>
+                    <lightning:button aura:id="modalAsignarGrupoBotonCancelar" label="Cancelar" onclick="{!c.modalAsignarGrupoCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalCrearVinculados" name="modalCrearVinculados" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCrearVinculadosCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Crear caso vinculado</h2>
+                    <p class="slds-var-m-top_x-small">Crear caso vinculado.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative">
+                    <aura:if isTrue="{!v.loadingCreandoCaso}">
+                        <div class="slds-spinner_container">
+                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                <span class="slds-assistive-text">Creando caso vinculado...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                    <!-- Incrustar componente para buscar la clasificación rápida -->
+                    <c:SEG_BuscadorCR recordId="{#v.recordId}" crId="{!v.selectedCR}" integratedMode="true"/>
+                    <br/>
+                    <span class="slds-form-element__label">Ficheros del caso</span>
+                    <br/>
+                    <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height:10rem">
+                        <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalCrearVinculadosBotonIniciar" label="Crear caso vinculado" variant="brand" iconName="action:new_child_case" onclick="{!c.crearCasosHijos}"  disabled="{!v.loadingCreandoCaso}"/>
+                    <lightning:button aura:id="modalCrearVinculadosBotonCancelar" label="Cancelar" onclick="{!c.modalCrearVinculadosCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalCrearCaso" name="modalCrearCaso" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-modal_small" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCrearCasoCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Crear caso desde mail</h2>
+                    <p class="slds-var-m-top_x-small">Crear caso a partir de correo electrónico.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative" style="padding-top: 15px;">
+                    <aura:if isTrue="{!v.loadingCreandoCaso}">
+                        <div class="slds-spinner_container">
+                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                <span class="slds-assistive-text">Creando caso...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!empty(v.casoCreadoId)}">
+                        <lightning:combobox aura:id="Emailcaso" name="Emails" label="Email" placeholder="Seleccionar email..." value="{!v.selectedEmailSR}" options="{!v.Emailcaso}"/>
+                        <br/>
+                        <span class="slds-form-element__label">Ficheros del caso</span>
+
+                        <br/>
+                        <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height:13rem">
+                            <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                        </div>
+                        <aura:set attribute="else">
+                            <br/>
+                            Número de caso: {!v.casoCreadoCN}
+                            <br/><br/>
+                            Clasificación rápida del caso: {!v.casoCreadoCR}
+                            <br/><br/>
+                            Asignado al grupo: {!v.casoCreadoGrupo}
+                            <br/><br/><br/>
+                            <lightning:textarea label="Escribe el motivo por el que realizas la autoasignación" type="text" aura:id="idObservacionAutoasginacionHijo" placeholder="Observaciones..."/>
+                            <br/>
+                            <lightning:button aura:id="modalCrearCasoBotonAutoasignarHijo" label="Autoasignar" iconName="utility:groups" onclick="{!c.autoasignarCasoHijo}"/>
+                            <lightning:button label="Ver caso" iconName="utility:case" onclick="{!c.modalCrearCasoVerCaso}"/>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalCrearCasoBotonIniciar" label="Crear caso desde mail" variant="brand" onclick="{!c.crearCasosEmailReciclado}" iconName="utility:case" disabled="{!v.loadingCreandoCaso || !empty(v.casoCreadoId) || !v.selectedEmailSR}"/>
+                    <lightning:button aura:id="modalCrearCasoBotonCancelar" onclick="{!c.modalCrearCasoCerrar}">{!empty(v.casoCreadoId) ? 'Cancelar' : 'Cerrar'}</lightning:button>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalCrearContratos" name="modalCrearContratos" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCrearContratosCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Crear caso y contratos</h2>
+                    <p class="slds-var-m-top_x-small">Crear caso de seguimiento con contratos.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large slds-is-relative">
+                    <aura:if isTrue="{!v.loadingCreandoCaso}">
+                        <div class="slds-spinner_container">
+                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                <span class="slds-assistive-text">Creando contratos...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </aura:if>
+                    <lightning:combobox aura:id="CRs" label="Clasificación rápida" placeholder="Seleccionar clasificación rápida..." value="{!v.selectedCR}" options="{!v.CRs}" required="true" />
+                    <br/>
+                    <lightning:input required="true" type="number" name="input1" value="{!v.numeroContratos}" label="Número de contratos" min="1" step="1" onchange="{!c.inputNombresContratosChange}"
+                    />
+                    <br/>
+                    <lightning:input aura:id="inputNombresContratos" name="inputNombresContratos" value="{!v.nombresContratos}" label="Nombres de los contratos separados por comas (',')" onchange="{!c.inputNombresContratosChange}" disabled="{!empty(v.numeroContratos)}"/>
+                    <br/>
+                    <aura:if isTrue="{!v.fatalCrearContratos}">
+                        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" style="border-radius: 4px;">
+                            <h2 style="color: white;">Has indicado más nombres de contrato que números de contratros a crear.</h2>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.warningCrearContratos}">
+                        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert" style="border-radius: 4px;">
+                            <h2 style="color: white;">No has indicado nombres de contrato para todos los contratos que se van a crear.</h2>
+                        </div>
+                    </aura:if>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalCrearContratosBotonIniciar" label="Crear caso y contratos" variant="brand" iconName="utility:edit_form" onclick="{!c.crearContratosVinculados}" />
+                    <lightning:button aura:id="modalCrearContratosBotonCancelar" label="Cancelar" onclick="{!c.modalCrearContratosCerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalImportarArchivos" name="modalImportarArchivos" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalImportarArchivosCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Importar</h2>
+                    <p class="slds-var-m-top_x-small">Importar emails y adjuntos de un caso.</p>
+                    <br/>
+                    <lightning:progressIndicator currentStep="1" type="base" variant="base">
+                        <lightning:progressStep label="Seleccionar caso" value="1"></lightning:progressStep>
+                        <lightning:progressStep label="Seleccionar correo y adjuntos" value="2"></lightning:progressStep>
+                        <lightning:progressStep label="Fin" value="3"></lightning:progressStep>
+                    </lightning:progressIndicator>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <div class="slds-combobox_container slds-combobox-addon_end">
+                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                <lightning:input
+                                    aura:id="casNum" label="Caso"
+                                    type="search"
+                                    placeholder="Introduzca un mínimo de 3 caracteres para iniciar la búsqueda..."
+                                    onchange="{!c.getCases}"
+                                    onfocus="{!c.inputBuscarCasosFocus}"
+                                    onblur="{!c.inputBuscarCasosBlur}"/>
+                            </div>
+                            <aura:if isTrue="{!v.mostrarCases}">
+                                <div class="slds-dropdown slds-dropdown_length-10" role="listbox" style="width: 100%; max-width: initial;">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <aura:iteration items="{!v.cases}" var="caso">
+                                            <li role="presentation" class="slds-listbox__item">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option" id="{!caso.id}" name="{!caso.caseNumber}" onclick="{!c.seleccionarCaso}">
+                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                        <lightning:icon iconName="standard:case" size="small"/>
+                                                    </span>
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-listbox__option-text_entity" style="font-weight: bold;">{!caso.caseNumber}</span>
+                                                        <span class="slds-listbox__option-meta" title="{!caso.subject}">{!caso.subject}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <div class="slds-text-body_small slds-text-color_weak" style="padding-left: 10px; padding-top: 14px;">
+                        {!empty(v.selectedCaseNumber) ? 'Ningún caso seleccionado.' : 'Caso seleccionado: ' + v.selectedCaseNumber + '.'}
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalImportarArchivosBotonCancelar" label="Cancelar" onclick="{!c.modalImportarArchivosCerrar}"/>
+                    <lightning:button label="Siguiente" variant="brand-outline" iconName="utility:forward" onclick="{!c.modalImportarArchivos2Abrir}" disabled="{!empty(v.selectedCaseId)}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalImportarArchivos2" name="modalImportarArchivos2" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalImportarArchivos2Cerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Importar</h2>
+                    <p class="slds-var-m-top_x-small">Importar emails y adjuntos de un caso.</p>
+                    <br/>
+                    <lightning:progressIndicator currentStep="2" type="base" variant="base">
+                        <lightning:progressStep label="Seleccionar caso" value="1"></lightning:progressStep>
+                        <lightning:progressStep label="Seleccionar correo y archivos" value="2"></lightning:progressStep>
+                        <lightning:progressStep label="Fin" value="3"></lightning:progressStep>
+                    </lightning:progressIndicator>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <lightning:combobox aura:id="Emailcaso" name="Emails" label="Email del caso" placeholder="Seleccionar email del caso..." value="{!v.selectedEmailSR}" options="{!v.Emailcaso}"/>
+                    <br/>
+                    <span class="slds-form-element__label">Ficheros del caso</span>
+                    <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height:10rem">
+                        <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button label="Atrás" iconName="utility:back" onclick="{!c.modalImportarArchivos2Atras}"/>
+                    <lightning:button aura:id="modalImportarArchivos2BotonSiguiente" label="Siguiente" variant="brand-outline" iconName="utility:forward" onclick="{!c.importarFicheros}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalImportarArchivos3" name="modalImportarArchivos3" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalImportarArchivos3Cerrar}" alternativeText="Atrás" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Importar</h2>
+                    <p class="slds-var-m-top_x-small">Importar emails y adjuntos de un caso.</p>
+                    <br/>
+                    <lightning:progressIndicator currentStep="3" type="base" variant="base">
+                        <lightning:progressStep label="Seleccionar caso" value="1"></lightning:progressStep>
+                        <lightning:progressStep label="Seleccionar correo y archivos" value="2"></lightning:progressStep>
+                        <lightning:progressStep label="Fin" value="3"></lightning:progressStep>
+                    </lightning:progressIndicator>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <div>
+                                <lightning:icon aura:id="modalImportarArchivos3Ok" iconName="utility:success" size="large" variant="success"/>
+                            </div>
+                            <div class="slds-text-heading_small slds-truncate" style="padding-top: 8px;">
+                                Archivos importados correctamente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalImportarArchivos3BotonCancelar" label="Cerrar" onclick="{!c.modalImportarArchivos3Cerrar}"/>
+                </footer>
+            </div>
+        </section>
+
+        <section aura:id="modalCanalBpo" name="modalCanalBpo" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalCanalBpoCerrar}" alternativeText="Atrás" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Enviar a Canal BPO</h2>
+                    <p class="slds-var-m-top_x-small">Se creará el caso en la aplicación externa Canal BPO.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <!--Mantener el estado del caso como activo-->
+                    <div class="slds-grid slds-gutters_direct-xxx-small slds-grid_vertical-align-center">
+                        <div class="slds-col slds-grow-none">
+                            <label class="slds-form-element__label">¿Mantener caso Activo? </label>
+                        </div>
+                        <div class="slds-col">
+                            <lightning:input type="toggle" name="checkStatusCase" onchange="{!c.togglecheckStatusCaseChange}" messageToggleActive="" messageToggleInactive="" variant="label-hidden" />
+                        </div>
+                    </div>
+                    <br/>
+                    <lightning:input aura:id="inputNifsrelaciones" name="inputNifsrelaciones" value="{!v.notasCIF}" label="Añade los NIF, la relación y todos los NIFs separados por comas (',')" onchange="{!c.inputNifRelacionChange}"/>
+                    <br/>
+                    <span class="slds-form-element__label">Ficheros del caso a enviar a canal BPO</span>
+                    <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height: 10rem; border-radius: 4px;">
+                        <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="modalCanalBpoBotonIniciar" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarCanalBpo}"/>
+                    <lightning:button aura:id="modalCanalBpoBotonCancelar" label="Cancelar" onclick="{!c.modalCanalBpoCerrar}"/>
+                </footer>
+            </div>
+        </section>
+        <!-- Modal AOR (Eric) -->
+        <section aura:id="modalAOR" name="modalAOR" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAORCerrar}" alternativeText="Atrás" variant="border-filled" class="slds-modal__close"/>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">Enviar a Asesoría Jurídica</h2>
+                    <p class="slds-var-m-top_x-small">Se creará el caso en la aplicación externa de Asesoría Jurídica.</p>
+                </header>
+                <div class="slds-modal__content slds-var-p-around_xx-large">
+                    <!-- ampos seleccionables de tipología -->
+                    <aura:if isTrue ="{!!v.caso.SEG_Identificador_AOR__c}">
+                        <div class="slds-var-m-top_x-small">
+                            <lightning:select aura:id="tipologiaN1" name="tipologiaN1" label="Tipología N1" value="{!v.selectedValueN1}" onchange="{!c.parentFieldChange}" required="true">
+                                <aura:iteration items="{!v.parentListAOR}" var="valueParent">
+                                <option value="{!valueParent}">{!valueParent}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning:select aura:id="tipologiaN2" name="tipologiaN2" label="Tipología N2" value="{!v.selectedValueN2}" disabled="{!v.disabledChildFieldAOR}" required="true">
+                                <aura:iteration items="{!v.childListAOR}" var="valueChild">
+                                    <option value="{!valueChild}">{!valueChild}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <!--  Campo "Consulta AOR" -->
+                        <div class="slds-var-m-top_x-small">
+                            <lightning:textarea aura:id="consultaAOR" name="consultaAOR" type="text" label="Consulta" placeholder="Escribe el motivo de tu consulta..."  value="{!v.consultPeticionAOR}"/>
+                        </div>
+                        <!-- Adjuntar ficheros -->
+                        <span class="slds-var-m-top_x-small slds-form-element__label">Ficheros del caso a enviar</span>
+                        <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height: 10rem; border-radius: 4px;">
+                            <lightning:datatable aura:id='tablaanexosAOR' columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-var-m-top_x-small">
+                                <lightning:input label="Tipología N1" value="{!v.fullRecord.fields.SEG_AORTipologiaN1__c.displayValue}" disabled = 'true'></lightning:input>
+                            </div>
+                            <div class="slds-var-m-top_x-small">
+                                <lightning:input label="Tipología N2" value="{!v.fullRecord.fields.SEG_AORTipologia_N2__c.displayValue}" disabled = 'true'></lightning:input>
+                            </div>
+                            <div class="slds-var-m-top_x-small">
+                                <lightning:textarea label="Consulta" value="{!v.caso.SEG_Consulta_AOR__c}" disabled = 'true'></lightning:textarea>
+                            </div>
+
+                            <div class="slds-var-m-top_x-small">
+                                <lightning:textarea aura:id="comentarioAOR" name="comentarioAOR" type="text" label="Comentario" placeholder="Escribe el comentario" value="{!v.comentarioAOR}"/>
+                            </div>
+                            <!-- Adjuntar ficheros -->
+                            <span class="slds-var-m-top_x-small slds-form-element__label">Ficheros del caso a enviar</span>
+                            <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height: 10rem; border-radius: 4px;">
+                                <lightning:datatable aura:id='tablaanexosAOR' columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <footer class="slds-modal__footer">
+                    <aura:if isTrue="{!v.caso.SEG_Identificador_AOR__c}">
+                        <lightning:button aura:id="modalAORBotonIniciarRitm" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}"/>
+                        <lightning:button aura:id="modalAORBotonCancelarRitm" label="Cancelar" onclick="{!c.modalAORCerrar}"/>
+                        <aura:set attribute="else">
+                            <lightning:button aura:id="modalAORBotonIniciar" label="Enviar" variant="brand" iconName="utility:anywhere_alert" onclick="{!c.enviarAOR}" disabled="{!!(v.selectedValueN1 &amp;&amp; v.selectedValueN2)}"/>
+                            <lightning:button aura:id="modalAORBotonCancelar" label="Cancelar" onclick="{!c.modalAORCerrar}"/>
+                        </aura:set>
+                    </aura:if>
+                </footer>
+           </div>
+        </section>
+        <!--  Fin botón AOR -->
+        <!-- No quitar el isTrue. Accordion renderiza mal con slds-fade-in-open -->
+        <aura:if isTrue="{!v.datosAdicionalesValija}">
+            <section aura:id="modalValija" name="modalValija" role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" onkeydown="{!c.modalTeclaPulsada}">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.modalAutoasignarValijaCerrar}" alternativeText="Cerrar" variant="border-filled" class="slds-modal__close"/>
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Autoasignar a Valija</h2>
+                        <p class="slds-var-m-top_x-small">Asignación automática a grupo.</p>
+                    </header>
+                    <div class="slds-modal__content slds-var-p-around_xx-large">
+                        <aura:if isTrue="{!v.loadingDatosAdicionales}">
+                        <div class="slds-spinner_container">
+                                <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                    <span class="slds-assistive-text">Cargando datos...</span>
+                                    <div class="slds-spinner__dot-a"></div>
+                                    <div class="slds-spinner__dot-b"></div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        <h2 class="slds-text-heading_medium slds-hyphenate">Información adicional para Valija...</h2>
+                        <br/>
+                        <lightning:accordion>
+                            <lightning:accordionSection name="notasSection" label="Notas manuales traspaso">
+                                <div class="slds-modal__content slds-var-p-around_xx-large">
+                                    <lightning:textarea label="Escribe el motivo por el que realizas la autoasignación" type="text" aura:id="idObservacionValija" placeholder="Observaciones..." value="{!v.notasManuales}"
+                                    onchange="{!c.actualizarEnviarNotificacionCaracteresRestantes}"/>
+                                    <!--Indicador de caracteres restantes-->
+                                    <div aura:id="divEnviarNotificacionCaracteresRestantes" class="slds-float_right">
+                                        <lightning:formattedNumber label="Caracteres restantes" value="{!v.enviarNotificacionCaracteresRestantes}"/> caracteres restantes.
+                                    </div>
+                                </div>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection name="impuestosSection" label="Datos de impuestos">
+                                <lightning:recordEditForm aura:id="formImpuestos" recordId="{!v.caseIdValija}" objectApiName="Case" onload="{!c.finCargaDatosImpuestos}" onsuccess="{!c.datosImpuestosActualizados}" onerror="{!c.errorDatosImpuestos}" onsubmit="{!c.inicioGuardadoDatosImpuestos}">
+                                    <!--<lightning:messages />-->
+                                    <lightning:inputField fieldName="SEG_ComunidadAutonoma__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <lightning:inputField fieldName="SEG_TipoCargo__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <lightning:inputField fieldName="SEG_FechaCargo__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <lightning:inputField fieldName="SEG_CIFOrdenanteValija__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <lightning:inputField fieldName="SEG_PagoAgrupado__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <lightning:inputField aura:id="caseOperations" fieldName="SEG_N_operaciones_del_caso__c" onchange="{!c.marcarDatosImpuestos}" />
+                                    <div class="slds-clearfix">
+                                        <div class="slds-float_right">
+                                            <lightning:button aura:id="botonGuardarDatosImpuestos" class="slds-var-m-top_small" variant="brand" type="submit" name="update" label="Actualizar caso" />
+                                        </div>
+                                    </div>
+                                </lightning:recordEditForm>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection name="ficherosSection" label="Selección de ficheros">
+                                <span class="slds-form-element__label">Ficheros del caso</span>
+                                <div class="slds-scrollable_y slds-border_bottom slds-border_left slds-border_right slds-border_top" style="height:10rem">
+                                    <lightning:datatable columns="{!v.columnasAnexos}" data="{!v.dataAnexos}" keyField="ContentDocumentId" selectedRows="{!v.currentSelectedRowsAnexos}" onrowselection="{!c.selectedRowsAnexos}"/>
+                                </div>
+                            </lightning:accordionSection>
+                        </lightning:accordion>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button aura:id="modalAutoasignarBotonValija" label="Autoasignar" variant="brand" iconName="utility:groups" onclick="{!c.autoasignarValija}" />
+                        <lightning:button aura:id="modalAutoasignarBotonValijaCancelar" label="Cancelar" onclick="{!c.modalAutoasignarValijaCerrar}"/>
+                    </footer>
+                </div>
+            </section>
+        </aura:if>
+    </aura:if>
+    <aura:if isTrue="{!v.spinner}">
+        <lightning:spinner class="spins" size="large" variant="brand" alternativeText="Cargando..." />
+    </aura:if>
+
+</aura:component>

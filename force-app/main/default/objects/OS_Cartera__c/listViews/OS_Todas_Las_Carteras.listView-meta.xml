@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Todas_Las_Carteras</fullName>
+    <columns>NAME</columns>
+    <columns>OS_Cola_Telefonia__c</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <label>Todas las carteras</label>
+</ListView>

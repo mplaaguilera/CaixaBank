@@ -1,0 +1,45 @@
+<template>
+    <lightning-card  variant="Narrow"  title="Comentarios supervisor" icon-name="standard:list_email" size="xx-small">
+        <div class="slds-grid slds-gutters myclass">
+            <div class="slds-col slds-size_2-of-3">
+                Aquí puede encontrar todas las notas.               
+            </div>
+            <template if:true={mostrarComprobar}>
+                <div class="slds-col slds-size_1-of-3 ">
+                    <div class="slds-float_right">
+                        <lightning-button variant="brand"
+                            label="Mostrar"
+                            title="Mostrar notas."
+                            onclick={comprobarClick}
+                            class="slds-m-left_x-small">
+                            </lightning-button>
+                    </div>                
+                </div>  
+            </template>
+            <template if:true={mostrarOcultar}>
+                <div class="slds-col slds-size_1-of-3 ">
+                    <div class="slds-float_right">
+                        <lightning-button variant="brand"
+                            label="Ocultar"
+                            title="Ocultar resultados"
+                            onclick={ocultarClick}
+                            class="slds-m-left_x-small">
+                            </lightning-button>
+                    </div>                
+                </div>  
+            </template>         
+        </div>           
+        <div class="myclass">
+            <template if:true={mostrarMensaje}>
+                <div class="slds-col slds-size_3-of-3 myclass sinResultadosClass">
+                    {mensaje}
+                </div>                
+            </template>
+            <template if:true={mostrarComentarios}>     
+                <lightning-input-rich-text value={comentarios} disabled="true">
+                </lightning-input-rich-text>
+            </template>
+        </div>
+           
+    </lightning-card>
+</template>

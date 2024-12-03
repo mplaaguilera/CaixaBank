@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_AuditoriasReplicadasMisGrupos</fullName>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_NombreAuditoria__c</columns>
+    <columns>SAC_SLACalidad__c</columns>
+    <columns>SAC_DictamenManual__c</columns>
+    <columns>SAC_Replica__c</columns>
+    <columns>SAC_Estado__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>SEG_Auditoria__c.SAC_Auditoria</value>
+    </filters>
+    <filters>
+        <field>SAC_EsMiGrupo__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>SAC_Estado__c</field>
+        <operation>equals</operation>
+        <value>SAC_Revisada</value>
+    </filters>
+    <label>SAC- Auditorías replicadas (mis grupos)</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

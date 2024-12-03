@@ -1,0 +1,108 @@
+<template>
+    <lightning-card icon-name="standard:event">
+        <div if:true={hasPermission}>
+            <lightning-button-icon if:false={editMode} class="slds-float_right slds-m-right_small slds-m-top_x-small" icon-name="utility:edit" size="medium" variant="bare" alternative-text="Edit" onclick={handleEnableEdit}></lightning-button-icon>											
+        </div>
+        <div slot="title">
+            <strong>
+                <h2>{title}</h2>
+            </strong>
+        </div>
+
+        <template if:false={editMode}>
+            <div class="slds-p-horizontal_small slds-border_top">
+                <div class=" slds-m-top_x-small">
+                    <header class="slds-post__header slds-media">
+                        <div class="slds-media__body">
+                            <ul class="slds-has-block-links">
+                                <li class="slds-item">
+                                    <lightning-icon class="slds-m-right_x-small"  icon-name="utility:user" size="x-small"></lightning-icon>
+                                    {labels.organizador}
+                                    <ul class="slds-list_horizontal slds-has-inline-block-links">
+                                        <li class=" slds-m-vertical_xx-small">
+                                            <template for:each={owner} for:item="o">
+                                                <lightning-formatted-url style=" margin-right: 10px"  key={o.id} value={o.contactId} label={o.name} tooltip={o.name} target="_self"></lightning-formatted-url>
+                                            </template>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="slds-item">
+                                    <lightning-icon class="slds-m-right_x-small" icon-name="utility:success" size="x-small" variant="success"></lightning-icon>
+                                    {aceptado}
+                                    <ul class="slds-list_horizontal slds-has-inline-block-links">
+                                        <li class=" slds-m-vertical_xx-small">
+                                            <template for:each={accepted} for:item="a">
+                                                <lightning-formatted-url key={a.id} value={a.contactId} label={a.name} tooltip={a.name} target="_self"></lightning-formatted-url>
+                                            </template>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="slds-item">
+                                    <lightning-icon class="slds-m-right_x-small" icon-name="utility:clear"   size="x-small" variant="error"></lightning-icon>
+                                    {declinado}
+                                    <ul class="slds-list_horizontal slds-has-inline-block-links">
+                                        <li class=" slds-m-vertical_xx-small">
+                                            <template for:each={declined} for:item="d">
+                                                <lightning-formatted-url style=" margin-right: 10px"  key={d.id} value={d.contactId} label={d.name} tooltip={d.name} target="_self"></lightning-formatted-url>
+                                            </template>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="slds-item">
+                                    <lightning-icon class="slds-m-right_x-small" icon-name="utility:clock"   size="x-small"></lightning-icon>
+                                    {pendiente}
+                                    <ul class="slds-list_horizontal slds-has-inline-block-links">
+                                        <li class=" slds-m-vertical_xx-small">
+                                            <template for:each={undecided} for:item="u">
+                                                <lightning-formatted-url style=" margin-right: 10px"  key={u.id} value={u.contactId} label={u.name} tooltip={u.name} target="_self"></lightning-formatted-url>
+                                            </template>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </header>
+                </div>
+            </div>    
+        </template>
+        <template if:true={editMode}>
+            <div class="slds-p-horizontal_small">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_11-of-12">
+                        <c-av_-lookup
+                            data-id="clookup1"
+                            selection={initialSelection}
+                            errors={errors}
+                            required={required}
+                            placeholder={placeholder}
+                            onsearch={handleSearch}
+                            onselectionchange={handleSelectionChange}>
+                        </c-av_-lookup>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12">
+                        <lightning-button-icon class="slds-float_right" icon-name="utility:close" size="medium" variant="bare" alternative-text="Edit" onclick={handleDisableEdit}></lightning-button-icon>
+                    </div>
+                    <div class="slds-col slds-size_12-of-12">
+                        <div class="slds-pill_container slds-wrap slds-m-top_small">
+                            <template for:each={attendees} for:item="attendee">
+                                <span key={attendee.id} class="slds-pill slds-pill_link">
+                                    <span class="slds-pill__icon_container">
+                                        <lightning-icon icon-name="standard:account" alternative-text="Account"></lightning-icon>
+                                    </span>
+                                    <div class="slds-pill__action">
+                                        <span class="slds-pill__label">{attendee.name}</span>
+                                    </div>
+                                    <lightning-button-icon if:false={attendee.isOwner} class="slds-pill__remove" icon-name="utility:close" size="x-small" variant="bare" data-id={attendee.id} onclick={handleRemove}></lightning-button-icon>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <lightning-spinner if:true={loading} alternative-text="Loading" size="x-small"></lightning-spinner>
+            </div>
+        </template>
+    </lightning-card>
+</template>

@@ -1,0 +1,60 @@
+<aura:component controller="SAC_Asignacion_Plantillas"
+    implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId"
+    access="global">
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]" />
+    <aura:attribute name="readonly" type="Boolean" default="true" />
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <article class="slds-card">
+        <div class="c-container">
+            <lightning:layout>
+                <lightning:layoutItem flexibility="auto" padding="around-small">
+                    <lightning:tabset>
+                        <lightning:tab label="Vinculación de plantillas">
+
+                            <lightning:combobox aura:id="PlantillaConsultaName" name="plantilla"
+                                label="Plantilla derivación consulta" placeholder="-Selecciona una plantilla-" value=""
+                                required="false" dropdownAlignment="right" variant="estandar" onchange="{!c.update}"
+                                options="{!v.opcionesPlantilla}" disabled="{!v.readonly}" />
+                            
+                            <lightning:combobox aura:id="PlantillaReclamacionName" name="plantilla"
+                                label="Plantilla derivación reclamación" placeholder="-Selecciona una plantilla-"
+                                value="" required="false" dropdownAlignment="right" variant="estandar"
+                                onchange="{!c.update}" options="{!v.opcionesPlantilla}" disabled="{!v.readonly}" />
+
+                            <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}"
+                                objectApiName="CC_Grupo_Colaborador__c" onload="{!c.recordLoaded}">
+                                <lightning:inputField fieldName="SAC_PlantillaConsultaId__c"
+                                    aura:id="PlantillaConsultaId" class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_PlantillaReclamacionId__c"
+                                    aura:id="PlantillaReclamacionId" class="slds-hide" />
+                                <lightning:inputField fieldName="SAC_PlantillaReclamanteId__c"
+                                    aura:id="PlantillaReclamanteId" class="slds-hide" />
+
+                                <aura:if isTrue="{!v.readonly}">
+                                    <lightning:outputField fieldName="SAC_PlantillaReclamante__c" />
+                                    <aura:set attribute="else">
+                                        <lightning:inputField fieldName="SAC_PlantillaReclamante__c" />
+                                    </aura:set>
+                                </aura:if>
+                            </lightning:recordEditForm>
+                            <br/>
+                            <aura:if isTrue="{!v.readonly}">
+                                <lightning:button label="Edit" iconName="utility:edit" iconPosition="left"
+                                    variant="brand" onclick="{!c.editar}" />
+                                <aura:set attribute="else">
+                                    <lightning:button label="Cancelar" iconName="utility:recycle_bin_empty"
+                                        iconPosition="left" onclick="{!c.noeditar}" />
+                                    <lightning:button label="Guardar" iconName="utility:save" iconPosition="left"
+                                        variant="brand" onclick="{!c.guardar}" />
+                                </aura:set>
+                            </aura:if>
+                        </lightning:tab>
+                    </lightning:tabset>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>
+    </article>
+
+</aura:component>

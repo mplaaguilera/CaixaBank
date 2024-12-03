@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Priority</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND ( Priority__c =0, TEXT(Tipo__c) =&apos;Periodico&apos;)</errorConditionFormula>
+    <errorDisplayField>Priority__c</errorDisplayField>
+    <errorMessage>Prioridad 0 solo permitido para ejecuciones no periódicas</errorMessage>
+</ValidationRule>

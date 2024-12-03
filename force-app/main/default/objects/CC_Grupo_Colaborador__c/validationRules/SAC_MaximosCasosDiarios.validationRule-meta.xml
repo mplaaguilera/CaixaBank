@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_MaximosCasosDiarios</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND($Profile.Name = &apos;SAC_General&apos;,RecordType.DeveloperName = &apos;SAC_GrupoProveedores&apos;,ISBLANK(SAC_MaximoCasosDiarios__c))</errorConditionFormula>
+    <errorDisplayField>SAC_MaximoCasosDiarios__c</errorDisplayField>
+    <errorMessage>Debes informar el número de máximos casos diarios para poder guardar el grupo</errorMessage>
+</ValidationRule>

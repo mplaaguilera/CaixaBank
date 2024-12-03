@@ -1,0 +1,10 @@
+<aura:component controller="AV_ActivateLeadOppController" implements="force:appHostable,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" description="Conversation toolkit api sample"> 
+    <aura:attribute name="recordId" type="String" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+<!--
+    <div>
+        <lightning:button label="Activar" onclick="{!c.activar}" disabled="{!v.isDesactived}"/>
+    </div> -->
+    
+</aura:component>

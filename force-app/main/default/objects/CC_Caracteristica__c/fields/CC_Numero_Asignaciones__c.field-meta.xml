@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Numero_Asignaciones__c</fullName>
+    <description>Número de asignaciones (cuentas o contactos) que tiene la característica.</description>
+    <label>Nº de asignaciones</label>
+    <summaryForeignKey>CC_Caracteristica_Detalle__c.CC_Caracteristica__c</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

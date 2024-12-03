@@ -1,0 +1,54 @@
+<template>
+    <div class="slds-page-header slds-page-header_related-list" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none;">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon class="iconoCabecera" icon-name="standard:call_history" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span lwc:if={telefono} class="slds-card__header-title slds-truncate">
+										<span class="slds-truncate">Otras llamadas a AC del</span>
+										<lightning-icon icon-name="utility:call" size="xx-small" class="slds-is-relative slds-var-m-left_small slds-var-m-right_xxx-small" style="top: 2px;"></lightning-icon>
+										{telefono}
+										<span class="slds-var-m-left_x-small">({datatableData.length})</span>
+									</span>
+                                    <span lwc:else class="slds-card__header-title slds-truncate">Otras llamadas a AC</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <article class="slds-card slds-scrollable_none" style="border-top-left-radius: 0; border-top-right-radius: 0;">
+        <div class="slds-card__body slds-card__body_inner slds-m-around_none slds-p-around_none">
+            <div lwc:if={spinner} align="center">
+				<lightning-spinner size="large" variant="brand" style="position: absolute;" alternative-text="Vinculando..."></lightning-spinner>
+			</div>
+			<!-- sldsValidatorIgnore -->
+			<div lwc:if={datatableData.length} class="datatableContainer">
+				<lightning-datatable
+					key-field="Id"
+					columns={datatableColumnas}
+					data={datatableData}
+					hide-checkbox-column
+					column-widths-mode="auto"
+					sorted-by="CreatedDate"
+					sorted-direction="Desc"
+					onrowaction={datatableOnrowaction}>
+				</lightning-datatable>
+			</div>
+			<div lwc:else style="padding: 8px 0 9px 0; font-size: 12px;">
+				<span class="slds-align_absolute-center slds-text-color_weak">No hay otras llamadas del mismo número.</span>
+			</div>
+        </div>
+    </article>
+
+
+</template>

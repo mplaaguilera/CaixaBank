@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_AdobeCampaign</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Identificador__c</columns>
+    <columns>CC_MensajeEntrada__c</columns>
+    <columns>CC_MensajeSalida__c</columns>
+    <columns>CC_FechaInicio__c</columns>
+    <columns>CC_FinOK__c</columns>
+    <columns>CC_FechaFin__c</columns>
+    <columns>CREATED_DATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Identificador__c</field>
+        <operation>equals</operation>
+        <value>CSBD_WS_ADOBE_CAMPAIGN</value>
+    </filters>
+    <label>Adobe Campaign</label>
+</ListView>

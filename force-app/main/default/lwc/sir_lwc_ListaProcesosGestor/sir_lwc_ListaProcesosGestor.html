@@ -1,0 +1,14 @@
+<template >   
+    <lightning-card icon-name="standard:procedure_detail" title={tituloTabla}>
+        <lightning-button label="Mis Clientes Soluciones" title="Mis Clientes Soluciones" onclick={goToCliente} slot="actions"></lightning-button>
+        
+        <div class="tablaAltura slds-scrollable">
+            <lightning-datatable
+                key-field="id"
+                data={procesos}
+                columns={columns}
+                hide-checkbox-column >
+            </lightning-datatable>
+        </div>
+    </lightning-card>  
+</template>

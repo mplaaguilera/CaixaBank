@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_DuracionOpcionalFormula__c</fullName>
+    <formula>OR(ISPICKVAL(EV_ProgramaDeEventos__c, &apos;009&apos;),ISPICKVAL(EV_ProgramaDeEventos__c, &apos;010&apos;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Duración Opcional</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

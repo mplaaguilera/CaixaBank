@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_GestorComercial__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Asignación de Gestor Comercial</description>
+    <label>Gestor Comercial</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>Contact.Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Centro CaixaBank, Cliente, Cliente (Segmentos)</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Filtros de Excepciones</relationshipLabel>
+    <relationshipName>Filtros_de_Excepciones</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

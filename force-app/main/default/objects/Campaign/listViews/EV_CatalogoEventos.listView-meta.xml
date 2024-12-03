@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_CatalogoEventos</fullName>
+    <columns>CAMPAIGN.NAME</columns>
+    <columns>EV_NombrePonente__c</columns>
+    <columns>CAMPAIGN.CAMPAIGN_TYPE</columns>
+    <columns>EV_ProgramaDeEventos__c</columns>
+    <columns>EV_FamiliaProducto__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CAMPAIGN.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Campaign.EV_CatalogoEventoFisico,Campaign.EV_CatalogoEventoVirtual</value>
+    </filters>
+    <label>Catálogo de eventos</label>
+    <sharedTo>
+        <portalRole>x0013Y00002uzFnjPartnerUser</portalRole>
+        <role>EV_Eventos</role>
+        <role>EV_Organizador</role>
+        <role>EV_Promotor</role>
+        <role>EV_Promotor_Externo</role>
+        <role>EV_Promotor_Interno</role>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TipoFastTrack__c</fullName>
+    <description>Campo picklist para elegir el tipo de fast track deseado</description>
+    <label>Tipo fast track</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_Completo</fullName>
+                <default>true</default>
+                <label>Completo</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

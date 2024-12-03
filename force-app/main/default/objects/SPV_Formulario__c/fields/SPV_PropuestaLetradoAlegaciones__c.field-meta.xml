@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_PropuestaLetradoAlegaciones__c</fullName>
+    <description>Campo picklist que indica la propuesta del letrado de alegaciones del formulario de la reclamación</description>
+    <label>Propuesta del letrado</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Alegación</fullName>
+                <default>false</default>
+                <label>Alegación</label>
+            </value>
+            <value>
+                <fullName>Inadmisión</fullName>
+                <default>false</default>
+                <label>Inadmisión</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

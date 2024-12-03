@@ -1,0 +1,39 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <lightning-card title={titulotabla} icon-name="custom:custom18">
+            <div slot="actions">
+                <div class="slds-float_right">              
+                    <lightning-button-icon
+                        icon-name="utility:refresh"
+                        title="Refrescar"
+                        onclick={handleRefreshClick}>
+                    </lightning-button-icon>
+                </div>
+            </div>
+            <div if:true={auditoriasAutomaticas}>
+                <lightning-datatable
+                        key-field="Id"
+                        data={mostrarAuditorias}
+                        columns={columnsAutomaticas}
+                        onrowaction={handleRowActionAuditoria}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortData}
+                        hide-checkbox-column="true">
+                </lightning-datatable>
+            </div>
+            <div if:false={auditoriasAutomaticas}>
+                <lightning-datatable
+                        key-field="Id"
+                        data={mostrarAuditorias}
+                        columns={columns}
+                        onrowaction={handleRowAction}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortData}
+                        hide-checkbox-column="true">
+                </lightning-datatable>
+            </div>
+    </lightning-card>
+    </div>
+</template>

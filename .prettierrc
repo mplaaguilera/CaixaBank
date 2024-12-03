@@ -1,0 +1,17 @@
+{
+  "trailingComma": "none",
+  "plugins": [
+    "prettier-plugin-apex",
+    "@prettier/plugin-xml"
+  ],
+  "overrides": [
+    {
+      "files": "**/classes/**/*.cls",
+      "options": {
+        "parser": "apex",
+        "tabWidth": 4,
+        "useTabs": true
+      }
+    }
+  ]
+}

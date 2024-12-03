@@ -1,0 +1,35 @@
+div.body {
+    min-height: 535px;
+    transition: opacity 80ms ease-out;
+}
+
+div.body.oculto {
+    opacity: 0;
+}
+
+div.container {
+    border: 1px solid rgb(201, 201, 201);
+    border-radius: 4px;
+    padding: 8px 8px 12px 8px;
+}
+
+div.datatableContainer {
+    position: relative;
+    border: var(--lwc-borderWidthThin, 1px) solid rgb(201, 201, 201);
+    border-radius: 4px;
+    background-color: #fafafa;
+    margin: 20px 4px 0px 4px;
+}
+
+div.datatableContainer > div {
+    height: 200px;
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+    --slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+:host {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}

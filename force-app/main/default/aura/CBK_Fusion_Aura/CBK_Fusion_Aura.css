@@ -1,0 +1,27 @@
+.THIS.backgroundbutton {
+    padding: 12px;
+}
+.THIS.uiButton.btn{
+   background-color: #8ebcf9;
+   color: #fff;
+   padding: 10px 20px;
+}
+.THIS.uiButton2.btn{
+    width: 90%;
+    max-width: 251px;
+    height: 56px;
+    border: 0;
+    box-shadow: 0 2px 4px 0 rgb(122 131 128 / 50%);
+    cursor: pointer;
+    transition: all .25s;
+    background-color: #8ebcf9;
+    border-radius: 4px;
+}
+.THIS.marcCertificats {
+    width: 286px;
+    height: 309px;
+    transform: rotate(-360deg);
+    border-radius: 8px;
+    border: solid 1px #8ebcf9;
+    padding: 15px;
+}

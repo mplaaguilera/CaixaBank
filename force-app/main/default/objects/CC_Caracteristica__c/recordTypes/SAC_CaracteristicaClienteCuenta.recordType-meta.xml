@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_CaracteristicaClienteCuenta</fullName>
+    <active>true</active>
+    <description>Record Type para la creación de características de clientes (cuenta) de SAC</description>
+    <label>Característica de Cliente (Cuenta) SAC</label>
+    <picklistValues>
+        <picklist>CC_Prioridad__c</picklist>
+        <values>
+            <fullName>1 - Alta</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>2 - Media</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>3 - Baja</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>HDT_Iconos_Caracteristicas__c</picklist>
+        <values>
+            <fullName>custom%3Acustom34</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>standard%3Acall</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>standard%3Acampaign</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>utility%3Aapex_plugin</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>OS_Negocio__c</picklist>
+        <values>
+            <fullName>CAM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CC</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>COPS</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSBD</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CSI_Bankia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>HDT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SACH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>SEGMENTOS</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

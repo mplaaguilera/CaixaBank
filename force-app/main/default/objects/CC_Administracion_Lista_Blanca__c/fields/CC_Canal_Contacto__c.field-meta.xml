@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Canal_Contacto__c</fullName>
+    <label>Canal de Contacto</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Chat</fullName>
+                <default>false</default>
+                <label>Chat</label>
+            </value>
+            <value>
+                <fullName>Chat App</fullName>
+                <default>false</default>
+                <label>Chat App</label>
+            </value>
+            <value>
+                <fullName>Chat web</fullName>
+                <default>false</default>
+                <label>Chat web</label>
+            </value>
+            <value>
+                <fullName>Comentarios Stores</fullName>
+                <default>false</default>
+                <label>Comentarios Stores</label>
+            </value>
+            <value>
+                <fullName>Twitter</fullName>
+                <default>false</default>
+                <label>Twitter</label>
+            </value>
+            <value>
+                <fullName>Email</fullName>
+                <default>false</default>
+                <label>Email</label>
+            </value>
+            <value>
+                <fullName>Carta</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta</label>
+            </value>
+            <value>
+                <fullName>Carta - Asociaciones de Consumo</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta - Asociaciones de Consumo</label>
+            </value>
+            <value>
+                <fullName>Carta - CCAA</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta - CCAA</label>
+            </value>
+            <value>
+                <fullName>Carta - Junta Andalucía</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta - Junta Andalucía</label>
+            </value>
+            <value>
+                <fullName>Carta - OMIC</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Carta - OMIC</label>
+            </value>
+            <value>
+                <fullName>Facebook</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Facebook</label>
+            </value>
+            <value>
+                <fullName>Formulario  Servicio Oficina</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Formulario  Servicio Oficina</label>
+            </value>
+            <value>
+                <fullName>Formulario web -  cliente</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Formulario web -  cliente</label>
+            </value>
+            <value>
+                <fullName>Instagram</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Instagram</label>
+            </value>
+            <value>
+                <fullName>Teléfono</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Teléfono</label>
+            </value>
+            <value>
+                <fullName>Web</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Web</label>
+            </value>
+            <value>
+                <fullName>Whatsapp</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Whatsapp</label>
+            </value>
+            <value>
+                <fullName>YouTube</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>YouTube</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

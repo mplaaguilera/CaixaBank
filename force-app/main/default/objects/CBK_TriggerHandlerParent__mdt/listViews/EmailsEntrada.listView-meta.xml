@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EmailsEntrada</fullName>
+    <columns>MasterLabel</columns>
+    <columns>DeveloperName</columns>
+    <columns>CBK_Email__c</columns>
+    <columns>CBKL_TriggerEvent__c</columns>
+    <columns>CBK_Type__c</columns>
+    <columns>CBK_HandlerClassName__c</columns>
+    <columns>CBK_Active__c</columns>
+    <columns>CBK_RecordType__c</columns>
+    <columns>CBK_ObjectAPIName__c</columns>
+    <columns>NamespacePrefix</columns>
+    <columns>IsProtected</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CBK_Type__c</field>
+        <operation>equals</operation>
+        <value>Entrada</value>
+    </filters>
+    <label>Emails de Entrada</label>
+    <language>en_US</language>
+</ListView>

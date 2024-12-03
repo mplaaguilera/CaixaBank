@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Feedback__c</fullName>
+    <label>Feedback</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OK</fullName>
+                <default>false</default>
+                <label>Respuesta satisfactoria</label>
+            </value>
+            <value>
+                <fullName>KO</fullName>
+                <default>false</default>
+                <label>Código obsoleto</label>
+            </value>
+            <value>
+                <fullName>ESC</fullName>
+                <default>false</default>
+                <label>Escalado a Click2Call</label>
+            </value>
+            <value>
+                <fullName>TO</fullName>
+                <default>false</default>
+                <label>Timeout</label>
+            </value>
+            <value>
+                <fullName>CTO</fullName>
+                <default>false</default>
+                <label>Timeout en Click2Call</label>
+            </value>
+            <value>
+                <fullName>C2C</fullName>
+                <default>false</default>
+                <label>El usuario selecciona un Click2Call</label>
+            </value>
+            <value>
+                <fullName>C2K</fullName>
+                <default>false</default>
+                <label>Click2Call a un teléfono erróneo</label>
+            </value>
+            <value>
+                <fullName>ERROR</fullName>
+                <default>false</default>
+                <label>Error al invocar la operación</label>
+            </value>
+            <value>
+                <fullName>QGO</fullName>
+                <default>false</default>
+                <label>La consulta se ha redirigido a QGO</label>
+            </value>
+            <value>
+                <fullName>CHE</fullName>
+                <default>false</default>
+                <label>Conversación de Chat acabada correctamente</label>
+            </value>
+            <value>
+                <fullName>CHL</fullName>
+                <default>false</default>
+                <label>Conversación de Chat acabada de forma inesperada</label>
+            </value>
+            <value>
+                <fullName>GFO</fullName>
+                <default>false</default>
+                <label>FAQ Guiada considerada útil por el usuario</label>
+            </value>
+            <value>
+                <fullName>DFO</fullName>
+                <default>false</default>
+                <label>Diálogo de Watson Assistant considerado útil por el usuario</label>
+            </value>
+            <value>
+                <fullName>GFN</fullName>
+                <default>false</default>
+                <label>FAQ Guiada considerada no útil por el usuario</label>
+            </value>
+            <value>
+                <fullName>DFN</fullName>
+                <default>false</default>
+                <label>Diálogo de Watson Assistant considerado no útil por el usuario</label>
+            </value>
+            <value>
+                <fullName>HAE</fullName>
+                <default>false</default>
+                <label>Hidden Agent termina la conversación. Código obsoleto</label>
+            </value>
+            <value>
+                <fullName>HANS</fullName>
+                <default>false</default>
+                <label>Hidden Agent termina la conversación. Respuesta no soportada</label>
+            </value>
+            <value>
+                <fullName>AGE</fullName>
+                <default>false</default>
+                <label>Chat Agent termina la conversación. Código obsoleto</label>
+            </value>
+            <value>
+                <fullName>AGNS</fullName>
+                <default>false</default>
+                <label>Chat Agent termina la conversación. Respuesta no soportada</label>
+            </value>
+            <value>
+                <fullName>CLS</fullName>
+                <default>false</default>
+                <label>El usuario ha cerrado la ventana sin finalizar la conversación</label>
+            </value>
+            <value>
+                <fullName>CLHA</fullName>
+                <default>false</default>
+                <label>El usuario ha cerrado la ventana cuando había una sesión con un Hidden Agent establecida</label>
+            </value>
+            <value>
+                <fullName>CLC</fullName>
+                <default>false</default>
+                <label>El usuario ha cerrado la ventana cuando había una sesión con un Chat Agent establecida</label>
+            </value>
+            <value>
+                <fullName>CRJ</fullName>
+                <default>false</default>
+                <label>El usuario rechaza contactar con un agente tras mostrarse la lista de escalado</label>
+            </value>
+            <value>
+                <fullName>HIS</fullName>
+                <default>false</default>
+                <label>El usuario ha seleccionado una FAQ o documento histórico</label>
+            </value>
+            <value>
+                <fullName>CN</fullName>
+                <default>false</default>
+                <label>El usuario ha cancelado la conversación actual para cambiar su consulta</label>
+            </value>
+            <value>
+                <fullName>EMC</fullName>
+                <default>false</default>
+                <label>El usuario selecciona el click to call de emergencia</label>
+            </value>
+            <value>
+                <fullName>EMK</fullName>
+                <default>false</default>
+                <label>Click to call de emergencia con error</label>
+            </value>
+            <value>
+                <fullName>ENE</fullName>
+                <default>false</default>
+                <label>Se termina la conversación al no haber opciones de escalado</label>
+            </value>
+            <value>
+                <fullName>HACAT</fullName>
+                <default>false</default>
+                <label>Hidden Agent contesta con una respuesta del catálogo</label>
+            </value>
+            <value>
+                <fullName>AGCAT</fullName>
+                <default>false</default>
+                <label>Chat Hidden Agent contesta con una respuesta del catálogo</label>
+            </value>
+            <value>
+                <fullName>CHI</fullName>
+                <default>false</default>
+                <label>Timeout por inactividad en la conversación con un Agent</label>
+            </value>
+            <value>
+                <fullName>STR</fullName>
+                <default>false</default>
+                <label>Usuario rechaza la reconexión con agente (STOP&amp;GO)</label>
+            </value>
+            <value>
+                <fullName>SGI</fullName>
+                <default>false</default>
+                <label>Timeout por inactividad al reconectar o rechazar la reconexión (STOP&amp;GO)</label>
+            </value>
+            <value>
+                <fullName>NODEF</fullName>
+                <default>false</default>
+                <label>Resultado dado por el batch cuando se añade una conversación que no ha llegado a tener CLOSESESION</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

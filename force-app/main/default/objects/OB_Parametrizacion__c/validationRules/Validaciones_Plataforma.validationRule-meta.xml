@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Plataforma</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Plataforma&apos;,
+   OR (
+      ISBLANK(OB_Codigo_Externo__c),
+      LEN(OB_Centro_Gestor__c) != 5,
+      NOT(BEGINS(OB_Usuario_Salesforce__r.EmployeeNumber, &apos;U01&apos;))
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

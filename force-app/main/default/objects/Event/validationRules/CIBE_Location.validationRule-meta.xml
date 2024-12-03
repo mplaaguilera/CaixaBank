@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Location</fullName>
+    <active>true</active>
+    <description>Comprueba si al modificar el campo Location el evento esta activo.</description>
+    <errorConditionFormula>AND(
+	$Profile.Name = &quot;CIBE_Gestor&quot;,
+	ISCHANGED(Location),
+	OR(
+		ISPICKVAL(CSBD_Evento_Estado__c , &apos;Cancelado&apos;),
+		ISPICKVAL(CSBD_Evento_Estado__c , &apos;Gestionada Positiva&apos;),
+		ISPICKVAL(CSBD_Evento_Estado__c , &apos;Completado&apos;)
+
+
+	),
+	OR(
+		RecordType.DeveloperName = &quot;CIBE_EventoCliente&quot;,
+		RecordType.DeveloperName = &quot;CIBE_EventodelGestor&quot;
+	)
+)</errorConditionFormula>
+    <errorMessage>El campo Ubicación no se puede modificar, el evento esta cerrado.</errorMessage>
+</ValidationRule>

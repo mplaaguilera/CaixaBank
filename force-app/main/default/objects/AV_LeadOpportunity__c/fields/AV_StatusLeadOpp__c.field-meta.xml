@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_StatusLeadOpp__c</fullName>
+    <label>Etapa</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Potencial</fullName>
+                <default>true</default>
+                <label>Potencial</label>
+            </value>
+            <value>
+                <fullName>En gestión/insistir</fullName>
+                <default>false</default>
+                <label>En gestión/insistir</label>
+            </value>
+            <value>
+                <fullName>Cerrada Positiva</fullName>
+                <default>false</default>
+                <label>Cerrada Positiva</label>
+            </value>
+            <value>
+                <fullName>Cerrada Negativa</fullName>
+                <default>false</default>
+                <label>Cerrada Negativa</label>
+            </value>
+            <value>
+                <fullName>Con venta</fullName>
+                <default>false</default>
+                <label>Con venta</label>
+            </value>
+            <value>
+                <fullName>No apto</fullName>
+                <default>false</default>
+                <label>No apto</label>
+            </value>
+            <value>
+                <fullName>Vencida</fullName>
+                <default>false</default>
+                <label>Vencida</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

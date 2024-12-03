@@ -1,0 +1,48 @@
+<aura:component controller="CC_Enlaces_Controller"
+                implements="flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName"
+                access="global">
+    
+    <aura:attribute name="enlaces" type="CC_Enlace__c[]"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="force:refreshView" value="{!this}" action="{!c.doInit}"/>
+    
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="enlaces">
+                        <lightning:icon iconName="custom:custom68" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Enlaces">
+                            <span>Enlaces</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+	
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+            <aura:iteration items="{!v.enlaces}" var="enlace">
+                <p style="line-height:18pt;">
+                    <a href="{!enlace.CC_URL__c}" class="slds-text-link_reset" style="color: #005fb2;" target="_blank">{!enlace.CC_Nombre__c}</a>
+                </p>
+            </aura:iteration>
+        </div>
+        
+        <!--Footer-->
+        <!--Se deshabilita el filtro de procedencia en sprint 4 a petición del cliente
+        <footer class="slds-card__footer">
+            Canal de procedencia: {!v.canalProcedencia}
+            <button class="slds-button slds-button_icon-container" onclick="{!c.doInit}">
+                    <lightning:icon iconName="utility:refresh" size="xx-small" alternativeText="Refrescar"/>
+            </button>
+        </footer>
+		-->
+	</article>
+</aura:component>

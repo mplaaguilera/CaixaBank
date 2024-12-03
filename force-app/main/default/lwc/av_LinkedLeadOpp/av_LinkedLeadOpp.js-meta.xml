@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>54.0</apiVersion>
+	<isExposed>true</isExposed>
+   <targets>
+      <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+          <property name="filterObject" type="String" default="" label="Filter Object Name" required="true" description="Filter Object Name"/>
+          <property name="filterField" type="String" default="" label="Filter Field Name" required="true" description="Filter Field Name"/>
+      </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

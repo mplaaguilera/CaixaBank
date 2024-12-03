@@ -1,0 +1,112 @@
+div.contenedor {
+    max-width: 800px;
+}
+
+div.calendario {
+    display: flex;
+    border: var(--lwc-borderWidthThin, 1px) solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+}
+
+div.columnaDia {
+    flex: 1;
+}
+
+div.columnaDia + div.columnaDia {
+    border-left: var(--lwc-borderWidthThin, 1px) solid #ddd;
+}
+
+div.columnaDia > div.tituloDia {
+    height: 38px;
+    text-transform: uppercase;
+    font-weight: 300;
+    border-bottom: 1px solid #edededd8;
+    letter-spacing: 1.1px;
+    cursor: default;
+}
+
+div.divSlot {
+    will-change: background-color;
+    font-weight: 100;
+    cursor: default;
+    height: 36px;
+    border-bottom: var(--lwc-borderWidthThin, 1px) solid #eee;
+    position: relative;
+    background-color: #fffafa;
+    letter-spacing: 0.6px;
+    transition: background-color 150ms ease-out;
+}
+
+div.divSlot.disponible {
+    font-weight: 300;
+    cursor: pointer;
+    background-color: #f0faf7;
+}
+
+div.divSlot.disponible:not(.seleccionado):hover {
+    background-color: #e1f6f0;
+}
+
+div.divSlot.disponible:active,
+div.divSlot.disponible:hover:active {
+    background-color: rgb(147, 199, 247);
+}
+
+div.divSlot.seleccionado {
+    font-weight: 400;
+    cursor: pointer;
+    background-color: #dbecff;
+}
+
+div.divMensajeSeleccion {
+    opacity: 0;
+    transform: translateY(-20px);
+    margin-right: 20px;
+}
+
+div.divMensajeSeleccion.mostrar {
+    /* visibility: visible; */
+    animation: mostrarMensajeSeleccion 70ms ease-in;
+    animation-fill-mode: forwards;
+}
+
+@keyframes mostrarMensajeSeleccion {
+    from {opacity: 0; transform: translateY(-3px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+div.divMensajeSeleccion.ocultar {
+    /* visibility: visible; */
+    animation: ocultarMensajeSeleccion 70ms ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes ocultarMensajeSeleccion {
+    from {opacity: 1; transform: translateY(0);}
+    to {opacity: 0; transform: translateY(3px);}
+}
+
+lightning-icon.iconoMensajeSeleccion {
+    position: relative;
+    top: -1px;
+    margin-right: 6px;
+    --sds-c-icon-color-foreground-default: #76aae4;
+}
+
+div.leyenda {
+    font-weight: 200;
+}
+
+div.leyenda lightning-icon.iconoDisponible {
+    margin-right: 5px;
+    --sds-c-icon-color-foreground: #d7f0e9;
+    --sds-c-icon-color-background: transparent;
+}
+
+div.leyenda lightning-icon.iconoNoDisponible {
+    margin-right: 5px;
+    --sds-c-icon-color-foreground: #f8e3e3;
+    --sds-c-icon-color-background: transparent;
+}

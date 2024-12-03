@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Restringir_Estado_Pendiente</fullName>
+    <active>true</active>
+    <description>Cuando un caso esta en estado pendiente, el grupo y el propietario no son editables.</description>
+    <errorConditionFormula>AND(
+OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;, RecordType.DeveloperName == &apos;SEG_Seguimiento&apos;),
+NOT($Permission.SEG_SaltarValidationRulesRobot),		
+ISPICKVAL(Status, &apos;Pendiente&apos;),
+SEG_Validacion_Valija__c = FALSE,
+AND(ISCHANGED(OwnerId), ISCHANGED(SEG_Grupo__c)),
+ISPICKVAL(PRIORVALUE(Status), &apos;Pendiente&apos;) 
+)</errorConditionFormula>
+    <errorMessage>No se permite editar el grupo de trabajo y el propietario de un caso pendiente.</errorMessage>
+</ValidationRule>

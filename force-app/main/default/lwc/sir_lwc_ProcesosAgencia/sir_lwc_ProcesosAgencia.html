@@ -1,0 +1,33 @@
+<template>
+    <lightning-card  variant="Narrow" icon-name="standard:process">
+        <h1 slot="title">Procesos Otras Unidades Gestión ({sumProcesos})</h1>
+        <template if:true={todoOK}>
+            <lightning-datatable
+                key-field="id"
+                data={otrosProcesos}
+                columns={columns}
+                hide-checkbox-column >
+            </lightning-datatable>
+            <template if:true={isEmpty}>
+                <div class="slds-text-heading_small slds-text-align_center slds-p-around_small">
+                    No existen registros asociados.
+                </div>
+            </template>
+        </template>
+        <template if:true={todoKO}>
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+                  <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+                    </svg>
+                  </span>
+                  <div class="slds-notify__content">
+                    <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+                    {codigoError}
+                  </div>
+                </div>
+              </div>
+        </template>
+    </lightning-card>
+</template>

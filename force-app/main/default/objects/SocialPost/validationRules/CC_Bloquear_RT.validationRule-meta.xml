@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloquear_RT</fullName>
+    <active>true</active>
+    <description>Bloqueamos los RT</description>
+    <errorConditionFormula>AND(
+				 !($Permission.CC_Social_Retuit), 
+				ISPICKVAL(MessageType,&quot;Retweet&quot;), 
+				IsOutbound 
+				)</errorConditionFormula>
+    <errorMessage>No tienes permisos para realizar un RT.</errorMessage>
+</ValidationRule>

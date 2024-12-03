@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_inscritosFisicosVirtualesC__c</fullName>
+    <description>Campo que cuenta el numero de inscritos físicos y inscritos virtuales</description>
+    <externalId>false</externalId>
+    <formula>EV_InscritosFisicosC__c + EV_InscritosVirtualesC__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Total Inscritos Fisicos Virtuales Evento</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

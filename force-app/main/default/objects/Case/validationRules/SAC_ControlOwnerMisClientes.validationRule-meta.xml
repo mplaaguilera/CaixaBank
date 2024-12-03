@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ControlOwnerMisClientes</fullName>
+    <active>true</active>
+    <description>Validation rule para controlar que no se pueda cambiar el owner una vez creada la reclamación</description>
+    <errorConditionFormula>AND(NOT($Permission.SAC_ByPass),
+				 RecordType.DeveloperName == &apos;SAC_Reclamacion&apos;,
+					ISCHANGED(OwnerId),
+     NOT(ISNEW()),
+					$Profile.Name == &apos;AV_Usuario_CaixaBank&apos;
+				 )</errorConditionFormula>
+    <errorMessage>No puedes cambiar el propietario de los registros</errorMessage>
+</ValidationRule>

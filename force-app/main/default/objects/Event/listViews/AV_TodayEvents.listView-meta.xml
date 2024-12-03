@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TodayEvents</fullName>
+    <columns>START_DATE_TIME</columns>
+    <columns>END_DATE_TIME</columns>
+    <columns>WHAT_NAME</columns>
+    <columns>SUBJECT</columns>
+    <columns>AV_Tipo__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>DUE_DATE</field>
+        <operation>lessOrEqual</operation>
+        <value>TODAY</value>
+    </filters>
+    <filters>
+        <field>END_DATE</field>
+        <operation>greaterOrEqual</operation>
+        <value>TODAY</value>
+    </filters>
+    <label>Mis Eventos de Hoy</label>
+    <sharedTo>
+        <role>AV_SistematicaComercial</role>
+    </sharedTo>
+</ListView>

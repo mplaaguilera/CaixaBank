@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CIBE_OpportunitiesNext7Days_EMP</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_BackgroundColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_BorderColor__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Data__c</field>
+        <value xsi:type="xsd:string">SELECT COUNT(Id) FROM Opportunity WHERE OwnerId = &apos;#userId&apos;  AND   AV_Center__c = &apos;#oficinaGestor&apos; AND ((RecordType.DeveloperName IN (&apos;CIBE_IniciativaEmpleadoEMP&apos;, &apos;CIBE_AccionComercialEMP&apos;, &apos;CIBE_SugerenciaEMP&apos;)    AND (StageName =&apos;En curso&apos; OR  StageName =&apos;CIBE_Pendiente_Firma&apos;)  AND  
+				((AV_FechaProximoRecordatorio__c= NEXT_N_DAYS:7 OR AV_FechaProximoRecordatorio__c = TODAY) OR (CloseDate = NEXT_N_DAYS:7 OR CloseDate = TODAY))) OR (Recordtype.DeveloperName = &apos;CIBE_AlertaComercialEMP&apos; and  (StageName =&apos;En curso&apos; OR  StageName =&apos;CIBE_Pendiente_Firma&apos; OR StageName  = &apos;Potencial&apos;) ))</value>
+    </values>
+    <values>
+        <field>AV_FilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Orden__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_Redirect__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>AV_ReportName__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_TipoGrafico__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AV_UserBackgroundColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,0.5)</value>
+    </values>
+    <values>
+        <field>AV_UserBorderColor__c</field>
+        <value xsi:type="xsd:string">rgba(254, 183, 22,1)</value>
+    </values>
+    <values>
+        <field>AV_UserFilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

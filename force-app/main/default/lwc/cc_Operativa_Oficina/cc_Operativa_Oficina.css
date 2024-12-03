@@ -1,0 +1,18 @@
+lightning-button, lightning-combobox {
+	--slds-g-color-border-base-4: rgb(201, 201, 201);
+    --slds-c-button-neutral-color-border: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-hover: rgb(201, 201, 201);
+	--slds-c-button-neutral-color-border-active: rgb(201, 201, 201);
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+}
+
+lightning-textarea {
+    --slds-c-textarea-color-border: rgb(201, 201, 201);
+}
+
+div.slds-dropdown {
+    border-color: rgb(201, 201, 201);
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Venta</fullName>
+    <fields>Name</fields>
+    <fields>AV_Cliente__c</fields>
+    <fields>AV_Importe__c</fields>
+    <fields>AV_TipoVenta__c</fields>
+    <fields>AV_Canal__c</fields>
+    <label>AV_Venta</label>
+</CompactLayout>

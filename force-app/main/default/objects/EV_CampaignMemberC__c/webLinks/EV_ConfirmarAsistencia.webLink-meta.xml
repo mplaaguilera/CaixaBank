@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_ConfirmarAsistencia</fullName>
+    <availability>online</availability>
+    <description>Botón para confirmar la asistencia de un Miembro de Campaña a un evento.</description>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <hasMenubar>false</hasMenubar>
+    <hasScrollbars>true</hasScrollbars>
+    <hasToolbar>false</hasToolbar>
+    <height>600</height>
+    <isResizable>true</isResizable>
+    <linkType>url</linkType>
+    <masterLabel>Confirmar Asistencia</masterLabel>
+    <openType>newWindow</openType>
+    <position>none</position>
+    <protected>false</protected>
+    <showsLocation>false</showsLocation>
+    <showsStatus>false</showsStatus>
+    <url>/flow/EV_Confirmar_Asistencia_CM?recordId={!EV_CampaignMemberC__c.Id}&amp;retURL={!EV_CampaignMemberC__c.Id}</url>
+</WebLink>

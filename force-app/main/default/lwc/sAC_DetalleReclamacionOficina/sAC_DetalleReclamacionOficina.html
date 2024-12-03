@@ -1,0 +1,238 @@
+<template>
+
+    <lightning-record-view-form
+    record-id={recordId}
+    object-api-name="Case">
+
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Datos del reclamante</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="AccountId">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_SuppliedNIF__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_EsCliente__c">
+            </lightning-output-field>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_TipoConsumidor__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_ReclamanteConformeNegociacion__c">
+            </lightning-output-field>
+            <br/>
+            <lightning-output-field field-name="SAC_Antecedentes_Revisados__c">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Datos de Contacto de la Reclamación</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="ContactId">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_NombreContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_UsarDatos__c">
+            </lightning-output-field>
+            <br/>
+            <lightning-output-field field-name="OS_Email__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Telefono_Contacto__c">
+            </lightning-output-field>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_DireccionContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_CodigoPostalContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_PoblacionContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_ProvinciaContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_PaisContacto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_DireccionPostalNotificacion__c">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Datos del Representante</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_TipoDeRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_TipoDeDocumento__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_NumeroDelDocumento__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_NombreRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_TelefonoRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_EmailRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_DespachoRepresentante__c">
+            </lightning-output-field>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_DireccionRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_CodigoPostalRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_PoblacionRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_ProvinciaRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_PaisRepresentante__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_DireccionPostal__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_PoderRepresentante__c">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Detalles</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="CaseNumber">
+            </lightning-output-field>
+            <lightning-output-field field-name="Subject">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_CasoRelacionado__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_NPretensionesActivas__c">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="Origin">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Canal_Procedencia__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Canal_Respuesta__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SuppliedEmail">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_Importe_Tipo__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Importe_Reclamado__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_Importe_Resuelto__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Importe_Abonado__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_Quebranto__c">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_TipoSubsanacion__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_SuppliedFiles__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_CasoEspecial__c">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_MotivoRechazo__c">
+            </lightning-output-field>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_Naturaleza__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="Status">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Idioma__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="Priority">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_Tipologiareparto__c">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_Entidad_Afectada__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Oficina_Afectada_Lookup__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_EntidadProductora__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_Oficina__c">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="SAC_FechaRecepcion__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CreatedDate">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_FechaVencimientoSLA__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="OS_Fecha_Resolucion__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="ClosedDate">
+            </lightning-output-field>
+            <br />
+            <lightning-output-field field-name="IsStopped">
+            </lightning-output-field>
+            <lightning-output-field field-name="StopStartDate">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Contenido de la reclamación</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="Description">
+            </lightning-output-field>
+            <lightning-output-field field-name="SourceId">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Categorización MCC</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="CC_MCC_Tematica__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="CC_MCC_Motivo__c">
+            </lightning-output-field>
+        </div>
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="CC_MCC_ProdServ__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SEG_Detalle__c">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+    <div class="slds-section__title-action">
+        <h3 class="slds-section__title">Resolución</h3>
+    </div>
+    <br />
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2">
+            <lightning-output-field field-name="SAC_SentidoResolucion__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_MotivoInadmision__c">
+            </lightning-output-field>
+            <lightning-output-field field-name="SAC_MotivoSentidoResolucion__c">
+            </lightning-output-field>
+        </div>
+    </div>
+    <br/>
+</lightning-record-view-form>      
+
+</template>

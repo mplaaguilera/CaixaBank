@@ -1,0 +1,34 @@
+<template>
+    <div class="slds-page-header slds-page-header_related-list" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none;">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                            <div class="slds-page-header__name-title">
+                                <h1>
+                                    <span class="slds-card__header-title slds-truncate">Casos como cliente o interviniente</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <article class="slds-card" style="border-top-left-radius: 0; border-top-right-radius: 0;">
+        <div class="slds-card__body slds-card__body_inner" style="margin: initial; padding: 0 0 5px 0; border-bottom: none;">
+            <!-- sldsValidatorIgnore -->
+            <lightning-datatable
+                key-field="Id"
+                columns={datatableColumnas}
+                data={datatableData}
+                hide-checkbox-column
+                column-widths-mode="auto">
+            </lightning-datatable>
+        </div>
+    </article>
+</template>

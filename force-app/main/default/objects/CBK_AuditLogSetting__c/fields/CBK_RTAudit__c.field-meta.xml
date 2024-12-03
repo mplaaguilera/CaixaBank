@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_RTAudit__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Indicador de si la operación requiere el registro en Tiempo Real (en caso de que no se marque esta opción se registrará de forma asincrona).</description>
+    <label>Auditoria en tiempo real</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

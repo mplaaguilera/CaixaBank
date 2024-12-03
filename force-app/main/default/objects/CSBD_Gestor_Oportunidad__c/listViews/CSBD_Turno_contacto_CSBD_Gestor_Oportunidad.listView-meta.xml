@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Turno_contacto_CSBD_Gestor_Oportunidad</fullName>
+    <filterScope>Queue</filterScope>
+    <label>CSBD -  Turno de contacto</label>
+    <queue>CSBD_Turno_contacto</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

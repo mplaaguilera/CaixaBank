@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cuenta_Numero_Oficina__c</fullName>
+    <externalId>false</externalId>
+    <formula>CC_Cuenta__r.CC_Numero_Oficina__c</formula>
+    <label>Nùmero oficina de la cuenta</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

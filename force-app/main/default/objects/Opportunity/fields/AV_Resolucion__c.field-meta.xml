@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Resolucion__c</fullName>
+    <label>Resolución</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Elige otra entidad por precio</fullName>
+                <default>false</default>
+                <label>Elige otra entidad por precio</label>
+            </value>
+            <value>
+                <fullName>Elige otra entidad características por producto</fullName>
+                <default>false</default>
+                <label>Elige otra entidad características por producto</label>
+            </value>
+            <value>
+                <fullName>No le interesa por precio</fullName>
+                <default>false</default>
+                <label>No le interesa por precio</label>
+            </value>
+            <value>
+                <fullName>No le interesa por las características del producto</fullName>
+                <default>false</default>
+                <label>No le interesa por las características del producto</label>
+            </value>
+            <value>
+                <fullName>PCI</fullName>
+                <default>false</default>
+                <label>Perfil cliente inadecuado</label>
+            </value>
+            <value>
+                <fullName>O</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>VD</fullName>
+                <default>false</default>
+                <label>Venta desestimada</label>
+            </value>
+            <value>
+                <fullName>CDP</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>CDP</label>
+            </value>
+            <value>
+                <fullName>MOEOE</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>MOEOE</label>
+            </value>
+            <value>
+                <fullName>NLIEP</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>NLIEP</label>
+            </value>
+            <value>
+                <fullName>PDP</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>PDP</label>
+            </value>
+            <value>
+                <fullName>PELC</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>PELC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

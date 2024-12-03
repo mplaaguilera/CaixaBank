@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_ProductoServicio</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Codigo_Externo__c</columns>
+    <columns>SAC_EndToEnd__c</columns>
+    <columns>CC_Tematica__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Producto_Servicio</value>
+    </filters>
+    <label>Producto/Servicio</label>
+    <sharedTo>
+        <role>SAC_General</role>
+        <role>SPV_General</role>
+    </sharedTo>
+</ListView>

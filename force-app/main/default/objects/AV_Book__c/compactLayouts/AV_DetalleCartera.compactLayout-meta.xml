@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_DetalleCartera</fullName>
+    <fields>Name</fields>
+    <fields>AV_Centro__c</fields>
+    <fields>AV_EspecialidadCartera__c</fields>
+    <label>AV_DetalleCartera</label>
+</CompactLayout>

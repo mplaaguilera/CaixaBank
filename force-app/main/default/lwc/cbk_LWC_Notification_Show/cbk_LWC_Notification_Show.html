@@ -1,0 +1,60 @@
+<template>  
+    <li>
+        <div class="slds-timeline__item_expandable slds-timeline__item">
+            <span class="slds-assistive-text">{msg.id}</span>
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <button aria-controls="divContent"  onclick={changeState} class="slds-button slds-button_icon">
+                        <div if:true={isexpanded}><lightning-icon icon-name="utility:switch" alternative-text="1" size="xx-small"></lightning-icon></div>
+                        <div if:false={isexpanded}><lightning-icon icon-name="utility:chevronright" alternative-text="1" size="xx-small"></lightning-icon></div>
+                    </button>
+                    <div class="slds-icon_container  slds-timeline__icon">
+                        <lightning-icon  icon-name="standard:custom_notification"></lightning-icon>     
+                    </div>
+                </div>
+                <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                            <h3 class="slds-truncate" title={msg.title}>
+                            <c-cc_navigation-link label={msg.title} title={msg.title} type="standard__recordPage" record-id={msg.id}></c-cc_navigation-link>
+                            </h3>
+                        </div>
+                        <div class="slds-timeline__actions slds-timeline__actions_inline">
+                            <h3 class="slds-timeline__date">{msg.dateMessage}</h3>
+                        </div>
+                    </div>
+                      
+                    <div >
+                        <p class="slds-m-horizontal_xx-small">
+                                <c-cc_navigation-link label={msg.autor} title={msg.autor} type="standard__recordPage" record-id={msg.createdbyId}></c-cc_navigation-link>
+                        </p>
+                    </div>               
+                      
+                    <article if:true={showMsg} class="slds-box slds-theme_shade" id="task-item-expanded">
+                        <div>
+                            <lightning-formatted-rich-text linkify value={msg.msg}> </lightning-formatted-rich-text>
+                        </div>
+
+                    </article>
+                    <template if:true={showMsg}>
+                    
+                    <!--<lightning-input type="checkbox" name="check" label="Seen"  checked = "{isChecked}" onchange={nameChange}> </lightning-input>--> <!--disabled-->
+    
+
+                        <!--<div class="slds-form-element">
+                          <div class="slds-form-element__control">
+                            <div class="slds-checkbox">
+                              <lightning-input type="checkbox" name="options" id="test" value="true" disabled=""  />
+                              <label class="slds-checkbox__label" for="checkbox-unique-id-288">
+                                <span class="slds-checkbox_faux"></span>
+                                <span class="slds-form-element__label"> Seen</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>-->
+                    </template>
+                </div>
+            </div>
+        </div>
+    </li>
+</template>

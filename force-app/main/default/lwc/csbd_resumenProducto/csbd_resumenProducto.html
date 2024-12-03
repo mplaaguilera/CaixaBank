@@ -1,0 +1,27 @@
+<template>
+    <div class="slds-m-horizontal_small">
+        <lightning-card  class="slds-m-bottom_xx-large">
+            <template if:true={isLoadingProd}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <template lwc:if={muestraCopiaProd}>
+                <lightning-formatted-rich-text
+                value={copiaResProd}
+                ></lightning-formatted-rich-text>
+            </template>
+            <template lwc:else>
+                <lightning-formatted-rich-text value={resumenProducto}>
+                </lightning-formatted-rich-text>
+            </template>
+            <!-- <lightning-record-view-form
+                    object-api-name="Opportunity"
+                    record-id={recordId}
+            >
+                <lightning-output-field field-name="CSBD_GptResumenProducto__c"> </lightning-output-field>
+            </lightning-record-view-form> -->
+            <div slot="footer">
+                <lightning-button class="slds-col" variant="brand" label="Refrescar" onclick={handleRefrescarProd}></lightning-button>
+            </div>
+        </lightning-card>
+    </div>
+</template>

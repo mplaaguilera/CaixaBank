@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_StringRedaccion_fileupload__c</fullName>
+    <description>Campo utlizado para poder identificar aquellos documentos que pertenecen a la resolución de la redaccón en el proyecto SAC</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <label>Redacción</label>
+    <length>80</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,21 @@
+<template>
+    <lightning-tabset variant="scoped" class="tab-active">
+        <lightning-tab label="Ingresos Intervinientes">
+            <c-sir_lwc_-Ingresos-Intervinientes record-id={recordId} onvaloresingresos={hanldeValoresIngresos} ></c-sir_lwc_-Ingresos-Intervinientes>
+        </lightning-tab>
+        <lightning-tab label="Gastos Intervinientes">
+            <c-sir_lwc_-Gastos-Intervinientes record-id={recordId} onvaloresgastos={hanldeValoresGastos}></c-sir_lwc_-Gastos-Intervinientes>
+        </lightning-tab>
+        <lightning-tab label="Cargas Financieras">
+            <c-sir_lwc_-Cargas-Financieras record-id={recordId} oncargasfinancieras={hanldeCargasFinancieras} ></c-sir_lwc_-Cargas-Financieras>
+        </lightning-tab>
+        <lightning-tab label="Capacidad y Solución">
+            <c-sir_lwc_-Capacidad-Solucion record-id={recordId}  ingresos-disponibles ={ingresosDisponibles} gastos-necesarios={valorTotalGastos} ratio-endeudamiento={ratioEndeudamiento} 
+            ratio-actual={ratioActual} importe-total-financiacion ={importeTotalFinanciacion} ratio-total={ratioTotal} capacidad-pago-cliente={capacidadPagoCliente} 
+            capacidad-devolucion={capacidadDevolucion} tipo-solucion={tipoSolucion} carga-finaciera-caixa={cargaFinacieraCaixa} check-finalista={checkFinalista} value={value} 
+            solucion-aplicar ={solucionAplicar} tipo-dificultad={tipoDificultad} check-corto-plazo={checkCortoPlazo} check-largo-plazo={checkLargoPlazo} ratio-futuro={ratioFuturo} 
+            solucion-deuda={solucionDeuda} importe-cuota-actual={importeCuotaActual}  importe-cuota-actual-futuro={importeCuotaActualFuturo}
+            ></c-sir_lwc_-Capacidad-Solucion>
+        </lightning-tab>
+    </lightning-tabset>
+</template>

@@ -1,0 +1,62 @@
+<aura:component controller="CC_Grupo_Colaborador_Plantilla" implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+
+    <aura:attribute name="recordId" type="Id" />    
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
+    <aura:attribute name="grupoPlantilla" type="CC_Grupo_Colaborador_Plantilla__c" default="{'sobjectType':'CC_Grupo_Colaborador_Plantilla__c'}"/>
+    <aura:attribute name="plantillaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="opcionesOperativa" type="List" default="[]"/>
+    <aura:attribute name="carpetaOperativaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaOperativa" type="String"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.iniciar }"/>
+
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon iconName="standard:email" size="medium"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate">Asignar plantillas</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+            <lightning:combobox aura:id="selectItem" name="operativa" label="Operativa"
+                placeholder="-Selecciona una operativa-"
+                value=""
+                required="true"
+                dropdownAlignment="right"
+                variant="standard"
+                onchange="{!c.handleOperativaSeleccionada}"
+                options="{!v.opcionesOperativa}"
+            />
+
+            <aura:if isTrue="{!v.carpetaOperativaSeleccionada}">
+                <br/>
+                <lightning:combobox aura:id="selectItem" name="plantilla" label="Plantilla"
+                    placeholder="-Selecciona una plantilla-"
+                    value=""
+                    required="true"
+                    dropdownAlignment="right"
+                    variant="standard"
+                    onchange="{!c.handlePlantillaSeleccionada}"
+                    options="{!v.opcionesPlantilla}"/>
+            </aura:if>
+
+            <div style="padding-top: 10px; text-align: right;">
+                <lightning:button label="Cancelar" onclick="{!c.handleClickCancelar}"/>
+                <aura:if isTrue="{!v.plantillaSeleccionada}">
+                    <lightning:button label="Asignar" variant="brand" onclick="{!c.handleClickAceptar}" />
+                </aura:if>
+            </div>
+        </div>
+    </article>
+</aura:component>

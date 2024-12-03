@@ -1,0 +1,99 @@
+<template>
+
+	<article class="contenedor slds-card slds-var-m-top_large">
+
+		<div class="slds-card__header slds-grid slds-var-m-bottom_small">
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__body">
+					<h2 class="slds-card__header-title" style="font-size: 16px;">
+						Fincas afectadas
+						<span lwc:if={fincas.length} style="font-weight: 600;">&nbsp;({fincas.length})</span>
+					</h2>
+				</div>
+				<div class="slds-no-flex">
+					<lightning-button label="Nueva" disabled={botonNuevaDisabled} onclick={nuevaFinca}></lightning-button>
+				</div>
+			</header>
+		</div>
+
+		<div class="slds-card__body slds-card__body_inner">
+			<!--Lista-->
+			<div style="position: relative; display: flex;">
+				<div class="datatableFincasContainer">
+					<div style="height: 100%;">
+						<!-- sldsValidatorIgnoreNextLine -->
+						<lightning-datatable
+							class="datatableFincas"
+							columns={columns}
+							data={fincas}
+							key-field="id"
+							column-widths-mode="auto"
+							max-row-selection=1
+							onrowselection={datatableOnrowselection}>
+						</lightning-datatable>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Formulario-->
+
+		<article lwc:if={fincaSeleccionada} class="slds-card slds-card_boundary slds-var-m-top_xx-large slds-var-p-top_small">
+			<div class="slds-card__header slds-grid slds-var-m-bottom_x-large">
+				<header class="slds-media slds-media_center slds-has-flexi-truncate">
+					<div class="slds-media__figure">
+						<lightning-icon icon-name="standard:address" size="small"></lightning-icon>
+					</div>
+					<div class="slds-media__body">
+						<h2 class="slds-card__header-title">
+							Finca {fincaSeleccionada.codigoCatastro}
+							<span lwc:if={fincaSeleccionada.tipoFinca}>&nbsp;({fincaSeleccionada.tipoFinca})</span>
+						</h2>
+					</div>
+				</header>
+			</div>
+			<div class="campos slds-card__body slds-card__body_inner">
+				<div class="slds-grid slds-gutters_direct-x-small slds-wrap">
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input class="codigoCatastro" label="Código de catastro" value={fincaSeleccionada.codigoCatastro} variant="label-inline" data-campo="codigoCatastro" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input label="Localidad" value={fincaSeleccionada.localidad} variant="label-inline" data-campo="localidad" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-combobox class="comboboxTipoFinca" label="Tipo de finca" options={opcionesTipoFinca} value={fincaSeleccionada.tipoFinca} variant="label-inline" required data-campo="tipoFinca" onchange={fincaSeleccionadaOnchange}> </lightning-combobox>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input label="Importe de compraventa" type="number" formatter="currency" step=".01" value={fincaSeleccionada.importeCompraventa} variant="label-inline" data-campo="importeCompraventa" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input label="Número de finca" value={fincaSeleccionada.numeroFinca} variant="label-inline" data-campo="numeroFinca" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input label="Importe de la hipoteca" type="number" formatter="currency" step=".01" value={fincaSeleccionada.importeHipoteca} variant="label-inline" data-campo="importeHipoteca" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-input label="Número RP" value={fincaSeleccionada.numeroRp} variant="label-inline" data-campo="numeroRp" required onchange={fincaSeleccionadaOnchange}></lightning-input>
+					</div>
+					<div class="slds-col slds-size_1-of-2">
+						<lightning-combobox class="comboboxCompraventaHipoteca" label="Compraventa/Hipoteca" options={opcionesCompraventaHipoteca} value={fincaSeleccionada.compraventaHipoteca} variant="label-inline" required data-campo="compraventaHipoteca" onchange={fincaSeleccionadaOnchange}> </lightning-combobox>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<footer class="slds-var-m-top_x-large slds-var-m-bottom_small">
+			<div class="slds-grid slds-grid_align-spread slds-gutters_direct-x-small">
+				<div class="slds-col">
+					<lightning-button label="Eliminar" variant="destructive-text" disabled={botonEliminarDisabled} onclick={eliminarFincaSeleccionada}></lightning-button>
+				</div>
+				<div class="slds-col">
+					<lightning-button label="Cancelar" disabled={botonesCancelarGuardarDisabled} onclick={deshacerCambios}></lightning-button>
+					<lightning-button label="Guardar" variant="brand" class="slds-var-m-left_small" disabled={botonesCancelarGuardarDisabled} onclick={guardarFincas}></lightning-button>
+				</div>
+			</div>
+		</footer>
+
+	</article>
+
+</template>

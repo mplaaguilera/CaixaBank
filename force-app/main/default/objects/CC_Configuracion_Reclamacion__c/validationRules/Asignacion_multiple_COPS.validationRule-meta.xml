@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Asignacion_multiple_COPS</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISPICKVAL(OS_Negocio__c , &apos;COPS&apos;),
+OR(OS_Asignar_Propietario__c == TRUE,
+OS_Asignar_Usuario__c != NULL),
+OR(OS_Asignar_Propietario__c == TRUE,
+OS_Asignar_GrupoTrabajo__c!= NULL),
+OR(OS_Asignar_Usuario__c != NULL,
+OS_Asignar_GrupoTrabajo__c != NULL)
+)</errorConditionFormula>
+    <errorMessage>No está permitido informar &apos;Asignar Propietario&apos;, &apos;Asignar Usuario&apos; y &apos;Asignar Grupo de Trabajo&apos; al mismo tiempo.</errorMessage>
+</ValidationRule>

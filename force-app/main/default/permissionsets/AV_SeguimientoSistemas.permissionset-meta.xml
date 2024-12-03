@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>PS para ver la tab del dashboard de seguimiento de procesos</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>AV_SeguimientoSistemas</label>
+    <tabSettings>
+        <tab>AV_Seguimiento_de_sistemas</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+</PermissionSet>

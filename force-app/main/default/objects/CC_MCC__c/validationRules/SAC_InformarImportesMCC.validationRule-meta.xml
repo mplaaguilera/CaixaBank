@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_InformarImportesMCC</fullName>
+    <active>true</active>
+    <description>Valida que el usuario introduce el rango completo de importes en el MCC (importe desde e importe hasta)</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.CBK_BypassValidationRules),
+				NOT($Permission.SAC_ByPass),
+    OR(
+				    AND( NOT(ISBLANK(SAC_ImporteHastaMCC__c)), ISBLANK(SAC_ImporteDesdeMCC__c)),
+        AND( NOT(ISBLANK(SAC_ImporteDesdeMCC__c)), ISBLANK(SAC_ImporteHastaMCC__c)),
+				    AND(SAC_ImporteDesdeMCC__c &gt; SAC_ImporteHastaMCC__c, NOT(ISBLANK(SAC_ImporteHastaMCC__c)), NOT(ISBLANK(SAC_ImporteDesdeMCC__c)))
+    )
+)</errorConditionFormula>
+    <errorMessage>Debe informar el rango completo de importes, siendo menor el importe desde que el importe hasta.</errorMessage>
+</ValidationRule>

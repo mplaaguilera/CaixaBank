@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_TelefonoIDX__c</fullName>
+    <description>Campo teléfono indexado (para búsquedas)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>Campo teléfono indexado (para búsquedas)</inlineHelpText>
+    <label>Teléfono (Indexado)</label>
+    <length>25</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>SACH Correos Buzones Entrada</label>
+    <pluralLabel>SACH Correos Buzones Entrada</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

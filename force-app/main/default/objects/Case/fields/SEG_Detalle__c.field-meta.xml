@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Detalle__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Detalle del MCC</description>
+    <inlineHelpText>Detalle del MCC</inlineHelpText>
+    <label>Detalle</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>(1 OR 3) AND 2</booleanFilter>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>SAC Detalle</value>
+        </filterItems>
+        <filterItems>
+            <field>$Source.CC_MCC_Motivo__c</field>
+            <operation>equals</operation>
+            <valueField>CC_MCC__c.CC_Motivo__c</valueField>
+        </filterItems>
+        <filterItems>
+            <field>CC_MCC__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Detalle</value>
+        </filterItems>
+        <isOptional>true</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_MCC__c</referenceTo>
+    <relationshipLabel>Casos (MCC)</relationshipLabel>
+    <relationshipName>Cases3</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

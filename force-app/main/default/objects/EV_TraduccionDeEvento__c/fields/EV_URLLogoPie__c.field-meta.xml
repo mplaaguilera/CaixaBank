@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLLogoPie__c</fullName>
+    <description>Imagen que se muestra en Logo 3 de las creatividades si se selecciona Otros en el campo Logo pie de Campaña</description>
+    <encryptionScheme>None</encryptionScheme>
+    <label>URL logo pie</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

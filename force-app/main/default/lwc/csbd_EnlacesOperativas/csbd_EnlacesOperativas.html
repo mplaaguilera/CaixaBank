@@ -1,0 +1,49 @@
+<template>
+
+	<article class="slds-card">
+		<div class="slds-card__header slds-grid slds-page-header" onclick={toggleLinkList}>
+			<header class="slds-media slds-media_center slds-has-flexi-truncate">
+				<div class="slds-media__figure">
+					<lightning-icon icon-name="standard:link" size="small"></lightning-icon>
+				</div>
+				<div class="slds-media__body slds-card__header-title">
+					Enlaces a operativas
+					<span lwc:if={links.length} class="slds-var-m-left_x-small">({links.length})</span>
+				</div>
+				<div class="botonExpandirContraer expandido slds-var-m-right_x-small">
+					<!-- sldsValidatorIgnoreNextLine -->
+					<lightning-button-icon icon-name="utility:chevronleft" title="Abrir" variant="bare"></lightning-button-icon>
+				</div>
+			</header>
+		</div>
+
+		<div lwc:if={linkListVisible} class="slds-grid slds-card__body slds-card__body_inner">
+			<template lwc:if={links.length}>
+				<div class="slds-col">
+					<ul>
+						<template for:each={linksPares} for:item="item" >
+							<li key={item.id}>
+								<lightning-icon icon-name="utility:new_window" size="xx-small" class="slds-var-p-around_medium slds-is-relative" style="top: -2px;"></lightning-icon>
+								<span class="slds-text-link_faux" data-label={item.label} data-url={item.url} onclick={abrirEnlace}>{item.label}</span>
+							</li>
+						</template>
+					</ul>
+				</div>
+				<div class="slds-col">
+					<ul>
+						<template for:each={linksImpares} for:item="item" >
+							<li key={item.id}>
+								<lightning-icon icon-name="utility:new_window" size="xx-small" class="slds-var-p-around_medium slds-is-relative" style="top: -2px;"></lightning-icon>
+								<span class="slds-text-link_faux" data-label={item.label} data-url={item.url} onclick={abrirEnlace}>{item.label}</span>
+							</li>
+						</template>
+					</ul>
+				</div>
+			</template>
+			<div lwc:else class="slds-var-p-around_xx-small slds-text-color_weak slds-align_absolute-center">
+				<p style="font-size: 12px;">No hay enlaces disponibles.</p>
+			</div>
+		</div>
+	</article>
+
+</template>

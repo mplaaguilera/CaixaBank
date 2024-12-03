@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_TipoBonificado__c</fullName>
+    <description>Interés bonificado ofrecido previamente por Now</description>
+    <inlineHelpText>Interés bonificado ofrecido previamente al cliente en el simulador de CaixaBankNow</inlineHelpText>
+    <label>Interés ofrecido previamente</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>3</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

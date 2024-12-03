@@ -1,0 +1,38 @@
+<template>
+    <template if:true={status}>
+        <template if:false={subsanacionActiva}>
+            <lightning-card title="SLA Pausado" icon-name="utility:pause">
+                <div class="slds-card__body slds-card__body_inner">
+                    <p>SLA detenido desde el&nbsp;
+                        <lightning-formatted-date-time
+                            value={stoppedSince} year="numeric" month="long" day="2-digit">
+                        </lightning-formatted-date-time>
+                        &nbsp;a las&nbsp;
+                        <lightning-formatted-date-time
+                            value={stoppedSince} hour="2-digit" minute="2-digit" second="2-digit">
+                        </lightning-formatted-date-time>
+                        &nbsp;por {status} 
+                    </p>
+                </div>
+            </lightning-card>
+            </template>
+    </template> 
+    <template if:true={status}>
+        <template if:true={subsanacionActiva}>
+            <lightning-card title="SLA Pausado" icon-name="utility:pause">
+                <div class="slds-card__body slds-card__body_inner">
+                    <p>SLA detenido desde el&nbsp;
+                        <lightning-formatted-date-time
+                            value={detenidoDesde} year="numeric" month="long" day="2-digit">
+                        </lightning-formatted-date-time>
+                        &nbsp;a las&nbsp;
+                        <lightning-formatted-date-time
+                            value={detenidoDesde} hour="2-digit" minute="2-digit" second="2-digit">
+                        </lightning-formatted-date-time>
+                        &nbsp;por {status} 
+                    </p>
+                </div>
+            </lightning-card>
+        </template>
+    </template>
+</template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_PretensionPrincipal__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo utilizado para indicar la pretensión principal de una reclamación. Utilizado en el proyecto SAC.</description>
+    <label>Pretension Principal</label>
+    <referenceTo>Case</referenceTo>
+    <relationshipLabel>Reclamacion</relationshipLabel>
+    <relationshipName>Reclamacion</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

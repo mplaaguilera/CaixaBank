@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="SAC_GetAntecedentes" ref="SAC_GetAntecedentes" label="Obtener antecedentes">
+		Componente usado para recoger los antecedentes asociados a uno o varios clientes
+	</aura:example>
+</aura:documentation>

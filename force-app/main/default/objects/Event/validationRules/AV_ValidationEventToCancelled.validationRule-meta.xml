@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ValidationEventToCancelled</fullName>
+    <active>true</active>
+    <description>No permitir que los gestores sin el PS AV_AvoidByPassVR  puedan cambiar el evento a el estado de Cancelado.</description>
+    <errorConditionFormula>AND(
+   ISCHANGED(CSBD_Evento_Estado__c),
+   ISPICKVAL(CSBD_Evento_Estado__c, &apos;Cancelado&apos;),
+   NOT($Permission.AV_AvoidByPassVR),
+   OR(
+      RecordType.DeveloperName = &apos;AV_EventosConCliente&apos;,
+      RecordType.DeveloperName = &apos;AV_EventosGestorA&apos;
+   )
+)</errorConditionFormula>
+    <errorMessage>No tiene permiso para poder cancelar el evento.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Saludo_Horario__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(TEXT(CC_Idioma__c)==&quot;ca&quot;,IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 12, &quot;Bon dia&quot;, (IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 19, &quot;Bona tarda&quot;, &quot;Bona nit&quot;))),IF(TEXT(CC_Idioma__c)==&quot;en&quot;,IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 12, &quot;Good morning&quot;, (IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 19, &quot;Good afternoon&quot;, &quot;Good night&quot;))),IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 12, &quot;Buenos días&quot;, (IF(VALUE(MID(TEXT(NOW()), 12, 2)) &lt; 19, &quot;Buenas tardes&quot;, &quot;Buenas noches&quot;)))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Saludo horario</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

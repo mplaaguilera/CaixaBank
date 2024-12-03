@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Caracteristicacaso__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Característica de un caso</label>
+    <lookupFilter>
+        <active>true</active>
+        <filterItems>
+            <field>CC_Caracteristica__c.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Característica de un caso</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>CC_Caracteristica__c</referenceTo>
+    <relationshipLabel>Características de un caso (Característica de un caso)</relationshipLabel>
+    <relationshipName>Caracter_sticas_de_un_caso</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

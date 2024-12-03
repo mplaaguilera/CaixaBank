@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_AssignedEmployee__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Campo de tipo Lookup que se relaciona con el objeto Contact</description>
+    <label>Assigned Employee</label>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Comments Histories</relationshipLabel>
+    <relationshipName>Comments_Histories</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

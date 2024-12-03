@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Falta_Entrega__c</fullName>
+    <label>Falta Entrega</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>No cumple requisitos</fullName>
+                <default>true</default>
+                <label>No cumple requisitos</label>
+            </value>
+            <value>
+                <fullName>La oficina está gestionando</fullName>
+                <default>false</default>
+                <label>La oficina está gestionando</label>
+            </value>
+            <value>
+                <fullName>Artículo agotado</fullName>
+                <default>false</default>
+                <label>Artículo agotado</label>
+            </value>
+            <value>
+                <fullName>Artículo disponible en oficina</fullName>
+                <default>false</default>
+                <label>Artículo disponible en oficina</label>
+            </value>
+            <value>
+                <fullName>Artículo disponible en domicilio</fullName>
+                <default>false</default>
+                <label>Artículo disponible en domicilio</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

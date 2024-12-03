@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Alertas</fullName>
+    <columns>CREATED_DATE</columns>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>NAME</columns>
+    <columns>SAC_Leido__c</columns>
+    <columns>SAC_FechaLectura__c</columns>
+    <columns>SAC_UsuarioLector__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>SAC-Alertas</label>
+    <sharedTo>
+        <role>SAC_General</role>
+    </sharedTo>
+</ListView>

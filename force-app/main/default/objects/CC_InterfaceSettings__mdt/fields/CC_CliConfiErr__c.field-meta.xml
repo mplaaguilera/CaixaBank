@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_CliConfiErr__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marcar el cliente confidencial frente a cualquier error en la integración</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Marcar el cliente confidencial frente a cualquier error en la integración</inlineHelpText>
+    <label>Cliente confidencial (todos errores)</label>
+    <type>Checkbox</type>
+</CustomField>

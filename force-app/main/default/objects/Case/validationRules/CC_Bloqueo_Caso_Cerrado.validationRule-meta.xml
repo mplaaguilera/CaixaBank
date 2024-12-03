@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo_Caso_Cerrado</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND($Setup.AdminSettings__c.Validaciones__c,
+!CC_Admin__c,
+!ISCHANGED(CC_Admin__c) ,
+OR(AND(TEXT(Status)=&quot;Cerrado&quot;,TEXT(PRIORVALUE(Status))=&quot;Cerrado&quot;),
+AND(TEXT(Status)=&quot;Rechazado&quot;,TEXT(PRIORVALUE(Status))=&quot;Rechazado&quot;)),
+!ISNEW(),
+AND(NOT(ISPICKVAL(CC_Canal_Resolucion__c,&quot;Atención al Cliente&quot;)),
+CC_Fecha_Limite_Resolucion__c &lt;&gt; null),
+NOT(ISPICKVAL(CC_Tipo_ChatTranscript__c, &quot;Hidden&quot;))
+)</errorConditionFormula>
+    <errorMessage>No se permite modificar un caso Cerrado o Rechazado</errorMessage>
+</ValidationRule>

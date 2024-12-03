@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_RecordToMask__c</fullName>
+    <description>Campo que dirá si el registro necesita que se le calculen los valores enmascarados.</description>
+    <formula>OR(ISBLANK(AV_FechaEnmascaramiento__c), AV_FechaEnmascaramiento__c &lt; DATEVALUE(LastModifiedDate))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>RecordToMask</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

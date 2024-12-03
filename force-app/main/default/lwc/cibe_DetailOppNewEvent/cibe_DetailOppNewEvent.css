@@ -1,0 +1,116 @@
+.chev-icon{
+    vertical-align: top;
+}
+.opptask-title{
+    vertical-align: sub;
+    font-size: 14px;
+    cursor: pointer;
+}
+.main-icon{
+    padding-right: 0.5rem;
+    vertical-align: baseline;
+}
+.linked-opptask-button{
+    float: right;
+}
+.last-opptask-button{
+    padding-right: 0.3rem;
+}
+.modify-opptask-button{
+    margin-right: 0.5rem;
+    float: right;
+}
+.section-div{
+    display: inherit;
+    overflow: auto;
+    margin: 1rem;
+    padding-bottom: 0.3rem;
+    padding-top: 0.3rem;
+}
+.opptask-form{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.footer-div{
+    overflow: auto;
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    padding-top: 0.3rem;
+    border-radius: var(--lwc-borderRadiusMedium,0.25rem);
+}
+.hidden-field{
+    display:none;
+}
+.path-margin{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.opptask-link{
+    text-decoration: none;
+}
+.value-concept{
+    width: auto;
+    display: inline-block;
+    padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+    margin-bottom: var(--lwc-spacingXSmall,0.5rem);
+}
+.help-text-icon{
+    padding-left: 0.2rem;
+}
+.read-only-field{
+    padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+    margin-bottom: var(--lwc-spacingXSmall,0.5rem);
+}
+.read-only-label{
+    padding: 0 var(--lwc-spacingXxSmall,0.25rem);
+}
+
+
+.lgc-bg {
+    position: absolute;
+    right: 5%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.center-buttons{
+	margin-top: auto;
+    margin-bottom: auto;
+}
+.chever-buttons{
+	margin-right: 1rem;
+}
+
+.opptask-titleMobile{
+	display: block;
+    line-height: normal;
+}
+.opptask-stage{
+	color: rgb(45 86 116);
+	font-size: 12px;
+	font-style: italic;
+	padding-bottom: 0.4rem;
+	position: relative;
+	display: inline;
+}
+.opptask-name{
+    padding-top: 0.4rem;
+    color: var(--lwc-brandTextLink,rgb(0, 109, 204))
+}
+
+.section-divMobile{
+	display: grid;
+	overflow: auto;
+	margin: 1rem;
+	padding-bottom: 0.3rem;
+	padding-top: 0.3rem;
+}
+
+.toggle-input{
+	padding-top: 0.5rem;
+}
+
+.label-priorizador{
+    padding-left: 2rem;
+	width: 17rem;
+}

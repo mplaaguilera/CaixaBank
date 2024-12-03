@@ -1,0 +1,63 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global">
+
+    <aura:attribute name="oportunidades" type="list" default="[]"/>
+
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container" title="Cierre masivo de oportunidades">
+                        <lightning:icon iconName="custom:custom68" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <a href="javascript:void(0);" class="slds-card__header-link slds-truncate" title="Cierre masivo de oportunidades">
+                            <span>Cierre masivo de oportunidades</span>
+                        </a>
+                    </h2>
+                </div>
+            </header>
+        </div>
+    
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner">
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                <thead>
+                    <tr class="slds-text-title_caps">
+                        <th scope="col">
+                            <div class="slds-truncate" title="First Name">First Name</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Last Name">Last Name</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Email">Email</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.oportunidades}" var="oportunidad">
+                        <tr>
+                            <th scope="row" data-label="First Name">
+                                <div class="slds-truncate" title="{! oportunidad.FirstName }">{! oportunidad.FirstName }</div>
+                            </th>
+                            <td data-label="Last Name">
+                                <div class="slds-truncate" title="{! oportunidad.LastName }">{! oportunidad.LastName }</div>
+                            </td>
+                            <td data-label="Email">
+                                <div class="slds-truncate" title="{! oportunidad.Email }">{! oportunidad.Email }</div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+        
+        <!--Footer-->
+        <footer class="slds-card__footer">
+            <lightning:button variant="brand" name="cerrar" aura:id="cerrar" label="Iniciar cierre masivo" onclick="{!c.cerrar}"/>
+        </footer>
+    </article>
+</aura:component>

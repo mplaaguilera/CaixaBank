@@ -1,0 +1,29 @@
+{
+    "solicitudes": [
+        {
+            "tipoSolicitud": "proAutomatica",
+            "nombreSolicitante": "JOSE MARIA FERNANDEZ MARTIN",
+            "telefono": "600600600",
+            "idProducto": "alta_cliente_CDP",
+            "idioma": "02",
+            "proceso": "contratación",
+            "nombre": "JOSE MARIA",
+            "apellido1": "FERNANDEZ",
+            "apellido2": "MARTIN",
+            "nif": "35111000F",
+            "canal": "mobile",
+            "numperso": "B99F26",
+            "entorn": "Safari",
+            "tipoContacto": "Nuevo",
+            "email1Tit": "email@email.com",
+            "nacionalidad1Tit": "España",
+            "hora": "25/07/2023 23:04:15",
+            "descripMotivo": "Cámara",
+			"origen": "Onboarding alta cliente",
+			"journeyActionId": "test",
+			"campaignId": "test",
+			"deliveryInternalName": "test",
+			"messageProfileId": "test"
+        }
+    ]
+}

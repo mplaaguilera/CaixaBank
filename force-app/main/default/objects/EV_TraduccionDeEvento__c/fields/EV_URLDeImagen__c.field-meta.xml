@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLDeImagen__c</fullName>
+    <description>Imagen formulario Portal. Tamaño imagen (408x260)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Imagen formulario Portal (408x260px)</inlineHelpText>
+    <label>URL Imagen Formulario</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

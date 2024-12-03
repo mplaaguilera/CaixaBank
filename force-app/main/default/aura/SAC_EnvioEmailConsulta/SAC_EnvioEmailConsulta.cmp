@@ -1,0 +1,148 @@
+<aura:component controller="SAC_LCMP_RedaccionFinal" implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    
+    <aura:attribute name="para"  type="String"/>
+    <aura:attribute name="CC"  type="String"/>
+    <aura:attribute name="asunto"  type="String"/>
+    <aura:attribute name="cuerpo"  type="String"/>
+    <aura:attribute name="procedencia"  type="String"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="caso"  type="Case"/>
+    <aura:attribute name="recordId"  type="String"/>
+    <aura:attribute name="esReclamacionoPretension"  type="Boolean" default="false"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="modalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="derivacionOconsulta" type="String"/>
+
+    <aura:attribute name="grupos" type="CC_Grupo_Colaborador__c[]"/>
+    <aura:attribute name="options" type="List"/>
+    <aura:attribute name="grupoAbuscar"   type="String" default=""/>
+    <aura:attribute name="grupoAbuscarId"   type="Id"/>
+    <aura:attribute name="value" type="String" default="" />
+    <aura:attribute name="mensaje"   type="String" default="" />
+    <aura:attribute name="mostrarGrupos" type="Boolean" default="false"/>
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="caracteresMin" type="Integer" default="1" />
+    <aura:attribute name="cerrar" type="Integer" default="0" />
+    <aura:attribute name="cadenaVacia" type="Boolean" default="true"/>
+    <aura:attribute name="labelInformacion" type="string"/>
+    <aura:attribute name="paraGrupo"  type="String"/>
+    <aura:attribute name="copiaGrupo"  type="String"/>
+
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" access="global" /> 
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate"> 
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.esReclamacionoPretension}">
+        <div class="slds-float--right slds-p-top_x-large">
+            <lightning:button variant="brand" label="Grupos de derivación" title="Grupos de derivación" onclick="{!c.abrirModalGruposDerivacion}" />
+            <lightning:button variant="brand" label="Grupos de consulta" title="Grupos de consulta" onclick="{!c.abrirModalGruposConsulta}" /> 
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.modalSeleccion}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open  "> <!-- slds-modal_small -->
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalSeleccion }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <aura:if isTrue="{!v.derivacionOconsulta == 'derivar'}">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Grupos de derivación</h2> 
+                    </aura:if>
+                    <aura:if isTrue="{!v.derivacionOconsulta == 'consulta'}">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Grupos de consulta</h2> 
+                    </aura:if>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                    <!-- NO existen grupos de derivacion o de consultas -->    <!-- AQUI VA TODO LO DE METER EL BUSCADOR IGUAL QUE ESTA EN DERIVAR --> 
+                    <aura:if isTrue="{!empty(v.grupos)}">
+                        <aura:if isTrue="{!v.derivacionOconsulta == 'derivar'}">
+                            Actualmente no existe ningún grupo que permita la derivación. Por favor, compruebe que existe un grupo proveedor con el check 'Permite derivación' activado.
+                        </aura:if>
+                        <aura:if isTrue="{!v.derivacionOconsulta == 'consulta'}">
+                            Actualmente no existe ningún grupo que permita consultas. Por favor, compruebe que existe un grupo proveedor con el check 'Permite consultas' activado.
+                        </aura:if>    
+                    </aura:if>
+                    <!-- Existen grupos de derivacion o de consultas -->
+                    <aura:if isTrue="{!not(empty(v.grupos))}">
+                        <div class="c-container"  > <!--class="c-container" style="padding-bottom: 125px"-->
+                            <aura:if isTrue="{!!empty(v.labelInformacion)}">
+                                <label class="slds-form-element__label">{!v.labelInformacion}</label>
+                                <lightning:helptext content="Este campo es obligatorio."/>
+                            </aura:if>
+                            <!-- buscador/selector de grupos -->
+                            <div class="slds-combobox_container">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                        <lightning:input   disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Escriba o seleccione el grupo deseado..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!v.grupoAbuscar}" autoComplete="off" variant="label-hidden" id="combobox-id-1" required="true"/> <!--required="true"-->
+                                        <!-- <lightning:icon class="slds-input__icon"  size="x-small" alternativeText="search"/> iconName="utility:down" -->
+                                    </div>
+                                </div>
+                            </div>  
+                            <!-- Lista de grupos -->
+                            <aura:if isTrue="{!v.mostrarGrupos}">  
+                                <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" > <!--   style="{! 'max-height:' + (8 + (v.recordCount * 40)) + 'px' }"-->
+                                    <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                        <aura:if isTrue="{!empty(v.mensaje)}" >
+                                            <!-- Mostrar los grupos -->
+                                            <aura:iteration items="{!v.options}" var="option" >
+                                                <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                    <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                                </li>
+                                            </aura:iteration>
+                                            <!-- Mostrar mensaje de grupo no encontrado -->
+                                            <aura:set attribute="else">
+                                                <li class="slds-listbox__item">
+                                                    <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                                </li>
+                                            </aura:set>
+                                        </aura:if>
+                                    </ul>      
+                                </div> 
+                            </aura:if>
+                        </div>
+                    </aura:if>
+                    <!--Botón confirmar-->
+                    <div class="slds-float--right slds-p-top_x-large">
+                            <lightning:button variant="brand" label="Confirmar" title="Confirmar" onclick="{!c.confirmarSeleccion}" />
+                    </div>
+                    <!--Botón cerrar-->
+                    <div class="slds-float--left slds-p-top_x-large">
+                        <lightning:button variant="brand" label="Cerrar" title="Cerrar" onclick="{! c.cerrarModalSeleccion }" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+  
+    <aura:if isTrue="{!v.caso}">
+        <c:SAC_GestionEmails recordId="{!v.recordId}" para="{!v.para}" copia="{!v.CC}" asunto="{!v.asunto}" cuerpo="{!v.cuerpo}" procedencia="{!v.procedencia}" usarComponente="{!v.usarComponente}" caso="{!v.caso}"/>
+    </aura:if>
+
+</aura:component>

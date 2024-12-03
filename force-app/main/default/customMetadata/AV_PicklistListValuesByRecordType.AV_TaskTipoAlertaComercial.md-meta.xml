@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>TaskTipoAlertaComercial</label>
+    <protected>false</protected>
+    <values>
+        <field>AV_ListSalesProcess__c</field>
+        <value xsi:type="xsd:string">Cita en la oficina;Cita telefónica;Videollamada;Visita del gestor;Llamada;Email,sms,etc;Muro;Tarea Oficina</value>
+    </values>
+    <values>
+        <field>AV_ObjectLabel__c</field>
+        <value xsi:type="xsd:string">Task</value>
+    </values>
+    <values>
+        <field>AV_RecordTypeLabel__c</field>
+        <value xsi:type="xsd:string">AV_AlertaComercial</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CierreCaso</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISCHANGED(Status),
+ISPICKVAL(Status,&quot;Cerrado&quot;),
+OR(RecordType.DeveloperName = &quot;SEG_Cliente&quot;,RecordType.DeveloperName = &quot;SEG_Seguimiento&quot;),
+OR(ISBLANK(CC_MCC_Tematica__c), ISBLANK(CC_MCC_ProdServ__c), ISBLANK( CC_MCC_Motivo__c ), AND(ISBLANK(SEG_N_operaciones_del_caso__c), NOT($Permission.SEG_SaltarValidationRulesRobot)))
+)</errorConditionFormula>
+    <errorMessage>No se permite cerrar el caso si no se ha informado de la Temática, el Producto, el Motivo y el Nº de operaciones del caso.</errorMessage>
+</ValidationRule>

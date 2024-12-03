@@ -1,0 +1,35 @@
+<aura:component controller="SAC_LCMP_PrestamoGlobal"
+                implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable" access="global">
+    <aura:attribute name="recordId" type="String" />
+    
+    <aura:attribute name="senRes" type="String" default="SAC_004"/>
+    <aura:attribute name="argRes" type="String" />
+    <aura:attribute name="motivoInad" type="String"/>
+    <aura:registerEvent name="cmpEmail" type="c:SAC_PrestamoShowEmailSender"/>
+
+    <div class="slds-box slds-col " style="padding-top: 12px">
+        <h1 style="padding-top: 12px; padding-left: 8px; font-size: 15px"><b>Sentido resolución:</b></h1>
+        <div class="slds-align-center" style="padding-top: 14px; padding-bottom: 8px">              
+            
+            <lightning:combobox label="Sentido de Resolución" required="true"
+                                onchange='{!c.sentidoRes}' value='Inadmisión'
+                                placeholder="Inadmisión" disabled="true">
+            </lightning:combobox>
+            <br />
+            <lightning:combobox label="Motivo inadmisión" required="true"
+                                onchange='{!c.motivoInad}' value='{!v.motivoInad}' disabled="true"
+                                placeholder="{!v.motivoInad}">
+            </lightning:combobox>
+            <br />
+            <lightning:textarea name="argumentoResolucion" value='{!v.argRes}'
+                                label="Argumento de Resolución" maxlength="5000"
+                                message-when-too-long="Número máximo de carácteres alcanzado." onchange='{!c.argumentoRes}'>
+            </lightning:textarea>
+        </div>
+        <div class="slds-col slds-size_12-of-12" style="padding: 8px">
+            <lightning:button label="Guardar Sentido Resolución" variant="brand"
+                              onclick='{!c.guardarResolucion}'>
+            </lightning:button>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,201 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+        <lightning-card title={tituloTabla} icon-name="standard:coaching">
+            <div slot="actions">
+                <div class="slds-float_right">
+                    
+                    <lightning-button-icon 
+                        icon-name="utility:filterList" 
+                        title="Filtrar" 
+                        onclick={handleFiltro}> 
+                    </lightning-button-icon>
+                   
+                    <lightning-button-icon
+                        icon-name="utility:refresh"
+                        title="Refrescar"
+                        onclick={handleRefreshClick}>
+                    </lightning-button-icon>
+                </div>
+            </div>
+            <div> 
+                <template if:true={showFilters}>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-4"> <!--Picklist Fecha creación-->
+                            <div class="slds-form-element slds-m-left_small">
+                                <label class="slds-form-element__label " for="picklist-id">Fecha creación:</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select class="picklist_fechaCreacion slds-select" onchange={handlePicklistChange}>
+                                            <option value="" selected style="color: #999;">Seleccionar...</option>
+                                            <option value="opcion1">Igual</option>
+                                            <option value="opcion2">Después de</option>
+                                            <option value="opcion3">Antes de</option>
+                                            <option value="opcion4">Mañana</option> 
+                                            <option value="opcion5">Hoy</option>
+                                            <option value="opcion6">Ayer</option>
+                                            <option value="opcion7">Semana siguiente</option>
+                                            <option value="opcion8">Esta semana</option>
+                                            <option value="opcion9">Semana pasada</option>
+                                            <option value="opcion10">Mes siguiente</option>
+                                            <option value="opcion11">Este mes</option>
+                                            <option value="opcion12">Mes pasado</option>
+                                            <option value="opcion13">Trimestre siguiente</option>
+                                            <option value="opcion14">Este trimestre</option>
+                                            <option value="opcion15">Trimestre pasado</option>
+                                            <option value="opcion16">Año siguiente</option>
+                                            <option value="opcion17">Este año</option>
+                                            <option value="opcion18">Año pasado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Calendario fecha creación-->
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <lightning-input type="date" class="date-picker_creacion" label="Seleccionar fecha:" disabled={isDatePickerEnabled}></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Picklist nombre alerta-->
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="picklist-id">Nombre alerta:</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select class="picklist_alertaName slds-select" onchange={handlePicklistChangeName}>
+                                            <option value="" selected style="color: #999;">Seleccionar...</option>
+                                            <option value="opcion1">Igual</option>
+                                            <option value="opcion2">Diferente</option>
+                                            <option value="opcion3">Empieza en</option>
+                                            <option value="opcion4">Acaba en</option>
+                                            <option value="opcion5">Contiene</option>
+                                            <option value="opcion6">No contiene</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Picklist leido-->
+                            <div class="slds-form-element slds-m-right_small">
+                                <label class="slds-form-element__label" for="picklist-id">Leído:</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select  class="picklist_leido slds-select" onchange={handlePicklistChangeLeido}>
+                                            <option value="" style="color: #999;">Seleccionar...</option>
+                                            <option value="opcionSI">Sí</option>
+                                            <option value="opcionNO">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-4">
+                            <p></p>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Input nombre alerta-->
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="text-input"></label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" class="text-input-alerta slds-input" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-4"> <!--Picklist Fecha lectura-->
+                            <div class="slds-form-element slds-m-left_small">
+                                <label class="slds-form-element__label" for="picklist-id">Fecha lectura:</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select class="picklist_fechaLectura slds-select"  onchange={handlePicklistChangeLectura}>
+                                            <option value=""  selected style="color: #999;">Seleccionar...</option>
+                                            <option value="opcion1">Igual</option>
+                                            <option value="opcion2">Después de</option>
+                                            <option value="opcion3">Antes de</option>
+                                            <option value="opcion4">Mañana</option>
+                                            <option value="opcion5">Hoy</option>
+                                            <option value="opcion6">Ayer</option>
+                                            <option value="opcion7">Semana siguiente</option>
+                                            <option value="opcion8">Esta semana</option>
+                                            <option value="opcion9">Semana pasada</option>
+                                            <option value="opcion10">Mes siguiente</option>
+                                            <option value="opcion11">Este mes</option>
+                                            <option value="opcion12">Mes pasado</option>
+                                            <option value="opcion13">Trimestre siguiente</option>
+                                            <option value="opcion14">Este trimestre</option>
+                                            <option value="opcion15">Trimestre pasado</option>
+                                            <option value="opcion16">Año siguiente</option>
+                                            <option value="opcion17">Este año</option>
+                                            <option value="opcion18">Año pasado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Calendario fecha Lectura-->
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <lightning-input type="date" class="date-picker_lectura" label="Seleccionar fecha:" disabled={isDatePickerEnabledLectura}></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Picklist leido por-->
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="picklist-id">Leído por:</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-select_container">
+                                        <select class="picklist_leidoPor slds-select" onchange={handlePicklistChangeLeidoPor}>
+                                            <option value="" selected style="color: #999;">Seleccionar...</option>
+                                            <option value="opcion1">Igual</option>
+                                            <option value="opcion2">Diferente</option>
+                                            <option value="opcion3">Empieza en</option>
+                                            <option value="opcion4">Acaba en</option>
+                                            <option value="opcion5">Contiene</option>
+                                            <option value="opcion6">No contiene</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                        </div>
+                        <div class="slds-col slds-size_1-of-4"> <!--Input leido por-->
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label" for="text-input"></label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" class="text-input-leido slds-input" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4">
+                            <lightning-button variant="brand" label="Filtrar" class="slds-button slds-button_brand slds-float_right slds-m-right_small" onclick={handleFiltrar}></lightning-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div>
+                <lightning-datatable
+                        key-field="Id"
+                        data={alertas}
+                        columns={columns}
+                        sorted-by={sortedBy}
+                        sorted-direction={sortedDirection}
+                        onsort={handleSortData}
+                        onrowaction={handleRowAction}
+                        hide-checkbox-column="true">
+                </lightning-datatable>
+            </div>
+        </lightning-card>
+    </div>
+ 
+</template>

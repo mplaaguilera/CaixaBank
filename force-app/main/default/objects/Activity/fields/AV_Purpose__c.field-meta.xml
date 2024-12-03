@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Purpose__c</fullName>
+    <description>Informa de la finalidad del evento</description>
+    <label>Finalidad</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>001</fullName>
+                <default>false</default>
+                <label>Comercial</label>
+            </value>
+            <value>
+                <fullName>002</fullName>
+                <default>false</default>
+                <label>Gestión Operativa</label>
+            </value>
+            <value>
+                <fullName>Comercial</fullName>
+                <default>false</default>
+                <label>Comercial Old</label>
+            </value>
+            <value>
+                <fullName>GestionOperativa</fullName>
+                <default>false</default>
+                <label>Gestión Operativa Old</label>
+            </value>
+            <value>
+                <fullName>Tabulada</fullName>
+                <default>false</default>
+                <label>Tabulada</label>
+            </value>
+            <value>
+                <fullName>Tabulada con gestión</fullName>
+                <default>false</default>
+                <label>Tabulada con gestión</label>
+            </value>
+            <value>
+                <fullName>Personalizada</fullName>
+                <default>false</default>
+                <label>Personalizada</label>
+            </value>
+            <value>
+                <fullName>Gestión Operativa</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Gestión Operativa Invalidado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

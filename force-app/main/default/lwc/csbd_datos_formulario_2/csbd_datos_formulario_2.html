@@ -1,0 +1,71 @@
+<template>
+    <template lwc:if={renderizar}>
+        <div lwc:if={solicitud}>
+            <article class="slds-card slds-var-m-horizontal_large slds-var-p-top_x-large">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container">
+                                <lightning-icon icon-name="standard:form" size="small"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body slds-truncate">
+                            <h2 class="slds-card__header-title">Datos de origen</h2>
+                            <div lwc:if={solicitudReferencia}>
+                                <span>Solicitud con referencia</span>
+                                <span class="spanReferencia">{solicitudReferencia}</span>.
+                            </div>
+                        </div>
+                        <div class="slds-no-flex">
+                            <lightning-button label="Copiar cuerpo de la solicitud" icon-name="utility:merge_field" onclick={copiarJsonAlPortapapeles}></lightning-button>
+                            <lightning-button label="Ver tarea" icon-name="utility:task" class="slds-var-m-left_small" onclick={verDetalleTarea}></lightning-button>
+                        </div>
+                    </header>
+                </div>
+
+                <div class="slds-card__body slds-card__body_inner slds-var-m-top_xx-large">
+                    <!--Buscador-->
+                    <lightning-input type="search" placeholder="Filtrar por nombre o valor" variant="label-hidden" onchange={filtrarAtributos}></lightning-input>
+                    <!--Lista de atributos-->
+                    <ul class="listaAtributos slds-var-m-top_x-large">
+                        <template for:each={solicitudResultados} for:item="atributo">
+                            <li class="atributo" key={atributo.nombre}>
+                                <div class="slds-grid">
+                                    <!-- Clave -->
+                                    <div class="atributoNombre slds-col slds-size_1-of-4 slds-text-align_right slds-truncate">
+                                        <span class="iconoCopiar slds-col slds-var-m-right_medium">
+                                            <!-- sldsValidatorIgnoreNextLine -->
+                                            <lightning-button-icon icon-name="utility:copy" variant="border-filled" onclick={copiarValor} title="Copiar valor" data-valor={atributo.nombre}></lightning-button-icon>
+                                        </span>
+                                        {atributo.nombre}:
+                                    </div>
+                                    <!-- Valor -->
+                                    <div class="atributoValor slds-col slds-truncate">
+                                        <span lwc:if={atributo.valor} data-atributo={atributo.nombre}>
+                                            {atributo.valor}
+                                            <span class="iconoCopiar slds-col slds-var-m-left_medium">
+                                                <!-- sldsValidatorIgnoreNextLine -->
+                                                <lightning-button-icon icon-name="utility:copy" variant="border-filled" title="Copiar valor" onclick={copiarValor} data-valor={atributo.valor}></lightning-button-icon>
+                                            </span>
+                                        </span>
+                                        <span lwc:else class="atributoValorSinValor">Sin valor</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <footer class="slds-card__footer slds-var-p-top_x-large">
+                    <span>Solicitud recibida el</span>&nbsp;
+                    <span>
+                        <lightning-formatted-date-time value={tareaSolicitudRecibida.CC_Fecha_Inicio__c} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                    </span>
+                </footer>
+            </article>
+        </div>
+        <div lwc:else>
+            <c-cc-scoped-notification icono="info_alt" mensaje="Sin datos de origen que mostrar."></c-cc-scoped-notification>
+        </div>
+    </template>
+
+</template>

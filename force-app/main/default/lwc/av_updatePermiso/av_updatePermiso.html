@@ -1,0 +1,74 @@
+<template>
+    <lightning-card class="customCard slds-border_bottom" variant="Narrow" title="Actualizar permiso"
+        icon-name="standard:portal">
+        <div class="slds-border_bottom"></div>
+
+        <!-- <div class="slds-form_vertical inputPadding" style="margin-top:1rem"> -->
+        <div class="slds-form_vertical inputPadding " >
+            <!-- <lightning-pill-container> -->
+
+            <!-- <lightning-pill label={permiso.AV_UsuarioCedido__r.Name} name={permiso.AV_UsuarioCedido__c>
+                    <lightning-icon icon-name="standard:user" alternative-text="user" style="border-radius:15px"></lightning-icon>
+                </lightning-pill> -->
+            <span class="slds-pill slds-pill_link" style="margin:1.5rem 0">
+                <span class="slds-pill__icon_container">
+                    <lightning-icon icon-name="standard:user" alternative-text="user" style="border-radius:15px"></lightning-icon>
+                </span>
+                <a  onclick={getContactRecord} class="slds-pill__action" href = "#">
+                    <span class="slds-pill__label">{permiso.AV_UsuarioCedido__r.Name} &nbsp;• &nbsp;Centro:&nbsp;{formatedOffice}</span>
+                </a>
+            </span>
+            <!-- </lightning-pill-container> -->
+        <div class="slds-border_bottom"></div>
+                <div class="slds-grid" style="padding-right:.5 rem">
+                    <div class="slds-col">
+                        <!-- <div class="slds-size_7-of-12"> -->
+                        <div class="stickyLabel">
+                            <abbr class="slds-required asterisk">*</abbr>
+                            <label class="slds-form-element__label label-fecha-gestion">Inicio cesión</label>
+                        </div>
+                        <lightning-input data-id='startDate' class="slds-size_12-of-12" type="date"
+                            value={permiso.AV_InicioPermiso__c} name="startDateInterval" onchange={handleDates}
+                            disabled={employeesDiv}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12"></div>
+                    <div class="slds-col" style="align-items: right;">
+                        <div style="text-align:left">
+
+                            <div class="stickyLabel">
+                                <abbr class="slds-required ">*</abbr>
+                                <label class="slds-form-element__label label-fecha-gestion">Final cesión</label>
+                            </div>
+                            <lightning-input data-id='endDate' class="slds-size_12-of-12" type="date"
+                                value={permiso.AV_FinalPermiso__c} name="endDateInterval" onchange={handleDates}
+                                disabled={employeesDiv}>
+                            </lightning-input>
+                        </div>
+                    </div>
+                </div>
+                <!-- </div> -->
+
+                <!-- <div style="width:130%;background-color:rgb(248,248,248)"> -->
+
+                <div class="buttonDiv">
+
+                    <!-- <div style=""> -->
+                    <button type="button" class="slds-button slds-button_neutral" onclick ={cancelModal}> Cancelar
+                    </button>
+                    <!-- <button type="button" class="slds-button slds-button_neutral" > <a href="#" style = "text-decoration:none">Cancelar</a>
+                    </button> -->
+                    <button type="button" class="slds-button slds-button_brand" onclick={executeUpdt}
+                        disabled={formedPer}>Actualizar </button>
+                    <!-- </div> -->
+                </div>
+                <!-- </div> -->
+
+            </div>
+
+        <!-- </div> -->
+        <!-- </div> -->
+        <lightning-spinner if:true={showSpinner} alternative-text="Loading" size="medium" class="spin-cls">
+        </lightning-spinner>
+    </lightning-card>
+
+</template>

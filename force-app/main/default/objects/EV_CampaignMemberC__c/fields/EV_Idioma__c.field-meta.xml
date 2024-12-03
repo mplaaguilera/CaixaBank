@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Idioma__c</fullName>
+    <description>Idioma</description>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(EV_LeadId__c),
+IF(ISBLANK(EV_ContactId__c),
+IF(ISBLANK(EV_AccountId__c), null, CASE(TEXT(EV_AccountId__r.AV_Idioma__c),
+&apos;002&apos;, &apos;Castellano&apos;,
+&apos;001&apos;, &apos;Catalán&apos;,
+&apos;010&apos;, &apos;Inglés&apos;,
+TEXT(EV_AccountId__r.AV_Idioma__c))),
+CASE(TEXT(EV_ContactId__r.CC_Idioma__c),
+&apos;es&apos;, &apos;Castellano&apos;,
+&apos;ca&apos;, &apos;Catalán&apos;,
+&apos;en&apos;, &apos;Inglés&apos;,
+TEXT(EV_ContactId__r.CC_Idioma__c))),
+CASE(TEXT(EV_LeadId__r.EV_Idiomas__c),
+&apos;002&apos;, &apos;Castellano&apos;,
+&apos;001&apos;, &apos;Catalán&apos;,
+&apos;010&apos;, &apos;Inglés&apos;,
+TEXT(EV_LeadId__r.EV_Idiomas__c)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Idioma</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

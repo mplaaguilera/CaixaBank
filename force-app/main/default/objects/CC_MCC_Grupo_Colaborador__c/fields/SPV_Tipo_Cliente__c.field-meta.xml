@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_Tipo_Cliente__c</fullName>
+    <description>Campo para seleccionar el tipo de cliente del registro</description>
+    <label>Tipo cliente</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>SAC</fullName>
+                <default>false</default>
+                <label>SAC</label>
+            </value>
+            <value>
+                <fullName>SPV</fullName>
+                <default>false</default>
+                <label>SPV</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

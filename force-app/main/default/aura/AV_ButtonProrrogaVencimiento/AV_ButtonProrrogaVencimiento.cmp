@@ -1,0 +1,46 @@
+<aura:component  controller="AV_ProrrogaVencimiento" implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:availableForFlowScreens" access="global">
+  	<aura:html tag="style">
+        .cuf-content {
+            padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+            padding: 0rem !important;
+        }       
+        .slds-modal__content{
+            overflow-y:hidden !important;
+            height:unset !important;
+            max-height:250px !important;
+        	margin-top: 10px;
+        	text-align: center;
+        }
+    </aura:html>
+<!-- ATRIBUTOS -->
+<aura:attribute name="recordId" type="String" />
+    
+    <div class="modal-header slds-modal__header slds-size_1-of-1">
+        <h4 class="title slds-text-heading--medium" >Prorrogar fecha vencimiento</h4>
+    </div>
+    
+	<!-- CUERPO DEL MODAL -->
+    <div>
+            <p>Se modificará la fecha de vencimiento, 
+         necesario grabar la llamada o disponer de un correo con la autorización</p>
+        
+        <!-- MODAL FOOTER -->
+		<div class="modal-footer slds-modal__footer slds-size_1-of-1">
+            <div class="forceChangeRecordTypeFooter">
+                <ui:button class="slds-button slds-button_neutral" label="Cancel" press="{! c.close}" /> 
+                <ui:button class="slds-button slds-button--brand" label="Save" press="{!c.save}"/>
+            </div>
+        </div>
+            	<!-- BOTONES DEL MODAL 
+            <lightning:button variant="neutral" 
+									label="Cancel"
+									title="Cancel"
+									onclick="{! c.close }"/>
+			<lightning:button variant="brand" 
+									label="Aceptar"
+									title="Aceptar"
+									onclick="{! c.save }"/> -->
+	</div>     
+</aura:component>

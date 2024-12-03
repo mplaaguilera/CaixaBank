@@ -1,0 +1,35 @@
+<aura:component controller="CSBD_Navegar_Listview_Controller" implements="flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="listViews" type="List"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <!--Card-->
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon iconName="custom:custom68" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>Enlaces</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner">
+            <aura:iteration items="{!v.listViews}" var="listView">
+                <div>
+                    <lightning:button name="{!listView.Id}" label="{!listView.Name}" iconName="utility:kanban" onclick="{!c.navegar}"/>
+                </div>
+            </aura:iteration>
+        </div>
+    </article>
+
+</aura:component>

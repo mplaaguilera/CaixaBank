@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Solicitud_Informacion_Aportar__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Si solicita información sobre la documentación a aportar</inlineHelpText>
+    <label>Información de documentación a aportar</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_ValidarFechaCargo</fullName>
+    <active>true</active>
+    <description>Validación de la fecha de cargo</description>
+    <errorConditionFormula>AND(
+				OR(ISNEW(), ISCHANGED(SEG_FechaCargo__c)),
+				OR(RecordType.DeveloperName == &apos;SEG_Cliente&apos;, RecordType.DeveloperName == &apos;SEG_Seguimiento&apos;),
+				SEG_FechaCargo__c &lt; TODAY()
+)</errorConditionFormula>
+    <errorMessage>La fecha de cargo informada no puede ser inferior a la fecha actual</errorMessage>
+</ValidationRule>

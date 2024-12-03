@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_VersionOficina__c</fullName>
+    <description>Campo texto que recoge la respuesta a la consulta que se genera automáticamente a la oficina</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Respuesta a la consulta oficina que se genera automáticamente</inlineHelpText>
+    <label>Versión de la oficina</label>
+    <length>32768</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

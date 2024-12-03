@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo__c</fullName>
+    <label>Tipo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>APEX</fullName>
+                <default>false</default>
+                <label>Custom</label>
+            </value>
+            <value>
+                <fullName>Merge_Fields</fullName>
+                <default>false</default>
+                <label>Merge con selección de campos</label>
+            </value>
+            <value>
+                <fullName>Merge</fullName>
+                <default>true</default>
+                <label>Merge estándar</label>
+            </value>
+            <value>
+                <fullName>Merge_NULLS</fullName>
+                <default>false</default>
+                <label>Merge con campos no Nulos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

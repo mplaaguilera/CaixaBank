@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_RO_si_cerrada</fullName>
+    <active>true</active>
+    <description>Controla que no se pueda modificar una oportunidad si su estado es cerrada o rechazada</description>
+    <errorConditionFormula>AND(
+    NOT($Permission.CSBD_Administrador),
+    AND(
+   OR(
+      BEGINS($Profile.Name, &apos;AM&apos;),
+      BEGINS($Profile.Name, &apos;AV&apos;),
+      BEGINS($Profile.Name, &apos;CC&apos;),
+BEGINS($Profile.Name, &apos;CSBD&apos;),
+      BEGINS($Profile.Name, &apos;EV&apos;),
+      BEGINS($Profile.Name, &apos;OB&apos;),
+      BEGINS($Profile.Name, &apos;OS&apos;),
+      BEGINS($Profile.Name, &apos;SAC&apos;),
+      BEGINS($Profile.Name, &apos;SEG&apos;)
+   ),
+   BEGINS(RecordType.DeveloperName , &apos;CSBD&apos;),
+AND(
+    NOT(ISCHANGED(Name)),
+    NOT(ISCHANGED(CSBD_Estado__c)),
+    NOT(ISCHANGED(OwnerId)),
+      NOT(ISCHANGED(CSBD_Alta_omnichannel__c)),
+    IsClosed
+  )
+    )
+)
+&amp;&amp; NOT(ISNEW())</errorConditionFormula>
+    <errorMessage>Para modificar una oportunidad en estado cerrada o rechazada debe reactivarla previamente.</errorMessage>
+</ValidationRule>

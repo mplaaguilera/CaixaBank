@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_Con_Duplicados__c</fullName>
+    <defaultValue>false</defaultValue>
+    <inlineHelpText>Se han rechazado automáticamente oportunidades anteriores que se han considerado duplicadas de ésta</inlineHelpText>
+    <label>Con duplicados</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

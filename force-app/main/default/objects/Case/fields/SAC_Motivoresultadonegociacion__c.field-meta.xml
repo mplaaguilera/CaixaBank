@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Motivoresultadonegociacion__c</fullName>
+    <label>Motivo rechazo negociación</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>% TAE insuficiente, solicita más bajada</fullName>
+                <default>false</default>
+                <label>% TAE insuficiente, solicita más bajada</label>
+            </value>
+            <value>
+                <fullName>Imposibilidad de contactar con el cliente / despacho</fullName>
+                <default>false</default>
+                <label>Imposibilidad de contactar con el cliente / despacho</label>
+            </value>
+            <value>
+                <fullName>No desea negociar solo devolución integra</fullName>
+                <default>false</default>
+                <label>No desea negociar solo devolución integra</label>
+            </value>
+            <value>
+                <fullName>Solicita verificar primero documentación no disponible</fullName>
+                <default>false</default>
+                <label>Solicita verificar primero documentación no disponible</label>
+            </value>
+            <value>
+                <fullName>No da respuesta a la oferta</fullName>
+                <default>false</default>
+                <label>No da respuesta a la oferta</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

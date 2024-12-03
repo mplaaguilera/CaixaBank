@@ -1,0 +1,26 @@
+<template>
+    <div class="slds-card slds-card_boundary">
+    <lightning-card title="Elementos enviados" icon-name="standard:document">
+        <!-- Contenedor de la barra de acciones -->
+        <div slot="actions" class="slds-float_right">
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                title="Refrescar"
+                alternative-text="Refrescar"
+                onclick={handleRefreshClick}>
+            </lightning-button-icon>
+        </div>
+
+        <!-- Contenedor de la tabla -->
+        <div class="slds-p-around_medium">
+            <lightning-datatable
+                key-field="Id"
+                data={documentos}
+                columns={columns}
+                hide-checkbox-column="true"
+                max-row-selection="1">
+            </lightning-datatable>
+        </div>
+    </lightning-card>
+    </div>
+</template>

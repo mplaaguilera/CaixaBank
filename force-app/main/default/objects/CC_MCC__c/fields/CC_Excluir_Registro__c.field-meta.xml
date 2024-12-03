@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Excluir_Registro__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Excluir registro de KPI derivación a Oficina</description>
+    <inlineHelpText>Excluir registro de KPI derivación a Oficina</inlineHelpText>
+    <label>Excluir Registro</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

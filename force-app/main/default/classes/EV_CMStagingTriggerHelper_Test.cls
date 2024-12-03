@@ -1,0 +1,120 @@
+/**********************************************************************************************************************
+ Name:   EV_CMStagingTriggerHelper_Test
+ Copyright © 2020  CaixaBank
+-----------------------------------------------------------------------------------------------------------------------
+Proposito: clase test para el trigger
+-----------------------------------------------------------------------------------------------------------------------
+Historial
+---------------------
+	VERSION     USER_STORY          AUTHOR                      DATE                Description
+	1.0 																			Init version
+	1.1								Mamen Arias					30/12/2022			Add test checkExternalIdEmpty() and checkExternalIdWrong()
+	1.2			US680535			Mamen Arias					03/08/2023			Add test validateCampaignMemberStagingWithCMCustom()
+***********************************************************************************************************************/
+@isTest
+public with sharing class EV_CMStagingTriggerHelper_Test {
+
+	@TestSetup
+	static void makeData(){
+		EV_TestHelper.createCampaignMemberContact(true, false);
+        EV_TestHelper.createCampaignMemberCustomContact(false, true);
+	}
+
+	@isTest
+	public static void validateCampaignMemberStaging() {
+		CampaignMember campMember =[SELECT Id, EV_ExternalId__c FROM CampaignMember];
+		
+		Test.startTest();
+		EV_CampaingMemeberStaging__c cms = new EV_CampaingMemeberStaging__c(
+			EV_ContadorCheckInVirtual__c =1,
+			EV_Origen__c = 'Newsletter',
+			EV_Canal__c = 'I',
+			EV_Numperso__c= '123oN76291pPKt1',
+			EV_ExternalId__c = campMember.EV_ExternalId__c
+		);
+
+		insert cms;
+		System.assertEquals(1, cms.EV_ContadorCheckInVirtual__c);
+		Test.stopTest();
+	}
+    
+    @isTest
+	public static void validateCampaignMemberStagingWithCMCustom() {
+		User newUser = EV_TestHelper.createUserTest('EV_Governance_Eventos','EV Gestor Eventos Senior','Eventos');
+		EV_CampaignMemberC__c campMember =[SELECT Id, EV_ExternalId__c FROM EV_CampaignMemberC__c];
+		EV_CampaingMemeberStaging__c cms = new EV_CampaingMemeberStaging__c();
+		
+		Test.startTest();
+		System.runAs(newUser){
+			cms.EV_ContadorCheckInVirtual__c =1;
+			cms.EV_Origen__c = 'Newsletter';
+			cms.EV_Canal__c = 'I';
+			cms.EV_Numperso__c= '123oN76291pPKt1';
+			cms.EV_ExternalId__c = campMember.EV_ExternalId__c;
+
+			insert cms;
+		}
+		
+		Test.stopTest();
+
+		System.assertEquals(1, cms.EV_ContadorCheckInVirtual__c);
+	}
+
+	@isTest
+	public static void validateCampaignMemberStagingBaja() {
+		CampaignMember campMember = [SELECT Id, EV_ExternalId__c FROM CampaignMember];
+		
+		Test.startTest();
+		EV_CampaingMemeberStaging__c cms = new EV_CampaingMemeberStaging__c(
+			EV_CampaignMemberStatus__c = 'Baja del evento',
+			EV_ExternalId__c = campMember.EV_ExternalId__c
+		);
+		
+		insert cms;
+		System.assertEquals('Baja del evento', cms.EV_CampaignMemberStatus__c);
+		Test.stopTest();
+	}
+
+	@isTest
+	public static void checkExternalIdEmpty(){
+		CampaignMember campMember = [SELECT Id, EV_ExternalId__c, EV_Numperso__c FROM CampaignMember];
+		campMember.EV_ExternalId__c = '';
+		update campMember;
+
+		Test.startTest();
+		EV_CampaingMemeberStaging__c cms = new EV_CampaingMemeberStaging__c(
+			EV_ExternalId__c = campMember.EV_ExternalId__c
+		);
+
+		try{
+			insert cms;
+		} catch (Exception e){
+			Test.stopTest();
+			System.assertEquals(e.getMessage()!=null, true);
+		}
+	}
+
+	@isTest
+	public static void checkExternalIdWrong(){
+		CampaignMember cm = new CampaignMember (
+			ContactId = EV_TestHelper.createContactAux('TestContact').Id,
+			CampaignId = EV_TestHelper.createChildCampaignFisica().Id,
+			EV_ExternalId__c = '5645652156',
+			Status = 'Pendiente'
+		);
+
+		Test.startTest();
+		insert cm;
+		
+		EV_CampaingMemeberStaging__c cms = new EV_CampaingMemeberStaging__c(
+			EV_ExternalId__c = cm.EV_ExternalId__c
+		);
+
+		try{
+			insert cms;
+		} catch (Exception e){
+			Test.stopTest();
+			System.assertEquals(e.getMessage()!=null, true);
+		}
+	}
+}

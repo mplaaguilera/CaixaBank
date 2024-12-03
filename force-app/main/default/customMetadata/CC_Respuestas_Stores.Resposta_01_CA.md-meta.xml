@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Resposta_01_CA</label>
+    <protected>false</protected>
+    <values>
+        <field>Idioma__c</field>
+        <value xsi:type="xsd:string">ca</value>
+    </values>
+    <values>
+        <field>Respuesta__c</field>
+        <value xsi:type="xsd:string">Hola, l&apos;equip de CaixaBank t&apos;agraeix la valoració i ens comprometem a continuar treballant per millorar.</value>
+    </values>
+</CustomMetadata>

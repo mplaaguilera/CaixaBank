@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SACH_Mis_casos_pendientes_de_colaborador</fullName>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.ORIGIN</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>NAME</columns>
+    <columns>SACH_Alerta_Ultima_Vencida__c</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Pendiente Colaborador</value>
+    </filters>
+    <filters>
+        <field>CASES.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Case.SACH_Cliente</value>
+    </filters>
+    <label>SACH - Mis casos pdtes. de colaborador</label>
+    <sharedTo>
+        <role>SACH</role>
+    </sharedTo>
+</ListView>

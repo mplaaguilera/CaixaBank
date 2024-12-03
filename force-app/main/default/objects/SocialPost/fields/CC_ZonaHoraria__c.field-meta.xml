@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ZonaHoraria__c</fullName>
+    <defaultValue>IF ( DATEVALUE($System.OriginDateTime ) &gt;= 
+DATE ( YEAR (DATEVALUE($System.OriginDateTime)),3,1) 
++ 
+( 
+14- 
+CASE( MOD(DATE ( YEAR (DATEVALUE($System.OriginDateTime)),3,1) - DATE (1900,1,7),7) , 
+0,7,MOD(DATE ( YEAR (DATEVALUE($System.OriginDateTime)),3,1) - DATE (1900,1,7),7)) 
+) 
+&amp;&amp; 
+DATEVALUE($System.OriginDateTime) &lt; 
+DATE ( YEAR (DATEVALUE($System.OriginDateTime)),11,1) 
++ 
+( 
+7- 
+CASE( MOD(DATE ( YEAR (DATEVALUE($System.OriginDateTime)),11,1) - DATE (1900,1,7),7) , 
+0,7,MOD(DATE ( YEAR (DATEVALUE($System.OriginDateTime)),11,1) - DATE (1900,1,7),7)) 
+), 
+1, 
+2 
+)</defaultValue>
+    <description>Zona horaria de la fecha de escritura del post</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Zona horaria de la fecha de escritura del post</inlineHelpText>
+    <label>Zona horaria</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

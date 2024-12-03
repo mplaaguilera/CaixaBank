@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_LongitudMobilePhone</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND ( 
+NOT ISBLANK(MobilePhone), 
+OR (
+				LEN(MobilePhone) &lt; 8,
+				LEN(MobilePhone) &gt; 23
+				)
+)</errorConditionFormula>
+    <errorDisplayField>MobilePhone</errorDisplayField>
+    <errorMessage>La longitud del teléfono móvil debe ser mínimo de 8 dígitos y máximo de 23 (prefijo incluido)</errorMessage>
+</ValidationRule>

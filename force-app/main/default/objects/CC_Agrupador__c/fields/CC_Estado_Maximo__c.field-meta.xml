@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Estado_Maximo__c</fullName>
+    <label>Estado Maximo</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ACCEPTED</fullName>
+                <default>false</default>
+                <label>Aceptado</label>
+            </value>
+            <value>
+                <fullName>CLOSED</fullName>
+                <default>false</default>
+                <label>Cerrado</label>
+            </value>
+            <value>
+                <fullName>INPROG</fullName>
+                <default>false</default>
+                <label>En Progreso</label>
+            </value>
+            <value>
+                <fullName>RESOLV_CHANGE</fullName>
+                <default>false</default>
+                <label>Pdte. Revisión Cambio</label>
+            </value>
+            <value>
+                <fullName>RESOLV_REV_CLOSE</fullName>
+                <default>false</default>
+                <label>Pdte. Revisión Cierre</label>
+            </value>
+            <value>
+                <fullName>RESOLV_DOC</fullName>
+                <default>false</default>
+                <label>Pdte. Revisión Documentación</label>
+            </value>
+            <value>
+                <fullName>RESOLV_REV_SOL</fullName>
+                <default>false</default>
+                <label>Pdte. Revisión Solución</label>
+            </value>
+            <value>
+                <fullName>PENDING_USER</fullName>
+                <default>false</default>
+                <label>Pdte. Usuario</label>
+            </value>
+            <value>
+                <fullName>RESOLVED</fullName>
+                <default>false</default>
+                <label>Resuelto</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

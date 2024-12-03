@@ -1,0 +1,15 @@
+.slds-modal__container {
+    margin: 0 auto;
+    width: 60%;
+    max-width: 60rem;
+    min-width: 20rem;
+}
+
+@media screen and (min-width: 48em) {
+    .slds-modal__container {
+        margin: 0 auto;
+        width: 60%;
+        max-width: 60rem;
+        min-width: 20rem;
+    }
+  }

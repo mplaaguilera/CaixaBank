@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LogWarn__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>If true the logging is print in the log (warn mode).
+            If false the logging isn&apos;t print in the log (warn mode).</description>
+    <inlineHelpText>True -&gt; print the logging
+            False -&gt; no print the logging</inlineHelpText>
+    <label>LogWarn</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

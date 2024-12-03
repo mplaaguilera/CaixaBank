@@ -1,0 +1,62 @@
+<template>
+  <header class="slds-modal__header">
+  <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Cancelar Proceso de Refinanciación</h2>
+  </header>
+  <template if:true={confirmacion}>
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">      
+      ¿Está seguro que desea cancelar el Proceso de Refinanciación? 
+    </div>           
+    <footer class="slds-modal__footer">
+      <button class="slds-button slds-button_brand" onclick={siCancelar} >Si</button>
+      <button class="slds-button slds-button_neutral" onclick={cancelar} >No</button>
+    </footer>
+  </template>
+
+  <template if:true={procesoCancelar}>
+    <div class="slds-modal__content slds-p-around_medium" >     
+      <template if:true={mensajeEspera}>
+        <div class="slds-notify_container slds-is-relative">
+          <div class="slds-notify slds-notify_toast slds-theme_info" role="status">
+            <lightning-spinner alternative-text="Loading" variant="brand" size="small"></lightning-spinner>
+            <div class="slds-notify__content">
+              <h2 class="slds-text-heading_small">Por favor espere</h2>
+            </div>                  
+          </div>
+        </div>
+      </template>
+      <template if:true={mensajeOK}>
+        <div class="slds-notify_container slds-is-relative">
+          <div class="slds-notify slds-notify_toast slds-theme_success" role="status">
+            <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Correcto">
+              <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#success"></use>
+              </svg>
+            </span>
+            <div class="slds-notify__content">
+              <h2 class="slds-text-heading_small">Se ha cancelado correctamente.</h2>
+            </div>                  
+          </div>
+        </div>
+      </template>
+      <template if:true={mensajeKO}>
+        <div class="slds-notify_container slds-is-relative">
+          <div class="slds-notify slds-notify_toast slds-theme_error" role="status">                  
+            <span class="slds-icon_container slds-icon-utility-error slds-m-right_small slds-no-flex slds-align-top" title="Error">
+              <svg class="slds-icon slds-icon_small" aria-hidden="true">
+              <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#error"></use>
+              </svg>
+            </span>
+            <div class="slds-notify__content">
+              <h2 class="slds-text-heading_small"><lightning-formatted-rich-text value={mensajeError} ></lightning-formatted-rich-text> </h2>
+              {codigoError}
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>           
+    <footer class="slds-modal__footer">
+      <button class="slds-button slds-button_neutral" onclick={cancelar} disabled={disabledCerrar}>Cerrar</button>
+    </footer>
+  </template>
+
+</template>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Cliente__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Cliente</label>
+    <lookupFilter>
+        <active>true</active>
+        <booleanFilter>1 OR 2</booleanFilter>
+        <filterItems>
+            <field>Contact.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente</value>
+        </filterItems>
+        <filterItems>
+            <field>Contact.Account.RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Cliente (cuenta personal)</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>Contact</referenceTo>
+    <relationshipLabel>Clientes</relationshipLabel>
+    <relationshipName>CC_Caracteristica_Detalles_Clientes</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

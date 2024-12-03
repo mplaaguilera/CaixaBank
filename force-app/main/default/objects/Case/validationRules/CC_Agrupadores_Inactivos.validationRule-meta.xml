@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agrupadores_Inactivos</fullName>
+    <active>true</active>
+    <description>Validation rule que impide vincular un agrupador cerrado / rechazado al caso.</description>
+    <errorConditionFormula>OR(
+AND(
+ISCHANGED( CC_Agrupador_Id__c),
+ISPICKVAL( CC_Agrupador_Id__r.CC_Estado__c,&quot;Cerrado&quot;)),
+AND(
+ISCHANGED( CC_Agrupador_Id__c),
+ISPICKVAL( CC_Agrupador_Id__r.CC_Estado__c,&quot;Rechazado&quot;)))</errorConditionFormula>
+    <errorMessage>Solo se pueden asociar agrupadores activos.</errorMessage>
+</ValidationRule>

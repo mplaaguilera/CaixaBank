@@ -1,0 +1,53 @@
+<aura:component controller="CSBD_LiveAgent_Welcome_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+	<aura:attribute name="recordId" type="String" />
+	<aura:attribute name="chat" type="LiveChatTranscript" />
+	<aura:attribute name="oportunidad" type="Opportunity" />
+	<aura:attribute name="errorLds" type="String" />
+	<aura:attribute name="timeout" type="Boolean" default="false" />
+	<aura:attribute name="saludoAutoCompletado" type="Boolean" default="false" />
+	<aura:attribute name="primerMsgAgenteEnviado" type="Boolean" default="false" />
+	<!-- <aura:attribute name="fechaPrimerMsgAgente" type="Datetime" /> -->
+
+	<aura:handler event="lightning:conversationNewMessage" action="{!c.onNewMessage}" />
+	<aura:handler event="lightning:conversationAgentSend" action="{!c.onAgentSend}" />
+	<aura:handler event="lightning:conversationChatEnded" action="{!c.onCloseWork}" />
+
+	<ltng:require afterScriptsLoaded="{!c.enviarSaludoAuto}" />
+
+	<lightning:conversationToolkitAPI aura:id="conversationKit" />
+	<lightning:omniToolkitAPI aura:id="omniToolkit" />
+
+	<force:recordData aura:id="chatData" recordId="{!v.recordId}"
+		fields="Status, CSBD_Oportunidad_Id__c, CSBD_Welcome_Enviado__c" targetFields="{!v.chat}" targetError="{!v.errorLds}"
+		recordUpdated="{!c.chatDataUpdated}" />
+
+	<force:recordData aura:id="opportunityData" recordId="{!v.chat.CSBD_Oportunidad_Id__c}" mode="EDIT"
+		fields="CSBD_Identificador__c, CSBD_PrimerContactoSLA__c, CSBD_SLA_Primera_Respuesta__c, CSBD_SLA_TGT__c, CreatedDate" targetFields="{!v.oportunidad}" targetError="{!v.errorLds}"
+		recordUpdated="{!c.opportunityDataUpdated}" />
+
+	<!-- <c:CSBD_LiveAgent_TimeOut aura:id="compTimeOut" timeout="{!v.timeout}"/> -->
+
+	<article class="slds-card">
+		<div class="slds-card__body slds-card__body_inner">
+			<aura:if isTrue="{!v.timeout}">
+				<div class="slds-box slds-var-m-bottom_large" style="background-color: floralwhite;">
+					<lightning:icon iconName="utility:clock" size="x-small" class="slds-is-relative slds-var-m-right_small" style="top: -1px;" />
+					<span>Chat cerrado por inactividad del cliente.</span>
+				</div>
+			</aura:if>
+
+			<div class="slds-grid slds-grid_vertical-align-center">
+				<div class="slds-col">
+					<lightning:recordViewForm recordId="{!v.recordId}" objectApiName="LiveChatTranscript">
+						<lightning:outputField fieldName="CC_Idioma__c" style="margin-bottom: 0px;"/>
+					</lightning:recordViewForm>
+				</div>
+				<div class="slds-col slds-grow-none">
+					<lightning:button label="Finalizar" variant="destructive" onclick="{!c.finalizarChat}" disabled="{!v.chat.Status != 'InProgress'}"/>
+				</div>
+			</div>
+		</div>
+	</article>
+
+</aura:component>

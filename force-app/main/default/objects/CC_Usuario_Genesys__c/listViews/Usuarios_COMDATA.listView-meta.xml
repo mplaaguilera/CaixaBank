@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usuarios_COMDATA</fullName>
+    <columns>NAME</columns>
+    <columns>CC_DN__c</columns>
+    <columns>CC_User__c</columns>
+    <columns>CC_Acceso__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>NAME</field>
+        <operation>startsWith</operation>
+        <value>1800,1801,1802</value>
+    </filters>
+    <label>Usuarios COMDATA</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

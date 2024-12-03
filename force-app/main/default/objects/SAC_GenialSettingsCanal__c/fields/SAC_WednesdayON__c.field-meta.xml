@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_WednesdayON__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Si es un miércoles, solo se podrán enviar casos a la IA si este check está a true.
+Por defecto estará checked.</description>
+    <label>Miercoles Activado</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

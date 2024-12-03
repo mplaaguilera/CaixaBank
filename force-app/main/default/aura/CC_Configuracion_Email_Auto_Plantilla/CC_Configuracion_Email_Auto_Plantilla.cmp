@@ -1,0 +1,111 @@
+<aura:component controller="CC_Configuracion_Reclamaciones_Auto" implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+
+	<aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="opcionesPlantilla" type="List" default="[]"/>
+    <aura:attribute name="configReclamacion" type="CC_Configuracion_Reclamacion__c" default="{'sobjectType':'CC_Configuracion_Reclamacion__c'}"/>
+    <aura:attribute name="valido" type="Boolean" default="false"/>
+
+    <aura:attribute name="opcionesOperativaFolder" type="List" default="[]"/>
+    <aura:attribute name="reclamacionSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaOperativaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaOperativa" type="String"/>
+
+    <aura:attribute name="opcionesIdiomaFolder" type="List" default="[]"/>
+    <aura:attribute name="carpetaIdiomaSeleccionada" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaIdioma" type="String"/>
+    
+    <aura:attribute name="opcionesReclamacion" type="List" default="[{'label': '1ª Reclamación', 'value': '1'},
+        {'label': '2ª Reclamación', 'value': '2'},
+        {'label': '3ª Reclamación', 'value': '3'}]"/>
+
+    <aura:attribute name="reclamacion" type="String"/>
+
+    <!--<aura:attribute name="opcionesTratamientoFolder" type="List" default="[]"/>-->
+    
+    <aura:attribute name="procesoFinalSeleccion" type="Boolean" default="false"/>
+    <aura:attribute name="carpetaFinal" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.iniciar}"/>
+
+    <article class="slds-card">
+        <!--Cabecera de la card-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container">
+                        <lightning:icon iconName="standard:email" size="small"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate">Asignar plantillas</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+    
+        <!--Cuerpo de la card-->
+        <div class="slds-card__body slds-card__body_inner" style="position: relative;">
+            <lightning:combobox aura:id="selectItem1" name="numReclamacion" label="Reclamación"
+                placeholder="-Selecciona una reclamación-"
+                value=""
+                required="true"
+                dropdownAlignment="right"
+                variant="standard"
+                messageWhenValueMissing="Debe seleccionar una reclamación"
+                onchange="{!c.handleReclamacionSeleccionada}"
+                options="{!v.opcionesReclamacion}"
+            />
+            <br/>
+        
+            <aura:if isTrue="{!v.reclamacionSeleccionada}">
+                <lightning:combobox aura:id="selectItem2" name="operativa" label="Destinatario"
+                    placeholder="-Selecciona un destinatario-"
+                    value=""
+                    required="true"
+                    dropdownAlignment="right"
+                    variant="standard"
+                    messageWhenValueMissing="Debe seleccionar una operativa"
+                    onchange="{!c.handleCarpetaOperativaSeleccionada}"
+                    options="{!v.opcionesOperativaFolder}"
+                />
+                <br/>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.carpetaOperativaSeleccionada}">
+                <lightning:combobox aura:id="selectItem3" name="idioma" label="Idioma"
+                    placeholder="-Selecciona un idioma-"
+                    value=""
+                    required="true"
+                    dropdownAlignment="right"
+                    variant="standard"
+                    messageWhenValueMissing="Debe seleccionar un idioma"
+                    onchange="{!c.handleCarpetaIdiomaSeleccionada}"
+                    options="{!v.opcionesIdiomaFolder}"
+                />
+                <br/>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.procesoFinalSeleccion}">
+                <lightning:combobox aura:id="selectItem4" name="plantilla" label="Plantilla"
+                    placeholder="-Selecciona una plantilla-"
+                    value=""
+                    required="true"
+                    dropdownAlignment="right"
+                    variant="standard"
+                    messageWhenValueMissing=" "
+                    onchange="{!c.handlePlantillaSeleccionada}"
+                    options="{!v.opcionesPlantilla}"
+                />
+                <br/>
+            </aura:if>
+        </div>
+        <!--Pie de la card-->
+        <footer class="slds-card__footer" style="text-align: right;">
+            <aura:if isTrue="{!v.valido}">
+                <lightning:button variant="brand" label="Asignar" onclick="{!c.handleClickAceptar}" />
+            </aura:if>
+            <lightning:button label="Cancelar" onclick="{!c.handleClickCancelar}"/>
+        </footer>
+    </article>
+</aura:component>

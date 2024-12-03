@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Bloqueo_Retencion_Saldo__c</fullName>
+    <label>Bloqueo Retención Saldos</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Control de vigencia</fullName>
+                <default>true</default>
+                <label>Control de vigencia</label>
+            </value>
+            <value>
+                <fullName>Embargo</fullName>
+                <default>false</default>
+                <label>Embargo</label>
+            </value>
+            <value>
+                <fullName>KYC</fullName>
+                <default>false</default>
+                <label>KYC</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

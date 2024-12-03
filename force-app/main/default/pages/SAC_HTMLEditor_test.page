@@ -1,0 +1,89 @@
+<apex:page >
+    <apex:includeScript value="{!URLFOR($Resource.TinyMCE, 'tinymce/js/tinymce/tinymce.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.html2pdf, 'js/html2pdf.bundle.min.js')}"/>
+
+    <script>
+                tinymce.init({
+                    selector : "textarea",
+                     font_formats: 'Arial=arial,helvetica,sans-serif;chicago;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;',
+                     toolbar: "insertfile undo redo",
+                     content_css: [
+                      '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                      '//www.tiny.cloud/css/codepen.min.css'
+                    ],
+                    
+                    menubar: 'file edit view insert format tools table help',
+                     plugins: [
+                                  "accordion","advlist","anchor","autolink","charmap ","lists","link","image","preview","anchor",
+                                   "searchreplace","wordcount","visualblocks","visualchars","code","fullscreen","codesample",
+                                    "media","save","table","directionality","help","importcss","insertdatetime","nonbreaking","pagebreak",
+                                    "emoticons","template","quickbars"
+                              ],
+                  });
+
+
+                function ConvertPDF() {    
+                    
+                    var element =  '<!DOCTYPE html><html lang="en"><head>';
+                    element = element + '<style>';
+                    element = element + '.page-break {';
+                    element = element + 'page-break-before: always;';
+                    element = element + '}';
+                    element = element + '.avoid-break {';
+                    element = element + 'page-break-inside: avoid;';
+                    element = element + '}';
+                    element = element + '</style>';
+                    element = element + '</head>';
+                    element = element + '<body>';
+                    element = element +  tinymce.get("myTextArea").getContent() ; 
+                    element = element + '</body>';
+
+                    //element = element.replace("<p><!-- pagebreak --><\/p>",'<div class="page-break"><\/div>');
+                    element = element.replace('!-- pagebreak -->', function (x) {
+                        return 'b></b><div class="page-break"><\/div>';
+					});
+                    
+
+			        console.log(element);
+                    var globalStaticResourcePathcabecera = "{!URLFOR($Resource.Plantillas)}"; // Corrección de la cadena
+                    
+                    var opt = {
+                      margin: [2, 1, 2, 1], //top, left, buttom, right,
+                      filename:     'myfile.pdf',
+                      image:        { type: 'jpeg', quality: 0.98 },
+                      html2canvas:  { scale: 2, useCORS: true, dpi: 192,letterRendering: true },
+                      pageBreak:    { mode: 'css', after:'.break-page'},
+                      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    
+                    //var worker = html2pdf().set(opt).from(element).save();
+                    //var worker = html2pdf().set(opt).from(element).output('dataurlnewwindow')
+					var worker = html2pdf().set(opt).from(element)
+                        .toPdf()
+                        .get('pdf')
+                        .then(function(doc) {                       
+                            var totalPages = doc.internal.getNumberOfPages(); 
+                            //var imgpath = globalStaticResourcePath + 'IMG/Cabecera.png'
+                            for(var i = 1; i <= totalPages; i++ ) {                                                     
+                					doc.setFontSize(10);	
+      								doc.setPage(i);
+                                	doc.addImage(globalStaticResourcePathcabecera + '/IMG/Cabecera.png', 'PNG', 0.7, 0.5,7,1.2);
+									doc.addImage(globalStaticResourcePathcabecera + '/IMG/Pie.png', 'PNG', 0.8, 10,7,1.2);
+									doc.addImage(globalStaticResourcePathcabecera + '/IMG/Lateral.png', 'PNG', 0.2, 3,0.5,7.5);
+                                	//var pageSize = doc.internal.pageSize;
+                                	//doc.text('Page ' + String(i) + ' of ' + String(totalPages), 1, 11,2,2); //data.settings.margin.left if you want it on the left
+                                                
+                            }                          
+                        });
+                    worker.save();
+                    //worker.output('dataurlnewwindow');
+             }
+            }
+    </script>
+
+    <apex:form id="myTextArea">
+        <textarea id="myTextArea" name="myTextArea">Initial content here...</textarea>
+        <button type="button" onclick="ConvertPDF();">Generate PDF</button>        
+    </apex:form>
+</apex:page>

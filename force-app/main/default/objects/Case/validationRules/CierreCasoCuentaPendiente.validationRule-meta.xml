@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CierreCasoCuentaPendiente</fullName>
+    <active>true</active>
+    <description>No cerrar el caso con cuenta pendiente de validar</description>
+    <errorConditionFormula>AND(
+ISCHANGED(Status),
+ISPICKVAL(Status,&quot;Cerrado&quot;),
+OR(RecordType.DeveloperName = &quot;SEG_Cliente&quot;,RecordType.DeveloperName = &quot;SEG_Seguimiento&quot;),
+OR(CONTAINS(Account.Name , &quot;CUENTA PENDIENTE ASOCIAR&quot;)))</errorConditionFormula>
+    <errorMessage>No se puede cerrar el caso si la cuenta esta pendiente de asociar</errorMessage>
+</ValidationRule>

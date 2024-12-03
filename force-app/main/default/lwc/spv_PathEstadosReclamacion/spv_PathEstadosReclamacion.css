@@ -1,0 +1,47 @@
+/*Class aplicada a los subestados que se han seleccionado al hacer click o por defecto al acceder al estado actual y mostrar el subestado actual*/
+.subestado_seleccionado {
+    display: flex;      
+    text-align: center;
+    justify-content:center;
+    background-color: #0d3146;
+    color: white;                         /*color del texto contenido*/
+    align-items: center;
+    padding-top: 5px;                       /*Espacio entre texto del contenido y parte superior del botón*/
+    padding-bottom: 5px;                    /*Espacio entre texto del contenido y parte superior del botón*/
+    border-width: 2px;                      
+    border-color: rgb(148,204,236);       /*Color de borde de un subestado seleccionado*/
+    transition: border-color 0.5s ease;     /*Animación de carga del borde del botón al seleccionar este subestado*/
+    border-radius: 5px;                     /*Para hacer las esquinas un poco redondeadas*/
+    white-space: nowrap;                    /*Para evitar que el texto se ponga en más de una línea y el botón se haga más grande*/
+}
+
+/*Class aplicada a los subestados que no se han seleccionado al acceder a un estado en la línea de vida*/
+.subestado_no_seleccionado {
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    color: rgb(47,107,140);               /*color del texto contenido*/
+    background-color: rgba(243,243,243,255);
+    border-color: rgba(243,243,243,255);
+    border-width: 1px;
+    padding-top: 5px;
+    padding-bottom: 5px;                    
+    transition: border-color 0s ease;        /*Quita la animación al de-seleccionar un subestado*/
+    border: none;                            /*Los subestados no seleccionados no tendrán borde*/
+    border-radius: 5px;                      /*Hacer las esquinas redondeadas*/
+
+    /*Nuevo */
+    white-space: nowrap;                
+    
+
+    
+}
+
+
+
+
+.contenedor {
+    display: flex;
+    justify-content: space-around;
+    gap: 5px;
+}

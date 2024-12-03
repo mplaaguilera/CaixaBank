@@ -1,0 +1,16 @@
+.THIS .options-title {
+    font-weight: bold;
+}
+
+.THIS .office-box:hover {
+    background-color: rgb(243, 243, 243);
+    cursor: pointer;
+}
+
+.THIS .office-box a {
+    text-decoration: none;
+}
+
+.THIS lightning-icon {
+    float: left;
+}

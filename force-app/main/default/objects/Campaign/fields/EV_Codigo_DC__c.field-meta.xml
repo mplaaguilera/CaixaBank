@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Codigo_DC__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(EV_CentroOrganizador__r.AV_TipoCentro__c = &apos;DG&apos;, 
+				HYPERLINK(&quot;/&quot; &amp;   EV_CentroOrganizador__r.Id, 
+													 EV_CentroOrganizador__r.CC_Numero_Oficina__c,&quot;_self&quot;), 
+			IF(EV_CentroOrganizador__r.AV_CentroSuperior__r.AV_TipoCentroSuperior__c = &apos;DG&apos;,  
+			HYPERLINK(&quot;/&quot; &amp;   EV_CentroOrganizador__r.AV_CentroSuperior__r.AV_CentroSuperior__r.Id, 
+													 EV_CentroOrganizador__r.AV_CentroSuperior__r.AV_CentroSuperior__r.CC_Numero_Oficina__c,&quot;_self&quot;),
+		IF(EV_CentroOrganizador__r.AV_TipoCentroSuperior__c = &apos;DG&apos;,
+		    HYPERLINK(&quot;/&quot; &amp;   EV_CentroOrganizador__r.AV_CentroSuperior__r.Id, 
+													 EV_CentroOrganizador__r.AV_CentroSuperior__r.CC_Numero_Oficina__c,&quot;_self&quot;), null)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Código DC</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

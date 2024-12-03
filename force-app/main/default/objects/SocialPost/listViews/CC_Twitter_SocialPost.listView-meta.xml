@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Twitter_SocialPost</fullName>
+    <columns>Name</columns>
+    <columns>Persona</columns>
+    <columns>Content</columns>
+    <columns>Posted</columns>
+    <columns>Parent</columns>
+    <columns>ReviewedStatus</columns>
+    <columns>Notes</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Provider</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <label>Twitter</label>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

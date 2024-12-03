@@ -1,0 +1,109 @@
+.slds-tile {
+  border: 1px solid #cccccc !important; /* Borde */
+  border-radius: 0.5rem !important; /* Esquinas redondeadas */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important; /* Sombra */
+  padding: 1rem !important; /* Espaciado interno */
+  background-color: #ffffff !important; /* Fondo blanco */
+  transition: border-color 0.3s, box-shadow 0.3s !important;
+}
+
+.slds-tile p {
+  margin-top: 0.5rem !important; /* Espacio título-contenido */
+}
+
+.bold-text {
+  font-weight: bold; /* Negrita */
+}
+lightning-card {
+  width: 100%;
+}
+
+/* Ajustar el ancho de la tabla al 100% */
+.slds-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Ajustar el contenido de las celdas para que se muestre en varias líneas si es necesario */
+.slds-table td {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.slds-table td.record-link {
+  color: rgb(23, 152, 193);
+  cursor: pointer;
+}
+  
+.slds-table td.record-link:hover {
+  text-decoration: underline;
+}
+
+.custom-bg-color {
+  background-color:  rgb(250, 250, 250);
+}
+
+.titulo {
+  font-size: 16px;
+}
+
+.slds-grid {
+margin: 1rem;
+}
+
+.slds-card {
+padding: 1rem;
+}
+
+.slds-col {
+margin-bottom: 1rem;
+}
+
+p {
+margin: 0.5rem 0;
+}
+
+a {
+color: #0070d2;
+text-decoration: none;
+}
+
+a:hover {
+text-decoration: underline;
+}
+.field-title {
+  font-size: .75rem;
+  padding-right:0.5rem;
+  padding-top:0.25rem;
+  margin-bottom:0.125rem;
+  /*line-height: 1.25;*/
+  color: #444444;
+  /*margin-bottom: .25rem;*/
+}
+.field-value {
+  font-size: .875rem;
+  font-weight: 400;
+  /*line-height: 1.25;*/
+  color: #181818;
+  /*margin-bottom: 1.75rem;*/
+}
+.underlined {
+  position: relative;
+  padding-bottom: 0.15rem; 
+  border-bottom: 0.5px solid #d3d3d3; 
+}
+.underlinedTransparent {
+  position: relative;
+  padding-bottom: 0.15rem; 
+  border-bottom: 0.5px solid #ffffff;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.no-horizontal-borders td {
+  border-bottom: none;
+  border-top: none;
+  padding-right: 20px;
+  margin-bottom: 1px;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_GenerarTaskMisClientes__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para indicar en el mcc cuando es referente a una queja o servicio, y así poder poder crear una Task cuando el check esté marcado.</description>
+    <label>Genera tarea mis clientes</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

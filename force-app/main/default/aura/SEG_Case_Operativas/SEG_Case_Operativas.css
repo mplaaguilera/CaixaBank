@@ -1,0 +1,52 @@
+.THIS .slds-modal__content {
+    overflow: initial;
+}
+
+.THIS div#child {
+    margin: 0 auto;
+}
+
+.THIS .avisoPlanificacion {
+    border-radius: 6px;
+    max-width: 510px;
+    background-color: rgba(0, 67, 255, 0.12);
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(0, 35, 223, 0.12);
+    font-weight: 300;
+}
+
+.THIS .blink {
+    animation-name: blinkKeyFrames;
+    animation-iteration-count: infinite;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+}
+
+.THIS .iconoAzul svg {
+    fill: black !important;
+
+}
+
+.THIS .seg-rojo {
+    color: red;
+}
+
+@keyframes blinkKeyFrames {
+    50% { opacity: 0.3; }
+}
+
+.THIS button.slds-button.slds-button_neutral,
+.THIS button.slds-button.slds-button_destructive,
+.THIS button.slds-button.slds-button_text-destructive,
+.THIS button.slds-button.slds-button_icon-border,
+.THIS button.slds-combobox__input,
+.THIS textarea.slds-textarea,
+.THIS select.slds-select,
+.THIS input.slds-input,
+.THIS div.slds-dropdown,
+.THIS ul.slds-dropdown,
+.THIS button.slds-button_icon-border-filled {
+    border-color: rgb(201, 201, 201);
+}

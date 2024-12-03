@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_CodigoQR__c</fullName>
+    <externalId>false</externalId>
+    <formula>IMAGE(&apos;https://chart.googleapis.com/chart?chs=200x200&amp;cht=qr&amp;chl=&apos;&amp; IF(ISPICKVAL(EV_FormatoDeAsistencias__c, &apos;002&apos;), SUBSTITUTE(EV_URLStreamingEvento__c, &apos;&amp;&apos;, &apos;%26&apos;),
+SUBSTITUTE(EV_URLStreamingEvento__c&amp;&apos;&amp;asistencia=fisica&apos;, &apos;&amp;&apos;, &apos;%26&apos;)),&apos;&apos;)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Código QR</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

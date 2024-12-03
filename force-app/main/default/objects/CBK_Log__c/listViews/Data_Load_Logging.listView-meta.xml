@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Data_Load_Logging</fullName>
+    <columns>NAME</columns>
+    <columns>createdBy__c</columns>
+    <columns>Project__c</columns>
+    <columns>Equipo__c</columns>
+    <columns>Job_Id__c</columns>
+    <columns>Entidad__c</columns>
+    <columns>createdDate__c</columns>
+    <columns>Fecha_de_fin__c</columns>
+    <columns>Rec_Error__c</columns>
+    <columns>Rec_Success__c</columns>
+    <columns>Rec_Loaded__c</columns>
+    <columns>ratio_Error__c</columns>
+    <columns>state__c</columns>
+    <columns>operation__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_Log__c.Data_Load_Log</value>
+    </filters>
+    <label>Data Load Logging</label>
+</ListView>

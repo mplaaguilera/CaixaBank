@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_REPORTEDEMAIL__c</fullName>
+    <description>Máximo. Mail de reporte de la incidencia.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Máximo. Mail de reporte de la incidencia.</inlineHelpText>
+    <label>REPORTEDEMAIL</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

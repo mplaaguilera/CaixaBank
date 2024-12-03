@@ -1,0 +1,652 @@
+<aura:component controller="SAC_LCMP_GestionAdjuntosGlobal"
+                implements="force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="objectApiName" type="String"/>
+    <aura:attribute name="fieldApiName" type="String"/>
+    <aura:attribute name="registroActual" type="Boolean" default="false"/>
+    <aura:attribute name="recordName" type="String"/>
+    <aura:attribute name="escalado" type="Object"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="busqueda" type="String" default=""/>
+    <aura:attribute name="selectedItem" type="String" />
+    <aura:attribute name="ficherosAdjuntos" type="Object[]" />
+    <aura:attribute name="ficherosAdjuntosVisibles" type="Object[]" />
+    <aura:attribute name="ficherosAdjuntosCase" type="Object[]" />
+    <aura:attribute name="ficherosAdjuntosVisiblesCase" type="Object[]" />
+    <aura:attribute name="idsFicherosAdjuntos" type="String[]" default="ini"/>
+    <aura:attribute name="ContentDocumentId" type="Id" />
+    <aura:attribute name="ContentDocumentIdSPV" type="Id" />
+    <aura:attribute name="verSF" type="Boolean" default="true"/>
+    <aura:attribute name="verActual" type="Boolean" default="false"/>
+    <aura:attribute name="verLocal" type="Boolean" default="false"/>
+    <aura:attribute name="pills" type="List" />
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="subido" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarOculto" type="Boolean" default="false"/>
+    <aura:attribute name="permitirEdicion" type="Boolean" default="false"/>
+    <aura:attribute name="popUpEliminar" type="Boolean" default="false"/>
+    <aura:attribute name="idAdjuntoEliminar" type="String"/>
+    <aura:attribute name="nameAdjuntoEliminar" type="String"/>
+
+    <aura:attribute name="tipoDocumento" type="String" default=""/>
+    <aura:attribute name="opcionesMaestroAdjuntos" type="List"/>
+    <aura:attribute name="value" type="String" default="" />
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="mostrarGrupos" type="Boolean" default="false"/>
+    <aura:attribute name="mensaje"   type="String" default="" />
+    <aura:attribute name="cadenaVacia" type="Boolean" default="true"/>
+    <aura:attribute name="cerrar" type="Integer" default="0" />
+    <aura:attribute name="caracteresMin" type="Integer" default="1" />
+    <aura:attribute name="adjuntoId" type="String" />
+    <aura:attribute name="tipoDocCargado" type="String" default="" />
+    <aura:attribute name="flagIdReCargado" type="Id" default="" />
+    <aura:attribute name="saltarValidacion" type="Boolean" default="false" />
+    <aura:attribute name="modalAdjuntarArchivos" type="Boolean" default="false" />
+    <aura:attribute name="esUserGeneral" type="Boolean" default="false" />
+    <aura:attribute name="bloquesAdjunto" type="List"/>
+    <aura:attribute name="modalClasificar" type="Boolean" default="false" />
+    <aura:attribute name="selectedClasificacion" type="String" />
+    <aura:attribute name="selectedFichero" type="String" />
+    <aura:attribute name="activeSectionNames" type="List" />
+    <aura:attribute name="disableButtons" type="Boolean" default="false" />
+    <aura:attribute name="opcionesBloques" type="List" />
+    <aura:attribute name="opcionesBloquesSeleccionadas" type="List" />
+    <aura:attribute name="mostrarBloques" type="Boolean" default="false" />
+    <aura:attribute name="idCasoVinculado" type="String"/>
+    <aura:attribute name="esRecAsociadaASPV" type="Boolean" default="false" />
+    <aura:attribute name="rtRegistro" type="String"/>
+
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.Inicial}" />
+    <aura:handler event="force:refreshView" action="{! c.Inicial}" />
+    <aura:handler name="change" value="{!v.recordId}" action="{!c.Inicial}" />
+    <aura:handler name="change" value="{!v.pills}" action="{!c.actualizaFicheros}" />
+
+
+    <div>
+        <div class="slds-grid contenedorPrincipal">
+            <div class="slds-tabs_default">
+                <ul class="slds-tabs_default__nav" role="tablist">
+                    <li class="slds-tabs_default__item slds-is-active" title="Item One" role="presentation">
+                        <a class="slds-tabs_default__link" href="#" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Adjuntos</a>
+                    </li>
+                </ul>
+                <div id="tab-default-1" class="slds-tabs_default__content slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+                    <div class="slds-grid">
+                    <div class="slds-col archivos">
+                        <div>
+                            <ui:scrollerWrapper class="scrollerSize">
+                                <!-- Mostrar ficheros por bloques cuando se esté utilizando en el objeto case -->
+                                <aura:if isTrue="{!v.mostrarBloques == true}">
+                                    <!-- Acordeon bloques de adjunto-->
+                                    <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{!v.activeSectionNames}">
+                                    <aura:iteration items="{!v.bloquesAdjunto}" var="valueBloque" indexVar="keyApiNameBloque">
+                                        <lightning:accordionSection name="{!valueBloque.value}" label="{!valueBloque.label}" >
+                                            <!-- Contenido de la sección del acordeón -->
+                                            <aura:iteration items="{!v.ficherosAdjuntos}" var="file">
+                                                <c:sac_clasificacionBloquesAdjuntos fichero="{!file}" bloqueAcordeon="{!valueBloque.value}" mostrarOculto="{!v.mostrarOculto}" esUserGeneral="{!v.esUserGeneral}" esRecAsociadaASPV="{!v.esRecAsociadaASPV}" recordTypeRegistro="{!v.rtRegistro}"
+                                                    onactualizarvista="{!c.handleActualizarVista}" onmostrarminiaturadocumento="{!c.handleMostrarMiniatura}" recordId="{!v.recordId}"/>
+                                                <!-- Fin item archivo-->
+                                            </aura:iteration>
+                                            <!-- Fin deccion acordeon -->
+                                        </lightning:accordionSection>
+                                    </aura:iteration>
+                                    <!-- Fin acordeon -->
+                                    </lightning:accordion>
+                                    <!--Mostrar ficheros que no tienen una clasificación-->
+                                    <div class="slds-border_top">
+                                        <h2 class="slds-m-left_small slds-m-top_small">Sin Clasificar</h2>
+                                        <div class="slds-m-left_small">
+                                            <aura:iteration items="{!v.ficherosAdjuntos}" var="file">
+                                                <aura:if isTrue="{!file.SAC_Bloque__c == null}">
+                                                    <aura:renderIf isTrue="{!or(v.mostrarOculto, file.SAC_Oculto__c == false)}">
+                                                        <!-- Inicio item archivo-->
+                                                        <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.ContentDocumentId}">
+                                                            <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                                <!--Boton clasificar-->
+                                                                <div class="slds-col slds-size_1-of-12">
+                                                                    <aura:if isTrue="{!v.esRecAsociadaASPV == false}">
+                                                                        <lightning:buttonIcon iconName="utility:sort" title="Clasificar" variant="bare" onclick="{!c.abrirModalClasificar}" value="{!file}" />
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:buttonIcon iconName="utility:sort" title="Clasificar" variant="bare" onclick="{!c.abrirModalClasificar}" value="{!file}" disabled="true"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </div>
+                                                                <!--Fecha-->
+                                                                <div class="slds-col slds-size_2-of-12">
+                                                                    <div class="slds-text-align_left">
+                                                                        <lightning:formattedDateTime value="{!file.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" />
+                                                                    </div>
+                                                                </div>
+                                                                <!--Nombre del fichero-->
+                                                                <div class="slds-col slds-size_3-of-12">
+                                                                    <div class="slds-text-align_left" style="padding: 4px;">
+                                                                        <span>{!file.Title}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-col slds-size_5-of-12">
+                                                                    <div class="slds-text-align_center">
+                                                                        <!-- buscador/selector de grupos -->
+                                                                        <aura:if isTrue="{!and(v.esUserGeneral == true &amp;&amp; v.esRecAsociadaASPV == false)}">
+                                                                            <div class="slds-combobox_container">
+                                                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                                                                        <aura:renderIf isTrue="{!and(file.SAC_TipoAdjunto__c != null &amp;&amp; file.Id == v.flagIdReCargado)}"> 
+                                                                                            <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones1}" onkeyup="{!c.filtroBusqueda}" value="{!v.tipoDocumento}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                            <aura:set attribute="else">
+                                                                                                <aura:renderIf isTrue="{!file.SAC_TipoAdjunto__c != null}">
+                                                                                                    <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                    <aura:set attribute="else">
+                                                                                                        <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                    </aura:set>
+                                                                                                </aura:renderIf>
+                                                                                            </aura:set>
+                                                                                        </aura:renderIf>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <aura:set attribute="else">
+                                                                                <lightning:input disabled="true" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1"/>
+                                                                            </aura:set>
+                                                                        </aura:if>
+                                                                        <!-- Lista de grupos (vista sin desplegar el adjuntos) -->
+                                                                        <aura:if isTrue="{!and(v.mostrarGrupos &amp;&amp; file.ContentDocumentId == v.ContentDocumentId &amp;&amp; v.modalAdjuntarArchivos == false)}">
+                                                                            <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" style="margin-left: 13%; width: 60%;">
+
+                                                                                <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                                                                    <aura:if isTrue="{!empty(v.mensaje)}">
+                                                                                        <!-- Mostrar los grupos -->
+                                                                                        <aura:iteration items="{!v.opcionesMaestroAdjuntos}" var="option" >
+                                                                                            <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                                                                <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                                                                            </li>
+                                                                                        </aura:iteration>
+                                                                                        <!-- Mostrar mensaje de grupo no encontrado -->
+                                                                                        <aura:set attribute="else">
+                                                                                            <li class="slds-listbox__item">
+                                                                                                <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                                                                            </li>
+                                                                                        </aura:set>
+                                                                                    </aura:if>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-12">
+                                                                    <aura:renderIf isTrue="{!file.SAC_Oculto__c}">
+                                                                        <lightning:buttonIcon iconName="utility:hide" variant="bare" alternativeText="Oculto" title="Oculto" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.desocultarFile}"/> <!-- {! !v.permitirEdicion} -->
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:buttonIcon iconName="utility:preview" variant="bare" alternativeText="Visible" title="Visible" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.ocultarFile}"/>
+                                                                    </aura:set>
+                                                                    </aura:renderIf>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </aura:renderIf>
+                                                </aura:if>
+                                                <!-- Fin item archivo-->
+                                            </aura:iteration>
+                                        </div>
+                                    </div>
+                                </aura:if>
+                                <!-- Mostrar ficheros sin clasificaciones cuando el objeto sea distinto a Case -->
+                                <aura:if isTrue="{!v.mostrarBloques == false}">
+                                    <div class="slds-border_top">
+                                        <aura:iteration items="{!v.ficherosAdjuntos}" var="file">
+                                            <aura:renderIf isTrue="{!or(v.mostrarOculto, file.SAC_Oculto__c == false)}">
+                                                <!-- Inicio item archivo-->
+                                                <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.ContentDocumentId}">
+                                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                        <!--Fecha-->
+                                                        <div class="slds-col slds-size_1-of-12">
+                                                            <div class="slds-text-align_left">
+                                                                <lightning:formattedDateTime value="{!file.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" />
+                                                            </div>
+                                                        </div>
+                                                        <!--Nombre del fichero-->
+                                                        <div class="slds-col slds-size_3-of-12">
+                                                            <div class="slds-text-align_left" style="padding: 4px;">
+                                                                <span>{!file.Title}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-size_6-of-12">
+                                                            <div class="slds-text-align_center">
+                                                                <!-- buscador/selector de grupos -->
+                                                                <aura:if isTrue="{!v.esUserGeneral == true}">
+                                                                    <div class="slds-combobox_container">
+                                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                                                                <aura:renderIf isTrue="{!and(file.SAC_TipoAdjunto__c != null &amp;&amp; file.Id == v.flagIdReCargado)}"> 
+                                                                                    <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones1}" onkeyup="{!c.filtroBusqueda}" value="{!v.tipoDocumento}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                    <aura:set attribute="else">
+                                                                                        <aura:renderIf isTrue="{!file.SAC_TipoAdjunto__c != null}">
+                                                                                            <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                            <aura:set attribute="else">
+                                                                                                <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                            </aura:set>
+                                                                                        </aura:renderIf>
+                                                                                    </aura:set>
+                                                                                </aura:renderIf>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:input disabled="true" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1"/>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                                <!-- Lista de grupos (vista sin desplegar el adjuntos) -->
+                                                                <aura:if isTrue="{!and(v.mostrarGrupos &amp;&amp; file.ContentDocumentId == v.ContentDocumentId &amp;&amp; v.modalAdjuntarArchivos == false)}">
+                                                                    <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" style="margin-left: 13%; width: 60%;">
+
+                                                                        <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                                                            <aura:if isTrue="{!empty(v.mensaje)}">
+                                                                                <!-- Mostrar los grupos -->
+                                                                                <aura:iteration items="{!v.opcionesMaestroAdjuntos}" var="option" >
+                                                                                    <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                                                        <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                                                                    </li>
+                                                                                </aura:iteration>
+                                                                                <!-- Mostrar mensaje de grupo no encontrado -->
+                                                                                <aura:set attribute="else">
+                                                                                    <li class="slds-listbox__item">
+                                                                                        <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                                                                    </li>
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </ul>
+                                                                    </div>
+                                                                </aura:if>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-12">
+                                                            <aura:renderIf isTrue="{!file.SAC_Oculto__c}">
+                                                                <lightning:buttonIcon iconName="utility:hide" variant="bare" alternativeText="Oculto" title="Oculto" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.desocultarFile}"/> <!-- {! !v.permitirEdicion} -->
+                                                            <aura:set attribute="else">
+                                                                <lightning:buttonIcon iconName="utility:preview" variant="bare" alternativeText="Visible" title="Visible" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.ocultarFile}"/>
+                                                            </aura:set>
+                                                            </aura:renderIf>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </aura:renderIf>
+                                            <!-- Fin item archivo-->
+                                        </aura:iteration>
+                                    </div>
+                                </aura:if>
+                            </ui:scrollerWrapper>
+                        </div>
+                    </div>
+                    <div class="slds-col infoFile">
+                        <lightning:fileCard fileId="{!v.ContentDocumentIdSPV}" description="Miniatura" />
+                        <lightning:recordViewForm recordId="{!v.ContentDocumentIdSPV}" objectApiName="ContentVersion">
+                            <lightning:outputField fieldName="Title"/>
+                            <lightning:outputField fieldName="CreatedDate"/>
+                        </lightning:recordViewForm>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <aura:renderIf isTrue="{!v.permitirEdicion}">
+            <div  class="row dark-background slds-box slds-box_xx-small" onclick="{!c.myFunctionAbrir}">
+                <div class="slds-text-heading_medium">
+                    <lightning:icon iconName="utility:new_window" alternativeText="Connected" variant="inverse" size="small"/>
+                    Adjuntar archivos
+                </div>
+            </div>
+
+            <div class="{!v.isOpen == true ? 'blockSF' : ''}"/>
+            <div class="{!v.isOpen == true ? 'aparece' : 'deaparece'}">
+
+                <div  class="row dark-background slds-box slds-box_xx-small" onclick="{!c.myFunctionCerrar}">
+                    <div class="slds-text-heading_medium">
+                        <lightning:icon iconName="utility:pop_in" alternativeText="Connected" variant="inverse" size="small"/>
+                        Adjuntar archivos
+                    </div>
+                </div>
+                <lightning:layout verticalAlign="stretch">
+                    <lightning:layoutItem class="fondo" size="2" >
+                        <lightning:verticalNavigation selectedItem="SF" class="navigation1 .slds-nowrap"
+                                                    onselect="{! c.handleSelect }">
+                            <lightning:verticalNavigationSection label="Ubicación">
+                                <aura:renderIf isTrue="{!not(v.registroActual)}">
+                                    <lightning:verticalNavigationItemIcon label="Reclamación" name="SF" iconName="utility:case"/>
+                                </aura:renderIf>
+                                <lightning:verticalNavigationItemIcon label="Mi equipo" name="EQUIPO" iconName="utility:open_folder" />
+                                <lightning:verticalNavigationItemIcon label="{!v.recordName}" name="REGISTRO" iconName="utility:record" />
+                                <lightning:fileUpload name="fileUploader" multiple="true"
+                                                    recordId="{!v.recordId}"
+                                                    onuploadfinished="{!c.handleUploadFinished}"
+                                                    class="file-selector-image"/>
+                            </lightning:verticalNavigationSection>
+                        </lightning:verticalNavigation>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="10" >
+                        <lightning:layout verticalAlign="stretch" multipleRows="true" class="x-large">
+                            <lightning:layoutItem size="12" flexibility="auto" padding="around-small">
+
+                                <lightning:input name="Busqueda" value='{!v.busqueda}' onchange='{!c.actualizaFicheros}' label="This is a search input"
+                                                type="search"
+                                                variant="label-hidden"/>
+                                <br/>
+                            </lightning:layoutItem>
+                            <div class="slds-grid contenedorPrincipalPopUp">
+                                <div class="slds-col archivos">
+                                    <div>
+                                        <ui:scrollerWrapper class="scrollerSize">
+
+                                            <aura:renderIf isTrue="{!v.verSF}">
+                                                <aura:iteration items="{!v.ficherosAdjuntosVisiblesCase}" var="file">
+                                                    <!-- Inicio item archivo-->
+                                                    <aura:renderIf isTrue="{!or(v.mostrarOculto, file.SAC_Oculto__c == false)}">
+
+                                                    <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.ContentDocumentId}">
+                                                        <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                            
+                                                            <div class="slds-col slds-size_1-of-12">
+                                                                <div class="slds-text-align_left">
+                                                                    <lightning:formattedDateTime value="{!file.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_3-of-12">
+                                                                <div class="slds-text-align_left" style="padding: 4px;">
+                                                                    <span>{!file.Title}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_6-of-12">
+                                                                <div class="slds-text-align_center">
+                                                                    <!-- buscador/selector de grupos -->
+                                                                    <aura:if isTrue="{!v.esUserGeneral == true}">
+                                                                        <div class="slds-combobox_container">
+                                                                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                                                                    <aura:renderIf isTrue="{!and(file.SAC_TipoAdjunto__c != null &amp;&amp; file.Id == v.flagIdReCargado)}"> 
+                                                                                        <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones1}" onkeyup="{!c.filtroBusqueda}" value="{!v.tipoDocumento}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                        <aura:set attribute="else">
+                                                                                            <aura:renderIf isTrue="{!file.SAC_TipoAdjunto__c != null}">
+                                                                                                <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                <aura:set attribute="else">
+                                                                                                    <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                </aura:set>
+                                                                                            </aura:renderIf>
+                                                                                        </aura:set>
+                                                                                    </aura:renderIf>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:input disabled="true" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <!-- Lista de grupos (vista al desplegar el adjuntos) -->
+                                                                    <aura:if isTrue="{!and(v.mostrarGrupos &amp;&amp; file.ContentDocumentId == v.ContentDocumentId &amp;&amp; true)}">
+                                                                        <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" style="margin-left: 13%; width: 60%;">
+            
+                                                                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                                                                <aura:if isTrue="{!empty(v.mensaje)}">
+                                                                                    <!-- Mostrar los grupos -->
+                                                                                    <aura:iteration items="{!v.opcionesMaestroAdjuntos}" var="option" >
+                                                                                        <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                                                            <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                                                                        </li>
+                                                                                    </aura:iteration>
+                                                                                    <!-- Mostrar mensaje de grupo no encontrado -->
+                                                                                    <aura:set attribute="else">
+                                                                                        <li class="slds-listbox__item">
+                                                                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                                                                        </li>
+                                                                                    </aura:set>
+                                                                                </aura:if>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="slds-col slds-size_1-of-12">
+                                                                <aura:renderIf isTrue="{!file.SAC_Oculto__c}">
+                                                                    <lightning:buttonIcon iconName="utility:hide" variant="bare" alternativeText="Oculto" title="Oculto" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.desocultarFile}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:buttonIcon iconName="utility:preview" variant="bare" alternativeText="Visible" title="Visible" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.ocultarFile}"/>
+                                                                </aura:set>
+                                                                </aura:renderIf>
+                                                            
+                                                                <aura:renderIf isTrue="{!v.permitirEdicion}">
+                                                                    <aura:renderIf isTrue="{!file.Seleccionado}">
+                                                                    <lightning:buttonIcon iconName="utility:check" variant="bare" alternativeText="Incluido" title="Incluido" name="{!file.Title}" value="{!file.ContentDocumentId}" class="slds-float_right"/>
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:buttonIcon iconName="utility:new" variant="bare" alternativeText="Incluir" title="Incluir"  onclick="{!c.vincularConRegistro}" name="{!file.Title}" value="{!file.ContentDocumentId}" class="slds-float_right"/>
+                                                                    </aura:set>
+                                                                </aura:renderIf>
+                                                            </aura:renderIf>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </aura:renderIf>
+                                                    <!-- Fin item archivo-->
+                                                </aura:iteration>
+                                                <br/><br/><br/><br/>
+                                            </aura:renderIf>
+                                            <aura:renderIf isTrue="{!v.verLocal}">
+                                                <aura:iteration items="{!v.pills}" var="file">
+                                                    <aura:renderIf isTrue="{!file.origen == 'PC'}">
+                                                        <!-- Inicio item archivo-->
+                                                        <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.id}">
+                                                            <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                                <div class="slds-col slds-size_11-of-12">
+                                                                    <div class="slds-text-align_left" style="padding: 4px;">
+                                                                        <span>{!file.label}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-12">
+                                                                    <lightning:buttonIcon iconName="utility:delete" variant="bare" alternativeText="Eliminar" title="Eliminar"  onclick="{!c.eliminaTemporal}" name="{!file.Title}" value="{!file.id}" class="slds-float_right"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Fin item archivo-->
+                                                    </aura:renderIf>
+                                                </aura:iteration>
+                                                <div class="slds-form-element" style="padding-left: 10px; padding-right: 10px;">
+                                                    <lightning:fileUpload name="fileUploader" multiple="true"
+                                                                        recordId="{!v.recordId}"
+                                                                        onuploadfinished="{!c.handleUploadFinished}" />
+                                                </div>
+                                                <br/><br/><br/><br/>
+                                            </aura:renderIf>
+                                            <aura:renderIf isTrue="{!v.verActual}">
+                                                <aura:iteration items="{!v.ficherosAdjuntosVisibles}" var="file">
+                                                    <!-- Inicio item archivo-->
+                                                    <aura:renderIf isTrue="{!or(v.mostrarOculto, file.SAC_Oculto__c == false)}">
+                                                    <div  class="slds-nav-vertical__item" style="padding: 2px;" onclick="{!c.ficheroSeleccionado}" id="{!file.ContentDocumentId}">
+                                                        <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-p-around_x-small" >
+                                                            <div class="slds-col slds-size_1-of-12">
+                                                                <div class="slds-text-align_left">
+                                                                    <lightning:formattedDateTime value="{!file.CreatedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_3-of-12">
+                                                                <div class="slds-text-align_left" style="padding: 4px;">
+                                                                    <span>{!file.Title}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_6-of-12">
+                                                                <div class="slds-text-align_center">
+                                                                    <!-- buscador/selector de grupos -->
+                                                                    <aura:if isTrue="{!v.esUserGeneral == true}">
+                                                                        <div class="slds-combobox_container">
+                                                                            <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="gruposCombobox" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  role="none">
+                                                                                    <aura:renderIf isTrue="{!and(file.SAC_TipoAdjunto__c != null &amp;&amp; file.Id == v.flagIdReCargado)}">
+                                                                                        <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones1}" onkeyup="{!c.filtroBusqueda}" value="{!v.tipoDocumento}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                        <aura:set attribute="else">
+                                                                                            <aura:renderIf isTrue="{!file.SAC_TipoAdjunto__c != null}">
+                                                                                                <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                <aura:set attribute="else">
+                                                                                                    <lightning:input disabled="{!v.disabled}" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." onblur="{!c.handleBlur}" onclick="{!c.mostrarOpciones}" onkeyup="{!c.filtroBusqueda}" value="" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1" name="{!file.Id}"/>
+                                                                                                </aura:set>
+                                                                                            </aura:renderIf>
+                                                                                        </aura:set>
+                                                                                    </aura:renderIf>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:input disabled="true" aura:id="inputLookup" class="inputBox" placeholder="Tipo de documento..." value="{!file.SAC_TipoAdjunto__r.Name}" autoComplete="off" spellcheck="false" variant="label-hidden" id="combobox-id-1"/>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                    <!-- Lista de grupos (vista al desplegar el adjuntos) -->
+                                                                    <aura:if isTrue="{!and(v.mostrarGrupos &amp;&amp; file.ContentDocumentId == v.ContentDocumentId &amp;&amp; true)}">
+                                                                        <div id="listbox-id-1" class="slds-dropdown  slds-dropdown_fluid slds-dropdown_length-5" style="margin-left: 13%; width: 60%;">
+            
+                                                                            <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                                                                <aura:if isTrue="{!empty(v.mensaje)}">
+                                                                                    <!-- Mostrar los grupos -->
+                                                                                    <aura:iteration items="{!v.opcionesMaestroAdjuntos}" var="option" >
+                                                                                        <li id="{!option.Name}" class="{!'slds-listbox__item eachItem' + if(option.isVisible,'',' slds-hide')}" onmousedown="{!c.seleccionarGrupo}">
+                                                                                            <lightning:icon class="{!if(option.selected,'','slds-hide')}" iconName="utility:check" size="x-small" alternativeText="icon" />
+                                                                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!option.Name}</span>
+                                                                                        </li>
+                                                                                    </aura:iteration>
+                                                                                    <!-- Mostrar mensaje de grupo no encontrado -->
+                                                                                    <aura:set attribute="else">
+                                                                                        <li class="slds-listbox__item">
+                                                                                            <span class="slds-media slds-listbox__option_entity verticalAlign slds-truncate">{!v.mensaje}</span>
+                                                                                        </li>
+                                                                                    </aura:set>
+                                                                                </aura:if>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-12">
+                                                                <aura:renderIf isTrue="{!file.SAC_Oculto__c}">
+                                                                    <lightning:buttonIcon iconName="utility:hide" variant="bare" alternativeText="Oculto" title="Oculto" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.desocultarFile}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:buttonIcon iconName="utility:preview" variant="bare" alternativeText="Visible" title="Visible" name="{!file.Title}" value="{!file.Id}" class="slds-float_right" disabled="true" onclick="{!c.ocultarFile}"/>
+                                                                </aura:set>
+                                                                </aura:renderIf>
+
+                                                                <aura:renderIf isTrue="{!v.permitirEdicion}">
+                                                                <lightning:buttonIcon iconName="utility:delete" variant="bare" alternativeText="Eliminar" title="Eliminar"  onclick="{!c.abrirPopUpEliminar}" name="{!file.Title}" value="{!file.ContentDocumentId}" class="slds-float_right"/>
+                                                                </aura:renderIf>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </aura:renderIf>
+                                                    <!-- Fin item archivo-->
+                                                </aura:iteration>
+                                                <br/><br/><br/><br/>
+                                            </aura:renderIf>
+                                        </ui:scrollerWrapper>
+                                    </div>
+                                </div>
+                                <div class="slds-col infoFile">
+                                    <!-- Condición puesta para evitar un error al seleccionar un fichero desde el componente lwc hijo -->
+                                    <!-- No hay necesidad de mostrar el recordViewForm en el objeto Case para usuarios oficina, ya que no pueden adjuntar archivos -->
+                                    <aura:if isTrue="{!and(v.esUserGeneral != true, v.objectApiName == 'Case')}"> 
+                                        <aura:set attribute="else">
+                                            <lightning:fileCard fileId="{!v.ContentDocumentId}" description="Miniatura" />
+                                            <lightning:recordViewForm recordId="{!v.ContentDocumentId}" objectApiName="ContentVersion">
+                                                <lightning:outputField fieldName="Title"/>
+                                                <lightning:outputField fieldName="CreatedDate"/>
+                                            </lightning:recordViewForm>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.popUpEliminar}">
+	                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        	                        <div class="slds-modal__container">
+                                        <header class="slds-modal__header">
+                                            <lightning:buttonIcon iconName="utility:close"
+                                                onclick="{! c.cerrarrPopUpEliminar }"
+                                                alternativeText="close"
+                                                variant="bare-inverse"
+                                                class="slds-modal__close"/>
+                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Eliminar adjunto</h2>
+                                        </header>
+                                    <aura:if isTrue="{!v.registroActual}">
+
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            <p><strong>Está a punto de eliminar el archivo: {!v.nameAdjuntoEliminar}</strong></p>
+                                            <br/>
+                                            <p>¿Confirmar?</p>
+                                        </div>
+                                        <footer class="slds-modal__footer">
+                                            <div class="slds-float--left slds-p-top_x-large">
+                                                <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.cerrarrPopUpEliminar }" />
+                                            </div>
+                                            <div class="slds-float--right slds-p-top_x-large">
+                                                <lightning:button variant="brand" label="Eliminar" title="Eliminar" onclick="{! c.eliminarRegistro }" />
+                                            </div>
+                                        </footer>
+
+                                    <aura:set attribute="else">
+
+                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                            <p><strong>Está a punto de eliminar el archivo: {!v.nameAdjuntoEliminar}</strong></p>
+                                            <br/>
+                                            <p>¿Desea eliminar el archivo de <strong>{!v.recordName}</strong> o eliminarlo definitivamente?</p>
+                                        </div>
+                                        <footer class="slds-modal__footer">
+                                            <div class="slds-float--left slds-p-top_x-large">
+                                                <lightning:button variant="neutral" label="Cancelar" title="Cancelar" onclick="{! c.cerrarrPopUpEliminar }" />
+                                            </div>
+                                            <div class="slds-float--right slds-p-top_x-large">
+                                                <lightning:button variant="brand" label="Eliminar" title="Eliminar" onclick="{! c.eliminarRegistro }" />
+                                            </div>
+                                            <div class="slds-float--right slds-p-top_x-large slds-p-right_medium">
+                                                <lightning:button variant="brand" label="{!v.recordName}" title="Desvincular" onclick="{! c.desvincularRegistro }" />
+                                            </div>
+                                        </footer>
+
+                                    </aura:set>
+                                    </aura:if>
+                                    </div>
+                                </section>
+                                <div class="slds-backdrop slds-backdrop_open"></div>
+                            </aura:if>
+                        </lightning:layout>
+                    </lightning:layoutItem>
+                </lightning:layout>        
+            </div>
+        </aura:renderIf>
+        <!-- Modal clasificar -->
+        <aura:if isTrue="{!v.modalClasificar}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.cerrarModalClasificar }" alternativeText="close"
+                            variant="bare-inverse" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            Clasificacion del fichero</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="max-height:350px;">
+                        <lightning:dualListbox name="combobox"
+                                       label="Selecciona valores"
+                                       sourceLabel="Disponibles"
+                                       selectedLabel="Seleccionados"
+                                       options="{!v.bloquesAdjunto}"
+                                       value="{!v.opcionesBloquesSeleccionadas}"
+                                       onchange="{!c.handleChangeClasificado}" />
+                        <br />
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="Cancelar" title="Cancelar"
+                            onclick="{! c.cerrarModalClasificar }" disabled="{!v.disableButtons}"/>
+                        <lightning:button variant="brand" label="Aceptar" title="OK" onclick="{!c.cambiarClasificacionFichero}" disabled="{!v.disableButtons}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+</aura:component>

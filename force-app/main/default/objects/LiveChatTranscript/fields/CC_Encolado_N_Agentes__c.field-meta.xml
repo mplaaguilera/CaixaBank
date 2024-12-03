@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Encolado_N_Agentes__c</fullName>
+    <description>Indica el número de agentes a los que ha sido enrutado</description>
+    <label>Encolado a N Agentes</label>
+    <summaryFilterItems>
+        <field>LiveChatTranscriptEvent.Type</field>
+        <operation>equals</operation>
+        <value>PushAssignment</value>
+    </summaryFilterItems>
+    <summaryForeignKey>LiveChatTranscriptEvent.LiveChatTranscriptId</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

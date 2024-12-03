@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Reglas_UAFE</fullName>
+    <booleanFilter>1 AND 2</booleanFilter>
+    <columns>NAME</columns>
+    <columns>OS_AgrupacionBuzon__c</columns>
+    <columns>SEG_ClasificacionRapida__c</columns>
+    <columns>OS_OrdenEjecucion__c</columns>
+    <columns>SEG_Inactiva__c</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>UPDATEDBY_USER</columns>
+    <columns>OWNER.ALIAS</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OS_AgrupacionBuzon__c</field>
+        <operation>equals</operation>
+        <value>Buzón UAFE</value>
+    </filters>
+    <filters>
+        <field>CBK_Negocio__c</field>
+        <operation>equals</operation>
+        <value>Cops</value>
+    </filters>
+    <label>Reglas UAFE</label>
+    <sharedTo>
+        <group>OS_3N_UAFE_CEF</group>
+        <group>OS_3N_UAFE_FAG</group>
+    </sharedTo>
+</ListView>

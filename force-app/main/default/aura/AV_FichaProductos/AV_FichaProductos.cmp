@@ -1,0 +1,130 @@
+<aura:component description="AV_FichaProductos" controller="AV_FichaProductosComponentController"
+				implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global">
+
+	<aura:attribute name="data" type="AV_FichaProductosComponentController.Response"/>
+	<aura:attribute name="clienteId" type="String"/>
+	<aura:attribute name="pfId" type="String"/>
+	<aura:attribute name="isOpenModel" type="Boolean" default="false"/>
+	<aura:attribute name="numOpp" type="List"/>
+	<aura:attribute name="clienteName" type="String"/>
+    <aura:attribute name="dataNoProf" type="List"/>
+	<aura:attribute name="dataProf" type="List"/>
+	<aura:attribute name="hasProfessional" type="Boolean" default="false"/>
+	
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<lightning:workspaceAPI aura:id="workspace" />
+	<lightning:quickActionAPI aura:id="quickActionAPI" />
+
+	<lightning:card class="cardStyle"> 
+		<!--<lightning:spinner aura:id="mySpinner" class="slds-show"/>-->
+
+		<aura:set attribute="title">
+			<div class="slds-align_absolute-center slds-m-top_xx-small">
+				<aura:renderIf isTrue="{!v.data.title.icon}">
+					<!--<lightning:icon iconName="{!v.data.title.icon}" alternativeText="Account" size="{!v.data.title.iconSize}" />-->
+					<img src="{!$Resource.AV_CommercialIcons + v.data.title.icon}" class="title-icon"/>
+				</aura:renderIf>
+				<span class="slds-m-around--xx-small slds-text-title_bold" style="color:rgb(0, 158, 219)">{!v.data.title.text}</span>
+			</div>
+		</aura:set>
+
+		<div class="slds-var-p-around_x-small parent-div-pad">
+			<div class=" borderTop"> 
+				<!--Información MyBox-->
+				<aura:if isTrue="{!and(not(empty(v.data.myBox.iconMyBox)),v.data.allBox)}">
+					<div class ="marginBottom slds-p-bottom_medium">
+						<img src="{!$Resource.AV_IconosProductos+v.data.myBox.iconMyBox}" class= "{!v.data.myBox.iconStyle}" title="{!v.data.myBox.textMyBox}"/>
+					</div>
+				</aura:if>
+				
+				<aura:if isTrue="{!and(empty(v.data.myBox.iconMyBox),v.data.allBox)}">
+					<div class ="marginBottom slds-hidden">
+						<img src="{!$Resource.AV_IconosProductos+v.data.myBox.iconMyBox}" class= "{!v.data.myBox.iconStyle}" title="{!v.data.myBox.textMyBox}"/>
+					</div>
+				</aura:if>
+				
+				<div class="min-h-div">
+					<aura:iteration items="{!v.dataNoProf}" var="rowData" indexVar="i">
+						<aura:if isTrue="{!rowData.display}">
+							<div class="slds-grid slds-col">
+								<p class=" slds-m-top_x-small">
+									<img src="{!$Resource.AV_IconosProductos+rowData.iconTenencia}" class= "{!rowData.iconStyle}" title="{!rowData.textTenencia}"/>
+									
+									<a title="{!rowData.text}" data-codProduct="{!rowData.codProduct}" onclick="{!c.navigateToRecord}">{!rowData.text}</a>
+
+									<aura:iteration items="{!rowData.potencialidad}" var="pot" indexVar="i">
+										<aura:if isTrue="{!pot.iconPotencialidad}">
+											<img src="{!$Resource.AV_IconosProductos + pot.iconPotencialidad}" class="{!pot.iconPStyle}" title="{!pot.textPotencialidad + '&nbsp;' + rowData.cantidad}"/>
+										</aura:if>
+									</aura:iteration>
+
+									<aura:if isTrue="{!rowData.cantidad}">
+										<span title="{!rowData.cantidad}" class="marginCantidad">{!rowData.cantidad}</span>
+									</aura:if>
+
+								</p>
+							</div>
+						</aura:if>
+					</aura:iteration>
+				</div>
+				<aura:if isTrue="{!v.hasProfessional}">
+					<div class="slds-border_bottom pad-prof">
+						<h1 class="slds-text-title title-bottom-pad"><b>Profesional</b></h1>
+					</div>
+				</aura:if>
+				<div>
+					<aura:iteration items="{!v.dataProf}" var="rowData" indexVar="i">
+						<aura:if isTrue="{!rowData.display}">
+							<div class="slds-grid slds-col">
+								<p class=" slds-m-top_x-small">
+									<img src="{!$Resource.AV_IconosProductos+rowData.iconTenencia}" class= "{!rowData.iconStyle}" title="{!rowData.textTenencia}"/>								
+									<!--<a data-codProduct="{!rowData.codProduct}" data-clientId="{!rowData.clientId}" title="{!rowData.text}" onclick="{!c.openSubtab}">{!rowData.text}</a>-->
+									<a title="{!rowData.text}" data-codProduct="{!rowData.codProduct}" onclick="{!c.navigateToRecord}">{!rowData.text}</a>
+									
+									<aura:iteration items="{!rowData.potencialidad}" var="pot" indexVar="i">
+										<aura:if isTrue="{!pot.iconPotencialidad}">
+											<img src="{!$Resource.AV_IconosProductos + pot.iconPotencialidad}" class="{!pot.iconPStyle}" title="{!pot.textPotencialidad + '&nbsp;' + rowData.cantidad}"/>
+										</aura:if>
+									</aura:iteration>
+
+									<aura:if isTrue="{!rowData.cantidad}">
+										<span title="{!rowData.cantidad}" class="marginCantidad">{!rowData.cantidad}</span>
+									</aura:if>
+
+								</p>
+							</div>
+						</aura:if>
+					</aura:iteration>
+				</div>
+			</div>
+		</div>
+	</lightning:card>
+	<!-- MODAL VIEW -->	
+	
+	<aura:if isTrue="{!v.isOpenModel}">
+		<div id="stack1" class="slds-m-around_xx-large">
+			<div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open slds-modal_medium">
+				<div class="slds-modal__container modalStyle">
+					<div class="slds-modal__header">
+						<button class="slds-button slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeModal}">
+							X <span class="slds-assistive-text">{!$Label.c.AV_Close}</span>
+						</button>
+						<h2 id="header99" class="slds-text-heading_medium">{!$Label.c.AV_OpportunityList} - [{!v.clienteName}]</h2>
+					</div>
+					<div class="modalText slds-modal__content slds-p-around_medium">
+						<div class="slds-section slds-is-open">
+							<div aura:id="newDtPlaceholder">
+								{!v.body}
+							</div>
+						</div>
+					</div>
+					<div class="slds-modal__footer">
+					</div>
+				</div>
+			</div>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</div>
+	</aura:if>
+	<!-- MODAL VIEW -->
+</aura:component>

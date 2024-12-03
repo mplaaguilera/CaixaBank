@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Llamada_ejecutada_manualmente__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>En el momento que el usuario hace la llamada marca este check para dejar constancia en el seguimiento del contrato.</description>
+    <label>Llamada ejecutada manualmente</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

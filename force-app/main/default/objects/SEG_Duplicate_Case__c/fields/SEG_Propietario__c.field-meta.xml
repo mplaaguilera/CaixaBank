@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Propietario__c</fullName>
+    <description>Camp propietario</description>
+    <externalId>false</externalId>
+    <formula>IF(
+ISBLANK(SEG_Case_Duplicated__r.Owner:User.Id), /* If blank, it&apos;s a queue */
+SEG_Case_Duplicated__r.Owner:Queue.QueueName,
+SEG_Case_Duplicated__r.Owner:User.FirstName &amp; &quot; &quot; &amp; SEG_Case_Duplicated__r.Owner:User.LastName
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Propietario</inlineHelpText>
+    <label>Propietario</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

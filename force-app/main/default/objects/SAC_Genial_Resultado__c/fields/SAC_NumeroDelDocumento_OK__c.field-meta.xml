@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_NumeroDelDocumento_OK__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>check de si el número del documento del representante esta ok</description>
+    <label>Numero Del Documento OK</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

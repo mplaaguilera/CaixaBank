@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>crypto</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Key__c</field>
+        <value xsi:type="xsd:string">cEB3ih+ek56k2BaHplaumRKvx9n/a7c8fc+kSy7Vg1w=</value>
+    </values>
+    <values>
+        <field>CC_Vector__c</field>
+        <value xsi:type="xsd:string">6835673018372837</value>
+    </values>
+</CustomMetadata>

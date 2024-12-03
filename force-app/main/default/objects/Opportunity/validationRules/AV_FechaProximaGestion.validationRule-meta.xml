@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_FechaProximaGestion</fullName>
+    <active>false</active>
+    <description>Será obligatorio rellenar la fecha de próxima gestión cuando las etapas sean en gestión/insistir y no apto.</description>
+    <errorConditionFormula>AND(
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+	OR(
+		RecordType.DeveloperName = &quot;AV_Iniciativa&quot;,
+		RecordType.DeveloperName = &quot;AV_AlertaComercial&quot;,
+		RecordType.DeveloperName = &quot;AV_Propuesta&quot;,
+		RecordType.DeveloperName = &quot;AV_Sugerencia&quot;
+	),
+ISBLANK(AV_FechaProximoRecordatorio__c),
+OR(
+ISPICKVAL(StageName, &quot;En gestión/insistir&quot;),
+ISPICKVAL(StageName, &quot;No apto&quot;)
+),
+NOT($Permission.AV_AvoidBulkApi),
+				NOT(ISPICKVAL(AV_OrigenApp__c,&quot;AV_BackReport&quot;)),
+				AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
+)</errorConditionFormula>
+    <errorMessage>Para la etapa seleccionada es obligatorio informar fecha de próxima gestión.</errorMessage>
+</ValidationRule>

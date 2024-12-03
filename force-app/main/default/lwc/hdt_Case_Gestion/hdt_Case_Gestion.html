@@ -1,0 +1,330 @@
+<template>
+        <lightning-card>
+            <div class="slds-card__header slds-grid" style="margin-bottom: 0.3rem;">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container">
+                            <lightning-icon icon-name="custom:custom62" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Clasificación</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox data-id="selectItemTematica" label="Temática" placeholder="--Selecciona una temática--" onchange={handleTematicaSeleccionada} onfocus={comboboxTematicasFocus} options={opcionesTematicas} disabled={disabled1}></lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox data-id="selectItemProducto" label="Producto/Servicio" placeholder="--Seleccione un producto/servicio--" onchange={handleProductoSeleccionado} onfocus={comboboxProductosFocus} options={opcionesProductos} disabled={disabled7}></lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox data-id="selectItemMotivo" label="Motivo" placeholder="--Seleccione un motivo--" onchange={funcionesMotivo} onfocus={comboboxMotivosFocus} options={opcionesMotivos} disabled={disabled8}></lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox data-id="selectItemCausa" label="Causa" placeholder="--Seleccione una causa--" onchange={handleCausaSeleccionada} onfocus={comboboxCausasFocus} options={opcionesCausas} disabled={disabled5}></lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox data-id="selectItemSolucion" label="Solución" placeholder="--Seleccione una solución--" onfocus={comboboxSolucionesFocus} options={opcionesSoluciones} disabled={disabled4}></lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox style="display: none;" data-id="selectItemCampana" label="Campaña" placeholder="--Seleccione una campaña--" onfocus={comboboxCampanasFocus} options={opcionesCampanas} disabled={disabled1}></lightning-combobox>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-var-m-around_xx-small">
+                                <lightning-combobox style="display: none;" data-id="selectItemErroresTF7" label="TF7" placeholder="--Seleccione un error--" onfocus={comboboxErroresTF7Focus} options={opcionesErrores} value={errorTf7} disabled={disabled1}></lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-card__header slds-grid" style="margin-bottom: 0px;">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container">
+                            <lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate" style="font-size: 13px;">Datos de gestión</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div role="listitem">
+                <div class="slds-form-element slds-form-element_stacked slds-is-editing">
+                    <br />
+                    <lightning-record-edit-form data-id="recordEditForm" record-id={recordId} object-api-name="Case" onsuccess={recordEditFormOnSuccess} onerror={recordEditFormOnError}>
+                        <div class="slds-grid slds-wrap slds-gutters_direct-x-small">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field style="display: none;" field-name="Origin" disabled="true"></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field style="display: none;" data-id="inputCanalProcedencia" field-name="CC_Canal_Procedencia__c" disabled="true"></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-Field field-name="CC_Canal_Resolucion__c" disabled={disabled2}></lightning-input-Field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-Field data-id="CC_Canal_Operativo__c" field-name="CC_Canal_Operativo__c" disabled={disabled2}></lightning-input-Field>
+                            </div>
+                            <template if:true={caseOriginNoPropuestasMejora}>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-Field field-name="CC_Tipo_Gestion__c" disabled={disabled1}></lightning-input-Field>
+                                </div>
+                            </template>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-Field data-id="CC_Tipo_Contacto__c" field-name="CC_Tipo_Contacto__c" disabled={disabled1} onchange={mccClasificacionRapida}></lightning-input-Field>
+                            </div>
+                            <template if:true={caseOriginNoPropuestasMejora}>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Idioma__c" field-name="CC_Idioma__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-col slds-size_1-of-2">
+                                    <lightning-input-field field-name="CC_Resolucion__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                            </template>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="HDT_Tipo_de_Cierre__c" field-name="HDT_Tipo_de_Cierre__c" disabled={disabled1}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="HDT_Tipo_de_puesto__c" field-name="HDT_Tipo_de_puesto__c" disabled={disabled1}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-col slds-size_1-of-2">
+                                <lightning-input-field field-name="CC_Resolucion2Nivel__c" disabled={disabled1}></lightning-input-field>
+                            </div>
+                            <template if:true={caseOriginFAQ}>
+                                <div class="slds-col slds-col slds-size_1-of-2">
+                                    <lightning-input-field field-name="CC_FAQ_Id__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                            </template>
+                            <template if:true={caseOriginNoPropuestasMejora}>
+                                <div class="slds-col slds-size_1-of-1 ">
+                                    <lightning-input-field data-id="CC_Detalles_Consulta__c" field-name="CC_Detalles_Consulta__c" disabled={disabled9} class="slds-form-element_1-col"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning-input-field data-id="DetallesSolucion" field-name="CC_Detalles_Solucion__c" disabled={disabled2} class="slds-form-element_1-col"></lightning-input-field>
+                                </div>
+                                <!--
+                                <div class="slds-col slds-size_1-of-1">
+                                    <lightning-input-field data-id="CC_Detalle_Solucion_Confidencial__c" field-name="CC_Detalle_Solucion_Confidencial__c" disabled={disabled3) class="slds-form-element_1-col"></lightning-input-field>
+                                </div>-->
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field style="display: none;" field-name="CC_Registro_de_escrito__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-output-field style="display: none;" field-name="CC_Canal_Respuesta__c"></lightning-output-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field style="display: none;" field-name="CC_Aqumetrix__c" disabled={disabled2}></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field style="display: none;" data-id="modificarResp" field-name="CC_Canal_Respuesta_Modificar__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                            </template>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="CC_Oficina_Afectada_Lookup__c" field-name="CC_Oficina_Afectada_Lookup__c" disabled={disabled2}></lightning-input-field>
+                            </div>
+                            <template if:true={caseOriginNoPropuestasMejora}>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field style="display: none;" data-id="CC_Importe_Reclamado__c" field-name="CC_Importe_Reclamado__c" disabled={disabled2}></lightning-input-field>
+                                </div>
+                                <template if:true={caseOriginPropuestasMejora}>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field data-id="CC_Importe_Abonado__c" field-name="CC_Importe_Abonado__c" disabled={disabled2}></lightning-input-field>
+                                    </div>
+                                </template>
+                            </template>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field data-id="Canal_del_Empleado__c" field-name="Canal_del_Empleado__c" disabled={disabled2}></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field style="display: none;" data-id="comentarios" field-name="Comments" disabled={disabled1}></lightning-input-field>
+                            </div>
+                            <!--<template if:true={templateIf4}>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Numero_Pedido__c" field-name="CC_Numero_Pedido__c" disabled={disabled1}></lightning-input-field>
+                                </div>
+                            </template>-->
+
+                            <!--Campos Propuestas de Mejora -->
+                            <template if:true={caseOriginPropuestasMejora}>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Titulo_Propuesta__c" field-name="CC_Titulo_Propuesta__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Descripcion_Problematica__c" field-name="CC_Descripcion_Problematica__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Descripcion_Propuesta__c" field-name="CC_Descripcion_Propuesta__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Observaciones__c" field-name="CC_Observaciones__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Volumen_Mensual__c" field-name="CC_Volumen_Mensual__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Estado_Propuesta__c" field-name="CC_Estado_Propuesta__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Fecha_Prevista__c" field-name="CC_Fecha_Prevista__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input-field data-id="CC_Fecha_Implantacion__c" field-name="CC_Fecha_Implantacion__c"></lightning-input-field>
+                                </div>
+                            </template>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-output-field field-name="CC_Resuelto_Primer_Contacto__c"></lightning-output-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <div style="display: none;" class="slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+                                    <label class="slds-form-element__label" for="cambiarPendienteColaborador" style="max-width: none;">
+                                        Cambiar estado a &quot;Pendiente colaborador&quot;
+                                    </label>
+                                    <lightning-helptext content="Al guardar el caso con esta casilla marcada, se cambiará su estado a &quot;Pendiente colaborador&quot; y se reabrirá la última actividad de tipo &quot;Traslado a colaborador&quot; cerrada." style="display: contents; padding-top: none; float:none;"></lightning-helptext>
+                                    <lightning-input class="slds-form-element__control" style="padding-top: 2px; padding-left: 17.5rem;" type="checkbox" data-id="cambiarEstadoPendienteColaborador" onchange={cambiarEstadoPendienteColaboradorOnchange} disabled></lightning-input>
+                                </div>
+                            </div>
+                            <!--Check de cambiar estado a Activo cuando el estado es pendiente cliente-->
+                            <div style="display: none;" class="slds-col slds-size_1-of-2">
+                                <div class="slds-form-element slds-form-element_horizontal slds-form-element_1-col">
+                                    <label class="slds-form-element__label" for="cambiarEstadoActivo" style="max-width: none;">
+                                        Cambiar estado a &quot;Activo&quot;
+                                    </label>
+                                    <lightning-helptext content="Al guardar el caso con esta casilla marcada, se cambiará su estado a &quot;Activo&quot;" style="display: contents; padding-top: none; float:none;"></lightning-helptext>
+                                    <lightning-input class="slds-form-element__control" style="padding-top: 2px; padding-left: 13.5rem;" type="checkbox" data-id="cambiarEstadoActivo" disabled></lightning-input>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input-field field-name="HDT_Resuelto_Primera_Llamada__c" disabled={disabled2}></lightning-input-field>
+                            </div>
+                            <!--Fila para los botones-->
+                            <div class="slds-col slds-size_1-of-1" style="text-align: right;">
+                                <lightning-button data-id="submitGuardar" label="Guardar" variant={variantGuardar} onclick={gestionaGuardarCerrar} disabled={disabled1}></lightning-button>
+                                <lightning-button data-id="submitGuardarCerrar" variant="Brand" label="Guardar y cerrar" onclick={gestionaGuardarCerrar} disabled={disabled10} class="slds-var-m-left_small"></lightning-button>
+                            </div>
+                        </div>
+
+                        <lightning-input-field data-id="tematicaSeleccionadaOculto" field-name="CC_MCC_Tematica__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="productoSeleccionadoOculto" field-name="CC_MCC_ProdServ__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="motivoSeleccionadoOculto" field-name="CC_MCC_Motivo__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="causaSeleccionadaOculto" field-name="CC_MCC_Causa__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="solucionSeleccionadaOculto" field-name="CC_MCC_Solucion__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="cerradoOperativa" field-name="CC_Cerrado_Operativa__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="estado" field-name="Status" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="campanaSeleccionadaOculto" field-name="CC_Campana__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="errorTerminalSeleccionadoOculto" field-name="CC_Error_TF7__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="tematicaInternaSeleccionadaOculto" field-name="CC_Tematica__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="productoInternoSeleccionadaOculto" field-name="CC_Producto_Servicio__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="motivoInternoSeleccionadaOculto" field-name="CC_Motivo__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="causaInternaSeleccionadaOculto" field-name="CC_Causa__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="solucionInternaSeleccionadaOculto" field-name="CC_Solucion__c" class="slds-hide"></lightning-input-field>
+                        <lightning-input-field data-id="RecordTypeId" class="slds-hide"></lightning-input-field>
+
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </lightning-card>
+        <!--</div>
+            </aura:if>-->
+        <!--Modal para cerrar caso origen-->
+        <!--<section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal" data-id="modalCerrarCasoOrigen" onkeydown={modalCerrarCasoOrigenTeclaPulsada}>-->
+            <!--<div class="slds-modal__container">-->
+                <!--Cabecera del modal-->
+                <!--<header class="slds-modal__header">-->
+
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <!--<lightning-button-icon icon-name="utility:close" size="large" onclick={modalCerrarCasoOrigenCerrar} alternative-text="Cerrar" variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>-->
+                    <!--Título-->
+                    <!--<h2 class="slds-text-heading_medium slds-hyphenate">¿Cerrar también el caso origen?</h2>-->
+                <!--</header>-->
+                <!--Contenido del modal-->
+                <!--<div class="slds-modal__content slds-var-p-around_medium">
+                    <lightning-layout-item size="12" padding="around-medium">
+                        <p>El caso que has cerrado está vinculado con el siguiente caso origen:</p>
+                        <div class="slds-grid slds-gutters_direct-xx-small slds-var-m-left_xx-large slds-var-m-right_xx-large slds-var-m-top_x-large slds-var-m-bottom_x-large slds-border_right slds-border_bottom slds-border_left slds-border_top cc_divInfoCasoOrigen">
+                            <div class="slds-col slds-col slds-var-m-left_large" style="position: relative; top: 13px;">
+                                <lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+                            </div>
+                            <div class="slds-col">
+                                <article class="slds-card slds-var-m-bottom_xx-large">
+                                    <div class="slds-card__body slds-card__body_inner">
+                                            <span style="font-weight: 400;">
+                                                <lightning-button variant="base" class="brandTextLink" label="Caso" onclick={modalCerrarCasoOrigenNavegar}></lightning-button> caso.CaseNumber es una varibale, pendiente de sabe jumtar el String con el valor del campo
+                                            </span>
+                                            <dl class="slds-dl_horizontal">
+                                                <dt class="slds-dl_horizontal__label">
+                                                    <p class="slds-truncate">Temática:</p>
+                                                </dt>
+                                                <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                                    <p class="slds-truncate">{casoOrigen.tematicaName}</p>
+                                                </dd>
+                                                <dt class="slds-dl_horizontal__label">
+                                                    <p class="slds-truncate">Fecha de apertura:</p>
+                                                </dt>
+                                                <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                                    <p class="slds-truncate">
+                                                        <lightning-formatted-date-time value={casoOrigen.CreatedDate} year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false"></lightning-formatted-date-time>
+                                                    </p>
+                                                </dd>
+                                                <dt class="slds-dl_horizontal__label">
+                                                    <p class="slds-truncate">Estado:</p>
+                                                </dt>
+                                                <dd class="slds-dl_horizontal__detail slds-tile__meta slds-var-m-bottom_x-small">
+                                                    <p class="slds-truncate">{casoOrigen.Status}</p>
+                                                </dd>
+                                                <dt class="slds-dl_horizontal__label">
+                                                    <p class="slds-truncate" title="Asunto">Asunto:</p>
+                                                </dt>
+                                                <dd class="slds-dl_horizontal__detail slds-tile__meta">
+                                                    <p class="slds-truncate">{casoOrigen.Subject}</p>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                </article>
+                            </div>
+                        </div>
+                        <p class="slds-var-m-top_small slds-var-m-bottom_large" style="font-weight: 500;">¿Quieres cerrar también el caso origen?</p>
+                        <div class="slds-grid slds-gutters_direct-x-small slds-grid_vertical-align-center slds-var-m-left_xx-large slds-var-m-right_x-large">
+                            <div class="slds-col">
+                                <lightning-icon icon-name="utility:info_alt" size="x-small"></lightning-icon>
+                            </div>
+                            <div class="slds-col slds-text-color_weak" style="font-size: 11px;">
+                                El caso origen se cerrará con los mismos valores del caso de seguimiento para los campos "Causa", "Solución" (si ambos comparten "Motivo") y "Detalles solución".
+                            </div>
+                        </div>
+                    </lightning-layout-item>
+                </div>-->
+                <!--Pie del modal-->
+                <!--<footer class="slds-modal__footer">-->
+                    <!--<div align="right">
+                        <lightning-button data-id="modalCerrarCasoOrigenCancelar" label="Cancelar" onclick={modalCerrarCasoOrigenCerrar}></lightning-button>
+                        <lightning-button data-id="modalCerrarCasoOrigenConfirmar" variant="brand" label="Cerrar caso origen" icon-name="utility:close" onclick={confirmarCerrarCasoOrigen} class="slds-var-m-left_small"></lightning-button>
+                    </div>
+                </footer>
+            </div>
+        </section>-->
+    </template>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Hidden_DispYRecicladores_ES_stopGo_LiveChatTranscript</fullName>
+    <filterScope>Queue</filterScope>
+    <label>CC_Hidden_DispYRecicladores_es</label>
+    <queue>CC_Hidden_DispYRecicladores_ES_stopGo</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

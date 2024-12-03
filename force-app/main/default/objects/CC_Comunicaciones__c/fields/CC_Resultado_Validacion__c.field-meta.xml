@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Resultado_Validacion__c</fullName>
+    <label>Resultado validación</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OTP errónea</fullName>
+                <default>false</default>
+                <label>OTP errónea</label>
+            </value>
+            <value>
+                <fullName>OTP validada correctamente</fullName>
+                <default>false</default>
+                <label>OTP validada correctamente</label>
+            </value>
+            <value>
+                <fullName>Identificación emergencia</fullName>
+                <default>false</default>
+                <label>Identificación emergencia</label>
+            </value>
+            <value>
+                <fullName>Identificación manual</fullName>
+                <default>false</default>
+                <label>Identificación manual</label>
+            </value>
+            <value>
+                <fullName>Identificación NOK</fullName>
+                <default>false</default>
+                <label>Identificación NOK</label>
+            </value>
+            <value>
+                <fullName>OTP no recibida</fullName>
+                <default>false</default>
+                <label>OTP no recibida</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

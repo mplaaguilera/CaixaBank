@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Cargo__c</fullName>
+    <label>Cargo</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Dir. Financiera</fullName>
+                <default>false</default>
+                <label>Dir. Financiera</label>
+            </value>
+            <value>
+                <fullName>Gerencia</fullName>
+                <default>false</default>
+                <label>Gerencia</label>
+            </value>
+            <value>
+                <fullName>Tesorería</fullName>
+                <default>false</default>
+                <label>Tesorería</label>
+            </value>
+            <value>
+                <fullName>Administración</fullName>
+                <default>false</default>
+                <label>Administración</label>
+            </value>
+            <value>
+                <fullName>Secretaria</fullName>
+                <default>false</default>
+                <label>Secretaria</label>
+            </value>
+            <value>
+                <fullName>Recursos Humanos</fullName>
+                <default>false</default>
+                <label>Recursos Humanos</label>
+            </value>
+            <value>
+                <fullName>Back Office</fullName>
+                <default>false</default>
+                <label>Back Office</label>
+            </value>
+            <value>
+                <fullName>Comercio exterior</fullName>
+                <default>false</default>
+                <label>Comercio exterior</label>
+            </value>
+            <value>
+                <fullName>Financiación y servicios</fullName>
+                <default>false</default>
+                <label>Financiación y servicios</label>
+            </value>
+            <value>
+                <fullName>Seguros</fullName>
+                <default>false</default>
+                <label>Seguros</label>
+            </value>
+            <value>
+                <fullName>Avales</fullName>
+                <default>false</default>
+                <label>Avales</label>
+            </value>
+            <value>
+                <fullName>Renting</fullName>
+                <default>false</default>
+                <label>Renting</label>
+            </value>
+            <value>
+                <fullName>Leasing</fullName>
+                <default>false</default>
+                <label>Leasing</label>
+            </value>
+            <value>
+                <fullName>Otros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+            <value>
+                <fullName>No Informado</fullName>
+                <default>false</default>
+                <label>No Informado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

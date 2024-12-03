@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Fechadrecepcionestadocerrado</fullName>
+    <active>true</active>
+    <description>No se puede borrar la fecha de recepción después de estar completada la fecha de resolución</description>
+    <errorConditionFormula>AND(OR (AND (!ISBLANK(OS_Fecha_Resolucion__c),
+ISBLANK(SAC_FechaRecepcion__c)) ,
+(AND (!ISBLANK(OS_Fecha_Resolucion__c),
+						PRIORVALUE(SAC_FechaRecepcion__c) != SAC_FechaRecepcion__c,   NOT($Permission.SAC_Auditor)))), 
+				RecordType.DeveloperName == &apos;SAC_Reclamacion&apos;)</errorConditionFormula>
+    <errorDisplayField>SAC_FechaRecepcion__c</errorDisplayField>
+    <errorMessage>No se puede borrar ni modificar la fecha de recepción si la fecha de resolución está informada</errorMessage>
+</ValidationRule>

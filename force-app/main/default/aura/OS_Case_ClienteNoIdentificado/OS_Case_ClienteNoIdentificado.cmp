@@ -1,0 +1,36 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global">
+
+    <!-- Atributos del componente -->
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="caso" type="Object"/>
+    <aura:attribute name="errorLds" type="String"/>
+
+    <!--Lightning Data Service-->
+    <force:recordData aura:id="caseData" recordId="{!v.recordId}" layoutType="FULL"
+                        fields="Id, AccountId, ContactId, CC_No_Identificado__c, CC_IdentCliente__c"
+                        targetFields="{!v.caso}" targetError="{!v.errorLds}" mode="EDIT"/>
+                    
+
+    <!--UI-->
+    <!--Card-->
+    <article class="slds-card">
+         <!--Cabecera de la card-->
+         <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="custom:custom64" size="small" class="cc_azul_cuenta"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Identificar Empleado</span>
+                    </h2>
+                </div>
+
+                <div class="slds-no-flex" style="padding-top: 4px; padding-right: 1px;">
+                    <lightning:button label="No se identifica" onclick="{!c.handleActualizarIdentificacion}" disabled="{!v.caso.CC_No_Identificado__c}"/>
+                </div>
+            </header>
+        </div>
+
+    </article>
+</aura:component>

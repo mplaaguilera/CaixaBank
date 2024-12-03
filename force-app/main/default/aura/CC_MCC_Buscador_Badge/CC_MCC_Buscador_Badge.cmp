@@ -1,0 +1,12 @@
+<aura:component>
+	<aura:attribute name="text" type="String"/>
+    <aura:attribute name="enteredValue" type="String" default=""/>
+    <aura:attribute name="fontWeight" type="String" default="400"/>
+    <aura:attribute name="badgeStyle" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <span class="slds-badge" style="{!v.badgeStyle}">
+        <aura:unescapedHtml value="{!v.text}" />
+    </span>
+</aura:component>

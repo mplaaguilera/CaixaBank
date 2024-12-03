@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Campos_inmodificables</fullName>
+    <active>true</active>
+    <description>Esta validation rule se ha creado para que una vez creado un registro, el único campo posible a modificar sea la fecha fin del registro</description>
+    <errorConditionFormula>AND(
+NOT(ISNEW()),
+OR(
+ISCHANGED(CC_Area_de_Negocio__c ),
+ISCHANGED(CC_Fecha_Inicio__c),
+ISCHANGED(CC_Margen__c)
+)
+)</errorConditionFormula>
+    <errorMessage>No puede modificar ningún campo salvo la fecha fin</errorMessage>
+</ValidationRule>

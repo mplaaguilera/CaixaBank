@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_OrigenConsulta__c</fullName>
+    <description>Picklist obligatorio para seleccionar el origen de la consulta SAC</description>
+    <label>Origen consulta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_OrigenCliente</fullName>
+                <default>false</default>
+                <label>Cliente</label>
+            </value>
+            <value>
+                <fullName>SAC_OrigenOficina</fullName>
+                <default>false</default>
+                <label>Oficina</label>
+            </value>
+            <value>
+                <fullName>SAC_OrigenProveedores</fullName>
+                <default>false</default>
+                <label>Proveedores</label>
+            </value>
+            <value>
+                <fullName>SAC_OrigenCOPS</fullName>
+                <default>false</default>
+                <label>COPS</label>
+            </value>
+            <value>
+                <fullName>SAC_OrigenOtros</fullName>
+                <default>false</default>
+                <label>Otros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

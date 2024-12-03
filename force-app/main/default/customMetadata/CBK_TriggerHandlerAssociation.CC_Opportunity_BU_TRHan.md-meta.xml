@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CC_Opportunity_BU_TRHan</label>
+    <protected>false</protected>
+    <values>
+        <field>CBK_ActiveParent__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>CBK_FilterFieldValue__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CBK_FilterField__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CBK_FilterProfile__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CBK_FilterRecordType__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CBK_HandlerClassName__c</field>
+        <value xsi:type="xsd:string">CC_Opportunity_BU_TRHan</value>
+    </values>
+    <values>
+        <field>CBK_ObjectApiName__c</field>
+        <value xsi:type="xsd:string">Opportunity</value>
+    </values>
+    <values>
+        <field>CBK_TriggerEvent__c</field>
+        <value xsi:type="xsd:string">beforeUpdate</value>
+    </values>
+    <values>
+        <field>CBK_ValidationHandlerEmail__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

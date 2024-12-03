@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_Report_Cabecera__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica que report tiene que estar fijo en la lista custom que se muestra en las oportunidades. Solo debe marcarse uno. Si hubiera mas de uno marcado. Se mostrarán por orden de llegada al componente</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Report de Cabecera</label>
+    <type>Checkbox</type>
+</CustomField>

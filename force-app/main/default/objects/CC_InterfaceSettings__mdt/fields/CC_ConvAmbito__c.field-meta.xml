@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_ConvAmbito__c</fullName>
+    <description>Máximo. Conversión del ámbito.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Máximo. Conversión del ámbito.</inlineHelpText>
+    <label>Conversión ámbito</label>
+    <required>false</required>
+    <type>TextArea</type>
+</CustomField>

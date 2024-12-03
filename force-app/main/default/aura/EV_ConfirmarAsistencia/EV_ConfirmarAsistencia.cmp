@@ -1,0 +1,85 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes" 
+                access="global" controller="EV_ConfirmarAsistencia_Controller">
+    
+    <!-- Declaramos variables -->
+    <aura:attribute name="idMiembro" type="String" />   
+    <aura:attribute name="campaignMember" type="CampaignMember"/>
+    <aura:attribute name="infoEstadoActivo" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />	
+    
+    <!-- PAGE HEADER -->
+    <lightning:layout class="slds-page-header slds-page-header--object-home">
+        <lightning:layoutItem>
+            <lightning:icon iconName="custom:custom101" alternativeText="{!v.campaignMember.Name}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+            <div class="page-section page-header">
+                <h1 class="slds-text-heading--label">Campaign Member</h1>
+                <h2 class="slds-text-heading--medium">{!v.campaignMember.Name}</h2>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <!-- / PAGE HEADER -->   
+    
+    <lightning:recordViewForm recordId="{!v.campaignMember.Id}" objectApiName="CampaignMember" class="slds-p-top_small">      
+        <!-- Seccion de los botones -->
+        <div class="slds-align_absolute-center slds-p-bottom_small">
+            <lightning:button class="slds-button slds-button_brand" disabled="{!v.campaignMember.Status == 'Asistencia realizada'}" label="Confirmar Asistencia" onclick="{!c.handleConfirmarAsistencia}"/>
+        </div>
+        
+        <div class="slds-box slds-theme_default">
+            <div class="slds-p-horizontal--medium">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning:outputField fieldName="CampaignId" />                        
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning:outputField fieldName="EV_Email__c" />                      
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-2">    
+                        <lightning:outputField fieldName="LeadId" />                      
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        <lightning:outputField fieldName="EV_Telefono__c" />                        
+                    </div>
+                </div>
+            </div>
+            <div class="{!'slds-section' + if(v.infoEstadoActivo,' slds-is-open','')}">
+                <div class="slds-section__title">
+                    <button class="slds-button slds-section__title-action slds-current-color" onclick="{!c.toggleInfoEstado}">
+                        <lightning:icon iconName="utility:switch" size="xx-small" class="{!if(v.infoEstadoActivo,'icon-opened','icon-closed')}"/>
+                        <span class="slds-truncate slds-p-left--small">Información del estado</span> 
+                    </button>
+                </div>
+                <div class="slds-section__content slds-p-horizontal--medium"> 
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">    
+                            <lightning:outputField fieldName="Status" />                      
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="EV_QR_Enviado__c" />
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">    
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="EV_Encuesta_Enviada__c" />
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">    
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:outputField fieldName="EV_Encuesta_Contestada__c" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </lightning:recordViewForm>
+</aura:component>

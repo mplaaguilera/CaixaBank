@@ -1,0 +1,671 @@
+div.datatableContainer > c-lwc-labs-loading-stencil {
+    display: block;
+    opacity: 0.58;
+    transition: opacity 50ms ease-out;
+}
+
+div.datatableContainer.datatableContainerImporte > c-lwc-labs-loading-stencil,
+div.datatableContainer.datatableContainerGeneral > c-lwc-labs-loading-stencil {
+    height: 61px;
+}
+
+div.datatableContainer.datatableContainerCuotaMensual > c-lwc-labs-loading-stencil,
+div.datatableContainer.datatableContainerFondosPropios > c-lwc-labs-loading-stencil,
+div.datatableContainer.datatableContainerPrimerTitular > c-lwc-labs-loading-stencil,
+div.datatableContainer.datatableContainerSegundoTitular > c-lwc-labs-loading-stencil,
+div.datatableContainer.datatableContainerDeuda > c-lwc-labs-loading-stencil {
+    height: 185px;
+}
+
+article.cardCalculadoraDti {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+.transparente {
+    opacity: 0 !important;
+}
+
+article.cardCalculadoraDti.noVisible > div.slds-card__body,
+article.cardCalculadoraDti.noVisible > footer.slds-card__footer {
+    display: none;
+}
+
+article.cardCalculadoraDti > footer.slds-card__footer {
+    text-align: start;
+}
+
+div.datatableContainer {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(201, 201, 201, 0.816);
+    border-radius: 7px;
+    overflow: hidden;
+}
+
+div.datatableContainer lightning-datatable {
+    --slds-c-button-shadow-focus: none;
+    --_slds-g-shadow-inset-inverse-focus: none;
+    --lwc-shadowButtonFocus: none;
+    --slds-c-button-color-border-active: transparent;
+    --slds-c-input-shadow: none;
+    transition: opacity 100ms ease-in;
+}
+
+div.divCalculos {
+    cursor: default;
+    background-color: #f8f8f7;
+    border: 1px solid #c9c9c9d0;
+    border-radius: 6px;
+    padding-left: 0.2rem;
+    padding-right: 1rem;
+    box-shadow: 0px 0px 10px 2px #00000010;
+    min-height: 64px;
+}
+
+div.divCalculos > div.slds-grid > div.slds-col {
+    padding-top: 13px;
+    padding-bottom: 8px;
+}
+
+div.divCalculos > div.slds-grid > div.slds-col:not(.slds-hide) + div.slds-col {
+    border-left: 1px solid;
+    border-image: linear-gradient(to bottom, transparent 0%, rgb(216, 216, 216) 50%, rgb(216, 216, 216) 70%, transparent) 1;
+}
+
+div.divInfo {
+    position: relative;
+    z-index: 90;
+    cursor: default;
+    margin: 4px 0px 13px 0px;
+}
+
+footer div.divInfo {
+    margin: 0;
+}
+
+div.divInfo ul > li {
+    display: inline-block;
+    text-overflow: ellipsis;
+}
+
+div.divInfo ul > li.infoItem + li.infoItem {
+    margin-left: 14px;
+}
+
+div.divInfo ul > li.infoItem {
+    position: relative;
+    top: -50px;
+    will-change: top, opacity, transform;
+    opacity: 0;
+    transform-origin: top;
+    animation: deslizarKf 100ms forwards;
+    animation-timing-function: ease-in;
+}
+
+div.divInfo ul > li.infoItem[data-popover-campos-requeridos="true"] {
+    cursor: pointer;
+}
+
+div.divInfo + hr {
+    margin: 0;
+    border-image: linear-gradient(to right, transparent 0%, rgba(235, 235, 235, 15%) 7%, rgb(235, 235, 235) 93%, transparent) 1;
+}
+
+@keyframes deslizarKf {
+    0% {
+        top: 8px;
+        opacity: 0.1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.2;
+        transform: scale(0.99);
+    }
+
+    70% {
+        opacity: 0.3;
+    }
+
+    100% {
+        top: 0px;
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+div.divInfo div.divTooltipCamposRequeridos {
+    position: relative;
+    text-align: start;
+}
+
+div.divInfo div.divTooltipCamposRequeridos > div.popoverCamposRequeridos {
+    top: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: max-content;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 140ms ease, opacity 140ms ease-out, top 140ms linear;
+    will-change: visibility, opacity, top;
+}
+
+div.divInfo div.divTooltipCamposRequeridos > div.popoverCamposRequeridos.visible {
+    top: 13px;
+    visibility: visible;
+    opacity: 1;
+}
+
+div.divInfo div.divTooltipCamposRequeridos > div.popoverCamposRequeridos > div.slds-popover__body > ul > li {
+    display: list-item;
+}
+
+div.divInfo div.divTooltipCamposRequeridos > div.popoverCamposRequeridos > div.slds-popover__body > ul > li + li {
+    margin-top: 5px;
+}
+
+div.divCalculoViabilidad lightning-icon {
+    transform: scale(1.1);
+}
+
+span.viabilidadLabel {
+    position: relative;
+    top: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02rem;
+    text-transform: uppercase;
+}
+
+span.calculoLabel {
+    display: block;
+    letter-spacing: 0.09rem;
+    text-transform: uppercase;
+    width: 100%;
+    font-size: 12.8px;
+}
+
+span.calculoLabel.subtitulo {
+    display: inline;
+    letter-spacing: 0.05rem;
+    font-size: 10.5px;
+    font-weight: 300;
+    margin-right: 7px;
+}
+
+/* article.cardCalculadoraDti.cargando div.divCalculos span.calculoValue {
+    visibility: hidden;
+} */
+
+.cargando {
+    visibility: hidden;
+}
+
+span.calculoValue {
+    color: #0e62ab;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.04rem;
+}
+
+span.calculoValue.sinBonificar {
+    color: #6d9a9d;
+}
+
+span.calculoValuePercent {
+    font-size: 16px;
+    margin-left: 0px;
+}
+
+span.calculoValueDesconocido {
+    position: relative;
+    top: 1px;
+    margin-left: 1px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #a17070;
+}
+
+div.divCalculoItem.noViable span.calculoLabel,
+div.divCalculoItem.noViable div.calculoValue {
+    color: firebrick;
+}
+
+lightning-helptext.calculoIcon {
+    position: relative;
+    visibility: hidden;
+    top: -2px;
+    transform-origin: center;
+    transform: scale(0);
+    opacity: 0;
+    transition: opacity 85ms ease-in-out, transform 85ms cubic-bezier(0.84, 0.86, 0.79, 1.43);
+    --slds-c-button-text-color-hover: #be0909;
+    --slds-c-button-text-color-active: #be0909;
+}
+
+div.divCalculoItem.noViable lightning-helptext.calculoIcon {
+    visibility: visible;
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+div.divCalculoItem.noViable lightning-helptext.calculoIcon:hover {
+    transform: scale(1.3);
+}
+
+div.tituloTabla {
+    margin-left: 3px;
+    /* margin-top: 2px; */
+    /* margin-bottom: 10px; */
+    font-size: 13px;
+    line-height: var(--lwc-lineHeightHeading, 1.25);
+    color: #154b7a;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    cursor: default;
+    position: relative;
+}
+
+div.tituloTabla > span.nombreContacto {
+    margin-right: 6px;
+    font-size: 12px;
+    line-height: var(--lwc-lineHeightHeading, 1.25);
+    color: #0d2f4d;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+}
+
+lightning-icon.tituloTablaIcono {
+    position: relative;
+    --slds-c-icon-color-foreground: #2e6391;
+    --slds-c-icon-color-foreground-default: #2e6391;
+}
+
+lightning-button,
+/* lightning-button-icon, */
+lightning-button-menu,
+lightning-input-field,
+div.slds-dropdown,
+div.slds-input_faux {
+    --slds-g-color-border-base-4: rgb(201, 201, 201);
+}
+
+lightning-input {
+    --slds-c-input-color-border: rgb(201, 201, 201);
+    --slds-c-input-color-border-focus: rgb(201, 201, 201);
+}
+
+lightning-textarea {
+    --slds-c-textarea-color-border: rgb(201, 201, 201);
+    --slds-c-textarea-color-border-focus: rgb(201, 201, 201);
+}
+
+lightning-input-field.lookupTitular {
+    --slds-g-color-border-base-4: rgb(232, 232, 232);
+    --slds-c-input-shadow: none;
+}
+
+div.divCalculoItem.animarCalculo span.calculoValue {
+    animation-name: animarCalculoKf;
+    animation-iteration-count: 12;
+    animation-duration: 110ms;
+    animation-timing-function: linear;
+    animation-direction: alternate;
+}
+
+@keyframes animarCalculoKf {
+    100% {
+        color: rgb(234, 134, 84);
+    }
+}
+
+span.pillCliente {
+    display: inline-flex;
+    padding: 2px 4px 2px 6px;
+    background-color: #fbfbfb;
+    color: #051523;
+    border: 1px solid rgb(216, 216, 216);
+    border-radius: 4px;
+    align-items: center;
+    text-transform: uppercase;
+    opacity: 0.82;
+}
+
+span.pillCliente > span.pillClienteSpanEnlace {
+    cursor: pointer;
+}
+
+span.pillCliente > div.pillClienteSpanBotonDetalles {
+    transform-origin: center;
+    will-change: transform;;
+    transition: transform 105ms linear;
+}
+
+span.pillCliente > div.pillClienteSpanBotonDetalles > lightning-button-icon {
+    --slds-c-button-shadow-focus: none;
+    --sds-c-button-shadow-focus: none;
+    --slds-g-shadow-outline-focus-1: none;
+}
+
+span.pillCliente > span.pillClienteSpanEnlace:hover {
+    opacity: 1;
+}
+
+span.pillCliente > span.pillClienteSpanEnlace > lightning-icon {
+    position: relative;
+    top: -1px;
+    opacity: 0.7;
+    transition: opacity 40ms linear, transform 40ms linear;
+    transform: scale(1.1);
+    transform-origin: center;
+}
+
+span.pillCliente > span.pillClienteSpanEnlace:hover > lightning-icon {
+    transform: scale(1.18);
+}
+
+span.pillCliente > span.pillClienteSpanEnlace > span.pillClienteLabel {
+    position: relative;
+    top: 1px;
+    padding: 2px 3px 2px 8px;
+}
+
+span.pillCliente > span.pillClienteSpanEnlace:hover > span.pillClienteLabel {
+    text-decoration: underline;
+}
+
+article.cardCalculadoraDti.mostrarDetallesTitulares div.gridColDatatable span.pillCliente > div.pillClienteSpanBotonDetalles {
+    transform: rotate(90deg);
+}
+
+.iconoSuccess {
+    --slds-c-icon-color-foreground: forestgreen;
+    --slds-c-icon-color-foreground-default: forestgreen;
+}
+
+.iconoWarning {
+    --slds-c-icon-color-foreground-default: indianred;
+    will-change: opacity, transform;
+    opacity: 0.4;
+    transform-origin: center;
+    animation: blinkKf 300ms ease-in-out infinite alternate;
+}
+
+@keyframes blinkKf {
+    from {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    to {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+}
+
+.iconoError {
+    --slds-c-icon-color-foreground: firebrick;
+    --slds-c-icon-color-foreground-default: firebrick;
+}
+
+section.modalBorrarDatosGuardados lightning-icon.modalBorrarDatosGuardadosIconoWarning {
+    --slds-c-icon-color-foreground-default: orangered;
+}
+
+div.gridColDatatable.disabled div.tituloTabla,
+div.gridColDatatable.disabled div.tituloTabla > lightning-icon {
+    color: darkgray;
+    --slds-c-icon-color-foreground: darkgray;
+    --slds-c-icon-color-foreground-default: darkgray;
+}
+
+div.gridColDatatable.disabled div.datatableContainer {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+div.gridColDatatable.disabled div.datosTitular {
+    opacity: 0.7;
+}
+
+div.camposCabecera {
+    cursor: default;
+    color: rgb(81, 81, 81);
+    margin-bottom: 18px;
+    min-height: 17px;
+    font-size: 12.5px;
+}
+
+div.camposCabecera span {
+    letter-spacing: 0.009rem;
+}
+
+div.camposCabecera lightning-icon.tipoOperacionUsoVivienda {
+    position: relative;
+    top: -1px;
+    --slds-c-icon-color-foreground-default: #237dad;
+}
+
+div.camposCabecera lightning-icon.tipoConstruccion {
+    position: relative;
+    top: -2px;
+    --slds-c-icon-color-foreground-default: #2787ba;
+}
+
+div.camposCabecera lightning-icon.direccion {
+    position: relative;
+    top: -2px;
+    --slds-c-icon-color-foreground-default: #4e92bb;
+}
+
+lightning-icon.iconoTiposBonificados {
+    transition: --slds-c-icon-color-foreground-default 200ms linear;
+    position: relative;
+    top: 3px;
+    cursor: pointer;
+    --slds-c-icon-color-foreground-default: #c5c5c5;
+    --slds-c-icon-radius-border: 50%;
+}
+
+lightning-icon.iconoTiposBonificados:hover {
+    --slds-c-icon-color-foreground-default: #2e6391;
+}
+
+section.popoverTiposBonificados {
+    position: absolute;
+    visibility: hidden;
+    z-index: 100;
+    opacity: 0;
+    will-change: visibility, opacity, left;
+    transition: visibility 140ms ease, opacity 140ms ease-out, left 140ms linear;
+    top: 8px;
+    left: 30px;
+    width: 211px;
+    display: block;
+    border-radius: 6px;
+    background-color: #fbfdff;
+    transform: translateY(-50%);
+}
+
+section.popoverTiposBonificados.visible {
+    visibility: visible;
+    opacity: 1;
+    left: 40px;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body {
+    padding-top: 0px;
+    padding-bottom: 12px;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body div.tituloDatatableTiposBonificados {
+    display: block;
+    text-align: center;
+    cursor: default;
+    font-weight: 500;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body div.tituloDatatableTiposBonificados > lightning-icon {
+    margin-right: 7px;
+    position: relative;
+    top: -1px;
+    --slds-c-icon-color-foreground-default: #2c74b4;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body > div.popoverTiposBonificadosTextoFooter {
+    font-size: 11.8px;
+    font-style: italic;
+    text-align: right;
+    color: rgb(160, 160, 160);
+    cursor: default;
+}
+
+/* section.popoverTiposBonificados > div.slds-popover__body div.slds-text-title_caps {
+    display: block;
+    text-align: center;
+    cursor: default;
+    font-weight: 500;
+} */
+
+section.popoverTiposBonificados > div.slds-popover__body lightning-datatable {
+    cursor: default;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body div.slds-text-title_caps:first-child {
+    padding-top: 2px;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body div.datatableContainerTiposBonificados {
+    border-left: 1px solid rgb(201, 201, 201);
+    border-right: 1px solid rgb(201, 201, 201);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+section.popoverTiposBonificados > div.slds-popover__body div.datatableContainerTiposBonificados > lightning-datatable {
+    line-height: 25px;
+}
+
+div.datosTitular {
+    opacity: 0;
+    max-height: 0px;
+    font-weight: 300;
+    text-align: end;
+    cursor: default;
+    margin-bottom: 6px;
+    will-change: opacity, max-height;
+    transition: opacity 205ms linear, max-height 205ms linear;
+}
+
+article.cardCalculadoraDti.mostrarDetallesTitulares div.gridColDatatable div.datosTitular {
+    opacity: 1;
+    max-height: 30px;
+}
+
+div.datosTitular > span.valor {
+    font-weight: 500;
+}
+
+span.lookupResultadoLink {
+    cursor: pointer;
+}
+
+span.lookupResultadoLink:hover {
+    text-decoration: underline;
+}
+
+div.divSumaIngresosTitulares {
+    margin-top: 9px;
+    text-align: center;
+    border: 1px solid rgb(224, 224, 224);
+    border-radius: 4px;
+    background-color: #ecf7ff;
+    font-weight: 200;
+    padding: 6px 0 6px 0;
+}
+
+div.divSumaIngresosTitulares lightning-formatted-number {
+    font-weight: 300;
+}
+
+:host {
+    --_slds-g-shadow-outline-focus: none;
+}
+
+button.slds-modal__close:hover > lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-c-button-text-color-hover, var(--lwc-brandAccessibleActive, rgba(21, 73, 102, 1)));
+}
+
+lightning-icon.iconoTooltipCalculos {
+    cursor: pointer;
+    --slds-c-icon-color-foreground-default: gray;
+}
+
+lightning-icon.iconoTooltipCalculos:hover {
+    --slds-c-icon-color-foreground-default: #082d5f;
+}
+
+div.tooltipCalculos {
+    top: -183px;
+    left: -152px;
+    width: 360px;
+    will-change: opacity, transform;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(7%);
+    transition: visibility 140ms ease, opacity 140ms ease-out, transform 140ms linear;
+}
+
+div.tooltipCalculos.visible {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+div.tooltipCalculos ul {
+    list-style: disc;
+    margin: 1px 1px 4px 16px;
+}
+
+div.tooltipCalculos ul > li {
+    display: list-item;
+}
+
+.csbd-var-m-top_xxx-large {
+    margin-top: 30px;
+}
+
+div.datosTitular lightning-badge + lightning-badge {
+    margin-left: 6px;
+}
+
+div.datosTitular lightning-badge.slds-badge {
+    --slds-c-badge-radius-border: 5px;
+    --slds-c-badge-color-border: transparent;
+    --lwc-fontWeightBold: 300;
+    letter-spacing: 0.3px;
+}
+
+div.datosTitular lightning-badge:not(.slds-badge_lightest) {
+    --slds-c-badge-color-background: #f5f4f5;
+}
+
+div.datosTitular lightning-badge:not(.slds-badge_lightest):hover {
+    --slds-c-badge-color-background: #ededed;
+}
+
+div.datosTitular lightning-badge.slds-badge.slds-badge_lightest {
+    --slds-c-badge-lightest-color-background: #fbfbfb;
+    --slds-c-badge-icon-color-foreground: var(--slds-g-color-neutral-base-70, #5c5c5c);
+    --slds-c-badge-text-color: var(--slds-g-color-neutral-base-50, #5c5c5c);
+}
+
+div.datosTitular lightning-badge.slds-badge_lightest:hover {
+    --slds-c-badge-lightest-color-background: #f4f4f4;
+}
+
+div.gridColDatatable div.slds-col {
+    will-change: top;
+}

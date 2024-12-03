@@ -1,0 +1,18 @@
+<template>
+    <template if:true={tieneCasosAnteriores}>
+        <article class="slds-card" style="margin-bottom: 0px;">
+            <div class="slds-card__body" style="margin: unset;">
+                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning" role="status">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" >
+                            <lightning-icon variant="inverse" icon-name="utility:info" size="x-small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p><strong><span style="color:Red">ALERTA:</span></strong> Cliente con llamada previa por DESBLOQUEO DE BANCA DIGITAL . - Extremar precauciones según protocolo </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </template>
+</template>

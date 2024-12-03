@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NumPersoAsoc__c</fullName>
+    <description>NumPerso asociado al contacto (para gestión de empresas y ALF)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <inlineHelpText>NumPerso asociado al contacto (para gestión de empresas y ALF)</inlineHelpText>
+    <label>NumPerso Asociado</label>
+    <length>15</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

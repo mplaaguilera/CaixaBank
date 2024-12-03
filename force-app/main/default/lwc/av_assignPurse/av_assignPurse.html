@@ -1,0 +1,58 @@
+<template>
+    <template if:true={noConnectedAPI}>
+        <template if:true={initModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalContact} data-name="closeContact">
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="inverse"
+                                size="small" ></lightning-icon>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{label.AV_ASSIGNCONTACT}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_large">
+                        <lightning-record-edit-form object-api-name="Opportunity">
+                            <lightning-input-field field-name="AV_Gestor__c" class="gestor" required="true" onchange={handleChangeContact}></lightning-input-field>
+                        </lightning-record-edit-form>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModalContact} data-name="cancelContact" title="Cancel">{label.AV_CANCEL}</button>
+                        <button class="slds-button slds-button_brand" onclick={handleOnClick} data-name="getContact" title="OK">{label.AV_SAVE}</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    
+        <template if:true={lastModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" data-name="closePurse" onclick={closeModalPurse}>
+                            <lightning-icon icon-name="utility:close"
+                                alternative-text="close"
+                                variant="inverse"
+                                size="small" ></lightning-icon>
+                        </button>
+                        <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">{label.AV_ASSIGNCONTACT}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_large">
+                        <p class="sTitle">{label.AV_SELECTPURSE}</p>
+                        <select class="slds-select" onchange={handleChangePurse}>
+                            <template for:each ={getPurseValue} for:item="purs">
+                               <option key={purs.key} value={purs.key} class="purse">{purs.value}</option>
+                            </template>
+                         </select>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModalPurse} data-name="cancelPurse" title="Cancel">{label.AV_CANCEL}</button>
+                        <button class="slds-button slds-button_brand" onclick={handleOnClick} data-name="getPurse" title="OK">{label.AV_SAVE}</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </template>
+ </template>

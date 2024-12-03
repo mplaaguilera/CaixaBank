@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Empleado_Cuenta</fullName>
+    <active>true</active>
+    <description>Impide que un contacto de tipo distinto a Empleado pueda asociarse a cuenta de tipo Centro CaixaBank.</description>
+    <errorConditionFormula>PRIORVALUE( AccountId ) != AccountId &amp;&amp; NOT(ISBLANK(AccountId)) &amp;&amp; Account.RecordType.DeveloperName == &apos;CC_CentroCaixaBank&apos; &amp;&amp; RecordType.DeveloperName &lt;&gt; &apos;CC_Empleado&apos;</errorConditionFormula>
+    <errorMessage>Una cuenta de tipo Centro CaixaBank sólo puede tener contactos de tipo Empleado.</errorMessage>
+</ValidationRule>

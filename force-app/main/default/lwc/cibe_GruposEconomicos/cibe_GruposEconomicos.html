@@ -1,0 +1,50 @@
+<template>
+    <template if:true={hasParents}>
+        <div class="slds-card">
+            <template for:each={parentStructureReversed} for:item="parents">
+                <lightning-breadcrumbs key={parents} class="slds-var-m-around_medium">
+                    <template for:each={parents} for:item="parent">
+                        <lightning-breadcrumb
+                            key={parent.id}
+                            label={parent.label}
+                            name={parent.id}
+                            href={parent.url}
+                            onclick={handleLoadParents}>
+                        </lightning-breadcrumb>
+                    </template>
+                </lightning-breadcrumbs>
+            </template>
+            <template if:true={showLoadingHeader}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+        </div>
+    </template>
+    <div class="slds-card">
+        <div class="slds-form-element slds-form-element_stacked slds-var-m-around_small slds-size_1-of-6">
+            <lightning-combobox
+                name="tipoGrupo"
+                label="Tipo de grupo económico"
+                value={tipoGrupo}
+                placeholder="Seleccione un tipo"
+                options={options}
+                onchange={handleTipoGrupoChange}
+                dropdown-alignment="auto"
+                required>
+            </lightning-combobox>
+        </div>
+        <div class="slds-var-p-around_medium lgc-bg">
+            <div style={height} class="slds-scrollable">
+                <lightning-tree-grid
+                    columns={gridColumns}
+                    data={record}
+                    key-field="id"
+                    ontoggle={handleRowToggle}
+                    resize-column-disabled
+                ></lightning-tree-grid>
+            </div>
+            <template if:true={showLoadingBody}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,40 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" controller="CC_Llamada">
+
+    <aura:attribute name="llamadaRecord" type="Object"/>
+    <aura:attribute name="errorRecordData" type="String"/>
+    <aura:attribute name="botonLlamadaDeshabilitado" type="Boolean" default="true"/>
+    <aura:attribute name="botonConsultaDeshabilitado" type="Boolean" default="true"/>
+
+    <ltng:require scripts="{!$Resource.jsencrypt}"/>
+
+    <force:recordData aura:id="llamadaData" recordId="{!v.recordId}"
+        fields="RecordType.DeveloperName, CC_Fecha_Inicio__c, CC_Fecha_Grabacion__c, CC_ConnId__c, CC_ConnId_Consulta__c, CC_Extension__c, OS_Nombre_Fichero_Grabacion__c"
+        targetFields="{!v.llamadaRecord}" targetError="{!v.errorRecordData}" recordUpdated="{!c.recordDataUpdated}"/>
+
+    <article class="slds-card">
+        <!--Header-->
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="action:download" size="xx-small"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate" style="font-size: 16px;">Descargar grabaciones</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+
+        <!--Body-->
+        <div class="slds-card__body slds-card__body_inner" style="padding-top: 7px;">
+            
+            <lightning:layout>
+                <lightning:button aura:id="botonEscucharLlamada" label="Llamada entrante" iconName="utility:download" onclick="{!c.obtenerGrabacion}" disabled="{!v.botonLlamadaDeshabilitado}"/>
+                <aura:if isTrue="{!!v.botonConsultaDeshabilitado}">
+                    <lightning:button aura:id="botonEscucharConsulta" label="Llamada de consulta" iconName="utility:download" onclick="{!c.obtenerGrabacion}" disabled="{!v.botonConsultaDeshabilitado}"/>
+                </aura:if>
+            </lightning:layout>
+        </div>
+    </article>
+</aura:component>

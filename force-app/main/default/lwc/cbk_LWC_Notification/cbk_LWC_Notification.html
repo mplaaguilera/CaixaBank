@@ -1,0 +1,13 @@
+<template>
+    <lightning-card>     
+        <article class="slds-card">
+            <div class="body_component">
+                <ul class="slds-timeline">
+                   <template for:each={interacciones} for:item="msg"> 
+                      <c-cbk_-L-W-C_-Notification_-Show key={msg.Id} msg={msg} isexpanded=false test={test}></c-cbk_-L-W-C_-Notification_-Show>
+                   </template>
+                </ul>
+            </div>
+        </article>
+    </lightning-card>
+</template>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_EspecialidadCartera__c</fullName>
+    <description>Especialidad de la cartera</description>
+    <label>Especialidad  Cartera</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>A</fullName>
+                <default>false</default>
+                <label>Asesoramiento A</label>
+            </value>
+            <value>
+                <fullName>B</fullName>
+                <default>false</default>
+                <label>Intouch</label>
+            </value>
+            <value>
+                <fullName>E</fullName>
+                <default>false</default>
+                <label>Negocios (Subdirector - 2º Responsable)</label>
+            </value>
+            <value>
+                <fullName>F</fullName>
+                <default>false</default>
+                <label>Negocios (Gestor)</label>
+            </value>
+            <value>
+                <fullName>G</fullName>
+                <default>false</default>
+                <label>Empresas (DBE)</label>
+            </value>
+            <value>
+                <fullName>I</fullName>
+                <default>false</default>
+                <label>Empresas (Gestor-CE)</label>
+            </value>
+            <value>
+                <fullName>K</fullName>
+                <default>false</default>
+                <label>Inmobiliario</label>
+            </value>
+            <value>
+                <fullName>L</fullName>
+                <default>false</default>
+                <label>Non-Core</label>
+            </value>
+            <value>
+                <fullName>M</fullName>
+                <default>false</default>
+                <label>Asesoramiento C</label>
+            </value>
+            <value>
+                <fullName>O</fullName>
+                <default>false</default>
+                <label>Empresas (Grandes Empresas)</label>
+            </value>
+            <value>
+                <fullName>Q</fullName>
+                <default>false</default>
+                <label>Micros (Director)</label>
+            </value>
+            <value>
+                <fullName>R</fullName>
+                <default>false</default>
+                <label>Micros (Gestor)</label>
+            </value>
+            <value>
+                <fullName>S</fullName>
+                <default>false</default>
+                <label>Especialista</label>
+            </value>
+            <value>
+                <fullName>T</fullName>
+                <default>false</default>
+                <label>Micros (Multicartera)</label>
+            </value>
+            <value>
+                <fullName>U</fullName>
+                <default>false</default>
+                <label>Empresas (DCE)</label>
+            </value>
+            <value>
+                <fullName>Z</fullName>
+                <default>false</default>
+                <label>Empresas (Inversores)</label>
+            </value>
+            <value>
+                <fullName>0</fullName>
+                <default>false</default>
+                <label>Empresas (Growth/Scale up)</label>
+            </value>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>Empresas (Early Stage)</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>Asesoramiento B</label>
+            </value>
+            <value>
+                <fullName>H</fullName>
+                <default>false</default>
+                <label>H</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>Negocios (Micro-DO)</label>
+            </value>
+            <value>
+                <fullName>4</fullName>
+                <default>false</default>
+                <label>Negocios (Micro-Gestor)</label>
+            </value>
+            <value>
+                <fullName>5</fullName>
+                <default>false</default>
+                <label>Negocios (Micro-Multicartera)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

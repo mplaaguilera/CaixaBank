@@ -1,0 +1,13 @@
+.myclass{
+    margin: 1%;
+}
+.space{
+    height: 1rem;
+
+}
+.sinResultadosClass{
+    text-align: center;
+}
+.textAreaBody {
+    --sds-c-textarea-sizing-min-height:100px;
+}

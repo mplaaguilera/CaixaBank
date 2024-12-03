@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Reaperturas_FCO_Case</fullName>
+    <filterScope>Queue</filterScope>
+    <label>Reaperturas de FCO</label>
+    <queue>CC_Reaperturas_FCO</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

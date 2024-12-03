@@ -1,0 +1,9 @@
+.list_container {
+    direction: ltr;
+    overflow:auto;
+    height: 500px;
+  }
+
+  .item_direction {
+    direction:ltr;
+  }

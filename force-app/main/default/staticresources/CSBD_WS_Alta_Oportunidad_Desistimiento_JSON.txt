@@ -1,0 +1,18 @@
+{
+    "solicitudes": [
+        {
+            "referencia_usuario": "DPR20200615235446456",
+            "tipoSolicitud": "desistimiento",
+            "usuclo": "08089705300",
+            "nombreProducto": "CancelaciÃ³n retos Imagin",
+            "nombre": "SAMUEL YANES MEDINA",
+            "horarioContacto": "",
+            "fechaContratacion": "01/05/2020",
+            "emailCliente": "samuelplaya12@gmail.com",
+            "descripMotivo": "No es un desistimiento. Proce der a la baja del producto",
+            "contrato": "2904010205128",
+            "canal": "50001",
+            "nif": "Y2992285E"
+        }
+    ]
+}

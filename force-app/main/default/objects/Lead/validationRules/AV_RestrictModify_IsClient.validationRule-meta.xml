@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_RestrictModify_IsClient</fullName>
+    <active>true</active>
+    <description>Restringir el campo Cliente CaixaBank para que solo pueda ser editado por Directores/Gerentes.</description>
+    <errorConditionFormula>AND(
+				NOT($Permission.AV_AvoidBulkApi),
+				  ISCHANGED(AV_IsClient__c),
+      NOT($Permission.AV_NowInDirectores),
+				  $Profile.Name = &apos;AV_Usuario_CaixaBank&apos;
+)</errorConditionFormula>
+    <errorDisplayField>AV_IsClient__c</errorDisplayField>
+    <errorMessage>Solo los Directores/Gerentes pueden modificar este campo.</errorMessage>
+</ValidationRule>

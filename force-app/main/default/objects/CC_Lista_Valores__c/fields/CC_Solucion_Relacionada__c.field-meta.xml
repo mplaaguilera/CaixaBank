@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Solucion_Relacionada__c</fullName>
+    <description>Campo descriptivo con la solución del MCC la cual se relaciona con el Motivo NOK de la operativa de tarjetas.</description>
+    <label>Solución relacionada</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Derivar a Asistencia tarjetas</fullName>
+                <default>false</default>
+                <label>Derivar a Asistencia tarjetas</label>
+            </value>
+            <value>
+                <fullName>Bloqueo</fullName>
+                <default>false</default>
+                <label>Bloqueo</label>
+            </value>
+            <value>
+                <fullName>CaixaBank protect emergency</fullName>
+                <default>false</default>
+                <label>CaixaBank protect emergency</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

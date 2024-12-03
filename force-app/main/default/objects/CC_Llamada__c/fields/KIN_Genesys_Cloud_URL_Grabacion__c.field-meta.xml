@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KIN_Genesys_Cloud_URL_Grabacion__c</fullName>
+    <encryptionScheme>None</encryptionScheme>
+    <label>URL Grabación Genesys Cloud</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

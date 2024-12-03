@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TieneOportunidad__c</fullName>
+    <description>Lista de valores que indica si tiene oportunidad, si se puede ofrecer o si ha sido rechazado por el cliente.</description>
+    <label>Tiene Oportunidad</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>OFERT</fullName>
+                <default>false</default>
+                <label>Producto a ofertar</label>
+            </value>
+            <value>
+                <fullName>OPORT</fullName>
+                <default>false</default>
+                <label>Oportunidad</label>
+            </value>
+            <value>
+                <fullName>RECHZ</fullName>
+                <default>false</default>
+                <label>Producto rechazado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,111 @@
+<template>
+    <div class="backdrop" if:true={showBackdrop}></div>
+    <lightning-card  variant="Narrow"  title="Histórico de contratos del cliente" icon-name="standard:account" size="small"  class={cardClass}>
+        <div class="slds-grid slds-gutters slds-m-left_x-small">
+            <div class="slds-col slds-size_2-of-3">
+                Consultar contratos del cliente              
+            </div>
+            <div class="slds-col slds-size_1-of-3 ">
+                <div class="slds-float_right">
+                    <lightning-button variant="brand" label="Solicitar" title="Solicitar" onclick={solicitarContratos} class="slds-m-right_medium"></lightning-button>
+
+                </div>                
+            </div> 
+            <!-- <div if:true={mostarSpinner}>
+                <lightning-spinner class="spinnerContainerZIndex" variant="brand" alternative-text="Recuperando casos..."></lightning-spinner>
+            </div> -->
+        </div>
+        <div class="slds-grid slds-align_absolute-center slds-p-around_medium">
+            <div if:true={isLoaded} class="slds-is-relative">
+              <lightning-spinner alternative-text="Loading..." variant="brand"></lightning-spinner>
+
+            </div>
+        </div>
+    </lightning-card>   
+    <!-- modal start -->      
+   <template if:true={isShowModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+            <!-- modal header start -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={hideModalBox}>
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Contratos</h2>
+            </header>
+
+            <!-- modal body start -->
+          <div class="slds-box slds-theme_default  slds-scrollable">
+                <lightning-card>
+                    <template if:true={listProducts} for:each={listProducts} for:item="product">
+                        <div key={product}>
+                            <div class="slds-section__title slds-theme_shade section-div">
+                                <lightning-button-icon if:true={product.showDetail} icon-name="utility:chevrondown" size="small" class="chev-icon" variant="container" onclick={mostrarDetalle} data-id={product.codProduct}></lightning-button-icon>
+                                <lightning-button-icon if:false={product.showDetail} icon-name="utility:chevronright" size="small" class="chev-icon" variant="container" onclick={mostrarDetalle} data-id={product.codProduct}></lightning-button-icon>
+                                <a class="contrato-title">{product.codProduct} - {product.nameProduct}</a>
+                            </div>
+                            <div if:true={product.showDetail} class="sec-form" data-id={product.codProduct}>
+                                <lightning-card>
+                                    <!--Campos-->
+                                    <!--Contratos-->
+                                    <div if:true={product.showDetail} class="slds-p-around_large" data-id={product.codProduct}>
+                                        <table class="tblColPad" cellpadding="10" cellspacing="10"  style="border-collapse:collapse;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="column-header"></th>
+                                                    <th class="column-header">Identificador</th>
+                                                    <th class="column-header">Descripción</th>
+                                                    <th class="column-header">Balance</th> 
+                                                    <th class="column-header">Fecha apertura</th> 
+                                                    <th class="column-header">Fecha cancelación</th> 
+                                                </tr>
+                                            </thead>
+                                            <tbody> 
+                                                <template for:each={product.lstContratos} for:item="contrato">
+                                                    <tr key={contrato}>
+                                                        <td class="column-cell">
+                                                            <lightning-button-icon data-id={contrato.id} data-description={contrato.description} data-product={product.nameProduct} icon-name="utility:link" alternative-text="Vincular contrato a la pretensión" class="slds-var-m-left_xxx-small" title="Vincular contrato a la pretensión" onclick={handleLink}></lightning-button-icon>
+                                                        </td>
+                                                        <td class="column-cell">
+                                                            {contrato.id}
+                                                        </td>
+                                                        <td class="column-cell">
+                                                            {contrato.description}
+                                                        </td>
+                                                        <td class="column-cell">
+                                                            {contrato.balance}
+                                                        </td>
+                                                        <td class="column-cell">
+                                                            {contrato.openDate}
+                                                        </td>
+                                                        <td class="column-cell">
+                                                            {contrato.cancelDate}
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                     </div>
+                                     <div if:false={showContratos} class="slds-col slds-size_2-of-3">
+                                        No hay contratos asociados a este producto.              
+                                    </div>
+                                </lightning-card>
+                            </div>
+                        </div>
+                    </template>
+                </lightning-card>
+            </div>  
+
+            <!-- modal footer start-->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_neutral" onclick={hideModalBox}>Cancel</button>
+            </footer>
+
+            </div>
+        </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    <!-- modal end -->   
+      
+</template>

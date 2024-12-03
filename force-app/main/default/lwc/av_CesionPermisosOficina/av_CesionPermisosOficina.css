@@ -1,0 +1,63 @@
+.fixBtnPosition {
+    width: 95%;
+    text-align: right;
+}
+
+
+.container {
+    margin-top:1rem;
+    padding: 0 1rem;
+    max-height:90%;
+}
+
+.cedidos {
+    padding:1rem;
+}
+.layoutMargin {
+    margin:.85rem 0;
+}
+
+.layoutMargin{
+    margin-top:.85rem;
+   
+}
+.layoutMarginGiven  {
+    margin:.85rem 0
+}
+
+.menuDrop{
+   position: relative;
+   left:100px;
+}
+
+.customCard{
+ margin-bottom: 1rem;
+
+    
+}
+
+.inputPadding{
+    padding:0 1rem;
+}
+
+.emp-select{
+    margin:1em 0;
+}
+
+.emp-select:first {
+    margin:0;
+}
+
+.fixPositionPermisoBtns button{
+    margin-bottom: 0;
+}
+
+h3 > span > a {
+    font-size: .75rem;
+    /* font-family: Georgia, 'Times New Roman', Times, serif; */
+}
+
+.fixBtnPosition{
+    /* height: 25vh; */
+    /* position: sticky; */
+}

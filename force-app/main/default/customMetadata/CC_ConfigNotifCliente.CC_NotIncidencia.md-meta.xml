@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CC_NotIncidencia</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Activa__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Canal__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Carpeta__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CaseCarpeta__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CaseCuerpo__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CaseEtiRemitente__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CaseOrigenProc__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CasePlantilla__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_CaseRemitente__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Cuerpo__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_DelayMinAcuse__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_EntidadOrigen__c</field>
+        <value xsi:type="xsd:string">Tarea</value>
+    </values>
+    <values>
+        <field>CC_EstadoTarea__c</field>
+        <value xsi:type="xsd:string">Completed</value>
+    </values>
+    <values>
+        <field>CC_EtiRemitente__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Idioma__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_OrigenCasoNotificacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_PlantillaBase__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Plantilla__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_ProcedenciaOrigenNotificacion__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Proceso__c</field>
+        <value xsi:type="xsd:string">CC_NotIncidencia</value>
+    </values>
+    <values>
+        <field>CC_Remitente__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TaskOrigenProc__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Texto_Plantilla__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_Tipo_Cliente__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>CC_TiposTareaCaso__c</field>
+        <value xsi:type="xsd:string">Traslado Incidencia;</value>
+    </values>
+</CustomMetadata>

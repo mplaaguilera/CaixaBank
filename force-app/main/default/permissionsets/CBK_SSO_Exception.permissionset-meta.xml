@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>No se requiere SSO para acceder a los usuarios con este PS</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>CBK_SSO_Exception</label>
+    <license>Salesforce</license>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>BypassMFAForUiLogins</name>
+    </userPermissions>
+</PermissionSet>

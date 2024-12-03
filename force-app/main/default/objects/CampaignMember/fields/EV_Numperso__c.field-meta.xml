@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_Numperso__c</fullName>
+    <caseSensitive>true</caseSensitive>
+    <description>Numperso del miembro de campaña cliente</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>true</externalId>
+    <label>Numperso</label>
+    <length>15</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

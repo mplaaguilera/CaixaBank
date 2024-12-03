@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CSBSOppoHeader</fullName>
+    <fields>CSBD_Now_Nombre__c</fields>
+    <fields>StageName</fields>
+    <fields>AV_ProductoSSCC__c</fields>
+    <fields>AV_Product__c</fields>
+    <label>CabeceraAD_CSBD</label>
+</CompactLayout>

@@ -1,0 +1,246 @@
+<template>
+    <template if:true={showbutton}>
+        <lightning-button variant="brand" label={inputLabel} title="Primary action" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+    </template>
+    <template if:true={active}>
+        <!-- Modal para Boton Quick Action -->
+        <template if:false={showbutton}>
+            <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Change Owner</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"  style="height: 300px" >
+                <br>  
+                <!-- <template if:true={showProject}>
+                    <lightning-combobox
+                            name="UserQueue"
+                            options={options}
+                            onchange={handleChange} >
+                    </lightning-combobox>
+                </template> -->
+    
+                <!-- Diseño custom -->
+                <template if:false={showProject}>
+                    <div class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox-group">
+                                <!--Desplegable de tipos de búsqueda-->
+                                <div class="slds-combobox_object-switcher slds-combobox-addon_start" style="z-index: 91;">
+                                    <div class="slds-form-element">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-combobox_container slds-has-icon-only">
+                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none" title={tipoBusquedaSeleccionado.label}>                                     
+                                                        <span class="slds-icon_container slds-input__icon slds-input__icon_left">
+                                                            <lightning-icon icon-name={tipoBusquedaSeleccionado.iconName} size="x-small"></lightning-icon>
+                                                        </span>
+                                                        <label for="input01"></label>
+                                                        <input id="input01" type="text" class="slds-input slds-combobox__input slds-combobox__input-value" aria-expanded="true" aria-haspopup="listbox" autocomplete="off" role="combobox" placeholder="" value={tipoBusquedaSeleccionado.label} onclick={menuTipoBusquedaAbrir} onblur={menuTipoBusquedaCerrar}/>
+                                                        <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                                            <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                                        </span>
+                                                    </div>
+                                                    <!--Opciones del combobox de tipos de búsqueda-->
+                                                    <div class="menuOpcionesTipoBusqueda slds-dropdown slds-dropdown_length-5 slds-dropdown_x-small slds-dropdown_left slds-hide" role="listbox">
+                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                            <!--Opción Usuario-->
+                                                            <li role="presentation" class="slds-listbox__item" data-tipo-busqueda="Usuario" onclick={menuTipoBusquedaSeleccion}>
+                                                                <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-truncate slds-var-p-left_small" title="Usuario">Usuario</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                
+                                                            <!--Opción Cola-->
+                                                            <li role="presentation" class="slds-listbox__item" data-tipo-busqueda="Cola" onclick={menuTipoBusquedaSeleccion}>
+                                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <lightning-icon icon-name="standard:orders" size="x-small"></lightning-icon>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-truncate slds-var-p-left_small" title="Cola">Cola</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Buscador-->
+                                <div class="slds-combobox_container slds-combobox-addon_end">
+                                    <div class="menuResultados slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" id="primary-combobox-id-1">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <lightning-input class="inputBusqueda" value={selectedItem} type="search" variant="label-hidden" placeholder="Buscar..." onchange={inputBusquedaChange} onfocus={menuResultadosAbrir} onblur={menuResultadosCerrar} style="left: -2px; z-index: 90;"></lightning-input>
+                                        </div>
+                                        <!--Menú de resltados-->
+                                        <div if:true={resultados.length} id="listbox-id-20" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                <template for:each={resultados} for:item="resultado">
+                                                    <li key={resultado.Id} role="presentation" class="slds-listbox__item" data-id-resultado={resultado.Id} onclick={resultadoClick}>
+                                                        <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-media_center" role="option">
+                                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                                <span if:true={isUser} class="slds-icon_container">
+                                                                    <!-- tipoBusquedaSeleccionadoEsUsuario -->
+                                                                    <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+                                                                </span>
+                                                                <span if:false={isUser} class="slds-icon_container">
+                                                                    <lightning-icon icon-name="standard:orders" size="small"></lightning-icon>
+                                                                </span>
+                                                            </span>
+                                                            <span  if:true={isUser} class="slds-media__body">
+                                                                <span class="slds-listbox__option-text_entity">{resultado.Assignee.Name}</span>
+                                                            </span>
+                                                            <span  if:false={isUser} class="slds-media__body">
+                                                                <span class="slds-listbox__option-text_entity">{resultado.Queue.Name}</span>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>   
+            <div class="slds-modal__footer">
+                <lightning-button label="Cancel"  onclick={closeModal} class="slds-m-left_x-small"></lightning-button>
+                <lightning-button variant="brand" disabled={disableButtonOwner} onclick={changeOwnerClick} label="Change Owner" class="slds-m-left_x-small"></lightning-button>  
+            </div>
+        </template>
+
+        <!-- Modal Boton record page -->
+        <template if:true={showbutton}>
+            <section role="dialog" tabindex="-1"  aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button  slds-modal__close slds-button_icon-inverse " title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close"
+                                            alternative-text="close"
+                                            variant="inverse"
+                                            size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    <h2 id="modal-heading-011" class="slds-modal__title slds-hyphenate">Change Owner</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-11"  style="height: 300px" >
+                        <br>  
+                        <!-- <template if:true={showProject}>
+                            <lightning-combobox
+                                    name="UserQueue"
+                                    options={options}
+                                    onchange={handleChange} >
+                            </lightning-combobox>
+                        </template> -->
+            
+                        <!-- Diseño custom -->
+                        <template if:false={showProject}>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control">
+                                    <div class="slds-combobox-group">
+                                        <!--Desplegable de tipos de búsqueda-->
+                                        <div class="slds-combobox_object-switcher slds-combobox-addon_start" style="z-index: 91;">
+                                            <div class="slds-form-element">
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-combobox_container slds-has-icon-only">
+                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none" title={tipoBusquedaSeleccionado.label}>                                     
+                                                                <span class="slds-icon_container slds-input__icon slds-input__icon_left">
+                                                                    <lightning-icon icon-name={tipoBusquedaSeleccionado.iconName} size="x-small"></lightning-icon>
+                                                                </span>
+                                                                <label for="input01"></label>
+                                                                <input id="input011" type="text" class="slds-input slds-combobox__input slds-combobox__input-value" aria-expanded="true" aria-haspopup="listbox" autocomplete="off" role="combobox" placeholder="" value={tipoBusquedaSeleccionado.label} onclick={menuTipoBusquedaAbrir} onblur={menuTipoBusquedaCerrar}/>
+                                                                <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                                                    <lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon>
+                                                                </span>
+                                                            </div>
+                                                            <!--Opciones del combobox de tipos de búsqueda-->
+                                                            <div class="menuOpcionesTipoBusqueda slds-dropdown slds-dropdown_length-5 slds-dropdown_x-small slds-dropdown_left slds-hide" role="listbox">
+                                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                    <!--Opción Usuario-->
+                                                                    <li role="presentation" class="slds-listbox__item" data-tipo-busqueda="Usuario" onclick={menuTipoBusquedaSeleccion}>
+                                                                        <div aria-checked="true" class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option">
+                                                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                                                <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
+                                                                            </span>
+                                                                            <span class="slds-media__body">
+                                                                                <span class="slds-truncate slds-var-p-left_small" title="Usuario">Usuario</span>
+                                                                            </span>
+                                                                        </div>
+                                                                    </li>
+                        
+                                                                    <!--Opción Cola-->
+                                                                    <li role="presentation" class="slds-listbox__item" data-tipo-busqueda="Cola" onclick={menuTipoBusquedaSeleccion}>
+                                                                        <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media_center" role="option">
+                                                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                                                <lightning-icon icon-name="standard:orders" size="x-small"></lightning-icon>
+                                                                            </span>
+                                                                            <span class="slds-media__body">
+                                                                                <span class="slds-truncate slds-var-p-left_small" title="Cola">Cola</span>
+                                                                            </span>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--Buscador-->
+                                        <div class="slds-combobox_container slds-combobox-addon_end">
+                                            <div class="menuResultados slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" id="primary-combobox-id-11">
+                                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                    <lightning-input class="inputBusqueda" value={selectedItem} type="search" variant="label-hidden" placeholder="Buscar..." onchange={inputBusquedaChange} onfocus={menuResultadosAbrir} onblur={menuResultadosCerrar} style="left: -2px; z-index: 90;"></lightning-input>
+                                                </div>
+                                                <!--Menú de resltados-->
+                                                <div if:true={resultados.length} id="listbox-id-201" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                        <template for:each={resultados} for:item="resultado">
+                                                            <li key={resultado.Id} role="presentation" class="slds-listbox__item" data-id-resultado={resultado.Id} onclick={resultadoClick}>
+                                                                <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta slds-media_center" role="option">
+                                                                    <span class="slds-media__figure slds-listbox__option-icon">
+                                                                        <span if:true={isUser} class="slds-icon_container">
+                                                                            <!-- tipoBusquedaSeleccionadoEsUsuario -->
+                                                                            <lightning-icon icon-name="standard:user" size="small"></lightning-icon>
+                                                                        </span>
+                                                                        <span if:false={isUser} class="slds-icon_container">
+                                                                            <lightning-icon icon-name="standard:orders" size="small"></lightning-icon>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span  if:true={isUser} class="slds-media__body">
+                                                                        <span class="slds-listbox__option-text_entity">{resultado.Assignee.Name}</span>
+                                                                    </span>
+                                                                    <span  if:false={isUser} class="slds-media__body">
+                                                                        <span class="slds-listbox__option-text_entity">{resultado.Queue.Name}</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </template>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>   
+                    <div class="slds-modal__footer">
+                        <lightning-button label="Cancel"  onclick={closeModal} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-button variant="brand" disabled={disableButtonOwner} onclick={changeOwnerClick} label="Change Owner" class="slds-m-left_x-small"></lightning-button>
+                    </div>
+                </div>
+          </section>
+          <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </template >
+  </template>

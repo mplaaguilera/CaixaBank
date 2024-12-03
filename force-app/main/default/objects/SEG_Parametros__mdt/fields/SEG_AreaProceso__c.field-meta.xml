@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_AreaProceso__c</fullName>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Área / Proceso</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>No aplica</fullName>
+                <default>true</default>
+                <label>No aplica</label>
+            </value>
+            <value>
+                <fullName>Sincronización grupos &lt;--&gt; equipos</fullName>
+                <default>false</default>
+                <label>Sincronización grupos &lt;--&gt; equipos</label>
+            </value>
+            <value>
+                <fullName>Valija</fullName>
+                <default>false</default>
+                <label>Valija</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

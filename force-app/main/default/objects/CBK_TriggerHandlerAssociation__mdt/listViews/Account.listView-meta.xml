@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Account</fullName>
+    <columns>MasterLabel</columns>
+    <columns>DeveloperName</columns>
+    <columns>CBK_TriggerEvent__c</columns>
+    <columns>CBK_ObjectApiName__c</columns>
+    <columns>CBK_FilterRecordType__c</columns>
+    <columns>CBK_FilterField__c</columns>
+    <columns>CBK_FilterFieldValue__c</columns>
+    <columns>CBK_FilterProfile__c</columns>
+    <columns>CBK_HandlerClassName__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CBK_ObjectApiName__c</field>
+        <operation>equals</operation>
+        <value>Account</value>
+    </filters>
+    <label>Account</label>
+    <language>en_US</language>
+</ListView>

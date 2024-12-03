@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ChangeStageFromSale</fullName>
+    <active>false</active>
+    <description>No permite modificar a una etapa anterior si está en estado &apos;Con Venta&apos;</description>
+    <errorConditionFormula>AND(
+ISCHANGED(StageName),
+$Profile.Name = &quot;AV_Usuario_CaixaBank&quot;,
+OR(RecordType.DeveloperName = &quot;AV_CallMe&quot;,
+RecordType.DeveloperName = &quot;AV_AlertaComercial&quot;,
+RecordType.DeveloperName = &quot;AV_Sugerencia&quot;,
+RecordType.DeveloperName = &quot;AV_Propuesta&quot;,
+RecordType.DeveloperName = &quot;AV_Iniciativa&quot;),
+TEXT(PRIORVALUE(StageName) )== &quot;Con venta&quot;,
+OR(
+ISPICKVAL(StageName, &quot;Cerrado positivo&quot;),
+ISPICKVAL(StageName, &quot;No interesado&quot;),
+ISPICKVAL(StageName, &quot;En gestión/insistir&quot;),
+ISPICKVAL(StageName, &quot;No apto&quot;)
+),
+NOT($Permission.AV_AvoidBulkApi),
+				NOT(ISPICKVAL(AV_OrigenApp__c,&quot;AV_BackReport&quot;)),
+				AND(
+!$Permission.AV_ByPassValidationRules,
+!$Permission.CBK_BypassValidationRules
+)
+)</errorConditionFormula>
+    <errorMessage>No se puede retroceder de etapa si está en estado Con Venta.</errorMessage>
+</ValidationRule>

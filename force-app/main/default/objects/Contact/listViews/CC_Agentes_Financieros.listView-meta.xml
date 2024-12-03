@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agentes_Financieros</fullName>
+    <columns>FULL_NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CONTACT.EMAIL</columns>
+    <columns>CC_Nombre_Oficina__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CONTACT.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Contact.CC_Empleado</value>
+    </filters>
+    <filters>
+        <field>CC_Cargo__c</field>
+        <operation>equals</operation>
+        <value>AGENTE FINANCIERO</value>
+    </filters>
+    <label>Agentes financieros</label>
+    <language>es</language>
+</ListView>

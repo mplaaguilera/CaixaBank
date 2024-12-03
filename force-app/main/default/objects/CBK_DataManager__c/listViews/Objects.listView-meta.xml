@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Objects</fullName>
+    <columns>NAME</columns>
+    <columns>API_Name__c</columns>
+    <columns>Proyectos__c</columns>
+    <columns>Status__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_DataManager__c.Object</value>
+    </filters>
+    <label>Objects</label>
+</ListView>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Todas_las_listas_COPS</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Activa__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_Lista_Valores__c.CC_Lista_Valores</value>
+    </filters>
+    <filters>
+        <field>NAME</field>
+        <operation>startsWith</operation>
+        <value>COPS</value>
+    </filters>
+    <label>Todas las listas COPS</label>
+    <sharedTo>
+        <group>OS_Responsables</group>
+    </sharedTo>
+</ListView>

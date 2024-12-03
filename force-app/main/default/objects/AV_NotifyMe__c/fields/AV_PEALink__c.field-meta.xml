@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_PEALink__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(AV_OrigenAct__c , &quot;AV_Muro&quot;),HYPERLINK(&quot;https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/peaRedirect.tf7?pea=CA.OFI.MuroConMiGestorMensajes.muro&amp;origen=salesforce&amp;_vmcNewTab=true&amp;params=idCliente%3D&quot;+ AV_AccountId__r.AV_NumPerso__c+&quot;%26nombre%3D&quot;+AV_AccountId__r.FirstName+&quot;%20&quot;+AV_AccountId__r.LastName+&quot;%26nif%3D&quot;+ AV_AccountId__r.CC_Numero_Documento__c ,AV_Subject__c ,&apos;_parent&apos;), 
+IF(ISPICKVAL(AV_OrigenAct__c , &quot;AV_Llamadas&quot;),HYPERLINK(&quot;https://l.tf7.lacaixa.es/TF7WebUtilities/redirect/peaRedirect.tf7?pea=CA.OFI.CallmeGesLlamadas.detalleLlamada&amp;origen=salesforce&amp;_vmcNewTab=true&amp;params=idFilenet%3D&quot;+ AV_ExternalId__c, AV_Subject__c,&apos;_parent&apos;),
+IF(ISPICKVAL(AV_OrigenAct__c , &quot;AV_R2B&quot;), AV_Subject__c,
+IF(ISPICKVAL(AV_OrigenAct__c , &quot;CIBE_OperacionesPendientesFirma&quot;), AV_Subject__c, null))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Enlace TF9</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

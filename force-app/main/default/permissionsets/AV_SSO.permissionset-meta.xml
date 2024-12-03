@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Permission set - Acceso con Single Sign On</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>AV_SSO</label>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>IsSsoEnabled</name>
+    </userPermissions>
+</PermissionSet>

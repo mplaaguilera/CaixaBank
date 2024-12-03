@@ -1,0 +1,82 @@
+.chev-icon{
+    vertical-align: top;
+}
+.opp-title{
+    color: #006dcc;
+    vertical-align: -webkit-baseline-middle;
+}
+.linked-opp-button{
+    float: right;
+}
+.section-div{
+    display: inherit;
+    overflow: auto;
+    margin: 1rem;
+    padding-bottom: 0.3rem;
+    padding-top: 0.3rem;
+}
+.opp-form{
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.path-margin{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.opp-link{
+    text-decoration: none;
+}
+.value-concept{
+    width: auto;
+    display: inline-block;
+}
+
+.section-divMobile{
+	display: grid;
+	overflow: auto;
+	margin: 1rem;
+	padding-bottom: 0.3rem;
+	padding-top: 0.3rem;
+}
+
+
+.center-buttons{
+	margin-top: auto;
+    margin-bottom: auto;
+}
+.chever-buttons{
+	margin-right: 1rem;
+}
+
+.opptask-titleMobile{
+	display: block;
+    line-height: normal;
+}
+.opptask-stage{
+	color: rgb(45 86 116);
+	font-size: 12px;
+	font-style: italic;
+	padding-bottom: 0.4rem;
+	position: relative;
+	display: inline;
+}
+.opptask-name{
+    padding-top: 0.4rem;
+    color: var(--lwc-brandTextLink,rgb(0, 109, 204))
+}
+
+.lgc-bg {
+    position: absolute;
+    right: 5%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.toggle-input{
+	padding-top: 0.5rem;
+}
+
+.label-priorizador{
+    padding-left: 2rem;
+	width: 17rem;
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ISINCompletoAlEnviarEscalado</fullName>
+    <active>true</active>
+    <description>Antes de enviar un escalado, el valor de ISIN de la reclamación debe estar relleno</description>
+    <errorConditionFormula>AND(
+				AND(
+				    !$Permission.CBK_BypassValidationRules,
+				    !$Permission.SPV_BypassValidationRules
+								),
+				 AND( 
+									 ISPICKVAL(SAC_Estado__c, &apos;SAC_PendienteRespuesta&apos;), 
+									AND(
+													ISBLANK(SAC_CasoEscalado__r.SPV_ISIN__c),
+									    ISPICKVAL(SAC_CasoEscalado__r.SPV_Organismo__c, &apos;SPV_CNMV&apos;))
+								
+									)
+			
+				
+ )</errorConditionFormula>
+    <errorMessage>ERROR: El campo ISIN de la reclamación asociada debe estar relleno para poder enviar el escalado.</errorMessage>
+</ValidationRule>

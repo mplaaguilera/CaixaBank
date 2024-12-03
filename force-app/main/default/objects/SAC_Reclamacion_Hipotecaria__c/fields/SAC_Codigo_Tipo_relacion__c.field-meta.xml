@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Codigo_Tipo_relacion__c</fullName>
+    <description>Código de tipo de relación de la persona en el contrato</description>
+    <externalId>false</externalId>
+    <label>Código Tipo relación</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

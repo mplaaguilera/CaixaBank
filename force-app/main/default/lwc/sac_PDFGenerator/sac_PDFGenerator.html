@@ -1,0 +1,108 @@
+<template>
+
+    <template if:false={ocultarBoton}>
+    <div class="slds-clearfix">
+        <lightning-button variant="brand" label="Generación Redacción Global" icon-name="utility:check" onclick={abrirEdicion} disabled={botonDisabled}></lightning-button>
+    </div>
+    </template> 
+    <template if:true={mostrarEdicion}>
+    <div class="slds-backdrop slds-backdrop_open" style="width: 100vw; height: 100vh; left: calc(-50vw + 50%) !important;">
+
+
+<!-----TINY. ---->
+    <lightning-button label="Call VF" title="Non-primary action" onclick={callVFPageMethod} class="slds-m-left_x-small"></lightning-button>
+    <br />
+<!---      <p style="font-weight: bold; font-size: x-large">{cuerpo}</p>. -->
+      <br />
+      <iframe id="LWCWithVFPage" src="/apex/Editor" width="100%" height="550px"> </iframe>
+<!-----TINY. ---->
+
+
+        <div class="slds-grid">
+            <div class="slds-col slds-size_2-of-3" style="padding-left: 36px; padding-top: 24px; padding-bottom: 24px; height: 100vh;">
+                <article class="slds-card" style="height: 100%; padding:13px">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="action:new_note" alternative-text="Redacción" title="Redacción">
+                                </lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-grid slds-wrap slds-media_center">
+                                    <div class="slds-col slds-size_1-of-4 slds-media_center">
+                                        <h2 class="slds-card__header-title">
+                                            <span>Documento de resolución</span>
+                                        </h2>
+                                    </div>
+                                    <div class="slds-col slds-size_3-of-4 slds-p-right_none">
+                                        <div class="slds-grid" style="padding: 8px">
+                                            <div class="slds-col">
+                                                <div class="slds-float_right" style="padding-left: 4px;">
+                                                    <lightning-button style="margin-right:4px;" label="Salir" icon-name="utility:close" onclick={cerrarEdicion}>
+                                                    </lightning-button>
+                                                    <lightning-button style="margin-right:4px;" label="Guardar" icon-name="utility:save" onclick={guardar}>
+                                                    </lightning-button>
+                                                    <lightning-button label="Generar Documento" icon-name="utility:work_order_type" onclick={generarDoc} disabled={botonGenerar}>
+                                                    </lightning-button>
+                                                </div>
+                                                <div class="slds-float_right">
+                                                            <c-sac_-recuperar-plantillas-redaccion cambiar-plantilla="true" 
+                                                            carpeta-raiz="SAC_PlantillasRedaccion" record-id={recordId} oneventoaplicar={handleEventoAplicar} oneventoabierto={handleEventoAbierto}></c-sac_-recuperar-plantillas-redaccion>
+                                                </div>
+                                            </div>
+                                        </div>
+                                  
+                                        <lightning-record-edit-form
+                                        object-api-name="SAC_DocumentoEnvio__c"
+                                        record-id={idRedaccion}
+                                        onsuccess={handleSuccess}
+                                      >
+                                        <lightning-messages></lightning-messages>
+                                        <lightning-input-field field-name="SAC_Header__c" value={header} class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_Footer__c" value={footer} class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_TipoDocumento__c" value=redaccion class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_Cuerpo__c" class="slds-hide" style="min-height: 50vh;" value={cuerpo}></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                                        <lightning-button class="slds-m-top_small slds-show slds-hide" type="submit" label="Actualizar previsualización"></lightning-button>
+                                      </lightning-record-edit-form>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                    </div>
+                        <lightning-input-rich-text class="TextAreaFull" value={cuerpo} label="Cuerpo" title="Cuerpo" formats={formats} onchange={handleRichTextChange} >
+                        </lightning-input-rich-text>
+                        <!-- <iframe style="border: 1px solid; height: 100vh;width: 100%;"
+                                                src="https://caixabankcc--devservice--c.sandbox.vf.force.com/apex/SAC_HTMLEditor"  ></iframe> -->
+                        <!-- <c-sac_-p-d-f-generator > </c-sac_-p-d-f-generator> -->
+                </article>
+            </div>
+            <div class="slds-col slds-size_1-of-3" style="min-height: 50vh;">
+                <div style="background-color:#16325c;padding:0.5rem">
+                    <div lwc:if ={idRedaccion}>
+
+                        <iframe style="border: 1px solid; height: 100vh;width: 100%;"
+                                                src={ruta}  ></iframe>
+                    </div>
+                    <div lwc:else>
+                            <div
+                                style="border: 1px solid; height: 100vh;width: 100%;background-color: white; text-align:center;">
+                                <div class="slds-text-heading_medium" style="top: 50%; position: relative;">
+                                    <lightning-icon icon-name="utility:save" alternative-text="Connected" size="large"
+                                        title="large size"></lightning-icon>
+                                    <p>Guarde el registro para poder previsualizarlo</p>
+                                </div>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- spinner -->
+        <lightning-spinner if:true={spinnerLoading} alternative-text="Cargando..." variant="brand" size="large" class="spin-cls" ></lightning-spinner>
+    </div>
+    
+     </template> 
+    
+</template>

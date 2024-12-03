@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Venta de patrimonio adicional si hay pat</label>
+    <protected>false</protected>
+    <values>
+        <field>SIR_Campo__c</field>
+        <value xsi:type="xsd:string">SolucionFinalista</value>
+    </values>
+    <values>
+        <field>SIR_Label__c</field>
+        <value xsi:type="xsd:string">Venta de patrimonio adicional si hay patrimonio disponible</value>
+    </values>
+    <values>
+        <field>SIR_Value__c</field>
+        <value xsi:type="xsd:string">2</value>
+    </values>
+</CustomMetadata>

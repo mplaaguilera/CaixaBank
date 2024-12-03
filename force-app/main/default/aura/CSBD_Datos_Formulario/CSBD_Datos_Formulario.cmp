@@ -1,0 +1,100 @@
+<aura:component controller="CSBD_Datos_Formulario_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId">
+
+    <aura:attribute name="cargando" type="Boolean" default="true"/>
+    <aura:attribute name="solicitud" type="List"/>
+    <aura:attribute name="solicitudResultados" type="List"/>
+    <aura:attribute name="solicitudReferencia" type="String"/>
+    <aura:attribute name="tareaSolicitudRecibida" type="Task"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.cargando}">
+        <article class="slds-card">
+            <div class="slds-card__body slds-card__body_inner" style="height: 200px;">
+                <lightning:spinner size="large" variant="brand" alternativeText="Cargando..."/>
+            </div>
+        </article>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!empty(v.solicitud)}">
+                <c:ccScopedNotification mensaje="Sin datos de formulario que mostrar."/>
+                <aura:set attribute="else">
+                    <article class="slds-card">
+                        <!--Cabecera de la card-->
+                        <div class="slds-card__header slds-grid" style="padding-left: 37px; padding-right: 40px; padding-top: 0.9rem; padding-bottom: 1.1rem;">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container">
+                                        <lightning:icon iconName="standard:form"/>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h2 class="slds-card__header-title">
+                                        <span>Datos del formulario</span>
+                                    </h2>
+                                    <aura:if isTrue="{!!empty(v.solicitudReferencia)}">
+                                        Solicitud con referencia {!v.solicitudReferencia}.
+                                    </aura:if>
+                                </div>
+                                <div class="slds-no-flex" style="padding-top: 4px;">
+                                    <lightning:buttonGroup>
+                                        <lightning:button label="Copiar cuerpo de la solicitud" iconName="utility:merge_field" onclick="{!c.copiarJson}"/>
+                                        <lightning:button label="Ver tarea" iconName="standard:task" onclick="{!c.abrirTarea}"/>
+                                    </lightning:buttonGroup>            
+                                    
+                                </div>
+                            </header>
+                        </div>
+        
+                        <!--Cuerpo de la card-->
+                        <div class="slds-card__body slds-card__body_inner">
+        
+                            <!--Buscador-->
+                            <div style="padding-left: 37px; padding-right: 40px; padding-bottom: 19px;">
+                                <lightning:input aura:id="inputBuscar" type="search" placeholder="Buscar atributo" variant="label-hidden" onchange="{!c.filtrarAtributos}"/>
+                            </div>
+        
+                            <div class="slds-grid slds-wrap slds-gutters slds-gutters_x-small" style="padding-left: 38px;">
+                                <aura:iteration items="{!v.solicitudResultados}" var="atributo">
+                                    <!-- Clave -->
+                                    <div class="slds-col slds-size_1-of-5 slds-text-align_right">
+                                        <p class="slds-truncate" style="font-weight: 600;">{!atributo.nombre}:</p>
+                                    </div>
+                                    <div class="slds-col slds-size_4-of-5" style="margin-bottom: 14px;">
+                                        <div class="slds-grid">
+                                            <!-- Valor -->
+                                            <div class="slds-col slds-grow-none">
+                                                <p>
+                                                    <aura:if isTrue="{!!empty(atributo.valor)}">
+                                                        {!atributo.valor}
+                                                        <aura:set attribute="else">
+                                                            <span class="slds-text-color_weak slds-text-body_small" style="font-style: italic;">Sin valor</span>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </p>
+                                            </div>
+                                            <!-- Botón "Copiar" -->
+                                            <aura:if isTrue="{!!empty(atributo.valor)}">
+                                                <div class="slds-col csbd-invisible" onmouseover="{!c.mostrarBotonCopiar}" onmouseout="{!c.mostrarBotonCopiar}">
+                                                    <lightning:buttonIcon iconName="utility:copy" variant="border-filled" onclick="{!c.copiarValor}" name="{!atributo.valor}" title="Copiar valor"/>
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+                                    
+                                </aura:iteration>
+                            </div>
+                        </div>
+        
+                        <!--Pie del modal-->
+                        <footer class="slds-card__footer">
+                            Solicitud recibida el
+                            <lightning:formattedDateTime value="{!v.tareaSolicitudRecibida.CC_Fecha_Inicio__c}"
+                                year="numeric" month="numeric" day="numeric" hour="2-digit" minute="2-digit" hour12="false"/>
+                        </footer>
+                    </article>
+                </aura:set>
+            </aura:if>
+            
+        </aura:set>
+    </aura:if>
+</aura:component>

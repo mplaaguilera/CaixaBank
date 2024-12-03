@@ -1,0 +1,11 @@
+.margin-card {
+    margin-left: 2rem;
+}
+
+.fechasDerecha {
+    text-align: right !important ;
+}
+
+.refreshRotate {
+    animation: rotate .4s;
+}

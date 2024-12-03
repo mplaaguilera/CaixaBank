@@ -1,0 +1,89 @@
+<template>
+
+    <!-- spinner -->
+    <template if:true={isLoading}>
+        <div class="slds-p-around_x-large">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+    <!-- componente inhabilitado -->
+    <template if:true={readOnly}>
+        <div style="padding: 12px">
+            <template if:true={opcionesSentido.data}>
+                <lightning-combobox
+                style="width:250px"
+                name="comboResolucion"
+                label="Sentido resolución"
+                placeholder="--Select--"
+                value={valueSentido}
+                options={opcionesSentido.data.values}
+                onchange={handleChangeSentido} 
+                disabled></lightning-combobox>
+            </template>
+            <br></br>
+            <lightning-combobox id="myCombo" label="Plantilla" value={value} placeholder="Selecciona una Plantilla..."
+                options={options} onchange={handleChange} disabled>
+            </lightning-combobox>
+        </div>
+        <p onchange={prueba}></p>
+        <div style="padding: 12px">
+            <lightning-input-rich-text placeholder="Escriba el cuerpo de la redacción..." value={myVal}
+                onchange={escritura} disabled>
+            </lightning-input-rich-text>
+        </div>
+        <div style="padding: 12px" class="slds-clearfix">
+            <lightning-input type="checkbox"  label="Listo para redacción final" checked={isChecked} disabled></lightning-input>
+            <lightning-button label="Guardar" slot="actions" variant="brand" onclick={handleClick} disabled
+            class="slds-float_right">
+            </lightning-button>
+        </div>
+    </template>
+    <!-- componente habilitado -->
+    <template if:false={readOnly}>
+        <div style="padding: 12px">
+            <template if:true={opcionesSentido.data}>
+                <lightning-combobox
+                style="width:250px"
+                name="comboResolucion"
+                label="Sentido resolución"
+                placeholder="--Select--"
+                value={valueSentido}
+                options={opcionesSentido.data.values}
+                onchange={handleChangeSentido} 
+                ></lightning-combobox>
+            </template>
+            <template if:true={esInadmision}>
+                <lightning-combobox
+                style="width:250px"
+                name="comboInadmision"
+                label="Motivo Inadmisión"
+                placeholder="--Select--"
+                value={valueMotivo}
+                options={opcionesMotivo.data.values}
+                onchange={handleChangeMotivo} 
+                ></lightning-combobox>
+            </template>
+            <br></br>
+            <lightning-textarea name="argumentoResolucion" value={argRes}
+                label="Argumento de Resolución" maxlength="1000"
+                message-when-too-long="Número máximo de caracteres alcanzado" onchange={argumentoRes}>
+            </lightning-textarea>
+            <br></br>
+            <lightning-combobox id="myCombo2" label="Plantilla" value={value} placeholder="Selecciona una Plantilla..."
+                options={options} onchange={handleChange}>
+            </lightning-combobox>
+        </div>
+        <div style="padding: 12px">
+            <lightning-input-rich-text placeholder="Escriba el cuerpo de la redacción..." value={myVal}
+                onchange={escritura}>
+            </lightning-input-rich-text>
+        </div>
+
+        <div style="padding: 12px" class="slds-clearfix">
+            <lightning-input type="checkbox"  label="Listo para redacción final" checked={listoRedaccionFinal} onchange={handleChangeRedaccionFinal}></lightning-input>
+            <lightning-button label="Guardar" slot="actions" variant="brand" onclick={handleClick}
+                class="slds-float_right">
+            </lightning-button>
+        </div>
+    </template>
+</template>

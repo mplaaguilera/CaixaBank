@@ -1,0 +1,59 @@
+<aura:component controller="SAC_LCMP_EnvioComunicacionCartaPostal"
+    implements="force:hasRecordId,flexipage:availableForRecordHome,force:appHostable,flexipage:availableForAllPageTypes"
+    access="global">
+
+    <!--atributos-->
+    <aura:attribute name="caseId" type="id" />
+    <aura:attribute name="nombreTitularEC" type="String" />
+    <aura:attribute name="direccionTotal" type="String" />
+    <aura:attribute name="direccionEC" type="String" />
+    <aura:attribute name="poblacionEC" type="String" />
+    <aura:attribute name="provinciaEC" type="String" />
+    <aura:attribute name="paisEC" type="String" />
+    <aura:attribute name="codigoPostalEC" type="String" />
+    <aura:attribute name="optionsEC" type="String[]" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+    <aura:attribute name="cuerpoEC" type="String" />
+    <aura:attribute name="cuerpoProrroga" type="String" />
+    <aura:attribute name="cartaPostalProrroga" type="String" />
+    <aura:attribute name="modalParaProrrogar" type="Boolean" default="false" />
+
+    <aura:attribute name="procedenciaEC" type="String" default="comunicación" />
+
+    <aura:attribute name="isLoading" type="Boolean" />
+
+    <!--eventos-->
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="force:refreshView" action="{! c.init}" />
+    
+    <!--spinner-->
+    <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-p-around_x-large">
+            <lightning:spinner alternative-text="Loading" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>
+    
+    <!--esqueleto componente-->
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-box myClass" style="padding: 14px; margin: 9px;" >
+            <aura:if isTrue="{!v.cartaPostalProrroga == true}">
+                <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoProrroga}" procedencia="{!v.procedenciaEC}"/>
+                <aura:set attribute="else">
+                    <c:SAC_GeneracionCartas caseId="{!v.recordId}" nombreTitular="{!v.nombreTitularEC}" direccion="{!v.direccionEC}" codigoPostal="{!v.codigoPostalEC}" poblacion="{!v.poblacionEC}" provincia="{!v.provinciaEC}" pais="{!v.paisEC}" plantilla="{!v.cuerpoEC}" procedencia="{!v.procedenciaEC}"/>
+
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!v.cartaPostalProrroga == true}">
+                <lightning:button class="slds-float_right" variant="brand" label="Enviar" title="Enviar" onclick="{!c.generarDocProrroga}" />
+                <aura:set attribute="else">
+                    <lightning:button class="slds-float_right" variant="brand" label="Enviar" title="Enviar" onclick="{!c.generarDoc}" />
+                </aura:set>
+            </aura:if>
+            
+        </div>
+    </div>
+
+
+    
+
+</aura:component>

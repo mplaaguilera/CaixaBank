@@ -1,0 +1,22 @@
+<template>
+    <lightning-quick-action-panel class = "customStyle" header="Reactivar oportunidad">
+      <lightning-spinner if:true={loading} size="large" variant="brand" class="custom-spin"></lightning-spinner>
+        <div class="row">
+             <h5 class="padding-layout">{label.reactivateOppo} <strong>{label.InManagementInsist}</strong>{label.reactivateOppo2}</h5> 
+             <!--<h5 class="padding-layout">Al reactivar la {label.opp},pasará a <strong> "En gestion/Insistir"</strong>. Selecciona la fecha de próxima gestión</h5> -->
+            <!-- <h2 class="header">Basic Input Date</h2> -->
+            <lightning-input type="date" name="input1" label="Fecha de próxima gestión" onchange={handleChangeDate}></lightning-input>
+            <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="8">
+              <div class="slds-grid toggle-div margin-layout">
+                  <lightning-input type="toggle" name="incluir" class="toggle-input user-input toogle-divCustom" onchange={handleIncluir} variant="label-hidden" message-toggle-active="Incluir" message-toggle-inactive="No Incluir" checked={priorizador}></lightning-input>
+                  <label class="slds-form-element__label label-priorizador ">{label.includeOppo}</label>
+              </div>
+          </lightning-layout-item>
+            </div>
+        <div slot="footer">
+          <lightning-button variant="neutral" label="Cancel" onclick={closeModalWindow}></lightning-button>
+          <lightning-button variant="brand" disabled={emptyDate} label="Aceptar" class="slds-m-left_x-small" onclick={handleSuccess}></lightning-button>
+        </div>
+      </lightning-quick-action-panel>
+
+</template>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SIR_HistoricoProcesos</fullName>
+    <fields>SIR_Estrategia__c</fields>
+    <fields>SIR_Proceso__c</fields>
+    <fields>SIR_FechaInicioEstrategia__c</fields>
+    <fields>SIR_FechaFinEstrategia__c</fields>
+    <fields>SIR_Situacion__c</fields>
+    <fields>SIR_FechaSituacion__c</fields>
+    <label>Historico Procesos</label>
+</CompactLayout>

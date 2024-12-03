@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Foto_de_Facturacion__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Foto de facturación</label>
+    <referenceTo>SEG_Fotosdefacturacion__c</referenceTo>
+    <relationshipName>Operaciones</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

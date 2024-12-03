@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>DespedidaConfidencial_ES_Tarde</label>
+    <protected>false</protected>
+    <values>
+        <field>CSBD_Chat_Hora__c</field>
+        <value xsi:type="xsd:string">Tarde</value>
+    </values>
+    <values>
+        <field>CSBD_Confidencial__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CSBD_Idioma__c</field>
+        <value xsi:type="xsd:string">es</value>
+    </values>
+    <values>
+        <field>CSBD_Mensaje__c</field>
+        <value xsi:type="xsd:string">Gracias a usted por su atención. Buenas tardes.</value>
+    </values>
+    <values>
+        <field>CSBD_Tipo__c</field>
+        <value xsi:type="xsd:string">Despedida</value>
+    </values>
+</CustomMetadata>

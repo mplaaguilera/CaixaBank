@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Nombre_empleado_gestor__c</fullName>
+    <externalId>false</externalId>
+    <formula>AV_EAPGestor__r.FirstName &amp; &quot; &quot; &amp;  AV_EAPGestor__r.LastName</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Nombre empleado gestor</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,44 @@
+.datatableContainer {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #C9C9C9;
+    border-radius: 4px;
+    min-height:10px;
+}
+
+.datatableContainerResultados {
+    border-width: .5px;
+    border-style: solid;
+    border-color: #C9C9C9;
+    border-radius: 4px;
+    min-height:10px;
+}
+
+.THIS .spinner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    vertical-align: center;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 0.3s;
+}
+
+.THIS .spinner::after {
+    position: absolute;
+    content: 'Buscando resultados...';
+    width: 100%;
+    text-align: center;
+    top: calc(50% + 2em);
+    z-index: 9999;
+
+    animation-name: cc_fade_in;
+    animation-iteration-count: 1;
+    animation-duration: 0.3s;
+}

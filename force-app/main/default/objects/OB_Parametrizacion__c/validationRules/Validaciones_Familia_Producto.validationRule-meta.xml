@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validaciones_Familia_Producto</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND (
+   RecordType.DeveloperName = &apos;OB_Familia_Producto&apos;,
+   OR (
+      AND(
+         OB_Envio_GDD__c,
+         OR(
+            ISBLANK(OB_Codigo_GDD__c),
+            ISBLANK(OB_Area_ALF__c),
+            NOT(REGEX(TEXT(OB_Formato_Codigo_Contrato__c), &apos;^[-.9]+$&apos;)),
+            ISBLANK(OB_Accion_Alta__c)
+         )
+      ),
+      OB_Fecha_Expiracion__c &lt;= OB_Fecha_Activacion__c
+   )
+)</errorConditionFormula>
+    <errorMessage>Datos incorrectos</errorMessage>
+</ValidationRule>

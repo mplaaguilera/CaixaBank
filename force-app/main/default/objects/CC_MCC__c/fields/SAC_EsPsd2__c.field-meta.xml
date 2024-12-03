@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_EsPsd2__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica si un MCC es de tipo PSD2</description>
+    <label>Es PSD2</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

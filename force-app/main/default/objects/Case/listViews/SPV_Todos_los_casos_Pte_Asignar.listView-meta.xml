@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_Todos_los_casos_Pte_Asignar</fullName>
+    <columns>SAC_FechaRecepcion__c</columns>
+    <columns>SPV_NumExpediente__c</columns>
+    <columns>SPV_IdPretension__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>SAC_Naturaleza__c</columns>
+    <columns>SAC_Reclamacion__c</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>SEG_Grupo__c</columns>
+    <columns>CASES.PRIORITY</columns>
+    <columns>CC_Idioma__c</columns>
+    <filterScope>Queue</filterScope>
+    <label>SPV - Todos los casos (Pte. Asignar)</label>
+    <queue>SPV_PendienteAsignar</queue>
+    <sharedTo>
+        <role>SPV_General</role>
+    </sharedTo>
+</ListView>

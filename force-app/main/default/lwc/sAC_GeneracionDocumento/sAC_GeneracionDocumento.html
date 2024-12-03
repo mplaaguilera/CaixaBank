@@ -1,0 +1,135 @@
+<template>
+    <template if:false={ocultarBoton}>
+    <div class="slds-clearfix">
+        <lightning-button variant="brand" label="Generación Redacción Global" icon-name="utility:check" onclick={abrirEdicion} disabled={botonDisabled}></lightning-button>
+    </div>
+    </template> 
+    <template if:true={mostrarEdicion}>
+    <div class="slds-backdrop slds-backdrop_open" style="width: 100vw; height: 100vh; left: calc(-50vw + 50%) !important;">
+        <div class="slds-grid">
+            <div class="slds-col slds-size_2-of-3" style="padding-left: 36px; padding-top: 24px; padding-bottom: 24px; height: 100vh;">
+                <article class="slds-card" style="height: 100%; padding:13px">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <lightning-icon icon-name="action:new_note" alternative-text="Redacción" title="Redacción">
+                                </lightning-icon>
+                            </div>
+                            <div class="slds-media__body">
+                                <div class="slds-grid slds-wrap slds-media_center">
+                                    <div class="slds-col slds-size_1-of-4 slds-media_center">
+                                        <h2 class="slds-card__header-title">
+                                            <span>Documento de resolución</span>
+                                        </h2>
+                                    </div>
+                                    <div class="slds-col slds-size_3-of-4 slds-p-right_none">
+                                        <div class="slds-grid" style="padding: 8px">
+                                            <div class="slds-col">
+                                                <div class="slds-float_right" style="padding-left: 4px;">
+                                                    <lightning-button style="margin-right:4px;" label="Insertar imagen" icon-name="utility:image" onclick={mostrarModalInsertarImagen}>
+                                                    </lightning-button>
+                                                    <lightning-button style="margin-right:4px;" label="Salir" icon-name="utility:close" onclick={cerrarEdicion}>
+                                                    </lightning-button>
+                                                    <lightning-button label="Generar Documento" icon-name="utility:work_order_type" onclick={generarDoc} disabled={botonGenerar}>
+                                                    </lightning-button>
+                                                </div>
+                                                <div class="slds-float_right">
+                                                            <c-sac_-recuperar-plantillas-redaccion cambiar-plantilla="true" 
+                                                            carpeta-raiz="SAC_PlantillasRedaccion" record-id={recordId} oneventoaplicar={handleEventoAplicar} oneventoabierto={handleEventoAbierto}></c-sac_-recuperar-plantillas-redaccion>
+                                                </div>
+                                            </div>
+                                        </div>
+                                  
+                                        <lightning-record-edit-form
+                                        object-api-name="SAC_DocumentoEnvio__c"
+                                        record-id={idDocumento}
+                                        onsuccess={handleSuccess}
+                                        onsubmit={handleSubmit}
+                                      >
+                                        <lightning-messages></lightning-messages>
+                                        <lightning-input-field field-name="SAC_Header__c" value={header} class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_Footer__c" value={footer} class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_TipoDocumento__c" value=redaccion class="slds-hide"></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_DocPDF__c" class="slds-hide" style="min-height: 50vh;" value={cuerpo}></lightning-input-field>
+                                        <lightning-input-field field-name="SAC_Caso__c" value={recordId} class="slds-hide"></lightning-input-field>
+                                        <lightning-button class="slds-m-top_small slds-show slds-hide botonOculto" type="submit" label="Actualizar previsualización"></lightning-button>
+                                      </lightning-record-edit-form>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="divEditor slds-hide" style="width:100%; height:90%">
+                        <iframe id="LWCWithVFPage" src={rutaVS} width="100%" height="100%" style= "border: none;"> </iframe>
+                    </div>
+                </article>
+            </div>
+            <div class="slds-col slds-size_1-of-3" style="min-height: 50vh;">
+                <div style="background-color:#16325c;padding:0.5rem">
+                    <div lwc:if ={idRedaccion}>
+                        <iframe style="border: 1px solid; height: 100vh;width: 100%;" src={ruta}></iframe>
+                    </div>
+                    <div lwc:else>
+                            <div
+                                style="border: 1px solid; height: 100vh;width: 100%;background-color: white; text-align:center;">
+                                <div class="slds-text-heading_medium" style="top: 50%; position: relative;">
+                                    <lightning-icon icon-name="utility:save" alternative-text="Connected" size="large"
+                                        title="large size"></lightning-icon>
+                                    <p>Guarde el registro para poder previsualizarlo</p>
+                                </div>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- spinner -->
+        <lightning-spinner if:true={spinnerLoading} alternative-text="Cargando..." variant="brand" size="large" class="spin-cls" ></lightning-spinner>
+    </div>
+    
+
+     <!--Modal finalizar consulta-->
+     <template if:true={mostrarInsertarImagen}> 
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-02" aria-modal="true" aria-describedby="modal-content-id-2" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModalImagen}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h3 id="modal-heading-formulario" class="slds-text-heading_medium slds-hyphenate">Insertar Imagen</h3>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <template if:true={mostrarMensajeNoImagen}> 
+                        <!--Si se copia texto y no se encuentra ninguna imagen se muestra un aviso-->
+                        <div class="slds-card" style="height: 1cm;">
+                            <div class="slds-card__body slds-card__body_inner" style="background-color: #fe9339; border-color: #fe9339;border-radius: 4px;height: 40px;">
+                                <span class="warning-icon" aria-hidden="true">
+                                    <lightning-icon icon-name="utility:warning" size="small" style="margin-right: 3px;"></lightning-icon>
+                                </span>
+                                <span class="warning-text" style="font-size: larger;">{mensajeNoImagen}</span>
+                            </div>
+                        </div>
+                    </template>
+                    <lightning-input-rich-text class="TextAreaFull" label="Cuerpo" title="Cuerpo" onchange={handleRichTextChange} onkeydown={inputOnKeyDown} disabled-categories="FORMAT_TEXT, FORMAT_FONT, FORMAT_BODY, ALIGN_TEXT, REMOVE_FORMATTING">
+                    </lightning-input-rich-text>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModalImagen} title="Cancel">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={insertarImagen} title="Insertar">Insertar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+         
+    </template>
+     </template> 
+    
+</template>

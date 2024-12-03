@@ -1,0 +1,137 @@
+/*h1 {
+    color: rgb(0, 112, 210);
+}*/
+
+p {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    color: rgb(62, 62, 60);
+}
+
+.app {
+    background-color: #fafaf9;
+    height: 100vh;
+    overflow: scroll;
+}
+
+.bgcWhite{
+    background-color: #fafaf9;
+}
+.bgColor {
+    background-color: rgb(243, 243, 243);
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.row-height {
+    height: 2.5em;
+}
+
+td {
+    height: 2.5em;
+}
+
+th {
+    height: 2.5em;
+    border-right: 1px solid rgb(229, 229, 229);
+}
+
+
+.filters_row_1 lightning-input:first-of-type {
+    padding-left: 5em;
+}
+
+.filters_row_1 lightning-combobox:first-of-type {
+    padding: 0 1.25em 0 2.5em;
+}
+
+.filters_row_1 lightning-combobox:nth-of-type(2) {
+    padding: 0 2.5em 0 1.25em;
+}
+
+.filters_row_1 lightning-combobox:last-of-type {
+    padding-right: 5em;
+}
+
+.div-checkbox{
+    padding-top: 1.75em;
+    
+}
+
+.divPadding {
+    /* padding-top: 1rem;
+    padding-bottom: 2rem; */
+    padding:1rem .5rem 2rem .5rem;
+}
+
+.buttonAlign {
+margin:.4rem 0;
+}
+
+.buttonStyle {
+    margin-top: 0.5rem;
+    margin-right: 1rem;
+    flex-grow: 1;
+}
+
+.size-icon {
+    zoom: 50%;
+    margin-right: 0.5em;
+}
+
+
+.align-icon {
+    display: flex;
+    align-items: center;
+}
+
+.customHeader{
+    padding:0 1.25rem;
+}
+
+.margin-right-search div:first-child{
+    margin-right:.5rem;
+}
+.margin-right-search div{
+    margin:0 1rem;
+    
+}
+.margin-right-search{
+    display: flex;
+    padding-bottom:1rem;
+
+}
+
+.margin-pill {
+   padding:.65rem 1rem;
+   flex-wrap: wrap;
+   row-gap: .5rem;
+   
+} 
+
+.margin-pill div{
+    margin: 0 .25rem;
+}
+
+/* .marginPill div:w */
+
+.customPill{
+    padding-left: .3rem ;
+    
+}
+
+.slds-pill__icon_container{
+    width: inherit !important;
+}
+
+
+
+
+.miDiv{
+    margin-top: 3.5px;
+}

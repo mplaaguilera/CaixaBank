@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Grupo_publico</fullName>
+    <columns>NAME</columns>
+    <columns>CC_Agrupacion__c</columns>
+    <columns>CC_Queue_Traslado__c</columns>
+    <columns>OS_GrupoTrabajo__c</columns>
+    <columns>OS_Negocio__c</columns>
+    <columns>RECORDTYPE</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>OS_GrupoTrabajo__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <filters>
+        <field>OS_Negocio__c</field>
+        <operation>equals</operation>
+        <value>CC</value>
+    </filters>
+    <label>Grupos públicos CC</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+    </sharedTo>
+</ListView>

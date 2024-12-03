@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Actualizar_ALF__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Marca para lanzar actualización ALF (Interno)</description>
+    <inlineHelpText>Marca para lanzar actualización ALF (Interno)</inlineHelpText>
+    <label>Actualizar ALF (Interno)</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

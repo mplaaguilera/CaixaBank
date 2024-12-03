@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_SnapshotExecutionLimit__c</fullName>
+    <description>Límite control para indicar el número de transacciones máximas a consumir por el CBK_Log</description>
+    <externalId>false</externalId>
+    <label>Snapshot Execution Limit</label>
+    <precision>7</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

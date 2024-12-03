@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>SAC_Consultas_COPS</name>
+    </customPermissions>
+    <description>Permission set que permite crear una consulta manualmente</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SAC_Consultas COPS</label>
+    <recordTypeVisibilities>
+        <recordType>Case.SAC_Consulta</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+</PermissionSet>

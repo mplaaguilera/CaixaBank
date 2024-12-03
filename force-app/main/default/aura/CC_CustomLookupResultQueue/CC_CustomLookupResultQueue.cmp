@@ -1,0 +1,16 @@
+<aura:component>
+    <aura:attribute name="oQueue" type="QueueSobject" />
+    <aura:registerEvent name="oSelectedQueueTransfer" type="c:CC_SelectedQueueEvent" />
+
+    <li role="presentation">
+        <span class="slds-lookup__item-action slds-media slds-media_center" id="lookup-option-350" role="option">
+            <div class="slds-media__body">
+                <div class="slds-input-has-icon slds-input-has-icon_right">
+                    <div class="slds-lookup__result-text">
+                        <a onclick="{!c.selectQueue}">{!v.oQueue.Queue.Name}</a>
+                    </div>
+                </div>
+            </div>
+        </span>
+    </li>
+</aura:component>

@@ -1,0 +1,36 @@
+<template>
+    <lightning-card>
+
+            <div class="slds-m-left_medium slds-m-right_medium"  >
+
+                    <header slot="title" class="slds-page-header slds-page-header_record-home" onclick={toggleShow}>
+                        <lightning-icon if:true={showDetail} icon-name="utility:chevrondown" size="x-small" class="chev-icon" variant="container"></lightning-icon>
+                        <lightning-icon if:false={showDetail} icon-name="utility:chevronright" size="x-small" class="chev-icon" variant="container"></lightning-icon>
+                        <label class="nameAccordation">Detalles Grupo de Interlocución</label>
+                    </header>
+
+                    <div if:true={showDetail}>
+                        <div if:true={result}>
+                            <div class="slds-m-left_medium slds-m-bottom_medium"  >
+                                <div>
+                                    <p style ="margin-top:.75rem">Interlocutor</p>
+                                    <div><a name={interlocutor.Id} onclick={redirectToClient}>{interlocutor.Name}</a></div>
+                                </div>  
+                                <div style="margin-top:.75rem">
+
+                                    <p style ="margin-bottom:.2rem">Miembros ({membersNumber})</p>
+                                    <template for:each={memberList} for:item="member">
+                                        <div key={member.id}>
+                                            <a name={member.Id} onclick={redirectToClient} href="#">{member.name}</a>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+            </div>
+
+    </lightning-card>
+
+</template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>OT Aplication FWK</label>
+    <protected>false</protected>
+    <values>
+        <field>DeveloperNameApp__c</field>
+        <value xsi:type="xsd:string">CBK_Adoptions_FWK</value>
+    </values>
+    <values>
+        <field>Project__c</field>
+        <value xsi:type="xsd:string">CBK</value>
+    </values>
+</CustomMetadata>

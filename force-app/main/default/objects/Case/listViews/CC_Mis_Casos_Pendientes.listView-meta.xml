@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Mis_Casos_Pendientes</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>Flag__c</columns>
+    <columns>CC_Nivel_Flag__c</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Owner_Anterior__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>CC_MCC_ProdServ__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>CC_Tipo_Contacto__c</columns>
+    <columns>CASES.ORIGIN</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CC_Canal_Resolucion__c</columns>
+    <columns>CC_Recipient_Id_Maximo_Agrupador__c</columns>
+    <columns>CASES.RECORDTYPE</columns>
+    <filterScope>Mine</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Activo</value>
+    </filters>
+    <label>Mis casos activos</label>
+    <sharedTo>
+        <group>CC_3N_CSBD</group>
+        <group>PublicGroup_3N_CSBD</group>
+        <role>Contact_Center</role>
+        <role>Contact_Center_sin_acceso_a_Directorio</role>
+        <role>HDT</role>
+    </sharedTo>
+</ListView>

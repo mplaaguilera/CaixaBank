@@ -1,0 +1,122 @@
+<template>
+    <div class="first-span-detail" style="text-align:right; padding-top:10px">Última actualización <lightning-formatted-date-time value={now} year="numeric" month="short" day="2-digit" hour="2-digit"
+        minute="2-digit"></lightning-formatted-date-time></div>
+
+    <div class="c-container">
+        <!-- CAJAS ESTRATEGIAS -->
+        <div class="slds-box slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Procesos Pendientes de Iniciar</h2>
+                <div class="slds-scrollable_y" style="max-height:450px">
+                    <lightning-layout multiple-rows >
+                        <template for:each={cajitas} for:item="caja">    
+                            <lightning-layout-item flexibility="auto" padding="around-small" key={caja} class={numCajitasFila} >                  
+                                <article class="slds-card slds-is-relative min-size card-temp styleCard dimensionesCajitas">   
+                                <div >                   
+                                    <div class="card-title min-size-title slds-text-align_center" title={caja.titulo}>{caja.titulo}</div>
+                                    <div class="slds-card__body slds-card__body_inner num-records-container" >
+                                        <span class="cursor-default no-select">{caja.numTotal}</span>
+                                    </div>
+                                    <div class="slds-text-align_center"><lightning-formatted-url value={caja.url} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></div>
+                                    <lightning-spinner if:true={loading} alternative-text="Loading" size="medium"></lightning-spinner>
+                                </div> 
+                                </article>                
+                            </lightning-layout-item>                
+                        </template>
+                    </lightning-layout>
+                </div>
+            </div>
+        </div>
+        <!-- CAJAS ESTRATEGIAS -->
+    
+
+        <!-- PROCESOS EN GESTION -->   
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px;">
+            <h2 class="titulo">Procesos Iniciados No Finalizados ({numProcesosEnGestion})</h2>            
+            <div class="tablaAltura slds-scrollable">
+                <template if:false={showTableEnGestion}>
+                    <div style="padding:15px; text-align:center">No hay datos que mostrar</div>
+                </template>
+                <template if:true={showTableEnGestion}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={procesosEnGestion}
+                        columns={columnsProcesosEnGestion}
+                        default-sort-direction={defaultSortDirection}
+                        sorted-direction={sortDirectionEnGestion}
+                        sorted-by={sortedBy}
+                        onsort={onHandleSort}
+                        hide-checkbox-column >
+                    </lightning-datatable>
+                </template>
+            </div>
+            <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosEnGestion} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS EN GESTION -->
+
+        <!-- GRAFICO -->
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding-left: 10px;padding-right: 10px;padding-bottom: 10px;">
+                <c-sir_lwc_-Chart-Procesos-Estrategias-Presol informe-procesos-estrategias={informeProcesosEstrategias}></c-sir_lwc_-Chart-Procesos-Estrategias-Presol>
+            </div>
+        </article>
+        <!-- GRAFICO -->
+
+        <!-- PROCESOS GESTIONADOS -->   
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Procesos Finalizados ({numProcesosGestionados})</h2>            
+                <div class="tablaAltura slds-scrollable">
+                    <template if:false={showTableGestionados}>
+                        <div style="padding:15px; text-align:center">No hay datos que mostrar</div>
+                    </template>
+                    <template if:true={showTableGestionados}>
+                        <lightning-datatable
+                            key-field="id"
+                            data={procesosGestionados}
+                            columns={columnsProcesosGestionados}
+                            default-sort-direction={defaultSortDirection}
+                            sorted-direction={sortDirectionGestionados}
+                            sorted-by={sortByEnGestionados}
+                            onsort={onHandleSortGestionados}
+                            hide-checkbox-column >
+                        </lightning-datatable>
+                    </template>
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeProcesosGestionados} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>            
+            </div>
+        </article>
+        <!-- PROCESOS GESTIONADOS -->
+
+        <!-- ACCIONES y TAREAS PENDIENTES SINCRONIZAR-->
+        <article class="dashGridItem slds-card  flexTable" dir="ltr">
+            <div style="padding: 10px;">
+                <h2 class="titulo">Tareas pendientes de Sincronizar ({numTareasPendientes})</h2>
+                <div class="tablaAlturaSmall slds-scrollable">
+                    <template if:false={showTableTareas}>
+                        <div style="padding:15px; text-align:center">No hay datos que mostrar</div>
+                    </template>
+                    <template if:true={showTableTareas}>
+                        <lightning-datatable
+                            key-field="id"
+                            data={tareasPendientes}
+                            columns={columnsTareas}
+                            default-sort-direction={defaultSortDirection}
+                            sorted-direction={sortDirectionTareas}
+                            sorted-by={sortedByTareas}
+                            onsort={onHandleSortTareas}
+                            hide-checkbox-column >
+                        </lightning-datatable>
+                    </template>
+        
+                </div>
+                <span class="textoVerInforme"><lightning-formatted-url value={informeTareasPendientes} label="Ver Informe" tooltip="Ver Informe" ></lightning-formatted-url></span>                        
+            </div>
+        </article>
+        <!-- ACCIONES y TAREAS PENDIENTES SINCRONIZAR-->
+
+    </div>
+    <div lwc:dom="manual"></div>
+</template>

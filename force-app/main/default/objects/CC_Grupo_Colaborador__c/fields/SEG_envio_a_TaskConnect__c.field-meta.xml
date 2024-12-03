@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_envio_a_TaskConnect__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>CheckBox que indica si el Grupo pertenece a TaskConnect</description>
+    <label>Envío a TaskConnect</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

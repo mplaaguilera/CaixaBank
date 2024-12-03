@@ -1,0 +1,312 @@
+<template>
+	<div class="slds-grid slds-grid_vertical slds-var-p-around_large slds-is-relative" style="margin-top: 0px;">
+
+		<!-- Banner -->
+		<div class="slds-col slds-grow-none slds-var-m-bottom_x-small">
+			<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xx-small">
+				<div class="slds-col">
+					<div class={tipoBanner.class} role="status" tabindex="0">
+						<div class="slds-media__figure">
+							<span class="slds-icon_container">
+								<lightning-icon icon-name={tipoBanner.iconName} size="x-small" variant="inverse"></lightning-icon>
+							</span>
+						</div>
+						<div class="slds-media__body"><p>{tipoBanner.texto}</p></div>
+					</div>
+				</div>
+				<div class="slds-col slds-grow-none">
+					<lightning-button-group>
+						<lightning-button-icon class="botonSuscribir" tooltip="Suscribir" icon-name="utility:broadcast" icon-class={botonesAtributos.suscribirIconClass} variant={botonesAtributos.suscribirVariant} onclick={subscribeToMessageChannel}></lightning-button-icon>
+						<lightning-button-icon class="botonDesuscribir" tooltip="Desuscribir" icon-name="utility:offline" icon-class={botonesAtributos.desuscribirIconClass} variant={botonesAtributos.desuscribirVariant} onclick={unsubscribeToMessageChannel} disabled></lightning-button-icon>
+					</lightning-button-group>
+				</div>
+			</div>
+		</div>
+
+		<!--Botón "Mostrar controles"-->
+		<div class="mostrarControles slds-var-m-top_medium slds-var-m-left_medium" style="cursor: pointer;" align="center">
+			<span onclick={mostrarControlesOnclick}>
+				<lightning-icon icon-name="utility:setup" size="x-small" class="slds-var-m-right_small"></lightning-icon>
+				<span class="mostrarControlesTexto slds-text-color_weak slds-is-relative" style="top: 1px;">Mostrar controles</span>
+			</span>
+		</div>
+
+		<!--Controles-->
+		<div class="controles slds-hide">
+			<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xx-small slds-var-m-top_medium slds-var-m-bottom_large">
+				<div class="slds-col slds-grow-none">
+					<label class="slds-form-element__label slds-var-p-right_xxx-small">Interacción</label>
+				</div>
+				<div class="slds-col">
+					<lightning-input class="inputInteractionId" value={interactionId} variant="label-hidden" onchange={inputInteractionIdOnchange} disabled spellcheck="false"></lightning-input>
+				</div>
+				<div class="slds-col slds-grow-none">
+					<lightning-button-group>
+						<lightning-button-icon icon-name="utility:edit" tooltip="Editar Id de interacción" onclick={editarInteractionId}></lightning-button-icon>
+						<lightning-button-icon icon-name="utility:light_bulb" tooltip="Generar Id de interacción aleatorio" onclick={generarInteractionId}></lightning-button-icon>
+						<lightning-button-icon icon-name="utility:copy" tooltip="Copiar Id de interacción" onclick={copiar} class="botonCopiarIdInteraccion"></lightning-button-icon>
+					</lightning-button-group>
+				</div>
+				<div class="slds-col slds-grow-none slds-is-relative">
+					<lightning-button-icon icon-name="utility:list" tooltip="Añadir custom attributes" onclick={abrirPopoverAddAttributes}></lightning-button-icon>
+
+					<section class="popoverAddAttributes slds-popover slds-nubbin_top-right slds-hide" role="dialog" style="position: absolute; top: 38px; transform: translate(calc(-100% + 9px)); width: 26rem;" onmousedown={stopPropagation}>
+						<lightning-button-icon icon-name="utility:close" variant="bare" onclick={cerrarPopoverAddAttributes} style="position: absolute; top: 3px; right: 6px; z-index: 6001;"></lightning-button-icon>
+						<div class="slds-popover__body">
+							<lightning-textarea
+								class="inputAddAtributes"
+								label="Custom attributes"
+								placeholder="\{&quot;nombre1&quot;: &quot;valor1&quot;, &quot;nombre2&quot;: &quot;valor2&quot;}"
+								onblur={inputAddAtributesOnblur}
+								required>
+							</lightning-textarea>
+							<div class="slds-var-m-top_small" style="text-align: right;">
+								<lightning-button label="Añadir" variant="brand" onclick={buttonAddAttributesOnclick}></lightning-button>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+
+		<!-- Historial -->
+		<div class="slds-col">
+			<div class="slds-grid slds-grid_vertical-align-center">
+				<div class="cabeceraLog slds-col slds-grow-none">
+					<label class="slds-form-element__label slds-is-relative slds-var-m-right_x-small" style="top: 2px; font-size: 12px;">Historial</label>
+					<lightning-button-icon tooltip="Copiar todos" icon-name="utility:copy" size="small" variant="bare" class="slds-var-m-left_small" onclick={copiar}></lightning-button-icon>
+					<div class="menuFiltrarHistorial slds-dropdown-trigger slds-dropdown-trigger_click" onclick={stopPropagation}>
+						<lightning-button-icon tooltip="Filtrar historial de eventos" icon-name="utility:filterList" size="small" variant="bare" class="slds-var-m-left_small" onclick={menuFiltrarHistorialOnclick}></lightning-button-icon>
+						<div class="slds-dropdown slds-dropdown_left slds-nubbin_top-left">
+							<ul class="slds-dropdown__list slds-is-relative" role="menu">
+								<li class="slds-dropdown__item logInfo" role="presentation" data-name="logInfo" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:info_alt" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Información</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logEvento" role="presentation" data-name="logEvento" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:anywhere_alert" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Eventos</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logApex" role="presentation" data-name="logApex" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:apex" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Apex: invocaciones</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logRespuestaApex" role="presentation" data-name="logRespuestaApex" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:apex" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Apex: respuestas</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logCustomAttributes" role="presentation" data-name="logCustomAttributes" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:list" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Alta de custom attributes</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logApiPurecloud" role="presentation" data-name="logApiPurecloud" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:http" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Llamadas a API Purecloud</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-dropdown__item logError" role="presentation" data-name="logError" onclick={menuFiltrarHistorialItemOnclick}>
+									<div class="slds-grid slds-grid_align-spread">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:warning" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Errores</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-icon icon-name="utility:check" size="xx-small"></lightning-icon>
+										</div>
+									</div>
+								</li>
+								<li class="slds-has-divider_top-space" role="separator"></li>
+								<li class="slds-dropdown__item mostrarSoloEventosRelevantes" role="presentation">
+									<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+										<div class="slds-col">
+											<lightning-icon icon-name="utility:anywhere_alert" size="xx-small" class="slds-var-m-right_small"></lightning-icon>
+											<span class="slds-truncate">Mostrar solo eventos relevantes</span>
+										</div>
+										<div class="slds-col slds-grow-none">
+											<lightning-input type="toggle" checked={mostrarSoloEventosRelevantes} variant="label-hidden" message-toggle-active="" message-toggle-inactive="" style="display: inline-block;" onchange={toggleMostrarSoloEventosRelevantesOnchange}></lightning-input>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--
+					<lightning-button-menu class="menuFiltrarHistorial" variant="container" icon-name="utility:filterList" tooltip="Filtrar historial de eventos" onselect={menuFiltrarHistorialOnselect}>
+						<lightning-menu-item class="logInfo" value="logInfo" label="Información" prefix-icon-name="utility:info_alt" icon-name="utility:check"></lightning-menu-item>
+						<lightning-menu-item class="logEvento" value="logEvento" label="Eventos" prefix-icon-name="utility:anywhere_alert" icon-name="utility:check"></lightning-menu-item>
+						<lightning-menu-item class="logApex" value="logApex" label="Apex: invocaciones" prefix-icon-name="utility:apex" icon-name="utility:check"></lightning-menu-item>
+						<lightning-menu-item class="logRespuestaApex" value="logRespuestaApex" label="Apex: respuestas" prefix-icon-name="utility:apex"></lightning-menu-item>
+						<lightning-menu-item class="logCustomAttributes" value="logCustomAttributes" label="Alta de custom attributes" prefix-icon-name="utility:list"></lightning-menu-item>
+						<lightning-menu-item class="logApiPurecloud" value="logApiPurecloud" label="Llamadas a API Purecloud" prefix-icon-name="utility:http"></lightning-menu-item>
+						<lightning-menu-item class="logError" value="logError" label="Errores" prefix-icon-name="utility:warning" icon-name="utility:check"></lightning-menu-item>
+						<lightning-menu-divider></lightning-menu-divider>
+						<lightning-menu-item class="mostrarSoloEventosRelevantes" value="mostrarSoloEventosRelevantes" label="Mostrar solo eventos relevantes" prefix-icon-name="utility:anywhere_alert" icon-name="utility:check"></lightning-menu-item>
+					</lightning-button-menu>
+					-->
+					<lightning-button-icon tooltip="Scroll automático al elemento más reciente del historial" icon-name="utility:arrow_top" size="small" variant="bare" class="iconoSeleccionable iconoSeleccionado slds-var-m-left_small" onclick={cambiarScrollAutomatico}></lightning-button-icon>
+					<lightning-button-icon tooltip="Borrar historial" icon-name="utility:delete" size="small" variant="bare" class="slds-var-m-left_small iconoBorrar" onclick={eliminarLog}></lightning-button-icon>
+				</div>
+				<div class="controles slds-col slds-var-m-right_x-small slds-hide" align="right">
+					<lightning-button-icon tooltip="Simular recepción de evento" icon-name="utility:new" size="small" variant="bare" onclick={modalAbrir} data-nombre-modal="modalSimularRecepcionEvento" data-elemento-focus-class=".modalSimularRecepcionEventoCancelar"></lightning-button-icon>
+					<lightning-button-icon tooltip="Simular respuesta API Purecloud" icon-name="utility:system_and_global_variable" size="small" variant="bare" class="botonAbrirModalSimularRespuestaApiPurecloud slds-var-m-left_medium" onclick={modalAbrir} data-nombre-modal="modalSimularRespuestaApiPurecloud" data-elemento-focus-class=".textareaJsonSimularApiPurecloud"></lightning-button-icon>
+					<lightning-button-icon tooltip="Log invocación API Purecloud" icon-name="utility:http" size="small" variant="bare" class="slds-var-m-left_medium" onclick={invocarApiPurecloud}></lightning-button-icon>
+					<lightning-button-icon tooltip="Log Desarrollo" icon-name="utility:bug" size="small" variant="bare" class="slds-var-m-left_medium" onclick={devLog}></lightning-button-icon>
+				</div>
+			</div>
+			<div class="logDiv">
+				<template for:each={logsVisibles} for:item="log">
+					<div key={log.key} class="log">
+						<span class={log.mensajeCabeceraClass}>
+							<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-x-small">
+								<div class="slds-col">
+									<div class="slds-grid slds-gutters_direct-xxx-small slds-var-m-left_medium">
+										<div class="slds-col slds-grow-none slds-shrink-none" style="font-size: 11.6px;">
+											<lightning-icon icon-name={log.iconName} size="xx-small" class="logMensajeCabeceraIcono slds-var-m-left_xx-small slds-var-m-right_small"></lightning-icon>
+											{log.fecha}
+										</div>
+										<div class="slds-col divLogTipo slds-grow-none slds-text-color_weak slds-var-m-left_xx-small">{log.tipo}</div>
+										<div lwc:if={log.apexTriggered} class="slds-col slds-is-relative" style="top: -1px;">
+											<div class="logMensajeDetalle slds-var-p-right_small" align="right" data-inbound={log.apexTriggered.inbound}>
+												<template lwc:if={log.apexTriggered.inbound}>
+													<lightning-icon icon-name="utility:enter" size="xx-small" class="logMensajeDetalleIconoFlecha slds-var-m-right_small"></lightning-icon>
+												</template>
+												<template lwc:else>
+													<lightning-icon icon-name="utility:forward" size="xx-small" class="logMensajeDetalleIconoFlecha slds-var-m-right_small"></lightning-icon>
+												</template>
+												<lightning-icon icon-name="utility:apex" size="xx-small" class="logMensajeDetalleIcono slds-var-m-right_x-small" data-inbound={log.apexTriggered.inbound}></lightning-icon>
+												<span style="font-weight: 600;">{log.apexTriggered.name}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</span>
+						<span class="logMensaje slds-is-relative">
+							<pre class={log.class}>
+								<div lwc:if={log.tituloText} class="logTitulo">{log.tituloText}</div>
+								<div lwc:if={log.text} class="logTexto">{log.text}</div>
+							</pre>
+							<lightning-button-icon tooltip="Copiar texto" class="botonCopiarLog" icon-name="utility:copy" size="small" variant="bare" onclick={copiar} data-evento-key={log.key}></lightning-button-icon>
+						</span>
+						<hr class="logSeparador"/>
+					</div>
+				</template>
+			</div>
+		</div>
+
+		<div class="slds-backdrop modalBackdrop"></div>
+	</div>
+
+	<!-- Modales -->
+	<template lwc:if={renderizarModales}>
+
+		<section role="dialog" tabindex="-1" aria-modal="true" class="modalSimularRecepcionEvento slds-modal slds-modal_medium" onkeydown={modalTeclaPulsada}>
+			<div class="slds-modal__container modalContainer slds-var-p-top_large slds-var-p-bottom_large">
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+				<div class="slds-modal__header">
+					<h1 class="slds-modal__title slds-hyphenate">Simular recepción de evento</h1>
+					<p class="slds-var-m-top_x-small">Indica el JSON con los datos del evento entrante que quieres simular.</p>
+				</div>
+				<div class="slds-modal__content modalContent slds-var-p-vertical_large slds-var-p-horizontal_x-large" style="height: 380px;">
+					<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-bottom_large">
+						<div class="slds-col">
+							<div class="slds-grid slds-grid_vertical-align-center slds-gutters_direct-xxx-small">
+								<div class="slds-col">
+									<label class="slds-form-element__label">Plantillas</label>
+								</div>
+								<div class="slds-col" style="min-width: 258px;">
+									<lightning-combobox class="comboboxCambiarPlantilla" options={plantillasModalSimularOpciones} value="registrarLlamadaEntrante" onchange={comboboxPlantillaJsonOnchange} variant="label-hidden" dropdown-alignment="bottom-left"></lightning-combobox>
+								</div>
+							</div>
+						</div>
+						<div class="slds-col">
+							<div class="slds-grid slds-grid_vertical-align-center">
+								<div class="slds-col">
+									<label class="slds-form-element__label">Usar Id de interacción en curso</label>
+								</div>
+								<div class="slds-col slds-is-relative" style="top: -1px;">
+									<lightning-helptext content="El valor del atributo data.id se reemplaza con el id de la interacción en curso si ésta existe." icon-name="utility:info_alt"></lightning-helptext>
+								</div>
+								<div class="slds-col">
+									<lightning-input class="toggleUsarIdActual" type="toggle" checked onchange={toggleUsarIdActualOnchange} message-toggle-active="" message-toggle-inactive="" variant="label-hidden"></lightning-input>
+								</div>
+							</div>
+						</div>
+					</div>
+					<lightning-textarea class="textareaJsonSimularEvento" variant="label-hidden" spellcheck="false"></lightning-textarea>
+				</div>
+				<div class="slds-modal__footer">
+					<lightning-button class="modalSimularRecepcionEventoCancelar" label="Cancelar" onclick={cerrarModales}></lightning-button>
+					<lightning-button class="modalSimularRecepcionEventoPublicar slds-var-m-left_medium" label="Publicar evento" variant="brand" onclick={modalSimularRecepcionEventoPublicar}></lightning-button>
+				</div>
+			</div>
+		</section>
+
+		<section role="dialog" tabindex="-1" aria-modal="true" class="modalSimularRespuestaApiPurecloud slds-modal slds-modal_medium" onkeydown={modalTeclaPulsada}>
+			<div class="slds-modal__container modalContainer slds-var-p-top_large slds-var-p-bottom_large">
+				<lightning-button-icon icon-name="utility:close" size="large" onclick={cerrarModales} variant="border-filled" class="slds-button slds-button_icon slds-modal__close"></lightning-button-icon>
+				<div class="slds-modal__header">
+					<h1 class="slds-modal__title slds-hyphenate">Simular respuesta API Purecloud</h1>
+					<p class="slds-var-m-top_x-small">Usar una respuesta fija en lugar de invocar a la API de Purecloud</p>
+				</div>
+				<div class="slds-modal__content modalContent slds-var-p-vertical_large slds-var-p-horizontal_x-large" style="height: 240px;">
+					<lightning-textarea class="textareaJsonSimularApiPurecloud" variant="label-hidden" spellcheck="false"></lightning-textarea>
+				</div>
+				<div class="slds-modal__footer">
+					<div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+						<div class="slds-col" style="display: flex;">
+							<label class="slds-form-element__label">Simular respuesta API Purecloud</label>
+							<lightning-input type="toggle" checked={simularRespuestaApiPurecloud} onchange={toggleSimularRespuestaApiPurecloudOnchange} message-toggle-active="" message-toggle-inactive="" variant="label-hidden"></lightning-input>
+						</div>
+						<div class="slds-col">
+							<lightning-button label="Cerrar" onclick={cerrarModales}></lightning-button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+	</template>
+
+</template>

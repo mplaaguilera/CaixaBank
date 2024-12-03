@@ -1,0 +1,28 @@
+template {
+    /* height: fit-content !important; */
+}
+
+.spin-cls {
+    /* height: fit-content !important; */
+}
+.inputPadding{
+    padding:0 1rem;
+}
+.stickyLabel {
+	/* margin: 0; */
+    /* margin-top: -10rem; */
+    margin-top:.5rem;
+    margin-bottom: -1rem;
+    /* background-color: red; */
+}
+.fixPositionPermisoBtns {
+    background-color: rgb(243,243,243);
+}
+.buttonDiv{
+    text-align:right;
+    padding:auto 2rem;
+    bottom:0;
+    margin-top:2rem;
+    width:100%;
+
+}

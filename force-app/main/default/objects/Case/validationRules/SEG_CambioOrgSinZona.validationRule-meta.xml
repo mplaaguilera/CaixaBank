@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_CambioOrgSinZona</fullName>
+    <active>true</active>
+    <description>Validación para no poder establecer una organización sin asignar una zona.</description>
+    <errorConditionFormula>AND(
+BEGINS(RecordType.DeveloperName, &apos;SEG_&apos;),
+ISCHANGED(SEG_Zona__c),
+ISPICKVAL(SEG_Zona__c, &apos;&apos;),
+NOT(ISPICKVAL(SEG_Organizacion__c, &apos;&apos;)))</errorConditionFormula>
+    <errorDisplayField>SEG_Zona__c</errorDisplayField>
+    <errorMessage>No se puede establecer una zona en blanco.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,639 @@
+<template>
+    <!-- spinner -->
+   <template lwc:if={spinnerLoading}>
+       <div class="slds-p-around_x-large">
+           <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+       </div>
+   </template>
+   <template lwc:else>
+       <template lwc:if={auditoriaRealizada}>
+           <!-- Seccion de datos de la auditoría -->
+           <div class={datosAuditoria}>
+               <h1 class="slds-section__title">
+               <button aria-controls="expando-unique-id-datos" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableDatosAuditoria}>
+                   <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                   <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                   </svg>
+                   <span style="font-size: 16px;" class="slds-truncate" title="Section Title"> Datos de la auditoría</span>
+               </button>
+               </h1>
+               <div class="slds-section__content" id="expando-unique-id-datos">
+                   <lightning-record-view-form record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
+                       <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="SAC_NombreAuditoria__c"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="CreatedDate"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="SAC_Tipo__c"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="SAC_Estado__c"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="SAC_GrupoResponsableResolver__c"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="CreatedById"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+
+                           <div class="slds-col slds-size_1-of-1">
+                               <lightning-output-field field-name="SAC_SLACalidad__c"> </lightning-output-field>
+                               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                           </div>
+                       </div>
+                   </lightning-record-view-form>
+               </div>
+           </div>
+
+           <!-- Seccion del dictamen de la auditoria -->
+           <div class={dictamenAuditoria}>
+               <h1 class="slds-section__title">
+               <button aria-controls="expando-unique-id-dictamen" aria-expanded="true" class="slds-button slds-section__title-action" onclick={handleExpandableDictamenAuditoria}>
+                   <svg class="slds-section__title-action-icon slds-button__icon slds-button__icon_left" aria-hidden="true">
+                   <use xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#switch"></use>
+                   </svg>
+                   <span style="font-size: 16px;" class="slds-truncate" title="Section Title"> Dictamen de la auditoría</span>
+               </button>
+               </h1>
+               <div class="slds-section__content" id="expando-unique-dictamen">
+                   <!-- Seccion de los datos dictamen con la auditoría finalizada -->
+                   <template lwc:if={auditoriaFinalizada}>
+                       <lightning-record-view-form record-id={idAuditoria} object-api-name="SEG_Auditoria__c">
+                           <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
+                               <div class="slds-col slds-size_3-of-12">
+                                   <span><b>Bloque</b></span>
+                               </div>
+                               <div class="slds-col slds-size_6-of-12">
+                                   <span><b>Punto de control</b></span>
+                               </div>
+                               <div class="slds-col slds-size_1-of-12">
+                                   <span><b>Crítico</b></span>
+                               </div>
+                               <div class="slds-col slds-size_2-of-12">
+                                   <span><b>Dictamen</b></span>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                               <!-- Puntos de control de la auditoria -->
+                               <template for:each={puntosControl} for:item="punto">
+                                   <div key={punto.Id} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xxx-small"> 
+                                       <div class="slds-col slds-size_3-of-12">{punto.SAC_PuntoDeControl__r.SAC_TipoAuditoria__c}</div>
+                                       <div class="slds-col slds-size_6-of-12">{punto.SAC_PuntoDeControl__r.Name}</div>
+                                       <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
+                                           <div lwc:else class="slds-col slds-size_1-of-12"></div> 
+                                       <div class="slds-col slds-size_2-of-12">
+                                           <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id}>
+                                               <lightning-output-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-output-field>
+                                           </lightning-record-view-form>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                   </div>
+                               </template>
+
+                               <div class="slds-col slds-size_3-of-12"></div>
+                               <div class="slds-col slds-size_6-of-12"><span>Dictamen final</span></div>
+                               <div class="slds-col slds-size_1-of-12"></div>
+                               <div class="slds-col slds-size_2-of-12">
+                                   <lightning-output-field field-name="SAC_DictamenManual__c" variant="label-hidden"> </lightning-output-field>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                               <div class="slds-col slds-size_3-of-12"></div>
+                               <div class="slds-col slds-size_2-of-12"><span>Observaciones</span></div>
+                               <div class="slds-col slds-size_7-of-12">
+                                   <lightning-output-field field-name="SAC_Observaciones__c" variant="label-hidden"> </lightning-output-field>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                               
+                               <!-- Funcionalidad para revisar la auditoria una vez completada -->
+                               <lightning-record-edit-form style="width:100%;" if:false={auditoriaReplicada} object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                   <div lwc:if={tienePermisosReplicar} class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                       <div class="slds-col slds-size_3-of-12"></div>
+                                       <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>
+                                       <div class="slds-col slds-size_7-of-12">
+                                           <lightning-input-field field-name="SAC_Replica__c" variant="label-hidden"> </lightning-input-field>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                       <div class="slds-col slds-size_1-of-1 slds-m-bottom_x-small">   
+                                           <lightning-button data-name={idAuditoria} style="padding-left:32px" class="slds-float_right" variant="brand" type="submit" label="Enviar réplica" onclick={handleReplicar}></lightning-button>                         
+                                           <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                                       </div>
+                                   </div>
+                               </lightning-record-edit-form>
+                               
+                               <div lwc:if={auditoriaReplicada} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                   <div class="slds-col slds-size_3-of-12"></div>
+                                   <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>
+                                   <div class="slds-col slds-size_7-of-12">
+                                       <lightning-output-field field-name="SAC_Replica__c" variant="label-hidden"> </lightning-output-field>
+                                   </div>
+                                   <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                               </div>
+
+                               <div if:true={permitirReabrir} class="slds-col slds-size_1-of-1">   
+                                   <lightning-button data-name="botonReabrir" class="slds-float_right" variant="brand" type="submit" label="Nueva auditoría bloque" onclick={handleReabrir}></lightning-button>                         
+                               </div>
+                           </div>
+                       </lightning-record-view-form>
+                   </template>
+
+                   <!-- Seccion de los datos dictamen para auditores del grupo gestor o letrado -->
+                   <template lwc:elseif={esGestorLetrado}>
+                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
+                                <div class="slds-col slds-size_3-of-12">
+                                    <span><b>Bloque</b></span>
+                                </div>
+                                <div class="slds-col slds-size_6-of-12">
+                                    <span><b>Punto de control</b></span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12">
+                                    <span><b>Crítico</b></span>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <span><b>Dictamen</b></span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                
+                                <!-- Puntos de control de la auditoria -->
+                                <template for:each={puntosControl} for:item="punto">
+                                    <div key={punto.Id} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                        <div class="slds-col slds-size_3-of-12">{punto.SAC_PuntoDeControl__r.SAC_TipoAuditoria__c}</div>
+                                        <div class="slds-col slds-size_6-of-12">{punto.SAC_PuntoDeControl__r.Name}</div>
+                                        <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
+                                            <div lwc:else class="slds-col slds-size_1-of-12"></div> 
+                                        <div class="slds-col slds-size_2-of-12">
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                    </div>
+                                </template>
+                                
+                                <!-- Dictámenes de la auditoria -->
+                                <div class="slds-col slds-size_3-of-12"></div>
+                                <div class="slds-col slds-size_6-of-12"><strong>Dictamen final</strong></div>
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <lightning-input-field field-name="SAC_DictamenManual__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                <!-- Observaciones de la auditoria -->
+                                <div class="slds-col slds-size_3-of-12"></div>
+                                <div class="slds-col slds-size_2-of-12"><span>Observaciones</span></div>
+                                <div class="slds-col slds-size_7-of-12">
+                                    <lightning-input-field field-name="SAC_Observaciones__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                                    <lightning-button data-name={idAuditoria} style="padding-left:32px" class="slds-float_right" variant="brand" type="submit" label="Finalizar" onclick={handleFinalizar}></lightning-button>                         
+                                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                                </div>
+                            </div> 
+                        </lightning-record-edit-form>
+                    </template>
+                   
+                   <template lwc:elseif={tienePermisosEditar}>
+                       <!-- Seccion de los datos dictamen con la auditoría SIN finalizar para gente con permisos-->
+                       <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                           <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
+                               <div class="slds-col slds-size_3-of-12">
+                                   <span><b>Bloque</b></span>
+                               </div>
+                               <div class="slds-col slds-size_6-of-12">
+                                   <span><b>Punto de control</b></span>
+                               </div>
+                               <div class="slds-col slds-size_1-of-12">
+                                   <span><b>Crítico</b></span>
+                               </div>
+                               <div class="slds-col slds-size_2-of-12">
+                                   <span><b>Dictamen</b></span>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                               
+                               <!-- Puntos de control de la auditoria -->
+                               <template for:each={puntosControl} for:item="punto">
+                                   <div key={punto.Id} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                       <div class="slds-col slds-size_3-of-12">{punto.SAC_PuntoDeControl__r.SAC_TipoAuditoria__c}</div>
+                                       <div class="slds-col slds-size_6-of-12">{punto.SAC_PuntoDeControl__r.Name}</div>
+                                       <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
+                                           <div lwc:else class="slds-col slds-size_1-of-12"></div> 
+                                       <div class="slds-col slds-size_2-of-12">
+                                           <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                               <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-input-field>
+                                           </lightning-record-edit-form>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                   </div>
+                               </template>
+                               
+                               <!-- Dictámenes de la auditoria -->
+                               <div class="slds-col slds-size_3-of-12"></div>
+                               <div class="slds-col slds-size_6-of-12"><strong>Dictamen final</strong></div>
+                               <div class="slds-col slds-size_1-of-12"></div>
+                               <div class="slds-col slds-size_2-of-12">
+                                   <lightning-input-field field-name="SAC_DictamenManual__c" variant="label-hidden"> </lightning-input-field>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                               <!-- Observaciones de la auditoria -->
+                               <div class="slds-col slds-size_3-of-12"></div>
+                               <div class="slds-col slds-size_2-of-12"><span>Observaciones</span></div>
+                               <div class="slds-col slds-size_7-of-12">
+                                   <lightning-input-field field-name="SAC_Observaciones__c" variant="label-hidden"> </lightning-input-field>
+                               </div>
+                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                               <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                                   <lightning-button data-name={idAuditoria} style="padding-left:32px" class="slds-float_right" variant="brand" type="submit" label="Finalizar" onclick={handleFinalizar}></lightning-button>                         
+                                   <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                               </div>
+                           </div> 
+                       </lightning-record-edit-form>
+
+                       <template if:true={spinnerGuardar}>
+                           <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+                               <div class="slds-modal__container">
+                                   <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                                       <div class="slds-form-element__control">
+                                           <div align="center">
+                                               <span class="slds-text-heading_small slds-truncate">
+                                                   <br/>
+                                                   Actualizando los datos... por favor espere.
+                                               </span>
+                                               <div class="caseHolder">
+                                                   <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </section>
+                           <div class="slds-backdrop slds-backdrop_open"></div>
+                       </template>
+                   </template>
+                   <!-- Seccion de los datos dictamen con la auditoría SIN finalizar para gente sin permisos -->
+                   <template lwc:else>
+                        <lightning-record-edit-form object-api-name="SEG_Auditoria__c" record-id={idAuditoria} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                            <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small"> 
+                                <div class="slds-col slds-size_3-of-12">
+                                    <span><b>Bloque</b></span>
+                                </div>
+                                <div class="slds-col slds-size_6-of-12">
+                                    <span><b>Punto de control</b></span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12">
+                                    <span><b>Crítico</b></span>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <span><b>Dictamen</b></span>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                
+                                <!-- Puntos de control de la auditoria -->
+                                <template for:each={puntosControl} for:item="punto">
+                                    <div key={punto.Id} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                        <div class="slds-col slds-size_3-of-12">{punto.SAC_PuntoDeControl__r.SAC_TipoAuditoria__c}</div>
+                                        <div class="slds-col slds-size_6-of-12">{punto.SAC_PuntoDeControl__r.Name}</div>
+                                        <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
+                                            <div lwc:else class="slds-col slds-size_1-of-12"></div> 
+                                        <div class="slds-col slds-size_2-of-12">
+                                            <lightning-record-edit-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                                <lightning-input-field field-name="SAC_Dictamen__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                            </lightning-record-edit-form>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                    </div>
+                                </template>
+                                
+                                <!-- Dictámenes de la auditoria -->
+                                <div class="slds-col slds-size_3-of-12"></div>
+                                <div class="slds-col slds-size_6-of-12"><strong>Dictamen final</strong></div>
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <lightning-input-field field-name="SAC_DictamenManual__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                <!-- Observaciones de la auditoria -->
+                                <div class="slds-col slds-size_3-of-12"></div>
+                                <div class="slds-col slds-size_2-of-12"><span>Observaciones</span></div>
+                                <div class="slds-col slds-size_7-of-12">
+                                    <lightning-input-field field-name="SAC_Observaciones__c" variant="label-hidden" disabled="true"> </lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                <div lwc:if={tienePermisosEditar} class="slds-col slds-size_1-of-1">   
+                                    <lightning-button data-name={idAuditoria} style="padding-left:32px" class="slds-float_right" variant="brand" type="submit" label="Finalizar" onclick={handleFinalizar}></lightning-button>                         
+                                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                                </div>
+                            </div> 
+                        </lightning-record-edit-form>
+                    </template>
+               </div>
+           </div>
+
+           <div lwc:if={hayAuditoriasFinalizadas}>
+               <h1 style="font-size: 16px;" class="slds-m-left_x-small"><strong>Auditorías finalizadas</strong></h1>
+               <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+           </div>
+
+           <!-- BUCLE PARA MOSTRAR LAS AUDITORIAS FINALIZADAS CUANDO SE REABRE UNA AUDITORIA -->
+           <template for:each={listaAuditoria} for:item="auditoria">
+               <!-- Seccion de la auditoría finalizada -->
+               <lightning-accordion style="--slds-c-accordion-heading-font-size: 1rem;" key={auditoria.Id} allow-multiple-sections-open>
+                   <lightning-accordion-section name={auditoria.SAC_NombreAuditoria__c} label={auditoria.SAC_NombreAuditoria__c}>
+                       <!-- Seccion de datos de la auditoría finalizada -->
+                       <lightning-accordion allow-multiple-sections-open>
+                           <lightning-accordion-section name="Datos de la auditoría finalizada" label="Datos de la auditoría finalizada">
+                               <lightning-record-view-form record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
+                                   <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="SAC_NombreAuditoria__c"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="CreatedDate"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="SAC_Tipo__c"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="SAC_Estado__c"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="SAC_GrupoResponsableResolver__c"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="CreatedById"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+
+                                       <div class="slds-col slds-size_1-of-1">
+                                           <lightning-output-field field-name="SAC_SLACalidad__c"> </lightning-output-field>
+                                           <lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider>
+                                       </div>
+                                   </div>
+                               </lightning-record-view-form>
+                           </lightning-accordion-section>
+                       </lightning-accordion>
+
+                       <!-- Seccion del dictamen de la auditoria finalizada -->
+                       <lightning-accordion allow-multiple-sections-open>
+                           <lightning-accordion-section name="Dictamen de la auditoría finalizada" label="Dictamen de la auditoría finalizada">
+                               <!-- Seccion de los datos dictamen con la auditoría finalizada -->
+                               <lightning-record-view-form record-id={auditoria.Id} object-api-name="SEG_Auditoria__c">
+                                   <div class="slds-grid slds-gutters slds-m-bottom_medium slds-wrap slds-m-horizontal_xx-small">    
+                                       <div class="slds-col slds-size_3-of-12">
+                                           <span><b>Bloque</b></span>
+                                       </div>
+                                       <div class="slds-col slds-size_6-of-12">
+                                           <span><b>Punto de control</b></span>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-12">
+                                           <span><b>Crítico</b></span>
+                                       </div>
+                                       <div class="slds-col slds-size_2-of-12">
+                                           <span><b>Dictamen</b></span>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                       <!-- Puntos de control de la auditoria -->
+                                       <template for:each={auditoria.PuntosControl} for:item="punto">
+                                           <div key={punto.Id} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xxx-small"> 
+                                               <div class="slds-col slds-size_3-of-12">{punto.SAC_PuntoDeControl__r.SAC_TipoAuditoria__c}</div>
+                                               <div class="slds-col slds-size_6-of-12">{punto.SAC_PuntoDeControl__r.Name}</div>
+                                               <div lwc:if={punto.SAC_PuntoDeControl__r.SAC_Critico__c} class="slds-col slds-size_1-of-12">Si</div>   
+                                                   <div lwc:else class="slds-col slds-size_1-of-12"></div> 
+                                               <div class="slds-col slds-size_2-of-12">
+                                                   <lightning-record-view-form object-api-name="SAC_PuntosControlAuditoria__c" record-id={punto.Id}>
+                                                       <lightning-output-field field-name="SAC_Dictamen__c" variant="label-hidden"> </lightning-output-field>
+                                                   </lightning-record-view-form>
+                                               </div>
+                                               <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                           </div>
+                                       </template>
+
+                                       <div class="slds-col slds-size_3-of-12"></div>
+                                       <div class="slds-col slds-size_6-of-12"><span>Dictamen final</span></div>
+                                       <div class="slds-col slds-size_1-of-12"></div>
+                                       <div class="slds-col slds-size_2-of-12">
+                                           <lightning-output-field field-name="SAC_DictamenManual__c" variant="label-hidden"> </lightning-output-field>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                       <div class="slds-col slds-size_3-of-12"></div>
+                                       <div class="slds-col slds-size_2-of-12"><span>Observaciones</span></div>
+                                       <div class="slds-col slds-size_7-of-12">
+                                           <lightning-output-field field-name="SAC_Observaciones__c" variant="label-hidden"> </lightning-output-field>
+                                       </div>
+                                       <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+
+                                       <!-- Funcionalidad para revisar la auditoria una vez completada -->
+                                        <lightning-record-edit-form style="width:100%;" if:false={auditoria.Replicada} object-api-name="SEG_Auditoria__c" record-id={auditoria.Id} onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                                            <div lwc:if={auditoria.PermisosReplicar} class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                                <div class="slds-col slds-size_3-of-12"></div>
+                                                <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>
+                                                <div class="slds-col slds-size_7-of-12">
+                                                    <lightning-input-field field-name="SAC_Replica__c" variant="label-hidden"> </lightning-input-field>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                                <div class="slds-col slds-size_1-of-1">   
+                                                    <lightning-button data-name={auditoria.Id} style="padding-left:32px" class="slds-float_right" variant="brand" type="submit" label="Enviar réplica" onclick={handleReplicar}></lightning-button>                         
+                                                    <lightning-button data-name="botonGuardar" class="slds-float_right" variant="brand" type="submit" label="Guardar"></lightning-button>
+                                                </div>
+                                            </div>
+                                        </lightning-record-edit-form>
+                                        <div lwc:if={auditoria.Replicada} style="width:100%;" class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xx-small"> 
+                                            <div class="slds-col slds-size_3-of-12"></div>
+                                            <div class="slds-col slds-size_2-of-12"><span>Réplica</span></div>
+                                            <div class="slds-col slds-size_7-of-12">
+                                                <lightning-output-field field-name="SAC_Replica__c" variant="label-hidden"> </lightning-output-field>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1"><lightning-menu-divider class="slds-m-right_medium"></lightning-menu-divider></div>
+                                        </div>
+                                   </div>
+                               </lightning-record-view-form>
+                           </lightning-accordion-section>
+                       </lightning-accordion>
+                   </lightning-accordion-section>
+               </lightning-accordion>
+           </template>
+       </template>
+       <template lwc:else>
+           <div class="slds-illustration slds-illustration_large" aria-hidden="true">
+               <img src="/img/chatter/Desert.svg" class="slds-illustration__svg" alt=""/>
+               <div class="slds-text-color_weak">
+                   <h3 class="slds-text-heading_medium">No hay ninguna auditoría creada en la reclamación</h3>
+               </div>
+           </div>
+       </template>
+
+
+       <!-- Modal Finalizar Auditoría -->
+       <template if:true={modalFinalizarAuditoria}>
+           <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+               <div class="slds-modal__container">
+                   <header class="slds-modal__header">
+                       <!-- Botón cerrar superior y cabecera -->
+                       <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalFinalizarAuditoria}>
+                           <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                           <span class="slds-assistive-text">Close</span>
+                       </button>
+                       <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Finalizar auditoría de la reclamación</h2>
+                   </header>
+                   <div class="slds-modal__content slds-p-around_large">
+                       <!-- Modal/Popup Box LWC body starts here -->
+                       <div class="slds-modal__content slds-p-around_medium" style="text-align:center;" id="modal-content-id-finalizar">
+                           <strong>¡Atención!</strong> La auditoría de la reclamación se finalizará y ya no podrá ser modificada.                             
+                       </div>
+                   </div>
+                   
+                   <!-- Botones Cancelar y Finalizar -->
+                   <footer class="slds-modal__footer">
+                       <lightning-button label="Cancelar" onclick={cerrarModalFinalizarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                       <lightning-button variant="brand" label="Finalizar" onclick={confirmarFinalizarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                   </footer>
+               </div>
+           </section>
+           <div class="slds-backdrop slds-backdrop_open"></div>
+       </template>
+
+
+        <!-- Modal Enviar Email -->
+        <template if:true={modalEnvioEmail}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <!-- Cabecera -->
+                        <h2 id="modal-heading-08" class="slds-text-heading_medium slds-hyphenate">Enviar comunicación auditoría completada</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_large">
+                        <!-- Modal/Popup Box LWC body starts here -->
+                        <div class="slds-modal__content slds-p-around_medium" style="text-align:center;" id="modal-content-id-correo">
+                            <strong>¡Atención!</strong> El dictamen de todas las reclamaciones auditadas en la auditoría "<lightning-button onclick={navigateToRecord} data-value={idAuditoriaPadre} label={nombreAuditoriaPadre} variant="base">{nombreAuditoriaPadre}</lightning-button>" ha sido completado. ¿Desea enviar un email de comunicación?                             
+                        </div>
+                    </div>
+                    
+                    <!-- Botones No y Si -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="No enviar email" onclick={cerrarModalEnvioEmail} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-button variant="brand" label="Enviar email" onclick={confirmarEnviarCorreo} class="slds-m-left_x-small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+
+       <!-- Modal Nueva auditoría bloque Auditoría -->
+       <template if:true={modalReabrirAuditoria}>
+           <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+               <div class="slds-modal__container">
+                   <header class="slds-modal__header">
+                       <!-- Botón cerrar superior y cabecera -->
+                       <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalReabrirAuditoria}>
+                           <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                           <span class="slds-assistive-text">Close</span>
+                       </button>
+                       <h2 id="modal-heading-02" class="slds-text-heading_medium slds-hyphenate">Nueva auditoría bloque de la reclamación</h2>
+                   </header>
+                   <div class="slds-modal__content slds-p-around_large">
+                       <lightning-input type="text" name="input" label="Nombre" placeholder="Nombre de la auditoría" required="true" onchange={handleChangeNombreAuditoria}></lightning-input><br>
+                       <div if:true={requeridoNombre} style="color:red">
+                           Por favor, debe rellenar el nombre de la auditoría.
+                       </div> 
+                       <lightning-combobox
+                           name="slaCalidad"
+                           label="SLA Calidad"
+                           value={value}
+                           options={auditoriaSLACalidad.data.values}
+                           placeholder="SLA Calidad"
+                           onchange={handleChangeSLACalidadAuditoria} 
+                           required="true">
+                       </lightning-combobox>
+                       <div if:true={requeridoSLACalidad} style="color:red">
+                           Por favor, debe rellenar el SLA calidad de la auditoría.
+                       </div>
+                       <br>
+                       <div class="slds-combobox_container">
+                           <lightning-dual-listbox
+                           name="tipoAuditoria"
+                           label="Tipo de auditoría"
+                           value={value}
+                           placeholder="Seleccione un motivo"
+                           options={tiposDisponibles}
+                           onchange={handleChangeTipoAuditoria} 
+                           required="true"></lightning-dual-listbox>
+                       </div>  
+                       <div if:true={requeridoTipo} style="color:red">
+                           Por favor, debe seleccionar al menos un tipo de auditoría.
+                       </div>                  
+                   </div>
+                   
+                   <!-- Botones Cancelar y Reabrir -->
+                   <footer class="slds-modal__footer">
+                       <lightning-button label="Cancelar" onclick={cerrarModalReabrirAuditoria} class="slds-m-left_x-small"></lightning-button>
+                       <lightning-button variant="brand" label="Nueva auditoria" onclick={confirmarReabrirAuditoria} class="slds-m-left_x-small"></lightning-button>
+                   </footer>
+               </div>
+           </section>
+           <div class="slds-backdrop slds-backdrop_open"></div>
+       </template>
+
+       <!-- Modal Replicar Auditoría -->
+       <template if:true={modalReplicarAuditoria}>
+           <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+               <div class="slds-modal__container">
+                   <header class="slds-modal__header">
+                       <!-- Botón cerrar superior y cabecera -->
+                       <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={cerrarModalReplicarAuditoria}>
+                           <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                           <span class="slds-assistive-text">Close</span>
+                       </button>
+                       <h2 id="modal-heading-03" class="slds-text-heading_medium slds-hyphenate">Finalizar réplica de la auditoría</h2>
+                   </header>
+                   <div class="slds-modal__content slds-p-around_large">
+                       <!-- Modal/Popup Box LWC body starts here -->
+                       <div class="slds-modal__content slds-p-around_medium" style="text-align:center;" id="modal-content-id-replicar">
+                           <strong>¡Atención!</strong> La réplica de la auditoría se finalizará y ya no podrá ser modificada.                             
+                       </div>
+                   </div>
+                   
+                   <!-- Botones Cancelar y Finalizar -->
+                   <footer class="slds-modal__footer">
+                       <lightning-button label="Cancelar" onclick={cerrarModalReplicarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                       <lightning-button variant="brand" label="Finalizar" onclick={confirmarReplicarAuditoria} class="slds-m-left_x-small"></lightning-button>
+                   </footer>
+               </div>
+           </section>
+           <div class="slds-backdrop slds-backdrop_open"></div>
+       </template>
+   </template>
+</template>

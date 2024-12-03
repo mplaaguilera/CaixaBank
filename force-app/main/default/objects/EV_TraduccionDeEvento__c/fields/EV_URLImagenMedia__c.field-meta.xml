@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLImagenMedia__c</fullName>
+    <description>Imagen catálogo normal NOW. Tamaño imagen (515x225)</description>
+    <encryptionScheme>None</encryptionScheme>
+    <inlineHelpText>Imagen catálogo normal NOW (515x225px)</inlineHelpText>
+    <label>URL Imagen Catálogo NOW</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

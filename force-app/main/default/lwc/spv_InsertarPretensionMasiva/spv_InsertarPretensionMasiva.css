@@ -1,0 +1,56 @@
+.slds-modal__content{
+    overflow: initial;
+}
+
+.slds-modal__container {
+    max-width: 85rem !important;
+    width: 85% !important;
+}
+
+.slds-modal__container_existe_principal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 50rem !important;
+    width: 50% !important;
+    border: 2px solid #717272;
+    border-radius: 4px;
+
+}
+
+
+.slds-modal__footer_directional{
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+}
+
+.botonIzquierdo{
+    margin-right: auto;
+}
+
+.botonDerecho{
+    margin-left: auto;
+}
+
+.buscador {
+    max-width: 75rem !important;
+    width: 75% !important;
+    margin-left: 15%;
+    padding-bottom:35px;
+}
+
+.tabla {
+    max-width: 90% !important;
+    width: 90% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.Principal {
+    text-align: center;
+}
+
+.PrincipalTitle{
+    text-align: center;
+}

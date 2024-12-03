@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Mapa con los diferentes valores del tipo de centro como key, y la función del usuario de ese centro como value.</description>
+    <label>Mapa Tipo Centro Funcion</label>
+    <pluralLabel>Mapa Tipo Centro Funcion</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

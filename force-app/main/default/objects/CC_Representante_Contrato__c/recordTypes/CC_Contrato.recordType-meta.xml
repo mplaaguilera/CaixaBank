@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Contrato</fullName>
+    <active>true</active>
+    <description>Contratos del cliente</description>
+    <label>Contrato</label>
+    <picklistValues>
+        <picklist>CC_TipoRepresentante__c</picklist>
+        <values>
+            <fullName>Apoderado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Autorizado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Representante legal</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

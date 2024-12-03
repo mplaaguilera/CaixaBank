@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Denegados</fullName>
+    <columns>NAME</columns>
+    <columns>Field_Name__c</columns>
+    <columns>API_Name__c</columns>
+    <columns>Object__c</columns>
+    <columns>Proyectos__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Denied</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CBK_DataManager__c.Field</value>
+    </filters>
+    <label>Fields Denegados</label>
+</ListView>

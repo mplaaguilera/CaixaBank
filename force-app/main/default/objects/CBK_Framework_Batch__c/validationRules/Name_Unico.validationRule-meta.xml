@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Name_Unico</fullName>
+    <active>true</active>
+    <description>Control de unicidad en el Nombre para batch periódicos</description>
+    <errorConditionFormula>AND(
+				OR(
+								ISNEW(),
+								ISCHANGED( Name )
+				),
+				TEXT(Tipo__c)=&apos;Periodico&apos;,
+				NOT(ISBLANK (
+								VLOOKUP($ObjectType.CBK_Framework_Batch__c.Fields.Name,
+																$ObjectType.CBK_Framework_Batch__c.Fields.Name, 
+																Name 
+															)
+				    )
+					)
+)</errorConditionFormula>
+    <errorDisplayField>Name</errorDisplayField>
+    <errorMessage>Ya esiste un Batch con ese nombre</errorMessage>
+</ValidationRule>

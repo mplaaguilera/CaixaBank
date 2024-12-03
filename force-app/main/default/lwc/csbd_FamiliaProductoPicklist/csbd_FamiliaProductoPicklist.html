@@ -1,0 +1,255 @@
+<template>
+	<lightning-card onclick={stopPropagation}>
+		<div class="seccion slds-section slds-is-open">
+			<h3 class="label slds-truncate slds-var-p-around_small slds-theme_shade" style="border-radius: 4px;" onclick={tituloSeccionOnclick}>
+				<button aria-expanded="true" class="slds-button slds-section__title-action">
+					<lightning-icon icon-name="utility:chevrondown" size="x-small" class="slds-section__title-action-icon slds-button__icon slds-button__icon_left slds-icon-utility-switch slds-icon_container"></lightning-icon>
+					<span class="slds-truncate" title="Información del producto" style="font-size: 14px;">Información del producto</span>
+				</button>
+			</h3>
+			<div class="slds-section__content section-content-grid slds-is-relative">
+				<div lwc:if={spinner} align="center">
+					<lightning-spinner size="small" variant="neutral" style="position: absolute;" alternative-text="Guardando..."></lightning-spinner>
+				</div>
+				<div class="slds-form" role="list">
+					<div class="slds-form__row">
+						<div class="slds-form__item" role="listitem">
+							<template lwc:if={editando}>
+								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<label class="slds-form-element__label">Empresa proveedora</label>
+									<div class="slds-form-element__control">
+										<lightning-combobox class="comboboxEmpresas" options={opcionesEmpresaProveedora} value={empresaProveedora.value} onchange={comboboxEmpresasOnchange} onfocus={comboboxEmpresasOnfocus}> </lightning-combobox>
+									</div>
+								</div>
+							</template>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                                <label class="slds-form-element__label">Empresa proveedora</label>
+								<div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{empresaProveedora.labelNoEdit}</div>
+									<lightning-button-icon icon-name="utility:edit" variant= "bare" onclick={inicioEditando}></lightning-button-icon>
+								</div>
+                            </div>
+						</div>
+						<div class="slds-form__item" role="listitem">
+							<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Origen</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static slds-truncate" title={origen}>{origen}</div>
+									<template lwc:if={detallesOrigen.hayDetalles}>
+										<lightning-button-icon lwc:if={formularioOrigenVisible} icon-name="utility:hide" size="medium" variant="bare" tooltip="Ocultar detalles del origen" onclick={mostrarFormularioOrigen} class="buttonIconBrand slds-var-m-right_x-small"></lightning-button-icon>
+										<lightning-button-icon lwc:else icon-name="utility:preview" size="medium" variant="bare" tooltip="Ver detalles del origen" onclick={mostrarFormularioOrigen} class="slds-var-m-right_x-small"></lightning-button-icon>
+									</template>
+								</div>
+							</div>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+								<label class="slds-form-element__label">Origen</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static slds-truncate" title={origen}>{origen}</div>
+									<template lwc:if={detallesOrigen.hayDetalles}>
+										<lightning-button-icon lwc:if={formularioOrigenVisible} icon-name="utility:hide" size="medium" variant="bare" tooltip="Ocultar detalles del origen" onclick={mostrarFormularioOrigen} class="buttonIconBrand slds-var-m-right_x-small"></lightning-button-icon>
+										<lightning-button-icon lwc:else icon-name="utility:preview" size="medium" variant="bare" tooltip="Ver detalles del origen" onclick={mostrarFormularioOrigen} class="slds-var-m-right_x-small"></lightning-button-icon>
+									</template>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__row">
+                        <div class="slds-form__item" role="listitem">
+							<template lwc:if={editando}>
+								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<label class="slds-form-element__label">Familia de producto</label>
+									<div  class="slds-form-element__control">
+										<lightning-combobox class="comboboxFamilias" options={opcionesFamiliaProducto} value={familiaProducto.value} onchange={comboboxFamiliasProductoOnchange} onfocus={comboboxFamiliasProductoOnfocus}></lightning-combobox>
+									</div>
+								</div>
+							</template>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                                <label class="slds-form-element__label">Familia de producto</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{familiaProducto.labelNoEdit}</div>
+									<lightning-button-icon icon-name="utility:edit" variant= "bare" onclick={inicioEditando}></lightning-button-icon>
+								</div>
+                            </div>
+						</div>
+						<div class="slds-form__item" role="listitem">
+							<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+								<label class="slds-form-element__label">Canal</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{canal}</div>
+								</div>
+							</div>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+								<label class="slds-form-element__label">Canal</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{canal}</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__row">
+                        <div class="slds-form__item" role="listitem">
+							<template lwc:if={editando}>
+								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<label class="slds-form-element__label">Producto</label>
+									<div lwc:if={editando} class="slds-form-element__control">
+										<lightning-combobox class="comboboxProductos" options={opcionesProducto} value={producto.value} onchange={comboboxProductosOnchange} onfocus={comboboxProductosOnfocus}></lightning-combobox>
+									</div>
+								</div>
+							</template>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                                <label class="slds-form-element__label">Producto</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{producto.labelNoEdit}</div>
+									<lightning-button-icon icon-name="utility:edit" variant= "bare" onclick={inicioEditando}></lightning-button-icon>
+								</div>
+                            </div>
+						</div>
+						<div class="slds-form__item" role="listitem"></div>
+					</div>
+					<div class="slds-form__row">
+						<div class="slds-form__item" role="listitem"  lwc:if={mostrar.motivoMac} >
+							<template lwc:if={editando}>
+								<div class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
+									<lightning-button-icon icon-name="utility:undo" variant="bare" class="undo slds-is-absolute" style="top: 0; right: 4px; z-index: 1;" onclick={deshacer}></lightning-button-icon>
+									<label class="slds-form-element__label">Motivo MAC</label>
+									<div lwc:if={editando} class="slds-form-element__control">
+										<lightning-combobox class="comboboxMotivosMac" options={opcionesMotivoMac} value={motivoMac.value} onchange={comboboxMotivosMacOnchange} onfocus={comboboxMotivosMacOnfocus}></lightning-combobox>
+									</div>
+								</div>
+							</template>
+                            <div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+                                <label class="slds-form-element__label">Motivo MAC</label>
+								<div class="slds-form-element__control">
+									<div class="slds-form-element__static">{motivoMac.labelNoEdit}</div>
+									<lightning-button-icon icon-name="utility:edit" variant= "bare" onclick={inicioEditando}></lightning-button-icon>
+								</div>
+                            </div>
+						</div>
+						<div class="slds-form__item" role="listitem"></div>
+					</div>
+                    <div class="slds-form__row">
+						<template lwc:if={mostrar.detalleProducto}>
+							<div class="slds-form__item" role="listitem" >
+								<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent" >
+									<label class="slds-form-element__label">Detalle producto</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detalleProducto}</div>
+									</div>
+								</div>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+									<label class="slds-form-element__label">Detalle producto</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detalleProducto}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem"></div>
+						</template>
+
+						<template lwc:if={mostrar.vehiculo}>
+							<div class="slds-form__item" role="listitem">
+								<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Vehículo</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{vehiculo}</div>
+									</div>
+								</div>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+									<label class="slds-form-element__label">Vehículo</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{vehiculo}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem"></div>
+						</template>
+
+						<template lwc:if={mostrar.finalidad}>
+							<div class="slds-form__item" role="listitem">
+								<div lwc:if={editando} class="slds-form-element slds-form-element_edit slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Finalidad</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{finalidad}</div>
+									</div>
+								</div>
+								<div lwc:else class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent" ondblclick={inicioEditando}>
+									<label class="slds-form-element__label">Finalidad</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{finalidad}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem"></div>
+						</template>
+					</div>
+				</div>
+
+				<!--Detalles del origen-->
+				<div lwc:if={formularioOrigenVisible} class="slds-box formularioOrigen slds-var-m-top_x-large slds-var-m-bottom_large slds-var-m-horizontal_x-large">
+					<div class="slds-var-m-top_x-small slds-var-m-bottom_medium" style="font-size: 15px;">
+						Detalles del origen
+					</div>
+					<div class="slds-form" role="list">
+						<div class="slds-form__row" style="line-height: 20px;">
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Fuente</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.fuente}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Entorno</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.entorno}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-form__row" style="line-height: 20px;">
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Página</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.pagina}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Tipo de campaña</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.tipoCampaña}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-form__row" style="line-height: 20px;">
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Medio</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.medio}</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-form__item" role="listitem">
+								<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_horizontal slds-hint-parent">
+									<label class="slds-form-element__label">Nombre de la campaña</label>
+									<div class="slds-form-element__control">
+										<div class="slds-form-element__static">{detallesOrigen.nombreCampaña}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</lightning-card>
+</template>

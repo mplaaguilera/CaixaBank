@@ -1,0 +1,61 @@
+.THIS > div.filaBotones {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    column-gap: 1px;
+    row-gap: 6px;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.THIS > div.filaBotones + div.filaBotones {
+    padding-top: 6px;
+}
+
+.THIS .cc-rojo {
+    color: red;
+}
+
+.THIS .cc_modalCitaGestor_div_comboboxes .slds-dropdown {
+    max-height: 200px;
+}
+
+.THIS .modalColaboradorContent {
+    overflow: initial !important;
+    min-height: 342px;
+}
+
+.THIS .modalBoxTransfer_modalContent {
+    overflow: initial !important;
+}
+
+.THIS .cc_modalCitaGestor_modalContent {
+    overflow: initial !important;
+}
+
+.THIS .cc_modalCitaGestor_modalContent {
+    overflow: initial !important;
+}
+
+.THIS .cc_modalContent_overflow_initial {
+    overflow: initial !important;
+}
+
+.THIS button.slds-button.slds-button_neutral,
+.THIS button.slds-button.slds-button_destructive,
+.THIS button.slds-button.slds-button_text-destructive,
+.THIS button.slds-combobox__input,
+.THIS textarea.slds-textarea,
+.THIS select.slds-select,
+.THIS input.slds-input,
+.THIS div.slds-combobox__input,
+.THIS div.slds-lookup__menu,
+.THIS div.slds-dropdown,
+.THIS ul.slds-dropdown,
+.THIS button.slds-button_icon:not(.slds-button_icon-bare),
+.THIS span.slds-pill,
+.THIS button.slds-button_icon-border-filled,
+.THIS span.slds-checkbox_faux {
+    border-color: rgb(201, 201, 201);
+}

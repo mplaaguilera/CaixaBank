@@ -1,0 +1,16 @@
+<design:component >
+    <design:attribute name="hasHeader" label="Cabecera"
+        description="Seleccionar si se desea añadir una cabecera"
+        required="false"/>
+    <design:attribute name="headerIcon" label="Icono Cabecera"
+        description="Icono para la cabera. Example: standard:dashboard"
+        required="false"/>
+    <design:attribute name="headerTitle" label="Título"
+        description="Título para la cabecera"
+        required="false"/>
+    <design:attribute name="headerSubtitle" label="Subtítulo"
+        description="Subtítulo de la cabecera"
+        required="false"/>
+    <design:attribute name="listDatasets" label="Nombre de los componentes"
+        required="true"/>
+</design:component>

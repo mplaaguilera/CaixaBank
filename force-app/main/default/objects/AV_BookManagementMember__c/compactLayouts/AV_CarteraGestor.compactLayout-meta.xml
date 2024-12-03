@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_CarteraGestor</fullName>
+    <fields>Name</fields>
+    <fields>AV_Cartera__c</fields>
+    <fields>AV_EmpleadoGestor__c</fields>
+    <label>AV_CarteraGestor</label>
+</CompactLayout>

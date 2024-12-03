@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_TieneUsuariosActivos__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Campo para indicar si al menos alguno de los usuarios del grupo está activo</description>
+    <label>Tiene usuarios ACTIVOS</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

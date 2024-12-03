@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Rechazar_LV</fullName>
+    <availability>online</availability>
+    <description>Botón para rechazar las reclamaciones de SAC en la list view</description>
+    <displayType>massActionButton</displayType>
+    <height>600</height>
+    <linkType>page</linkType>
+    <masterLabel>Rechazar SAC</masterLabel>
+    <openType>sidebar</openType>
+    <page>SAC_RechazarReclamacionMasiva</page>
+    <protected>false</protected>
+    <requireRowSelection>true</requireRowSelection>
+</WebLink>

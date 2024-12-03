@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CSBD_NombresProductos__c</fullName>
+    <description>Tiene los nombres de los productos asociados a este articulo. Usa los valores que hay en CSBD_Producto__c.</description>
+    <label>Nombres Productos</label>
+    <required>false</required>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Deposito Bonificado</fullName>
+                <default>false</default>
+                <label>Deposito Bonificado</label>
+            </value>
+            <value>
+                <fullName>MyBox Vida</fullName>
+                <default>false</default>
+                <label>MyBox Vida</label>
+            </value>
+            <value>
+                <fullName>MyBox Auto TR</fullName>
+                <default>false</default>
+                <label>MyBox Auto TR</label>
+            </value>
+            <value>
+                <fullName>MyBox Hogar</fullName>
+                <default>false</default>
+                <label>MyBox Hogar</label>
+            </value>
+            <value>
+                <fullName>MyBox Salud</fullName>
+                <default>false</default>
+                <label>MyBox Salud</label>
+            </value>
+            <value>
+                <fullName>Mascotas</fullName>
+                <default>false</default>
+                <label>Mascotas</label>
+            </value>
+            <value>
+                <fullName>Seviam</fullName>
+                <default>false</default>
+                <label>Seviam</label>
+            </value>
+            <value>
+                <fullName>MyBox Jubilación</fullName>
+                <default>false</default>
+                <label>MyBox Jubilación</label>
+            </value>
+            <value>
+                <fullName>Nómina</fullName>
+                <default>false</default>
+                <label>Nómina</label>
+            </value>
+            <value>
+                <fullName>MyCard Imagin</fullName>
+                <default>false</default>
+                <label>MyCard Imagin</label>
+            </value>
+            <value>
+                <fullName>MyBox Auto</fullName>
+                <default>false</default>
+                <label>MyBox Auto</label>
+            </value>
+            <value>
+                <fullName>MyCard</fullName>
+                <default>false</default>
+                <label>MyCard</label>
+            </value>
+            <value>
+                <fullName>Nomina</fullName>
+                <default>false</default>
+                <label>Nomina</label>
+            </value>
+            <value>
+                <fullName>MyBox Alarmas</fullName>
+                <default>false</default>
+                <label>MyBox Alarmas</label>
+            </value>
+            <value>
+                <fullName>Previsión Profesional</fullName>
+                <default>false</default>
+                <label>Previsión Profesional</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>10</visibleLines>
+</CustomField>

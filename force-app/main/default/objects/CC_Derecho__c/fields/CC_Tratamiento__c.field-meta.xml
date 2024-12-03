@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Tratamiento__c</fullName>
+    <description>Campo utilizado para el tratamiento de los derechos.</description>
+    <label>Tratamiento</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Segmentación de clientes</fullName>
+                <default>false</default>
+                <label>Segmentación de clientes</label>
+            </value>
+            <value>
+                <fullName>Gestión del desempeño de empleados, agentes y proveedores</fullName>
+                <default>false</default>
+                <label>Gestión del desempeño de empleados, agentes y proveedores</label>
+            </value>
+            <value>
+                <fullName>Prevención del fraude</fullName>
+                <default>false</default>
+                <label>Prevención del fraude</label>
+            </value>
+            <value>
+                <fullName>Consulta y comunicación a sistemas de información crediticia en el marco de la solicitud y posterior gestión de productos que impliquen financiación</fullName>
+                <default>false</default>
+                <label>Consulta y comunicación a sistemas de información crediticia en el marco de la solicitud y posterior gestión de productos que impliquen financiación</label>
+            </value>
+            <value>
+                <fullName>Obtención de datos de contacto adicionales para la gestión de situaciones de impago</fullName>
+                <default>false</default>
+                <label>Obtención de datos de contacto adicionales para la gestión de situaciones de impago</label>
+            </value>
+            <value>
+                <fullName>Elaboración de informes estadísticos y modelos matemáticos</fullName>
+                <default>false</default>
+                <label>Elaboración de informes estadísticos y modelos matemáticos</label>
+            </value>
+            <value>
+                <fullName>Sanciones y contramedidas financieras internacionales</fullName>
+                <default>false</default>
+                <label>Sanciones y contramedidas financieras internacionales</label>
+            </value>
+            <value>
+                <fullName>Clasificación de clientes</fullName>
+                <default>false</default>
+                <label>Clasificación de clientes</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

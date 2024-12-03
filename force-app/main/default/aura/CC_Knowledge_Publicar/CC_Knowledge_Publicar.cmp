@@ -1,0 +1,14 @@
+<aura:component controller="CC_Knowledge_Publicar" implements="flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="sePuedePublicar" type="Boolean" default="false"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.cargarArticulos}" />
+    <lightning:card>
+    <aura:set attribute="title">
+            {!v.sePuedePublicar ?  'El artículo se ha publicado correctamente' : 'Este artículo no se puede publicar, revise el estado'}
+    </aura:set>
+    </lightning:card>
+    
+</aura:component>

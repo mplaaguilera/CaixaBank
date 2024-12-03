@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_Estado__c</fullName>
+    <description>Estado de la acción</description>
+    <label>Estado</label>
+    <required>false</required>
+    <trackFeedHistory>true</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SAC_PendienteEnviar</fullName>
+                <default>true</default>
+                <label>Pendiente enviar</label>
+            </value>
+            <value>
+                <fullName>SAC_PendienteAsignar</fullName>
+                <default>false</default>
+                <label>Pendiente asignar</label>
+            </value>
+            <value>
+                <fullName>SAC_EnGestion</fullName>
+                <default>false</default>
+                <label>Pendiente</label>
+            </value>
+            <value>
+                <fullName>SAC_Finalizada</fullName>
+                <default>false</default>
+                <label>Finalizada</label>
+            </value>
+            <value>
+                <fullName>SAC_FinalizadaIncompleta</fullName>
+                <default>false</default>
+                <label>Finalizada incompleta</label>
+            </value>
+            <value>
+                <fullName>SAC_StandBy</fullName>
+                <default>false</default>
+                <label>Stand By</label>
+            </value>
+            <value>
+                <fullName>SAC_PendienteRevision</fullName>
+                <default>false</default>
+                <label>Pendiente revisión de GGH</label>
+            </value>
+            <value>
+                <fullName>SAC_Devuelta</fullName>
+                <default>false</default>
+                <label>Devuelta</label>
+            </value>
+            <value>
+                <fullName>SAC_PteReenvio</fullName>
+                <default>false</default>
+                <label>Pendiente reenvío a GGH</label>
+            </value>
+            <value>
+                <fullName>SAC_Descartada</fullName>
+                <default>false</default>
+                <label>Descartada</label>
+            </value>
+            <value>
+                <fullName>SAC_Abierto</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Abierto</label>
+            </value>
+            <value>
+                <fullName>SAC_Cerrado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Cerrado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

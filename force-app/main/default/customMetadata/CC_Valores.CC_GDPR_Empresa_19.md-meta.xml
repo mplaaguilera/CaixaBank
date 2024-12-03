@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>CC_GDPR_Empresa_19</label>
+    <protected>false</protected>
+    <values>
+        <field>CC_Activa__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>CC_Descripcion__c</field>
+        <value xsi:type="xsd:string">Empresa disponible en el formulario de GDPR</value>
+    </values>
+    <values>
+        <field>CC_Lista__c</field>
+        <value xsi:type="xsd:string">CC_GDPR_Empresa</value>
+    </values>
+    <values>
+        <field>CC_Valor_SFDC__c</field>
+        <value xsi:type="xsd:string">HIPOTECAIXA 2, S.L.</value>
+    </values>
+    <values>
+        <field>CC_Valor__c</field>
+        <value xsi:type="xsd:string">458</value>
+    </values>
+</CustomMetadata>

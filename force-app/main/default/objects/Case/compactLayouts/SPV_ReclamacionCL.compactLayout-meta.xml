@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SPV_ReclamacionCL</fullName>
+    <fields>Subject</fields>
+    <fields>Status</fields>
+    <fields>SPV_Organismo__c</fields>
+    <fields>SPV_NumExpediente__c</fields>
+    <fields>SAC_FechaVencimientoSLA__c</fields>
+    <label>SPV Reclamacion Compact Layout</label>
+</CompactLayout>

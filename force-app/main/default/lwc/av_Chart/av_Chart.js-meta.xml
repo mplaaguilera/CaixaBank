@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>48.0</apiVersion>
+	<isExposed>true</isExposed>
+	<targets>
+		<target>lightning__AppPage</target>
+		<target>lightning__HomePage</target>
+		<target>lightning__RecordPage</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__AppPage, lightning__HomePage,lightning__RecordPage">
+			<property name="icono" type="String" default="utility:chart" label="Icon" description="Icon to display in the component (top left)"/>
+			<property name="title" type="String" default="" label="Title" required="true" description="Title of the component"/>
+			<property name="subTitle" type="String" default="" label="SubTitle" description="SubTitle of the component"/>
+			<property name="typeChart" type="String" default="bar" datasource="bar,horizontalBar" label="Type of chart" description="Type of chart: vertical, horizontal"/>
+			<property name="chartTitle" type="String" default="" label="Chart title" description="Title of the chart (on top)"/>
+			<property name="displayTitle" type="Boolean" default="false" label="Display chart title" description="Display or not the chart title"/>
+			<!-- datasource="true, false" --><property name="titlePosition" type="String" default="top" datasource="top, left, bottom, right" label="Position of the chart title" description="Position where display the chart title"/>
+			<property name="displayLegend" type="Boolean" default="false" label="Display Leyend"/>
+			<!-- datasource="true, false" --><property name="legendPosition" type="String" default="right" datasource="top, left, bottom, right" label="Position of the leyend" description="Position where display the leyend of the chart"/>
+			<property name="chartHeight" type="String" default="100" label="Height of the chart" description="The number should be between 0 and 100"/>
+			<property name="chartWidth" type="String" default="100" label="Width of the chart" description="The number should be between 0 and 100"/>
+			<property name="listLabels" type="String" default="" label="Query labels" required="true" description="Query for display the labels"/>
+			<property name="labelField" type="String" default="" label="Field to get the label" required="true" description="Field label to get the description"/>
+			<property name="listDatasets" type="String" default="" label="List of dataset" required="true" description="DeveloperName of the metadata (AV_ConfiguracionGrafico__mdt) split by comma (',') and for each metadata include the simple quote. For example: 'AV_ChartWeekLess1','AV_ChartWeekLess2'"/>
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

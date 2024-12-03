@@ -1,0 +1,18 @@
+<template>
+	<lightning-card title={title} icon-name={icono}>
+		<p if:true={subTitle} class="slds-p-horizontal_small slds-m-left_x-large slds-m-bottom_small">{subTitle}</p>
+		<div class="slds-grid slds-wrap slds-grid--pull-padded slds-m-around_xx-small">
+			<div if:true={isChartJsInitialized} class="slds-col--padded slds-size--1-of-1">
+				<canvas class="chartStacked" lwc:dom="manual"></canvas>			   
+			</div>
+			<div if:false={isChartJsInitialized} class="slds-col--padded slds-size--1-of-1">
+				<div if:true={noDataAvailable} class="slds-col--padded slds-size--1-of-1">
+					{label.AV_ChartJSNoData}
+				</div>
+				<div if:false={noDataAvailable} class="slds-col--padded slds-size--1-of-1">
+					<lightning-spinner alternative-text={chartNotLoaded} size="medium"></lightning-spinner>
+				</div>
+			</div>
+		</div>
+	</lightning-card>
+</template>

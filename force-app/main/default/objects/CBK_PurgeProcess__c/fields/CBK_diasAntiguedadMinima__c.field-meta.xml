@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CBK_diasAntiguedadMinima__c</fullName>
+    <description>Antigüedad mínima en número de días previos ( desde la fecha de ejecución) del proceso de purgado sobre los que se han de eliminar los registros previos recuperados que cumplan las condiciones</description>
+    <externalId>false</externalId>
+    <label>Antigüedad Mínima Purgado</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

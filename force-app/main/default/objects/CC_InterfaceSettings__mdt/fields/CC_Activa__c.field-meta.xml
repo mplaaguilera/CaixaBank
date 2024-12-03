@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Activa__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Interfaz activa</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Interfaz activa</inlineHelpText>
+    <label>Activa</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,19 @@
+<template>
+    <article class="slds-card" style="margin-bottom: -18px; height:40px;background-color: rgb(244 151 86);border-color: rgb(244 151 86);">
+        <div class="slds-card__header slds-grid slds-grid_align-end" style="padding-right: 6px !important;padding: 0;"></div>
+    </article>
+    <lightning-card variant="Narrow" title="Eventos clave" icon-name="standard:entity_milestone">
+        <div class="slds-grid slds-gutters" style="margin-left: 0; margin-right: 0">
+            <div class="slds-col slds-size_1-of-1">
+                <template for:each={mapaMilestone} for:item="milestone">
+                    <ul key={milestone.key} class="slds-has-dividers_bottom-space">
+                        <li key={milestone.key} class="slds-item">
+                            <h1 key={milestone.key} style="font-size:0.825rem;padding-bottom:2px;"><b>{milestone.key}</b></h1>
+                            <p key={milestone.key} style="font-style:italic;font-size:0.75rem">{milestone.value}</p>
+                        </li>
+                    </ul>
+                </template>
+            </div>
+        </div>         
+    </lightning-card>
+</template>

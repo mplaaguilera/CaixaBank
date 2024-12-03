@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_URLRegistroBase__c</fullName>
+    <description>URL base de URL de registro</description>
+    <externalId>false</externalId>
+    <formula>LEFT(EV_URLRegistro__c ,FIND(&quot;?&quot;, EV_URLRegistro__c )-1)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>URL Registro Base</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

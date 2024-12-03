@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_TipoOperativa__c</fullName>
+    <label>Tipo de operativa</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Acuse de recibo</fullName>
+                <default>false</default>
+                <label>Acuse de recibo</label>
+            </value>
+            <value>
+                <fullName>Firma</fullName>
+                <default>false</default>
+                <label>Firma</label>
+            </value>
+            <value>
+                <fullName>Cierre</fullName>
+                <default>false</default>
+                <label>Cierre</label>
+            </value>
+            <value>
+                <fullName>Cierre Caso Padre</fullName>
+                <default>false</default>
+                <label>Cierre Caso Padre</label>
+            </value>
+            <value>
+                <fullName>Manual</fullName>
+                <default>false</default>
+                <label>Manual</label>
+            </value>
+            <value>
+                <fullName>Reclamaciones</fullName>
+                <default>false</default>
+                <label>Reclamaciones</label>
+            </value>
+            <value>
+                <fullName>Acuse de recibo Reciclado</fullName>
+                <default>false</default>
+                <label>Acuse de recibo Reciclado</label>
+            </value>
+            <value>
+                <fullName>Envío automático gestor</fullName>
+                <default>false</default>
+                <label>Envío automático gestor</label>
+            </value>
+            <value>
+                <fullName>Valija</fullName>
+                <default>false</default>
+                <label>Valija</label>
+            </value>
+            <value>
+                <fullName>Acuse de correo reciclado</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Acuse de correo reciclado</label>
+            </value>
+            <value>
+                <fullName>Autoasignación</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Autoasignación</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

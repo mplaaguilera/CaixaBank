@@ -1,0 +1,1033 @@
+<aura:component controller="SAC_Case_Operativas_Controller"
+    implements="force:hasRecordId,flexipage:availableForAllPageTypes,force:appHostable" access="global">
+
+    <aura:attribute name="caso" type="Case" />
+
+    <aura:attribute name="user" type="String" />
+    <aura:attribute name="grupo" type="CC_Grupo_Colaborador__c" />
+    <aura:attribute name="gruposC" type="List" />
+    <aura:attribute name="key" type="String" />
+    <aura:attribute name="tipoOperativa" type="String" />
+    <aura:attribute name="esPropietario" type="Boolean" default="false" />
+    <aura:attribute name="isLoading" type="Boolean" default="false" />
+    <aura:attribute name="isGestor" type="Boolean" default="false" />
+    <aura:attribute name="tienePretensiones" type="Boolean" default="false" />
+    <aura:attribute name="tienePretensionesPSD2" type="Boolean" default="false" />
+    <aura:attribute name="botonPulsado" type="String" />
+    <aura:attribute name="avisoIdioma" type="Boolean" default="false" />
+    <aura:attribute name="checkConfirmacionValidacion" type="Boolean" default="false" />
+    <aura:attribute name="derivar" type="Boolean" default="false" />
+    <aura:attribute name="convertir" type="Boolean" default="false" />
+    <aura:attribute name="confirmarConvertir" type="Boolean" default="false" />
+    <aura:attribute name="reabrir" type="Boolean" default="false" />
+    <aura:attribute name="abrirCopiaMasiva" type="Boolean" default="false" />
+    <aura:attribute name="nuevaReclamacion" type="Boolean" default="false" />
+    <aura:attribute name="nuevaReclamacionPage2" type="Boolean" default="false" />
+    <aura:attribute name="usarBtnPretePrincipal" type="Boolean" default="false" />
+    <aura:attribute name="propietarioCOPSOAdmin" type="Boolean" default="false" />
+    <aura:attribute name="esGrupoLetrado" type="Boolean" default="false" />
+    <aura:attribute name="reasignar" type="Boolean" default="false" />
+    <aura:attribute name="grupoLetradoSelected" type="CC_Grupo_Colaborador__c"/>
+    <aura:attribute name="mostrarBtnNRVinvulada" type="Boolean" default="false" />
+    <aura:attribute name="modalParaSupervisor" type="Boolean" default="false" />
+    <aura:attribute name="modalParaSupervisores" type="Boolean" default="false" />
+    <aura:attribute name="modalParaSupervisorPre" type="Boolean" default="false" />
+    <aura:attribute name="modalDevolverSupervisoresPre" type="Boolean" default="false" />
+    <aura:attribute name="mostrarSupervisor" type="Boolean" default="false" />
+    <aura:attribute name="modalParaPropietarioAnterior" type="Boolean" default="false" />
+    <aura:attribute name="modalParaPropietarioAnteriorPre" type="Boolean" default="false" />
+    <aura:attribute name="modalParaProrrogar" type="Boolean" default="false" />
+    <aura:attribute name="modalAvisomcc" type="Boolean" default="false" />
+    <aura:attribute name="acuseReciboEnviado" type="Boolean" default="false" />
+    <aura:attribute name="idiomaInformado" type="Boolean" default="false" />
+
+    <!--Renderizar modales-->
+
+    <aura:attribute name="showAllButtons" type="Boolean" default="false" />
+    <aura:attribute name="observacionesAsignacion" type="Boolean" default="false" />
+
+    <!--Input-->
+    <aura:attribute name="modalGrupo" type="Boolean" default="false" />
+    <aura:attribute name="modalRechazar" type="Boolean" default="false" />
+    <aura:attribute name="modalCerrar" type="Boolean" default="false" />
+    <aura:attribute name="modalCola" type="Boolean" default="false" />
+    <aura:attribute name="modalColaPretensiones" type="Boolean" default="false" />
+
+    <aura:attribute name="observacionesGrupo" type="Boolean" default="false" />
+    <aura:attribute name="modalResp" type="Boolean" default="false" />
+    <aura:attribute name="modalSRauditoria" type="Boolean" default="false" />
+    <aura:attribute name="modalSRultiplesCasos" type="Boolean" default="false" />
+    <aura:attribute name="modalAdvertencia" type="Boolean" default="false" />
+
+    <aura:attribute name="grupos" type="List" />
+    <aura:attribute name="plantillas" type="List" />
+    <aura:attribute name="selectedPlantilla" type="String" />
+    <aura:attribute name="selectedGroup" type="String" />
+    <aura:attribute name="resultados" type="List" />
+    <aura:attribute name="selectedResul" type="String" />
+
+    <aura:attribute name="numeroContratos" type="Integer" default="" />
+    <aura:attribute name="inputNumContrato" type="List" />
+    <aura:attribute name="showInputsContratos" type="Boolean" />
+
+    <aura:attribute name="gruposLetrado" type="List"/>
+
+    <aura:attribute name="motivoReabrir" type="String" />
+    <aura:attribute name="motivoReasignar" type="String" />
+
+    <!--Atributos Ficheros Anexos en modo tabla-->
+    <aura:attribute name="dataAnexos" type="Object" />
+    <aura:attribute name="columnasAnexos" type="List" />
+    <aura:attribute name="currentSelectedRowsAnexos" type="List" default="0" />
+    <aura:attribute name="defaultRows" type="List" default="[]" description="reset selected rows..." />
+    <!--Atributos Casos hijos creados-->
+    <aura:attribute name="casoCreadoCN" type="String" />
+    <aura:attribute name="casoCreadoCR" type="String" />
+    <aura:attribute name="casoCreadoGrupo" type="String" />
+    <aura:attribute name="casoCreadoId" type="String" />
+    <!--aura:attribute name="columnasCasosHijos" type="List"/>-->
+    <!--Atributos de Clasificación Rápida-->
+    <aura:attribute name="CRs" type="List" />
+    <aura:attribute name="selectedCR" type="String" />
+    <aura:attribute name="caso2updCR" type="String" />
+
+    <!--Atributos de Emails asociados al caso-->
+    <aura:attribute name="Emailcaso" type="List" />
+    <aura:attribute name="selectedEmailSR" type="String" />
+    <aura:attribute name="caso2updEmSR" type="String" />
+
+    <!--Motivos devolver caso en los botones con pop up-->
+    <aura:attribute name="motivosDevolver" type="List" />
+    <aura:attribute name="selectedMotivo" type="String" />
+    <aura:attribute name="selectedMotivoPret" type="String" />
+    <aura:attribute name="observacText" type="String" />
+
+    <!--Importar emails y archivos de sr relacionada-->
+    <aura:attribute name="casosImportar" type="List" />
+    <aura:attribute name="selectedSR" type="String" />
+    <aura:attribute name="mostrarCases" type="boolean" default="true" />
+    <aura:attribute name="caseNumber" type="String" default="" />
+    <aura:attribute name="cases" type="List" />
+    <aura:attribute name="caseId" type="String" default="" />
+    <aura:attribute name="searchAvailable" type="boolean" default="false" />
+
+    <!--Atributos email plantilla boton prorrogar-->
+    <aura:attribute name="para"  type="String"/>
+    <aura:attribute name="CC"  type="String"/>
+    <aura:attribute name="asunto"  type="String"/>
+    <aura:attribute name="cuerpo"  type="String"/>
+    <aura:attribute name="procedencia"  type="String"/>
+    <aura:attribute name="usarComponente"  type="Boolean" default="true"/>
+    <aura:attribute name="recordId"  type="String"/>
+    <aura:attribute name="ficherosAdjuntos" type="ContentVersion[]" />
+
+    <!--Atributos carta postal boton prorrogar-->
+    <aura:attribute name="nombreTitularEC" type="String" />
+    <aura:attribute name="direccionTotal" type="String" />
+    <aura:attribute name="direccionEC" type="String" />
+    <aura:attribute name="poblacionEC" type="String" />
+    <aura:attribute name="provinciaEC" type="String" />
+    <aura:attribute name="paisEC" type="String" />
+    <aura:attribute name="codigoPostalEC" type="String" />
+    <aura:attribute name="optionsEC" type="String[]" />
+    <aura:attribute name="paisSeleccionado" type="String" />
+    <aura:attribute name="cuerpoEC" type="String" />
+    <aura:attribute name="cartaPostalProrroga" type="Boolean" default="true"/>
+
+    <!--CanalBPO-->
+    <aura:attribute name="errorPermisosBPO" type="boolean" default="false" />
+    <aura:attribute name="mostrarCanalBPO" type="boolean" default="false" />
+
+    <aura:attribute name="accts" type="Account[]"/>
+
+
+    <!--Init-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+
+    <!--refreshView-->
+    <aura:handler event="force:refreshView" action="{! c.init}" />
+
+    <!--Handlers-->
+    <aura:handler name="oSelectedAccountEvent" event="c:CC_SelectedAccountEvent"
+        action="{!c.seleccionarResultadoGrupo}" />
+    <aura:handler name="oSelectedPlantillaEvent" event="c:CC_SelectedPlantillaEvent"
+        action="{!c.seleccionarResultadoPlantilla}" />
+
+    <!--WorkspaceAPI-->
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <!--Acceso a las quick actions-->
+    <lightning:quickActionAPI aura:id="quickActionAPI" />
+
+    <!--Backdrop (fondo oscuro) para los modales-->
+    <div class="slds-backdrop" aura:id="backdrop" />
+
+    <!--Botones supeditados a que se coja contexto-->
+    <!--RECLAMACIÓN-->
+
+    <aura:if isTrue="{!and(v.showAllButtons, v.caso.RecordType.Name=='Reclamacion')}">
+        <div style="padding-top: 4px" align="center">
+            <aura:if isTrue="{!or(v.caso.Status=='Descartado', v.caso.Status=='Cerrado') || v.caso.Status=='SAC_008' || v.caso.Status=='SAC_014'}">
+                <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner"
+                    onclick="{!c.tomarPropiedad}" disabled="true" />
+                <aura:set attribute="else">
+                    <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad"
+                        iconName="utility:change_owner" onclick="{!c.tomarPropiedad}" disabled="{!v.esPropietario}" />
+                </aura:set>
+            </aura:if>
+            <!--Devolver Caso SAC_001 (Alta)-->
+            <aura:if isTrue="{!and(v.caso.Status=='SAC_001', v.isGestor)}">
+                <lightning:button label="Devolver caso" iconName="utility:skip"
+                    onclick="{!c.abrirModalAdvertenciaDevolver}" disabled="{!(!v.esPropietario)}" />
+                <aura:set attribute="else">
+                    <lightning:button label="Devolver caso " iconName="utility:skip"
+                        onclick="{!c.abrirModalAdvertenciaDevolver}" disabled="true" />
+                </aura:set>
+            </aura:if>
+
+
+            <!-- INI - US213189 - Marcela Neira
+                Obj: Derivar el caso de SAC a Contac Center
+            -->
+            <!-- <c:sAC_DerivarACC recordId="{!v.recordId}" />
+            <aura:if isTrue="{!or(v.tienePretensiones, v.caso.Status!='SAC_001')}">
+                -->
+            <!-- <aura:if isTrue="{!or(v.tienePretensiones, v.caso.Status!='SAC_001')}"> -->
+            <aura:if isTrue="{!v.caso.Status!='SAC_001'}">
+                <lightning:button label="Derivar a Contact Center" onclick="{! c.derivar }" disabled="true" />
+
+                <aura:set attribute="else">
+
+                    <aura:if isTrue="{!v.usarBtnPretePrincipal}">
+                        <lightning:button aura:id="derivarCC" label="Derivar a Contact Center" onclick="{! c.mostrarAvisoIdioma }"/>
+
+                        <aura:set attribute="else">
+                            <lightning:button label="Derivar a Contact Center" disabled="true"/>
+                        </aura:set>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US271730 - Carlos Solis
+                Obj: Derivar el caso de SAC a otro departamento
+            -->
+
+            <aura:if isTrue="{!and ( and(v.usarBtnPretePrincipal, v.caso.OS_Fecha_Resolucion__c==null), or(v.caso.Status=='SAC_001', v.caso.Status=='SAC_002') || v.caso.Status=='SAC_003')}">
+                    <aura:if isTrue="{!v.caso.Status=='SAC_001'}">
+                        <lightning:button aura:id="derivar" label="Derivar" onclick="{! c.mostrarAvisoIdioma }"/>
+                        <aura:set attribute="else">
+                            <lightning:button label="Derivar" onclick="{! c.derivacion }"/>
+                        </aura:set>
+                    </aura:if>
+                <aura:set attribute="else">
+                    <lightning:button label="Derivar" onclick="{! c.derivacion }" disabled="true"/>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US309487 - Daniel Benito
+                Obj: Reasignar las pretensiones de la reclamación a un letrado
+            -->
+            <aura:if isTrue="{!and(v.tienePretensiones, v.propietarioCOPSOAdmin) || v.caso.Status=='SAC_009'}">
+                <lightning:button label="Reasignar letrado" onclick="{! c.modalReasignar }"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Reasignar letrado" disabled="true"/>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US200252 - Carlos Solis
+                Obj: Reabrir la reclamación
+            -->
+            <aura:if isTrue="{!or(v.caso.Status=='Cerrado', v.caso.Status=='SAC_004') }"> <!-- || v.caso.Status=='SAC_014' -->
+                <lightning:button label="Creación nueva reclamación vinculada" onclick="{! c.modalNuevaReclamacion }"
+                disabled="{!or( (!v.esPropietario), not(empty(v.caso.CC_Detalles_Solucion__c)) )}"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Creación nueva reclamación vinculada" disabled="true"/>
+                </aura:set>
+            </aura:if>
+
+            <aura:if isTrue="{!or(v.caso.Status=='Cerrado', v.caso.Status=='SAC_004') || v.caso.Status=='SAC_008' || v.caso.Status=='Rechazado' || v.caso.Status=='SAC_014'}">
+                <lightning:button label="Reabrir reclamación" onclick="{! c.modalReabrir }" disabled="{!(!v.usarBtnPretePrincipal)}"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Reabrir reclamación" disabled="true"/>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US550726 - Sergio Martín
+                Obj: Convertir la reclamacion en una consulta COPS o una consulta SAC
+            -->
+            <aura:if isTrue="{!and(v.usarBtnPretePrincipal, or(v.caso.Status=='SAC_001', v.caso.Status=='SAC_002'))}">
+                <lightning:button label="Convertir Reclamación" onclick="{! c.modalConvertir }" disabled="false" />
+
+                <aura:set attribute="else">
+                    <lightning:button label="Convertir Reclamación" onclick="{! c.modalConvertir }" disabled="true"/>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US308696 - Carlos Solis
+                Obj: Copia masiva de reclamacion y sus pretensiones
+            -->
+            <aura:if isTrue="{!v.caso.Status=='SAC_001'}">
+                <lightning:button label="Copiar reclamación" onclick="{! c.modalCopiaMasiva }" disabled="{!or((!v.esPropietario), not(empty(v.caso.SAC_CasoRelacionado__c))) || not(empty(v.caso.CC_Detalles_Solucion__c))}"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Copiar reclamación" disabled="true"/>
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!v.esPropietario &amp;&amp; v.caso.Status!='Cerrado' &amp;&amp; v.caso.Status!='SAC_014' &amp;&amp; v.caso.Status!='SAC_004' &amp;&amp; empty(v.caso.SAC_UserElevoASupervisor__c)}">
+                <lightning:button label="Elevar a supervisor" onclick="{! c.modalElevarSupervisor }" disabled=""
+                    title="El caso pasará a la cola Pte. supervisores"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Elevar a supervisor" disabled="true"></lightning:button>
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!v.esPropietario &amp;&amp; v.caso.Status!='Cerrado' &amp;&amp; v.caso.Status!='SAC_014' &amp;&amp; v.caso.Status!='SAC_004'  &amp;&amp; v.mostrarSupervisor &amp;&amp; !empty(v.caso.SAC_UserElevoASupervisor__c)}">
+                <lightning:button label="Devolver a supervisores" onclick="{! c.modalDevolverSupervisores }" disabled=""
+                    title="El caso pasará a la cola Pte. supervisores"/>
+                <lightning:button label="Contestar al propietario anterior" onclick="{! c.modalDevolverPropietarioA }" disabled=""
+                    title="Este caso pasará a ser propiedad del gestor/letrado que lo haya elevado a los supervisores"/>
+            </aura:if>
+
+
+            <!-- INI - DE65531 - Sergio Martin y Raúl Santos
+                Obj: Botón prorrogar
+            -->
+            <aura:if isTrue="{!or(v.esGrupoLetrado, v.esPropietario)}">
+                <aura:if isTrue="{!v.tienePretensionesPSD2}">
+                    <aura:if isTrue="{!or(v.caso.Status=='SAC_002', v.caso.Status=='SAC_003') &amp;&amp; v.caso.Status!='Cerrado' &amp;&amp; v.caso.Status!='SAC_014' &amp;&amp; not(v.caso.SAC_Prorrogado__c)}">
+                        <lightning:button label="Prorrogar" onclick="{! c.openModalProrroga }" disabled=""
+                        title="El caso se prorrogará"/>
+                    </aura:if>
+                </aura:if>
+            </aura:if>
+        </div>
+
+        <!--Modal reabrir-->
+        <aura:if isTrue="{!v.reabrir}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalReabrir }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reabrir reclamación</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Va a reabrir una reclamación cerrada. El SLA se reactivará sumando el periodo en el que ha estado detenido.
+                        <br>  </br>
+                        <br>  </br>
+                        <lightning:textarea name="input3" label="Escriba el motivo de reabrir la reclamación..." placeholder="Motivo..." required="true" aura:id="motivoId" value="{!v.motivoReabrir}"/>
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalReabrir }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.llamadaReabrirReclamacion }" title="OK">Reabrir</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+
+        <!--Modal Convertir Reclamacion/Consulta-->
+        <aura:if isTrue="{!v.convertir}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalConvertir }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Convertir Reclamación</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" style="text-align:center;" id="modal-content-id-1">
+                        <aura:if isTrue="{!v.confirmarConvertir}">
+                            <strong>¡Atención!</strong> Esta reclamación se rechazará y se creará una nueva consulta COPS.
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.caso.Status=='SAC_002'}">
+                                        <h1>¿Quiere convertir la reclamación a una Consulta COPS o a una Consulta SAC?</h1>
+                                        <h1><strong>¡Atención!</strong> Las pretensiones de la reclamación se darán de baja.</h1>
+                                        <br> </br>
+                                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.confirmarConsultaCOPS}" title="Reclamación">Consulta COPS</lightning:button>
+                                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.convertirAConsultaSAC}" title="Consulta SAC" disabled="true">Consulta SAC</lightning:button>
+                                    <aura:set attribute="else">
+                                        <h1>¿Quiere convertir la reclamación a una Consulta COPS o a una Consulta SAC?</h1>
+                                        <h1><strong>¡Atención!</strong> Las pretensiones de la reclamación se darán de baja.</h1>
+                                        <br> </br>
+                                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.confirmarConsultaCOPS}" title="Reclamación">Consulta COPS</lightning:button>
+                                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.convertirAConsultaSAC}" title="Consulta SAC">Consulta SAC</lightning:button>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalConvertir }" title="Cancelar">Cancelar</lightning:button>
+                        <aura:if isTrue="{!v.confirmarConvertir}">
+                            <lightning:button class="slds-button slds-button_brand" onclick="{! c.convertirAConsultaCOPS }" title="OK">Convertir Reclamacion</lightning:button>
+                        </aura:if>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+
+        <!--Modal derivar-->
+        <aura:if isTrue="{!v.derivar}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small ">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarDerivar }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Derivar</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <c:SAC_Derivar recordId="{!v.recordId}" derivar="{!v.derivar}"/>
+                    </div>
+
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal reasignar pretensiones-->
+        <aura:if isTrue="{!v.reasignar}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalReasignar }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reasignar letrado</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" style="overflow: initial;" id="modal-content-id-1">
+                        Elija el grupo al que va a reasignar las pretensiones
+                        <lightning:combobox type="text" aura:id="grpuosLetrado"
+                                                                name="Grupos"
+                                                                placeholder="-Select-"
+                                                                value="{!v.grupoLetradoSelected}"
+                                                                options="{!v.gruposLetrado}"/>
+                        <br/>
+                        <lightning:textarea name="input4" label="Escriba el motivo de la reasignación..." placeholder="Motivo..." aura:id="motivoReasignarId" value="{!v.motivoReasignar}" required="true"/>
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalReasignar }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.reasignarGrupoPretensiones }" title="OK">OK</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal copia masiva-->
+        <aura:if isTrue="{!v.abrirCopiaMasiva}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.CerrarModalCopiaMasiva }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Copiar reclamación</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <c:sac_CopiaMasivaCasos aura:id="lwcCopiaMasivaCasos" recordId="{!v.recordId}" onsenddata="{!c.receiveLWCData}"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal Devolver al propietario anterior -->
+        <aura:if isTrue="{!v.modalParaPropietarioAnterior}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarDevolverPropietarioA }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver a propietario anterior</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Esta reclamación se enviará al propietario anterior, indique los comentarios a continuación.
+                        <br />
+                        <lightning:inputRichText aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarDevolverPropietarioA }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.devolverPropietarioAnteriorJS }" title="OK">OK</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal de aviso revisar idioma-->
+        <aura:if isTrue="{!v.avisoIdioma}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarAvisoIdioma }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Revisión del idioma de la reclamación</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-4">
+                        <p>Para <b>asegurar la correcta finalización del alta </b> , recuerde realizar las siguientes validaciones:</p><br/>
+                        <p>&ensp;&ensp;1. El campo <b>IDIOMA </b>de la pestaña <b>Detalles</b> se corresponde con el idioma del escrito del reclamante.</p>
+                        <aura:if isTrue="{!v.acuseReciboEnviado}">
+                            <p>&ensp;&ensp;2. Se ha enviado el acuse de recibo en el idioma del escrito del reclamante.</p> <!-- , de forma manual, -->
+                        </aura:if>
+                        <br/>
+                        <lightning:input type="checkbox" label="Confirmo que he realizado las validaciones" value="{!v.checkConfirmacionValidacion}" checked="{!v.checkConfirmacionValidacion}" />
+                        <br/>
+                        <aura:if isTrue="{!v.acuseReciboEnviado}">
+                            <p>Se va a finalizar el alta y pasar el caso al siguiente estado.<br/></p>
+                            <aura:set attribute="else">
+                                <p>Se va a finalizar el alta, se procederá al envío del acuse de recibo y se pasará el caso al siguiente estado.<br/>
+                                </p> 
+                            </aura:set>
+                        </aura:if>   
+                        <p><b>¿Está seguro que quiere ejecutar la operación y ha realizado las comprobaciones anteriores?</b></p>                               
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarAvisoIdioma }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.aceptarAvisoIdiomas }" title="Aceptar">Aceptar</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+    </aura:if>
+    <!--CONSULTA COPS-->
+    <aura:if isTrue="{!and(v.showAllButtons, v.caso.RecordType.Name=='Consulta')}">
+        <div style="padding-top: 4px" align="center">
+            <aura:if isTrue="{!or( or(v.caso.Status=='SAC_012', v.caso.Status=='SAC_005'), v.caso.Status=='SAC_008')}">
+                <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad" iconName="utility:change_owner"
+                    onclick="{!c.tomarPropiedadConsulta}" disabled="true" />
+                <aura:set attribute="else">
+                    <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad"
+                        iconName="utility:change_owner" onclick="{!c.tomarPropiedadConsulta}" disabled="{!v.esPropietario}" />
+                </aura:set>
+            </aura:if>
+            <!--Devolver Caso SAC_010 (Pdte Asignar)-->
+            <aura:if isTrue="{!and(v.caso.Status=='SAC_010', v.isGestor)}">
+                <lightning:button label="Devolver caso" iconName="utility:skip"
+                    onclick="{!c.abrirModalAdvertenciaDevolverConsulta}" disabled="{!(!v.esPropietario)}" />
+                <aura:set attribute="else">
+                    <lightning:button label="Devolver caso " iconName="utility:skip"
+                        onclick="{!c.abrirModalAdvertenciaDevolverConsulta}" disabled="true" />
+                </aura:set>
+            </aura:if>
+
+
+            <!-- INI - US213189 - Marcela Neira
+                Obj: Derivar el caso de SAC a Contac Center
+            -->
+            <!-- <c:sAC_DerivarACC recordId="{!v.recordId}" />
+            <aura:if isTrue="{!or(v.tienePretensiones, v.caso.Status!='SAC_010')}">
+                -->
+            <aura:if isTrue="{!or(v.tienePretensiones, v.caso.Status!='SAC_010')}">
+
+                <lightning:button label="Derivar a Contact Center" onclick="{! c.derivar }" disabled="true" />
+
+                <aura:set attribute="else">
+                    <lightning:button label="Derivar a Contact Center" onclick="{! c.derivar }"/>
+                </aura:set>
+            </aura:if>
+
+            <!-- INI - US271730 - Carlos Solis
+                Obj: Derivar el caso de SAC a otro departamento
+            -->
+            <aura:if isTrue="{!or(v.caso.Status=='SAC_010', v.caso.Status=='SAC_011')}">
+                <lightning:button label="Derivar" onclick="{! c.derivacion }"/>
+                <!--Flow-->
+                <lightning:flow aura:id="flowData"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Derivar" onclick="{! c.derivacion }" disabled="true"/>
+                </aura:set>
+            </aura:if>
+        </div>
+    </aura:if>
+
+    <!--INI - INS: US204743 - Luis Mesa García
+                Obj: Añadir botón a la botonera para indicar que la pretensión actual va a convertirse en la pretensión principal de la reclamación a la que pertenezca
+            -->
+
+    <!-- PRETENSION -->
+    <aura:if isTrue="{!v.caso.RecordType.Name=='Pretension'}">
+        <div style="padding-top: 4px" align="center">
+            <aura:if
+                isTrue="{!or(v.caso.SAC_Reclamacion__r.SAC_PretensionPrincipal__c==v.caso.Id, v.caso.Status == 'SAC_009') || !v.usarBtnPretePrincipal}">
+                <lightning:button label="Pretensión Principal" iconName="utility:check"
+                    onclick="{!c.asignarPretensionPrincipal}" disabled="true" />
+                <aura:set attribute="else">
+                    <lightning:button label="Pretensión Principal" iconName="utility:check"
+                        onclick="{!c.asignarPretensionPrincipal}" />
+                </aura:set>
+            </aura:if>
+
+            <aura:if isTrue = "{!v.caso.SAC_Reclamacion__r.SAC_PretensionPrincipal__c == v.recordId}">
+                <lightning:button aura:id="botonTomarPropiedad" label="Tomar propiedad"
+                            iconName="utility:change_owner" onclick="{!c.abrirModalAvisoMcc}" disabled="{!(v.esPropietario)}" />
+
+                <lightning:button label="Devolver pretensiones" iconName="utility:skip"
+                onclick="{!c.abrirModalAdvertenciaDevolverPret}" disabled="{!(!v.esPropietario)}" />
+            </aura:if>
+
+            <aura:if isTrue="{!v.esPropietario &amp;&amp; v.caso.Status!='Cerrado' &amp;&amp; v.caso.Status!='SAC_001' &amp;&amp; v.caso.Status!='SAC_009' &amp;&amp; empty(v.caso.SAC_UserElevoASupervisor__c)}">
+                <lightning:button label="Elevar a supervisor" onclick="{! c.modalElevarSupervisorPre }" disabled="" title="Todas las pretensiones pasarán a la cola Pte. supervisores"/>
+                <aura:set attribute="else">
+                    <lightning:button label="Elevar a supervisor" disabled="true"/>
+                </aura:set>
+            </aura:if>
+            <aura:if isTrue="{!v.esPropietario &amp;&amp; v.caso.Status!='Cerrado' &amp;&amp; v.caso.Status!='SAC_004'  &amp;&amp; v.mostrarSupervisor &amp;&amp; !empty(v.caso.SAC_UserElevoASupervisor__c)}">
+                <lightning:button label="Devolver a supervisores" onclick="{! c.modalDevolverSupervisoresPre }" disabled=""
+                    title="El caso pasará a la cola Pte. supervisores"/>
+                <lightning:button label="Devolver al propietario anterior" onclick="{! c.modalDevolverPropietarioAPre }" disabled=""
+                    title="Este caso pasará a ser propiedad del gestor/letrado que lo haya elevado a los supervisores"/>
+            </aura:if>
+
+        </div>
+    </aura:if>
+
+
+    <!--Pop up previo Devolver Caso (multiples cuantas del mismo cliente)-->
+    <aura:if isTrue="{!v.modalAdvertencia}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <lightning:icon iconName="action:change_record_type"></lightning:icon>
+                            <span class="slds-text-heading_small slds-truncate">
+                                Devolver caso
+                            </span>
+                        </div>
+                        <br></br>
+                        <h2>Existe más de una reclamación asociada al mismo cliente de la que usted es propietario. Si
+                            devuelve esta reclamación usted continuará gestionando el resto de reclamaciones de este
+                            cliente. </h2>
+                        <br></br>
+                        <h2 align="center">¿Desea continuar con la devolución de la reclamación? </h2>
+                        <br></br>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand"
+                        onclick="{!c.modalAdvertenciaDevolverCerrar}">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.abrirModalSegBO}">Aceptar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!--FIN - Pop up previo Devolver Caso (multiples cuantas del mismo cliente) Oriol Castro-->
+    <!--Pop up Devolver Caso-->
+    <aura:if isTrue="{!v.modalCola}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <lightning:icon iconName="action:change_record_type"></lightning:icon>
+                            <span class="slds-text-heading_small slds-truncate">
+                                Devolver caso
+                            </span>
+                        </div>
+                        <br></br>
+                        <lightning:combobox aura:id="motivosDevlver" name="Motivo" label="Motivos"
+                            placeholder="Buscar motivos.." value="{!v.selectedMotivo}" options="{!v.motivosDevolver}" required="true" />
+                        <br></br>
+                        <lightning:textarea label="Escribe el motivo por el que devuelves el caso" type="text"
+                            aura:id="observacionId" class="slds-input" style="height: 130px; resize:none"
+                            placeholder="Observaciones..." />
+                        <br></br>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand"
+                        onclick="{!c.modalAsignarDevolverCerrar}">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.devolverACola}">Guardar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+
+    <aura:if isTrue="{!v.modalColaPretensiones}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <lightning:icon iconName="action:change_record_type"></lightning:icon>
+                            <span class="slds-text-heading_small slds-truncate">
+                                Devolver pretensiones
+                            </span>
+                        </div>
+                        <br></br>
+                        <lightning:combobox aura:id="motivosDevlverPrt" name="Motivo" label="Motivos"
+                            placeholder="Buscar motivos.." value="{!v.selectedMotivoPret}" options="{!v.motivosDevolver}" />
+                        <br></br>
+                        <lightning:textarea label="Escribe el motivo por el que devuelves el caso" type="text"
+                            aura:id="observacionIdPret" class="slds-input" style="height: 130px; resize:none"
+                            placeholder="Observaciones..." />
+                        <br></br>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand"
+                        onclick="{!c.cerrarModalAdvertenciaDevolverPret}">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.devolverAColaPretensiones}">Guardar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!--FIN - INS: US204743 - Luis Mesa García-->
+
+    <aura:if isTrue="{!v.modalSRultiplesCasos}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <lightning:icon iconName="utility:warning"></lightning:icon>
+                            <span class="slds-text-heading_small slds-truncate">
+                                Propiedad de la reclamación
+                            </span>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                        <h2 align="center">Existe más de una reclamación en curso asociada al mismo cliente. Si toma en
+                            propiedad esta reclamación se le asociarán todas estas reclamaciones. </h2>
+                        <br></br>
+                        <h2 align="center">¿Desea continuar con la asignación? </h2>
+                        <br></br>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_outline-brand" onclick="{!c.modalCerrar}">Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.tomarPropiedad}">Continuar</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+     <!--Modal nuevaReclamacion-->
+     <aura:if isTrue="{!v.nuevaReclamacion}">
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarNuevaReclamacion }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Nueva reclamación</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <strong>¡Atención!</strong> Se va a proceder a crear una nueva reclamación,
+                                     en breves recibirá un correo con la información de la nueva reclamación
+                                     ¿Desea continuar con este proceso?
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarNuevaReclamacion }" title="Cancelar">Cancelar</lightning:button>
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.llamadaNuevaReclamacion }" title="OK">OK</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+
+        <!--Modal modalParaSupervisor-->
+        <aura:if isTrue="{!v.modalParaSupervisor}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalSupervisor }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Elevar a supervisor</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Esta reclamación se enviará al grupo de supervisores, indique los comentarios a continuación.
+                        <br />
+                        <lightning:inputRichText aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalSupervisor }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.elevarASupervisor }" title="OK">Elevar a supervisor</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal modalParaSupervisor en las Pretensiones-->
+        <aura:if isTrue="{!v.modalParaSupervisorPre}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{!c.cerrarModalSupervisorPre }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Elevar a supervisor</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Se enviarán todas las pretensiones al grupo de supervisores indique los comentarios a continuación.
+                        <br />
+                        <lightning:inputRichText aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{!c.cerrarModalSupervisorPre }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.elevarASupervisorPre }" title="OK">Elevar a supervisor</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+         <!--Modal modalParaSupervisores-->
+         <aura:if isTrue="{!v.modalParaSupervisores}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarDevolverSupervisores }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver a supervisores</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Esta reclamación se enviará al grupo de supervisores, indique los comentarios a continuación.
+
+                        <lightning:inputRichText  aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarDevolverSupervisores }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.devolverASupervisoresJS }" title="OK">OK</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+         <!--Modal modalParaSupervisor en las Pretensiones-->
+         <aura:if isTrue="{!v.modalDevolverSupervisoresPre}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarDevolverSupervisoresPre }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver a supervisores</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Se enviarán todas las pretensiones al grupo de supervisores indique los comentarios a continuación.
+
+                        <lightning:inputRichText  aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarDevolverSupervisoresPre }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.devolverASupervisoresPreJS }" title="OK">OK</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!--Modal Devolver al propietario anterior Pretensión -->
+        <aura:if isTrue="{!v.modalParaPropietarioAnteriorPre}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarDevolverPropietarioAPre }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Devolver a propietario anterior</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <strong>¡Atención!</strong> Esta pretensión y sus hermanas se enviarán al propietario anterior, indique los comentarios a continuación.
+                        <br />
+                        <lightning:inputRichText aura:id="textoSupervisor" placeholder="Escriba aquí su comentario." />
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarDevolverPropietarioAPre }" title="Cancelar">Cancelar</lightning:button>
+                        <lightning:button class="slds-button slds-button_brand" onclick="{! c.devolverPropietarioAnteriorPreJS }" title="OK">OK</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+        <!-- Model para prorrogar-->
+        <aura:if isTrue="{!v.modalParaProrrogar}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box LWC header here -->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                            onclick="{! c.cerrarModalParaProrrogar }"
+                                            alternativeText="close"
+                                            variant="bare-inverse"
+                                            class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Prorrogar</h2>
+                    </header>
+                    <!-- Modal/Popup Box LWC body starts here -->
+                    <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                        <aura:if isTrue="{!v.caso.CC_Canal_Respuesta__c == 'SAC_CartaPostal'}">
+                            <c:SAC_EnvioComunicacionCartaPostal recordId="{!v.recordId}" nombreTitularEC="{!v.caso.SAC_NombreContacto__c}" cuerpoProrroga="{!v.cuerpo}" cartaPostalProrroga="{!v.cartaPostalProrroga}"
+                                modalParaProrrogar="{!v.modalParaProrrogar}"/>
+                            <aura:set attribute="else">
+                                <c:SAC_GestionEmails usarComponente="{!v.usarComponente}" procedencia="{!v.procedencia}" para="{!v.para}" copia="{!v.copia}" cuerpo="{!v.cuerpo}"
+                                    asunto="{!v.asunto}" caso="{!v.caso}" modalParaProrrogar="{!v.modalParaProrrogar}"/>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <!-- Modal/Popup Box LWC footer starts here -->
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_neutral" onclick="{! c.cerrarModalParaProrrogar }" title="Cancelar">Cancelar</lightning:button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+
+    <!-- <aura:if isTrue="{!v.isLoading}">
+        <div class="slds-backdrop slds-backdrop_open"  style="width: 100vw;  height: 100vh; left: calc(-50vw + 50%) !important;">
+            <lightning:spinner alternative-text="Cargando" size="large" variant="brand"></lightning:spinner>
+        </div>
+    </aura:if>-->
+
+    <!--Modal aviso revisar mccs-->
+    <aura:if isTrue="{!v.modalAvisomcc}">
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                        onclick="{! c.cerrarModalAvisoMcc }"
+                                        alternativeText="close"
+                                        variant="bare-inverse"
+                                        class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Revisión de MCCs</h2>
+                </header>
+                <!--Modal/Popup Box Body Starts here-->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p>Apreciado, por favor, revise la clasificación (MCC) de la pretensión una vez analizada la misma.
+                        En caso que no sea correcta subsane la clasificación.
+                        En caso de no hacerlo podría incurrir en una penalización a nivel de servicio. Gracias.</p>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button_brand" onclick="{! c.tomarPropiedadPretensiones }" title="OK">Aceptar</lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+    <aura:if isTrue="{!v.isLoading}">
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div align='left' class="slds-modal__content slds-var-p-around_medium">
+                    <div class="slds-form-element__control">
+                        <div align="center">
+                            <span class="slds-text-heading_small slds-truncate">
+                                <br/>
+                                Actualizando los datos... por favor espere.
+                            </span>
+                            <div class="caseHolder">
+                                <lightning:spinner alternativeText="Loading" size="medium" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+
+</aura:component>

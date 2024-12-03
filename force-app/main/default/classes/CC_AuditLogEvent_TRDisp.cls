@@ -1,0 +1,38 @@
+/**********************************************************************************************************************
+ Name:	  CBK_AuditLogEvent_TRDisp
+ Copyright © 2021  CaixaBank
+=======================================================================================================================
+Proposito: Clase Dispatcher del trigger del platform event CBK_AuditLogEvent__e del FW de auditoría para el escenario de registro asíncrono opcional.
+=======================================================================================================================
+Historial
+---------------------
+	VERSION		USER_STORY			AUTHOR				DATE				Description
+	1.0								Francisco Zaragoza	30/04/2021			Init version
+***********************************************************************************************************************/
+public with sharing class CC_AuditLogEvent_TRDisp extends CC_TriggerDispatcherBase {
+
+    private static Boolean isAfterInsertProcessing = false;  
+    private static String objectApiName = 'CBK_AuditLogEvent__e';
+
+    /**
+    * @description Metodo invocado en el after insert del trigger 
+    * @author   fzaragoza | 26/04/2021 
+    * @param    tp  Parametros del trigger (CC_TriggerParameters)
+    **/
+    public virtual override void afterInsert(CC_TriggerParameters tp) {
+        
+        if (!isAfterInsertProcessing) {           
+            isAfterInsertProcessing = true;
+            for (String handlerClassName : getAssociatedHandlers(objectApiName, 'afterInsert')) {
+                Type handlerClassType = Type.forName(handlerClassName);
+                execute((CC_ITriggerHandler)handlerClassType.newInstance(), tp, CC_TriggerParameters.TriggerEvent.afterInsert);
+            }
+            isAfterInsertProcessing = false;
+        }
+        else{
+            execute(null, tp, CC_TriggerParameters.TriggerEvent.afterInsert);
+        } 
+    }
+
+    
+}

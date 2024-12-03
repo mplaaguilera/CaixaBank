@@ -1,0 +1,31 @@
+<template>
+    <div class="contenedor slds-var-m-bottom_large slds-var-p-around_medium">
+        <div class="calendario">
+            <template lwc:if={diasSemana.length} for:each={diasSemana} for:item="diaSemana">
+                <div key={diaSemana.label} class="columnaDia">
+                    <div class="tituloDia slds-align_absolute-center">{diaSemana.label}</div>
+                    <template for:each={diaSemana.slots} for:item="slot">
+                        <div class={slot.classes} key={slot.hora} data-hora={slot.hora} data-dia={diaSemana.label} onclick={slotOnclick}>
+                            <span>{slot.hora}</span>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-top_small slds-var-p-horizontal_small">
+            <div class="slds-col">
+                <div class="divMensajeSeleccion ocultar">
+                    <lightning-icon icon-name="utility:event" size="x-small" class="iconoMensajeSeleccion"></lightning-icon>
+                    <span style="font-weight: 200;">Dia i hora seleccionats:&nbsp;</span>
+                    <span style="font-weight: 400;">{mensajeSeleccion}</span>
+                </div>
+            </div>
+            <div class="leyenda slds-col">
+                <lightning-icon icon-name="custom:custom12" size="x-small" class="iconoDisponible"></lightning-icon>
+                Disponible
+                <lightning-icon icon-name="custom:custom12" size="x-small" class="iconoNoDisponible slds-var-m-left_small"></lightning-icon>
+                No disponible
+            </div>
+        </div>
+    </div>
+</template>

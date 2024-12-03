@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>CSBD_Orden__c</columns>
+    <columns>CSBD_Excluir_Clientes_Limite__c</columns>
+    <columns>CSBD_Enviar_Correo_Auto__c</columns>
+    <columns>CSBD_Plantilla_Correo_Castellano__c</columns>
+    <columns>CSBD_Importe_Desde__c</columns>
+    <columns>CSBD_Importe_Hasta__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Records</label>
+</ListView>

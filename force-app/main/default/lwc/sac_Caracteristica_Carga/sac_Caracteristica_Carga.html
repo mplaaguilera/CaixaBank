@@ -1,0 +1,20 @@
+<template>
+    <center>
+        <div>
+            <p>
+                <lightning-file-upload
+                        name="fileUploader"
+                        accept=".txt"
+                        record-id={recordId}
+                        onuploadfinished={handleUploadFinished}>
+                </lightning-file-upload>
+            </p>
+        </div>
+    </center>
+    <br/>
+    <div style="float:right">
+        <lightning-button variant="brand" label="Aceptar" title="Aceptar" onclick={handleClickAceptar} disabled={acceptButtonDisabled}></lightning-button>
+        &nbsp;&nbsp;&nbsp;
+        <lightning-button variant="brand" label="Cancelar" title="Cancelar" onclick={handleClickCancelar} disabled={cancelButtonDisabled}></lightning-button>
+    </div>
+</template>

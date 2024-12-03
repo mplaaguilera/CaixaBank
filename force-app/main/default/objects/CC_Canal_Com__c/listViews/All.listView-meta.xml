@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All</fullName>
+    <columns>NAME</columns>
+    <columns>OWNER.LAST_NAME</columns>
+    <columns>CC_Clase_Com__c</columns>
+    <columns>CC_CuentaId__c</columns>
+    <columns>CC_ContactName__c</columns>
+    <columns>CC_Telefono__c</columns>
+    <columns>CC_TelefonoIDX__c</columns>
+    <columns>CC_Telefono_Correo_Formula__c</columns>
+    <columns>CC_Tipo_Com__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>Todos</label>
+</ListView>

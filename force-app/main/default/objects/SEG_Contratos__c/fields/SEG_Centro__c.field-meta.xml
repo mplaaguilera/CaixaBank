@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Centro__c</fullName>
+    <description>Centro del client escogido para cada uno de los contratos.</description>
+    <externalId>false</externalId>
+    <formula>SEG_NombreCuenta__r.AV_OficinaPrincipal__r.Name</formula>
+    <label>Centro</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

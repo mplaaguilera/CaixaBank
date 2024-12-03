@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_NotChangeOwner</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND($Permission.EV_NotChangeANYOwnerCampaign, PRIORVALUE(OwnerId)!=OwnerId)</errorConditionFormula>
+    <errorMessage>Error. No puede cambiar el propietario de una campaña.</errorMessage>
+</ValidationRule>

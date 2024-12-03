@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SEG_Empleados</fullName>
+    <columns>FULL_NAME</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>Account.CC_Numero_Oficina__c</columns>
+    <columns>CC_Num_Empleado__c</columns>
+    <columns>CONTACT.PHONE1</columns>
+    <columns>CONTACT.PHONE3</columns>
+    <columns>CONTACT.EMAIL</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CONTACT.RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>Contact.CC_Empleado</value>
+    </filters>
+    <label>Empleados SEG</label>
+    <sharedTo>
+        <roleAndSubordinates>SEG_Segmentos</roleAndSubordinates>
+    </sharedTo>
+</ListView>

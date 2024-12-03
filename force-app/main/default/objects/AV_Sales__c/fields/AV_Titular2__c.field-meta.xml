@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_Titular2__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Titular 2 de la venta</description>
+    <label>Titular 2 Venta</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Ventas (Titular 2 Venta)</relationshipLabel>
+    <relationshipName>Ventas2</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

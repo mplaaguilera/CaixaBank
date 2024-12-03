@@ -1,0 +1,28 @@
+<template>
+    <div class="slds-m-bottom_large" style="margin-top: 1rem;">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container" title="Servicios">
+                            <lightning-icon icon-name="standard:live_chat" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-card__header-link slds-truncate">Chats en cola</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <lightning-datatable class="slds-border_bottom slds-border_left slds-border_right slds-border_top"
+                data={skillReqListCount}
+                columns={mycolumnsCount}
+                key-field="id"
+                hide-checkbox-column="true">
+            </lightning-datatable>
+
+
+        </article>
+    </div>
+</template>

@@ -1,0 +1,41 @@
+.marginPagination {
+    margin-top:1em;
+}
+.marginPagination2 {
+    margin-top:-1em;
+}
+.boldRow {
+    font-weight: bold;
+}
+.color-yelow {
+    background-color: yellow;
+}
+.comboSize{
+    width: 70px;
+}
+
+/*.custom-border{
+
+    border: solid;
+    border-left: 20px;
+    border-right: 10px;
+    border-top: medium dashed green;
+    size: 0.5px;
+    border-style: outset;
+    border-color: grey;
+    margin-left: 30px;
+    padding-left: 40px;
+}*/
+
+.custom-border{
+
+    border: solid;
+    border-color: grey;
+}
+
+/* .slds-border_bottom{
+    border-top: 10px;
+    border-left: 30px;
+    border-right: 10px;
+    border-color: blue; 
+}*/

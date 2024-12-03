@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_NoContestar__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL(CC_Idioma__c, &quot;ca&quot;),
+&quot;Si us plau, no responguis aquest correu. Has estat enviat des d&apos;una bústia d&apos;emissió que no permet resposta.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;es&quot;),
+&quot;Por favor, no contestes este correo. Ha sido enviado desde un buzón de emisión que no permite respuesta.&quot;,
+
+IF(ISPICKVAL(CC_Idioma__c, &quot;en&quot;),
+&quot;Please does not reply this mail. It has been sent from a no-reply email address.&quot;,
+
+&quot;Por favor, no contestes este correo. Ha sido enviado desde un buzón de emisión que no permite respuesta.&quot;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>No contestar</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AM_Buzon_Carteras_Case</fullName>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <columns>NAME</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CASES.STATUS</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CC_Fecha_Ultima_Interaccion__c</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>OWNER_NAME</columns>
+    <columns>CASES.RECORDTYPE</columns>
+    <columns>AM_Caso_Origen_SNAD__c</columns>
+    <filterScope>Queue</filterScope>
+    <filters>
+        <field>AM_Caso_Origen_SNAD__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>notEqual</operation>
+        <value>Rechazado</value>
+    </filters>
+    <label>Pendientes Asignar Buzón Carteras</label>
+    <queue>AM_Buzon_Carteras</queue>
+    <sharedTo>
+        <group>AM_Buzon_Carteras</group>
+    </sharedTo>
+</ListView>

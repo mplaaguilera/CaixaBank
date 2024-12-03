@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Buzón Financiación Comex</label>
+    <protected>false</protected>
+    <values>
+        <field>OS_Canal_Procedencia__c</field>
+        <value xsi:type="xsd:string">Buzón Financiación Comex</value>
+    </values>
+    <values>
+        <field>OS_Cola_Procedencia__c</field>
+        <value xsi:type="xsd:string">OS_Financiacion_COMEX_Indra</value>
+    </values>
+    <values>
+        <field>OS_Correo__c</field>
+        <value xsi:type="xsd:string">operativacomex@comex.caixabankops.com</value>
+    </values>
+    <values>
+        <field>OS_Email__c</field>
+        <value xsi:type="xsd:string">financiacioncomex@1eac350o83lwnfsnjzui6swn2t3vdxxxi3cmezf4rhduapq4ym.1t-x4n6eaa.eu30.apex.salesforce.com</value>
+    </values>
+    <values>
+        <field>OS_Recordtype_Caso_Defecto__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

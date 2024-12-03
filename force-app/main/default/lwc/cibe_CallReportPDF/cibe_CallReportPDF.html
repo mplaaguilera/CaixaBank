@@ -1,0 +1,8 @@
+<template>
+    <div style="position: relative;">
+        <c-cibe_-P-D-F-Viewer label={label} visualforce-name={visualforceName} record-id={recordId} has-record-id="true" onsave={handleSave}></c-cibe_-P-D-F-Viewer>
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+    </div>
+</template>

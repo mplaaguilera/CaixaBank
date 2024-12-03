@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_NoGestionable__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Si el campo esta true la tarea es no gestionable, y si su valor es false la tarea es gestionable</description>
+    <label>No gestionable</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_TenenciaProducto__c</fullName>
+    <description>Valor de tenencia del PF</description>
+    <label>Situación Actual</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>1</fullName>
+                <default>false</default>
+                <label>No tiene Producto</label>
+            </value>
+            <value>
+                <fullName>2</fullName>
+                <default>false</default>
+                <label>Tiene Producto</label>
+            </value>
+            <value>
+                <fullName>3</fullName>
+                <default>false</default>
+                <label>Tuvo Producto</label>
+            </value>
+            <value>
+                <fullName>4</fullName>
+                <default>false</default>
+                <label>No interesado/a en el producto</label>
+            </value>
+            <value>
+                <fullName>11</fullName>
+                <default>false</default>
+                <label>No tiene + Info de otras entidades</label>
+            </value>
+            <value>
+                <fullName>12</fullName>
+                <default>false</default>
+                <label>Tiene + Info de otras entidades</label>
+            </value>
+            <value>
+                <fullName>13</fullName>
+                <default>false</default>
+                <label>Tuvo + Info en otras entidades</label>
+            </value>
+            <value>
+                <fullName>14</fullName>
+                <default>false</default>
+                <label>No apto + Info de otras entidades</label>
+            </value>
+            <value>
+                <fullName>AV_IcoTieneParcial</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Tiene y puede tener más producto/s</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,114 @@
+<template>
+    <details open class="formulario">
+        <summary><lightning-icon  size="x-small" icon-name="utility:chevronright"></lightning-icon> Cargas financieras del cliente</summary>
+    <div class="slds-grid slds-wrap">      
+        <div class="slds-size_2-of-2">
+        </br>
+            <table  class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="noBordes"></th>
+                        <th colspan="2" class="textCenter fondoAzul">CAIXABANK</th>
+                        <th colspan="2" class="textCenter">Otras Entidades</th>
+                    </tr>                
+                    <tr class="slds-line-height_reset">
+                        <th class="noBordes"></th>
+                        <th class="textoCentrado">Deuda total</th>
+                        <th class="textoCentrado">Cuota mensual</th>
+                        <th class="textoCentrado">Deuda total</th>
+                        <th class="textoCentrado">Cuota mensual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="slds-hint-parent">
+                    <td>Préstamos y créditos con garantía Real</td>
+                    <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamoRealCaixa} onchange={changeDeudaPrestamoRealCaixa}></lightning-input></div></td>
+                    <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaPrestamoRealCaixa} onchange={changeCuotaPrestamoRealCaixa}></lightning-input></div></td>
+                    <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamoRealNoCaixa} onchange={changeDeudaPrestamoRealNoCaixa}></lightning-input></div></td>
+                    <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaPrestamoRealNoCaixa} onchange={changeCuotaPrestamoRealNoCaixa}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <td>Préstamos y créditos con garantía Personal</td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamoPersonalCaixa} onchange={changeDeudaPrestamoPersonalCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaPrestamoPersonalCaixa} onchange={changeCuotaPrestamoPersonalCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamoPersonalNoCaixa} onchange={changeDeudaPrestamoPersonalNoCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaPrestamoPersonalNoCaixa} onchange={changeCuotaPrestamoPersonalNoCaixa}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <td>Tarjetas</td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaTarjetaCaixa} onchange={changeDeudaTarjetaCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaTarjetaCaixa} onchange={changeCuotaTarjetaCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaTarjetaNoCaixa} onchange={changeDeudaTarjetaNoCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaTarjetaNoCaixa} onchange={changeCuotaTarjetaNoCaixa}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <td>Operaciones con empresas del Grupo</td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOperacionesCaixa} onchange={changeDeudaOperacionesCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOperacionesCaixa} onchange={changeCuotaOperacionesCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOperacionesNoCaixa} onchange={changeDeudaOperacionesNoCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOperacionesNoCaixa} onchange={changeCuotaOperacionesNoCaixa}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <td>Otros</td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOtrosCaixa} onchange={changeDeudaOtrosCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOtrosCaixa} onchange={changeCuotaOtrosCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOtrosNoCaixa} onchange={changeDeudaOtrosNoCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOtrosNoCaixa} onchange={changeCuotaOtrosNoCaixa}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <th class="textoGrande negrita">Total</th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={totalDeudaCargasCaixa} onchange={changeTotalDeudaCargasCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={totalCuotaCargasCaixa} onchange={changeTotalCuotaCargasCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={totalDeudaCargasNoCaixa} onchange={changeTotalDeudaCargasNoCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={totalCuotaCargasNoCaixa} onchange={changeTotalCuotaCargasNoCaixa}></lightning-input></div></th>
+                    </tr>     
+                    <tr class="slds-hint-parent" style="height: 30px;" >
+                        <th class="sinBordeTop"> </th>
+                        <th class="sinBordeTop"><div class="slds-m-around_x-small noLabel"></div></th>
+                        <th class="sinBordeTop"><div class="slds-m-around_x-small noLabel"></div></th>
+                        <th class="sinBordeTop"><div class="slds-m-around_x-small noLabel"></div></th>
+                        <th class="sinBordeTop"><div class="slds-m-around_x-small noLabel"></div></th>
+                    </tr>             
+                    <tr class="slds-hint-parent">
+                        <td >Préstamo/s a cancelar/reducir</td>
+                        <td class=" tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamosCaixa} onchange={changeDeudaPrestamosCaixa}></lightning-input></div></td>
+                        <td class=" tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaPrestamosCaixa} onchange={changeCuotaPrestamosCaixa}></lightning-input></div></td>
+                        <td class=" tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaPrestamosNoCaixa} onchange={changeDeudaPrestamos}></lightning-input></div></td>
+                        <td class=" tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={CuotaPrestamosNoCaixa} onchange={changeCuotaPrestamos}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <td >Operación de refinanciación <div style="float: right;  padding-right: 10em; text-decoration: none;" class="negrita"><a href={calculadora} target="_blank" style="color: black;"><img src={calculadoraIcon} alt="Calculadora"><em style="padding: 10px;">Simulador</em></a></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOperacionRefCaixa} onchange={changeOperacionDeudaCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOperacionRefCaixa} onchange={changeOperacionCuotaCaixa}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaOperacionRefNoCaixa} onchange={changeDeudaOperacion}></lightning-input></div></td>
+                        <td class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaOperacionRefNoCaixa} onchange={changeCuotaOperacion}></lightning-input></div></td>
+                    </tr>
+                    <tr class="slds-hint-parent">
+                        <th class=""><p class="textoGrande negrita">Total Riesgo del cliente tras la refinanciación</p> </br><i>(Deuda total - Préstamo a cancelar + Operación de Refinanciación)</i></br> </th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaTotalRefCaixa} onchange={changeDeudaTotalRefCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaTotalRefCaixa} onchange={changeCuotaTotalRefCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={deudaTotalRefNoCaixa} onchange={changeDeudaTotalRefNoCaixa}></lightning-input></div></th>
+                        <th class="tdInputCentrado"><div class="slds-m-around_x-small noLabel"><lightning-input type="number" label="" formatter="currency" step=".01" value={cuotaTotalRefNoCaixa} onchange={changeCuotaTotalRefNoCaixa}></lightning-input></div></th>
+                    </tr>                    
+                </tbody>
+              </table>
+            </br>
+            </br>
+        </div>
+    
+        <div class="slds-size_1-of-2">
+            <div class="slds-m-around_x-small">
+                <lightning-textarea name="input1" label="Motivo de endeudamiento con terceros" value={otrosDatosCargas} onchange={changeOtrosDatosCargas}></lightning-textarea>
+            </div>
+        </div>         
+    </div>
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-size_2-of-2">
+            <div style="float: left;" class="slds-m-around_x-small">
+                <button class="slds-button slds-button_brand"  onclick={guardar}>Guardar</button>
+            </div>
+        </div>       
+    </div>
+    </details>  
+</template>

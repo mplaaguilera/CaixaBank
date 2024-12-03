@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AV_ProductoFicha__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>PF relacionado</description>
+    <label>Producto Ficha</label>
+    <referenceTo>Product2</referenceTo>
+    <relationshipLabel>ProductoFicha-Experiencia</relationshipLabel>
+    <relationshipName>ProductoFicha_Experiencia</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

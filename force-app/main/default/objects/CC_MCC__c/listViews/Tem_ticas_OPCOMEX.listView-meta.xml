@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tem_ticas_OPCOMEX</fullName>
+    <columns>CC_Codigo_Externo__c</columns>
+    <columns>NAME</columns>
+    <columns>OS_Buzon_Salida__c</columns>
+    <columns>CC_Activo__c</columns>
+    <columns>CC_Tipo_Cliente__c</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>OS_Horario__c</columns>
+    <columns>CBK_Traslado_Remitido__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CC_Tipo_Cliente__c</field>
+        <operation>equals</operation>
+        <value>Cliente (COPS),Empleado (COPS),Cliente (COPS)/Empleado (COPS)</value>
+    </filters>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>CC_MCC__c.CC_Tematica</value>
+    </filters>
+    <filters>
+        <field>OS_Departamento__c</field>
+        <operation>equals</operation>
+        <value>OPCOMEX</value>
+    </filters>
+    <label>Temáticas OPCOMEX</label>
+    <sharedTo>
+        <group>OS_OPERATIVA_COMEX</group>
+    </sharedTo>
+</ListView>

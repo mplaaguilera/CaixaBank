@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SAC_FechaRecepcion</fullName>
+    <active>true</active>
+    <description>No permite cambiar la fecha de recepción a una posterior a la fecha de creación de una reclamación</description>
+    <errorConditionFormula>AND(
+    AND(NOT($Permission.CBK_BypassValidationRules),
+        NOT($Permission.SAC_ByPass)
+    ),
+    (RecordType.DeveloperName == &apos;SAC_Reclamacion&apos; ||
+RecordType.DeveloperName == &apos;SAC_Consulta&apos; ||
+RecordType.DeveloperName == &apos;SAC_ConsultaSAC&apos;) &amp;&amp;
+    SAC_FechaRecepcion__c &gt; CreatedDate
+)</errorConditionFormula>
+    <errorMessage>La fecha de recepción no puede ser posterior a la fecha de creación.</errorMessage>
+</ValidationRule>

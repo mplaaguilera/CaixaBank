@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>50.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>CIBE Second New opportunity</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="fechaCierre" type="Date" label="Fecha Cierre" description="Fecha de Cierre" />
+            <property name="balance" type="Integer" label="balance" description="Balance"/>
+            <property name="comisiones" type="Integer" label="Comisiones" description="Comisiones" />
+            <property name="entidad" type="String" label="Entidad" description="Entidad" />
+            <property name="fechaVto" type="Date" label="Fecha VTO" description="Fecha VTO" />
+            <property name="precio" type="Integer" label="precio" description="Precio" />
+            <property name="margen" type="Integer" label="margen" description="Margen" />
+            <property name="AppDefinition" type="String" label="AppDefinition" description="AppDefinition"/>
+            <property name="divisa" type="String" label="divisa" description="Divisa"/>
+            <property name="productoid" type="String" label="productoid" description="Producto" />
+            <property name="exito" type="String" label="Probabilidad de Exito" description="Probabilidad de Exit" />
+            
+            <property name="importeSaldo" type="Integer" label="Importe(Saldo)" description="Importe(Saldo)" />
+            <property name="numeroUnidades" type="Integer" label="Numero Unidades" description="Numero Unidades" />
+            <property name="valor" type="Integer" label="valor" description="valor"/>
+            <property name="fechaProxGestion" type="Date" label="Fecha Proxima Gestión" description="Fecha Proxima Gestión" />
+            <property name="incluirCliente" type="Boolean" label="Incluir la oportunidad en Clientes priorizados" description="Incluir la oportunidad en Clientes priorizados" />
+
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

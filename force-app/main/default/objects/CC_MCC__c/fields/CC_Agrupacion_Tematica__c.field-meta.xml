@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CC_Agrupacion_Tematica__c</fullName>
+    <label>Agrupación Temática</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>A- OPERACIONES DE ACTIVO</fullName>
+                <default>false</default>
+                <label>A- OPERACIONES DE ACTIVO</label>
+            </value>
+            <value>
+                <fullName>B- OPERACIONES DE PASIVO</fullName>
+                <default>false</default>
+                <label>B- OPERACIONES DE PASIVO</label>
+            </value>
+            <value>
+                <fullName>C- INVERSIÓN</fullName>
+                <default>false</default>
+                <label>C- INVERSIÓN</label>
+            </value>
+            <value>
+                <fullName>D- SERVICIOS DE COBROS Y PAGOS</fullName>
+                <default>false</default>
+                <label>D- SERVICIOS DE COBROS Y PAGOS</label>
+            </value>
+            <value>
+                <fullName>E- CANALES</fullName>
+                <default>false</default>
+                <label>E- CANALES</label>
+            </value>
+            <value>
+                <fullName>F- SEGUROS Y PLANES DE PENSIONES</fullName>
+                <default>false</default>
+                <label>F- SEGUROS Y PLANES DE PENSIONES</label>
+            </value>
+            <value>
+                <fullName>G- PROGRAMAS, CONVENIOS Y COLECTIVOS</fullName>
+                <default>false</default>
+                <label>G- PROGRAMAS, CONVENIOS Y COLECTIVOS</label>
+            </value>
+            <value>
+                <fullName>H- OTROS SERVICIOS</fullName>
+                <default>false</default>
+                <label>H- OTROS SERVICIOS</label>
+            </value>
+            <value>
+                <fullName>I- HERRAMIENTAS DE GESTIÓN</fullName>
+                <default>false</default>
+                <label>I- HERRAMIENTAS DE GESTIÓN</label>
+            </value>
+            <value>
+                <fullName>J- SEGURIDAD OFICINAS Y CLIENTES</fullName>
+                <default>false</default>
+                <label>J- SEGURIDAD OFICINAS Y CLIENTES</label>
+            </value>
+            <value>
+                <fullName>K- COMERCIO EXTERIOR</fullName>
+                <default>false</default>
+                <label>K- COMERCIO EXTERIOR</label>
+            </value>
+            <value>
+                <fullName>L- EMPLEADOS</fullName>
+                <default>false</default>
+                <label>L- EMPLEADOS</label>
+            </value>
+            <value>
+                <fullName>M- PUESTO DE TRABAJO Y SMARTPHONES</fullName>
+                <default>false</default>
+                <label>M- PUESTO DE TRABAJO Y SMARTPHONES</label>
+            </value>
+            <value>
+                <fullName>N- HERRAMIENTAS PARA LA OFICINA</fullName>
+                <default>false</default>
+                <label>N- HERRAMIENTAS PARA LA OFICINA</label>
+            </value>
+            <value>
+                <fullName>O- CAMPAÑAS DE PRODUCTOS</fullName>
+                <default>false</default>
+                <label>O- CAMPAÑAS DE PRODUCTOS</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

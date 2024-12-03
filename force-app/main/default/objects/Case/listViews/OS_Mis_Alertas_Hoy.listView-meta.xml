@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OS_Mis_Alertas_Hoy</fullName>
+    <columns>OS_Alerta_Fecha__c</columns>
+    <columns>CASES.CASE_NUMBER</columns>
+    <columns>CASES.CREATED_DATE_DATE_ONLY</columns>
+    <columns>CASES.SUBJECT</columns>
+    <columns>CC_Canal_Procedencia__c</columns>
+    <columns>CC_MCC_Motivo__c</columns>
+    <columns>ACCOUNT.NAME</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>CASES.STATUS</field>
+        <operation>equals</operation>
+        <value>Pendiente Alerta</value>
+    </filters>
+    <filters>
+        <field>OS_Nuevo_Propietario_Es_Usuario_Actual__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>OS_Fecha_Alerta_Hoy__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <label>Mis alertas programadas para hoy</label>
+    <sharedTo>
+        <role>Contact_Center</role>
+    </sharedTo>
+</ListView>

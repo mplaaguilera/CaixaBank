@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CIBE_PDRating__c</fullName>
+    <externalId>false</externalId>
+    <formula>text( round(CIBE_RARPD__c, 3) ) + &apos; &apos; + CIBE_RatingPD__c</formula>
+    <label>PD rating</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

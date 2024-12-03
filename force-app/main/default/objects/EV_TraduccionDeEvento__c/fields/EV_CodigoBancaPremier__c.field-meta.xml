@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EV_CodigoBancaPremier__c</fullName>
+    <description>Campo codigo utilizado para eventos de tipo Festivales y otras experiencias</description>
+    <encryptionScheme>None</encryptionScheme>
+    <externalId>false</externalId>
+    <inlineHelpText>Si los campos para alguno de los segmentos fuesen vacios, se pintará el de Retail para el resto de clientes.</inlineHelpText>
+    <label>Código Banca Premier</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
